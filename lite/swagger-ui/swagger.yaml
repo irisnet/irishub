@@ -1447,169 +1447,309 @@ paths:
                     type: string
         '500':
           description: Server internel error
-  '/validator/validators/{name}':
+  '/coinswap/liquidities/{id}':
     get:
-      deprecated: true
-      summary: Get a validator information by name
+      summary: Query liquidity by id
       tags:
-        - Validator
-      produces:
-        - application/json
+        - CoinSwap
       parameters:
         - in: path
-          name: name
-          description: Validator name
+          name: id
+          description: the unique liquidity id of the token-iris pair
           required: true
-          type: string
-          x-example: v1
-      responses:
-        '200':
-          description: validator information on the blockchain
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-              moniker:
-                type: string
-              pubkey:
-                type: string
-              power:
-                type: integer
-              details:
-                type: string
-              jailed:
-                type: boolean
-              Operator:
-                type: string
-                description: bech32 encoded address
-                example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
-        '400':
-          description: Invalid request
-        '500':
-          description: Server internal error
-  /validator/validators:
-    get:
-      deprecated: true
-      summary: Get validator list
-      tags:
-        - Validator
-      produces:
-        - application/json
-      parameters:
-        - in: query
-          name: jailed
-          description: Query by validator status
-          type: boolean
-          x-example: true
-        - in: query
-          name: page
-          description: Page number
-          type: integer
-          x-example: 1
-        - in: query
-          name: limit
-          description: Maximum number of items per page
-          type: integer
-          x-example: 1
-      responses:
-        '200':
-          description: validator information on the blockchain
-          schema:
-            type: array
-            properties:
-              name:
-                type: string
-              moniker:
-                type: string
-              pubkey:
-                type: string
-              power:
-                type: integer
-              details:
-                type: string
-              jailed:
-                type: boolean
-              Operator:
-                type: string
-                description: bech32 encoded address
-                example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
-        '400':
-          description: Invalid request
-        '500':
-          description: Server internal error
-  /validator/parameters:
-    get:
-      deprecated: true
-      summary: Get the parameters information in validator module
-      tags:
-        - Validator
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: parameters information in validator module
-          schema:
-            properties:
-              historical_entries:
-                type: integer
-                example: 100
-        '400':
-          description: Invalid request
-        '500':
-          description: Server internal error
-  /supply/total:
-    get:
-      deprecated: true
-      summary: Total supply of coins in the chain
-      tags:
-        - Supply
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: object
-            properties:
-              total:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    denom:
-                      type: string
-                      example: point
-                    amount:
-                      type: string
-                      example: '50'
-        '500':
-          description: Internal Server Error
-  '/supply/total/{denomination}':
-    parameters:
-      - in: path
-        name: denomination
-        description: Coin denomination
-        required: true
-        type: string
-        x-example: uatom
-    get:
-      deprecated: true
-      summary: Total supply of a single coin denomination
-      tags:
-        - Supply
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: OK
           schema:
             type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  iris:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                        example: point
+                      amount:
+                        type: string
+                        example: '50'
+                  token:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                        example: point
+                      amount:
+                        type: string
+                        example: '50'
+                  liquidity:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                        example: point
+                      amount:
+                        type: string
+                        example: '50'
+                  fee:
+                    type: string
+                    example: '0.003'
         '400':
-          description: Invalid coin denomination
+          description: Invalid Liquidity Id
         '500':
           description: Internal Server Error
-  /token:
+  '/coinswap/liquidities/{id}/deposit':
+    post:
+      summary: >-
+        Add liquidity by exact iris amount, calculated token and liquidity
+        amount
+      tags:
+        - CoinSwap
+      parameters:
+        - in: path
+          name: id
+          description: the unique liquidity id of the token-iris pair
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  type: object
+                  properties:
+                    chain_id:
+                      type: string
+                      example: irishub-test
+                    gas:
+                      type: string
+                      example: '20000'
+                    fee:
+                      type: string
+                      example: 0.4iris
+                    memo:
+                      type: string
+                      example: memo
+                max_token:
+                  type: integer
+                  example: '10'
+                exact_iris_amt:
+                  type: integer
+                  example: '10000000000000000000'
+                min_liquidity:
+                  type: integer
+                  example: '10000000000000000000'
+                deadline:
+                  type: string
+                  example: 30s
+                sender:
+                  type: string
+                  description: bech32 encoded address
+                  example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+  '/coinswap/liquidities/{id}/withdraw':
+    post:
+      summary: >-
+        Remove liquidity by exact liquidity amount, calculated iris and token
+        amount
+      tags:
+        - CoinSwap
+      parameters:
+        - in: path
+          name: id
+          description: the unique liquidity id of the token-iris pair
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  type: object
+                  properties:
+                    chain_id:
+                      type: string
+                      example: irishub-test
+                    gas:
+                      type: string
+                      example: '20000'
+                    fee:
+                      type: string
+                      example: 0.4iris
+                    memo:
+                      type: string
+                      example: memo
+                min_token:
+                  type: integer
+                  example: '100'
+                min_iris_amt:
+                  type: integer
+                  example: '10000000000000000000'
+                withdraw_liquidity:
+                  type: integer
+                  example: '10000000000000000000'
+                deadline:
+                  type: string
+                  example: 30s
+                sender:
+                  type: string
+                  description: bech32 encoded address
+                  example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+  /coinswap/liquidities/buy:
+    post:
+      summary: 'Swap coin by exact output, calculated input'
+      tags:
+        - CoinSwap
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  type: object
+                  properties:
+                    chain_id:
+                      type: string
+                      example: irishub-test
+                    gas:
+                      type: string
+                      example: '20000'
+                    fee:
+                      type: string
+                      example: 0.4iris
+                    memo:
+                      type: string
+                      example: memo
+                input:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                      example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
+                    coin:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          example: point
+                        amount:
+                          type: string
+                          example: '50'
+                output:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                      example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
+                    coin:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          example: point
+                        amount:
+                          type: string
+                          example: '50'
+                deadline:
+                  type: string
+                  example: 30s
+  /coinswap/liquidities/sell:
+    post:
+      summary: 'Swap coin by exact input, calculated output'
+      tags:
+        - CoinSwap
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  type: object
+                  properties:
+                    chain_id:
+                      type: string
+                      example: irishub-test
+                    gas:
+                      type: string
+                      example: '20000'
+                    fee:
+                      type: string
+                      example: 0.4iris
+                    memo:
+                      type: string
+                      example: memo
+                input:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                      example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
+                    coin:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          example: point
+                        amount:
+                          type: string
+                          example: '50'
+                output:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                      example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
+                    coin:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          example: point
+                        amount:
+                          type: string
+                          example: '50'
+                deadline:
+                  type: string
+                  example: 30s
+  /token/tokens:
     post:
       deprecated: true
       summary: Issue a token
@@ -1742,6 +1882,182 @@ paths:
           description: Invalid parameters
         '500':
           description: Internal Server Error
+  /htlc/htlcs:
+    post:
+      summary: create an HTLC
+      tags:
+        - HTLC
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  type: object
+                  properties:
+                    chain_id:
+                      type: string
+                      example: irishub-test
+                    gas:
+                      type: string
+                      example: '20000'
+                    fee:
+                      type: string
+                      example: 0.4iris
+                    memo:
+                      type: string
+                      example: memo
+                sender:
+                  type: string
+                  description: bech32 encoded address
+                  example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+                to:
+                  type: string
+                  description: bech32 encoded address
+                  example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+                receiver_on_other_chain:
+                  type: string
+                  example: '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826'
+                hash_lock:
+                  type: string
+                  example: >-
+                    327a66212cbee3756816e617b38f9dfe327a66212cbee3756816e617b38f9dfe
+                amount:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                        example: point
+                      amount:
+                        type: string
+                        example: '50'
+                time_lock:
+                  type: integer
+                  example: '100'
+                timestamp:
+                  type: integer
+                  example: '1568011909'
+  '/htlc/htlcs/{hash-lock}':
+    get:
+      summary: query HTLC by hash-lock
+      tags:
+        - HTLC
+      parameters:
+        - in: path
+          name: hash-lock
+          description: the hash-lock of the HTLC
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+  '/htlc/htlcs/{hash-lock}/claim':
+    post:
+      summary: claim an opened HTLC
+      tags:
+        - HTLC
+      parameters:
+        - in: path
+          name: hash-lock
+          description: the hash-lock of the HTLC
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  type: object
+                  properties:
+                    chain_id:
+                      type: string
+                      example: irishub-test
+                    gas:
+                      type: string
+                      example: '20000'
+                    fee:
+                      type: string
+                      example: 0.4iris
+                    memo:
+                      type: string
+                      example: memo
+                sender:
+                  type: string
+                  description: bech32 encoded address
+                  example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+                secret:
+                  type: string
+                  example: >-
+                    5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f
+  '/htlc/htlcs/{hash-lock}/refund':
+    post:
+      summary: refund from an expired HTLC
+      tags:
+        - HTLC
+      parameters:
+        - in: path
+          name: hash-lock
+          description: the hash-lock of the HTLC
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  type: object
+                  properties:
+                    chain_id:
+                      type: string
+                      example: irishub-test
+                    gas:
+                      type: string
+                      example: '20000'
+                    fee:
+                      type: string
+                      example: 0.4iris
+                    memo:
+                      type: string
+                      example: memo
+                sender:
+                  type: string
+                  description: bech32 encoded address
+                  example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
   '/token/tokens/{symbol}':
     get:
       deprecated: true
@@ -2443,7 +2759,7 @@ paths:
           description: Invalid parameters
         '500':
           description: Internal Server Error
-  '/nft/nfts/collections/{denom}':
+  '/nft/collections/{denom}':
     get:
       deprecated: true
       summary: Query the NFT collection of the specified denom
@@ -2469,7 +2785,7 @@ paths:
           description: Invalid parameters
         '500':
           description: Internal Server Error
-  '/nft/nfts/owners/{address}':
+  '/nft/owners/{address}':
     get:
       deprecated: true
       summary: Query the collections of NFTs owned by an address
@@ -2517,7 +2833,7 @@ paths:
           description: Invalid parameters
         '500':
           description: Internal Server Error
-  /nft/nfts/denoms:
+  /nft/denoms:
     get:
       deprecated: true
       summary: Query all existing denoms
@@ -2536,7 +2852,7 @@ paths:
           description: Invalid parameters
         '500':
           description: Internal Server Error
-  '/nft/nfts/supplies/{denom}':
+  '/nft/collections/{denom}/supply':
     get:
       deprecated: true
       summary: Query the supply of NFTs of the specified denom
@@ -2558,6 +2874,467 @@ paths:
                 type: integer
         '400':
           description: Invalid parameters
+        '500':
+          description: Internal Server Error
+  '/oracle/feeds/{feed-name}':
+    put:
+      summary: Edit a feed
+      description: Send transaction to edit a feed
+      tags:
+        - Oracle
+      parameters:
+        - in: path
+          name: feed-name
+          description: feed name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid service binding deposit refund body
+        '500':
+          description: Internal Server Error
+    get:
+      summary: Query a feed definition
+      tags:
+        - Oracle
+      parameters:
+        - in: path
+          name: feed-name
+          description: feed name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feed-name:
+                    type: string
+                  description:
+                    type: string
+                  aggregate_func:
+                    type: string
+                  value_json_path:
+                    type: string
+                  latest_history:
+                    type: integer
+                  request_context_id:
+                    type: string
+                  creator:
+                    type: string
+                    description: bech32 encoded address
+                    example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+        '400':
+          description: Invalid symbol
+        '500':
+          description: Internal Server Error
+  /oracle/feeds:
+    post:
+      summary: Define a feed
+      tags:
+        - Oracle
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_req:
+                  type: object
+                  properties:
+                    from:
+                      type: string
+                      example: iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy
+                      description: Sender address or Keybase name to generate a transaction
+                    memo:
+                      type: string
+                      example: Sent via IRISHub
+                    chain_id:
+                      type: string
+                      example: IRISHub
+                    account_number:
+                      type: string
+                      example: '0'
+                    sequence:
+                      type: string
+                      example: '1'
+                    gas:
+                      type: string
+                      example: '200000'
+                    gas_adjustment:
+                      type: string
+                      example: '1.2'
+                    fees:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          denom:
+                            type: string
+                            example: point
+                          amount:
+                            type: string
+                            example: '50'
+                    simulate:
+                      type: boolean
+                      example: false
+                      description: >-
+                        Estimate gas for a transaction (cannot be used in
+                        conjunction with generate_only)
+                feed_name:
+                  type: string
+                aggregate_func:
+                  type: string
+                value_json_path:
+                  type: string
+                latest_history:
+                  type: string
+                description:
+                  type: string
+                creator:
+                  type: string
+                service_name:
+                  type: string
+                providers:
+                  type: array
+                  items:
+                    type: string
+                input:
+                  type: string
+                timeout:
+                  type: integer
+                service_fee_cap:
+                  type: string
+                repeated_frequency:
+                  type: integer
+                response_threshold:
+                  type: integer
+    get:
+      summary: Guery a feed list by condition
+      tags:
+        - Oracle
+      parameters:
+        - in: query
+          name: state
+          description: the state of '/oracle/feeds'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Internal Server Error
+  '/oracle/feeds/{feed-name}/values':
+    get:
+      summary: Guery a feed list by feedname
+      tags:
+        - Oracle
+      parameters:
+        - in: path
+          name: feed-name
+          description: the name of feeds
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Internal Server Error
+  '/oracle/feeds/{feed-name}/start':
+    post:
+      summary: Start a feed
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: feed-name
+          description: the name of feeds
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: ReadRESTReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                type: object
+                properties:
+                  from:
+                    type: string
+                    example: iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy
+                    description: Sender address or Keybase name to generate a transaction
+                  memo:
+                    type: string
+                    example: Sent via IRISHub
+                  chain_id:
+                    type: string
+                    example: IRISHub
+                  account_number:
+                    type: string
+                    example: '0'
+                  sequence:
+                    type: string
+                    example: '1'
+                  gas:
+                    type: string
+                    example: '200000'
+                  gas_adjustment:
+                    type: string
+                    example: '1.2'
+                  fees:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          example: point
+                        amount:
+                          type: string
+                          example: '50'
+                  simulate:
+                    type: boolean
+                    example: false
+                    description: >-
+                      Estimate gas for a transaction (cannot be used in
+                      conjunction with generate_only)
+              creator:
+                type: string
+                description: bech32 encoded address
+                example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+      tags:
+        - Oracle
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+  '/oracle/feeds/{feed-name}/pause':
+    post:
+      summary: Pause a feed
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: feed-name
+          description: the name of feeds
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: pauseFeedReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                type: object
+                properties:
+                  from:
+                    type: string
+                    example: iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy
+                    description: Sender address or Keybase name to generate a transaction
+                  memo:
+                    type: string
+                    example: Sent via IRISHub
+                  chain_id:
+                    type: string
+                    example: IRISHub
+                  account_number:
+                    type: string
+                    example: '0'
+                  sequence:
+                    type: string
+                    example: '1'
+                  gas:
+                    type: string
+                    example: '200000'
+                  gas_adjustment:
+                    type: string
+                    example: '1.2'
+                  fees:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          example: point
+                        amount:
+                          type: string
+                          example: '50'
+                  simulate:
+                    type: boolean
+                    example: false
+                    description: >-
+                      Estimate gas for a transaction (cannot be used in
+                      conjunction with generate_only)
+              creator:
+                type: string
+                description: bech32 encoded address
+                example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+      tags:
+        - Oracle
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+  /random/randoms:
+    post:
+      summary: Request a random number
+      tags:
+        - Random
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_req:
+                  type: object
+                  properties:
+                    from:
+                      type: string
+                      example: iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy
+                      description: Sender address or Keybase name to generate a transaction
+                    memo:
+                      type: string
+                      example: Sent via IRISHub
+                    chain_id:
+                      type: string
+                      example: IRISHub
+                    account_number:
+                      type: string
+                      example: '0'
+                    sequence:
+                      type: string
+                      example: '1'
+                    gas:
+                      type: string
+                      example: '200000'
+                    gas_adjustment:
+                      type: string
+                      example: '1.2'
+                    fees:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          denom:
+                            type: string
+                            example: point
+                          amount:
+                            type: string
+                            example: '50'
+                    simulate:
+                      type: boolean
+                      example: false
+                      description: >-
+                        Estimate gas for a transaction (cannot be used in
+                        conjunction with generate_only)
+                consumer:
+                  type: string
+                  description: bech32 encoded address
+                  example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+                block_interval:
+                  type: integer
+                  example: '10'
+  '/random/randoms/{request-id}':
+    get:
+      summary: Query a random number by the specified request id
+      tags:
+        - Random
+      parameters:
+        - in: path
+          name: request-id
+          description: the request id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request_tx_hash:
+                    type: string
+                  height:
+                    type: integer
+                  value:
+                    type: string
+        '400':
+          description: Invalid request id
+        '500':
+          description: Internal Server Error
+  /random/queue:
+    get:
+      summary: Query the pending requests with an optional height
+      tags:
+        - Random
+      parameters:
+        - in: query
+          name: height
+          description: the destination block height
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    height:
+                      type: integer
+                    consumer:
+                      type: string
+                      description: bech32 encoded address
+                      example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+                    tx_hash:
+                      type: string
+        '400':
+          description: Invalid height if provided
         '500':
           description: Internal Server Error
   /record/records:
@@ -29537,25 +30314,6 @@ definitions:
         type: string
       option:
         type: string
-  Validator:
-    type: object
-    properties:
-      name:
-        type: string
-      moniker:
-        type: string
-      pubkey:
-        type: string
-      power:
-        type: integer
-      details:
-        type: string
-      jailed:
-        type: boolean
-      Operator:
-        type: string
-        description: bech32 encoded address
-        example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
   PublicKey:
     type: object
     properties:
@@ -29577,20 +30335,74 @@ definitions:
         example: ''
       value:
         type: object
-  Supply:
+  CoinSwapLiquidity:
     type: object
     properties:
-      total:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-              example: point
-            amount:
-              type: string
-              example: '50'
+      iris:
+        type: object
+        properties:
+          denom:
+            type: string
+            example: point
+          amount:
+            type: string
+            example: '50'
+      token:
+        type: object
+        properties:
+          denom:
+            type: string
+            example: point
+          amount:
+            type: string
+            example: '50'
+      liquidity:
+        type: object
+        properties:
+          denom:
+            type: string
+            example: point
+          amount:
+            type: string
+            example: '50'
+      fee:
+        type: string
+        example: '0.003'
+  CoinSwapInputOutput:
+    type: object
+    properties:
+      address:
+        type: string
+        example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
+      coin:
+        type: object
+        properties:
+          denom:
+            type: string
+            example: point
+          amount:
+            type: string
+            example: '50'
+  Rand:
+    type: object
+    properties:
+      request_tx_hash:
+        type: string
+      height:
+        type: integer
+      value:
+        type: string
+  Request:
+    type: object
+    properties:
+      height:
+        type: integer
+      consumer:
+        type: string
+        description: bech32 encoded address
+        example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+      tx_hash:
+        type: string
   Token:
     type: object
     properties:
@@ -29854,6 +30666,40 @@ definitions:
             amount:
               type: string
               example: '50'
+  BaseTx:
+    type: object
+    properties:
+      chain_id:
+        type: string
+        example: irishub-test
+      gas:
+        type: string
+        example: '20000'
+      fee:
+        type: string
+        example: 0.4iris
+      memo:
+        type: string
+        example: memo
+  Feed:
+    type: object
+    properties:
+      feed-name:
+        type: string
+      description:
+        type: string
+      aggregate_func:
+        type: string
+      value_json_path:
+        type: string
+      latest_history:
+        type: integer
+      request_context_id:
+        type: string
+      creator:
+        type: string
+        description: bech32 encoded address
+        example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
   cosmos.auth.v1beta1.Params:
     type: object
     properties:
