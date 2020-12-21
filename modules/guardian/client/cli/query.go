@@ -43,7 +43,12 @@ func GetCmdQuerySupers() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			res, err := queryClient.Supers(context.Background(), &types.QuerySupersRequest{})
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			res, err := queryClient.Supers(context.Background(), &types.QuerySupersRequest{Pagination: pageReq})
 			if err != nil {
 				return err
 			}
@@ -52,5 +57,6 @@ func GetCmdQuerySupers() *cobra.Command {
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
+	flags.AddPaginationFlagsToCmd(cmd, "all supper")
 	return cmd
 }

@@ -2,20 +2,20 @@
 
 set -eo pipefail
 
-SDK_VERSION=v0.34.4-0.20201014023301-f172e47973d0
-IRISMOD_VERSION=v1.1.1-0.20201015064111-9d21ec6ad6fc
+SDK_VERSION=v0.40.0-rc3
+IRISMOD_VERSION=v1.1.1-0.20201215020504-ae6a23d4bec2
 WASMD_VERSION=v0.12.1
 WASMD_PROTO_DIR=x/wasm/internal/types
 
-chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/cosmos
-chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/ibc
+chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/cosmos
+chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/ibc
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/!cosm!wasm/wasmd@${WASMD_VERSION}/${WASMD_PROTO_DIR}
 
 mkdir -p ./proto/wasm
 
-cp -r ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/cosmos ./proto
-cp -r ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/ibc ./proto
+cp -r ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/cosmos ./proto
+cp -r ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/ibc ./proto
 cp -r ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto ./
 cp -r ${GOPATH}/pkg/mod/github.com/!cosm!wasm/wasmd@${WASMD_VERSION}/${WASMD_PROTO_DIR}/*.proto ./proto/wasm
 
