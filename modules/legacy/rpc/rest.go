@@ -14,4 +14,6 @@ func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 	r.HandleFunc("/blocks/{height}", BlockRequestHandlerFn(clientCtx)).Methods("GET")
 	r.HandleFunc("/validatorsets/latest", LatestValidatorSetRequestHandlerFn(clientCtx)).Methods("GET")
 	r.HandleFunc("/validatorsets/{height}", ValidatorSetRequestHandlerFn(clientCtx)).Methods("GET")
+	r.HandleFunc("/block-results/latest", LatestBlockResultRequestHandlerFn(clientCtx)).Methods("GET")
+	r.HandleFunc("/block-results/{height}", BlockResultRequestHandlerFn(clientCtx)).Methods("GET")
 }

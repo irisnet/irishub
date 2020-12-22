@@ -591,6 +591,189 @@ paths:
           description: Request block height doesn't
         '500':
           description: Server internal error
+  /block-results/latest:
+    get:
+      summary: Get the latest block result
+      tags:
+        - Tendermint RPC
+      responses:
+        '200':
+          description: The latest block result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Height:
+                    type: string
+                  results:
+                    type: object
+                    properties:
+                      deliver_tx:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                          data:
+                            type: string
+                          log:
+                            type: string
+                          info:
+                            type: string
+                          gas_wanted:
+                            type: string
+                          gas_used:
+                            type: string
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                value:
+                                  type: string
+                      end_block:
+                        type: object
+                        properties:
+                          validator_updates:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                pub_key:
+                                  type: string
+                                power:
+                                  type: string
+                          consensus_param_updates:
+                            type: object
+                            properties:
+                              blockSize:
+                                type: string
+                              evidence:
+                                type: string
+                              validator:
+                                type: string
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                value:
+                                  type: string
+                      begin_block:
+                        type: object
+                        properties:
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                value:
+                                  type: string
+        '500':
+          description: Server internal error
+  '/block-results/{height}':
+    get:
+      summary: Get a block result at a certain height
+      tags:
+        - Tendermint RPC
+      parameters:
+        - in: path
+          name: height
+          description: Block height
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: The block result at a specific height
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Height:
+                    type: string
+                  results:
+                    type: object
+                    properties:
+                      deliver_tx:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                          data:
+                            type: string
+                          log:
+                            type: string
+                          info:
+                            type: string
+                          gas_wanted:
+                            type: string
+                          gas_used:
+                            type: string
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                value:
+                                  type: string
+                      end_block:
+                        type: object
+                        properties:
+                          validator_updates:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                pub_key:
+                                  type: string
+                                power:
+                                  type: string
+                          consensus_param_updates:
+                            type: object
+                            properties:
+                              blockSize:
+                                type: string
+                              evidence:
+                                type: string
+                              validator:
+                                type: string
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                value:
+                                  type: string
+                      begin_block:
+                        type: object
+                        properties:
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                value:
+                                  type: string
+        '400':
+          description: Invalid height
+        '404':
+          description: Request block height doesn't
+        '500':
+          description: Server internal error
   /validatorsets/latest:
     get:
       summary: Get the latest validator set
@@ -30109,6 +30292,80 @@ definitions:
                       type: string
                       example: >-
                         7uTC74QlknqYWEwg7Vn6M8Om7FuZ0EO4bjvuj6rwH1mTUJrRuMMZvAAqT9VjNgP0RA/TDp6u/92AqrZfXJSpBQ==
+  BlockResultQuery:
+    type: object
+    properties:
+      Height:
+        type: string
+      results:
+        type: object
+        properties:
+          deliver_tx:
+            type: object
+            properties:
+              code:
+                type: string
+              data:
+                type: string
+              log:
+                type: string
+              info:
+                type: string
+              gas_wanted:
+                type: string
+              gas_used:
+                type: string
+              tags:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+          end_block:
+            type: object
+            properties:
+              validator_updates:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pub_key:
+                      type: string
+                    power:
+                      type: string
+              consensus_param_updates:
+                type: object
+                properties:
+                  blockSize:
+                    type: string
+                  evidence:
+                    type: string
+                  validator:
+                    type: string
+              tags:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+          begin_block:
+            type: object
+            properties:
+              tags:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
   DelegationDelegatorReward:
     type: object
     properties:
