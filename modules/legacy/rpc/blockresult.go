@@ -2,11 +2,11 @@ package rpc
 
 import (
 	"context"
-	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	"net/http"
 	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 	abci "github.com/tendermint/tendermint/abci/types"

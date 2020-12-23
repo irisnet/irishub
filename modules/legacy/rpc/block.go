@@ -2,16 +2,18 @@ package rpc
 
 import (
 	"context"
+	"net/http"
+	"strconv"
+	"sync"
+	"time"
+
 	"github.com/gorilla/mux"
+
 	"github.com/tendermint/tendermint/crypto"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	tmprotoversion "github.com/tendermint/tendermint/proto/tendermint/version"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"net/http"
-	"strconv"
-	"sync"
-	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/legacy"
