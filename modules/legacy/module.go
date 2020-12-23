@@ -17,8 +17,9 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
-	"github.com/irisnet/irishub/modules/legacy/rpc"
-	"github.com/irisnet/irishub/modules/legacy/tx"
+	"github.com/irisnet/irishub/modules/legacy/client/rest/bank"
+	"github.com/irisnet/irishub/modules/legacy/client/rest/rpc"
+	"github.com/irisnet/irishub/modules/legacy/client/rest/tx"
 	"github.com/irisnet/irishub/modules/legacy/types"
 )
 
@@ -56,6 +57,7 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, config client.TxE
 func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
 	rpc.RegisterRoutes(clientCtx, rtr)
 	tx.RegisterTxRoutes(clientCtx, rtr)
+	bank.RegisterRoutes(clientCtx, rtr)
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the bank module.
