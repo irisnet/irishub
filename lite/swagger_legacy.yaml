@@ -383,8 +383,9 @@ paths:
           description: The tx was malformated
         500:
           description: Server internal error
-  /v0.16.3/blocks/latest:
+  /legacy/blocks/latest:
     get:
+      deprecated: true
       summary: Get the latest block
       tags:
         - Legacy
@@ -397,8 +398,9 @@ paths:
             $ref: "#/definitions/BlockQuery"
         500:
           description: Server internal error
-  /v0.16.3/blocks/{height}:
+  /legacy/blocks/{height}:
     get:
+      deprecated: true
       summary: Get a block at a certain height
       tags:
         - Legacy
@@ -422,8 +424,9 @@ paths:
           description: Invalid height
         500:
           description: Server internal error
-  /v0.16.3/block-results/latest:
+  /legacy/block-results/latest:
     get:
+      deprecated: true
       summary: Get the latest block result
       tags:
         - Legacy
@@ -436,8 +439,9 @@ paths:
                 $ref: '#/definitions/BlockResultQuery'
         '500':
           description: Server internal error
-  /v0.16.3/block-results/{height}:
+  /legacy/block-results/{height}:
     get:
+      deprecated: true
       summary: Get a block result at a certain height
       tags:
         - Legacy
@@ -461,7 +465,7 @@ paths:
           description: Request block height doesn't
         '500':
           description: Server internal error
-  /v0.16.3/txs/{hash}:
+  /legacy/txs/{hash}:
     get:
       deprecated: true
       summary: Get a Tx by hash
@@ -484,7 +488,7 @@ paths:
             $ref: "#/definitions/TxQuery"
         500:
           description: Internal Server Error
-  /v0.16.3/txs:
+  /legacy/txs:
     get:
       deprecated: true
       tags:
@@ -533,6 +537,53 @@ paths:
           description: Invalid search events
         500:
           description: Internal Server Error
+  '/legacy/bank/accounts/{address}':
+    get:
+      deprecated: true
+      summary: Get the account information on blockchain
+      tags:
+        - Legacy
+      parameters:
+        - in: path
+          name: address
+          description: Account address
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account information on the blockchain
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  value:
+                    type: object
+                    properties:
+                      account_number:
+                        type: string
+                      address:
+                        type: string
+                      coins:
+                        type: array
+                        items:
+                          $ref: "#/definitions/Coin"
+                      public_key:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                          value:
+                            type: string
+                      sequence:
+                        type: string
+        '204':
+          description: No content about this account address
+        '500':
+          description: Server internel error
   /bank/balances/{address}:
     get:
       deprecated: true
