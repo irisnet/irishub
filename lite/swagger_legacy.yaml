@@ -32,7 +32,7 @@ tags:
   - name: Misc
     description: Query app version
   - name: Legacy
-    description: Legacy module APIs
+    description: Legacy APIs
 host: localhost:1317
 paths:
   /node_info:
