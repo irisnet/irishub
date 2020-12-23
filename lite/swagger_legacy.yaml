@@ -31,6 +31,8 @@ tags:
     description: Service module APIs
   - name: Misc
     description: Query app version
+  - name: Legacy
+    description: Legacy module APIs
 host: localhost:1317
 paths:
   /node_info:
@@ -161,45 +163,6 @@ paths:
         400:
           description: Invalid height
         500:
-          description: Server internal error
-  /block-results/latest:
-    get:
-      summary: Get the latest block result
-      tags:
-        - Tendermint RPC
-      responses:
-        '200':
-          description: The latest block result
-          content:
-            application/json:
-              schema:
-                $ref: '#/definitions/BlockResultQuery'
-        '500':
-          description: Server internal error
-  '/block-results/{height}':
-    get:
-      summary: Get a block result at a certain height
-      tags:
-        - Tendermint RPC
-      parameters:
-        - in: path
-          name: height
-          description: Block height
-          required: true
-          schema:
-            type: number
-      responses:
-        '200':
-          description: The block result at a specific height
-          content:
-            application/json:
-              schema:
-                $ref: '#/definitions/BlockResultQuery'
-        '400':
-          description: Invalid height
-        '404':
-          description: Request block height doesn't
-        '500':
           description: Server internal error
   /validatorsets/latest:
     get:
@@ -420,6 +383,156 @@ paths:
           description: The tx was malformated
         500:
           description: Server internal error
+  /v0.16.3/blocks/latest:
+    get:
+      summary: Get the latest block
+      tags:
+        - Legacy
+      produces:
+        - application/json
+      responses:
+        200:
+          description: The latest block
+          schema:
+            $ref: "#/definitions/BlockQuery"
+        500:
+          description: Server internal error
+  /v0.16.3/blocks/{height}:
+    get:
+      summary: Get a block at a certain height
+      tags:
+        - Legacy
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: height
+          description: Block height
+          required: true
+          type: number
+          x-example: 1
+      responses:
+        200:
+          description: The block at a specific height
+          schema:
+            $ref: "#/definitions/BlockQuery"
+        404:
+          description: Request block height doesn't
+        400:
+          description: Invalid height
+        500:
+          description: Server internal error
+  /v0.16.3/block-results/latest:
+    get:
+      summary: Get the latest block result
+      tags:
+        - Legacy
+      responses:
+        '200':
+          description: The latest block result
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/BlockResultQuery'
+        '500':
+          description: Server internal error
+  /v0.16.3/block-results/{height}:
+    get:
+      summary: Get a block result at a certain height
+      tags:
+        - Legacy
+      parameters:
+        - in: path
+          name: height
+          description: Block height
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: The block result at a specific height
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/BlockResultQuery'
+        '400':
+          description: Invalid height
+        '404':
+          description: Request block height doesn't
+        '500':
+          description: Server internal error
+  /v0.16.3/txs/{hash}:
+    get:
+      deprecated: true
+      summary: Get a Tx by hash
+      tags:
+        - Legacy
+      description: Retrieve a transaction using its hash.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: hash
+          description: Tx hash
+          required: true
+          type: string
+          x-example: BCBE20E8D46758B96AE5883B792858296AC06E51435490FBDCAE25A72B3CC76B
+      responses:
+        200:
+          description: Tx with the provided hash
+          schema:
+            $ref: "#/definitions/TxQuery"
+        500:
+          description: Internal Server Error
+  /v0.16.3/txs:
+    get:
+      deprecated: true
+      tags:
+        - Legacy
+      summary: Search transactions
+      description: Search transactions by events.
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: message.action
+          type: string
+          description: "transaction events such as 'message.action=send' which results in the following endpoint: 'GET /txs?message.action=send'. note that each module documents its own events. look for xx_events.md in the corresponding cosmos-sdk/docs/spec directory"
+          x-example: "send"
+        - in: query
+          name: message.sender
+          type: string
+          description: "transaction tags with sender: 'GET /txs?message.action=send&message.sender=iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf'"
+          x-example: "iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy"
+        - in: query
+          name: page
+          description: Page number
+          type: integer
+          x-example: 1
+        - in: query
+          name: limit
+          description: Maximum number of items per page
+          type: integer
+          x-example: 1
+        - in: query
+          name: tx.minheight
+          type: integer
+          description: "transactions on blocks with height greater or equal this value"
+          x-example: 25
+        - in: query
+          name: tx.maxheight
+          type: integer
+          description: "transactions on blocks with height less than or equal this value"
+          x-example: 800000
+      responses:
+        200:
+          description: All txs matching the provided events
+          schema:
+            $ref: "#/definitions/PaginatedQueryTxs"
+        400:
+          description: Invalid search events
+        500:
+          description: Internal Server Error
   /bank/balances/{address}:
     get:
       deprecated: true

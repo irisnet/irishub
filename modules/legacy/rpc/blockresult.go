@@ -1,25 +1,25 @@
 package rpc
 
 import (
+	"context"
 	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	"net/http"
 	"strconv"
-	"context"
 
-	"github.com/gorilla/mux"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/gorilla/mux"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 type ResponseDeliverTx struct {
-	Code      uint32                   `json:"code"`
-	Data      []byte                   `json:"data"`
-	Log       string                   `json:"log"`
-	Info      string                   `json:"info"`
-	GasWanted int64                    `json:"gas_wanted"`
-	GasUsed   int64                    `json:"gas_used"`
-	Tags      []ReadableTag              `json:"tags"`
+	Code      uint32        `json:"code"`
+	Data      []byte        `json:"data"`
+	Log       string        `json:"log"`
+	Info      string        `json:"info"`
+	GasWanted int64         `json:"gas_wanted"`
+	GasUsed   int64         `json:"gas_used"`
+	Tags      []ReadableTag `json:"tags"`
 }
 
 type ReadableTag struct {
@@ -28,9 +28,9 @@ type ReadableTag struct {
 }
 
 type ResponseEndBlock struct {
-	ValidatorUpdates      []abci.ValidatorUpdate   `json:"validator_updates"`
-	ConsensusParamUpdates *abci.ConsensusParams    `json:"consensus_param_updates"`
-	Tags                  []ReadableTag `json:"tags"`
+	ValidatorUpdates      []abci.ValidatorUpdate `json:"validator_updates"`
+	ConsensusParamUpdates *abci.ConsensusParams  `json:"consensus_param_updates"`
+	Tags                  []ReadableTag          `json:"tags"`
 }
 
 type ResponseBeginBlock struct {

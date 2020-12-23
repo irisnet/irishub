@@ -591,189 +591,6 @@ paths:
           description: Request block height doesn't
         '500':
           description: Server internal error
-  /block-results/latest:
-    get:
-      summary: Get the latest block result
-      tags:
-        - Tendermint RPC
-      responses:
-        '200':
-          description: The latest block result
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  Height:
-                    type: string
-                  results:
-                    type: object
-                    properties:
-                      deliver_tx:
-                        type: object
-                        properties:
-                          code:
-                            type: string
-                          data:
-                            type: string
-                          log:
-                            type: string
-                          info:
-                            type: string
-                          gas_wanted:
-                            type: string
-                          gas_used:
-                            type: string
-                          tags:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                key:
-                                  type: string
-                                value:
-                                  type: string
-                      end_block:
-                        type: object
-                        properties:
-                          validator_updates:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                pub_key:
-                                  type: string
-                                power:
-                                  type: string
-                          consensus_param_updates:
-                            type: object
-                            properties:
-                              blockSize:
-                                type: string
-                              evidence:
-                                type: string
-                              validator:
-                                type: string
-                          tags:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                key:
-                                  type: string
-                                value:
-                                  type: string
-                      begin_block:
-                        type: object
-                        properties:
-                          tags:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                key:
-                                  type: string
-                                value:
-                                  type: string
-        '500':
-          description: Server internal error
-  '/block-results/{height}':
-    get:
-      summary: Get a block result at a certain height
-      tags:
-        - Tendermint RPC
-      parameters:
-        - in: path
-          name: height
-          description: Block height
-          required: true
-          schema:
-            type: number
-      responses:
-        '200':
-          description: The block result at a specific height
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  Height:
-                    type: string
-                  results:
-                    type: object
-                    properties:
-                      deliver_tx:
-                        type: object
-                        properties:
-                          code:
-                            type: string
-                          data:
-                            type: string
-                          log:
-                            type: string
-                          info:
-                            type: string
-                          gas_wanted:
-                            type: string
-                          gas_used:
-                            type: string
-                          tags:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                key:
-                                  type: string
-                                value:
-                                  type: string
-                      end_block:
-                        type: object
-                        properties:
-                          validator_updates:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                pub_key:
-                                  type: string
-                                power:
-                                  type: string
-                          consensus_param_updates:
-                            type: object
-                            properties:
-                              blockSize:
-                                type: string
-                              evidence:
-                                type: string
-                              validator:
-                                type: string
-                          tags:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                key:
-                                  type: string
-                                value:
-                                  type: string
-                      begin_block:
-                        type: object
-                        properties:
-                          tags:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                key:
-                                  type: string
-                                value:
-                                  type: string
-        '400':
-          description: Invalid height
-        '404':
-          description: Request block height doesn't
-        '500':
-          description: Server internal error
   /validatorsets/latest:
     get:
       summary: Get the latest validator set
@@ -1416,6 +1233,934 @@ paths:
           description: The tx was malformated
         '500':
           description: Server internal error
+  /v0.16.3/blocks/latest:
+    get:
+      summary: Get the latest block
+      tags:
+        - Legacy
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: The latest block
+          schema:
+            type: object
+            properties:
+              block_meta:
+                type: object
+                properties:
+                  header:
+                    type: object
+                    properties:
+                      chain_id:
+                        type: string
+                        example: IRISHub
+                      height:
+                        type: number
+                        example: 1
+                      time:
+                        type: string
+                        example: '2017-12-30T05:53:09.287+01:00'
+                      num_txs:
+                        type: number
+                        example: 0
+                      last_block_id:
+                        type: object
+                        properties:
+                          hash:
+                            type: string
+                            example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                          parts:
+                            type: object
+                            properties:
+                              total:
+                                type: number
+                                example: 0
+                              hash:
+                                type: string
+                                example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      total_txs:
+                        type: number
+                        example: 35
+                      last_commit_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      data_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      validators_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      next_validators_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      consensus_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      app_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      last_results_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      evidence_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      proposer_address:
+                        type: string
+                        description: bech32 encoded address
+                        example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+                      version:
+                        type: object
+                        properties:
+                          block:
+                            type: string
+                            example: 10
+                          app:
+                            type: string
+                            example: 0
+                  block_id:
+                    type: object
+                    properties:
+                      hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      parts:
+                        type: object
+                        properties:
+                          total:
+                            type: number
+                            example: 0
+                          hash:
+                            type: string
+                            example: EE5F3404034C524501629B56E0DDC38FAD651F04
+              block:
+                type: object
+                properties:
+                  header:
+                    type: object
+                    properties:
+                      chain_id:
+                        type: string
+                        example: IRISHub
+                      height:
+                        type: number
+                        example: 1
+                      time:
+                        type: string
+                        example: '2017-12-30T05:53:09.287+01:00'
+                      num_txs:
+                        type: number
+                        example: 0
+                      last_block_id:
+                        type: object
+                        properties:
+                          hash:
+                            type: string
+                            example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                          parts:
+                            type: object
+                            properties:
+                              total:
+                                type: number
+                                example: 0
+                              hash:
+                                type: string
+                                example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      total_txs:
+                        type: number
+                        example: 35
+                      last_commit_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      data_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      validators_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      next_validators_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      consensus_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      app_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      last_results_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      evidence_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      proposer_address:
+                        type: string
+                        description: bech32 encoded address
+                        example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+                      version:
+                        type: object
+                        properties:
+                          block:
+                            type: string
+                            example: 10
+                          app:
+                            type: string
+                            example: 0
+                  txs:
+                    type: array
+                    items:
+                      type: string
+                  evidence:
+                    type: array
+                    items:
+                      type: string
+                  last_commit:
+                    type: object
+                    properties:
+                      block_id:
+                        type: object
+                        properties:
+                          hash:
+                            type: string
+                            example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                          parts:
+                            type: object
+                            properties:
+                              total:
+                                type: number
+                                example: 0
+                              hash:
+                                type: string
+                                example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      precommits:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            validator_address:
+                              type: string
+                            validator_index:
+                              type: string
+                              example: '0'
+                            height:
+                              type: string
+                              example: '0'
+                            round:
+                              type: string
+                              example: '0'
+                            timestamp:
+                              type: string
+                              example: '2017-12-30T05:53:09.287+01:00'
+                            type:
+                              type: number
+                              example: 2
+                            block_id:
+                              type: object
+                              properties:
+                                hash:
+                                  type: string
+                                  example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                                parts:
+                                  type: object
+                                  properties:
+                                    total:
+                                      type: number
+                                      example: 0
+                                    hash:
+                                      type: string
+                                      example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                            signature:
+                              type: string
+                              example: >-
+                                7uTC74QlknqYWEwg7Vn6M8Om7FuZ0EO4bjvuj6rwH1mTUJrRuMMZvAAqT9VjNgP0RA/TDp6u/92AqrZfXJSpBQ==
+        '500':
+          description: Server internal error
+  '/v0.16.3/blocks/{height}':
+    get:
+      summary: Get a block at a certain height
+      tags:
+        - Legacy
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: height
+          description: Block height
+          required: true
+          type: number
+          x-example: 1
+      responses:
+        '200':
+          description: The block at a specific height
+          schema:
+            type: object
+            properties:
+              block_meta:
+                type: object
+                properties:
+                  header:
+                    type: object
+                    properties:
+                      chain_id:
+                        type: string
+                        example: IRISHub
+                      height:
+                        type: number
+                        example: 1
+                      time:
+                        type: string
+                        example: '2017-12-30T05:53:09.287+01:00'
+                      num_txs:
+                        type: number
+                        example: 0
+                      last_block_id:
+                        type: object
+                        properties:
+                          hash:
+                            type: string
+                            example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                          parts:
+                            type: object
+                            properties:
+                              total:
+                                type: number
+                                example: 0
+                              hash:
+                                type: string
+                                example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      total_txs:
+                        type: number
+                        example: 35
+                      last_commit_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      data_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      validators_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      next_validators_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      consensus_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      app_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      last_results_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      evidence_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      proposer_address:
+                        type: string
+                        description: bech32 encoded address
+                        example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+                      version:
+                        type: object
+                        properties:
+                          block:
+                            type: string
+                            example: 10
+                          app:
+                            type: string
+                            example: 0
+                  block_id:
+                    type: object
+                    properties:
+                      hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      parts:
+                        type: object
+                        properties:
+                          total:
+                            type: number
+                            example: 0
+                          hash:
+                            type: string
+                            example: EE5F3404034C524501629B56E0DDC38FAD651F04
+              block:
+                type: object
+                properties:
+                  header:
+                    type: object
+                    properties:
+                      chain_id:
+                        type: string
+                        example: IRISHub
+                      height:
+                        type: number
+                        example: 1
+                      time:
+                        type: string
+                        example: '2017-12-30T05:53:09.287+01:00'
+                      num_txs:
+                        type: number
+                        example: 0
+                      last_block_id:
+                        type: object
+                        properties:
+                          hash:
+                            type: string
+                            example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                          parts:
+                            type: object
+                            properties:
+                              total:
+                                type: number
+                                example: 0
+                              hash:
+                                type: string
+                                example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      total_txs:
+                        type: number
+                        example: 35
+                      last_commit_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      data_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      validators_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      next_validators_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      consensus_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      app_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      last_results_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      evidence_hash:
+                        type: string
+                        example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      proposer_address:
+                        type: string
+                        description: bech32 encoded address
+                        example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+                      version:
+                        type: object
+                        properties:
+                          block:
+                            type: string
+                            example: 10
+                          app:
+                            type: string
+                            example: 0
+                  txs:
+                    type: array
+                    items:
+                      type: string
+                  evidence:
+                    type: array
+                    items:
+                      type: string
+                  last_commit:
+                    type: object
+                    properties:
+                      block_id:
+                        type: object
+                        properties:
+                          hash:
+                            type: string
+                            example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                          parts:
+                            type: object
+                            properties:
+                              total:
+                                type: number
+                                example: 0
+                              hash:
+                                type: string
+                                example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                      precommits:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            validator_address:
+                              type: string
+                            validator_index:
+                              type: string
+                              example: '0'
+                            height:
+                              type: string
+                              example: '0'
+                            round:
+                              type: string
+                              example: '0'
+                            timestamp:
+                              type: string
+                              example: '2017-12-30T05:53:09.287+01:00'
+                            type:
+                              type: number
+                              example: 2
+                            block_id:
+                              type: object
+                              properties:
+                                hash:
+                                  type: string
+                                  example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                                parts:
+                                  type: object
+                                  properties:
+                                    total:
+                                      type: number
+                                      example: 0
+                                    hash:
+                                      type: string
+                                      example: EE5F3404034C524501629B56E0DDC38FAD651F04
+                            signature:
+                              type: string
+                              example: >-
+                                7uTC74QlknqYWEwg7Vn6M8Om7FuZ0EO4bjvuj6rwH1mTUJrRuMMZvAAqT9VjNgP0RA/TDp6u/92AqrZfXJSpBQ==
+        '400':
+          description: Invalid height
+        '404':
+          description: Request block height doesn't
+        '500':
+          description: Server internal error
+  /v0.16.3/block-results/latest:
+    get:
+      summary: Get the latest block result
+      tags:
+        - Legacy
+      responses:
+        '200':
+          description: The latest block result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Height:
+                    type: string
+                  results:
+                    type: object
+                    properties:
+                      deliver_tx:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                          data:
+                            type: string
+                          log:
+                            type: string
+                          info:
+                            type: string
+                          gas_wanted:
+                            type: string
+                          gas_used:
+                            type: string
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                value:
+                                  type: string
+                      end_block:
+                        type: object
+                        properties:
+                          validator_updates:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                pub_key:
+                                  type: string
+                                power:
+                                  type: string
+                          consensus_param_updates:
+                            type: object
+                            properties:
+                              blockSize:
+                                type: string
+                              evidence:
+                                type: string
+                              validator:
+                                type: string
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                value:
+                                  type: string
+                      begin_block:
+                        type: object
+                        properties:
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                value:
+                                  type: string
+        '500':
+          description: Server internal error
+  '/v0.16.3/block-results/{height}':
+    get:
+      summary: Get a block result at a certain height
+      tags:
+        - Legacy
+      parameters:
+        - in: path
+          name: height
+          description: Block height
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: The block result at a specific height
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Height:
+                    type: string
+                  results:
+                    type: object
+                    properties:
+                      deliver_tx:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                          data:
+                            type: string
+                          log:
+                            type: string
+                          info:
+                            type: string
+                          gas_wanted:
+                            type: string
+                          gas_used:
+                            type: string
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                value:
+                                  type: string
+                      end_block:
+                        type: object
+                        properties:
+                          validator_updates:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                pub_key:
+                                  type: string
+                                power:
+                                  type: string
+                          consensus_param_updates:
+                            type: object
+                            properties:
+                              blockSize:
+                                type: string
+                              evidence:
+                                type: string
+                              validator:
+                                type: string
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                value:
+                                  type: string
+                      begin_block:
+                        type: object
+                        properties:
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                value:
+                                  type: string
+        '400':
+          description: Invalid height
+        '404':
+          description: Request block height doesn't
+        '500':
+          description: Server internal error
+  '/v0.16.3/txs/{hash}':
+    get:
+      deprecated: true
+      summary: Get a Tx by hash
+      tags:
+        - Legacy
+      description: Retrieve a transaction using its hash.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: hash
+          description: Tx hash
+          required: true
+          type: string
+          x-example: BCBE20E8D46758B96AE5883B792858296AC06E51435490FBDCAE25A72B3CC76B
+      responses:
+        '200':
+          description: Tx with the provided hash
+          schema:
+            type: object
+            properties:
+              hash:
+                type: string
+                example: >-
+                  D085138D913993919295FF4B0A9107F1F2CDE0D37A87CE0644E217CBF3B49656
+              height:
+                type: number
+                example: 368
+              tx:
+                type: object
+                properties:
+                  msg:
+                    type: array
+                    items:
+                      type: string
+                  fee:
+                    type: object
+                    properties:
+                      gas:
+                        type: string
+                      amount:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            denom:
+                              type: string
+                              example: point
+                            amount:
+                              type: string
+                              example: '50'
+                  memo:
+                    type: string
+                  signature:
+                    type: object
+                    properties:
+                      signature:
+                        type: string
+                        example: >-
+                          MEUCIQD02fsDPra8MtbRsyB1w7bqTM55Wu138zQbFcWx4+CFyAIge5WNPfKIuvzBZ69MyqHsqD8S1IwiEp+iUb6VSdtlpgY=
+                      pub_key:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            example: tendermint/PubKeySecp256k1
+                          value:
+                            type: string
+                            example: Avz04VhtKJh8ACCVzlI8aTosGy0ikFXKIVHQ3jKMrosH
+                      account_number:
+                        type: string
+                        example: '0'
+                      sequence:
+                        type: string
+                        example: '0'
+              result:
+                type: object
+                properties:
+                  log:
+                    type: string
+                  gas_wanted:
+                    type: string
+                    example: '200000'
+                  gas_used:
+                    type: string
+                    example: '26354'
+                  tags:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        value:
+                          type: string
+        '500':
+          description: Internal Server Error
+  /v0.16.3/txs:
+    get:
+      deprecated: true
+      tags:
+        - Legacy
+      summary: Search transactions
+      description: Search transactions by events.
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: message.action
+          type: string
+          description: >-
+            transaction events such as 'message.action=send' which results in
+            the following endpoint: 'GET /txs?message.action=send'. note that
+            each module documents its own events. look for xx_events.md in the
+            corresponding cosmos-sdk/docs/spec directory
+          x-example: send
+        - in: query
+          name: message.sender
+          type: string
+          description: >-
+            transaction tags with sender: 'GET
+            /txs?message.action=send&message.sender=iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf'
+          x-example: iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy
+        - in: query
+          name: page
+          description: Page number
+          type: integer
+          x-example: 1
+        - in: query
+          name: limit
+          description: Maximum number of items per page
+          type: integer
+          x-example: 1
+        - in: query
+          name: tx.minheight
+          type: integer
+          description: transactions on blocks with height greater or equal this value
+          x-example: 25
+        - in: query
+          name: tx.maxheight
+          type: integer
+          description: transactions on blocks with height less than or equal this value
+          x-example: 800000
+      responses:
+        '200':
+          description: All txs matching the provided events
+          schema:
+            type: object
+            properties:
+              total_count:
+                type: number
+                example: 1
+              count:
+                type: number
+                example: 1
+              page_number:
+                type: number
+                example: 1
+              page_total:
+                type: number
+                example: 1
+              limit:
+                type: number
+                example: 30
+              txs:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    hash:
+                      type: string
+                      example: >-
+                        D085138D913993919295FF4B0A9107F1F2CDE0D37A87CE0644E217CBF3B49656
+                    height:
+                      type: number
+                      example: 368
+                    tx:
+                      type: object
+                      properties:
+                        msg:
+                          type: array
+                          items:
+                            type: string
+                        fee:
+                          type: object
+                          properties:
+                            gas:
+                              type: string
+                            amount:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  denom:
+                                    type: string
+                                    example: point
+                                  amount:
+                                    type: string
+                                    example: '50'
+                        memo:
+                          type: string
+                        signature:
+                          type: object
+                          properties:
+                            signature:
+                              type: string
+                              example: >-
+                                MEUCIQD02fsDPra8MtbRsyB1w7bqTM55Wu138zQbFcWx4+CFyAIge5WNPfKIuvzBZ69MyqHsqD8S1IwiEp+iUb6VSdtlpgY=
+                            pub_key:
+                              type: object
+                              properties:
+                                type:
+                                  type: string
+                                  example: tendermint/PubKeySecp256k1
+                                value:
+                                  type: string
+                                  example: Avz04VhtKJh8ACCVzlI8aTosGy0ikFXKIVHQ3jKMrosH
+                            account_number:
+                              type: string
+                              example: '0'
+                            sequence:
+                              type: string
+                              example: '0'
+                    result:
+                      type: object
+                      properties:
+                        log:
+                          type: string
+                        gas_wanted:
+                          type: string
+                          example: '200000'
+                        gas_used:
+                          type: string
+                          example: '26354'
+                        tags:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              key:
+                                type: string
+                              value:
+                                type: string
+        '400':
+          description: Invalid search events
+        '500':
+          description: Internal Server Error
   '/bank/balances/{address}':
     get:
       deprecated: true

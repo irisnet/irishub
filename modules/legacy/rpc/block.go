@@ -2,56 +2,129 @@ package rpc
 
 import (
 	"context"
-	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/modules/legacy/types"
-	"github.com/spf13/cobra"
+	"github.com/tendermint/tendermint/crypto"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmprotoversion "github.com/tendermint/tendermint/proto/tendermint/version"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
+	tmtypes "github.com/tendermint/tendermint/types"
 	"net/http"
 	"strconv"
+	"sync"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 )
 
-//BlockCommand returns the verified block data for a given heights
-func BlockCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "block [height]",
-		Short: "Get verified data for a the block at given height",
-		Args:  cobra.MaximumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
+type Protocol uint64
+type Address = crypto.Address
+type SignedMsgType byte
 
-			var height *int64
+// Single block (with meta)
+type ResultBlock struct {
+	BlockMeta *BlockMeta `json:"block_meta"`
+	Block     *Block     `json:"block"`
+}
 
-			// optional height
-			if len(args) > 0 {
-				h, err := strconv.Atoi(args[0])
-				if err != nil {
-					return err
-				}
-				if h > 0 {
-					tmp := int64(h)
-					height = &tmp
-				}
-			}
+// Block defines the atomic unit of a Tendermint blockchain.
+type Block struct {
+	mtx          sync.Mutex
+	Header       `json:"header"`
+	tmtypes.Data `json:"data"`
+	Evidence     EvidenceData `json:"evidence"`
+	LastCommit   *Commit      `json:"last_commit"`
+}
 
-			output, err := getBlock(clientCtx, height)
-			if err != nil {
-				return err
-			}
+// BlockMeta contains meta information about a block - namely, it's ID and Header.
+type BlockMeta struct {
+	BlockID tmtypes.BlockID `json:"block_id"` // the block hash and partsethash
+	Header  Header          `json:"header"`   // The block's Header
+}
 
-			fmt.Println(string(output))
-			return nil
-		},
-	}
+// MaxDataBytesUnknownEvide
+// Header defines the structure of a Tendermint block header.
+// NOTE: changes to the Header should be duplicated in:
+// - header.Hash()
+// - abci.Header
+// - /docs/spec/blockchain/blockchain.md
+type Header struct {
+	// basic block info
+	Version  tmprotoversion.Consensus `json:"version"`
+	ChainID  string                   `json:"chain_id"`
+	Height   int64                    `json:"height"`
+	Time     time.Time                `json:"time"`
+	NumTxs   int64                    `json:"num_txs"`
+	TotalTxs int64                    `json:"total_txs"`
 
-	cmd.Flags().StringP(flags.FlagNode, "n", "tcp://localhost:26657", "Node to connect to")
+	// prev block info
+	LastBlockID tmtypes.BlockID `json:"last_block_id"`
 
-	return cmd
+	// hashes of block data
+	LastCommitHash tmbytes.HexBytes `json:"last_commit_hash"` // commit from validators from the last block
+	DataHash       tmbytes.HexBytes `json:"data_hash"`        // transactions
+
+	// hashes from the app output from the prev block
+	ValidatorsHash     tmbytes.HexBytes `json:"validators_hash"`      // validators for the current block
+	NextValidatorsHash tmbytes.HexBytes `json:"next_validators_hash"` // validators for the next block
+	ConsensusHash      tmbytes.HexBytes `json:"consensus_hash"`       // consensus params for current block
+	AppHash            tmbytes.HexBytes `json:"app_hash"`             // state after txs from the previous block
+	LastResultsHash    tmbytes.HexBytes `json:"last_results_hash"`    // root hash of all results from the txs from the previous block
+
+	// consensus info
+	EvidenceHash    tmbytes.HexBytes `json:"evidence_hash"`    // evidence included in the block
+	ProposerAddress Address          `json:"proposer_address"` // original proposer of the block
+}
+
+// Commit contains the evidence that a block was committed by a set of validators.
+// NOTE: Commit is empty for height 1, but never nil.
+type Commit struct {
+	// NOTE: The Precommits are in order of address to preserve the bonded ValidatorSet order.
+	// Any peer with a block can gossip precommits by index with a peer without recalculating the
+	// active ValidatorSet.
+	BlockID    tmtypes.BlockID `json:"block_id"`
+	Precommits []*Vote         `json:"precommits"`
+
+	// Volatile
+	firstPrecommit *Vote
+	hash           tmbytes.HexBytes
+	bitArray       *BitArray
+}
+
+type Vote struct {
+	Type             SignedMsgType   `json:"type"`
+	Height           int64           `json:"height"`
+	Round            int32           `json:"round"`
+	BlockID          tmtypes.BlockID `json:"block_id"` // zero if vote is nil.
+	Timestamp        time.Time       `json:"timestamp"`
+	ValidatorAddress Address         `json:"validator_address"`
+	ValidatorIndex   int             `json:"validator_index"`
+	Signature        []byte          `json:"signature"`
+}
+
+// BitArray is a thread-safe implementation of a bit array.
+type BitArray struct {
+	mtx   sync.Mutex
+	Bits  int      `json:"bits"`  // NOTE: persisted via reflect, must be exported
+	Elems []uint64 `json:"elems"` // NOTE: persisted via reflect, must be exported
+}
+
+// SignedHeader is a header along with the commits that prove it.
+// It is the basis of the lite client.
+type SignedHeader struct {
+	*Header `json:"header"`
+	Commit  *Commit `json:"commit"`
+}
+
+//-----------------------------------------------------------------------------
+
+// EvidenceData contains any evidence of malicious wrong-doing by validators
+type EvidenceData struct {
+	Evidence tmtypes.EvidenceList `json:"evidence"`
+
+	// Volatile
+	hash tmbytes.HexBytes
 }
 
 func getBlock(clientCtx client.Context, height *int64) ([]byte, error) {
@@ -74,10 +147,10 @@ func getBlock(clientCtx client.Context, height *int64) ([]byte, error) {
 	return legacy.Cdc.MarshalJSON(result)
 }
 
-func convertResultBlock(tmBlock *ctypes.ResultBlock) *types.ResultBlock{
-	precommits := make([]*types.Vote,len(tmBlock.Block.LastCommit.Signatures))
-	for k,v := range tmBlock.Block.LastCommit.Signatures{
-		precommits[k] = &types.Vote{
+func convertResultBlock(tmBlock *ctypes.ResultBlock) *ResultBlock {
+	precommits := make([]*Vote, len(tmBlock.Block.LastCommit.Signatures))
+	for k, v := range tmBlock.Block.LastCommit.Signatures {
+		precommits[k] = &Vote{
 			Type:             0x02,
 			Height:           tmBlock.Block.LastCommit.Height,
 			Round:            tmBlock.Block.LastCommit.Round,
@@ -88,7 +161,7 @@ func convertResultBlock(tmBlock *ctypes.ResultBlock) *types.ResultBlock{
 			Signature:        v.Signature,
 		}
 	}
-	header := types.Header{
+	header := Header{
 		Version:            tmBlock.Block.Version,
 		ChainID:            tmBlock.Block.ChainID,
 		Height:             tmBlock.Block.Height,
@@ -106,18 +179,18 @@ func convertResultBlock(tmBlock *ctypes.ResultBlock) *types.ResultBlock{
 		EvidenceHash:       tmBlock.Block.EvidenceHash,
 		ProposerAddress:    tmBlock.Block.ProposerAddress,
 	}
-	return &types.ResultBlock{
-		BlockMeta: &types.BlockMeta{
+	return &ResultBlock{
+		BlockMeta: &BlockMeta{
 			BlockID: tmBlock.BlockID,
 			Header:  header,
 		},
-		Block:     &types.Block{
-			Header:     header,
-			Data:       tmBlock.Block.Data,
-			Evidence:   types.EvidenceData{
+		Block: &Block{
+			Header: header,
+			Data:   tmBlock.Block.Data,
+			Evidence: EvidenceData{
 				Evidence: tmBlock.Block.Evidence.Evidence,
 			},
-			LastCommit: &types.Commit{
+			LastCommit: &Commit{
 				BlockID:    tmBlock.BlockID,
 				Precommits: precommits,
 			},
