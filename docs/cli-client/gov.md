@@ -186,7 +186,7 @@ Where proposal.json contains:
 {
     "title": "Community Pool Spend",
     "description": "Pay me some Atoms!",
-    "recipient": "cosmos1s5afhd6gxevu37mkqcvvsj8qeylhn0rz46zdlq",
+    "recipient": "iaa1mjk4p68mmulwla3x5uzlgjwsc3zrms448rel3q",
     "amount": "1000stake",
     "deposit": "1000stake"
 }
