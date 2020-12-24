@@ -225,33 +225,6 @@ func convertToStdTx(w http.ResponseWriter, clientCtx client.Context, txBytes []b
 	return stdTx, nil
 }
 
-//func GetTxCoinFlow(clientCtx client.Context, height *int64, hashStr string) ([]string, error) {
-//	// get the node
-//	node, err := clientCtx.GetNode()
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	res, err := node.BlockResults(context.Background(), height)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	var coinFlowTags []string
-//	endBlockTags := rpc.MakeTagsHumanReadable(res.EndBlockEvents)
-//	found := false
-//	for _, tag := range endBlockTags {
-//		if tag.Key == hashStr {
-//			coinFlowTags = append(coinFlowTags, tag.Value)
-//			found = true
-//		} else if found {
-//			//txHash coin flow records are centralized distributed
-//			break
-//		}
-//	}
-//	return coinFlowTags, nil
-//}
-
 func ConvertEventToTags(event sdk.StringEvent) []ReadableTag {
 	readableTags := make([]ReadableTag, len(event.Attributes))
 	for i, kv := range event.Attributes {
