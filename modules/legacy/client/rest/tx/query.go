@@ -32,14 +32,14 @@ type InfoCoinFlow struct {
 }
 
 type ResponseDeliverTx struct {
-	Code      uint32
-	Data      string
-	Log       string
-	Info      string
-	GasWanted int64
-	GasUsed   int64
-	Tags      []ReadableTag
-	Codespace string
+	Code                 uint32
+	Data                 string
+	Log                  string
+	Info                 string
+	GasWanted            int64
+	GasUsed              int64
+	Tags                 []ReadableTag
+	Codespace            string
 	XXX_NoUnkeyedLiteral struct{}
 	XXX_unrecognized     []byte
 	XXX_sizecache        int32
@@ -50,14 +50,13 @@ type ReadableTag struct {
 	Value string `json:"value"`
 }
 
-
 // SearchTxsResult defines a structure for querying txs pageable
 type SearchTxsResult struct {
-	TotalCount uint64 `json:"total_count"` // Count of all txs
-	Count      uint64 `json:"count"`       // Count of txs in current page
-	PageNumber uint64 `json:"page_number"` // Index of current page, start from 1
-	PageTotal  uint64 `json:"page_total"`  // Count of total pages
-	Size       uint64 `json:"size"`        // Max count txs per page
+	TotalCount uint64         `json:"total_count"` // Count of all txs
+	Count      uint64         `json:"count"`       // Count of txs in current page
+	PageNumber uint64         `json:"page_number"` // Index of current page, start from 1
+	PageTotal  uint64         `json:"page_total"`  // Count of total pages
+	Size       uint64         `json:"size"`        // Max count txs per page
 	Txs        []InfoCoinFlow `json:"txs"`         // List of txs in current page
 }
 
@@ -178,8 +177,8 @@ func packStdTxResponse(w http.ResponseWriter, clientCtx client.Context, txRes *s
 	if err != nil {
 		return nil, err
 	}
-	signatures := make([]types.StdSignature,len(stdTx.Signatures))
-	for k,v := range stdTx.Signatures{
+	signatures := make([]types.StdSignature, len(stdTx.Signatures))
+	for k, v := range stdTx.Signatures {
 		signatures[k].Signature = v.Signature
 		signatures[k].PubKey = v.PubKey
 	}

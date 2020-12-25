@@ -9,10 +9,10 @@ import (
 var _ sdk.Tx = (*StdTx)(nil)
 
 type StdTx struct {
-	Msgs       []sdk.Msg               `json:"msg"`
-	Fee        legacytx.StdFee         `json:"fee"`
-	Signatures []StdSignature `json:"signatures"`
-	Memo       string                  `json:"memo"`
+	Msgs       []sdk.Msg       `json:"msg"`
+	Fee        legacytx.StdFee `json:"fee"`
+	Signatures []StdSignature  `json:"signatures"`
+	Memo       string          `json:"memo"`
 }
 
 // GetMsgs returns the all the transaction's messages.

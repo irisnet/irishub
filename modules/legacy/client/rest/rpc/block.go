@@ -42,7 +42,7 @@ type Block struct {
 // BlockMeta contains meta information about a block - namely, it's ID and Header.
 type BlockMeta struct {
 	BlockID BlockID `json:"block_id"` // the block hash and partsethash
-	Header  Header          `json:"header"`   // The block's Header
+	Header  Header  `json:"header"`   // The block's Header
 }
 
 type BlockID struct {
@@ -51,7 +51,7 @@ type BlockID struct {
 }
 
 type PartSetHeader struct {
-	Total int          `json:"total"`
+	Total int              `json:"total"`
 	Hash  tmbytes.HexBytes `json:"hash"`
 }
 
@@ -96,7 +96,7 @@ type Commit struct {
 	// Any peer with a block can gossip precommits by index with a peer without recalculating the
 	// active ValidatorSet.
 	BlockID    BlockID `json:"block_id"`
-	Precommits []*Vote         `json:"precommits"`
+	Precommits []*Vote `json:"precommits"`
 
 	// Volatile
 	firstPrecommit *Vote
@@ -105,14 +105,14 @@ type Commit struct {
 }
 
 type Vote struct {
-	Type             SignedMsgType   `json:"type"`
-	Height           int64           `json:"height"`
-	Round            int32           `json:"round"`
-	BlockID          BlockID `json:"block_id"` // zero if vote is nil.
-	Timestamp        time.Time       `json:"timestamp"`
-	ValidatorAddress Address         `json:"validator_address"`
-	ValidatorIndex   int             `json:"validator_index"`
-	Signature        []byte          `json:"signature"`
+	Type             SignedMsgType `json:"type"`
+	Height           int64         `json:"height"`
+	Round            int32         `json:"round"`
+	BlockID          BlockID       `json:"block_id"` // zero if vote is nil.
+	Timestamp        time.Time     `json:"timestamp"`
+	ValidatorAddress Address       `json:"validator_address"`
+	ValidatorIndex   int           `json:"validator_index"`
+	Signature        []byte        `json:"signature"`
 }
 
 // BitArray is a thread-safe implementation of a bit array.
@@ -162,21 +162,21 @@ func getBlock(clientCtx client.Context, height *int64) ([]byte, error) {
 func convertResultBlock(tmBlock *ctypes.ResultBlock) *ResultBlock {
 	precommits := make([]*Vote, len(tmBlock.Block.LastCommit.Signatures))
 	lastCommitBlockID := BlockID{
-		Hash:          tmBlock.Block.LastCommit.BlockID.Hash,
+		Hash: tmBlock.Block.LastCommit.BlockID.Hash,
 		PartSetHeader: PartSetHeader{
 			Total: int(tmBlock.Block.LastCommit.BlockID.PartSetHeader.Total),
 			Hash:  tmBlock.Block.LastCommit.BlockID.PartSetHeader.Hash,
 		},
 	}
 	lastBlockID := BlockID{
-		Hash:          tmBlock.Block.LastBlockID.Hash,
+		Hash: tmBlock.Block.LastBlockID.Hash,
 		PartSetHeader: PartSetHeader{
 			Total: int(tmBlock.Block.LastBlockID.PartSetHeader.Total),
 			Hash:  tmBlock.Block.LastBlockID.PartSetHeader.Hash,
 		},
 	}
 	blockID := BlockID{
-		Hash:          tmBlock.BlockID.Hash,
+		Hash: tmBlock.BlockID.Hash,
 		PartSetHeader: PartSetHeader{
 			Total: int(tmBlock.BlockID.PartSetHeader.Total),
 			Hash:  tmBlock.BlockID.PartSetHeader.Hash,
