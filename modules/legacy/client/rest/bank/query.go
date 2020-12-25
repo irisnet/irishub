@@ -8,10 +8,11 @@ import (
 
 	"github.com/tendermint/tendermint/crypto"
 
+	"github.com/irisnet/irishub/modules/legacy/types"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
@@ -67,7 +68,7 @@ func QueryAccountRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		legacyAccount := BaseAccount{
+		legacyAccount := types.BaseAccount{
 			Address:       account.GetAddress(),
 			Coins:         balances.Balances,
 			PubKey:        account.GetPubKey(),
@@ -75,6 +76,6 @@ func QueryAccountRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
 			Sequence:      account.GetSequence(),
 		}
 
-		rest.PostProcessResponseBare(w, clientCtx, legacyAccount)
+		rest.PostProcessResponseBare(w, clientCtx, types.Account(legacyAccount))
 	}
 }

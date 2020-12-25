@@ -11,6 +11,8 @@ import (
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSend{}, "irishub/bank/Send", nil)
 	cdc.RegisterConcrete(StdTx{}, "irishub/bank/StdTx", nil)
+	cdc.RegisterConcrete(&BaseAccount{}, "irishub/bank/Account", nil)
+	cdc.RegisterInterface((*Account)(nil), nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
