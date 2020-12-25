@@ -7,7 +7,13 @@
     },
     "apis": [
         {
-            "url": "./lite/swagger_legacy.yaml",
+            "url": "./lite/cosmos_swagger_legacy.yaml",
+            "dereference": {
+                "circular": "ignore"
+            }
+        },
+        {
+            "url": "./lite/irishub_swagger_legacy.yaml",
             "dereference": {
                 "circular": "ignore"
             }
