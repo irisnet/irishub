@@ -8,15 +8,15 @@ iris export --home <old_node_home> --for-zero-height
 ```
 
 ### Step 2
-Use irishub v1.0.0 to migrate the exported genesis.json by Step 1
+Use irishub v1.0.0 to migrate the exported genesis.json
 ```
 iris migrate genesis.json --chain-id test > genesis_new.json
 ```
 
 ### Step 3
-Use irishub v1.0.0 to init new node
+Use irishub v1.0.0 to initialize the new node
 ```
-iris init
+iris init --home {$new_node_home}
 ```
 
 ### Step 4
