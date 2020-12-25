@@ -42,7 +42,6 @@ var (
 		appendFromArgs("distribution", "fund-community-pool", 0).
 		appendFromArgs("gov", "deposit", 1).
 		appendFromResponse("query", "account", "coins", filedTypeArray).
-		appendFromResponse("token", "params", "issue_token_base_fee", filedTypeMap).
 		appendFromResponse("gov", "params", "deposit_parmas.min_deposit", filedTypeArray)
 
 	rescueStdout = os.Stdout
