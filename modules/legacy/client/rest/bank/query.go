@@ -6,25 +6,13 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/tendermint/tendermint/crypto"
-
-	"github.com/irisnet/irishub/modules/legacy/types"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/irisnet/irishub/modules/legacy/types"
 )
-
-type BaseAccount struct {
-	Address       sdk.AccAddress `json:"address"`
-	Coins         sdk.Coins      `json:"coins"`
-	PubKey        crypto.PubKey  `json:"public_key"`
-	AccountNumber uint64         `json:"account_number"`
-	Sequence      uint64         `json:"sequence"`
-	MemoRegexp    string         `json:"memo_regexp"`
-}
 
 // QueryAccountRequestHandlerFn performs account information query
 func QueryAccountRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
@@ -76,6 +64,6 @@ func QueryAccountRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
 			Sequence:      account.GetSequence(),
 		}
 
-		rest.PostProcessResponseBare(w, clientCtx, types.Account(legacyAccount))
+		rest.PostProcessResponseBare(w, clientCtx, legacyAccount)
 	}
 }

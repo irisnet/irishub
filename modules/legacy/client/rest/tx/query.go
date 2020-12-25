@@ -8,8 +8,6 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/irisnet/irishub/modules/legacy/types"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	clienttx "github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -177,11 +175,6 @@ func packStdTxResponse(w http.ResponseWriter, clientCtx client.Context, txRes *s
 	if err != nil {
 		return nil, err
 	}
-	signatures := make([]types.StdSignature, len(stdTx.Signatures))
-	for k, v := range stdTx.Signatures {
-		signatures[k].Signature = v.Signature
-		signatures[k].PubKey = v.PubKey
-	}
 	result := ResponseDeliverTx{
 		Code:      txRes.Code,
 		Data:      txRes.Data,
@@ -193,14 +186,9 @@ func packStdTxResponse(w http.ResponseWriter, clientCtx client.Context, txRes *s
 		Codespace: txRes.Codespace,
 	}
 	return &InfoCoinFlow{
-		Hash:   txRes.TxHash,
-		Height: txRes.Height,
-		Tx: types.StdTx{
-			Msgs:       stdTx.Msgs,
-			Fee:        stdTx.Fee,
-			Signatures: signatures,
-			Memo:       stdTx.Memo,
-		},
+		Hash:      txRes.TxHash,
+		Height:    txRes.Height,
+		Tx:        stdTx,
 		Result:    result,
 		Timestamp: txRes.Timestamp,
 	}, nil
