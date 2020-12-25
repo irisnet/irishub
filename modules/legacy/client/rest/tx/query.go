@@ -8,6 +8,8 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"github.com/irisnet/irishub/modules/legacy/types"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	clienttx "github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,12 +22,13 @@ import (
 )
 
 // Info is used to prepare info to display
-type Info struct {
+type InfoCoinFlow struct {
 	Hash      string            `json:"hash"`
 	Height    int64             `json:"height"`
-	Tx        StdTx             `json:"tx"`
+	Tx        sdk.Tx            `json:"tx"`
 	Result    ResponseDeliverTx `json:"result"`
 	Timestamp string            `json:"timestamp,omitempty"`
+	CoinFlow  []string          `json:"coin_flow"`
 }
 
 type ResponseDeliverTx struct {
@@ -37,6 +40,9 @@ type ResponseDeliverTx struct {
 	GasUsed   int64
 	Tags      []ReadableTag
 	Codespace string
+	XXX_NoUnkeyedLiteral struct{}
+	XXX_unrecognized     []byte
+	XXX_sizecache        int32
 }
 
 type ReadableTag struct {
@@ -44,12 +50,6 @@ type ReadableTag struct {
 	Value string `json:"value"`
 }
 
-type StdTx struct {
-	Msgs       []sdk.Msg               `json:"msg"`
-	Fee        legacytx.StdFee         `json:"fee"`
-	Signatures []legacytx.StdSignature `json:"signatures"`
-	Memo       string                  `json:"memo"`
-}
 
 // SearchTxsResult defines a structure for querying txs pageable
 type SearchTxsResult struct {
@@ -58,7 +58,7 @@ type SearchTxsResult struct {
 	PageNumber uint64 `json:"page_number"` // Index of current page, start from 1
 	PageTotal  uint64 `json:"page_total"`  // Count of total pages
 	Size       uint64 `json:"size"`        // Max count txs per page
-	Txs        []Info `json:"txs"`         // List of txs in current page
+	Txs        []InfoCoinFlow `json:"txs"`         // List of txs in current page
 }
 
 // QueryTxsRequestHandlerFn implements a REST handler that searches for transactions.
@@ -110,7 +110,7 @@ func QueryTxsRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		txsResult := make([]Info, len(searchResult.Txs))
+		txsResult := make([]InfoCoinFlow, len(searchResult.Txs))
 		for k, txRes := range searchResult.Txs {
 			txResult, err := packStdTxResponse(w, clientCtx, txRes)
 			if err != nil {
@@ -170,13 +170,18 @@ func QueryTxRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
 // packStdTxResponse takes a sdk.TxResponse, converts the Tx into a StdTx, and
 // packs the StdTx again into the sdk.TxResponse Any. Amino then takes care of
 // seamlessly JSON-outputting the Any.
-func packStdTxResponse(w http.ResponseWriter, clientCtx client.Context, txRes *sdk.TxResponse) (*Info, error) {
+func packStdTxResponse(w http.ResponseWriter, clientCtx client.Context, txRes *sdk.TxResponse) (*InfoCoinFlow, error) {
 	// We just unmarshalled from Tendermint, we take the proto Tx's raw
 	// bytes, and convert them into a StdTx to be displayed.
 	txBytes := txRes.Tx.Value
 	stdTx, err := convertToStdTx(w, clientCtx, txBytes)
 	if err != nil {
 		return nil, err
+	}
+	signatures := make([]types.StdSignature,len(stdTx.Signatures))
+	for k,v := range stdTx.Signatures{
+		signatures[k].Signature = v.Signature
+		signatures[k].PubKey = v.PubKey
 	}
 	result := ResponseDeliverTx{
 		Code:      txRes.Code,
@@ -188,13 +193,13 @@ func packStdTxResponse(w http.ResponseWriter, clientCtx client.Context, txRes *s
 		Tags:      ConvertLogsToTags(txRes.Logs),
 		Codespace: txRes.Codespace,
 	}
-	return &Info{
+	return &InfoCoinFlow{
 		Hash:   txRes.TxHash,
 		Height: txRes.Height,
-		Tx: StdTx{
+		Tx: types.StdTx{
 			Msgs:       stdTx.Msgs,
 			Fee:        stdTx.Fee,
-			Signatures: stdTx.Signatures,
+			Signatures: signatures,
 			Memo:       stdTx.Memo,
 		},
 		Result:    result,
