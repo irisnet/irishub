@@ -10,11 +10,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -31,7 +34,7 @@ import (
 
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/migrate/v0_16"
-	"github.com/irisnet/irishub/migrate/v0_16/stake"
+	"github.com/irisnet/irishub/migrate/v0_16/auth"
 	"github.com/irisnet/irishub/migrate/v0_16/types"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
@@ -145,12 +148,12 @@ func Migrate(cdc codec.JSONMarshaler, initialState v0_16.GenesisFileState) (appS
 	// sdk modules
 	// ------------------------------------------------------------
 	stakingGenesis, bondedTokens := migrateStaking(initialState)
-	authGenesisState, bankGenesisState := migrateAuth(initialState, bondedTokens)
+	authGenesisState, bankGenesisState, communityTax := migrateAuth(initialState, bondedTokens)
 	appState[stakingtypes.ModuleName] = cdc.MustMarshalJSON(stakingGenesis)
 	appState[authtypes.ModuleName] = cdc.MustMarshalJSON(&authGenesisState)
 	appState[banktypes.ModuleName] = cdc.MustMarshalJSON(&bankGenesisState)
 	appState[slashingtypes.ModuleName] = cdc.MustMarshalJSON(migrateSlashing(initialState))
-	appState[distributiontypes.ModuleName] = cdc.MustMarshalJSON(migrateDistribution(initialState))
+	appState[distributiontypes.ModuleName] = cdc.MustMarshalJSON(migrateDistribution(initialState, communityTax))
 	appState[govtypes.ModuleName] = cdc.MustMarshalJSON(migrateGov(initialState))
 
 	// ------------------------------------------------------------
@@ -167,25 +170,46 @@ func Migrate(cdc codec.JSONMarshaler, initialState v0_16.GenesisFileState) (appS
 
 }
 
-func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens sdk.Coins) (authtypes.GenesisState, banktypes.GenesisState) {
+func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens sdk.Coins) (authtypes.GenesisState, banktypes.GenesisState, sdk.Coins) {
 	params := authtypes.DefaultParams()
 	var accounts authtypes.GenesisAccounts
 	var balances []banktypes.Balance
+	var communityTax sdk.Coins
 	for _, acc := range initialState.Accounts {
 		var coins sdk.Coins
 		for _, c := range acc.Coins {
-			coins = append(coins, convertCoinStr(c))
+			coin, add := convertCoinStr(c)
+			if add {
+				coins = append(coins, coin)
+			}
 		}
+		var account authtypes.GenesisAccount
 		baseAccount := authtypes.NewBaseAccount(acc.Address, nil, acc.AccountNumber, acc.Sequence)
-		accounts = append(accounts, baseAccount)
-		balances = append(balances, banktypes.Balance{Address: acc.Address, Coins: coins})
+
+		switch acc.Address.String() {
+		case auth.ServiceDepositCoinsAccAddr.String():
+			baseAccount.Address = authtypes.NewModuleAddress(servicetypes.DepositAccName).String()
+			account = authtypes.NewModuleAccount(baseAccount, servicetypes.DepositAccName, authtypes.Burner)
+		case auth.ServiceRequestCoinsAccAddr.String():
+			baseAccount.Address = authtypes.NewModuleAddress(servicetypes.RequestAccName).String()
+			account = authtypes.NewModuleAccount(baseAccount, servicetypes.RequestAccName)
+		case auth.CommunityTaxCoinsAccAddr.String():
+			communityTax = coins
+			account = baseAccount
+		default:
+			account = baseAccount
+		}
+		accounts = append(accounts, account)
+		coins = sdk.NewCoins(coins...)
+		balances = append(balances, banktypes.Balance{Address: acc.Address.String(), Coins: coins})
+
 	}
 	bondedPoolAddress := authtypes.NewModuleAddress(stakingtypes.BondedPoolName)
 	accounts = append(accounts, authtypes.NewModuleAccount(
 		authtypes.NewBaseAccount(bondedPoolAddress, nil, uint64(len(initialState.Accounts)), 0),
 		stakingtypes.BondedPoolName, authtypes.Burner, authtypes.Staking),
 	)
-	balances = append(balances, banktypes.Balance{Address: bondedPoolAddress, Coins: bondedTokens})
+	balances = append(balances, banktypes.Balance{Address: bondedPoolAddress.String(), Coins: bondedTokens})
 
 	authGenesisState := authtypes.NewGenesisState(
 		params, accounts,
@@ -196,7 +220,7 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens sdk.Coins) (a
 		Balances: balances,
 	}
 
-	return *authGenesisState, bankGenesisState
+	return *authGenesisState, bankGenesisState, communityTax
 }
 
 func migrateStaking(initialState v0_16.GenesisFileState) (*stakingtypes.GenesisState, sdk.Coins) {
@@ -214,30 +238,28 @@ func migrateStaking(initialState v0_16.GenesisFileState) (*stakingtypes.GenesisS
 		lastValidatorPowers = append(
 			lastValidatorPowers,
 			stakingtypes.LastValidatorPower{
-				Address: lvp.Address,
+				Address: lvp.Address.String(),
 				Power:   lvp.Power.Quo(Precision).Int64(),
 			},
 		)
 	}
 	var validators stakingtypes.Validators
 	for _, v := range initialState.StakeData.Validators {
-		var status sdk.BondStatus
-		switch stake.BondStatusToString(v.Status) {
-		case sdk.BondStatusBonded:
-			status = sdk.Bonded
-		case sdk.BondStatusUnbonding:
-			status = sdk.Unbonding
-		case sdk.BondStatusUnbonded:
-			status = sdk.Unbonded
-		default:
-			panic("unknown bond status")
-		}
+		status := stakingtypes.BondStatus(int32(v.Status) + 1)
 		bondedToken := v.Tokens.TruncateInt().Quo(Precision)
+		consPubKey, err := ed25519.FromTmEd25519(v.ConsPubKey)
+		if err != nil {
+			panic(err)
+		}
+		pkAny, err := codectypes.PackAny(consPubKey)
+		if err != nil {
+			panic(err)
+		}
 		validators = append(
 			validators,
 			stakingtypes.Validator{
-				OperatorAddress: v.OperatorAddr,
-				ConsensusPubkey: sdk.MustBech32ifyPubKey(sdk.Bech32PubKeyTypeConsPub, v.ConsPubKey),
+				OperatorAddress: v.OperatorAddr.String(),
+				ConsensusPubkey: pkAny,
 				Jailed:          v.Jailed,
 				Status:          status,
 				Tokens:          bondedToken,
@@ -269,8 +291,8 @@ func migrateStaking(initialState v0_16.GenesisFileState) (*stakingtypes.GenesisS
 		delegations = append(
 			delegations,
 			stakingtypes.Delegation{
-				DelegatorAddress: b.DelegatorAddr,
-				ValidatorAddress: b.ValidatorAddr,
+				DelegatorAddress: b.DelegatorAddr.String(),
+				ValidatorAddress: b.ValidatorAddr.String(),
 				Shares:           b.Shares.Quo(sdk.NewDecFromInt(Precision)),
 			},
 		)
@@ -280,8 +302,8 @@ func migrateStaking(initialState v0_16.GenesisFileState) (*stakingtypes.GenesisS
 		unbondingDelegations = append(
 			unbondingDelegations,
 			stakingtypes.UnbondingDelegation{
-				DelegatorAddress: b.DelegatorAddr,
-				ValidatorAddress: b.ValidatorAddr,
+				DelegatorAddress: b.DelegatorAddr.String(),
+				ValidatorAddress: b.ValidatorAddr.String(),
 				Entries: []stakingtypes.UnbondingDelegationEntry{
 					{
 						CreationHeight: b.CreationHeight,
@@ -298,9 +320,9 @@ func migrateStaking(initialState v0_16.GenesisFileState) (*stakingtypes.GenesisS
 		redelegations = append(
 			redelegations,
 			stakingtypes.Redelegation{
-				DelegatorAddress:    r.DelegatorAddr,
-				ValidatorSrcAddress: r.ValidatorSrcAddr,
-				ValidatorDstAddress: r.ValidatorDstAddr,
+				DelegatorAddress:    r.DelegatorAddr.String(),
+				ValidatorSrcAddress: r.ValidatorSrcAddr.String(),
+				ValidatorDstAddress: r.ValidatorDstAddr.String(),
 				Entries: []stakingtypes.RedelegationEntry{
 					{
 						CreationHeight: r.CreationHeight,
@@ -337,7 +359,7 @@ func migrateSlashing(initialState v0_16.GenesisFileState) *slashingtypes.Genesis
 	for ba, vs := range initialState.SlashingData.SigningInfos {
 		acc, _ := sdk.ConsAddressFromBech32(ba)
 		validatorSigningInfos[ba] = slashingtypes.ValidatorSigningInfo{
-			Address:             acc,
+			Address:             acc.String(),
 			StartHeight:         vs.StartHeight,
 			IndexOffset:         vs.IndexOffset,
 			JailedUntil:         vs.JailedUntil,
@@ -384,7 +406,7 @@ func migrateSlashing(initialState v0_16.GenesisFileState) *slashingtypes.Genesis
 	}
 }
 
-func migrateDistribution(initialState v0_16.GenesisFileState) *distributiontypes.GenesisState {
+func migrateDistribution(initialState v0_16.GenesisFileState, communityTax sdk.Coins) *distributiontypes.GenesisState {
 	v016params := initialState.DistrData.Params
 	params := distributiontypes.Params{
 		CommunityTax:        v016params.CommunityTax,
@@ -392,7 +414,7 @@ func migrateDistribution(initialState v0_16.GenesisFileState) *distributiontypes
 		BonusProposerReward: v016params.BonusProposerReward,
 		WithdrawAddrEnabled: true,
 	}
-	feePool := distributiontypes.FeePool{CommunityPool: initialState.DistrData.FeePool.CommunityPool}
+	feePool := distributiontypes.FeePool{CommunityPool: sdk.NewDecCoinsFromCoins(communityTax...)}
 
 	var delegatorWithdrawInfos []distributiontypes.DelegatorWithdrawInfo
 	previousProposer := initialState.DistrData.PreviousProposer
@@ -407,7 +429,7 @@ func migrateDistribution(initialState v0_16.GenesisFileState) *distributiontypes
 		Params:                          params,
 		FeePool:                         feePool,
 		DelegatorWithdrawInfos:          delegatorWithdrawInfos,
-		PreviousProposer:                previousProposer,
+		PreviousProposer:                previousProposer.String(),
 		OutstandingRewards:              outstandingRewards,
 		ValidatorAccumulatedCommissions: validatorAccumulatedCommissions,
 		ValidatorHistoricalRewards:      validatorHistoricalRewards,
@@ -470,8 +492,8 @@ func migrateRand(initialState v0_16.GenesisFileState) *randomtypes.GenesisState 
 				requests,
 				randomtypes.Request{
 					Height:   r.Height,
-					Consumer: r.Consumer,
-					TxHash:   r.TxHash,
+					Consumer: r.Consumer.String(),
+					TxHash:   tmbytes.HexBytes(r.TxHash).String(),
 				},
 			)
 		}
@@ -516,25 +538,23 @@ func migrateCoinswap(initialState v0_16.GenesisFileState) *coinswaptypes.Genesis
 }
 
 func migrateGuardian(initialState v0_16.GenesisFileState) *guardiantypes.GenesisState {
-	var profilers guardiantypes.Profilers
-	var trustees guardiantypes.Trustees
+	var supers []guardiantypes.Super
 
 	for _, profiler := range initialState.GuardianData.Profilers {
 		accountType, err := guardiantypes.AccountTypeFromString(profiler.AccountType.String())
 		if err != nil {
 			panic(err.Error())
 		}
-		profilers = append(profilers, guardiantypes.Guardian{
+		supers = append(supers, guardiantypes.Super{
 			Description: profiler.Description,
 			AccountType: accountType,
-			Address:     profiler.Address,
-			AddedBy:     profiler.AddedBy,
+			Address:     profiler.Address.String(),
+			AddedBy:     profiler.AddedBy.String(),
 		})
 	}
 
 	return &guardiantypes.GenesisState{
-		Profilers: profilers,
-		Trustees:  trustees,
+		Supers: supers,
 	}
 }
 
@@ -556,16 +576,16 @@ func migrateService(initialState v0_16.GenesisFileState) *servicetypes.GenesisSt
 	}
 }
 
-func convertCoinStr(coinStr string) sdk.Coin {
+func convertCoinStr(coinStr string) (sdk.Coin, bool) {
 	c := strings.ReplaceAll(coinStr, IRISATTO, UIRIS)
 	coin, err := sdk.ParseCoin(c)
 	if err != nil {
-		panic(err)
+		return sdk.Coin{}, false
 	}
 	return sdk.Coin{
 		Denom:  coin.Denom,
 		Amount: coin.Amount.Quo(Precision),
-	}
+	}, true
 }
 
 func convertCoins(coins sdk.Coins) sdk.Coins {
