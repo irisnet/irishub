@@ -34,6 +34,7 @@ import (
 
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/migrate/v0_16"
+	"github.com/irisnet/irishub/migrate/v0_16/auth"
 	"github.com/irisnet/irishub/migrate/v0_16/types"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
@@ -147,12 +148,12 @@ func Migrate(cdc codec.JSONMarshaler, initialState v0_16.GenesisFileState) (appS
 	// sdk modules
 	// ------------------------------------------------------------
 	stakingGenesis, bondedTokens := migrateStaking(initialState)
-	authGenesisState, bankGenesisState := migrateAuth(initialState, bondedTokens)
+	authGenesisState, bankGenesisState, communityTax := migrateAuth(initialState, bondedTokens)
 	appState[stakingtypes.ModuleName] = cdc.MustMarshalJSON(stakingGenesis)
 	appState[authtypes.ModuleName] = cdc.MustMarshalJSON(&authGenesisState)
 	appState[banktypes.ModuleName] = cdc.MustMarshalJSON(&bankGenesisState)
 	appState[slashingtypes.ModuleName] = cdc.MustMarshalJSON(migrateSlashing(initialState))
-	appState[distributiontypes.ModuleName] = cdc.MustMarshalJSON(migrateDistribution(initialState))
+	appState[distributiontypes.ModuleName] = cdc.MustMarshalJSON(migrateDistribution(initialState, communityTax))
 	appState[govtypes.ModuleName] = cdc.MustMarshalJSON(migrateGov(initialState))
 
 	// ------------------------------------------------------------
@@ -169,18 +170,39 @@ func Migrate(cdc codec.JSONMarshaler, initialState v0_16.GenesisFileState) (appS
 
 }
 
-func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens sdk.Coins) (authtypes.GenesisState, banktypes.GenesisState) {
+func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens sdk.Coins) (authtypes.GenesisState, banktypes.GenesisState, sdk.Coins) {
 	params := authtypes.DefaultParams()
 	var accounts authtypes.GenesisAccounts
 	var balances []banktypes.Balance
+	var communityTax sdk.Coins
 	for _, acc := range initialState.Accounts {
 		var coins sdk.Coins
 		for _, c := range acc.Coins {
-			coins = append(coins, convertCoinStr(c))
+			coin, add := convertCoinStr(c)
+			if add {
+				coins = append(coins, coin)
+			}
 		}
+		var account authtypes.GenesisAccount
 		baseAccount := authtypes.NewBaseAccount(acc.Address, nil, acc.AccountNumber, acc.Sequence)
-		accounts = append(accounts, baseAccount)
+
+		switch acc.Address.String() {
+		case auth.ServiceDepositCoinsAccAddr.String():
+			baseAccount.Address = authtypes.NewModuleAddress(servicetypes.DepositAccName).String()
+			account = authtypes.NewModuleAccount(baseAccount, servicetypes.DepositAccName, authtypes.Burner)
+		case auth.ServiceRequestCoinsAccAddr.String():
+			baseAccount.Address = authtypes.NewModuleAddress(servicetypes.RequestAccName).String()
+			account = authtypes.NewModuleAccount(baseAccount, servicetypes.RequestAccName)
+		case auth.CommunityTaxCoinsAccAddr.String():
+			communityTax = coins
+			account = baseAccount
+		default:
+			account = baseAccount
+		}
+		accounts = append(accounts, account)
+		coins = sdk.NewCoins(coins...)
 		balances = append(balances, banktypes.Balance{Address: acc.Address.String(), Coins: coins})
+
 	}
 	bondedPoolAddress := authtypes.NewModuleAddress(stakingtypes.BondedPoolName)
 	accounts = append(accounts, authtypes.NewModuleAccount(
@@ -198,7 +220,7 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens sdk.Coins) (a
 		Balances: balances,
 	}
 
-	return *authGenesisState, bankGenesisState
+	return *authGenesisState, bankGenesisState, communityTax
 }
 
 func migrateStaking(initialState v0_16.GenesisFileState) (*stakingtypes.GenesisState, sdk.Coins) {
@@ -384,7 +406,7 @@ func migrateSlashing(initialState v0_16.GenesisFileState) *slashingtypes.Genesis
 	}
 }
 
-func migrateDistribution(initialState v0_16.GenesisFileState) *distributiontypes.GenesisState {
+func migrateDistribution(initialState v0_16.GenesisFileState, communityTax sdk.Coins) *distributiontypes.GenesisState {
 	v016params := initialState.DistrData.Params
 	params := distributiontypes.Params{
 		CommunityTax:        v016params.CommunityTax,
@@ -392,7 +414,7 @@ func migrateDistribution(initialState v0_16.GenesisFileState) *distributiontypes
 		BonusProposerReward: v016params.BonusProposerReward,
 		WithdrawAddrEnabled: true,
 	}
-	feePool := distributiontypes.FeePool{CommunityPool: initialState.DistrData.FeePool.CommunityPool}
+	feePool := distributiontypes.FeePool{CommunityPool: sdk.NewDecCoinsFromCoins(communityTax...)}
 
 	var delegatorWithdrawInfos []distributiontypes.DelegatorWithdrawInfo
 	previousProposer := initialState.DistrData.PreviousProposer
@@ -554,16 +576,16 @@ func migrateService(initialState v0_16.GenesisFileState) *servicetypes.GenesisSt
 	}
 }
 
-func convertCoinStr(coinStr string) sdk.Coin {
+func convertCoinStr(coinStr string) (sdk.Coin, bool) {
 	c := strings.ReplaceAll(coinStr, IRISATTO, UIRIS)
 	coin, err := sdk.ParseCoin(c)
 	if err != nil {
-		panic(err)
+		return sdk.Coin{}, false
 	}
 	return sdk.Coin{
 		Denom:  coin.Denom,
 		Amount: coin.Amount.Quo(Precision),
-	}
+	}, true
 }
 
 func convertCoins(coins sdk.Coins) sdk.Coins {

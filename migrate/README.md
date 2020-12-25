@@ -2,32 +2,38 @@
 
 ### Step 1
 
-use irishub v0.16.3 to export mainnet state genesis with '--for-zero-height'
+Use irishub v0.16.3 to export mainnet state genesis with '--for-zero-height'
 ```bash
-iris export --home <your_home> --for-zero-height
+iris export --home <old_node_home> --for-zero-height
 ```
 
 ### Step 2
-use irishub v1.0.0 to migrate the exported genesis.json by Step 1
+Use irishub v1.0.0 to migrate the exported genesis.json by Step 1
 ```
 iris migrate genesis.json --chain-id test > genesis_new.json
 ```
 
 ### Step 3
-Upgrade privkey file
+Use irishub v1.0.0 to init new node
 ```
-go run migrate/scripts/privValUpgrade.go {$node_home}/config/priv_validator.json {$node_home}/config/priv_validator.json {$node_home}/data/priv_validator_state.json
+iris init
 ```
 
 ### Step 4
-Copy new genesis.json to node home
+Upgrade privkey file
 ```
-cp genesis_new.json {$node_home}/config/genesis.json
+go run migrate/scripts/privValUpgrade.go {$old_node_home}/config/priv_validator.json {$new_node_home}/config/priv_validator.json {$new_node_home}/data/priv_validator_state.json
 ```
 
 ### Step 5
-reset node and start
+Copy new genesis.json to new node home
 ```
-iris unsafe-reset-all --home {node_home}
-iris start --home {node_home}
+cp genesis_new.json {$new_node_home}/config/genesis.json
+```
+
+### Step 6
+Start node
+```
+iris unsafe-reset-all --home {new_node_home}
+iris start --home {new_node_home}
 ```
