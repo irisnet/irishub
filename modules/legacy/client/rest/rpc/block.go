@@ -41,8 +41,18 @@ type Block struct {
 
 // BlockMeta contains meta information about a block - namely, it's ID and Header.
 type BlockMeta struct {
-	BlockID tmtypes.BlockID `json:"block_id"` // the block hash and partsethash
-	Header  Header          `json:"header"`   // The block's Header
+	BlockID BlockID `json:"block_id"` // the block hash and partsethash
+	Header  Header  `json:"header"`   // The block's Header
+}
+
+type BlockID struct {
+	Hash          tmbytes.HexBytes `json:"hash"`
+	PartSetHeader PartSetHeader    `json:"parts"`
+}
+
+type PartSetHeader struct {
+	Total int              `json:"total"`
+	Hash  tmbytes.HexBytes `json:"hash"`
 }
 
 // MaxDataBytesUnknownEvide
@@ -61,7 +71,7 @@ type Header struct {
 	TotalTxs int64                    `json:"total_txs"`
 
 	// prev block info
-	LastBlockID tmtypes.BlockID `json:"last_block_id"`
+	LastBlockID BlockID `json:"last_block_id"`
 
 	// hashes of block data
 	LastCommitHash tmbytes.HexBytes `json:"last_commit_hash"` // commit from validators from the last block
@@ -85,8 +95,8 @@ type Commit struct {
 	// NOTE: The Precommits are in order of address to preserve the bonded ValidatorSet order.
 	// Any peer with a block can gossip precommits by index with a peer without recalculating the
 	// active ValidatorSet.
-	BlockID    tmtypes.BlockID `json:"block_id"`
-	Precommits []*Vote         `json:"precommits"`
+	BlockID    BlockID `json:"block_id"`
+	Precommits []*Vote `json:"precommits"`
 
 	// Volatile
 	firstPrecommit *Vote
@@ -95,14 +105,14 @@ type Commit struct {
 }
 
 type Vote struct {
-	Type             SignedMsgType   `json:"type"`
-	Height           int64           `json:"height"`
-	Round            int32           `json:"round"`
-	BlockID          tmtypes.BlockID `json:"block_id"` // zero if vote is nil.
-	Timestamp        time.Time       `json:"timestamp"`
-	ValidatorAddress Address         `json:"validator_address"`
-	ValidatorIndex   int             `json:"validator_index"`
-	Signature        []byte          `json:"signature"`
+	Type             SignedMsgType `json:"type"`
+	Height           int64         `json:"height"`
+	Round            int32         `json:"round"`
+	BlockID          BlockID       `json:"block_id"` // zero if vote is nil.
+	Timestamp        time.Time     `json:"timestamp"`
+	ValidatorAddress Address       `json:"validator_address"`
+	ValidatorIndex   int           `json:"validator_index"`
+	Signature        []byte        `json:"signature"`
 }
 
 // BitArray is a thread-safe implementation of a bit array.
@@ -151,12 +161,33 @@ func getBlock(clientCtx client.Context, height *int64) ([]byte, error) {
 
 func convertResultBlock(tmBlock *ctypes.ResultBlock) *ResultBlock {
 	precommits := make([]*Vote, len(tmBlock.Block.LastCommit.Signatures))
+	lastCommitBlockID := BlockID{
+		Hash: tmBlock.Block.LastCommit.BlockID.Hash,
+		PartSetHeader: PartSetHeader{
+			Total: int(tmBlock.Block.LastCommit.BlockID.PartSetHeader.Total),
+			Hash:  tmBlock.Block.LastCommit.BlockID.PartSetHeader.Hash,
+		},
+	}
+	lastBlockID := BlockID{
+		Hash: tmBlock.Block.LastBlockID.Hash,
+		PartSetHeader: PartSetHeader{
+			Total: int(tmBlock.Block.LastBlockID.PartSetHeader.Total),
+			Hash:  tmBlock.Block.LastBlockID.PartSetHeader.Hash,
+		},
+	}
+	blockID := BlockID{
+		Hash: tmBlock.BlockID.Hash,
+		PartSetHeader: PartSetHeader{
+			Total: int(tmBlock.BlockID.PartSetHeader.Total),
+			Hash:  tmBlock.BlockID.PartSetHeader.Hash,
+		},
+	}
 	for k, v := range tmBlock.Block.LastCommit.Signatures {
 		precommits[k] = &Vote{
 			Type:             0x02,
 			Height:           tmBlock.Block.LastCommit.Height,
 			Round:            tmBlock.Block.LastCommit.Round,
-			BlockID:          tmBlock.Block.LastCommit.BlockID,
+			BlockID:          lastCommitBlockID,
 			Timestamp:        v.Timestamp,
 			ValidatorAddress: v.ValidatorAddress,
 			ValidatorIndex:   k,
@@ -170,7 +201,7 @@ func convertResultBlock(tmBlock *ctypes.ResultBlock) *ResultBlock {
 		Time:               tmBlock.Block.Time,
 		NumTxs:             0,
 		TotalTxs:           int64(len(tmBlock.Block.Data.Txs)),
-		LastBlockID:        tmBlock.Block.LastBlockID,
+		LastBlockID:        lastBlockID,
 		LastCommitHash:     tmBlock.Block.LastCommitHash,
 		DataHash:           tmBlock.Block.DataHash,
 		ValidatorsHash:     tmBlock.Block.ValidatorsHash,
@@ -183,7 +214,7 @@ func convertResultBlock(tmBlock *ctypes.ResultBlock) *ResultBlock {
 	}
 	return &ResultBlock{
 		BlockMeta: &BlockMeta{
-			BlockID: tmBlock.BlockID,
+			BlockID: blockID,
 			Header:  header,
 		},
 		Block: &Block{
@@ -193,7 +224,7 @@ func convertResultBlock(tmBlock *ctypes.ResultBlock) *ResultBlock {
 				Evidence: tmBlock.Block.Evidence.Evidence,
 			},
 			LastCommit: &Commit{
-				BlockID:    tmBlock.BlockID,
+				BlockID:    lastCommitBlockID,
 				Precommits: precommits,
 			},
 		},

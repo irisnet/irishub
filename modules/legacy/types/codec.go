@@ -10,6 +10,7 @@ import (
 // Register concrete types on codec codec
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSend{}, "irishub/bank/Send", nil)
+	cdc.RegisterConcrete(&BaseAccount{}, "irishub/bank/Account", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
