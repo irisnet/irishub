@@ -183,6 +183,7 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens sdk.Coins) (a
 			if add {
 				coins = append(coins, coin)
 			}
+			coins = sdk.NewCoins(coins...)
 		}
 		var account authtypes.GenesisAccount
 		baseAccount := authtypes.NewBaseAccount(acc.Address, nil, acc.AccountNumber, acc.Sequence)
@@ -197,16 +198,16 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens sdk.Coins) (a
 		case auth.ServiceTaxCoinsAccAddr.String():
 			serviceTax = coins
 			account = baseAccount
+			coins = sdk.NewCoins()
 		case auth.CommunityTaxCoinsAccAddr.String():
 			communityTax = coins
-			account = baseAccount
+			baseAccount.Address = authtypes.NewModuleAddress(distributiontypes.ModuleName).String()
+			account = authtypes.NewModuleAccount(baseAccount, distributiontypes.ModuleName)
 		default:
 			account = baseAccount
 		}
 		accounts = append(accounts, account)
-		coins = sdk.NewCoins(coins...)
-		balances = append(balances, banktypes.Balance{Address: acc.Address.String(), Coins: coins})
-
+		balances = append(balances, banktypes.Balance{Address: account.GetAddress().String(), Coins: coins})
 	}
 	bondedPoolAddress := authtypes.NewModuleAddress(stakingtypes.BondedPoolName)
 	accounts = append(accounts, authtypes.NewModuleAccount(

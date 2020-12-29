@@ -16,13 +16,13 @@ iris migrate genesis.json --chain-id test > genesis_new.json
 ### Step 3
 Use irishub v1.0.0 to initialize the new node
 ```
-iris init --home {$new_node_home}
+iris init [key_name] --home {$new_node_home}
 ```
 
 ### Step 4
 Upgrade privkey file
 ```
-go run migrate/scripts/privValUpgrade.go {$old_node_home}/config/priv_validator.json {$new_node_home}/config/priv_validator.json {$new_node_home}/data/priv_validator_state.json
+go run migrate/scripts/privValUpgrade.go {$old_node_home}/config/priv_validator.json {$new_node_home}/config/priv_validator_key.json {$new_node_home}/data/priv_validator_state.json
 ```
 
 ### Step 5
