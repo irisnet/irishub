@@ -49,7 +49,7 @@ func createFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			}
 		}
 
-		serviceFeeCap, err := sdk.ParseCoins(req.ServiceFeeCap)
+		serviceFeeCap, err := sdk.ParseCoinsNormalized(req.ServiceFeeCap)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -103,7 +103,7 @@ func editFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			}
 		}
 
-		serviceFeeCap, err := sdk.ParseCoins(req.ServiceFeeCap)
+		serviceFeeCap, err := sdk.ParseCoinsNormalized(req.ServiceFeeCap)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

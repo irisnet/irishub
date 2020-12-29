@@ -40,8 +40,7 @@ func GetCmdQueryToken() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query token token <denom>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 
 			if err != nil {
 				return err
@@ -61,7 +60,7 @@ func GetCmdQueryToken() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.Token)
+			return clientCtx.PrintProto(res.Token)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -76,8 +75,7 @@ func GetCmdQueryTokens() *cobra.Command {
 		Long:    "Query token by the owner.",
 		Example: fmt.Sprintf("$ %s query token tokens <owner>", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -115,7 +113,7 @@ func GetCmdQueryTokens() *cobra.Command {
 				tokens = append(tokens, evi)
 			}
 
-			return clientCtx.PrintOutputLegacy(tokens)
+			return clientCtx.PrintObjectLegacy(tokens)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -132,8 +130,7 @@ func GetCmdQueryFee() *cobra.Command {
 		Long:    "Query the token related fees.",
 		Example: fmt.Sprintf("$ %s query token fee <symbol>", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -155,7 +152,7 @@ func GetCmdQueryFee() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res)
+			return clientCtx.PrintProto(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -170,8 +167,7 @@ func GetCmdQueryParams() *cobra.Command {
 		Long:    "Query values set as token parameters.",
 		Example: fmt.Sprintf("$ %s query token params", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -182,7 +178,7 @@ func GetCmdQueryParams() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(&res.Params)
+			return clientCtx.PrintProto(&res.Params)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

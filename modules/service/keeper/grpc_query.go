@@ -204,7 +204,7 @@ func (k Keeper) RequestsByReqCtx(c context.Context, req *types.QueryRequestsByRe
 	store := ctx.KVStore(k.storeKey)
 	requestStore := prefix.NewStore(store, types.GetRequestSubspaceByReqCtx(requestContextId, req.BatchCounter))
 	pageRes, err := query.Paginate(requestStore, req.Pagination, func(key []byte, value []byte) error {
-		requestID := append(append(requestContextId, sdk.Uint64ToBigEndian(req.BatchCounter)...),key...)
+		requestID := append(append(requestContextId, sdk.Uint64ToBigEndian(req.BatchCounter)...), key...)
 		request, _ := k.GetRequest(ctx, requestID)
 		requests = append(requests, &request)
 		return nil

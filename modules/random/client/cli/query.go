@@ -39,8 +39,7 @@ func GetCmdQueryRandom() *cobra.Command {
 		Example: fmt.Sprintf("%s query random random <request-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -56,7 +55,7 @@ func GetCmdQueryRandom() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.Random)
+			return clientCtx.PrintProto(res.Random)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -70,8 +69,7 @@ func GetCmdQueryRandomRequestQueue() *cobra.Command {
 		Short:   "Query the random number request queue with an optional height",
 		Example: fmt.Sprintf("%s query random queue <gen-height>", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -95,7 +93,7 @@ func GetCmdQueryRandomRequestQueue() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res)
+			return clientCtx.PrintProto(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

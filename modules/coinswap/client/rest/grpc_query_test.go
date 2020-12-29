@@ -145,7 +145,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 		WithSequence(account.GetSequence())
 
 	// sign Tx (offline mode so we can manually set sequence number)
-	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, true)
+	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, false, true)
 	s.Require().NoError(err)
 
 	stdTx := txBuilder.GetTx().(legacytx.StdTx)
@@ -205,7 +205,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 		WithSequence(account.GetSequence() + 1)
 
 	// sign Tx (offline mode so we can manually set sequence number)
-	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, true)
+	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, false, true)
 	s.Require().NoError(err)
 
 	stdTx = txBuilder.GetTx().(legacytx.StdTx)
@@ -265,7 +265,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 		WithSequence(account.GetSequence() + 2)
 
 	// sign Tx (offline mode so we can manually set sequence number)
-	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, true)
+	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, false, true)
 	s.Require().NoError(err)
 
 	stdTx = txBuilder.GetTx().(legacytx.StdTx)
@@ -325,7 +325,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 		WithSequence(account.GetSequence() + 3)
 
 	// sign Tx (offline mode so we can manually set sequence number)
-	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, true)
+	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, false, true)
 	s.Require().NoError(err)
 
 	stdTx = txBuilder.GetTx().(legacytx.StdTx)
@@ -380,7 +380,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 		WithSequence(account.GetSequence() + 4)
 
 	// sign Tx (offline mode so we can manually set sequence number)
-	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, true)
+	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, false, true)
 	s.Require().NoError(err)
 
 	stdTx = txBuilder.GetTx().(legacytx.StdTx)
@@ -435,7 +435,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 		WithSequence(account.GetSequence() + 5)
 
 	// sign Tx (offline mode so we can manually set sequence number)
-	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, true)
+	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, false, true)
 	s.Require().NoError(err)
 
 	stdTx = txBuilder.GetTx().(legacytx.StdTx)

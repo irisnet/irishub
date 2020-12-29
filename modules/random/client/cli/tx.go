@@ -39,8 +39,7 @@ func GetCmdRequestRandom() *cobra.Command {
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -57,7 +56,7 @@ func GetCmdRequestRandom() *cobra.Command {
 				return err
 			}
 			if oracle {
-				if serviceFeeCap, err = sdk.ParseCoins(rawServiceFeeCap); err != nil {
+				if serviceFeeCap, err = sdk.ParseCoinsNormalized(rawServiceFeeCap); err != nil {
 					return err
 				}
 			}

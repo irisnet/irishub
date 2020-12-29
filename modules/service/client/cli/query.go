@@ -56,8 +56,7 @@ func GetCmdQueryServiceDefinition() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query service definition <service-name>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -77,7 +76,7 @@ func GetCmdQueryServiceDefinition() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.ServiceDefinition)
+			return clientCtx.PrintProto(res.ServiceDefinition)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -94,8 +93,7 @@ func GetCmdQueryServiceBinding() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query service binding <service-name> <provider-address>", version.AppName),
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -121,7 +119,7 @@ func GetCmdQueryServiceBinding() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.ServiceBinding)
+			return clientCtx.PrintProto(res.ServiceBinding)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -138,8 +136,7 @@ func GetCmdQueryServiceBindings() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query service bindings <service-name> --owner=<address>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -177,7 +174,7 @@ func GetCmdQueryServiceBindings() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res)
+			return clientCtx.PrintProto(res)
 		},
 	}
 
@@ -197,8 +194,7 @@ func GetCmdQueryWithdrawAddr() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query service withdraw-addr <address>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -219,7 +215,7 @@ func GetCmdQueryWithdrawAddr() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res)
+			return clientCtx.PrintProto(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -236,8 +232,7 @@ func GetCmdQueryServiceRequest() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query service request <request-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -271,7 +266,7 @@ func GetCmdQueryServiceRequest() *cobra.Command {
 				return fmt.Errorf("unknown request: %s", requestID)
 			}
 
-			return clientCtx.PrintOutput(res.Request)
+			return clientCtx.PrintProto(res.Request)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -288,8 +283,7 @@ func GetCmdQueryServiceRequests() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query service requests <service-name> <provider> | <request-context-id> <batch-counter>", version.AppName),
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -315,7 +309,7 @@ func GetCmdQueryServiceRequests() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				return clientCtx.PrintOutput(res)
+				return clientCtx.PrintProto(res)
 			}
 
 			requestContextID, err := hex.DecodeString(args[0])
@@ -340,7 +334,7 @@ func GetCmdQueryServiceRequests() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res)
+			return clientCtx.PrintProto(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -357,8 +351,7 @@ func GetCmdQueryServiceResponse() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query service response <request-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -391,7 +384,7 @@ func GetCmdQueryServiceResponse() *cobra.Command {
 				return fmt.Errorf("unknown response: %s", requestID)
 			}
 
-			return clientCtx.PrintOutput(res.Response)
+			return clientCtx.PrintProto(res.Response)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -408,8 +401,7 @@ func GetCmdQueryServiceResponses() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query service responses <request-context-id> <batch-counter>", version.AppName),
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 
 			if err != nil {
 				return err
@@ -442,7 +434,7 @@ func GetCmdQueryServiceResponses() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res)
+			return clientCtx.PrintProto(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -460,8 +452,7 @@ func GetCmdQueryRequestContext() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query service request-context <request-context-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -482,7 +473,7 @@ func GetCmdQueryRequestContext() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(&res)
+			return clientCtx.PrintProto(&res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -499,8 +490,7 @@ func GetCmdQueryEarnedFees() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query service fees <provider-address>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -521,7 +511,7 @@ func GetCmdQueryEarnedFees() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res)
+			return clientCtx.PrintProto(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -538,8 +528,7 @@ func GetCmdQuerySchema() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query service schema <schema-name>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -555,7 +544,7 @@ func GetCmdQuerySchema() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res)
+			return clientCtx.PrintProto(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -572,8 +561,7 @@ func GetCmdQueryParams() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query service params", version.AppName),
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -585,7 +573,7 @@ func GetCmdQueryParams() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(&res.Params)
+			return clientCtx.PrintProto(&res.Params)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

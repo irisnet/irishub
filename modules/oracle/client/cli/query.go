@@ -38,8 +38,7 @@ func GetCmdQueryFeed() *cobra.Command {
 		Example: fmt.Sprintf("%s query oracle feed <feed-name>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -51,7 +50,7 @@ func GetCmdQueryFeed() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(&res.Feed)
+			return clientCtx.PrintProto(&res.Feed)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeed)
@@ -66,8 +65,7 @@ func GetCmdQueryFeeds() *cobra.Command {
 		Short:   "Query a group of feed definition.",
 		Example: fmt.Sprintf("%s query oracle feeds", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -86,7 +84,7 @@ func GetCmdQueryFeeds() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res)
+			return clientCtx.PrintProto(res)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeeds)
@@ -103,8 +101,7 @@ func GetCmdQueryFeedValue() *cobra.Command {
 		Example: fmt.Sprintf("%s query oracle value <feed-name>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -116,7 +113,7 @@ func GetCmdQueryFeedValue() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res)
+			return clientCtx.PrintProto(res)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeedValue)

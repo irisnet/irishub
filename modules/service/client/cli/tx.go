@@ -65,8 +65,7 @@ func GetCmdDefineService() *cobra.Command {
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -148,8 +147,7 @@ func GetCmdBindService() *cobra.Command {
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -198,7 +196,7 @@ func GetCmdBindService() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			deposit, err := sdk.ParseCoins(depositStr)
+			deposit, err := sdk.ParseCoinsNormalized(depositStr)
 			if err != nil {
 				return err
 			}
@@ -263,8 +261,7 @@ func GetCmdUpdateServiceBinding() *cobra.Command {
 		),
 		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -285,7 +282,7 @@ func GetCmdUpdateServiceBinding() *cobra.Command {
 				return err
 			}
 			if len(depositStr) != 0 {
-				deposit, err = sdk.ParseCoins(depositStr)
+				deposit, err = sdk.ParseCoinsNormalized(depositStr)
 				if err != nil {
 					return err
 				}
@@ -371,8 +368,7 @@ func GetCmdSetWithdrawAddr() *cobra.Command {
 		Example: fmt.Sprintf("$ %s tx service set-withdraw-addr <withdrawal-address> --from mykey", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -404,8 +400,7 @@ func GetCmdDisableServiceBinding() *cobra.Command {
 		Example: fmt.Sprintf("$ %s tx service disable <service-name> <provider-address> --from mykey", version.AppName),
 		Args:    cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -442,8 +437,7 @@ func GetCmdEnableServiceBinding() *cobra.Command {
 		Example: fmt.Sprintf("$ %s tx service enable <service-name> <provider-address> --deposit=1stake --from mykey", version.AppName),
 		Args:    cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -462,7 +456,7 @@ func GetCmdEnableServiceBinding() *cobra.Command {
 				return err
 			}
 			if len(depositStr) != 0 {
-				deposit, err = sdk.ParseCoins(depositStr)
+				deposit, err = sdk.ParseCoinsNormalized(depositStr)
 				if err != nil {
 					return err
 				}
@@ -492,8 +486,7 @@ func GetCmdRefundServiceDeposit() *cobra.Command {
 		Example: fmt.Sprintf("$ %s tx service refund-deposit <service-name> <provider-address> --from mykey", version.AppName),
 		Args:    cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -541,8 +534,7 @@ func GetCmdCallService() *cobra.Command {
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -568,7 +560,7 @@ func GetCmdCallService() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			serviceFeeCap, err := sdk.ParseCoins(rawServiceFeeCap)
+			serviceFeeCap, err := sdk.ParseCoinsNormalized(rawServiceFeeCap)
 			if err != nil {
 				return err
 			}
@@ -659,8 +651,7 @@ func GetCmdRespondService() *cobra.Command {
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -754,8 +745,7 @@ func GetCmdPauseRequestContext() *cobra.Command {
 		Example: fmt.Sprintf("$ %s tx service pause <request-context-id> --from mykey", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -788,8 +778,7 @@ func GetCmdStartRequestContext() *cobra.Command {
 		Example: fmt.Sprintf("$ %s tx service start <request-context-id> --from mykey", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -822,8 +811,7 @@ func GetCmdKillRequestContext() *cobra.Command {
 		Example: fmt.Sprintf("$ %s tx service kill <request-context-id> --from mykey", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -865,8 +853,7 @@ func GetCmdUpdateRequestContext() *cobra.Command {
 		),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -894,7 +881,7 @@ func GetCmdUpdateRequestContext() *cobra.Command {
 				return err
 			}
 			if len(serviceFeeCapStr) != 0 {
-				serviceFeeCap, err = sdk.ParseCoins(serviceFeeCapStr)
+				serviceFeeCap, err = sdk.ParseCoinsNormalized(serviceFeeCapStr)
 				if err != nil {
 					return err
 				}
@@ -940,8 +927,7 @@ func GetCmdWithdrawEarnedFees() *cobra.Command {
 		Example: fmt.Sprintf("$ %s tx service withdraw-fees <provider-address> --from mykey", version.AppName),
 		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}

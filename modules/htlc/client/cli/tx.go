@@ -54,8 +54,7 @@ func GetCmdCreateHTLC() *cobra.Command {
 		),
 		PreRunE: preCheckCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -80,7 +79,7 @@ func GetCmdCreateHTLC() *cobra.Command {
 				return err
 			}
 
-			amount, err := sdk.ParseCoins(amountStr)
+			amount, err := sdk.ParseCoinsNormalized(amountStr)
 			if err != nil {
 				return err
 			}
@@ -155,8 +154,7 @@ func GetCmdClaimHTLC() *cobra.Command {
 		Example: fmt.Sprintf("$ %s tx htlc claim <hash-lock> <secret> --from mykey", version.AppName),
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -193,8 +191,7 @@ func GetCmdRefundHTLC() *cobra.Command {
 		Example: fmt.Sprintf("$ %s tx htlc refund <hash-lock> --from mykey", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}

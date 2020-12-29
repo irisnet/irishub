@@ -92,7 +92,7 @@ func bindServiceHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			provider = req.Provider
 		}
 
-		deposit, err := sdk.ParseCoins(req.Deposit)
+		deposit, err := sdk.ParseCoinsNormalized(req.Deposit)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -142,7 +142,7 @@ func updateServiceBindingHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		var deposit sdk.Coins
 		var err error
 		if req.Deposit != "" {
-			deposit, err = sdk.ParseCoins(req.Deposit)
+			deposit, err = sdk.ParseCoinsNormalized(req.Deposit)
 			if err != nil {
 				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
@@ -269,7 +269,7 @@ func enableServiceBindingHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		var deposit sdk.Coins
 		var err error
 		if len(req.Deposit) != 0 {
-			deposit, err = sdk.ParseCoins(req.Deposit)
+			deposit, err = sdk.ParseCoinsNormalized(req.Deposit)
 			if err != nil {
 				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
@@ -343,7 +343,7 @@ func requestServiceHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		serviceFeeCap, err := sdk.ParseCoins(req.ServiceFeeCap)
+		serviceFeeCap, err := sdk.ParseCoinsNormalized(req.ServiceFeeCap)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -534,7 +534,7 @@ func updateRequestContextHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		var serviceFeeCap sdk.Coins
 		var err error
 		if len(req.ServiceFeeCap) != 0 {
-			serviceFeeCap, err = sdk.ParseCoins(req.ServiceFeeCap)
+			serviceFeeCap, err = sdk.ParseCoinsNormalized(req.ServiceFeeCap)
 			if err != nil {
 				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return

@@ -42,8 +42,7 @@ func GetCmdQueryHTLC() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query htlc htlc <hash-lock>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientQueryContext(cmd)
 
 			if err != nil {
 				return err
@@ -60,7 +59,7 @@ func GetCmdQueryHTLC() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return clientCtx.PrintOutput(response.Htlc)
+			return clientCtx.PrintProto(response.Htlc)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

@@ -43,8 +43,7 @@ func GetCmdQuerySupply() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query nft supply <denom-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -75,7 +74,7 @@ func GetCmdQuerySupply() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return clientCtx.PrintOutput(resp)
+			return clientCtx.PrintProto(resp)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQuerySupply)
@@ -92,8 +91,7 @@ func GetCmdQueryOwner() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query nft owner <address> --denom-id=<denom-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -118,7 +116,7 @@ func GetCmdQueryOwner() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return clientCtx.PrintOutput(resp)
+			return clientCtx.PrintProto(resp)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryOwner)
@@ -136,8 +134,7 @@ func GetCmdQueryCollection() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query nft collection <denom-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -161,7 +158,7 @@ func GetCmdQueryCollection() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return clientCtx.PrintOutput(resp)
+			return clientCtx.PrintProto(resp)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -177,8 +174,7 @@ func GetCmdQueryDenoms() *cobra.Command {
 		Long:    "Query all denominations of all collections of NFTs.",
 		Example: fmt.Sprintf("$ %s query nft denoms", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -192,7 +188,7 @@ func GetCmdQueryDenoms() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return clientCtx.PrintOutput(resp)
+			return clientCtx.PrintProto(resp)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -208,8 +204,7 @@ func GetCmdQueryDenom() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query nft denom <denom-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -227,7 +222,7 @@ func GetCmdQueryDenom() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return clientCtx.PrintOutput(resp.Denom)
+			return clientCtx.PrintProto(resp.Denom)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -243,8 +238,7 @@ func GetCmdQueryNFT() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query nft token <denom-id> <token-id>", version.AppName),
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -267,7 +261,7 @@ func GetCmdQueryNFT() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return clientCtx.PrintOutput(resp.NFT)
+			return clientCtx.PrintProto(resp.NFT)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

@@ -37,8 +37,7 @@ func GetCmdQueryRecord() *cobra.Command {
 		Short: "Query a record",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -57,7 +56,7 @@ func GetCmdQueryRecord() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.Record)
+			return clientCtx.PrintProto(res.Record)
 		},
 	}
 

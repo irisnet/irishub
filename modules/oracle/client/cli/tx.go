@@ -56,8 +56,7 @@ func GetCmdCreateFeed() *cobra.Command {
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -78,7 +77,7 @@ func GetCmdCreateFeed() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			serviceFeeCap, err := sdk.ParseCoins(rawServiceFeeCap)
+			serviceFeeCap, err := sdk.ParseCoinsNormalized(rawServiceFeeCap)
 			if err != nil {
 				return err
 			}
@@ -189,8 +188,7 @@ func GetCmdStartFeed() *cobra.Command {
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -223,8 +221,7 @@ func GetCmdPauseFeed() *cobra.Command {
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -263,8 +260,7 @@ func GetCmdEditFeed() *cobra.Command {
 				version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -284,7 +280,7 @@ func GetCmdEditFeed() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			serviceFeeCap, err := sdk.ParseCoins(rawServiceFeeCap)
+			serviceFeeCap, err := sdk.ParseCoinsNormalized(rawServiceFeeCap)
 			if err != nil {
 				return err
 			}

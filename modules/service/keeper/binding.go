@@ -500,7 +500,7 @@ func (k Keeper) ParsePricing(ctx sdk.Context, pricing string) (p types.Pricing, 
 		return p, sdkerrors.Wrapf(types.ErrInvalidPricing, "failed to unmarshal the pricing: %s", err.Error())
 	}
 
-	tokenPrice, err := sdk.ParseCoin(rawPricing.Price)
+	tokenPrice, err := sdk.ParseCoinNormalized(rawPricing.Price)
 	if err != nil {
 		return p, sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid price: %s", err.Error())
 	}
