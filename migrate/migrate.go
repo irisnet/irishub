@@ -175,6 +175,7 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens sdk.Coins) (a
 	var accounts authtypes.GenesisAccounts
 	var balances []banktypes.Balance
 	var communityTax sdk.Coins
+	var serviceTax sdk.Coins
 	for _, acc := range initialState.Accounts {
 		var coins sdk.Coins
 		for _, c := range acc.Coins {
@@ -193,6 +194,9 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens sdk.Coins) (a
 		case auth.ServiceRequestCoinsAccAddr.String():
 			baseAccount.Address = authtypes.NewModuleAddress(servicetypes.RequestAccName).String()
 			account = authtypes.NewModuleAccount(baseAccount, servicetypes.RequestAccName)
+		case auth.ServiceTaxCoinsAccAddr.String():
+			serviceTax = coins
+			account = baseAccount
 		case auth.CommunityTaxCoinsAccAddr.String():
 			communityTax = coins
 			account = baseAccount
@@ -210,6 +214,9 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens sdk.Coins) (a
 		stakingtypes.BondedPoolName, authtypes.Burner, authtypes.Staking),
 	)
 	balances = append(balances, banktypes.Balance{Address: bondedPoolAddress.String(), Coins: bondedTokens})
+
+	feeCollectorAddress := authtypes.NewModuleAddress(authtypes.FeeCollectorName)
+	balances = append(balances, banktypes.Balance{Address: feeCollectorAddress.String(), Coins: serviceTax})
 
 	authGenesisState := authtypes.NewGenesisState(
 		params, accounts,
@@ -576,6 +583,7 @@ func migrateService(initialState v0_16.GenesisFileState) *servicetypes.GenesisSt
 	}
 }
 
+// ignore token that cannot be converted
 func convertCoinStr(coinStr string) (sdk.Coin, bool) {
 	c := strings.ReplaceAll(coinStr, IRISATTO, UIRIS)
 	coin, err := sdk.ParseCoin(c)
