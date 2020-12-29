@@ -164,7 +164,7 @@ Bump Tendermint version to irisnet/tendermint [v0.31.1](https://github.com/irisn
 ### Tendermint
 * Update to irisnet/tendermint [v0.31.0](https://github.com/irisnet/tendermint/releases/tag/v0.31.0)
   * [\#1379](https://github.com/irisnet/irishub/issues/1379) [p2p] Simplify GetSelectionWithBias for addressbook
-  * [\#1432](https://github.com/irisnet/irishub/issues/1432) [crypto] Allow PubKeyMultisigThreshold to unmarshal into cryptotypes.PubKey
+  * [\#1432](https://github.com/irisnet/irishub/issues/1432) [crypto] Allow PubKeyMultisigThreshold to unmarshal into crypto.PubKey
   * [\#1451](https://github.com/irisnet/irishub/issues/1451) [db] Close WriteBatch to prevent memory leak
   * [\#1460](https://github.com/irisnet/irishub/issues/1460) [kms] Shut down tmkms when a validator enters proposal round crashes the app
   * [\#1554](https://github.com/irisnet/irishub/issues/1554) [consensus] Log block status on replay block
