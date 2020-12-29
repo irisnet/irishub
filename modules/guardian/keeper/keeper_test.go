@@ -6,12 +6,12 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/ed25519"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/modules/guardian/keeper"
@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	pks = []crypto.PubKey{
+	pks = []cryptotypes.PubKey{
 		newPubKey("0B485CFC0EECC619440448436F8FC9DF40566F2369E72400281454CB552AFB50"),
 		newPubKey("0B485CFC0EECC619440448436F8FC9DF40566F2369E72400281454CB552AFB51"),
 		newPubKey("0B485CFC0EECC619440448436F8FC9DF40566F2369E72400281454CB552AFB52"),
@@ -105,12 +105,13 @@ func (suite *KeeperTestSuite) TestQuerySupers() {
 	suite.Contains(supers, super)
 }
 
-func newPubKey(pk string) (res crypto.PubKey) {
+func newPubKey(pk string) (res cryptotypes.PubKey) {
 	pkBytes, err := hex.DecodeString(pk)
 	if err != nil {
 		panic(err)
 	}
-	var pkEd = make(ed25519.PubKey, ed25519.PubKeySize)
-	copy(pkEd[:], pkBytes[:])
-	return pkEd
+
+	pubkey := &ed25519.PubKey{Key: pkBytes}
+
+	return pubkey
 }
