@@ -1,13 +1,15 @@
 package cmd
 
 import (
-	"context"
-
 	"io"
 	"os"
 
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
+
+	tmcli "github.com/tendermint/tendermint/libs/cli"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -27,10 +29,6 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-
-	tmcli "github.com/tendermint/tendermint/libs/cli"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 
@@ -70,22 +68,6 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	initRootCmd(rootCmd, encodingConfig)
 
 	return rootCmd, encodingConfig
-}
-
-// Execute executes the root command.
-func Execute(rootCmd *cobra.Command) error {
-	// Create and set a client.Context on the command's Context. During the pre-run
-	// of the root command, a default initialized client.Context is provided to
-	// seed child command execution with values such as AccountRetriver, Keyring,
-	// and a Tendermint RPC. This requires the use of a pointer reference when
-	// getting and setting the client.Context. Ideally, we utilize
-	// https://github.com/spf13/cobra/pull/1118.
-	ctx := context.Background()
-	ctx = context.WithValue(ctx, client.ClientContextKey, &client.Context{})
-	ctx = context.WithValue(ctx, server.ServerContextKey, server.NewDefaultContext())
-
-	executor := tmcli.PrepareBaseCmd(rootCmd, "", app.DefaultNodeHome)
-	return executor.ExecuteContext(ctx)
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
