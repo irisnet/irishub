@@ -3,13 +3,23 @@ package main
 import (
 	"os"
 
+	"github.com/cosmos/cosmos-sdk/server"
+	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
+	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/cmd/iris/cmd"
 	_ "github.com/irisnet/irishub/lite/statik"
 )
 
 func main() {
 	rootCmd, _ := cmd.NewRootCmd()
-	if err := cmd.Execute(rootCmd); err != nil {
-		os.Exit(1)
+
+	if err := svrcmd.Execute(rootCmd, app.DefaultNodeHome); err != nil {
+		switch e := err.(type) {
+		case server.ErrorCode:
+			os.Exit(e.Code)
+
+		default:
+			os.Exit(1)
+		}
 	}
 }
