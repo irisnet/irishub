@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/base64"
 	"encoding/json"
 
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -17,35 +18,36 @@ type WasmCustomEncoder struct {
 
 // MsgWasmCustom implement wasm module CustomEncoder
 type MsgWasmCustom struct {
-	Type  string          `json:"type"`
-	Value json.RawMessage `json:"value"`
+	Router string `json:"router"`
+	Data   string `json:"data"`
 }
 
 // Encode implement wasm module CustomEncoder
 func (encoder WasmCustomEncoder) Encode(sender sdk.AccAddress, data json.RawMessage) ([]sdk.Msg, error) {
-	var msgs []MsgWasmCustom
-	if err := json.Unmarshal(data, &msgs); err != nil {
+	var msg MsgWasmCustom
+	if err := json.Unmarshal(data, &msg); err != nil {
 		return nil, sdkerrors.Wrap(wasm.ErrInvalidMsg, "data type not match []MsgWasmCustom, json.Unmarshal failed")
 	}
 
-	var moduleMsgs = make([]sdk.Msg, len(msgs))
-	for i, msg := range msgs {
-		sysMsg, err := encoder.registry.Resolve(msg.Type)
-		if err != nil {
-			return nil, err
-		}
-
-		if err := json.Unmarshal(msg.Value, &sysMsg); err != nil {
-			return nil, sdkerrors.Wrapf(wasm.ErrInvalidMsg, "data not match %v, json.Unmarshal failed", sysMsg)
-		}
-
-		if m, ok := sysMsg.(sdk.Msg); ok {
-			moduleMsgs[i] = m
-		} else {
-			return nil, sdkerrors.Wrap(wasm.ErrInvalidMsg, "not implement sdk.Msg")
-		}
+	sysMsg, err := encoder.registry.Resolve(msg.Router)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(wasm.ErrInvalidMsg, err.Error())
 	}
-	return moduleMsgs, nil
+
+	msgByte, err := base64.StdEncoding.DecodeString(msg.Data)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(wasm.ErrInvalidMsg, err.Error())
+	}
+
+	if err := json.Unmarshal(msgByte, &sysMsg); err != nil {
+		return nil, sdkerrors.Wrapf(wasm.ErrInvalidMsg, "data not match %v, json.Unmarshal failed", sysMsg)
+	}
+
+	m, ok := sysMsg.(sdk.Msg)
+	if !ok {
+		return nil, sdkerrors.Wrap(wasm.ErrInvalidMsg, "not implement sdk.Msg")
+	}
+	return []sdk.Msg{m}, nil
 }
 
 // NewMessageEncoders overide the wasm module CustomEncoder

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -34,11 +35,9 @@ func TestWasmCustomEncoder_Encode(t *testing.T) {
 	jsonMsgMintToken, err := json.Marshal(msgMintToken)
 	require.NoError(t, err)
 
-	msg, err := json.Marshal([]MsgWasmCustom{
-		{
-			Type:  fmt.Sprintf("/%s", proto.MessageName(msgMintToken)),
-			Value: jsonMsgMintToken,
-		},
+	msg, err := json.Marshal(MsgWasmCustom{
+		Router: fmt.Sprintf("/%s", proto.MessageName(msgMintToken)),
+		Data:   base64.StdEncoding.EncodeToString(jsonMsgMintToken),
 	})
 	require.NoError(t, err)
 
