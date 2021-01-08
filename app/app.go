@@ -457,7 +457,7 @@ func NewIrisApp(
 		wasmDir,
 		wasmConfig,
 		supportedFeatures,
-		NewMessageEncoders(interfaceRegistry),
+		nil,
 		nil,
 	)
 
