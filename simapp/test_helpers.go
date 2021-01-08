@@ -21,10 +21,10 @@ import (
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/simapp/helpers"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/testutil"
@@ -128,7 +128,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 		// There is ongoing work to add secp256k1 keys (https://github.com/cosmos/cosmos-sdk/pull/7604).
 		pk, err := cryptocodec.FromTmPubKeyInterface(val.PubKey)
 		require.NoError(t, err)
-		pkAny, err := codectypes.PackAny(pk)
+		pkAny, err := codectypes.NewAnyWithValue(pk)
 		require.NoError(t, err)
 		validator := stakingtypes.Validator{
 			OperatorAddress:   sdk.ValAddress(val.Address).String(),
