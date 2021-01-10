@@ -33,7 +33,7 @@ func LoadOldFilePV(filePath string) (*OldFilePV, error) {
 		return nil, err
 	}
 	pv := &OldFilePV{}
-	err = cdc.UnmarshalJSON(pvJSONBytes, &pv)
+	err = tmjson.Unmarshal(pvJSONBytes, &pv)
 	if err != nil {
 		return nil, err
 	}

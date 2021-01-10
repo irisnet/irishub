@@ -6,25 +6,23 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	cosmoscrypto "github.com/cosmos/cosmos-sdk/crypto"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tendermint/tendermint/crypto"
-
-	guardiancli "github.com/irisnet/irishub/modules/guardian/client/cli"
-	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
+	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/client/testutil"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/cosmos/cosmos-sdk/testutil/network"
-	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/client/testutil"
-
+	guardiancli "github.com/irisnet/irishub/modules/guardian/client/cli"
 	guardiantestutil "github.com/irisnet/irishub/modules/guardian/client/testutil"
+	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	"github.com/irisnet/irishub/simapp"
 )
 
-var privKey crypto.PrivKey
-var pubKey crypto.PubKey
+var privKey cryptotypes.PrivKey
+var pubKey cryptotypes.PubKey
 var addr sdk.AccAddress
 
 type IntegrationTestSuite struct {

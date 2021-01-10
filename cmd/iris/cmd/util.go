@@ -305,8 +305,7 @@ func convertToMainCoin(cmd *cobra.Command, srcCoin sdk.Coin) (coin sdk.DecCoin, 
 }
 
 func queryToken(cmd *cobra.Command, denom string) (ft tokentypes.TokenI, err error) {
-	clientCtx := client.GetClientContextFromCmd(cmd)
-	clientCtx, err = client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+	clientCtx, err := client.GetClientQueryContext(cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -337,7 +336,7 @@ func parseCoins(srcCoinsStr string) (sdk.DecCoins, error) {
 	if cs, err := sdk.ParseDecCoins(srcCoinsStr); err == nil {
 		return cs, nil
 	}
-	if cs, err := sdk.ParseCoins(srcCoinsStr); err == nil {
+	if cs, err := sdk.ParseCoinsNormalized(srcCoinsStr); err == nil {
 		return sdk.NewDecCoinsFromCoins(cs...), nil
 	}
 	return sdk.DecCoins{}, fmt.Errorf("parsed decimal coins are invalid: %s", srcCoinsStr)

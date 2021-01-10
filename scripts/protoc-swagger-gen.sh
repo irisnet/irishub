@@ -2,9 +2,9 @@
 
 set -eo pipefail
 
-SDK_VERSION=v0.40.0-rc3
-IRISMOD_VERSION=v1.1.1-0.20201215020504-ae6a23d4bec2
-WASMD_VERSION=v0.12.1
+SDK_VERSION=v0.40.0-rc5
+IRISMOD_VERSION=v1.1.1-0.20201229063925-7d7dad20f951
+WASMD_VERSION=v0.13.1-0.20201217131318-53bbf96e9e87
 WASMD_PROTO_DIR=x/wasm/internal/types
 
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/cosmos
@@ -23,7 +23,7 @@ sed -i "" "s@${WASMD_PROTO_DIR}@wasm@g" `find ./proto/wasm -type file`
 
 mkdir -p ./tmp-swagger-gen
 
-proto_dirs=$(find ./proto -path -prune -o -name 'query.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+proto_dirs=$(find ./proto -path './proto/cosmos/base/tendermint*' -prune -o -name 'query.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
 
     # generate swagger files (filter query files)

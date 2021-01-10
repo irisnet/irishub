@@ -17,7 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -255,11 +255,11 @@ func migrateStaking(initialState v0_16.GenesisFileState) (*stakingtypes.GenesisS
 	for _, v := range initialState.StakeData.Validators {
 		status := stakingtypes.BondStatus(int32(v.Status) + 1)
 		bondedToken := v.Tokens.TruncateInt().Quo(Precision)
-		consPubKey, err := ed25519.FromTmEd25519(v.ConsPubKey)
+		consPubKey, err := cryptocodec.FromTmPubKeyInterface(v.ConsPubKey)
 		if err != nil {
 			panic(err)
 		}
-		pkAny, err := codectypes.PackAny(consPubKey)
+		pkAny, err := codectypes.NewAnyWithValue(consPubKey)
 		if err != nil {
 			panic(err)
 		}
@@ -587,7 +587,7 @@ func migrateService(initialState v0_16.GenesisFileState) *servicetypes.GenesisSt
 // ignore token that cannot be converted
 func convertCoinStr(coinStr string) (sdk.Coin, bool) {
 	c := strings.ReplaceAll(coinStr, IRISATTO, UIRIS)
-	coin, err := sdk.ParseCoin(c)
+	coin, err := sdk.ParseCoinNormalized(c)
 	if err != nil {
 		return sdk.Coin{}, false
 	}
