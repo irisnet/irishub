@@ -53,3 +53,9 @@ type mintTokenReq struct {
 	To      string       `json:"to"`     // address of minting token to
 	Amount  uint64       `json:"amount"` // amount of minting token
 }
+
+type burnTokenReq struct {
+	BaseReq rest.BaseReq `json:"base_req"`
+	Sender  string       `json:"owner"`  // the current owner address of the token
+	Amount  uint64       `json:"amount"` // amount of burning token
+}

@@ -122,6 +122,25 @@ func (suite *KeeperTestSuite) TestMintToken() {
 	suite.Equal("2000000000000000000000satoshi", amt.String())
 }
 
+func (suite *KeeperTestSuite) TestBurnToken() {
+	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 1000, 2000, true, owner.String())
+
+	err := suite.keeper.IssueToken(suite.ctx, *msg)
+	require.NoError(suite.T(), err)
+
+	suite.True(suite.keeper.HasToken(suite.ctx, msg.Symbol))
+
+	amt := suite.bk.GetBalance(suite.ctx, owner, msg.MinUnit)
+	suite.Equal("1000000000000000000000satoshi", amt.String())
+
+	msgBurnToken := types.NewMsgBurnToken(msg.Symbol, owner.String(), 200)
+	err = suite.keeper.BurnToken(suite.ctx, *msgBurnToken)
+	require.NoError(suite.T(), err)
+
+	amt = suite.bk.GetBalance(suite.ctx, owner, msg.MinUnit)
+	suite.Equal("800000000000000000000satoshi", amt.String())
+}
+
 func (suite *KeeperTestSuite) TestTransferToken() {
 
 	suite.TestIssueToken()

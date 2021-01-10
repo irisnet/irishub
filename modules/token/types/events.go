@@ -5,6 +5,7 @@ const (
 	EventTypeIssueToken         = "issue_token"
 	EventTypeEditToken          = "edit_token"
 	EventTypeMintToken          = "mint_token"
+	EventTypeBurnToken          = "burn_token"
 	EventTypeTransferTokenOwner = "transfer_token_owner"
 
 	AttributeValueCategory = ModuleName

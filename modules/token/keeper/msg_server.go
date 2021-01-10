@@ -108,6 +108,37 @@ func (m msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 	return &types.MsgMintTokenResponse{}, nil
 }
 
+func (m msgServer) BurnToken(goCtx context.Context, msg *types.MsgBurnToken) (*types.MsgBurnTokenResponse, error) {
+	owner, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := m.Keeper.DeductMintTokenFee(ctx, owner, msg.Symbol); err != nil {
+		return nil, err
+	}
+
+	if err := m.Keeper.BurnToken(ctx, *msg); err != nil {
+		return nil, err
+	}
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeBurnToken,
+			sdk.NewAttribute(types.AttributeKeySymbol, msg.Symbol),
+			sdk.NewAttribute(types.AttributeKeyAmount, strconv.FormatUint(msg.Amount, 10)),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+		),
+	})
+
+	return &types.MsgBurnTokenResponse{}, nil
+}
+
 func (m msgServer) TransferTokenOwner(goCtx context.Context, msg *types.MsgTransferTokenOwner) (*types.MsgTransferTokenOwnerResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if err := m.Keeper.TransferTokenOwner(ctx, *msg); err != nil {

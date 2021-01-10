@@ -91,6 +91,22 @@ This message is expected to fail if:
 - the `Owner` is not the token owner
 - the `Amount` `Coin` has exceeded the number of additional issuances（**MaxSupply - Issued**）
 
+## MsgBurnToken
+
+The owner of the token can mint some tokens to the specified account
+
+```go
+type MsgBurnToken struct {
+  Symbol string
+  Sender sdk.AccAddress
+  Amount uint64
+```
+
+This message is expected to fail if:
+
+- the `Symbol` is not existed
+- the `Amount` don't have enough tokens
+
 ## MsgTransferTokenOwner
 
 The ownership of the `token` can be transferred to others

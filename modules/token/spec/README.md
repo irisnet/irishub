@@ -20,6 +20,7 @@ This specification describes the management of Fungible Token on the chain, Anyo
     - [MsgIssueToken](02_messages.md#msgIssueToken)
     - [MsgEditToken](02_messages.md#msgEditToken)
     - [MsgMintToken](02_messages.md#msgMintToken)
+    - [MsgBurnToken](02_messages.md#msgBurnToken)
     - [MsgTransferTokenOwner](02_messages.md#msgTransferTokenOwner)
     - [MsgBeginRedelegate](02_messages.md#msgbeginredelegate)
 3. **[Events](03_events.md)**

@@ -29,6 +29,7 @@ func NewTxCmd() *cobra.Command {
 		GetCmdIssueToken(),
 		GetCmdEditToken(),
 		GetCmdMintToken(),
+		GetCmdBurnToken(),
 		GetCmdTransferTokenOwner(),
 	)
 
@@ -123,8 +124,6 @@ func GetCmdIssueToken() *cobra.Command {
 				prompt += fmt.Sprintf(": %s", issueFeeMainUnit)
 			}
 
-			// a confirmation is needed
-			prompt += "\nAre you sure to proceed?"
 			fmt.Println(prompt)
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
@@ -261,9 +260,62 @@ func GetCmdMintToken() *cobra.Command {
 				prompt += fmt.Sprintf(": %s", mintFeeMainUnit)
 			}
 
-			// a confirmation is needed
-			prompt += "\nAre you sure to proceed?"
 			fmt.Println(prompt)
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsMintToken)
+	_ = cmd.MarkFlagRequired(FlagAmount)
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func GetCmdBurnToken() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "burn [symbol]",
+		Long: "Burn tokens.",
+		Example: fmt.Sprintf(
+			"$ %s tx token burn <symbol> "+
+				"--amount=<amount> "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			owner := clientCtx.GetFromAddress().String()
+
+			amount, err := cmd.Flags().GetUint64(FlagAmount)
+			if err != nil {
+				return err
+			}
+
+			addr, err := cmd.Flags().GetString(FlagTo)
+			if err != nil {
+				return err
+			}
+			if len(strings.TrimSpace(addr)) > 0 {
+				if _, err = sdk.AccAddressFromBech32(addr); err != nil {
+					return err
+				}
+			}
+
+			msg := types.NewMsgBurnToken(
+				strings.TrimSpace(args[0]), owner, amount,
+			)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},

@@ -135,6 +135,31 @@ func TestMsgMintTokenValidateBasic(t *testing.T) {
 	}
 }
 
+func TestMsgBurnTokenValidateBasic(t *testing.T) {
+	testData := []struct {
+		msg        string
+		symbol     string
+		sender     string
+		amount     uint64
+		expectPass bool
+	}{
+		{"basic good", "btc", addr1, 1000, true},
+		{"empty symbol", "", addr1, 1000, false},
+		{"wrong symbol", "bt", addr1, 1000, false},
+		{"empty sender", "btc", emptyAddr, 1000, false},
+		{"invalid amount", "btc", addr1, 0, false},
+	}
+
+	for _, td := range testData {
+		msg := NewMsgBurnToken(td.symbol, td.sender, td.amount)
+		if td.expectPass {
+			require.Nil(t, msg.ValidateBasic(), "test: %v", td.msg)
+		} else {
+			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.msg)
+		}
+	}
+}
+
 func TestMsgTransferTokenOwnerValidation(t *testing.T) {
 	testData := []struct {
 		name       string

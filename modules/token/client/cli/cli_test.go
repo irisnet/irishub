@@ -163,6 +163,32 @@ func (s *IntegrationTestSuite) TestToken() {
 	exceptedAmount := initAmount + mintAmount
 	s.Require().Equal(exceptedAmount, balance.Amount.Int64())
 
+	//------test GetCmdBurnToken()-------------
+
+	burnAmount := int64(2000000)
+
+	args = []string{
+		fmt.Sprintf("--%s=%d", tokencli.FlagAmount, burnAmount),
+
+		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+	}
+	respType = proto.Message(&sdk.TxResponse{})
+	bz, err = tokentestutil.BurnTokenExec(clientCtx, from.String(), symbol, args...)
+
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp = respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
+
+	out, err = simapp.QueryBalanceExec(clientCtx, from.String(), strings.ToLower(symbol))
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
+	balance = coinType.(*sdk.Coin)
+	exceptedAmount = exceptedAmount - burnAmount
+	s.Require().Equal(exceptedAmount, balance.Amount.Int64())
+
 	//------test GetCmdEditToken()-------------
 	newName := "Wd Token"
 	newMaxSupply := 200000000

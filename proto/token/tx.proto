@@ -17,6 +17,9 @@ service Msg {
     // MintToken defines a method for minting some tokens.
     rpc MintToken(MsgMintToken) returns (MsgMintTokenResponse);
 
+    // BurnToken defines a method for burning some tokens.
+    rpc BurnToken(MsgBurnToken) returns (MsgBurnTokenResponse);
+
     // TransferTokenOwner defines a method for minting some tokens.
     rpc TransferTokenOwner(MsgTransferTokenOwner) returns (MsgTransferTokenOwnerResponse);
 }
@@ -26,9 +29,9 @@ message MsgIssueToken {
     string symbol = 1;
     string name = 2;
     uint32 scale = 3;
-    string min_unit = 4 [(gogoproto.moretags) = "yaml:\"min_unit\""];
-    uint64 initial_supply = 5 [(gogoproto.moretags) = "yaml:\"initial_supply\""];
-    uint64 max_supply = 6 [(gogoproto.moretags) = "yaml:\"max_supply\""];
+    string min_unit = 4 [ (gogoproto.moretags) = "yaml:\"min_unit\"" ];
+    uint64 initial_supply = 5 [ (gogoproto.moretags) = "yaml:\"initial_supply\"" ];
+    uint64 max_supply = 6 [ (gogoproto.moretags) = "yaml:\"max_supply\"" ];
     bool mintable = 7;
     string owner = 8;
 }
@@ -38,8 +41,8 @@ message MsgIssueTokenResponse {}
 
 // MsgMintToken defines an SDK message for transferring the token owner.
 message MsgTransferTokenOwner {
-    string src_owner = 1 [(gogoproto.moretags) = "yaml:\"src_owner\""];
-    string dst_owner = 2 [(gogoproto.moretags) = "yaml:\"dst_owner\""];
+    string src_owner = 1 [ (gogoproto.moretags) = "yaml:\"src_owner\"" ];
+    string dst_owner = 2 [ (gogoproto.moretags) = "yaml:\"dst_owner\"" ];
     string symbol = 3;
 }
 
@@ -50,8 +53,8 @@ message MsgTransferTokenOwnerResponse {}
 message MsgEditToken {
     string symbol = 1;
     string name = 2;
-    uint64 max_supply = 3 [(gogoproto.moretags) = "yaml:\"max_supply\""];
-    string mintable = 4 [(gogoproto.casttype) = "Bool"];
+    uint64 max_supply = 3 [ (gogoproto.moretags) = "yaml:\"max_supply\"" ];
+    string mintable = 4 [ (gogoproto.casttype) = "Bool" ];
     string owner = 5;
 }
 
@@ -68,3 +71,13 @@ message MsgMintToken {
 
 // MsgMintTokenResponse defines the Msg/MintToken response type.
 message MsgMintTokenResponse {}
+
+// MsgBurnToken defines an SDK message for burning some tokens.
+message MsgBurnToken {
+    string symbol = 1;
+    uint64 amount = 2;
+    string sender = 3;
+}
+
+// MsgBurnTokenResponse defines the Msg/BurnToken response type.
+message MsgBurnTokenResponse {}

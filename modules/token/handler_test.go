@@ -110,3 +110,25 @@ func (suite *HandlerSuite) TestMintToken() {
 	endNativeAmt := suite.bk.GetBalance(suite.ctx, owner, denom).Amount
 	suite.Equal(beginNativeAmt.Sub(fee.Amount), endNativeAmt)
 }
+
+func (suite *HandlerSuite) TestBurnToken() {
+	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 1000, 2000, true, owner.String())
+
+	err := suite.keeper.IssueToken(suite.ctx, *msg)
+	suite.NoError(err)
+
+	suite.True(suite.keeper.HasToken(suite.ctx, msg.Symbol))
+
+	beginBtcAmt := suite.bk.GetBalance(suite.ctx, owner, msg.MinUnit).Amount
+	suite.Equal(sdk.NewIntWithDecimal(int64(msg.InitialSupply), int(msg.Scale)), beginBtcAmt)
+
+	h := token.NewHandler(suite.keeper)
+
+	msgBurnToken := types.NewMsgBurnToken(msg.Symbol, owner.String(), 200)
+	_, err = h(suite.ctx, msgBurnToken)
+	suite.NoError(err)
+
+	endBtcAmt := suite.bk.GetBalance(suite.ctx, owner, msg.MinUnit).Amount
+	burnBtcAmt := sdk.NewIntWithDecimal(int64(msgBurnToken.Amount), int(msg.Scale))
+	suite.Equal(beginBtcAmt.Sub(burnBtcAmt), endBtcAmt)
+}

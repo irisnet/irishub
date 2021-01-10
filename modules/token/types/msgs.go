@@ -14,6 +14,7 @@ const (
 	TypeMsgIssueToken         = "issue_token"
 	TypeMsgEditToken          = "edit_token"
 	TypeMsgMintToken          = "mint_token"
+	TypeMsgBurnToken          = "burn_token"
 	TypeMsgTransferTokenOwner = "transfer_token_owner"
 
 	// constant used to indicate that some field should not be updated
@@ -38,6 +39,7 @@ var (
 	_ sdk.Msg = &MsgIssueToken{}
 	_ sdk.Msg = &MsgEditToken{}
 	_ sdk.Msg = &MsgMintToken{}
+	_ sdk.Msg = &MsgBurnToken{}
 	_ sdk.Msg = &MsgTransferTokenOwner{}
 )
 
@@ -175,6 +177,25 @@ func (msg MsgEditToken) Route() string { return MsgRoute }
 // Type implements Msg
 func (msg MsgEditToken) Type() string { return TypeMsgEditToken }
 
+// GetSignBytes implements Msg
+func (msg MsgEditToken) GetSignBytes() []byte {
+	b, err := ModuleCdc.MarshalJSON(&msg)
+	if err != nil {
+		panic(err)
+	}
+
+	return sdk.MustSortJSON(b)
+}
+
+// GetSigners implements Msg
+func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
+	from, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
+}
+
 // ValidateBasic implements Msg
 func (msg MsgEditToken) ValidateBasic() error {
 	// check owner
@@ -193,25 +214,6 @@ func (msg MsgEditToken) ValidateBasic() error {
 
 	// check symbol
 	return CheckSymbol(msg.Symbol)
-}
-
-// GetSignBytes implements Msg
-func (msg MsgEditToken) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-
-	return sdk.MustSortJSON(b)
-}
-
-// GetSigners implements Msg
-func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
-	from, err := sdk.AccAddressFromBech32(msg.Owner)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{from}
 }
 
 // NewMsgMintToken creates a MsgMintToken
@@ -260,6 +262,53 @@ func (msg MsgMintToken) ValidateBasic() error {
 		if _, err := sdk.AccAddressFromBech32(msg.To); err != nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid mint reception address (%s)", err)
 		}
+	}
+
+	if msg.Amount == 0 || msg.Amount > MaximumMaxSupply {
+		return sdkerrors.Wrapf(ErrInvalidMaxSupply, "invalid token amount %d, only accepts value (0, %d]", msg.Amount, MaximumMaxSupply)
+	}
+
+	return CheckSymbol(msg.Symbol)
+}
+
+// NewMsgBurnToken creates a MsgMintToken
+func NewMsgBurnToken(symbol string, owner string, amount uint64) *MsgBurnToken {
+	return &MsgBurnToken{
+		Symbol: symbol,
+		Amount: amount,
+		Sender: owner,
+	}
+}
+
+// Route implements Msg
+func (msg MsgBurnToken) Route() string { return MsgRoute }
+
+// Type implements Msg
+func (msg MsgBurnToken) Type() string { return TypeMsgBurnToken }
+
+// GetSignBytes implements Msg
+func (msg MsgBurnToken) GetSignBytes() []byte {
+	b, err := ModuleCdc.MarshalJSON(&msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// GetSigners implements Msg
+func (msg MsgBurnToken) GetSigners() []sdk.AccAddress {
+	from, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
+}
+
+// ValidateBasic implements Msg
+func (msg MsgBurnToken) ValidateBasic() error {
+	// check the owner
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	if msg.Amount == 0 || msg.Amount > MaximumMaxSupply {

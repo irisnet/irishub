@@ -42,6 +42,16 @@ func MintTokenExec(clientCtx client.Context, from string, symbol string, extraAr
 	return clitestutil.ExecTestCLICmd(clientCtx, tokencli.GetCmdMintToken(), args)
 }
 
+func BurnTokenExec(clientCtx client.Context, from string, symbol string, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := []string{
+		symbol,
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, tokencli.GetCmdBurnToken(), args)
+}
+
 func TransferTokenOwnerExec(clientCtx client.Context, from string, symbol string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		symbol,

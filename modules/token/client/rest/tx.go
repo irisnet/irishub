@@ -23,6 +23,8 @@ func registerTxRoutes(cliCtx client.Context, r *mux.Router) {
 	r.HandleFunc(fmt.Sprintf("/%s/tokens/{%s}/transfer", types.ModuleName, RestParamSymbol), transferOwnerHandlerFn(cliCtx)).Methods("POST")
 	// mint token
 	r.HandleFunc(fmt.Sprintf("/%s/tokens/{%s}/mint", types.ModuleName, RestParamSymbol), mintTokenHandlerFn(cliCtx)).Methods("POST")
+	// burn token
+	r.HandleFunc(fmt.Sprintf("/%s/tokens/{%s}/burn", types.ModuleName, RestParamSymbol), burnTokenHandlerFn(cliCtx)).Methods("POST")
 }
 
 func issueTokenHandlerFn(cliCtx client.Context) http.HandlerFunc {
@@ -132,6 +134,32 @@ func mintTokenHandlerFn(cliCtx client.Context) http.HandlerFunc {
 
 		// create the MsgMintToken message
 		msg := types.NewMsgMintToken(symbol, req.Owner, req.To, req.Amount)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, msg)
+	}
+}
+
+func burnTokenHandlerFn(cliCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		symbol := strings.TrimSpace(vars[RestParamSymbol])
+
+		var req burnTokenReq
+		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
+			return
+		}
+
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		// create the MsgMintToken message
+		msg := types.NewMsgBurnToken(symbol, req.Sender, req.Amount)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

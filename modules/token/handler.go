@@ -28,6 +28,10 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			res, err := msgServer.MintToken(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
+		case *types.MsgBurnToken:
+			res, err := msgServer.BurnToken(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+
 		case *types.MsgTransferTokenOwner:
 			res, err := msgServer.TransferTokenOwner(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)

@@ -27,6 +27,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgIssueToken{}, "irismod/token/MsgIssueToken", nil)
 	cdc.RegisterConcrete(&MsgEditToken{}, "irismod/token/MsgEditToken", nil)
 	cdc.RegisterConcrete(&MsgMintToken{}, "irismod/token/MsgMintToken", nil)
+	cdc.RegisterConcrete(&MsgBurnToken{}, "irismod/token/MsgBurnToken", nil)
 	cdc.RegisterConcrete(&MsgTransferTokenOwner{}, "irismod/token/MsgTransferTokenOwner", nil)
 }
 
@@ -35,6 +36,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgIssueToken{},
 		&MsgEditToken{},
 		&MsgMintToken{},
+		&MsgBurnToken{},
 		&MsgTransferTokenOwner{},
 	)
 	registry.RegisterInterface(
