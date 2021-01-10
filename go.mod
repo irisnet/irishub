@@ -3,7 +3,6 @@ module github.com/irisnet/irishub
 go 1.15
 
 require (
-	github.com/CosmWasm/wasmd v0.13.1-0.20201217131318-53bbf96e9e87
 	github.com/cosmos/cosmos-sdk v0.40.0
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.3
@@ -22,6 +21,7 @@ require (
 	github.com/tendermint/tendermint v0.34.1
 	github.com/tendermint/tm-db v0.6.3
 	github.com/tidwall/gjson v1.6.1 // indirect
+	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
 	google.golang.org/genproto v0.0.0-20201214200347-8c77b98c765d
 	google.golang.org/grpc v1.34.0
 	gopkg.in/yaml.v2 v2.4.0

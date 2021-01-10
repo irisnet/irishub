@@ -202,14 +202,6 @@
                     "Params": "GuardianParams"
                 }
             }
-        },
-        {
-            "url": "./tmp-swagger-gen/wasm/query.swagger.json",
-            "operationIds": {
-                "rename": {
-                    "Params": "WasmParams"
-                }
-            }
         }
     ]
 }
