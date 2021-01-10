@@ -5,6 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/server"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
+
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/cmd/iris/cmd"
 	_ "github.com/irisnet/irishub/lite/statik"
