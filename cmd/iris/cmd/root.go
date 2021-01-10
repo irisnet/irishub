@@ -30,8 +30,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 
-	"github.com/CosmWasm/wasmd/x/wasm"
-
 	"github.com/irisnet/irishub/app"
 )
 
@@ -98,7 +96,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 
 func addModuleInitFlags(rootCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(rootCmd)
-	wasm.AddModuleInitFlags(rootCmd)
 }
 
 func queryCommand() *cobra.Command {
