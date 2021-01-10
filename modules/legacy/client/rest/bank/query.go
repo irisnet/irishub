@@ -11,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+
 	"github.com/irisnet/irishub/modules/legacy/types"
 )
 

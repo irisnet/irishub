@@ -4,22 +4,14 @@ set -eo pipefail
 
 SDK_VERSION=v0.40.0-rc5
 IRISMOD_VERSION=v1.1.1-0.20201229063925-7d7dad20f951
-WASMD_VERSION=v0.13.1-0.20201217131318-53bbf96e9e87
-WASMD_PROTO_DIR=x/wasm/internal/types
 
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/cosmos
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/ibc
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto
-chmod -R 755 ${GOPATH}/pkg/mod/github.com/!cosm!wasm/wasmd@${WASMD_VERSION}/${WASMD_PROTO_DIR}
-
-mkdir -p ./proto/wasm
 
 cp -r ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/cosmos ./proto
 cp -r ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/ibc ./proto
 cp -r ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto ./
-cp -r ${GOPATH}/pkg/mod/github.com/!cosm!wasm/wasmd@${WASMD_VERSION}/${WASMD_PROTO_DIR}/*.proto ./proto/wasm
-
-sed -i "" "s@${WASMD_PROTO_DIR}@wasm@g" `find ./proto/wasm -type file`
 
 mkdir -p ./tmp-swagger-gen
 
@@ -71,4 +63,3 @@ rm -rf ./proto/random
 rm -rf ./proto/record
 rm -rf ./proto/service
 rm -rf ./proto/token
-rm -fr ./proto/wasm
