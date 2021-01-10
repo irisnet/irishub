@@ -3,11 +3,11 @@ package stake
 import (
 	"time"
 
-	tmamino "github.com/cosmos/cosmos-sdk/crypto/codec"
+	"github.com/cosmos/cosmos-sdk/codec/legacy"
+	"github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/tendermint/tendermint/crypto"
-
-	"github.com/irisnet/irishub/migrate/v0_16/types"
+	tmjson "github.com/tendermint/tendermint/libs/json"
 )
 
 type GenesisState struct {
@@ -147,7 +147,7 @@ func (b BondStatus) Equal(b2 BondStatus) bool {
 // UnmarshalJSON unmarshals the validator from JSON using Bech32
 func (v *Validator) UnmarshalJSON(data []byte) error {
 	bv := &bechValidator{}
-	if err := types.CodeC.UnmarshalJSON(data, bv); err != nil {
+	if err := tmjson.Unmarshal(data, bv); err != nil {
 		return err
 	}
 	bz, err := sdk.GetFromBech32(bv.ConsPubKey, "icp")
@@ -157,10 +157,12 @@ func (v *Validator) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	consPubKey, err := tmamino.PubKeyFromBytes(bz)
+	pubkey, err := legacy.PubKeyFromBytes(bz)
 	if err != nil {
 		return err
 	}
+
+	consPubKey, err := codec.ToTmPubKeyInterface(pubkey)
 
 	*v = Validator{
 		OperatorAddr:     bv.OperatorAddr,

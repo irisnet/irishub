@@ -28,8 +28,8 @@ import (
 	"github.com/irisnet/irishub/migrate/v0_16/service"
 	"github.com/irisnet/irishub/migrate/v0_16/slashing"
 	"github.com/irisnet/irishub/migrate/v0_16/stake"
-	"github.com/irisnet/irishub/migrate/v0_16/types"
 	"github.com/irisnet/irishub/migrate/v0_16/upgrade"
+	tmjson "github.com/tendermint/tendermint/libs/json"
 )
 
 type GenesisFileState struct {
@@ -94,7 +94,7 @@ func GenesisDocFromFile(genDocFile string) (*GenesisDoc, error) {
 
 func GenesisDocFromJSON(jsonBlob []byte) (*GenesisDoc, error) {
 	genDoc := GenesisDoc{}
-	err := types.CodeC.UnmarshalJSON(jsonBlob, &genDoc)
+	err := tmjson.Unmarshal(jsonBlob, &genDoc)
 	if err != nil {
 		return nil, err
 	}
