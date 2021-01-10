@@ -97,7 +97,7 @@ func queryRandomRequestQueueByHeight(ctx sdk.Context, height int64, k Keeper) []
 func queryAllRandomRequestsInQueue(ctx sdk.Context, k Keeper) []types.Request {
 	var requests = make([]types.Request, 0)
 
-	k.IterateRandomRequestQueue(ctx, func(h int64, r types.Request) (stop bool) {
+	k.IterateRandomRequestQueue(ctx, func(h int64, reqID []byte, r types.Request) (stop bool) {
 		requests = append(requests, r)
 		return false
 	})

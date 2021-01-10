@@ -62,7 +62,7 @@ func (suite *GenesisTestSuite) TestExportGenesis() {
 
 	// get the pending requests from queue
 	storedRequests := make(map[int64][]types.Request)
-	suite.keeper.IterateRandomRequestQueue(suite.ctx, func(h int64, r types.Request) bool {
+	suite.keeper.IterateRandomRequestQueue(suite.ctx, func(h int64, reqID []byte, r types.Request) bool {
 		storedRequests[h] = append(storedRequests[h], r)
 		return false
 	})
@@ -76,7 +76,6 @@ func (suite *GenesisTestSuite) TestExportGenesis() {
 	// assert that exported requests are consistent with requests in queue
 	for height, requests := range exportedRequests {
 		h, _ := strconv.ParseInt(height, 10, 64)
-		storedHeight := h + testNewHeight - 1
-		suite.Equal(storedRequests[storedHeight], requests.Requests)
+		suite.Equal(storedRequests[h], requests.Requests)
 	}
 }

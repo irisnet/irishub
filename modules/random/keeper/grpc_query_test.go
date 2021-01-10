@@ -51,7 +51,7 @@ func (suite *KeeperTestSuite) TestGRPCRandomRequestQueue() {
 	suite.Require().NoError(err)
 	var requests = make([]types.Request, 0)
 
-	app.RandomKeeper.IterateRandomRequestQueue(ctx, func(h int64, r types.Request) (stop bool) {
+	app.RandomKeeper.IterateRandomRequestQueue(ctx, func(h int64, reqID []byte, r types.Request) (stop bool) {
 		requests = append(requests, r)
 		return false
 	})

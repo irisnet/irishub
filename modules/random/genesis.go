@@ -27,8 +27,8 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	pendingRequests := make(map[string]types.Requests)
 
-	k.IterateRandomRequestQueue(ctx, func(height int64, request types.Request) bool {
-		leftHeight := fmt.Sprintf("%d", height-ctx.BlockHeight()+1)
+	k.IterateRandomRequestQueue(ctx, func(height int64, reqID []byte, request types.Request) bool {
+		leftHeight := fmt.Sprintf("%d", height)
 		heightRequests, ok := pendingRequests[leftHeight]
 		if ok {
 			heightRequests.Requests = append(heightRequests.Requests, request)
@@ -42,4 +42,13 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	})
 
 	return &types.GenesisState{PendingRandomRequests: pendingRequests}
+}
+
+func PrepForZeroHeightGenesis(ctx sdk.Context, k keeper.Keeper) {
+	k.IterateRandomRequestQueue(ctx, func(height int64, reqID []byte, request types.Request) bool {
+		leftHeight := height-ctx.BlockHeight()+1
+		k.DequeueRandomRequest(ctx, height, reqID)
+		k.EnqueueRandomRequest(ctx, leftHeight, reqID, request)
+		return false
+	})
 }

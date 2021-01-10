@@ -169,7 +169,7 @@ func (k Keeper) IterateRandomRequestQueueByHeight(ctx sdk.Context, height int64)
 }
 
 // IterateRandomRequestQueue iterates through the random number request queue
-func (k Keeper) IterateRandomRequestQueue(ctx sdk.Context, op func(h int64, r types.Request) (stop bool)) {
+func (k Keeper) IterateRandomRequestQueue(ctx sdk.Context, op func(h int64, reqID []byte, r types.Request) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
 	iterator := sdk.KVStorePrefixIterator(store, types.PrefixRandomRequestQueue)
@@ -178,11 +178,12 @@ func (k Keeper) IterateRandomRequestQueue(ctx sdk.Context, op func(h int64, r ty
 	for ; iterator.Valid(); iterator.Next() {
 		keyParts := bytes.Split(iterator.Key(), types.KeyDelimiter)
 		height, _ := strconv.ParseInt(string(keyParts[1]), 10, 64)
+		reqID := keyParts[2]
 
 		var request types.Request
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &request)
 
-		if stop := op(height, request); stop {
+		if stop := op(height, reqID, request); stop {
 			break
 		}
 	}

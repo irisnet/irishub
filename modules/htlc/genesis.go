@@ -3,7 +3,6 @@ package htlc
 import (
 	"encoding/hex"
 	"fmt"
-
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -32,18 +31,28 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	k.IterateHTLCs(ctx, func(hlock tmbytes.HexBytes, h types.HTLC) (stop bool) {
 		if h.State == types.Open {
-			h.ExpirationHeight = h.ExpirationHeight - uint64(ctx.BlockHeight()) + 1
 			pendingHtlcs[hlock.String()] = h
-		} else if h.State == types.Expired {
-			if err := k.RefundHTLC(ctx, hlock); err != nil {
-				panic(fmt.Errorf("failed to export the HTLC genesis state: %s", hlock.String()))
-			}
 		}
-
 		return false
 	})
 
 	return &types.GenesisState{
 		PendingHtlcs: pendingHtlcs,
 	}
+}
+
+func PrepForZeroHeightGenesis(ctx sdk.Context, k keeper.Keeper) {
+	k.IterateHTLCs(
+		ctx,
+		func(hlock tmbytes.HexBytes, h types.HTLC) (stop bool) {
+			if h.State == types.Open {
+				h.ExpirationHeight = h.ExpirationHeight - uint64(ctx.BlockHeight()) + 1
+				k.SetHTLC(ctx,h,hlock)
+			} else if h.State == types.Expired {
+				if err := k.RefundHTLC(ctx, hlock); err != nil {
+					panic(fmt.Errorf("failed to export the HTLC genesis state: %s", hlock.String()))
+				}
+			}
+			return false
+		})
 }
