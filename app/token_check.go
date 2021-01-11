@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
 
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
@@ -29,7 +30,7 @@ func (ctd CheckTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 	for _, msg := range tx.GetMsgs() {
 		switch msg := msg.(type) {
 		case *ibctransfertypes.MsgTransfer:
-			if strings.HasPrefix(msg.Token.Denom, coinswaptypes.FormatUniABSPrefix) {
+			if containCoinPrefix(sdk.NewCoins(msg.Token), coinswaptypes.FormatUniABSPrefix) {
 				return ctx, sdkerrors.Wrap(
 					sdkerrors.ErrInvalidRequest, "can't transfer coinswap coin from the ibc module")
 			}
@@ -38,7 +39,26 @@ func (ctd CheckTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 				return ctx, sdkerrors.Wrapf(
 					sdkerrors.ErrInvalidRequest, "can't burn token %s，only the token managed by the token module can be burned", msg.Symbol)
 			}
+		case *govtypes.MsgSubmitProposal:
+			if containCoinPrefix(msg.InitialDeposit, coinswaptypes.FormatUniABSPrefix) {
+				return ctx, sdkerrors.Wrapf(
+					sdkerrors.ErrInvalidRequest, "can't deposit token %s for proposal", msg.InitialDeposit)
+			}
+		case *govtypes.MsgDeposit:
+			if containCoinPrefix(msg.Amount, coinswaptypes.FormatUniABSPrefix) {
+				return ctx, sdkerrors.Wrapf(
+					sdkerrors.ErrInvalidRequest, "can't deposit token %s for proposal", msg.Amount)
+			}
 		}
 	}
 	return next(ctx, tx, simulate)
+}
+
+func containCoinPrefix(coins sdk.Coins, prefix string) bool {
+	for _, coin := range coins {
+		if strings.HasPrefix(coin.Denom, prefix) {
+			return true
+		}
+	}
+	return false
 }
