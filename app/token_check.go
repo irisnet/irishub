@@ -32,22 +32,22 @@ func (ctd CheckTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 		case *ibctransfertypes.MsgTransfer:
 			if containCoinPrefix(sdk.NewCoins(msg.Token), coinswaptypes.FormatUniABSPrefix) {
 				return ctx, sdkerrors.Wrap(
-					sdkerrors.ErrInvalidRequest, "can't transfer coinswap coin from the ibc module")
+					sdkerrors.ErrInvalidRequest, "can't transfer coinswap liquidity tokens through the IBC module")
 			}
 		case *tokentypes.MsgBurnToken:
 			if _, err := ctd.tk.GetToken(ctx, msg.Symbol); err != nil {
-				return ctx, sdkerrors.Wrapf(
-					sdkerrors.ErrInvalidRequest, "can't burn token %s，only the token managed by the token module can be burned", msg.Symbol)
+				return ctx, sdkerrors.Wrap(
+					sdkerrors.ErrInvalidRequest, "burnt failed, only native tokens can be burnt")
 			}
 		case *govtypes.MsgSubmitProposal:
 			if containCoinPrefix(msg.InitialDeposit, coinswaptypes.FormatUniABSPrefix) {
-				return ctx, sdkerrors.Wrapf(
-					sdkerrors.ErrInvalidRequest, "can't deposit token %s for proposal", msg.InitialDeposit)
+				return ctx, sdkerrors.Wrap(
+					sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
 			}
 		case *govtypes.MsgDeposit:
 			if containCoinPrefix(msg.Amount, coinswaptypes.FormatUniABSPrefix) {
-				return ctx, sdkerrors.Wrapf(
-					sdkerrors.ErrInvalidRequest, "can't deposit token %s for proposal", msg.Amount)
+				return ctx, sdkerrors.Wrap(
+					sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity  token %s for proposal")
 			}
 		}
 	}
