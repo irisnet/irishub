@@ -10,6 +10,7 @@ token模块用于管理你在IRIS Hub上发行的资产。
 | [edit](#iris-tx-token-edit)         | 编辑通证                 |
 | [transfer](#iris-tx-token-transfer) | 转让通证所有权           |
 | [mint](#iris-tx-token-mint)         | 增发通证到指定账户       |
+| [burn](#iris-tx-token-burn)         | 销毁通证                 |
 | [token](#iris-query-token-token)    | 查询通证                 |
 | [tokens](#iris-query-token-tokens)  | 查询指定所有者的通证集合 |
 | [fee](#iris-query-token-fee)        | 查询通证相关费用         |
@@ -114,6 +115,26 @@ iris tx token mint [symbol] [flags]
 
 ```bash
 iris tx token mint <symbol> --amount=<amount> --to=<to> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
+```
+
+## iris tx token burn
+
+增发通证到指定地址。
+
+```bash
+iris tx token burn [symbol] [flags]
+```
+
+**标识：**
+
+| 名称，速记 | 类型   | 必须 | 默认 | 描述       |
+| ---------- | ------ | ---- | ---- | ---------- |
+| --amount   | uint64 | 是   | 0    | 销毁的数量 |
+
+### 销毁通证
+
+```bash
+iris tx token burn <symbol> --amount=<amount> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ## iris query token token
