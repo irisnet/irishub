@@ -101,7 +101,7 @@ Sell exact amount of a token for buying another, non of them are standard token
 @return: actual amount of the token to be bought
 */
 func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Input, output types.Output) (sdk.Int, error) {
-	standardDenom := k.GetParams(ctx).StandardDenom
+	standardDenom := k.GetStandardDenom(ctx)
 	standardAmount, err := k.calculateWithExactInput(ctx, input.Coin, standardDenom)
 	if err != nil {
 		return sdk.ZeroInt(), err
@@ -215,7 +215,7 @@ Buy exact amount of a token by specifying the max amount of another token, non o
 @return : actual amount of the token to be paid
 */
 func (k Keeper) doubleTradeInputForExactOutput(ctx sdk.Context, input types.Input, output types.Output) (sdk.Int, error) {
-	standardDenom := k.GetParams(ctx).StandardDenom
+	standardDenom := k.GetStandardDenom(ctx)
 	soldStandardAmount, err := k.calculateWithExactOutput(ctx, output.Coin, standardDenom)
 	if err != nil {
 		return sdk.ZeroInt(), err

@@ -21,7 +21,7 @@ func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
 func queryLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id := vars[RestPoolID]
+		denom := vars[RestPoolID]
 
 		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
 		if !ok {
@@ -29,7 +29,7 @@ func queryLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		}
 
 		params := types.QueryLiquidityParams{
-			ID: id,
+			Denom: denom,
 		}
 
 		bz, err := cliCtx.LegacyAmino.MarshalJSON(params)

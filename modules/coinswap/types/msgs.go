@@ -15,12 +15,17 @@ var (
 )
 
 const (
-	FormatUniABSPrefix = "uni:"   // format uni ABS Prefix
-	FormatUniDenom     = "uni:%s" // format uni denom
+	// FormatUniABSPrefix define the prefix of liquidity token
+	FormatUniABSPrefix = "swap/"
+	// FormatUniDenom define the name of liquidity token
+	FormatUniDenom = "swap/%s"
 
-	TypeMsgAddLiquidity    = "add_liquidity"    // type for MsgAddLiquidity
-	TypeMsgRemoveLiquidity = "remove_liquidity" // type for MsgRemoveLiquidity
-	TypeMsgSwapOrder       = "swap_order"       // type for MsgSwapOrder
+	// TypeMsgAddLiquidity define the event type of the MsgAddLiquidity
+	TypeMsgAddLiquidity = "add_liquidity"
+	// TypeMsgRemoveLiquidity define the event type of the MsgRemoveLiquidity
+	TypeMsgRemoveLiquidity = "remove_liquidity"
+	// TypeMsgSwapOrder define the event type of the MsgSwapOrder
+	TypeMsgSwapOrder = "swap_order"
 )
 
 /* --------------------------------------------------------------------------- */

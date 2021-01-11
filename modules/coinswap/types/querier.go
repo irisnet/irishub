@@ -7,5 +7,5 @@ const (
 
 // QueryLiquidityParams is the query parameters for 'custom/swap/liquidity'
 type QueryLiquidityParams struct {
-	ID string `json:"id" yaml:"id"` // same as uniDenom
+	Denom string `json:"denom" yaml:"denom"` // same as uniDenom
 }

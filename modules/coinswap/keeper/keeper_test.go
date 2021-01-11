@@ -55,7 +55,7 @@ func (suite *TestSuite) TestParams() {
 		params types.Params
 	}{
 		{types.DefaultParams()},
-		{types.NewParams(sdk.NewDecWithPrec(5, 10), denomStandard)},
+		{types.NewParams(sdk.NewDecWithPrec(5, 10))},
 	}
 	for _, tc := range cases {
 		suite.app.CoinswapKeeper.SetParams(suite.ctx, tc.params)

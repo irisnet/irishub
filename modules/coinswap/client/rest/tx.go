@@ -31,15 +31,9 @@ func registerTxRoutes(cliCtx client.Context, r *mux.Router) {
 func addLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		uniDenom := vars[RestPoolID]
+		denom := vars[RestPoolID]
 
-		if err := types.CheckUniDenom(uniDenom); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		tokenDenom, err := types.GetCoinDenomFromUniDenom(uniDenom)
-		if err != nil {
+		if err := sdk.ValidateDenom(denom); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -90,7 +84,7 @@ func addLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgAddLiquidity(sdk.NewCoin(tokenDenom, maxToken), exactStandardAmt, minLiquidity, deadline.Unix(), req.Sender)
+		msg := types.NewMsgAddLiquidity(sdk.NewCoin(denom, maxToken), exactStandardAmt, minLiquidity, deadline.Unix(), req.Sender)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -104,9 +98,9 @@ func addLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 func removeLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		uniDenom := vars[RestPoolID]
+		denom := vars[RestPoolID]
 
-		if err := types.CheckUniDenom(uniDenom); err != nil {
+		if err := sdk.ValidateDenom(denom); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -154,6 +148,12 @@ func removeLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		liquidityAmt, ok := sdk.NewIntFromString(req.WithdrawLiquidity)
 		if !ok || !liquidityAmt.IsPositive() {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid liquidity amount: "+req.WithdrawLiquidity)
+			return
+		}
+
+		uniDenom, e := types.GetUniDenomFromDenom(denom)
+		if e != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, e.Error())
 			return
 		}
 

@@ -15,9 +15,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		panic(fmt.Errorf("panic for ValidateGenesis,%v", err))
 	}
 	k.SetParams(ctx, data.Params)
+	k.SetStandardDenom(ctx, data.StandardDenom)
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper.
 func ExportGenesis(ctx sdk.Context, keeper keeper.Keeper) *types.GenesisState {
-	return types.NewGenesisState(keeper.GetParams(ctx))
+	return types.NewGenesisState(keeper.GetParams(ctx), keeper.GetStandardDenom(ctx))
 }

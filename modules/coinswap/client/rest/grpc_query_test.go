@@ -73,7 +73,8 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	maxSupply := int64(200000000)
 	mintable := true
 	baseURL := val.APIAddress
-	uniKitty := "uni:kitty"
+	uniKitty, err := coinswaptypes.GetUniDenomFromDenom(symbol)
+	s.Require().NoError(err)
 
 	//------test GetCmdIssueToken()-------------
 	args := []string{
@@ -162,12 +163,14 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	out, err = simapp.QueryBalancesExec(clientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
-	balances = respType.(*banktypes.QueryAllBalancesResponse)
-	s.Require().Equal("99999000", balances.Balances[0].Amount.String())
-	s.Require().Equal("399985965", balances.Balances[2].Amount.String())
-	s.Require().Equal("1000", balances.Balances[3].Amount.String())
 
-	url := fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, uniKitty)
+	balances = respType.(*banktypes.QueryAllBalancesResponse)
+	coins := balances.Balances
+	s.Require().Equal("99999000", coins.AmountOf(symbol).String())
+	s.Require().Equal("399985965", coins.AmountOf(sdk.DefaultBondDenom).String())
+	s.Require().Equal("1000", coins.AmountOf(uniKitty).String())
+
+	url := fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
 	resp, err := rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().Equal("1000", gjson.Get(string(resp), "result.standard.amount").String())
@@ -222,12 +225,14 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	out, err = simapp.QueryBalancesExec(clientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
-	balances = respType.(*banktypes.QueryAllBalancesResponse)
-	s.Require().Equal("99996999", balances.Balances[0].Amount.String())
-	s.Require().Equal("399983955", balances.Balances[2].Amount.String())
-	s.Require().Equal("3000", balances.Balances[3].Amount.String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, uniKitty)
+	balances = respType.(*banktypes.QueryAllBalancesResponse)
+	coins = balances.Balances
+	s.Require().Equal("99996999", coins.AmountOf(symbol).String())
+	s.Require().Equal("399983955", coins.AmountOf(sdk.DefaultBondDenom).String())
+	s.Require().Equal("3000", coins.AmountOf(uniKitty).String())
+
+	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().Equal("3000", gjson.Get(string(resp), "result.standard.amount").String())
@@ -282,12 +287,14 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	out, err = simapp.QueryBalancesExec(clientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
-	balances = respType.(*banktypes.QueryAllBalancesResponse)
-	s.Require().Equal("99995999", balances.Balances[0].Amount.String())
-	s.Require().Equal("399984693", balances.Balances[2].Amount.String())
-	s.Require().Equal("3000", balances.Balances[3].Amount.String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, uniKitty)
+	balances = respType.(*banktypes.QueryAllBalancesResponse)
+	coins = balances.Balances
+	s.Require().Equal("99995999", coins.AmountOf(symbol).String())
+	s.Require().Equal("399984693", coins.AmountOf(sdk.DefaultBondDenom).String())
+	s.Require().Equal("3000", coins.AmountOf(uniKitty).String())
+
+	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().Equal("2252", gjson.Get(string(resp), "result.standard.amount").String())
@@ -342,12 +349,14 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	out, err = simapp.QueryBalancesExec(clientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
-	balances = respType.(*banktypes.QueryAllBalancesResponse)
-	s.Require().Equal("99996999", balances.Balances[0].Amount.String())
-	s.Require().Equal("399983930", balances.Balances[2].Amount.String())
-	s.Require().Equal("3000", balances.Balances[3].Amount.String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, uniKitty)
+	balances = respType.(*banktypes.QueryAllBalancesResponse)
+	coins = balances.Balances
+	s.Require().Equal("99996999", coins.AmountOf(symbol).String())
+	s.Require().Equal("399983930", coins.AmountOf(sdk.DefaultBondDenom).String())
+	s.Require().Equal("3000", coins.AmountOf(uniKitty).String())
+
+	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().Equal("3005", gjson.Get(string(resp), "result.standard.amount").String())
@@ -397,12 +406,14 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	out, err = simapp.QueryBalancesExec(clientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
-	balances = respType.(*banktypes.QueryAllBalancesResponse)
-	s.Require().Equal("99998999", balances.Balances[0].Amount.String())
-	s.Require().Equal("399985923", balances.Balances[2].Amount.String())
-	s.Require().Equal("1000", balances.Balances[3].Amount.String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, uniKitty)
+	balances = respType.(*banktypes.QueryAllBalancesResponse)
+	coins = balances.Balances
+	s.Require().Equal("99998999", coins.AmountOf(symbol).String())
+	s.Require().Equal("399985923", coins.AmountOf(sdk.DefaultBondDenom).String())
+	s.Require().Equal("1000", coins.AmountOf(uniKitty).String())
+
+	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().Equal("1002", gjson.Get(string(resp), "result.standard.amount").String())
@@ -452,12 +463,14 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	out, err = simapp.QueryBalancesExec(clientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
-	balances = respType.(*banktypes.QueryAllBalancesResponse)
-	s.Require().Equal("100000000", balances.Balances[0].Amount.String())
-	s.Require().Equal("399986915", balances.Balances[2].Amount.String())
-	s.Require().Equal("0", balances.Balances[3].Amount.String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, uniKitty)
+	balances = respType.(*banktypes.QueryAllBalancesResponse)
+	coins = balances.Balances
+	s.Require().Equal("100000000", coins.AmountOf(symbol).String())
+	s.Require().Equal("399986915", coins.AmountOf(sdk.DefaultBondDenom).String())
+	s.Require().Equal("0", coins.AmountOf(uniKitty).String())
+
+	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().Equal("0", gjson.Get(string(resp), "result.standard.amount").String())

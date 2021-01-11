@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
+	gogotypes "github.com/gogo/protobuf/types"
+
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -57,7 +59,7 @@ func (k Keeper) Swap(ctx sdk.Context, msg *types.MsgSwapOrder) error {
 	var amount sdk.Int
 	var err error
 
-	standardDenom := k.GetParams(ctx).StandardDenom
+	standardDenom := k.GetStandardDenom(ctx)
 	isDoubleSwap := (msg.Input.Coin.Denom != standardDenom) && (msg.Output.Coin.Denom != standardDenom)
 
 	if msg.IsBuyOrder && isDoubleSwap {
@@ -89,7 +91,7 @@ func (k Keeper) Swap(ctx sdk.Context, msg *types.MsgSwapOrder) error {
 
 // AddLiquidity add liquidity to specified pool
 func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.Coin, error) {
-	standardDenom := k.GetParams(ctx).StandardDenom
+	standardDenom := k.GetStandardDenom(ctx)
 	uniDenom, err := types.GetUniDenomFromDenom(msg.MaxToken.Denom)
 	if err != nil {
 		return sdk.Coin{}, err
@@ -160,7 +162,7 @@ func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, standardCoi
 
 // RemoveLiquidity remove liquidity from specified pool
 func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) (sdk.Coins, error) {
-	standardDenom := k.GetParams(ctx).StandardDenom
+	standardDenom := k.GetStandardDenom(ctx)
 	uniDenom := msg.WithdrawLiquidity.Denom
 
 	minTokenDenom, err := types.GetCoinDenomFromUniDenom(uniDenom)
@@ -261,13 +263,31 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }
 
+// SetStandardDenom sets the standardDenom for the coinswap module.
+func (k Keeper) SetStandardDenom(ctx sdk.Context, denom string) {
+	store := ctx.KVStore(k.storeKey)
+	denomWrap := gogotypes.StringValue{Value: denom}
+	bz := k.cdc.MustMarshalBinaryBare(&denomWrap)
+	store.Set(types.KeyStandardDenom, bz)
+}
+
+// GetStandardDenom return the standard denom of the coinswap module.
+func (k Keeper) GetStandardDenom(ctx sdk.Context) string {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(types.KeyStandardDenom)
+
+	var denomWrap = gogotypes.StringValue{}
+	k.cdc.MustUnmarshalBinaryBare(bz, &denomWrap)
+	return denomWrap.Value
+}
+
 // GetUniDenomFromDenoms returns the uni denom for the provided denominations.
 func (k Keeper) GetUniDenomFromDenoms(ctx sdk.Context, denom1, denom2 string) (string, error) {
 	if denom1 == denom2 {
 		return "", types.ErrEqualDenom
 	}
 
-	standardDenom := k.GetParams(ctx).StandardDenom
+	standardDenom := k.GetStandardDenom(ctx)
 	if denom1 != standardDenom && denom2 != standardDenom {
 		return "", sdkerrors.Wrap(types.ErrNotContainStandardDenom, fmt.Sprintf("standard denom: %s,denom1: %s,denom2: %s", standardDenom, denom1, denom2))
 	}

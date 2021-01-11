@@ -26,26 +26,21 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 // upon success or an error if the query fails.
 func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var params types.QueryLiquidityParams
-	standardDenom := k.GetParams(ctx).StandardDenom
+
 	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
-	if err := types.CheckUniDenom(params.ID); err != nil {
-		return nil, err
-	}
-
-	uniDenom := params.ID
-
-	tokenDenom, err := types.GetCoinDenomFromUniDenom(uniDenom)
+	uniDenom, err := types.GetUniDenomFromDenom(params.Denom)
 	if err != nil {
 		return nil, err
 	}
 
-	reservePool := k.GetReservePool(ctx, params.ID)
+	standardDenom := k.GetStandardDenom(ctx)
+	reservePool := k.GetReservePool(ctx, uniDenom)
 
 	standard := sdk.NewCoin(standardDenom, reservePool.AmountOf(standardDenom))
-	token := sdk.NewCoin(tokenDenom, reservePool.AmountOf(tokenDenom))
+	token := sdk.NewCoin(params.Denom, reservePool.AmountOf(params.Denom))
 	liquidity := sdk.NewCoin(uniDenom, k.bk.GetSupply(ctx).GetTotal().AmountOf(uniDenom))
 
 	swapParams := k.GetParams(ctx)

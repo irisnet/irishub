@@ -3,7 +3,7 @@
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 PACKAGES_UNITTEST=$(shell go list ./... | grep -v '/simulation' | grep -v '/cli_test')
 
-ldflags = -X github.com/cosmos/cosmos-sdk/types.reDnmString=[a-z][a-z0-9:]{2,15}
+ldflags = -X github.com/cosmos/cosmos-sdk/types.reDnmString=[a-zA-Z][a-zA-Z0-9/:]{2,127}
 
 all: tools lint
 

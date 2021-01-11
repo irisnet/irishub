@@ -23,23 +23,21 @@ var (
 )
 
 // NewParams coinswap paramtypes constructor
-func NewParams(fee sdk.Dec, feeDenom string) Params {
+func NewParams(fee sdk.Dec) Params {
 	return Params{
-		Fee:           fee,
-		StandardDenom: feeDenom,
+		Fee: fee,
 	}
 }
 
-// ParamTypeTable returns the TypeTable for coinswap module
+// ParamKeyTable returns the TypeTable for coinswap module
 func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-// KeyValuePairs implements paramtypes.KeyValuePairs
+// ParamSetPairs implements paramtypes.KeyValuePairs
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(KeyFee, &p.Fee, validateFee),
-		paramtypes.NewParamSetPair(KeyStandardDenom, &p.StandardDenom, validateStandardDenom),
 	}
 }
 
@@ -47,8 +45,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 func DefaultParams() Params {
 	fee := sdk.NewDecWithPrec(3, 3)
 	return Params{
-		Fee:           fee,
-		StandardDenom: StandardDenom,
+		Fee: fee,
 	}
 }
 
@@ -62,9 +59,6 @@ func (p Params) String() string {
 func (p Params) Validate() error {
 	if !p.Fee.GT(sdk.ZeroDec()) || !p.Fee.LT(sdk.OneDec()) {
 		return fmt.Errorf("fee must be positive and less than 1: %s", p.Fee.String())
-	}
-	if p.StandardDenom == "" {
-		return fmt.Errorf("coinswap parameter standard denom can't be an empty string")
 	}
 	return nil
 }
