@@ -536,12 +536,12 @@ func migrateHTLC(initialState v0_16.GenesisFileState) *htlctypes.GenesisState {
 func migrateCoinswap(initialState v0_16.GenesisFileState) *coinswaptypes.GenesisState {
 	fee, _ := sdk.NewDecFromStr(initialState.SwapData.Params.Fee.FloatString(sdk.Precision))
 	params := coinswaptypes.Params{
-		Fee:           fee,
-		StandardDenom: UIRIS,
+		Fee: fee,
 	}
 
 	return &coinswaptypes.GenesisState{
-		Params: params,
+		Params:        params,
+		StandardDenom: UIRIS,
 	}
 }
 
