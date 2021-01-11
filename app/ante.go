@@ -38,6 +38,7 @@ func NewAnteHandler(
 		ante.NewSigGasConsumeDecorator(ak, sigGasConsumer),
 		ante.NewSigVerificationDecorator(ak, signModeHandler),
 		ante.NewIncrementSequenceDecorator(ak),
+		NewCheckTokenDecorator(tk),
 		tokenkeeper.NewValidateTokenFeeDecorator(tk, bk),
 		oraclekeeper.NewValidateOracleAuthDecorator(ok, oak),
 	)
