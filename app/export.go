@@ -6,16 +6,16 @@ import (
 
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	"github.com/irisnet/irismod/modules/htlc"
-	"github.com/irisnet/irismod/modules/oracle"
-	"github.com/irisnet/irismod/modules/random"
-	"github.com/irisnet/irismod/modules/service"
-
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"github.com/irisnet/irismod/modules/htlc"
+	"github.com/irisnet/irismod/modules/oracle"
+	"github.com/irisnet/irismod/modules/random"
+	"github.com/irisnet/irismod/modules/service"
 )
 
 // ExportAppStateAndValidators exports the state of the application for a genesis
