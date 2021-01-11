@@ -11,6 +11,11 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"github.com/irisnet/irismod/modules/htlc"
+	"github.com/irisnet/irismod/modules/oracle"
+	"github.com/irisnet/irismod/modules/random"
+	"github.com/irisnet/irismod/modules/service"
 )
 
 // ExportAppStateAndValidators exports the state of the application for a genesis
@@ -177,4 +182,9 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 			return false
 		},
 	)
+
+	htlc.PrepForZeroHeightGenesis(ctx, app.htlcKeeper)
+	random.PrepForZeroHeightGenesis(ctx, app.randomKeeper)
+	oracle.PrepForZeroHeightGenesis(ctx, app.oracleKeeper)
+	service.PrepForZeroHeightGenesis(ctx, app.serviceKeeper)
 }
