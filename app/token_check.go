@@ -30,7 +30,7 @@ func (ctd CheckTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 	for _, msg := range tx.GetMsgs() {
 		switch msg := msg.(type) {
 		case *ibctransfertypes.MsgTransfer:
-			if containCoinPrefix(sdk.NewCoins(msg.Token), coinswaptypes.FormatUniABSPrefix) {
+			if containSwapCoin(msg.Token) {
 				return ctx, sdkerrors.Wrap(
 					sdkerrors.ErrInvalidRequest, "can't transfer coinswap liquidity tokens through the IBC module")
 			}
@@ -40,12 +40,12 @@ func (ctd CheckTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 					sdkerrors.ErrInvalidRequest, "burnt failed, only native tokens can be burnt")
 			}
 		case *govtypes.MsgSubmitProposal:
-			if containCoinPrefix(msg.InitialDeposit, coinswaptypes.FormatUniABSPrefix) {
+			if containSwapCoin(msg.InitialDeposit...) {
 				return ctx, sdkerrors.Wrap(
 					sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
 			}
 		case *govtypes.MsgDeposit:
-			if containCoinPrefix(msg.Amount, coinswaptypes.FormatUniABSPrefix) {
+			if containSwapCoin(msg.Amount...) {
 				return ctx, sdkerrors.Wrap(
 					sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity  token %s for proposal")
 			}
@@ -54,9 +54,9 @@ func (ctd CheckTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 	return next(ctx, tx, simulate)
 }
 
-func containCoinPrefix(coins sdk.Coins, prefix string) bool {
+func containSwapCoin(coins ...sdk.Coin) bool {
 	for _, coin := range coins {
-		if strings.HasPrefix(coin.Denom, prefix) {
+		if strings.HasPrefix(coin.Denom, coinswaptypes.FormatUniABSPrefix) {
 			return true
 		}
 	}
