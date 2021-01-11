@@ -10,6 +10,7 @@ Token module allows you to manage assets on IRIS Hub
 | [edit](#iris-tx-token-edit)         | Edit an existing token             |
 | [transfer](#iris-tx-token-transfer) | Transfer the ownership of a token  |
 | [mint](#iris-tx-token-mint)         | Mint tokens to a specified address |
+| [burn](#iris-tx-token-burn)         | Burn some tokens                   |
 | [token](#iris-query-token-token)    | Query a token by symbol            |
 | [tokens](#iris-query-token-tokens)  | Query tokens by owner              |
 | [fee](#iris-query-token-fee)        | Query the token related fees       |
@@ -124,6 +125,26 @@ iris tx token mint [symbol] [flags]
 
 ```bash
 iris tx token mint <symbol> --amount=<amount> --to=<to> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
+```
+
+## iris tx token burn
+
+Burn some tokens
+
+```bash
+iris tx token burn [symbol] [flags]
+```
+
+**Flags:**
+
+| Name     | Type   | Required | Default | Description                   |
+| -------- | ------ | -------- | ------- | ----------------------------- |
+| --amount | uint64 | Yes      | 0       | Amount of the tokens to burnt |
+
+### Burn Token
+
+```bash
+iris tx token burn <symbol> --amount=<amount> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ## iris query token token
