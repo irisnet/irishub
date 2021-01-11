@@ -154,6 +154,7 @@ func (t Token) ToMinCoin(coin sdk.DecCoin) (newCoin sdk.Coin, err error) {
 	return sdk.NewCoin(t.MinUnit, amount.TruncateInt()), nil
 }
 
+// ValidateToken checks if the given token is valid
 func ValidateToken(token Token) error {
 	_, err := sdk.AccAddressFromBech32(token.Owner)
 	if err != nil {
@@ -169,9 +170,8 @@ func ValidateToken(token Token) error {
 		return err
 	}
 
-	minUnitLen := len(strings.TrimSpace(token.MinUnit))
-	if minUnitLen < MinimumMinUnitLen || minUnitLen > MaximumMinUnitLen || !IsAlphaNumericDash(token.MinUnit) || !IsBeginWithAlpha(token.MinUnit) {
-		return sdkerrors.Wrapf(ErrInvalidMinUnit, "invalid token min_unit %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", token.MinUnit, MinimumMinUnitLen, MaximumMinUnitLen)
+	if err := CheckMinUnit(token.Symbol); err != nil {
+		return err
 	}
 
 	if token.InitialSupply > MaximumInitSupply {
@@ -189,6 +189,15 @@ func ValidateToken(token Token) error {
 	return nil
 }
 
+// CheckMinUnit checks if the given minUnit is valid
+func CheckMinUnit(minUnit string) error {
+	minUnitLen := len(strings.TrimSpace(minUnit))
+	if minUnitLen < MinimumMinUnitLen || minUnitLen > MaximumMinUnitLen || !IsAlphaNumericDash(minUnit) || !IsBeginWithAlpha(minUnit) {
+		return sdkerrors.Wrapf(ErrInvalidMinUnit, "invalid token min_unit %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", minUnit, MinimumMinUnitLen, MaximumMinUnitLen)
+	}
+	return nil
+}
+
 // CheckSymbol checks if the given symbol is valid
 func CheckSymbol(symbol string) error {
 	if len(symbol) < MinimumSymbolLen || len(symbol) > MaximumSymbolLen {
@@ -198,7 +207,6 @@ func CheckSymbol(symbol string) error {
 	if !IsBeginWithAlpha(symbol) || !IsAlphaNumericDash(symbol) {
 		return sdkerrors.Wrapf(ErrInvalidSymbol, "invalid symbol: %s, only accepts alphanumeric characters, and begin with an english letter", symbol)
 	}
-
 	return nil
 }
 

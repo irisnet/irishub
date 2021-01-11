@@ -23,7 +23,7 @@ var (
 	ErrServiceBindingAvailable   = sdkerrors.Register(ModuleName, 15, "service binding available")
 	ErrIncorrectRefundTime       = sdkerrors.Register(ModuleName, 16, "incorrect refund time")
 
-	ErrInvalidServiceFee         = sdkerrors.Register(ModuleName, 17, "invalid service fee")
+	ErrInvalidServiceFeeCap      = sdkerrors.Register(ModuleName, 17, "invalid service fee cap")
 	ErrInvalidProviders          = sdkerrors.Register(ModuleName, 18, "invalid providers")
 	ErrInvalidTimeout            = sdkerrors.Register(ModuleName, 19, "invalid timeout")
 	ErrInvalidRepeatedFreq       = sdkerrors.Register(ModuleName, 20, "invalid repeated frequency")

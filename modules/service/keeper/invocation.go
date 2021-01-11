@@ -1177,7 +1177,7 @@ func (k Keeper) validateServiceFeeCap(ctx sdk.Context, serviceFeeCap sdk.Coins) 
 	baseDenom := k.BaseDenom(ctx)
 
 	if len(serviceFeeCap) != 1 || serviceFeeCap[0].Denom != baseDenom {
-		return sdkerrors.Wrapf(types.ErrInvalidDeposit, "service fee cap only accepts %s", baseDenom)
+		return sdkerrors.Wrapf(types.ErrInvalidServiceFeeCap, "service fee cap only accepts %s", baseDenom)
 	}
 
 	return nil
