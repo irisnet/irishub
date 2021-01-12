@@ -24,7 +24,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/cosmos/cosmos-sdk/simapp"
-	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -106,11 +105,11 @@ import (
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
 	"github.com/irisnet/irishub/address"
+	irisappparams "github.com/irisnet/irishub/app/params"
 	"github.com/irisnet/irishub/lite"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
-
 	"github.com/irisnet/irishub/modules/legacy"
 	"github.com/irisnet/irishub/modules/mint"
 	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
@@ -278,7 +277,7 @@ func init() {
 // NewIrisApp returns a reference to an initialized IrisApp.
 func NewIrisApp(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
-	homePath string, invCheckPeriod uint, encodingConfig simappparams.EncodingConfig,
+	homePath string, invCheckPeriod uint, encodingConfig irisappparams.EncodingConfig,
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *IrisApp {
 
