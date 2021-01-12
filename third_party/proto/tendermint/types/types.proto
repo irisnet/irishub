@@ -5,7 +5,6 @@ option go_package = "github.com/tendermint/tendermint/proto/tendermint/types";
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
-import "tendermint/libs/bits/types.proto";
 import "tendermint/crypto/proof.proto";
 import "tendermint/version/types.proto";
 import "tendermint/types/validator.proto";
@@ -26,13 +25,13 @@ enum SignedMsgType {
   option (gogoproto.goproto_enum_stringer) = true;
   option (gogoproto.goproto_enum_prefix)   = false;
 
-  SIGNED_MSG_TYPE_UNKNOWN   = 0 [(gogoproto.enumvalue_customname) = "UnknownType"];
+  SIGNED_MSG_TYPE_UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "UnknownType"];
   // Votes
   SIGNED_MSG_TYPE_PREVOTE   = 1 [(gogoproto.enumvalue_customname) = "PrevoteType"];
   SIGNED_MSG_TYPE_PRECOMMIT = 2 [(gogoproto.enumvalue_customname) = "PrecommitType"];
 
   // Proposals
-  SIGNED_MSG_TYPE_PROPOSAL  = 32 [(gogoproto.enumvalue_customname) = "ProposalType"];
+  SIGNED_MSG_TYPE_PROPOSAL = 32 [(gogoproto.enumvalue_customname) = "ProposalType"];
 }
 
 // PartsetHeader
@@ -88,8 +87,6 @@ message Data {
   // NOTE: not all txs here are valid.  We're just agreeing on the order first.
   // This means that block.AppHash does not include these txs.
   repeated bytes txs = 1;
-  // Volatile
-  bytes hash = 2;
 }
 
 // Vote represents a prevote, precommit, or commit vote from validators for
@@ -99,9 +96,9 @@ message Vote {
   int64         height   = 2;
   int32         round    = 3;
   BlockID       block_id = 4
-      [(gogoproto.nullable) = false, (gogoproto.customname) = "BlockID"];  // zero if vote is nil.
+  [(gogoproto.nullable) = false, (gogoproto.customname) = "BlockID"];  // zero if vote is nil.
   google.protobuf.Timestamp timestamp = 5
-      [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   bytes validator_address = 6;
   int32 validator_index   = 7;
   bytes signature         = 8;
@@ -113,8 +110,6 @@ message Commit {
   int32                         round      = 2;
   BlockID                       block_id   = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "BlockID"];
   repeated CommitSig            signatures = 4 [(gogoproto.nullable) = false];
-  bytes                         hash       = 5;
-  tendermint.libs.bits.BitArray bit_array  = 6;
 }
 
 // CommitSig is a part of the Vote included in a Commit.
@@ -122,7 +117,7 @@ message CommitSig {
   BlockIDFlag               block_id_flag     = 1;
   bytes                     validator_address = 2;
   google.protobuf.Timestamp timestamp         = 3
-      [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   bytes signature = 4;
 }
 
@@ -133,7 +128,7 @@ message Proposal {
   int32                     pol_round = 4;
   BlockID                   block_id  = 5 [(gogoproto.customname) = "BlockID", (gogoproto.nullable) = false];
   google.protobuf.Timestamp timestamp = 6
-      [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   bytes signature = 7;
 }
 
@@ -144,7 +139,7 @@ message SignedHeader {
 
 message LightBlock {
   SignedHeader                  signed_header = 1;
-  tendermint.types.ValidatorSet validator_set = 2; 
+  tendermint.types.ValidatorSet validator_set = 2;
 }
 
 message BlockMeta {
