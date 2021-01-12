@@ -17,6 +17,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	tmjson "github.com/tendermint/tendermint/libs/json"
+
 	"github.com/irisnet/irishub/migrate/v0_16/auth"
 	"github.com/irisnet/irishub/migrate/v0_16/coinswap"
 	"github.com/irisnet/irishub/migrate/v0_16/distribution"
@@ -29,7 +31,6 @@ import (
 	"github.com/irisnet/irishub/migrate/v0_16/slashing"
 	"github.com/irisnet/irishub/migrate/v0_16/stake"
 	"github.com/irisnet/irishub/migrate/v0_16/upgrade"
-	tmjson "github.com/tendermint/tendermint/libs/json"
 )
 
 type GenesisFileState struct {

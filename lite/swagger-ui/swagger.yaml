@@ -9546,7 +9546,7 @@ paths:
               QueryAccountResponse is the response type for the Query/Account
               RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -9775,7 +9775,7 @@ paths:
               QueryParamsResponse is the response type for the Query/Params RPC
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10017,7 +10017,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10090,6 +10090,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/bank/v1beta1/balances/{address}/{denom}':
@@ -10114,7 +10115,7 @@ paths:
               QueryBalanceResponse is the response type for the Query/Balance
               RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10170,6 +10171,7 @@ paths:
                           type: string
                         enabled:
                           type: boolean
+                          format: boolean
                       description: >-
                         SendEnabled maps coin denom to a send_enabled status
                         (whether a denom is
@@ -10177,12 +10179,13 @@ paths:
                         sendable).
                   default_send_enabled:
                     type: boolean
+                    format: boolean
                 description: Params defines the parameters for the bank module.
             description: >-
               QueryParamsResponse defines the response type for querying x/bank
               parameters.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10239,7 +10242,7 @@ paths:
 
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10284,7 +10287,7 @@ paths:
               QuerySupplyOfResponse is the response type for the Query/SupplyOf
               RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10348,7 +10351,7 @@ paths:
 
               RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10435,7 +10438,7 @@ paths:
               QueryDelegationTotalRewardsResponse is the response type for the
               Query/DelegationTotalRewards RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10497,7 +10500,7 @@ paths:
               QueryDelegationRewardsResponse is the response type for the
               Query/DelegationRewards RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10552,7 +10555,7 @@ paths:
               QueryDelegatorValidatorsResponse is the response type for the
               Query/DelegatorValidators RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10598,7 +10601,7 @@ paths:
               QueryDelegatorWithdrawAddressResponse is the response type for the
               Query/DelegatorWithdrawAddress RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10649,11 +10652,12 @@ paths:
                     type: string
                   withdraw_addr_enabled:
                     type: boolean
+                    format: boolean
             description: >-
               QueryParamsResponse is the response type for the Query/Params RPC
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10712,7 +10716,7 @@ paths:
               QueryValidatorCommissionResponse is the response type for the
               Query/ValidatorCommission RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10784,7 +10788,7 @@ paths:
 
               Query/ValidatorOutstandingRewards RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10866,7 +10870,7 @@ paths:
               QueryValidatorSlashesResponse is the response type for the
               Query/ValidatorSlashes RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -10955,6 +10959,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   /cosmos/evidence/v1beta1/evidence:
@@ -11169,7 +11174,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -11404,6 +11409,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/evidence/v1beta1/evidence/{evidence_hash}':
@@ -11487,7 +11493,7 @@ paths:
               QueryEvidenceResponse is the response type for the Query/Evidence
               RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -11757,7 +11763,7 @@ paths:
               QueryParamsResponse is the response type for the Query/Params RPC
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -12248,7 +12254,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -12519,6 +12525,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/gov/v1beta1/proposals/{proposal_id}':
@@ -12787,7 +12794,7 @@ paths:
               QueryProposalResponse is the response type for the Query/Proposal
               RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -13049,7 +13056,7 @@ paths:
               QueryDepositsResponse is the response type for the Query/Deposits
               RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -13290,6 +13297,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}':
@@ -13334,7 +13342,7 @@ paths:
               QueryDepositResponse is the response type for the Query/Deposit
               RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -13562,7 +13570,7 @@ paths:
               QueryTallyResultResponse is the response type for the Query/Tally
               RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -13825,7 +13833,7 @@ paths:
               QueryVotesResponse is the response type for the Query/Votes RPC
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -14066,6 +14074,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}':
@@ -14109,7 +14118,7 @@ paths:
               QueryVoteResponse is the response type for the Query/Vote RPC
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -14337,7 +14346,7 @@ paths:
               QueryParamsResponse is response type for the Query/Params RPC
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -14405,7 +14414,7 @@ paths:
               QueryParamsResponse is the response type for the Query/Params RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -14461,6 +14470,7 @@ paths:
                       title: timestamp validator cannot be unjailed until
                     tombstoned:
                       type: boolean
+                      format: boolean
                       title: >-
                         whether or not a validator has been tombstoned (killed
                         out of validator
@@ -14511,7 +14521,7 @@ paths:
 
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -14579,6 +14589,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/slashing/v1beta1/signing_infos/{cons_address}':
@@ -14615,6 +14626,7 @@ paths:
                     title: timestamp validator cannot be unjailed until
                   tombstoned:
                     type: boolean
+                    format: boolean
                     title: >-
                       whether or not a validator has been tombstoned (killed out
                       of validator
@@ -14637,7 +14649,7 @@ paths:
 
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -14746,7 +14758,7 @@ paths:
               QueryDelegatorDelegationsResponse is response type for the
               Query/DelegatorDelegations RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -14986,6 +14998,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/staking/v1beta1/delegators/{delegator_addr}/redelegations':
@@ -15099,7 +15112,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -15349,6 +15362,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/staking/v1beta1/delegators/{delegator_addr}/unbonding_delegations':
@@ -15421,7 +15435,7 @@ paths:
 
               Query/UnbondingDelegatorDelegations RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -15661,6 +15675,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators':
@@ -15861,6 +15876,7 @@ paths:
                             }
                     jailed:
                       type: boolean
+                      format: boolean
                     status:
                       type: string
                       enum:
@@ -15971,7 +15987,7 @@ paths:
               QueryDelegatorValidatorsResponse is response type for the
               Query/DelegatorValidators RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -16211,6 +16227,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/{validator_addr}':
@@ -16408,6 +16425,7 @@ paths:
                           }
                   jailed:
                     type: boolean
+                    format: boolean
                   status:
                     type: string
                     enum:
@@ -16476,7 +16494,7 @@ paths:
               QueryDelegatorValidatorResponse response type for the
               Query/DelegatorValidator RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -16955,6 +16973,7 @@ paths:
                                 }
                         jailed:
                           type: boolean
+                          format: boolean
                         status:
                           type: string
                           enum:
@@ -17048,7 +17067,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -17276,7 +17295,7 @@ paths:
               QueryParamsResponse is response type for the Query/Params RPC
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -17486,7 +17505,7 @@ paths:
                     type: string
             description: QueryPoolResponse is response type for the Query/Pool RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -17872,6 +17891,7 @@ paths:
                             }
                     jailed:
                       type: boolean
+                      format: boolean
                     status:
                       type: string
                       enum:
@@ -17982,7 +18002,7 @@ paths:
               QueryValidatorsResponse is response type for the Query/Validators
               RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -18222,6 +18242,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/staking/v1beta1/validators/{validator_addr}':
@@ -18417,6 +18438,7 @@ paths:
                           }
                   jailed:
                     type: boolean
+                    format: boolean
                   status:
                     type: string
                     enum:
@@ -18485,7 +18507,7 @@ paths:
               QueryValidatorResponse is response type for the Query/Validator
               RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -18756,7 +18778,7 @@ paths:
               QueryValidatorDelegationsResponse is response type for the
               Query/ValidatorDelegations RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -18996,6 +19018,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}':
@@ -19050,7 +19073,7 @@ paths:
               QueryDelegationResponse is response type for the Query/Delegation
               RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -19295,7 +19318,7 @@ paths:
 
               RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -19564,7 +19587,7 @@ paths:
 
               Query/ValidatorUnbondingDelegations RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -19804,6 +19827,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/upgrade/v1beta1/applied_plan/{name}':
@@ -19826,7 +19850,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -20275,7 +20299,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -20656,7 +20680,7 @@ paths:
 
               RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -21004,7 +21028,7 @@ paths:
               QueryChannelsResponse is the response type for the Query/Channels
               RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -21239,6 +21263,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}':
@@ -21365,7 +21390,7 @@ paths:
 
               proof was retrieved.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -21803,7 +21828,7 @@ paths:
               QueryChannelClientStateResponse is the Response type for the
               Query/QueryChannelClientState RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -22226,7 +22251,7 @@ paths:
               QueryChannelClientStateResponse is the Response type for the
               Query/QueryChannelClientState RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -22490,7 +22515,7 @@ paths:
               QuerySequenceResponse is the request type for the
               Query/QueryNextSequenceReceiveResponse RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -22793,7 +22818,7 @@ paths:
               QueryPacketAcknowledgemetsResponse is the request type for the
               Query/QueryPacketAcknowledgements RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -23038,6 +23063,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}':
@@ -23093,7 +23119,7 @@ paths:
 
               proof was retrieved
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -23400,7 +23426,7 @@ paths:
               QueryPacketCommitmentsResponse is the request type for the
               Query/QueryPacketCommitments RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -23645,6 +23671,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks':
@@ -23698,7 +23725,7 @@ paths:
               QueryUnreceivedAcksResponse is the response type for the
               Query/UnreceivedAcks RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -23960,7 +23987,7 @@ paths:
               QueryUnreceivedPacketsResponse is the response type for the
               Query/UnreceivedPacketCommitments RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -24225,7 +24252,7 @@ paths:
 
               retrieved
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -24446,6 +24473,7 @@ paths:
             properties:
               received:
                 type: boolean
+                format: boolean
                 title: success flag for if receipt exists
               proof:
                 type: string
@@ -24487,7 +24515,7 @@ paths:
 
               retrieved
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -24845,7 +24873,7 @@ paths:
               QueryConnectionChannelsResponse is the Response type for the
               Query/QueryConnectionChannels RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -25085,6 +25113,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   /ibc/client/v1beta1/params:
@@ -25112,7 +25141,7 @@ paths:
               QueryClientParamsResponse is the response type for the
               Query/ClientParams RPC method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -25538,7 +25567,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -25773,6 +25802,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/core/client/v1beta1/client_states/{client_id}':
@@ -25997,7 +26027,7 @@ paths:
 
               which the proof was retrieved.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -26451,7 +26481,7 @@ paths:
               QueryConsensusStatesResponse is the response type for the
               Query/ConsensusStates RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -26691,6 +26721,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/core/client/v1beta1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}':
@@ -26918,7 +26949,7 @@ paths:
 
               RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -27133,6 +27164,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/core/connection/v1beta1/client_connections/{client_id}':
@@ -27187,7 +27219,7 @@ paths:
               QueryClientConnectionsResponse is the response type for the
               Query/ClientConnections RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -27541,7 +27573,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -27776,6 +27808,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/core/connection/v1beta1/connections/{connection_id}':
@@ -27919,7 +27952,7 @@ paths:
 
               which the proof was retrieved.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -28350,7 +28383,7 @@ paths:
               QueryConnectionClientStateResponse is the response type for the
               Query/ConnectionClientState RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -28768,7 +28801,7 @@ paths:
               QueryConnectionConsensusStateResponse is the response type for the
               Query/ConnectionConsensusState RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -29029,7 +29062,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -29097,6 +29130,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/applications/transfer/v1beta1/denom_traces/{hash}':
@@ -29131,7 +29165,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -29176,6 +29210,7 @@ paths:
                 properties:
                   send_enabled:
                     type: boolean
+                    format: boolean
                     description: >-
                       send_enabled enables or disables all cross-chain token
                       transfers from this
@@ -29183,6 +29218,7 @@ paths:
                       chain.
                   receive_enabled:
                     type: boolean
+                    format: boolean
                     description: >-
                       receive_enabled enables or disables all cross-chain token
                       transfers to this
@@ -29192,7 +29228,7 @@ paths:
               QueryParamsResponse is the response type for the Query/Params RPC
               method.
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -29279,7 +29315,7 @@ paths:
               QueryParametersResponse is response type for the Query/Parameters
               RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -29687,7 +29723,7 @@ paths:
               QueryTokensResponse is response type for the Query/Tokens RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -29924,6 +29960,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/irismod/token/tokens/{denom}':
@@ -30109,7 +30146,7 @@ paths:
                       }
             title: QueryTokenResponse is response type for the Query/Token RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -30316,6 +30353,7 @@ paths:
             properties:
               exist:
                 type: boolean
+                format: boolean
               issue_fee:
                 type: object
                 properties:
@@ -30348,7 +30386,7 @@ paths:
                   signatures required by gogoproto.
             title: QueryFeesResponse is response type for the Query/Fees RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -30606,7 +30644,7 @@ paths:
               QueryBalanceResponse is the response type for the Query/HTLC RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -30698,7 +30736,7 @@ paths:
               QueryLiquidityResponse is response type for the Query/Liquidity
               RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -30798,7 +30836,7 @@ paths:
               QueryCollectionResponse is the response type for the
               Query/Collection RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -30868,6 +30906,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/irismod/nft/collections/{denom_id}/supply':
@@ -30887,7 +30926,7 @@ paths:
               QuerySupplyResponse is the response type for the Query/Supply RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -30974,7 +31013,7 @@ paths:
               QueryDenomsResponse is the response type for the Query/Denoms RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -31040,6 +31079,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/irismod/nft/denoms/{denom_id}':
@@ -31068,7 +31108,7 @@ paths:
               QueryDenomResponse is the response type for the Query/Denom RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -31153,7 +31193,7 @@ paths:
               QueryOwnerResponse is the response type for the Query/Owner RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -31227,6 +31267,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/irismod/nft/nfts/{denom_id}/{token_id}':
@@ -31255,7 +31296,7 @@ paths:
                 description: BaseNFT defines a non fungible token.
             title: QueryNFTResponse is the response type for the Query/NFT RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -31333,6 +31374,7 @@ paths:
                       type: string
                     available:
                       type: boolean
+                      format: boolean
                     disabled_time:
                       type: string
                       format: date-time
@@ -31370,7 +31412,7 @@ paths:
               QueryDefinitionsResponse is response type for the Query/Bindings
               RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -31444,6 +31486,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/irismod/service/bindings/{service_name}/{provider}':
@@ -31489,6 +31532,7 @@ paths:
                     type: string
                   available:
                     type: boolean
+                    format: boolean
                   disabled_time:
                     type: string
                     format: date-time
@@ -31499,7 +31543,7 @@ paths:
               QueryDefinitionResponse is response type for the Query/Binding RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -31578,8 +31622,10 @@ paths:
                     format: int64
                   super_mode:
                     type: boolean
+                    format: boolean
                   repeated:
                     type: boolean
+                    format: boolean
                   repeated_frequency:
                     type: string
                     format: uint64
@@ -31634,7 +31680,7 @@ paths:
               QueryRequestContextResponse is response type for the
               Query/RequestContext RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -31694,7 +31740,7 @@ paths:
               QueryDefinitionResponse is response type for the Query/Definition
               RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -31753,7 +31799,7 @@ paths:
               QueryEarnedFeesResponse is response type for the Query/EarnedFees
               RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -31797,7 +31843,7 @@ paths:
               QueryWithdrawAddressResponse is response type for the
               Query/WithdrawAddress RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -31906,7 +31952,7 @@ paths:
               QueryParametersResponse is response type for the Query/Parameters
               RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -31974,6 +32020,7 @@ paths:
                           signatures required by gogoproto.
                     super_mode:
                       type: boolean
+                      format: boolean
                     request_height:
                       type: string
                       format: int64
@@ -32017,7 +32064,7 @@ paths:
               QueryRequestsByReqCtxResponse is response type for the
               Query/RequestsByReqCtx RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -32092,6 +32139,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/irismod/service/requests/{request_id}':
@@ -32136,6 +32184,7 @@ paths:
                         signatures required by gogoproto.
                   super_mode:
                     type: boolean
+                    format: boolean
                   request_height:
                     type: string
                     format: int64
@@ -32152,7 +32201,7 @@ paths:
               QueryRequestResponse is response type for the Query/Request RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -32225,6 +32274,7 @@ paths:
                           signatures required by gogoproto.
                     super_mode:
                       type: boolean
+                      format: boolean
                     request_height:
                       type: string
                       format: int64
@@ -32268,7 +32318,7 @@ paths:
               QueryRequestsResponse is response type for the Query/Requests RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -32342,6 +32392,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/irismod/service/responses/{request_context_id}/{batch_counter}':
@@ -32404,7 +32455,7 @@ paths:
               QueryResponsesResponse is response type for the Query/Responses
               RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -32479,6 +32530,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/irismod/service/responses/{request_id}':
@@ -32512,7 +32564,7 @@ paths:
               QueryResponseResponse is response type for the Query/Response RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -32556,7 +32608,7 @@ paths:
               QuerySchemaResponse is response type for the Query/Schema RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -32698,7 +32750,7 @@ paths:
                   request message has used PageRequest
             title: QueryFeedsResponse is response type for the Query/Feeds RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -32768,6 +32820,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/irismod/oracle/feeds/{feed_name}':
@@ -32854,7 +32907,7 @@ paths:
                 title: FeedContext defines the feed context struct
             title: QueryFeedResponse is response type for the Query/Feed RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -32907,7 +32960,7 @@ paths:
               QueryFeedValueResponse is response type for the Query/FeedValue
               RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -32959,6 +33012,7 @@ paths:
                       type: string
                     oracle:
                       type: boolean
+                      format: boolean
                     service_fee_cap:
                       type: array
                       items:
@@ -32984,7 +33038,7 @@ paths:
               QueryRandomRequestQueueResponse is response type for the
               Query/RandomRequestQueue RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -33038,7 +33092,7 @@ paths:
               QueryParametersResponse is response type for the Query/Random RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -33101,7 +33155,7 @@ paths:
               QueryRecordResponse is the response type for the Query/Record RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -33180,7 +33234,7 @@ paths:
               QueryParametersResponse is response type for the Query/Parameters
               RPC method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -33266,7 +33320,7 @@ paths:
               QuerySupersResponse is response type for the Query/Supers RPC
               method
         default:
-          description: An unexpected error response.
+          description: An unexpected error response
           schema:
             type: object
             properties:
@@ -33332,6 +33386,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
 securityDefinitions:
@@ -36133,6 +36188,7 @@ definitions:
               type: string
             enabled:
               type: boolean
+              format: boolean
           description: >-
             SendEnabled maps coin denom to a send_enabled status (whether a
             denom is
@@ -36140,6 +36196,7 @@ definitions:
             sendable).
       default_send_enabled:
         type: boolean
+        format: boolean
     description: Params defines the parameters for the bank module.
   cosmos.bank.v1beta1.QueryAllBalancesResponse:
     type: object
@@ -36211,6 +36268,7 @@ definitions:
                   type: string
                 enabled:
                   type: boolean
+                  format: boolean
               description: >-
                 SendEnabled maps coin denom to a send_enabled status (whether a
                 denom is
@@ -36218,6 +36276,7 @@ definitions:
                 sendable).
           default_send_enabled:
             type: boolean
+            format: boolean
         description: Params defines the parameters for the bank module.
     description: >-
       QueryParamsResponse defines the response type for querying x/bank
@@ -36266,6 +36325,7 @@ definitions:
         type: string
       enabled:
         type: boolean
+        format: boolean
     description: |-
       SendEnabled maps coin denom to a send_enabled status (whether a denom is
       sendable).
@@ -36296,6 +36356,7 @@ definitions:
           If left empty it will default to a value to be set by each app.
       count_total:
         type: boolean
+        format: boolean
         description: >-
           count_total is set to true  to indicate that the result set should
           include
@@ -36394,6 +36455,7 @@ definitions:
         type: string
       withdraw_addr_enabled:
         type: boolean
+        format: boolean
     description: Params defines the set of params for the distribution module.
   cosmos.distribution.v1beta1.QueryCommunityPoolResponse:
     type: object
@@ -36524,6 +36586,7 @@ definitions:
             type: string
           withdraw_addr_enabled:
             type: boolean
+            format: boolean
     description: QueryParamsResponse is the response type for the Query/Params RPC method.
   cosmos.distribution.v1beta1.QueryValidatorCommissionResponse:
     type: object
@@ -38180,6 +38243,7 @@ definitions:
             title: timestamp validator cannot be unjailed until
           tombstoned:
             type: boolean
+            format: boolean
             title: >-
               whether or not a validator has been tombstoned (killed out of
               validator
@@ -38223,6 +38287,7 @@ definitions:
               title: timestamp validator cannot be unjailed until
             tombstoned:
               type: boolean
+              format: boolean
               title: >-
                 whether or not a validator has been tombstoned (killed out of
                 validator
@@ -38287,6 +38352,7 @@ definitions:
         title: timestamp validator cannot be unjailed until
       tombstoned:
         type: boolean
+        format: boolean
         title: >-
           whether or not a validator has been tombstoned (killed out of
           validator
@@ -38667,6 +38733,7 @@ definitions:
                     }
             jailed:
               type: boolean
+              format: boolean
             status:
               type: string
               enum:
@@ -39129,6 +39196,7 @@ definitions:
                   }
           jailed:
             type: boolean
+            format: boolean
           status:
             type: string
             enum:
@@ -39375,6 +39443,7 @@ definitions:
                     }
             jailed:
               type: boolean
+              format: boolean
             status:
               type: string
               enum:
@@ -39748,6 +39817,7 @@ definitions:
                         }
                 jailed:
                   type: boolean
+                  format: boolean
                 status:
                   type: string
                   enum:
@@ -40251,6 +40321,7 @@ definitions:
                   }
           jailed:
             type: boolean
+            format: boolean
           status:
             type: string
             enum:
@@ -40551,6 +40622,7 @@ definitions:
                     }
             jailed:
               type: boolean
+              format: boolean
             status:
               type: string
               enum:
@@ -41014,6 +41086,7 @@ definitions:
               }
       jailed:
         type: boolean
+        format: boolean
       status:
         type: string
         enum:
@@ -43100,6 +43173,7 @@ definitions:
     properties:
       received:
         type: boolean
+        format: boolean
         title: success flag for if receipt exists
       proof:
         type: string
@@ -45479,6 +45553,7 @@ definitions:
     properties:
       send_enabled:
         type: boolean
+        format: boolean
         description: >-
           send_enabled enables or disables all cross-chain token transfers from
           this
@@ -45486,6 +45561,7 @@ definitions:
           chain.
       receive_enabled:
         type: boolean
+        format: boolean
         description: >-
           receive_enabled enables or disables all cross-chain token transfers to
           this
@@ -45576,6 +45652,7 @@ definitions:
         properties:
           send_enabled:
             type: boolean
+            format: boolean
             description: >-
               send_enabled enables or disables all cross-chain token transfers
               from this
@@ -45583,6 +45660,7 @@ definitions:
               chain.
           receive_enabled:
             type: boolean
+            format: boolean
             description: >-
               receive_enabled enables or disables all cross-chain token
               transfers to this
@@ -45616,6 +45694,7 @@ definitions:
           If left empty it will default to a value to be set by each app.
       count_total:
         type: boolean
+        format: boolean
         description: >-
           count_total is set to true  to indicate that the result set should
           include
@@ -45682,6 +45761,7 @@ definitions:
     properties:
       exist:
         type: boolean
+        format: boolean
       issue_fee:
         type: object
         properties:
@@ -46628,6 +46708,7 @@ definitions:
             type: string
           available:
             type: boolean
+            format: boolean
           disabled_time:
             type: string
             format: date-time
@@ -46673,6 +46754,7 @@ definitions:
               type: string
             available:
               type: boolean
+              format: boolean
             disabled_time:
               type: string
               format: date-time
@@ -46866,8 +46948,10 @@ definitions:
             format: int64
           super_mode:
             type: boolean
+            format: boolean
           repeated:
             type: boolean
+            format: boolean
           repeated_frequency:
             type: string
             format: uint64
@@ -46954,6 +47038,7 @@ definitions:
                 signatures required by gogoproto.
           super_mode:
             type: boolean
+            format: boolean
           request_height:
             type: string
             format: int64
@@ -47004,6 +47089,7 @@ definitions:
                   signatures required by gogoproto.
             super_mode:
               type: boolean
+              format: boolean
             request_height:
               type: string
               format: int64
@@ -47083,6 +47169,7 @@ definitions:
                   signatures required by gogoproto.
             super_mode:
               type: boolean
+              format: boolean
             request_height:
               type: string
               format: int64
@@ -47237,6 +47324,7 @@ definitions:
             signatures required by gogoproto.
       super_mode:
         type: boolean
+        format: boolean
       request_height:
         type: string
         format: int64
@@ -47283,8 +47371,10 @@ definitions:
         format: int64
       super_mode:
         type: boolean
+        format: boolean
       repeated:
         type: boolean
+        format: boolean
       repeated_frequency:
         type: string
         format: uint64
@@ -47406,6 +47496,7 @@ definitions:
         type: string
       available:
         type: boolean
+        format: boolean
       disabled_time:
         type: string
         format: date-time
@@ -47737,6 +47828,7 @@ definitions:
               type: string
             oracle:
               type: boolean
+              format: boolean
             service_fee_cap:
               type: array
               items:
@@ -47798,6 +47890,7 @@ definitions:
         type: string
       oracle:
         type: boolean
+        format: boolean
       service_fee_cap:
         type: array
         items:
