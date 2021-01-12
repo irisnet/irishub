@@ -32,7 +32,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 			} else {
 				_, err := k.RefundHTLC(ctx, hlock)
 				if err != nil {
-					panic(fmt.Errorf("failed to export HTLC genesis state: %s", hex.EncodeToString(hlock)))
+					panic(fmt.Errorf("failed to export HTLC genesis state: %s, %s", hex.EncodeToString(hlock), err.Error()))
 				}
 			}
 		}
