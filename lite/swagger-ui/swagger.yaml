@@ -5663,6 +5663,10 @@ paths:
         amount
       tags:
         - CoinSwap
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - in: path
           name: id
@@ -5670,6 +5674,70 @@ paths:
           required: true
           schema:
             type: string
+        - in: body
+          name: coinswap
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                type: object
+                properties:
+                  from:
+                    type: string
+                    example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
+                    description: Sender address or Keybase name to generate a transaction
+                  memo:
+                    type: string
+                    example: "Sent via Cosmos Voyager \U0001F680"
+                  chain_id:
+                    type: string
+                    example: Cosmos-Hub
+                  account_number:
+                    type: string
+                    example: '0'
+                  sequence:
+                    type: string
+                    example: '1'
+                  gas:
+                    type: string
+                    example: '200000'
+                  gas_adjustment:
+                    type: string
+                    example: '1.2'
+                  fees:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          example: stake
+                        amount:
+                          type: string
+                          example: '50'
+                  simulate:
+                    type: boolean
+                    example: false
+                    description: >-
+                      Estimate gas for a transaction (cannot be used in
+                      conjunction with generate_only)
+              max_token:
+                type: integer
+                example: '10'
+              exact_iris_amt:
+                type: integer
+                example: '10000000000000000000'
+              min_liquidity:
+                type: integer
+                example: '10000000000000000000'
+              deadline:
+                type: string
+                example: 30s
+              sender:
+                type: string
+                description: bech32 encoded address
+                example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
       responses:
         '200':
           description: Unsigned tx was succesfully generated
@@ -5677,70 +5745,6 @@ paths:
           description: Invalid parameters
         '500':
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_req:
-                  type: object
-                  properties:
-                    from:
-                      type: string
-                      example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
-                      description: Sender address or Keybase name to generate a transaction
-                    memo:
-                      type: string
-                      example: "Sent via Cosmos Voyager \U0001F680"
-                    chain_id:
-                      type: string
-                      example: Cosmos-Hub
-                    account_number:
-                      type: string
-                      example: '0'
-                    sequence:
-                      type: string
-                      example: '1'
-                    gas:
-                      type: string
-                      example: '200000'
-                    gas_adjustment:
-                      type: string
-                      example: '1.2'
-                    fees:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          denom:
-                            type: string
-                            example: stake
-                          amount:
-                            type: string
-                            example: '50'
-                    simulate:
-                      type: boolean
-                      example: false
-                      description: >-
-                        Estimate gas for a transaction (cannot be used in
-                        conjunction with generate_only)
-                max_token:
-                  type: integer
-                  example: '10'
-                exact_iris_amt:
-                  type: integer
-                  example: '10000000000000000000'
-                min_liquidity:
-                  type: integer
-                  example: '10000000000000000000'
-                deadline:
-                  type: string
-                  example: 30s
-                sender:
-                  type: string
-                  description: bech32 encoded address
-                  example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
   '/coinswap/liquidities/{id}/withdraw':
     post:
       deprecated: true
@@ -5749,6 +5753,10 @@ paths:
         amount
       tags:
         - CoinSwap
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - in: path
           name: id
@@ -5756,6 +5764,70 @@ paths:
           required: true
           schema:
             type: string
+        - in: body
+          name: coinswap
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                type: object
+                properties:
+                  from:
+                    type: string
+                    example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
+                    description: Sender address or Keybase name to generate a transaction
+                  memo:
+                    type: string
+                    example: "Sent via Cosmos Voyager \U0001F680"
+                  chain_id:
+                    type: string
+                    example: Cosmos-Hub
+                  account_number:
+                    type: string
+                    example: '0'
+                  sequence:
+                    type: string
+                    example: '1'
+                  gas:
+                    type: string
+                    example: '200000'
+                  gas_adjustment:
+                    type: string
+                    example: '1.2'
+                  fees:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          example: stake
+                        amount:
+                          type: string
+                          example: '50'
+                  simulate:
+                    type: boolean
+                    example: false
+                    description: >-
+                      Estimate gas for a transaction (cannot be used in
+                      conjunction with generate_only)
+              min_token:
+                type: integer
+                example: '100'
+              min_iris_amt:
+                type: integer
+                example: '10000000000000000000'
+              withdraw_liquidity:
+                type: integer
+                example: '10000000000000000000'
+              deadline:
+                type: string
+                example: 30s
+              sender:
+                type: string
+                description: bech32 encoded address
+                example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
       responses:
         '200':
           description: Unsigned tx was succesfully generated
@@ -5763,76 +5835,98 @@ paths:
           description: Invalid parameters
         '500':
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_req:
-                  type: object
-                  properties:
-                    from:
-                      type: string
-                      example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
-                      description: Sender address or Keybase name to generate a transaction
-                    memo:
-                      type: string
-                      example: "Sent via Cosmos Voyager \U0001F680"
-                    chain_id:
-                      type: string
-                      example: Cosmos-Hub
-                    account_number:
-                      type: string
-                      example: '0'
-                    sequence:
-                      type: string
-                      example: '1'
-                    gas:
-                      type: string
-                      example: '200000'
-                    gas_adjustment:
-                      type: string
-                      example: '1.2'
-                    fees:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          denom:
-                            type: string
-                            example: stake
-                          amount:
-                            type: string
-                            example: '50'
-                    simulate:
-                      type: boolean
-                      example: false
-                      description: >-
-                        Estimate gas for a transaction (cannot be used in
-                        conjunction with generate_only)
-                min_token:
-                  type: integer
-                  example: '100'
-                min_iris_amt:
-                  type: integer
-                  example: '10000000000000000000'
-                withdraw_liquidity:
-                  type: integer
-                  example: '10000000000000000000'
-                deadline:
-                  type: string
-                  example: 30s
-                sender:
-                  type: string
-                  description: bech32 encoded address
-                  example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
   /coinswap/liquidities/buy:
     post:
       deprecated: true
       summary: 'Swap coin by exact output, calculated input'
       tags:
         - CoinSwap
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: coinswap
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                type: object
+                properties:
+                  from:
+                    type: string
+                    example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
+                    description: Sender address or Keybase name to generate a transaction
+                  memo:
+                    type: string
+                    example: "Sent via Cosmos Voyager \U0001F680"
+                  chain_id:
+                    type: string
+                    example: Cosmos-Hub
+                  account_number:
+                    type: string
+                    example: '0'
+                  sequence:
+                    type: string
+                    example: '1'
+                  gas:
+                    type: string
+                    example: '200000'
+                  gas_adjustment:
+                    type: string
+                    example: '1.2'
+                  fees:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          example: stake
+                        amount:
+                          type: string
+                          example: '50'
+                  simulate:
+                    type: boolean
+                    example: false
+                    description: >-
+                      Estimate gas for a transaction (cannot be used in
+                      conjunction with generate_only)
+              input:
+                type: object
+                properties:
+                  address:
+                    type: string
+                    example: iaa1ezzh0humhy3329xg4avhcjtay985nll06lgq50
+                  coin:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                        example: stake
+                      amount:
+                        type: string
+                        example: '50'
+              output:
+                type: object
+                properties:
+                  address:
+                    type: string
+                    example: iaa1ezzh0humhy3329xg4avhcjtay985nll06lgq50
+                  coin:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                        example: stake
+                      amount:
+                        type: string
+                        example: '50'
+              deadline:
+                type: string
+                example: 30s
       responses:
         '200':
           description: Unsigned tx was succesfully generated
@@ -5840,93 +5934,98 @@ paths:
           description: Invalid parameters
         '500':
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_req:
-                  type: object
-                  properties:
-                    from:
-                      type: string
-                      example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
-                      description: Sender address or Keybase name to generate a transaction
-                    memo:
-                      type: string
-                      example: "Sent via Cosmos Voyager \U0001F680"
-                    chain_id:
-                      type: string
-                      example: Cosmos-Hub
-                    account_number:
-                      type: string
-                      example: '0'
-                    sequence:
-                      type: string
-                      example: '1'
-                    gas:
-                      type: string
-                      example: '200000'
-                    gas_adjustment:
-                      type: string
-                      example: '1.2'
-                    fees:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          denom:
-                            type: string
-                            example: stake
-                          amount:
-                            type: string
-                            example: '50'
-                    simulate:
-                      type: boolean
-                      example: false
-                      description: >-
-                        Estimate gas for a transaction (cannot be used in
-                        conjunction with generate_only)
-                input:
-                  type: object
-                  properties:
-                    address:
-                      type: string
-                      example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
-                    coin:
-                      type: object
-                      properties:
-                        denom:
-                          type: string
-                          example: stake
-                        amount:
-                          type: string
-                          example: '50'
-                output:
-                  type: object
-                  properties:
-                    address:
-                      type: string
-                      example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
-                    coin:
-                      type: object
-                      properties:
-                        denom:
-                          type: string
-                          example: stake
-                        amount:
-                          type: string
-                          example: '50'
-                deadline:
-                  type: string
-                  example: 30s
   /coinswap/liquidities/sell:
     post:
       deprecated: true
       summary: 'Swap coin by exact input, calculated output'
       tags:
         - CoinSwap
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: coinswap
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                type: object
+                properties:
+                  from:
+                    type: string
+                    example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
+                    description: Sender address or Keybase name to generate a transaction
+                  memo:
+                    type: string
+                    example: "Sent via Cosmos Voyager \U0001F680"
+                  chain_id:
+                    type: string
+                    example: Cosmos-Hub
+                  account_number:
+                    type: string
+                    example: '0'
+                  sequence:
+                    type: string
+                    example: '1'
+                  gas:
+                    type: string
+                    example: '200000'
+                  gas_adjustment:
+                    type: string
+                    example: '1.2'
+                  fees:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          example: stake
+                        amount:
+                          type: string
+                          example: '50'
+                  simulate:
+                    type: boolean
+                    example: false
+                    description: >-
+                      Estimate gas for a transaction (cannot be used in
+                      conjunction with generate_only)
+              input:
+                type: object
+                properties:
+                  address:
+                    type: string
+                    example: iaa1ezzh0humhy3329xg4avhcjtay985nll06lgq50
+                  coin:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                        example: stake
+                      amount:
+                        type: string
+                        example: '50'
+              output:
+                type: object
+                properties:
+                  address:
+                    type: string
+                    example: iaa1ezzh0humhy3329xg4avhcjtay985nll06lgq50
+                  coin:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                        example: stake
+                      amount:
+                        type: string
+                        example: '50'
+              deadline:
+                type: string
+                example: 30s
       responses:
         '200':
           description: Unsigned tx was succesfully generated
@@ -5934,87 +6033,6 @@ paths:
           description: Invalid parameters
         '500':
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_req:
-                  type: object
-                  properties:
-                    from:
-                      type: string
-                      example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
-                      description: Sender address or Keybase name to generate a transaction
-                    memo:
-                      type: string
-                      example: "Sent via Cosmos Voyager \U0001F680"
-                    chain_id:
-                      type: string
-                      example: Cosmos-Hub
-                    account_number:
-                      type: string
-                      example: '0'
-                    sequence:
-                      type: string
-                      example: '1'
-                    gas:
-                      type: string
-                      example: '200000'
-                    gas_adjustment:
-                      type: string
-                      example: '1.2'
-                    fees:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          denom:
-                            type: string
-                            example: stake
-                          amount:
-                            type: string
-                            example: '50'
-                    simulate:
-                      type: boolean
-                      example: false
-                      description: >-
-                        Estimate gas for a transaction (cannot be used in
-                        conjunction with generate_only)
-                input:
-                  type: object
-                  properties:
-                    address:
-                      type: string
-                      example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
-                    coin:
-                      type: object
-                      properties:
-                        denom:
-                          type: string
-                          example: stake
-                        amount:
-                          type: string
-                          example: '50'
-                output:
-                  type: object
-                  properties:
-                    address:
-                      type: string
-                      example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
-                    coin:
-                      type: object
-                      properties:
-                        denom:
-                          type: string
-                          example: stake
-                        amount:
-                          type: string
-                          example: '50'
-                deadline:
-                  type: string
-                  example: 30s
   /token/tokens:
     post:
       deprecated: true
@@ -6895,11 +6913,11 @@ paths:
                 example: iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy
                 type: string
                 description: bech32 encoded address
-              token_id:
+              id:
                 type: string
-              token_uri:
+              uri:
                 type: string
-              denom:
+              denom_id:
                 type: string
       responses:
         '200':
@@ -7658,6 +7676,66 @@ paths:
       summary: Request a random number
       tags:
         - Random
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ReadRESTReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                type: object
+                properties:
+                  from:
+                    type: string
+                    example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
+                    description: Sender address or Keybase name to generate a transaction
+                  memo:
+                    type: string
+                    example: "Sent via Cosmos Voyager \U0001F680"
+                  chain_id:
+                    type: string
+                    example: Cosmos-Hub
+                  account_number:
+                    type: string
+                    example: '0'
+                  sequence:
+                    type: string
+                    example: '1'
+                  gas:
+                    type: string
+                    example: '200000'
+                  gas_adjustment:
+                    type: string
+                    example: '1.2'
+                  fees:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          example: stake
+                        amount:
+                          type: string
+                          example: '50'
+                  simulate:
+                    type: boolean
+                    example: false
+                    description: >-
+                      Estimate gas for a transaction (cannot be used in
+                      conjunction with generate_only)
+              consumer:
+                type: string
+                description: bech32 encoded address
+                example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
+              block_interval:
+                type: integer
+                example: '10'
       responses:
         '200':
           description: Unsigned tx was succesfully generated
@@ -7665,61 +7743,6 @@ paths:
           description: Invalid parameters
         '500':
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_req:
-                  type: object
-                  properties:
-                    from:
-                      type: string
-                      example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
-                      description: Sender address or Keybase name to generate a transaction
-                    memo:
-                      type: string
-                      example: "Sent via Cosmos Voyager \U0001F680"
-                    chain_id:
-                      type: string
-                      example: Cosmos-Hub
-                    account_number:
-                      type: string
-                      example: '0'
-                    sequence:
-                      type: string
-                      example: '1'
-                    gas:
-                      type: string
-                      example: '200000'
-                    gas_adjustment:
-                      type: string
-                      example: '1.2'
-                    fees:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          denom:
-                            type: string
-                            example: stake
-                          amount:
-                            type: string
-                            example: '50'
-                    simulate:
-                      type: boolean
-                      example: false
-                      description: >-
-                        Estimate gas for a transaction (cannot be used in
-                        conjunction with generate_only)
-                consumer:
-                  type: string
-                  description: bech32 encoded address
-                  example: iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq
-                block_interval:
-                  type: integer
-                  example: '10'
   '/random/randoms/{request-id}':
     get:
       deprecated: true
@@ -35553,7 +35576,7 @@ definitions:
     properties:
       address:
         type: string
-        example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
+        example: iaa1ezzh0humhy3329xg4avhcjtay985nll06lgq50
       coin:
         type: object
         properties:
