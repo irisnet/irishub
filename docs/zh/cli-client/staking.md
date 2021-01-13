@@ -114,13 +114,13 @@ Delegation:
 通过委托人与验证人地址查询unbonding-delegation记录。
 
 ```bash
-iris query staking unbonding-delegation [delegator-addr] [validator-addr] [flags]```
+iris query staking unbonding-delegation [delegator-addr] [validator-addr] [flags]
 ```
 
 ### 查询unbonding-delegation记录
 
 ```bash
-iris query staking unbonding-delegation [delegator-addr] [validator-addr] [flags]```
+iris query staking unbonding-delegation <iaa...> <iva...>
 ```
 
 ## iris query staking unbonding-delegations

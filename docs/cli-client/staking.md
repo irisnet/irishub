@@ -114,7 +114,7 @@ Delegation:
 Query an unbonding-delegation record based on delegator and validator address.
 
 ```bash
-iris query staking unbonding-delegation [delegator-addr] [validator-addr] [flags]```
+iris query staking unbonding-delegation [delegator-addr] [validator-addr] [flags]
 ```
 
 ### Query an unbonding delegation record

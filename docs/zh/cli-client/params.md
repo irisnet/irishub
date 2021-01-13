@@ -28,13 +28,13 @@ iris query params subspace [subspace] [key] [flags]
 
 ## staking
 
-| key                 | description            | default |
-| ------------------- | ---------------------- | ------- |
-| `UnbondingTime`     | 抵押解绑时间           | 3w      |
-| `MaxValidators`     | 最大验证人数量         | 100     |
-| `MaxEntries`        | 解绑、转委托的最大数量 | 7       |
-| `BondDenom`         | 可抵押的代币           | uiris   |
-| `HistoricalEntries` |                        | 100     |
+| key                 | description            | default   |
+| ------------------- | ---------------------- | --------- |
+| `UnbondingTime`     | 抵押解绑时间           | 3w(weeks) |
+| `MaxValidators`     | 最大验证人数量         | 100       |
+| `MaxEntries`        | 解绑、转委托的最大数量 | 7         |
+| `BondDenom`         | 可抵押的代币           | uiris     |
+| `HistoricalEntries` |                        | 100       |
 
 ## mint
 
@@ -64,32 +64,31 @@ iris query params subspace [subspace] [key] [flags]
 
 ## gov
 
-| key             | description            | default |
-| --------------- | ---------------------- | ------- |
-| `depositparams` | 提议抵押阶段的相关参数 |         |
-| `votingparams`  | 提议投票阶段的相关参数 |         |
-| `tallyparams`   | 投票统计阶段的相关参数 |         |
+| key             | description            | default                                                      |
+| --------------- | ---------------------- | ------------------------------------------------------------ |
+| `depositparams` | 提议抵押阶段的相关参数 | `min_deposit`:    10000000uiris; `max_deposit_period`: 2d(days) |
+| `votingparams`  | 提议投票阶段的相关参数 | `voting_period`: 2d(days)                                    |
+| `tallyparams`   | 投票统计阶段的相关参数 | `quorum`: 0.334; `threshold`: 0.5; `veto_threshold`: 0.334   |
 
 ## crisis
 
-| key           | description | default |
-| ------------- | ----------- | ------- |
-| `ConstantFee` | 固定费用    |         |
+| key           | description | default   |
+| ------------- | ----------- | --------- |
+| `ConstantFee` | 固定费用    | 1000uiris |
 
 ## token
 
-| key                 | description                | default   |
-| ------------------- | -------------------------- | --------- |
-| `TokenTaxRate`      | 发行、增发代币的费率       | 0.4       |
-| `IssueTokenBaseFee` | 发行代币所需支付的代币数量 | 60000iris |
-| `MintTokenFeeRatio` | 增发代币的费率             | 0.1       |
+| key                 | description                | default            |
+| ------------------- | -------------------------- | ------------------ |
+| `TokenTaxRate`      | 发行、增发代币的费率       | 0.4                |
+| `IssueTokenBaseFee` | 发行代币所需支付的基准费用 | 60000 * 10^6 uiris |
+| `MintTokenFeeRatio` | 增发代币的费率             | 0.1                |
 
 ## coinswap
 
-| key             | description          | default |
-| --------------- | -------------------- | ------- |
-| `Fee`           | 支付的手续费率       | 0.003   |
-| `StandardDenom` | 支付的手续费代币名称 | uiris   |
+| key   | description    | default |
+| ----- | -------------- | ------- |
+| `Fee` | 支付的手续费率 | 0.003   |
 
 ## service
 
@@ -97,7 +96,7 @@ iris query params subspace [subspace] [key] [flags]
 | ---------------------- | --------------------------- | --------- |
 | `MaxRequestTimeout`    | 最大请求超时时间            | 100(区块) |
 | `MinDepositMultiple`   | 最小抵押倍数                | 200       |
-| `MinDeposit`           | 最小抵押数量                | 6000iris  |
+| `MinDeposit`           | 最小抵押数量                | 6000uiris |
 | `ServiceFeeTax`        | 服务费率                    | 0.1       |
 | `SlashFraction`        | 惩罚系数                    | 0.001     |
 | `ComplaintRetrospect`  | 投诉周期                    | 15d       |

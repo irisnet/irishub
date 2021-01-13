@@ -1,6 +1,6 @@
 # Bank
 
-Bank模块用于管理本地帐户中的资产
+Bank模块用于管理本地帐户中的资产。
 
 ## 可用命令
 
@@ -24,6 +24,7 @@ iris query bank balances [address] [flags]
 | ---------- | ------ | ---- | ---- | -------------------------- |
 | -h, --help |        |      |      | `balances`子命令的提示信息 |
 | --denom    | string |      |      | 要查询的指定余额面值       |
+| --count-total   |        |          |         | 所有查询的余额记录总数 |
 
 ## iris query bank total
 
@@ -42,7 +43,7 @@ iris query bank total [flags]
 
 ## iris tx bank send
 
-发送令牌到另一个地址，此命令包括 `generate`，`sign` 和 `broadcast` 这些步骤。
+发送代币到另一个地址，此命令包括 `generate`，`sign` 和 `broadcast` 这些步骤。
 
 ```bash
 iris tx bank send [from_key_or_address] [to_address] [amount] [flags]

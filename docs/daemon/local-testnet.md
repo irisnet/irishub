@@ -49,7 +49,7 @@ iris add-genesis-account $(iris keys show MyValidator --address) 150000000uiris
 Generate the transaction that creates your validator. The gentxs are stored in `~/.iris/config/gentx/`
 
 ```bash
-iris gentx MyValidator --chain-id=testing --amount 100000000uiris
+iris gentx MyValidator 100000000uiris --chain-id=testing 
 ```
 
 ### iris collect-gentxs
@@ -65,7 +65,7 @@ iris collect-gentxs
 Change the default token denom to `uiris`
 
 ```bash
-sed -i '' 's/stake/uiris/g' $HOME/.iris/config/genesis.json
+sed -i  's/stake/uiris/g' $HOME/.iris/config/genesis.json
 ```
 
 Now it‘s ready to start `iris`
