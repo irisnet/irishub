@@ -83,10 +83,17 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 
 	// withdraw all delegator rewards
 	dels := app.stakingKeeper.GetAllDelegations(ctx)
-	for _, del := range dels {
-		delegatorAddress, _ := sdk.AccAddressFromBech32(del.DelegatorAddress)
-		validatorAddress, _ := sdk.ValAddressFromBech32(del.ValidatorAddress)
-		_, _ = app.distrKeeper.WithdrawDelegationRewards(ctx, delegatorAddress, validatorAddress)
+	for _, delegation := range dels {
+		valAddr, err := sdk.ValAddressFromBech32(delegation.ValidatorAddress)
+		if err != nil {
+			panic(err)
+		}
+
+		delAddr, err := sdk.AccAddressFromBech32(delegation.DelegatorAddress)
+		if err != nil {
+			panic(err)
+		}
+		_, _ = app.distrKeeper.WithdrawDelegationRewards(ctx, delAddr, valAddr)
 	}
 
 	// clear validator slash events
@@ -113,10 +120,16 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 
 	// reinitialize all delegations
 	for _, del := range dels {
-		delegatorAddress, _ := sdk.AccAddressFromBech32(del.DelegatorAddress)
-		validatorAddress, _ := sdk.ValAddressFromBech32(del.ValidatorAddress)
-		app.distrKeeper.Hooks().BeforeDelegationCreated(ctx, delegatorAddress, validatorAddress)
-		app.distrKeeper.Hooks().AfterDelegationModified(ctx, delegatorAddress, validatorAddress)
+		valAddr, err := sdk.ValAddressFromBech32(del.ValidatorAddress)
+		if err != nil {
+			panic(err)
+		}
+		delAddr, err := sdk.AccAddressFromBech32(del.DelegatorAddress)
+		if err != nil {
+			panic(err)
+		}
+		app.distrKeeper.Hooks().BeforeDelegationCreated(ctx, delAddr, valAddr)
+		app.distrKeeper.Hooks().AfterDelegationModified(ctx, delAddr, valAddr)
 	}
 
 	// reset context height
