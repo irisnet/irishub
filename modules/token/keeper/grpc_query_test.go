@@ -5,6 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irismod/modules/token/types"
 )
@@ -58,4 +59,28 @@ func (suite *KeeperTestSuite) TestGRPCQueryParams() {
 	params := app.TokenKeeper.GetParamSet(ctx)
 	suite.Require().NoError(err)
 	suite.Equal(params, paramsResp.Params)
+}
+
+func (suite *KeeperTestSuite) TestGRPCQueryTotalBurn() {
+	app, ctx := suite.app, suite.ctx
+
+	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
+	types.RegisterQueryServer(queryHelper, app.TokenKeeper)
+	queryClient := types.NewQueryClient(queryHelper)
+
+	_, _, addr := testdata.KeyTestPubAddr()
+	token := types.NewToken("btc", "Bitcoin Token", "satoshi", 18, 21000000, 22000000, true, addr)
+	err := suite.app.TokenKeeper.AddToken(ctx, token)
+	suite.Require().NoError(err)
+
+	buinCoin := sdk.NewInt64Coin("satoshi", 1000000000000000000)
+	app.TokenKeeper.AddBurnCoin(ctx, buinCoin)
+
+	expCoin, err := token.ToMainCoin(buinCoin)
+	suite.Require().NoError(err)
+
+	resp, err := queryClient.TotalBurn(gocontext.Background(), &types.QueryTotalBurnRequest{})
+	suite.Require().NoError(err)
+	suite.Len(resp.BurnCoins, 1)
+	suite.EqualValues(expCoin, resp.BurnCoins[0])
 }

@@ -23,6 +23,8 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 			return queryFees(ctx, req, k, legacyQuerierCdc)
 		case types.QueryParams:
 			return queryParams(ctx, req, k, legacyQuerierCdc)
+		case types.QueryTotalBurn:
+			return queryTotalBurn(ctx, req, k, legacyQuerierCdc)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown token query endpoint")
 		}
@@ -78,4 +80,12 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuer
 func queryParams(ctx sdk.Context, _ abci.RequestQuery, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	params := keeper.GetParamSet(ctx)
 	return codec.MarshalJSONIndent(legacyQuerierCdc, params)
+}
+
+func queryTotalBurn(ctx sdk.Context, _ abci.RequestQuery, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+	resp, err := keeper.TotalBurn(sdk.WrapSDKContext(ctx), &types.QueryTotalBurnRequest{})
+	if err != nil {
+		return nil, err
+	}
+	return codec.MarshalJSONIndent(legacyQuerierCdc, resp)
 }

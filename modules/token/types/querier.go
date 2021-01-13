@@ -5,10 +5,11 @@ import (
 )
 
 const (
-	QueryToken  = "token"
-	QueryTokens = "tokens"
-	QueryFees   = "fees"
-	QueryParams = "params"
+	QueryToken     = "token"
+	QueryTokens    = "tokens"
+	QueryFees      = "fees"
+	QueryParams    = "params"
+	QueryTotalBurn = "total_burn"
 )
 
 // QueryTokenParams is the query parameters for 'custom/token/token'

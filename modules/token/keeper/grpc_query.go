@@ -126,9 +126,32 @@ func (k Keeper) Fees(c context.Context, req *types.QueryFeesRequest) (*types.Que
 	}, nil
 }
 
+// Params return the all the parameter in tonken module
 func (k Keeper) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 	params := k.GetParamSet(ctx)
 
 	return &types.QueryParamsResponse{Params: params}, nil
+}
+
+// TotalBurn return the all burn coin
+func (k Keeper) TotalBurn(c context.Context, req *types.QueryTotalBurnRequest) (*types.QueryTotalBurnResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+	burnCoins := k.GetAllBurnCoin(ctx)
+
+	coins := make([]sdk.DecCoin, len(burnCoins))
+	for i, coin := range burnCoins {
+		token, err := k.GetToken(ctx, coin.Denom)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, err.Error())
+		}
+
+		mainCoin, err := token.ToMainCoin(coin)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, err.Error())
+		}
+
+		coins[i] = mainCoin
+	}
+	return &types.QueryTotalBurnResponse{BurnCoins: coins}, nil
 }

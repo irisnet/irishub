@@ -113,6 +113,46 @@ func (k Keeper) GetOwner(ctx sdk.Context, denom string) (sdk.AccAddress, error) 
 	return token.GetOwner(), nil
 }
 
+// AddBurnCoin save the total amount of tokens burned
+func (k Keeper) AddBurnCoin(ctx sdk.Context, coin sdk.Coin) {
+	var total = coin
+	if hasCoin, err := k.GetBurnCoin(ctx, coin.Denom); err == nil {
+		total = total.Add(hasCoin)
+	}
+	bz := k.cdc.MustMarshalBinaryBare(&total)
+	key := types.KeyBurnTokenAmt(coin.Denom)
+	store := ctx.KVStore(k.storeKey)
+	store.Set(key, bz)
+}
+
+// GetBurnCoin return the total amount of tokens burned
+func (k Keeper) GetBurnCoin(ctx sdk.Context, minUint string) (sdk.Coin, error) {
+	key := types.KeyBurnTokenAmt(minUint)
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(key)
+
+	if len(bz) == 0 {
+		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrNotFoundTokenAmt, "not found symbol:%s", minUint)
+	}
+	var coin sdk.Coin
+	k.cdc.MustUnmarshalBinaryBare(bz, &coin)
+	return coin, nil
+}
+
+// GetAllBurnCoin return all the total amount of tokens burned
+func (k Keeper) GetAllBurnCoin(ctx sdk.Context) []sdk.Coin {
+	store := ctx.KVStore(k.storeKey)
+
+	var coins []sdk.Coin
+	it := sdk.KVStorePrefixIterator(store, types.PeffixBurnTokenAmt)
+	for ; it.Valid(); it.Next() {
+		var coin sdk.Coin
+		k.cdc.MustUnmarshalBinaryBare(it.Value(), &coin)
+		coins = append(coins, coin)
+	}
+	return coins
+}
+
 // GetParamSet returns token params from the global param store
 func (k Keeper) GetParamSet(ctx sdk.Context) types.Params {
 	var p types.Params

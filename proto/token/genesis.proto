@@ -3,12 +3,14 @@ package irismod.token;
 
 import "gogoproto/gogo.proto";
 import "token/token.proto";
+import "cosmos_proto/coin.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/token/types";
 
 // GenesisState defines the token module's genesis state.
 message GenesisState {
-    Params params = 1 [(gogoproto.nullable) = false];
-    repeated Token tokens = 2 [(gogoproto.nullable) = false];
+  Params params = 1 [ (gogoproto.nullable) = false ];
+  repeated Token tokens = 2 [ (gogoproto.nullable) = false ];
+  repeated cosmos.base.v1beta1.Coin burn_coins = 3
+      [ (gogoproto.nullable) = false ];
 }
-

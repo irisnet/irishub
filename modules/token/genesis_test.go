@@ -38,9 +38,13 @@ func TestInitGenesis(t *testing.T) {
 	addr := sdk.AccAddress(tmhash.SumTruncated([]byte("addr1")))
 	ft := types.NewToken("btc", "Bitcoin Network", "satoshi", 1, 1, 1, true, addr)
 
+	burnCoins := []sdk.Coin{
+		{Denom: ft.MinUnit, Amount: sdk.NewInt(1000)},
+	}
 	genesis := types.GenesisState{
-		Params: types.DefaultParams(),
-		Tokens: []types.Token{ft},
+		Params:    types.DefaultParams(),
+		Tokens:    []types.Token{ft},
+		BurnCoins: burnCoins,
 	}
 
 	// initialize genesis
@@ -50,4 +54,7 @@ func TestInitGenesis(t *testing.T) {
 	var tokens = app.TokenKeeper.GetTokens(ctx, nil)
 	require.Equal(t, len(tokens), 2)
 	require.Equal(t, tokens[0], &ft)
+
+	var coins = app.TokenKeeper.GetAllBurnCoin(ctx)
+	require.Equal(t, burnCoins, coins)
 }

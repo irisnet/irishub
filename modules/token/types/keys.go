@@ -27,6 +27,7 @@ var (
 	PrefixTokenForSymbol  = []byte{0x1} // symbol prefix for the token
 	PrefixTokenForMinUint = []byte{0x2} // min_unit prefix for the token
 	PrefixTokens          = []byte{0x3} // prefix for the tokens
+	PeffixBurnTokenAmt    = []byte{0x4} // prefix for the amount of token burt
 )
 
 // KeySymbol returns the key of the token with the specified symbol
@@ -45,4 +46,9 @@ func KeyMinUint(minUnit string) []byte {
 func KeyTokens(owner sdk.AccAddress, symbol string) []byte {
 	symbol = strings.ToLower(strings.TrimSpace(symbol))
 	return append(append(PrefixTokens, owner.Bytes()...), []byte(symbol)...)
+}
+
+// KeyBurnTokenAmt returns the key of the specified minUint.
+func KeyBurnTokenAmt(minUint string) []byte {
+	return append(PeffixBurnTokenAmt, []byte(minUint)...)
 }

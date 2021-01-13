@@ -26,6 +26,7 @@ func GetQueryCmd() *cobra.Command {
 		GetCmdQueryToken(),
 		GetCmdQueryTokens(),
 		GetCmdQueryFee(),
+		GetCmdQueryTotalBurn(),
 		GetCmdQueryParams(),
 	)
 
@@ -179,6 +180,31 @@ func GetCmdQueryParams() *cobra.Command {
 			}
 
 			return clientCtx.PrintProto(&res.Params)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdQueryTotalBurn return the total amount of all burn tokens
+func GetCmdQueryTotalBurn() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "total-burn",
+		Long:    "Query the total amount of all burn tokens.",
+		Example: fmt.Sprintf("$ %s query token params", version.AppName),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.TotalBurn(context.Background(), &types.QueryTotalBurnRequest{})
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

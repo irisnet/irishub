@@ -22,6 +22,8 @@ func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
 	r.HandleFunc(fmt.Sprintf("/%s/tokens/{%s}/fees", types.ModuleName, RestParamSymbol), queryTokenFeesHandlerFn(cliCtx)).Methods("GET")
 	// Query token params
 	r.HandleFunc(fmt.Sprintf("/%s/params", types.ModuleName), queryTokenParamsHandlerFn(cliCtx)).Methods("GET")
+	// Query the total amount of all burn tokens
+	r.HandleFunc(fmt.Sprintf("/%s/total_burn", types.ModuleName), queryTotalBurnHandlerFn(cliCtx)).Methods("GET")
 }
 
 // queryTokenHandlerFn is the HTTP request handler to query token
@@ -149,6 +151,27 @@ func queryTokenParamsHandlerFn(cliCtx client.Context) http.HandlerFunc {
 
 		res, height, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryParams), nil,
+		)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		cliCtx = cliCtx.WithHeight(height)
+		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}
+
+// queryTotalBurnHandlerFn is the HTTP request handler to query the total amount of all burn tokens
+func queryTotalBurnHandlerFn(cliCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
+			return
+		}
+
+		res, height, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryTotalBurn), nil,
 		)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
