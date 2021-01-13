@@ -229,11 +229,11 @@ iris tx gov submit-proposal software-upgrade [name] (--upgrade-height [height] |
 
 **标识：**
 
-| 名称, 速记       | 类型   | 必须 | 默认 | 描述                                                   |
-| ---------------- | ------ | ---- | ---- | ------------------------------------------------------ |
-| --deposit        | Coin   | Yes  |      | 提案抵押的代币                                         |
-| --title          | string | Yes  |      | 提案的标题                                             |
-| --description    | string | Yes  |      | 提案的描述                                             |
+| 名称, 速记       | 类型   | 必须 | 默认 | 描述                                                 |
+| ---------------- | ------ | ---- | ---- | ------------------------------------------------ |
+| --deposit        | Coin   | Yes  |      | 提案抵押的代币                                     |
+| --title          | string | Yes  |      | 提案的标题                                         |
+| --description    | string | Yes  |      | 提案的描述                                         |
 | --upgrade-height | int64  |      |      | 升级必须发生的高度（不要与`--upgrade-time`一起使用）   |
 | --time           | string |      |      | 升级必须发生的时间（不要与`--upgrade-height`一起使用） |
 | --info           | string |      |      | 计划升级的可选信息，例如提交哈希等。                   |

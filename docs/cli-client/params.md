@@ -29,13 +29,13 @@ Among them, the parameters available for query for each subspace are as follows:
 
 ## staking
 
-| key                 | description                                                  | default   |
-| ------------------- | ------------------------------------------------------------ | --------- |
-| `UnbondingTime`     | Mortgage redemption time                                     | 3w(weeks) |
-| `MaxValidators`     | Maximum number of validators                                 | 100       |
+| key                 | description                                                     | default   |
+| ------------------- | --------------------------------------------------------------- | --------- |
+| `UnbondingTime`     | Mortgage redemption time                                        | 3w(weeks) |
+| `MaxValidators`     | Maximum number of validators                                    | 100       |
 | `MaxEntries`        | The maximum number of unbinding/redelegation orders in progress | 7         |
-| `BondDenom`         | Bond denom                                                   | uiris     |
-| `HistoricalEntries` |                                                              | 100       |
+| `BondDenom`         | Bond denom                                                      | uiris     |
+| `HistoricalEntries` |                                                                 | 100       |
 
 ## mint
 
