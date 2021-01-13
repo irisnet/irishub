@@ -47,7 +47,7 @@ func (ctd CheckTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 		case *govtypes.MsgDeposit:
 			if containSwapCoin(msg.Amount...) {
 				return ctx, sdkerrors.Wrap(
-					sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity  token %s for proposal")
+					sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
 			}
 		}
 	}

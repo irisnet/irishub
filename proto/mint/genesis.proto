@@ -9,5 +9,5 @@ option go_package = "github.com/irisnet/irishub/modules/mint/types";
 // GenesisState defines the guardian module's genesis state.
 message GenesisState {
     Minter minter = 1 [(gogoproto.nullable) = false];
-    Params Params = 2 [(gogoproto.nullable) = false];
+    Params params = 2 [(gogoproto.nullable) = false];
 }

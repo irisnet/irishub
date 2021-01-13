@@ -2,8 +2,8 @@
 
 set -eo pipefail
 
-SDK_VERSION=v0.40.0-rc5
-IRISMOD_VERSION=v1.1.1-0.20201229063925-7d7dad20f951
+SDK_VERSION=v0.40.0
+IRISMOD_VERSION=v1.1.1-0.20210111090024-463e3e11dc14
 
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/cosmos
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/ibc
@@ -15,7 +15,7 @@ cp -r ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto ./
 
 mkdir -p ./tmp-swagger-gen
 
-proto_dirs=$(find ./proto -path './proto/cosmos/base/tendermint*' -prune -o -name 'query.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+proto_dirs=$(find ./proto -path -prune -o -name 'query.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
 
     # generate swagger files (filter query files)
