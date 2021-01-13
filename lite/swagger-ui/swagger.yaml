@@ -5899,7 +5899,7 @@ paths:
                 properties:
                   address:
                     type: string
-                    example: iaa1ezzh0humhy3329xg4avhcjtay985nll06lgq50
+                    example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
                   coin:
                     type: object
                     properties:
@@ -5914,7 +5914,7 @@ paths:
                 properties:
                   address:
                     type: string
-                    example: iaa1ezzh0humhy3329xg4avhcjtay985nll06lgq50
+                    example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
                   coin:
                     type: object
                     properties:
@@ -5998,7 +5998,7 @@ paths:
                 properties:
                   address:
                     type: string
-                    example: iaa1ezzh0humhy3329xg4avhcjtay985nll06lgq50
+                    example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
                   coin:
                     type: object
                     properties:
@@ -6013,7 +6013,7 @@ paths:
                 properties:
                   address:
                     type: string
-                    example: iaa1ezzh0humhy3329xg4avhcjtay985nll06lgq50
+                    example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
                   coin:
                     type: object
                     properties:
@@ -35576,7 +35576,7 @@ definitions:
     properties:
       address:
         type: string
-        example: iaa1ezzh0humhy3329xg4avhcjtay985nll06lgq50
+        example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
       coin:
         type: object
         properties:
