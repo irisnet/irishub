@@ -46,7 +46,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 func PrepForZeroHeightGenesis(ctx sdk.Context, k keeper.Keeper) {
 	k.IterateRandomRequestQueue(ctx, func(height int64, reqID []byte, request types.Request) bool {
-		leftHeight := height-ctx.BlockHeight()+1
+		leftHeight := height - ctx.BlockHeight() + 1
 		k.DequeueRandomRequest(ctx, height, reqID)
 		k.EnqueueRandomRequest(ctx, leftHeight, reqID, request)
 		return false

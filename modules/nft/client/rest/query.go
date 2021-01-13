@@ -33,17 +33,19 @@ func registerQueryRoutes(cliCtx client.Context, r *mux.Router, queryRoute string
 func querySupply(cliCtx client.Context, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		denomID := strings.TrimSpace(mux.Vars(r)[RestParamDenomID])
-		if err := types.ValidateDenomID(denomID); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-		}
-
-		ownerStr := r.FormValue(RestParamOwner)
-		owner, err := sdk.AccAddressFromBech32(ownerStr)
+		err := types.ValidateDenomID(denomID)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
 		}
-
+		var owner sdk.AccAddress
+		ownerStr := r.FormValue(RestParamOwner)
+		if len(ownerStr) > 0 {
+			owner, err = sdk.AccAddressFromBech32(ownerStr)
+			if err != nil {
+				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+		}
 		params := types.NewQuerySupplyParams(denomID, owner)
 		bz, err := cliCtx.LegacyAmino.MarshalJSON(params)
 		if err != nil {

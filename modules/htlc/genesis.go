@@ -47,7 +47,7 @@ func PrepForZeroHeightGenesis(ctx sdk.Context, k keeper.Keeper) {
 		func(hlock tmbytes.HexBytes, h types.HTLC) (stop bool) {
 			if h.State == types.Open {
 				h.ExpirationHeight = h.ExpirationHeight - uint64(ctx.BlockHeight()) + 1
-				k.SetHTLC(ctx,h,hlock)
+				k.SetHTLC(ctx, h, hlock)
 			} else if h.State == types.Expired {
 				if err := k.RefundHTLC(ctx, hlock); err != nil {
 					panic(fmt.Errorf("failed to export the HTLC genesis state: %s", hlock.String()))
