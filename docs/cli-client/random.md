@@ -4,11 +4,11 @@ Rand module allows you to post a random number request to the IRIS Hub and query
 
 ## Available Commands
 
-| Name                                             | Description                                                      |
-| ------------------------------------------------ | ---------------------------------------------------------------- |
-| [request](#iris-tx-random-request)               | Request a random number with an optional block interval                                          |
-| [random](#iris-query-random-random)              | Query the generated random number by the request id              |
-| [queue](#iris-query-random-queue)                | Query the pending random number requests with an optional height |
+| Name                                | Description                                                      |
+| ----------------------------------- | ---------------------------------------------------------------- |
+| [request](#iris-tx-random-request)  | Request a random number with an optional block interval          |
+| [random](#iris-query-random-random) | Query the generated random number by the request id              |
+| [queue](#iris-query-random-queue)   | Query the pending random number requests with an optional height |
 
 ## iris tx random request
 

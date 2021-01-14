@@ -31,7 +31,7 @@ Service模块允许在IRIS Hub中定义、绑定、调用服务。[了解更多i
 | [fees](#iris-query-service-fees)                        | 查询服务提供者的收益                         |
 | [withdraw-fees](#iris-tx-service-withdraw-fees)         | 提取服务提供者的收益                         |
 | [schema](#iris-query-service-schema)                    | 通过 schema 名称查询系统 schema              |
-| [params](#iris-query-service-params)                    | 查询当前服务参数值                         |
+| [params](#iris-query-service-params)                    | 查询当前服务参数值                           |
 
 ## iris tx service define
 
@@ -296,7 +296,7 @@ iris tx service call [flags]
 
 | 名称，速记        | 默认  | 描述                                                  | 必须 |
 | ----------------- | ----- | ----------------------------------------------------- | ---- |
-| --service-name     |       | 服务名称                                              | 是   |
+| --service-name    |       | 服务名称                                              | 是   |
 | --providers       |       | 服务提供者列表                                        | 是   |
 | --service-fee-cap |       | 愿意为单个请求支付的最大服务费用                      | 是   |
 | --data            |       | 请求输入的内容或文件路径，是一个Input JSON Schema实例 | 是   |
