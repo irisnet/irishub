@@ -13,13 +13,13 @@ iris export --home [v0.16.3_node_home] --height [upgrade-height] --for-zero-heig
 Migrate the exported genesis.json with irishub v1.0.0
 
 ```bash
-iris migrate genesis.json --chain-id [chain-id] > genesis_v1.0.0.json
+iris migrate genesis.json --chain-id irishub-1 > genesis_v1.0.0.json
 ```
 
 Check if md5 is correct
 
 ```bash
-md5sum genesis_new.json
+md5sum genesis_v1.0.0.json
 ```
 
 ## 3. Initialize new node
@@ -48,7 +48,7 @@ cp [v0.16.3_node_home]/config/node_key.json [v1.0.0_node_home]/config/node_key.j
 
 ## 6. Copy migrated genesis file
 
-Copy new genesis.json to new node home
+Copy genesis_v1.0.0.json to new node home
 
 ```bash
 cp genesis_v1.0.0.json [v1.0.0_node_home]/config/genesis.json
@@ -56,10 +56,28 @@ cp genesis_v1.0.0.json [v1.0.0_node_home]/config/genesis.json
 
 ## 7. Config new node
 
-Add one step to modify minimum-gas-prices and migrate config.toml (eg.persistent_peers)
+Config `minimum-gas-prices` in `[v1.0.0_node_home]/config/app.toml`
 
-```bash
+```toml
+...
 
+# The minimum gas prices a validator is willing to accept for processing a
+# transaction. A transaction's fees must meet the minimum of any denomination
+# specified in this config (e.g. 0.25token1;0.0001token2).
+minimum-gas-prices = ""
+
+...
+```
+
+Config `persistent_peers` in `[v1.0.0_node_home]/config/config.toml`
+
+```toml
+...
+
+# Comma separated list of nodes to keep persistent connections to
+persistent_peers = ""
+
+...
 ```
 
 ## 8. Start new node
