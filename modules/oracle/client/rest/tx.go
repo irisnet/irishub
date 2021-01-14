@@ -109,8 +109,9 @@ func editFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
+		vars := mux.Vars(r)
 		msg := &types.MsgEditFeed{
-			FeedName:          req.FeedName,
+			FeedName:          vars[FeedName],
 			LatestHistory:     req.LatestHistory,
 			Description:       req.Description,
 			Providers:         req.Providers,

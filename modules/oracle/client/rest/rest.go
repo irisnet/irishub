@@ -37,7 +37,6 @@ type createFeedReq struct {
 
 type editFeedReq struct {
 	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
-	FeedName          string       `json:"feed_name"`
 	Description       string       `json:"description"`
 	LatestHistory     uint64       `json:"latest_history"`
 	Creator           string       `json:"creator"`
