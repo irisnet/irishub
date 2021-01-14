@@ -256,6 +256,10 @@ paths:
       summary: Add liquidity by exact iris amount, calculated token and liquidity amount
       tags:
         - CoinSwap
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - in: path
           name: id
@@ -263,6 +267,28 @@ paths:
           required: true
           schema:
             type: string
+        - in: body
+          name: coinswap
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/BaseReq"
+              max_token:
+                type: integer
+                example: "10"
+              exact_iris_amt:
+                type: integer
+                example: "10000000000000000000"
+              min_liquidity:
+                type: integer
+                example: "10000000000000000000"
+              deadline:
+                type: string
+                example: "30s"
+              sender:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
       responses:
         "200":
           description: Unsigned tx was succesfully generated
@@ -270,34 +296,16 @@ paths:
           description: Invalid parameters
         "500":
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: "#/definitions/BaseTx"
-                max_token:
-                  type: integer
-                  example: "10"
-                exact_iris_amt:
-                  type: integer
-                  example: "10000000000000000000"
-                min_liquidity:
-                  type: integer
-                  example: "10000000000000000000"
-                deadline:
-                  type: string
-                  example: "30s"
-                sender:
-                  $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
   "/coinswap/liquidities/{id}/withdraw":
     post:
       deprecated: true
       summary: Remove liquidity by exact liquidity amount, calculated iris and token amount
       tags:
         - CoinSwap
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - in: path
           name: id
@@ -305,6 +313,28 @@ paths:
           required: true
           schema:
             type: string
+        - in: body
+          name: coinswap
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/BaseReq"
+              min_token:
+                type: integer
+                example: "100"
+              min_iris_amt:
+                type: integer
+                example: "10000000000000000000"
+              withdraw_liquidity:
+                type: integer
+                example: "10000000000000000000"
+              deadline:
+                type: string
+                example: "30s"
+              sender:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
       responses:
         "200":
           description: Unsigned tx was succesfully generated
@@ -312,34 +342,32 @@ paths:
           description: Invalid parameters
         "500":
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: "#/definitions/BaseTx"
-                min_token:
-                  type: integer
-                  example: "100"
-                min_iris_amt:
-                  type: integer
-                  example: "10000000000000000000"
-                withdraw_liquidity:
-                  type: integer
-                  example: "10000000000000000000"
-                deadline:
-                  type: string
-                  example: "30s"
-                sender:
-                  $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
   "/coinswap/liquidities/buy":
     post:
       deprecated: true
       summary: Swap coin by exact output, calculated input
       tags:
         - CoinSwap
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: coinswap
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/BaseReq"
+              input:
+                $ref: "#/definitions/CoinSwapInputOutput"
+              output:
+                $ref: "#/definitions/CoinSwapInputOutput"
+              deadline:
+                type: string
+                example: "30s"
       responses:
         "200":
           description: Unsigned tx was succesfully generated
@@ -347,27 +375,32 @@ paths:
           description: Invalid parameters
         "500":
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: "#/definitions/BaseTx"
-                input:
-                  $ref: "#/definitions/CoinSwapInputOutput"
-                output:
-                  $ref: "#/definitions/CoinSwapInputOutput"
-                deadline:
-                  type: string
-                  example: "30s"
   "/coinswap/liquidities/sell":
     post:
       deprecated: true
       summary: Swap coin by exact input, calculated output
       tags:
         - CoinSwap
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: coinswap
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/BaseReq"
+              input:
+                $ref: "#/definitions/CoinSwapInputOutput"
+              output:
+                $ref: "#/definitions/CoinSwapInputOutput"
+              deadline:
+                type: string
+                example: "30s"
       responses:
         "200":
           description: Unsigned tx was succesfully generated
@@ -375,21 +408,6 @@ paths:
           description: Invalid parameters
         "500":
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: "#/definitions/BaseTx"
-                input:
-                  $ref: "#/definitions/CoinSwapInputOutput"
-                output:
-                  $ref: "#/definitions/CoinSwapInputOutput"
-                deadline:
-                  type: string
-                  example: "30s"
   "/token/tokens":
     post:
       deprecated: true
@@ -428,7 +446,7 @@ paths:
                 example: "2000000000"
               scale:
                 type: integer
-                example: 18
+                example: 6
               mintable:
                 type: boolean
                 example: true
@@ -468,6 +486,39 @@ paths:
       summary: create an HTLC
       tags:
         - HTLC
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: htlc
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/BaseReq"
+              sender:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
+              to:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
+              receiver_on_other_chain:
+                type: string
+                example: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826"
+              hash_lock:
+                type: string
+                example: "327a66212cbee3756816e617b38f9dfe327a66212cbee3756816e617b38f9dfe"
+              amount:
+                type: array
+                items:
+                  $ref: "./cosmos_swagger_legacy.yaml#/definitions/Coin"
+              time_lock:
+                type: integer
+                example: "100"
+              timestamp:
+                type: integer
+                example: "1568011909"
       responses:
         "200":
           description: Unsigned tx was succesfully generated
@@ -475,34 +526,6 @@ paths:
           description: Invalid parameters
         "500":
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: "#/definitions/BaseTx"
-                sender:
-                  $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
-                to:
-                  $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
-                receiver_on_other_chain:
-                  type: string
-                  example: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826"
-                hash_lock:
-                  type: string
-                  example: "327a66212cbee3756816e617b38f9dfe327a66212cbee3756816e617b38f9dfe"
-                amount:
-                  type: array
-                  items:
-                    $ref: "./cosmos_swagger_legacy.yaml#/definitions/Coin"
-                time_lock:
-                  type: integer
-                  example: "100"
-                timestamp:
-                  type: integer
-                  example: "1568011909"
   "/htlc/htlcs/{hash-lock}":
     get:
       deprecated: true
@@ -529,6 +552,10 @@ paths:
       summary: claim an opened HTLC
       tags:
         - HTLC
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - in: path
           name: hash-lock
@@ -536,6 +563,19 @@ paths:
           required: true
           schema:
             type: string
+        - in: body
+          name: htlc
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/BaseReq"
+              sender:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
+              secret:
+                type: string
+                example: "5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f"
       responses:
         "200":
           description: Unsigned tx was succesfully generated
@@ -543,19 +583,6 @@ paths:
           description: Invalid parameters
         "500":
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: "#/definitions/BaseTx"
-                sender:
-                  $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
-                secret:
-                  type: string
-                  example: "5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f"
   "/htlc/htlcs/{hash-lock}/refund":
     post:
       deprecated: true
@@ -569,6 +596,16 @@ paths:
           required: true
           schema:
             type: string
+        - in: body
+          name: htlc
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/BaseReq"
+              sender:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
       responses:
         "200":
           description: Unsigned tx was succesfully generated
@@ -576,16 +613,6 @@ paths:
           description: Invalid parameters
         "500":
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: "#/definitions/BaseTx"
-                sender:
-                  $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
   "/token/tokens/{symbol}":
     get:
       deprecated: true
@@ -760,7 +787,7 @@ paths:
           description: Invalid parameters
         500:
           description: Internal Server Error
-  "/token/tokens/{symbol}/fee":
+  "/token/tokens/{symbol}/fees":
     get:
       deprecated: true
       summary: Query the fees for issuing and minting the token with the given symbol
@@ -809,11 +836,11 @@ paths:
               recipient:
                 $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
                 example: "iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy"
-              token_id:
+              id:
                 type: string
-              token_uri:
+              uri:
                 type: string
-              denom:
+              denom_id:
                 type: string
       responses:
         200:
@@ -1282,6 +1309,24 @@ paths:
       summary: Request a random number
       tags:
         - Random
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ReadRESTReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/BaseReq"
+              consumer:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
+              block_interval:
+                type: integer
+                example: "10"
       responses:
         "200":
           description: Unsigned tx was succesfully generated
@@ -1289,19 +1334,6 @@ paths:
           description: Invalid parameters
         "500":
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_req:
-                  $ref: "./cosmos_swagger_legacy.yaml#/definitions/BaseReq"
-                consumer:
-                  $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
-                block_interval:
-                  type: integer
-                  example: "10"
   "/random/randoms/{request-id}":
     get:
       deprecated: true
@@ -2854,7 +2886,7 @@ definitions:
     properties:
       chain_id:
         type: string
-        example: irishub-test
+        example: "irishub-test"
       gas:
         type: string
         example: "20000"
