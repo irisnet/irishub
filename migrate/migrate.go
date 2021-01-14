@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"sort"
 	"strings"
 	"time"
 
@@ -32,7 +33,6 @@ import (
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	randomtypes "github.com/irisnet/irismod/modules/random/types"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/migrate/v0_16"
@@ -390,6 +390,18 @@ func migrateStaking(initialState v0_16.GenesisFileState) (*stakingtypes.GenesisS
 	}, bondedTokens, notBondedTokens
 }
 
+type SigningInfoSlice []slashingtypes.SigningInfo
+
+func (s SigningInfoSlice) Len() int {
+	return len(s)
+}
+func (s SigningInfoSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s SigningInfoSlice) Less(i, j int) bool {
+	return s[j].Address < s[i].Address
+}
+
 func migrateSlashing(initialState v0_16.GenesisFileState) *slashingtypes.GenesisState {
 	params := slashingtypes.Params{
 		SignedBlocksWindow:      initialState.SlashingData.Params.SignedBlocksWindow,
@@ -418,6 +430,8 @@ func migrateSlashing(initialState v0_16.GenesisFileState) *slashingtypes.Genesis
 			ValidatorSigningInfo: validatorSigningInfo,
 		})
 	}
+
+	sort.Sort(SigningInfoSlice(signingInfos))
 
 	return &slashingtypes.GenesisState{
 		Params:       params,
@@ -487,7 +501,7 @@ func migrateGov(initialState v0_16.GenesisFileState) *govtypes.GenesisState {
 }
 
 func genCrisis() *crisistypes.GenesisState {
-	return crisistypes.NewGenesisState(sdk.NewCoin(tokentypes.GetNativeToken().MinUnit, sdk.NewInt(1000)))
+	return crisistypes.NewGenesisState(sdk.NewCoin(UIRIS, sdk.NewInt(1000)))
 }
 
 func migrateMint(initialState v0_16.GenesisFileState) *minttypes.GenesisState {
@@ -591,7 +605,7 @@ func migrateService(initialState v0_16.GenesisFileState) *servicetypes.GenesisSt
 		ComplaintRetrospect:  initialState.ServiceData.Params.ComplaintRetrospect,
 		ArbitrationTimeLimit: initialState.ServiceData.Params.ArbitrationTimeLimit,
 		TxSizeLimit:          initialState.ServiceData.Params.TxSizeLimit,
-		BaseDenom:            tokentypes.GetNativeToken().MinUnit,
+		BaseDenom:            UIRIS,
 	}
 
 	return &servicetypes.GenesisState{
