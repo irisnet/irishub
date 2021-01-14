@@ -56,29 +56,27 @@ cp genesis_v1.0.0.json [v1.0.0_node_home]/config/genesis.json
 
 ## 7. Config new node
 
-Config `minimum-gas-prices` in `[v1.0.0_node_home]/config/app.toml`
+Configure `minimum-gas-prices` in `[v1.0.0_node_home]/config/app.toml`
 
 ```toml
-...
 
 # The minimum gas prices a validator is willing to accept for processing a
 # transaction. A transaction's fees must meet the minimum of any denomination
 # specified in this config (e.g. 0.25token1;0.0001token2).
-minimum-gas-prices = ""
+minimum-gas-prices = "0.2uiris"
 
-...
 ```
 
-Config `persistent_peers` in `[v1.0.0_node_home]/config/config.toml`
+Copy `persistent_peers` in `[v0.16.3_node_home]/config/config.toml` to `[v1.0.0_node_home]/config/config.toml`
 
 ```toml
-...
 
 # Comma separated list of nodes to keep persistent connections to
 persistent_peers = ""
 
-...
 ```
+
+And configure other fields refer to `[v0.16.3_node_home]/config/config.toml`
 
 ## 8. Start new node
 
