@@ -22,6 +22,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
@@ -31,6 +32,7 @@ import (
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	randomtypes "github.com/irisnet/irismod/modules/random/types"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/migrate/v0_16"
@@ -154,6 +156,7 @@ func Migrate(cdc codec.JSONMarshaler, initialState v0_16.GenesisFileState) (appS
 	appState[slashingtypes.ModuleName] = cdc.MustMarshalJSON(migrateSlashing(initialState))
 	appState[distributiontypes.ModuleName] = cdc.MustMarshalJSON(migrateDistribution(initialState, communityTax))
 	appState[govtypes.ModuleName] = cdc.MustMarshalJSON(migrateGov(initialState))
+	appState[crisistypes.ModuleName] = cdc.MustMarshalJSON(genCrisis())
 
 	// ------------------------------------------------------------
 	// irishub modules
@@ -162,8 +165,8 @@ func Migrate(cdc codec.JSONMarshaler, initialState v0_16.GenesisFileState) (appS
 	appState[randomtypes.ModuleName] = cdc.MustMarshalJSON(migrateRand(initialState))
 	appState[htlctypes.ModuleName] = cdc.MustMarshalJSON(migrateHTLC(initialState))
 	appState[coinswaptypes.ModuleName] = cdc.MustMarshalJSON(migrateCoinswap(initialState))
-	appState[guardiantypes.ModuleName] = cdc.MustMarshalJSON(migrateGuardian(initialState)) // TODO
-	appState[servicetypes.ModuleName] = cdc.MustMarshalJSON(migrateService(initialState))   // TODO
+	appState[guardiantypes.ModuleName] = cdc.MustMarshalJSON(migrateGuardian(initialState))
+	appState[servicetypes.ModuleName] = cdc.MustMarshalJSON(migrateService(initialState))
 
 	return appState
 
@@ -483,6 +486,10 @@ func migrateGov(initialState v0_16.GenesisFileState) *govtypes.GenesisState {
 	}
 }
 
+func genCrisis() *crisistypes.GenesisState {
+	return crisistypes.NewGenesisState(sdk.NewCoin(tokentypes.GetNativeToken().MinUnit, sdk.NewInt(1000)))
+}
+
 func migrateMint(initialState v0_16.GenesisFileState) *minttypes.GenesisState {
 	minter := minttypes.Minter{
 		LastUpdate:    initialState.MintData.Minter.LastUpdate,
@@ -584,7 +591,7 @@ func migrateService(initialState v0_16.GenesisFileState) *servicetypes.GenesisSt
 		ComplaintRetrospect:  initialState.ServiceData.Params.ComplaintRetrospect,
 		ArbitrationTimeLimit: initialState.ServiceData.Params.ArbitrationTimeLimit,
 		TxSizeLimit:          initialState.ServiceData.Params.TxSizeLimit,
-		BaseDenom:            servicetypes.DefaultBaseDenom,
+		BaseDenom:            tokentypes.GetNativeToken().MinUnit,
 	}
 
 	return &servicetypes.GenesisState{

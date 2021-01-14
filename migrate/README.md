@@ -1,45 +1,58 @@
-## migrate
+# Migrate IRISHub to v1.0.0 from v0.16.3
 
-### Step 1
+## 1. Export genesis file
 
-Stop irishub v0.16.3 daemon and use irishub v0.16.3 to export mainnet state genesis with '--for-zero-height'
+Stop irishub v0.16.3 daemon and use irishub v0.16.3 to export mainnet state genesis with `--for-zero-height` at the upgrade block height
+
 ```bash
-iris export --home <old_node_home> --for-zero-height
+iris export --home [v0.16.3_node_home] --height [upgrade-height] --for-zero-height
 ```
 
-### Step 2
-Use irishub v1.0.0 to migrate the exported genesis.json
-```
-iris migrate genesis.json --chain-id test > genesis_new.json
+## 2. Migrate genesis file
+
+Migrate the exported genesis.json with irishub v1.0.0
+
+```bash
+iris migrate genesis.json --chain-id [chain-id] > genesis_new.json
 ```
 
-### Step 3
-Use irishub v1.0.0 to initialize the new node
-```
-iris init [moniker] --home {$new_node_home}
+## 3. Initialize new node
+
+Initialize the new node with irishub v1.0.0
+
+```bash
+iris init [moniker] --home [v1.0.0_node_home]
 ```
 
-### Step 4
-Upgrade privkey file
-```
-go run migrate/scripts/privValUpgrade.go {$old_node_home}/config/priv_validator.json {$new_node_home}/config/priv_validator_key.json {$new_node_home}/data/priv_validator_state.json
+## 4. Migrate privkey file
+
+Migrate privkey file with irishub v1.0.0
+
+```bash
+go run migrate/scripts/privValUpgrade.go [v0.16.3_node_home]/config/priv_validator.json {$v1.0.0_node_home}/config/priv_validator_key.json {$v1.0.0_node_home}/data/priv_validator_state.json
 ```
 
-### Step 5
-Migrate node key file
-```
-cp {$old_node_home}/config/node_key.json {$new_node_home}/config/node_key.json
+## 5. Migrate node key file
+
+Migrate node key file with irishub v1.0.0
+
+```bash
+cp [old_node_home]/config/node_key.json [v1.0.0_node_home]/config/node_key.json
 ```
 
-### Step 6
+## 6. Copy migrated genesis file
+
 Copy new genesis.json to new node home
-```
-cp genesis_new.json {$new_node_home}/config/genesis.json
+
+```bash
+cp genesis_new.json [v1.0.0_node_home]/config/genesis.json
 ```
 
-### Step 7
-Start new node
-```
-iris unsafe-reset-all --home {new_node_home}
-iris start --home {new_node_home}
+## 7. Start new node
+
+Start new node with irishub v1.0.0
+
+```bash
+iris unsafe-reset-all --home [v1.0.0_node_home]
+iris start --home [v1.0.0_node_home]
 ```
