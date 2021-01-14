@@ -26,7 +26,7 @@ const (
 				"pair": {
 					"description": "exchange pair",
 					"type": "string",
-					"pattern": "^[0-9a-zA-Z]+-[0-9a-zA-Z]+$"
+					"pattern": "^[0-9a-zA-Z/]+-[0-9a-zA-Z/]+$"
 				}
 			},
 			"additionalProperties": false,

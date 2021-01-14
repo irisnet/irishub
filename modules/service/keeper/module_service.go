@@ -15,9 +15,14 @@ func (k Keeper) RegisterModuleService(moduleName string, moduleService *types.Mo
 		return sdkerrors.Wrapf(types.ErrModuleServiceRegistered, "%s already registered for module %s", "module service", moduleName)
 	}
 
-	k.moduleServices[moduleName] = moduleService
+	k.SetModuleService(moduleName, moduleService)
 
 	return nil
+}
+
+// SetModuleService sets the module service for the given module
+func (k Keeper) SetModuleService(moduleName string, moduleService *types.ModuleService) {
+	k.moduleServices[moduleName] = moduleService
 }
 
 func (k Keeper) GetModuleServiceByModuleName(moduleName string) (*types.ModuleService, bool) {

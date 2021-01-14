@@ -192,7 +192,7 @@ func ValidateToken(token Token) error {
 // CheckMinUnit checks if the given minUnit is valid
 func CheckMinUnit(minUnit string) error {
 	minUnitLen := len(strings.TrimSpace(minUnit))
-	if minUnitLen < MinimumMinUnitLen || minUnitLen > MaximumMinUnitLen || !IsAlphaNumericDash(minUnit) || !IsBeginWithAlpha(minUnit) {
+	if minUnitLen < MinimumMinUnitLen || minUnitLen > MaximumMinUnitLen || !IsAlphaNumeric(minUnit) || !IsBeginWithAlpha(minUnit) {
 		return sdkerrors.Wrapf(ErrInvalidMinUnit, "invalid token min_unit %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", minUnit, MinimumMinUnitLen, MaximumMinUnitLen)
 	}
 	return nil
@@ -204,7 +204,7 @@ func CheckSymbol(symbol string) error {
 		return sdkerrors.Wrapf(ErrInvalidSymbol, "invalid symbol: %s,  only accepts length [%d, %d]", symbol, MinimumSymbolLen, MaximumSymbolLen)
 	}
 
-	if !IsBeginWithAlpha(symbol) || !IsAlphaNumericDash(symbol) {
+	if !IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) {
 		return sdkerrors.Wrapf(ErrInvalidSymbol, "invalid symbol: %s, only accepts alphanumeric characters, and begin with an english letter", symbol)
 	}
 	return nil

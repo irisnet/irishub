@@ -175,10 +175,24 @@ func (r Response) Empty() bool {
 	return len(r.RequestContextId) == 0
 }
 
+// ResultCode defines the type for the result code
+type ResultCode uint16
+
+const (
+	// ResultOK means that the request is well processed
+	ResultOK ResultCode = 200
+
+	// ResultBadRequest means that the request is incorrect
+	ResultBadRequest ResultCode = 400
+
+	// ResultServerError is the code resulting from the internal server error
+	ResultServerError ResultCode = 500
+)
+
 // Result defines a struct for the response result
 type Result struct {
-	Code    uint16 `json:"code"`
-	Message string `json:"message"`
+	Code    ResultCode `json:"code"`
+	Message string     `json:"message"`
 }
 
 // ParseResult parses the given string to Result

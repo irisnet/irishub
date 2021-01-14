@@ -1054,13 +1054,13 @@ func ValidateInput(input string) error {
 	return nil
 }
 
-func ValidateOutput(code uint16, output string) error {
-	if code == 200 && len(output) == 0 {
-		return sdkerrors.Wrap(ErrInvalidResponse, "output must be specified when the result code is 200")
+func ValidateOutput(code ResultCode, output string) error {
+	if code == ResultOK && len(output) == 0 {
+		return sdkerrors.Wrapf(ErrInvalidResponse, "output must be specified when the result code is %v", ResultOK)
 	}
 
-	if code != 200 && len(output) != 0 {
-		return sdkerrors.Wrap(ErrInvalidResponse, "output should not be specified when the result code is not 200")
+	if code != ResultOK && len(output) != 0 {
+		return sdkerrors.Wrapf(ErrInvalidResponse, "output should not be specified when the result code is not %v", ResultOK)
 	}
 
 	if len(output) > 0 && ValidateResponseOutput(output) != nil {

@@ -1,11 +1,13 @@
 package keeper_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/stretchr/testify/suite"
+	"github.com/tidwall/gjson"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
@@ -24,6 +26,12 @@ var (
 	testCoin1   = sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10000))
 	testCoin2   = sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))
 	testCoin3   = sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(2))
+
+	testDenom1 = "testdenom1"                                                           // testing the normal cases
+	testDenom2 = "testdenom2"                                                           // testing the case in which the feed value is 0
+	testDenom3 = "testdenom3"                                                           // testing the case in which the feed is not existent
+	testDenom4 = "ibc/9ebf7ebe6f8ffd34617809f3cf00e04a10d8b7226048f68866371fb9dad8a25d" // testing the ibc case
+	testDenom5 = "peggy/0xdac17f958d2ee523a2206206994597c13d831ec7"                     // testing the ethpeg case
 
 	testAuthor    sdk.AccAddress
 	testOwner     sdk.AccAddress
@@ -527,6 +535,77 @@ func (suite *KeeperTestSuite) TestRequestServiceFromModule() {
 	suite.True(callbacked)
 }
 
+func (suite *KeeperTestSuite) TestGetMinDeposit() {
+	oracleService := MockOracleService{
+		feeds: map[string]string{
+			fmt.Sprintf("%s-%s", testDenom1, sdk.DefaultBondDenom): "0.5",
+			fmt.Sprintf("%s-%s", testDenom2, sdk.DefaultBondDenom): "0",
+			fmt.Sprintf("%s-%s", testDenom4, sdk.DefaultBondDenom): "50",
+			fmt.Sprintf("%s-%s", testDenom5, sdk.DefaultBondDenom): "20",
+		},
+	}
+
+	suite.keeper.SetModuleService(types.RegisterModuleName, &types.ModuleService{
+		ReuquestService: oracleService.GetExchangeRate,
+	})
+
+	testPricing1 := fmt.Sprintf(`{"price":"100%s"}`, testDenom1)
+	testPricing2 := fmt.Sprintf(`{"price":"1%s"}`, testDenom1)
+	testPricing3 := fmt.Sprintf(`{"price":"0%s"}`, testDenom1)
+	testPricing4 := fmt.Sprintf(`{"price":"1%s"}`, testDenom2)
+	testPricing5 := fmt.Sprintf(`{"price":"1%s"}`, testDenom3)
+	testPricing6 := fmt.Sprintf(`{"price":"10%s"}`, testDenom4)
+	testPricing7 := fmt.Sprintf(`{"price":"5%s"}`, testDenom5)
+
+	pricing, err := suite.keeper.ParsePricing(suite.ctx, testPricing)
+	suite.NoError(err)
+
+	minDeposit, err := suite.keeper.GetMinDeposit(suite.ctx, pricing)
+	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(6000))), minDeposit)
+
+	pricing1, err := suite.keeper.ParsePricing(suite.ctx, testPricing1)
+	suite.NoError(err)
+
+	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing1)
+	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10000))), minDeposit)
+
+	pricing2, err := suite.keeper.ParsePricing(suite.ctx, testPricing2)
+	suite.NoError(err)
+
+	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing2)
+	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(6000))), minDeposit)
+
+	pricing3, err := suite.keeper.ParsePricing(suite.ctx, testPricing3)
+	suite.NoError(err)
+
+	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing3)
+	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(0))), minDeposit)
+
+	pricing4, err := suite.keeper.ParsePricing(suite.ctx, testPricing4)
+	suite.NoError(err)
+
+	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing4)
+	suite.NotNil(err, "should error when the exchange rate is zero")
+
+	pricing5, err := suite.keeper.ParsePricing(suite.ctx, testPricing5)
+	suite.NoError(err)
+
+	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing5)
+	suite.NotNil(err, "should error when the feed does not exist")
+
+	pricing6, err := suite.keeper.ParsePricing(suite.ctx, testPricing6)
+	suite.NoError(err)
+
+	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing6)
+	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000))), minDeposit)
+
+	pricing7, err := suite.keeper.ParsePricing(suite.ctx, testPricing7)
+	suite.NoError(err)
+
+	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing7)
+	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(20000))), minDeposit)
+}
+
 func callback(ctx sdk.Context, requestContextID tmbytes.HexBytes, responses []string, err error) {
 	callbacked = true
 }
@@ -571,4 +650,24 @@ func (suite *KeeperTestSuite) setRequest(ctx sdk.Context, consumer sdk.AccAddres
 	suite.keeper.AddActiveRequestByID(ctx, requestID)
 
 	return requestID
+}
+
+// MockOracleService defines a mock oracle service for exchange rate
+type MockOracleService struct {
+	feeds map[string]string
+}
+
+func (m MockOracleService) GetExchangeRate(ctx sdk.Context, input string) (result string, output string) {
+	feedName := gjson.Get(input, "body").Get("pair").String()
+
+	value, ok := m.feeds[feedName]
+	if !ok {
+		result = `{"code":"400","message":"feed not found"}`
+		return
+	}
+
+	result = `{"code":"200","message":""}`
+	output = fmt.Sprintf(`{"header":{},"body":{"rate":"%s"}}`, value)
+
+	return
 }

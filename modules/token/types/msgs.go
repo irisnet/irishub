@@ -31,8 +31,8 @@ const (
 )
 
 var (
-	// IsAlphaNumericDash only accepts alphanumeric characters
-	IsAlphaNumericDash = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString
+	// IsAlphaNumeric only accepts alphanumeric characters
+	IsAlphaNumeric = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString
 	// IsBeginWithAlpha only begin with chars [a-zA-Z]
 	IsBeginWithAlpha = regexp.MustCompile(`^[a-zA-Z].*`).MatchString
 )

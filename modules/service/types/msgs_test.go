@@ -162,7 +162,7 @@ func TestMsgBindServiceValidation(t *testing.T) {
 	invalidQoS := uint64(0)
 
 	invalidPricing := `{"price":"1stake","other":"notallowedfield"}`
-	invalidSymbolPricing := `{"price":"0.5invalidsymbol"}`
+	invalidDenomPricing := `{"price":"5invalid#denom"}`
 	invalidPromotionTimePricing := `{"price":"1stake","promotions_by_time":[{"start_time":"2018-10-10T13:30:30","end_time":"2019-10-10T13:30:30Z","discount":"0.8"}]}`
 	invalidPromotionVolPricing := `{"price":"1stake","promotions_by_volume":[{"volume":0,"discount":"0.7"}]}`
 	invalidOptions := ""
@@ -176,7 +176,7 @@ func TestMsgBindServiceValidation(t *testing.T) {
 		NewMsgBindService(testServiceName, testProvider, invalidDeposit, testPricing, testQoS, testOptions, testOwner),              // invalid deposit
 		NewMsgBindService(testServiceName, testProvider, testDeposit, "", testQoS, testOptions, testOwner),                          // missing pricing
 		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPricing, testQoS, testOptions, testOwner),              // invalid Pricing JSON Schema instance
-		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidSymbolPricing, testQoS, testOptions, testOwner),        // invalid pricing symbol
+		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidDenomPricing, testQoS, testOptions, testOwner),         // invalid pricing denom
 		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPromotionTimePricing, testQoS, testOptions, testOwner), // invalid promotion time lack of time zone
 		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPromotionVolPricing, testQoS, testOptions, testOwner),  // invalid promotion volume
 		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, invalidQoS, testOptions, testOwner),              // invalid qos
@@ -196,7 +196,7 @@ func TestMsgBindServiceValidation(t *testing.T) {
 		{testMsgs[5], false, "invalid deposit"},
 		{testMsgs[6], false, "missing pricing"},
 		{testMsgs[7], false, "invalid Pricing JSON Schema instance"},
-		{testMsgs[8], false, "invalid pricing symbol"},
+		{testMsgs[8], false, "invalid pricing denom"},
 		{testMsgs[9], false, "invalid promotion time lack of time zone"},
 		{testMsgs[10], false, "invalid promotion volume"},
 		{testMsgs[11], false, "invalid qos"},
@@ -248,7 +248,7 @@ func TestMsgUpdateServiceBindingValidation(t *testing.T) {
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 
 	invalidPricing := `{"price":"1stake","other":"notallowedfield"}`
-	invalidSymbolPricing := `{"price":"1invalidsymbol"}`
+	invalidDenomPricing := `{"price":"1invaliddenom*"}`
 	invalidPromotionTimePricing := `{"price":"1stake","promotions_by_time":[{"start_time":"2018-10-10T13:30:30","end_time":"2019-10-10T13:30:30Z","discount":"0.8"}]}`
 	invalidPromotionVolPricing := `{"price":"1stake","promotions_by_volume":[{"volume":0,"discount":"0.7"}]}`
 	invalidOptions := ""
@@ -264,7 +264,7 @@ func TestMsgUpdateServiceBindingValidation(t *testing.T) {
 		NewMsgUpdateServiceBinding(invalidName, testProvider, testAddedDeposit, testPricing, testQoS, testOptions, testOwner),                       // service name contains illegal characters
 		NewMsgUpdateServiceBinding(invalidLongName, testProvider, testAddedDeposit, testPricing, testQoS, testOptions, testOwner),                   // too long service name
 		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPricing, testQoS, testOptions, testOwner),                // invalid Pricing JSON Schema instance
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidSymbolPricing, testQoS, testOptions, testOwner),          // invalid pricing symbol
+		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidDenomPricing, testQoS, testOptions, testOwner),           // invalid pricing denom
 		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPromotionTimePricing, testQoS, testOptions, testOwner),   // invalid promotion time lack of time zone
 		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPromotionVolPricing, testQoS, testOptions, testOwner),    // invalid promotion volume
 		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPromotionVolPricing, testQoS, invalidOptions, testOwner), // invalid options
@@ -285,7 +285,7 @@ func TestMsgUpdateServiceBindingValidation(t *testing.T) {
 		{testMsgs[7], false, "service name contains illegal characters"},
 		{testMsgs[8], false, "too long service name"},
 		{testMsgs[9], false, "invalid Pricing JSON Schema instance"},
-		{testMsgs[10], false, "invalid pricing symbol"},
+		{testMsgs[10], false, "invalid pricing denom"},
 		{testMsgs[11], false, "invalid promotion time lack of time zone"},
 		{testMsgs[12], false, "invalid promotion volume"},
 		{testMsgs[13], false, "invalid options"},
