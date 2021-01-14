@@ -110,7 +110,6 @@ import (
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
-	"github.com/irisnet/irishub/modules/legacy"
 	"github.com/irisnet/irishub/modules/mint"
 	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
@@ -153,7 +152,6 @@ var (
 		service.AppModuleBasic{},
 		oracle.AppModuleBasic{},
 		random.AppModuleBasic{},
-		legacy.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -457,7 +455,6 @@ func NewIrisApp(
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
 		oracle.NewAppModule(appCodec, app.oracleKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
-		legacy.NewAppModule(appCodec, app.bankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that

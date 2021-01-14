@@ -13,12 +13,6 @@
             }
         },
         {
-            "url": "./lite/irishub_swagger_legacy.yaml",
-            "dereference": {
-                "circular": "ignore"
-            }
-        },
-        {
             "url": "./tmp-swagger-gen/cosmos/auth/v1beta1/query.swagger.json",
             "operationIds": {
                 "rename": {
