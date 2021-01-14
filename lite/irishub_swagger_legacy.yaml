@@ -278,7 +278,7 @@ paths:
               max_token:
                 type: integer
                 example: "10"
-              exact_iris_amt:
+              exact_standard_amt:
                 type: integer
                 example: "10000000000000000000"
               min_liquidity:
@@ -1096,6 +1096,12 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: owner
+          description: owner of nft
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: OK
@@ -1114,6 +1120,10 @@ paths:
       description: Send transaction to edit a feed
       tags:
         - Oracle
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - in: path
           name: feed-name
@@ -1121,6 +1131,37 @@ paths:
           required: true
           schema:
             type: string
+        - in: body
+          name: edit
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/BaseReq"
+              latest_history:
+                type: string
+                example: "10"
+              description:
+                type: string
+              creator:
+                type: string
+              providers:
+                type: array
+                items:
+                  type: string
+              timeout:
+                type: integer
+                example: "0"
+              service_fee_cap:
+                type: string
+                example: "50stake"
+              repeated_frequency:
+                type: integer
+                example: "0"
+              response_threshold:
+                type: integer
+                example: 0
       responses:
         "200":
           description: Unsigned tx was succesfully generated
@@ -1157,6 +1198,55 @@ paths:
       summary: Define a feed
       tags:
         - Oracle
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: define
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "./cosmos_swagger_legacy.yaml#/definitions/BaseReq"
+              feed_name:
+                type: string
+              aggregate_func:
+                type: string
+                example: "avg"
+              value_json_path:
+                type: string
+                example: "price"
+              latest_history:
+                type: string
+                example: "10"
+              description:
+                type: string
+              creator:
+                type: string
+              service_name:
+                type: string
+              providers:
+                type: array
+                items:
+                  type: string
+              input:
+                type: string
+                example: "{\"header\":{},\"body\":{}}"
+              timeout:
+                type: integer
+                example: "2"
+              service_fee_cap:
+                type: string
+                example: "50stake"
+              repeated_frequency:
+                type: integer
+                example: "3"
+              response_threshold:
+                type: integer
+                example: 1
       responses:
         "200":
           description: Unsigned tx was succesfully generated
@@ -1164,42 +1254,6 @@ paths:
           description: Invalid parameters
         "500":
           description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_req:
-                  $ref: "./cosmos_swagger_legacy.yaml#/definitions/BaseReq"
-                feed_name:
-                  type: string
-                aggregate_func:
-                  type: string
-                value_json_path:
-                  type: string
-                latest_history:
-                  type: string
-                description:
-                  type: string
-                creator:
-                  type: string
-                service_name:
-                  type: string
-                providers:
-                  type: array
-                  items:
-                    type: string
-                input:
-                  type: string
-                timeout:
-                  type: integer
-                service_fee_cap:
-                  type: string
-                repeated_frequency:
-                  type: integer
-                response_threshold:
-                  type: integer
     get:
       deprecated: true
       summary: Guery a feed list by condition
@@ -1366,7 +1420,7 @@ paths:
         - Random
       parameters:
         - in: query
-          name: height
+          name: gen-height
           description: the destination block height
           required: false
           schema:
@@ -1565,9 +1619,14 @@ paths:
               pricing:
                 type: string
                 example: '{"price":"1iris"}'
-              min_resp_time:
+              qos:
                 type: integer
                 example: "50"
+              options:
+                type: string
+                example: "{}"
+              owner:
+                type: string
       responses:
         "200":
           description: Unsigned tx was succesfully generated
@@ -1678,7 +1737,7 @@ paths:
           description: Invalid parameters
         "500":
           description: Internal Server Error
-  "/service/providers/{provider}/withdraw-address":
+  "/service/owners/{owner}/withdraw-address":
     get:
       deprecated: true
       summary: Query the withdrawal address of a provider
@@ -1686,8 +1745,8 @@ paths:
         - Service
       parameters:
         - in: path
-          name: provider
-          description: provider address
+          name: owner
+          description: owner address
           required: true
           schema:
             type: string
@@ -1711,8 +1770,8 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: provider
-          description: provider adress
+          name: owner
+          description: owner adress
           required: true
           schema:
             type: string
@@ -1883,7 +1942,7 @@ paths:
                 $ref: "./cosmos_swagger_legacy.yaml#/definitions/Address"
               input:
                 type: string
-                example: '{"id":1}'
+                example: '{"header":{},"body":{}}'
               service_fee_cap:
                 type: string
                 example: "1iris"
