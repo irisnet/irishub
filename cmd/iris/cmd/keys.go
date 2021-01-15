@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"encoding/json"
 	"io/ioutil"
 
 	"github.com/spf13/cobra"
@@ -89,16 +90,18 @@ func importKeyCommand() *cobra.Command {
 				return err
 			}
 
-			armor := getArmor(bz, passphrase)
+			armor, err := getArmor(bz, passphrase)
+			if err != nil {
+				return err
+			}
 			return clientCtx.Keyring.ImportPrivKey(args[0], armor, passphrase)
 		},
 	}
 }
 
-func getArmor(privBytes []byte, passphrase string) string {
-	armor, err := keystore.RecoveryAndExportPrivKeyArmor(privBytes, passphrase)
-	if err != nil {
-		return string(privBytes)
+func getArmor(privBytes []byte, passphrase string) (string, error) {
+	if !json.Valid(privBytes) {
+		return string(privBytes), nil
 	}
-	return armor
+	return keystore.RecoveryAndExportPrivKeyArmor(privBytes, passphrase)
 }
