@@ -1,45 +1,88 @@
-## migrate
+# Migrate IRISHub to v1.0.0 from v0.16.3
 
-### Step 1
+## 1. Export genesis file
 
-Stop irishub v0.16.3 daemon and use irishub v0.16.3 to export mainnet state genesis with '--for-zero-height'
+Stop irishub v0.16.3 daemon and use irishub v0.16.3 to export mainnet state genesis with `--for-zero-height` at the upgrade block height
+
 ```bash
-iris export --home <old_node_home> --for-zero-height
+iris export --home [v0.16.3_node_home] --height [upgrade-height] --for-zero-height
 ```
 
-### Step 2
-Use irishub v1.0.0 to migrate the exported genesis.json
-```
-iris migrate genesis.json --chain-id test > genesis_new.json
+## 2. Migrate genesis file
+
+Migrate the exported genesis.json with irishub v1.0.0
+
+```bash
+iris migrate genesis.json --chain-id irishub-1 > genesis_v1.0.0.json
 ```
 
-### Step 3
-Use irishub v1.0.0 to initialize the new node
-```
-iris init [moniker] --home {$new_node_home}
+Check if md5 is correct
+
+```bash
+md5sum genesis_v1.0.0.json
 ```
 
-### Step 4
-Upgrade privkey file
-```
-go run migrate/scripts/privValUpgrade.go {$old_node_home}/config/priv_validator.json {$new_node_home}/config/priv_validator_key.json {$new_node_home}/data/priv_validator_state.json
+## 3. Initialize new node
+
+Initialize the new node with irishub v1.0.0
+
+```bash
+iris init [moniker] --home [v1.0.0_node_home]
 ```
 
-### Step 5
-Migrate node key file
-```
-cp {$old_node_home}/config/node_key.json {$new_node_home}/config/node_key.json
+## 4. Migrate privkey file
+
+Migrate privkey file with irishub v1.0.0
+
+```bash
+go run migrate/scripts/privValUpgrade.go [v0.16.3_node_home]/config/priv_validator.json [v1.0.0_node_home]/config/priv_validator_key.json [v1.0.0_node_home]/data/priv_validator_state.json
 ```
 
-### Step 6
-Copy new genesis.json to new node home
-```
-cp genesis_new.json {$new_node_home}/config/genesis.json
+## 5. Migrate node key file
+
+Migrate node key file with irishub v1.0.0
+
+```bash
+cp [v0.16.3_node_home]/config/node_key.json [v1.0.0_node_home]/config/node_key.json
 ```
 
-### Step 7
-Start new node
+## 6. Copy migrated genesis file
+
+Copy genesis_v1.0.0.json to new node home
+
+```bash
+cp genesis_v1.0.0.json [v1.0.0_node_home]/config/genesis.json
 ```
-iris unsafe-reset-all --home {new_node_home}
-iris start --home {new_node_home}
+
+## 7. Config new node
+
+Configure `minimum-gas-prices` in `[v1.0.0_node_home]/config/app.toml`
+
+```toml
+
+# The minimum gas prices a validator is willing to accept for processing a
+# transaction. A transaction's fees must meet the minimum of any denomination
+# specified in this config (e.g. 0.25token1;0.0001token2).
+minimum-gas-prices = "0.2uiris"
+
+```
+
+Copy `persistent_peers` in `[v0.16.3_node_home]/config/config.toml` to `[v1.0.0_node_home]/config/config.toml`
+
+```toml
+
+# Comma separated list of nodes to keep persistent connections to
+persistent_peers = ""
+
+```
+
+And configure other fields refer to `[v0.16.3_node_home]/config/config.toml`
+
+## 8. Start new node
+
+Start new node with irishub v1.0.0
+
+```bash
+iris unsafe-reset-all --home [v1.0.0_node_home]
+iris start --home [v1.0.0_node_home]
 ```
