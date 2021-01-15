@@ -12,7 +12,7 @@ iris keys add n2 --recover
 
 ## Keystore
 
-This way is suitable for users who have lost the mnemonic but saved the db file of the keys, or the keystore file of the keys. The keystore file of irishub v0.16.x is in the format of Ethereum, and v1.0.0 is also fully compatible with a new format. Therefore, the user can export the old private key using the keystore, and then use the v1.0.0 version of irishub to import the keystore to complete the key migration.The operation process is as follows:
+This way is suitable for users who have lost the mnemonic but saved the db file of the keys, or the keystore file of the keys. The format of the keystore file of irishub v0.16.x is similar to that of Ethereum, and v1.0.0 is also fully compatible with a new format. Therefore, the user can export the old private key using the keystore, and then use the v1.0.0 version of irishub to import the keystore to complete the key migration.The operation process is as follows:
 
 1. Use irishub v0.16.x to export keystore file
 
