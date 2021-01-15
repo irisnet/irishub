@@ -1,6 +1,6 @@
 # Keys Migrate
 
-The keyfile(private key)of irishub v0.16.x uses db storage. The new version v1.0.0 will take a new way to store user private keys. In order to support the migration of the old keyfile to the new version, two solutions are now provided:
+The keyfile(private key) of irishub v0.16.x uses db storage. The new version v1.0.0 will take a new way to store user private keys. In order to support the migration of the old keyfile to the new version, two solutions are now provided:
 
 ## Mnemonic
 
