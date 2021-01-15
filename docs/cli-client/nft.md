@@ -23,7 +23,7 @@
 Specify the nft Denom (nft category) and metadata JSON Schema to issue nft.
 
 ```bash
-iris tx nft issue [denom] [flags]
+iris tx nft issue [denom-id] [flags]
 ```
 
 **Flags:**

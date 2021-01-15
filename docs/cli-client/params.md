@@ -12,13 +12,13 @@ Among them, the parameters available for query for each subspace are as follows:
 
 ## auth
 
-| key                      | description                                                     | default |
-| ------------------------ | --------------------------------------------------------------- | ------- |
+| key                      | description                                                  | default |
+| ------------------------ | ------------------------------------------------------------ | ------- |
 | `MaxMemoCharacters`      | Maximum number of characters in the memo field in a transaction | 256     |
-| `TxSigLimit`             | Maximum number of signatures per transaction                    | 7       |
-| `TxSizeCostPerByte`      | The amount of gas consumed per byte of the transaction          | 10      |
-| `SigVerifyCostED25519`   | Gas spent on edd2519 algorithm signature verification           | 590     |
-| `SigVerifyCostSecp256k1` | Gas spent on secp256k1 algorithm signature verification         | 1000    |
+| `TxSigLimit`             | Maximum number of signatures per transaction                 | 7       |
+| `TxSizeCostPerByte`      | The amount of gas consumed per byte of the transaction       | 10      |
+| `SigVerifyCostED25519`   | Gas spent on edd2519 algorithm signature verification        | 590     |
+| `SigVerifyCostSecp256k1` | Gas spent on secp256k1 algorithm signature verification      | 1000    |
 
 ## bank
 
@@ -65,31 +65,30 @@ Among them, the parameters available for query for each subspace are as follows:
 
 ## gov
 
-| key             | description                                      | default |
-| --------------- | ------------------------------------------------ | ------- |
-| `depositparams` | Related parameters of the deposit mortgage phase |         |
-| `votingparams`  | Related parameters of the voting mortgage phase  |         |
-| `tallyparams`   | Related parameters of the voting tally phase     |         |
+| key             | description                                      | default                                                      |
+| --------------- | ------------------------------------------------ | ------------------------------------------------------------ |
+| `depositparams` | Related parameters of the deposit mortgage phase | `min_deposit`:    10000000uiris; `max_deposit_period`: 2d(days) |
+| `votingparams`  | Related parameters of the voting mortgage phase  | `voting_period`: 2d(days)                                    |
+| `tallyparams`   | Related parameters of the voting tally phase     | `quorum`: 0.334; `threshold`: 0.5; `veto_threshold`: 0.334   |
 
 ## crisis
 
-| key           | description  | default |
-| ------------- | ------------ | ------- |
-| `ConstantFee` | Constant Fee |         |
+| key           | description  | default   |
+| ------------- | ------------ | --------- |
+| `ConstantFee` | Constant Fee | 1000uiris |
 
 ## token
 
-| key                 | description                       | default   |
-| ------------------- | --------------------------------- | --------- |
-| `TokenTaxRate`      | Base rate for issuing/mint tokens | 0.4       |
-| `IssueTokenBaseFee` | Base token for issuing tokens     | 60000iris |
-| `MintTokenFeeRatio` | Rate for mint tokens              | 0.1       |
+| key                 | description                       | default            |
+| ------------------- | --------------------------------- | ------------------ |
+| `TokenTaxRate`      | Base rate for issuing/mint tokens | 0.4                |
+| `IssueTokenBaseFee` | Base token for issuing tokens     | 60000 * 10^6 uiris |
+| `MintTokenFeeRatio` | Rate for mint tokens              | 0.1                |
 
 ## coinswap
 
 | key             | description                   | default |
 | --------------- | ----------------------------- | ------- |
-| `Fee`           | Charge rate                   | 0.003   |
 | `StandardDenom` | The name of the token charged | uiris   |
 
 ## service
@@ -98,7 +97,7 @@ Among them, the parameters available for query for each subspace are as follows:
 | ---------------------- | --------------------------------------------------- | ---------- |
 | `MaxRequestTimeout`    | Maximum service request timeout                     | 100(block) |
 | `MinDepositMultiple`   | Minimum deposit multiple                            | 200        |
-| `MinDeposit`           | Minimum deposit amount                              | 6000iris   |
+| `MinDeposit`           | Minimum deposit amount                              | 6000uiris  |
 | `ServiceFeeTax`        | Service rate                                        | 0.1        |
 | `SlashFraction`        | Slash  Fraction                                     | 0.001      |
 | `ComplaintRetrospect`  | Complaint Retrospect                                | 15d        |
