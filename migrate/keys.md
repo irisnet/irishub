@@ -1,15 +1,23 @@
 # Keys Migrate
 
-The keyfile(private key)of irishub v0.16 uses db storage. The new version 1.0 will take a new way to store user private keys. In order to support the migration of the old keyfile to the new version, two solutions are now provided:
+The keyfile(private key)of irishub v0.16.x uses db storage. The new version v1.0.0 will take a new way to store user private keys. In order to support the migration of the old keyfile to the new version, two solutions are now provided:
+
+## Mnemonic
+
+This way is suitable for users who have mnemonic words. When generating a new account, the system will randomly assign a mnemonic phrase to the user, and use the mnemonic phrase to recover the user's private key. Regardless of the v0.16.x version, v1.0.0, or future versions, the mnemonic phrase remains unchanged. You can use the `add` command with the `--recover` flag to restore the account, for example:
+
+```bash
+iris keys add n2 --recover
+```
 
 ## Keystore
 
-The keystore file of irishub v0.16 is in the format of Ethereum, and 1.0 is also fully compatible with a new format. Therefore, the user can export the old private key using the keystore, and then use the 1.0 version of irishub to import the keystore to complete the key migration.The operation process is as follows:
+This way is suitable for users who have lost the mnemonic but saved the db file of the keys, or the keystore file of the keys. The keystore file of irishub v0.16.x is in the format of Ethereum, and v1.0.0 is also fully compatible with a new format. Therefore, the user can export the old private key using the keystore, and then use the v1.0.0 version of irishub to import the keystore to complete the key migration.The operation process is as follows:
 
-1. Use irishub 0.16 to export keystore file
+1. Use irishub v0.16.x to export keystore file
 
     ```bash
-    iriscli keys export test1 --output-file=test1_key --home ./iriscli_test 
+    iriscli keys export test1 --output-file=key.json --home ./iriscli_test 
     ```
 
     output:
@@ -37,10 +45,10 @@ The keystore file of irishub v0.16 is in the format of Ethereum, and 1.0 is also
     }
     ```
 
-2. Use irishub 1.0 to import keystore file
+2. Use irishub v1.0.0 to import keystore file
 
     ```bash
-    iris keys import n2 test1_key --keyring-backend file 
+    iris keys import n2 key.json --keyring-backend file 
     ```
 
 3. Verify the imported key information
@@ -63,7 +71,3 @@ The keystore file of irishub v0.16 is in the format of Ethereum, and 1.0 is also
     ```
 
     The output account address is consistent with the address in the keystore file, and the migration is successful.
-
-## Migrate
-
-If there are more keys to be migrated, the keystore solution is not suitable, so version 1.0 provides a new command `migrate` to solve this problem. However, due to the defect in `cosmos-sdk` for this function, it cannot be used temporarily.
