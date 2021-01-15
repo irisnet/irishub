@@ -1,10 +1,10 @@
 # Keys Migrate
 
-The keyfile(private key) of irishub v0.16.x uses db storage. The new version v1.0.0 will take a new way to store user private keys. In order to support the migration of the old keyfile to the new version, two solutions are now provided:
+The keyfile (private key) of irishub v0.16.x uses db storage. The new version v1.0.0 will offer a new way to store user private keys. In order to support the migration of the old keyfile to the new version, there are two solutions provided:
 
 ## Mnemonic
 
-This way is suitable for users who have mnemonic words. When generating a new account, the system will randomly assign a mnemonic phrase to the user, and use the mnemonic phrase to recover the user's private key. Regardless of the v0.16.x version, v1.0.0, or future versions, the mnemonic phrase remains unchanged. You can use the `add` command with the `--recover` flag to restore the account, for example:
+This way is suitable for users who have mnemonic words. When creating a new account, the system will randomly assign a mnemonic phrase to the user, and use this mnemonic phrase to recover the user's private key.  Regardless of the v0.16.x version, v1.0.0, or future versions, the mnemonic phrase remains unchanged. You can use the `add` command with the `--recover` flag to restore the account, for example:
 
 ```bash
 iris keys add n2 --recover
