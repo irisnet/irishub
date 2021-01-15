@@ -49,7 +49,7 @@ iris add-genesis-account $(iris keys show MyValidator --address) 150000000uiris
 生成创建验证人的交易。gentx 存储在 `~/.iris/config/` 中
 
 ```bash
-iris gentx MyValidator --chain-id=testing --amount 100000000uiris
+iris gentx MyValidator 100000000uiris --chain-id=testing 
 ```
 
 ### iris collect-gentxs
@@ -65,7 +65,7 @@ iris collect-gentxs
 修改默认token为 `uiris`
 
 ```bash
-sed -i '' 's/stake/uiris/g' $HOME/.iris/config/genesis.json
+sed -i 's/stake/uiris/g' $HOME/.iris/config/genesis.json
 ```
 
 现在可以启动 `iris` 了

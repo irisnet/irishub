@@ -23,7 +23,7 @@
 发行资产
 
 ```bash
-iris tx nft issue [denom] [flags]
+iris tx nft issue [denom-id] [flags]
 ```
 
 **标志：**
