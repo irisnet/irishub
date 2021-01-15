@@ -170,7 +170,7 @@ func ValidateToken(token Token) error {
 		return err
 	}
 
-	if err := CheckMinUnit(token.Symbol); err != nil {
+	if err := CheckMinUnit(token.MinUnit); err != nil {
 		return err
 	}
 
