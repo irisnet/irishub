@@ -2,7 +2,7 @@
 
 ## 1.0.0-rc0
 
-*January 15th, 2021*
+*January 18th, 2021*
 
 ### CLI
 
