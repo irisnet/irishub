@@ -6,10 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spf13/cast"
-
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
+	"github.com/spf13/cast"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
