@@ -6,7 +6,7 @@
 
 ### CLI
 
-* [\#2154](https://github.com/irisnet/irishub/issues/2154) Handling command line token unit conversions
+* [\#2154](https://github.com/irisnet/irishub/issues/2154) Support token unit conversion in command
 * [\#2484](https://github.com/irisnet/irishub/pull/2484) Bump cosmos-sdk version to [v0.40.0](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.40.0)
 * [\#2484](https://github.com/irisnet/irishub/pull/2484) Bump tendermint verion to [v0.34.1](https://github.com/tendermint/tendermint/releases/tag/v0.34.1)
 
@@ -15,11 +15,10 @@
 * [\#2484](https://github.com/irisnet/irishub/pull/2484) Bump cosmos-sdk version to [v0.40.0](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.40.0)
 * [\#2484](https://github.com/irisnet/irishub/pull/2484) Bump tendermint verion to [v0.34.1](https://github.com/tendermint/tendermint/releases/tag/v0.34.1)
 * [\#2501](https://github.com/irisnet/irishub/issues/2501) Merge the swagger docs of cosmos-sdk and irismod
-* [\#2485](https://github.com/irisnet/irishub/pull/2485) Keys support importing v0.16.3 keystore file
+* [\#2485](https://github.com/irisnet/irishub/pull/2485) Support key import v0.16.3 keystore file
 * [\#2488](https://github.com/irisnet/irishub/pull/2488) Restrict the use of certain token for specified Msg
 * [\#2098](https://github.com/irisnet/irishub/issues/2098) Migrate iriscli test
-* [\#2154](https://github.com/irisnet/irishub/issues/2154) Handling command line token unit conversions
-* [\#2097](https://github.com/irisnet/irishub/issues/2097) Add scripts to migrate genesis data of v0.16.3
+* [\#2097](https://github.com/irisnet/irishub/issues/2097) Add scripts to migrate genesis data from v0.16.3
 * [\#2090](https://github.com/irisnet/irishub/issues/2090) Refactor guardian module
 * [\#2089](https://github.com/irisnet/irishub/issues/2089) Overwrite mint module
 * [\#2500](https://github.com/irisnet/irishub/issues/2500) Migrate IRISnet modules to irismod
