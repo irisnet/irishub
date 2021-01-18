@@ -51,7 +51,7 @@ iris query distribution rewards [delegator-addr] [validator-addr] [flags]
 
 ## iris query distribution slashes
 
-查询验证人指定块范围内的分割。
+查询验证人指定块范围内的的惩罚。
 
 ```bash
 iris query distribution slashes [validator] [start-height] [end-height] [flags]

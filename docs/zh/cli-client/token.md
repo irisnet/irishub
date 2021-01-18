@@ -4,17 +4,18 @@ token模块用于管理你在IRIS Hub上发行的资产。
 
 ## 可用命令
 
-| 名称                                | 描述                     |
-| ----------------------------------- | ------------------------ |
-| [issue](#iris-tx-token-issue)       | 发行通证                 |
-| [edit](#iris-tx-token-edit)         | 编辑通证                 |
-| [transfer](#iris-tx-token-transfer) | 转让通证所有权           |
-| [mint](#iris-tx-token-mint)         | 增发通证到指定账户       |
-| [burn](#iris-tx-token-burn)         | 销毁通证                 |
-| [token](#iris-query-token-token)    | 查询通证                 |
-| [tokens](#iris-query-token-tokens)  | 查询指定所有者的通证集合 |
-| [fee](#iris-query-token-fee)        | 查询通证相关费用         |
-| [params](#iris-query-token-params)  | 查询通证相关参数         |
+| 名称                                       | 描述                     |
+| ------------------------------------------ | ------------------------ |
+| [issue](#iris-tx-token-issue)              | 发行通证                 |
+| [edit](#iris-tx-token-edit)                | 编辑通证                 |
+| [transfer](#iris-tx-token-transfer)        | 转让通证所有权           |
+| [mint](#iris-tx-token-mint)                | 增发通证到指定账户       |
+| [burn](#iris-tx-token-burn)                | 销毁通证                 |
+| [token](#iris-query-token-token)           | 查询通证                 |
+| [tokens](#iris-query-token-tokens)         | 查询指定所有者的通证集合 |
+| [fee](#iris-query-token-fee)               | 查询通证相关费用         |
+| [params](#iris-query-token-params)         | 查询通证相关参数         |
+| [total-burn](#iris-query-token-total-burn) | 查询所有销毁的通证总量   |
 
 ## iris tx token issue
 
@@ -39,7 +40,17 @@ iris tx token issue [flags]
 ### 发行通证
 
 ```bash
-iris tx token issue --name="Kitty Token" --symbol="kitty" --min-unit="kitty" --scale=0 --initial-supply=100000000000 --max-supply=1000000000000 --mintable=true --from=<key-name> --chain-id=<chain-id> --fees=<fee>
+iris tx token issue \
+	--name="Kitty Token" \
+	--symbol="kitty" \
+	--min-unit="kitty" \
+	--scale=0 \
+	--initial-supply=100000000000 \
+	--max-supply=1000000000000 \
+	--mintable=true \
+	--from=<key-name> \
+	--chain-id=<chain-id> \
+	--fees=<fee>
 ```
 
 ### 发送通证
@@ -197,4 +208,18 @@ iris query token params [flags]
 
 ```bash
 iris query token params
+```
+
+## iris query token total-burn
+
+查询所有销毁的通证总量
+
+```bash
+iris query token total-burn [flags]
+```
+
+### 查询所有销毁的通证总量
+
+```bash
+iris query token total-burn
 ```
