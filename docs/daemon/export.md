@@ -15,7 +15,7 @@ If you want to export the state from a nonexisting snapshot height, you need to 
 ## Usage
 
 ```bash
- iris export [flags]
+iris export [flags]
 ```
 
 ## Flags
