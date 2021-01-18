@@ -1,6 +1,6 @@
 # Gov
 
-此模块提供[治理](../../features/governance.md)的基本功能
+此模块提供[治理](../../features/governance.md)的基本功能。
 
 ## 可用命令
 
@@ -22,7 +22,7 @@
 
 ## iris query gov proposal
 
-查询单个提案的详细信息
+查询单个提案的详细信息。
 
 ```bash
 iris query gov proposal [proposal-id] [flags]
@@ -36,7 +36,7 @@ iris query gov proposal <proposal-id>
 
 ## iris query gov proposals
 
-使用可选过滤器提案
+使用可选过滤器提案。
 
 ```bash
 iris query gov proposals [flags]
@@ -65,7 +65,7 @@ iris query gov proposals --limit=3 --status=Passed --depositor=<iaa...>
 
 ## iris query gov vote
 
-查询一次投票的详细信息
+查询一次投票的详细信息。
 
 ```bash
 iris query gov vote [proposal-id] [voter-addr] [flags]
@@ -79,7 +79,7 @@ iris query gov vote <proposal-id> <iaa...>
 
 ## iris query gov votes
 
-查询提案的投票信息
+查询提案的投票信息。
 
 ```bash
 iris query gov votes [proposal-id] [flags]
@@ -93,7 +93,7 @@ iris query gov votes <proposal-id>
 
 ## iris query gov deposit
 
-通过提案ID查询提案中的某个抵押人的抵押信息
+通过提案ID查询提案中的某个抵押人的抵押信息。
 
 ```bash
 iris query gov deposit [proposal-id] [depositer-addr] [flags]
@@ -107,7 +107,7 @@ iris query gov deposit <proposal-id> <iaa...>
 
 ## iris query gov deposits
 
-查询提案中所有抵押信息
+查询提案中所有抵押信息。
 
 ```bash
 iris query gov deposits [proposal-id] [flags]
@@ -135,7 +135,7 @@ iris query gov tally <proposal-id>
 
 ## iris query gov param
 
-查询治理过程的参数。
+查询治理过程的参数 （`voting` |`tallying`| `deposit`）。
 
 ```bash
 iris query gov param [param-type] [flags]
@@ -154,7 +154,7 @@ iris query gov param [param-type] [flags]
 查询治理过程的所有参数。
 
 ```bash
-iris query gov param [param-type] [flags]
+iris query gov params [flags]
 ```
 
 ## iris query gov proposer
@@ -168,7 +168,7 @@ iris query gov proposer [proposal-id] [flags]
 ## iris tx gov submit-proposal
 
 提交提案并附带初始委托。 提案标题、描述、类型和抵押可以直接提供，也可以通过JSON文件提供。
-可用命令：`community-pool-spend`，`param-change`，`software-upgrade`
+可用命令：`community-pool-spend`，`param-change`，`software-upgrade`，`cancel-software-upgrade` 。
 
 ### iris tx gov submit-proposal community-pool-spend
 
@@ -185,8 +185,8 @@ iris tx gov submit-proposal community-pool-spend <path/to/proposal.json> --from=
     "title": "Community Pool Spend",
     "description": "Pay me some Atoms!",
     "recipient": "iaa1mjk4p68mmulwla3x5uzlgjwsc3zrms448rel3q",
-    "amount": "1000stake",
-    "deposit": "1000stake"
+    "amount": "1000uiris",
+    "deposit": "1000uiris"
 }
 ```
 
@@ -194,9 +194,9 @@ iris tx gov submit-proposal community-pool-spend <path/to/proposal.json> --from=
 
 提交参数修改提案。提案详细信息必须通过JSON文件提供。 对于包含的值，只有非空字段将被更新。
 
-目前，参数更改已评估但尚未通过验证，因此
-非常重要的一点是，任何“值”更改都是有效的（即正确的类型且在范围之内）
-对于其各自的参数，例如。 `MaxValidators`应为整数而不是十进制。
+重要说明：目前，对参数更改进行了评估，但尚未验证，因此，对于任何“值”更改，对其各自的参数都是有效的（即正确的类型和范围之内），例如 `MaxValidators`应为整数而不是十进制。
+
+对参数更改建议进行适当的审核应防止这种情况的发生（在治理过程中不应出现任何沉积物），但无论如何都应注意。
 
 ```bash
 iris tx gov submit-proposal param-change <path/to/proposal.json> --from=<key_or_address>
@@ -215,7 +215,7 @@ iris tx gov submit-proposal param-change <path/to/proposal.json> --from=<key_or_
         "value": 105
         }
     ],
-    "deposit": "1000stake"
+    "deposit": "1000uiris"
 }
 ```
 
@@ -229,14 +229,29 @@ iris tx gov submit-proposal software-upgrade [name] (--upgrade-height [height] |
 
 **标识：**
 
+| 名称, 速记       | 类型   | 必须 | 默认 | 描述                                                 |
+| ---------------- | ------ | ---- | ---- | ------------------------------------------------ |
+| --deposit        | Coin   | Yes  |      | 提案抵押的代币                                     |
+| --title          | string | Yes  |      | 提案的标题                                         |
+| --description    | string | Yes  |      | 提案的描述                                         |
+| --upgrade-height | int64  |      |      | 升级必须发生的高度（不要与`--upgrade-time`一起使用）   |
+| --time           | string |      |      | 升级必须发生的时间（不要与`--upgrade-height`一起使用） |
+| --info           | string |      |      | 计划升级的可选信息，例如提交哈希等。                   |
+
+### iris tx gov submit-proposal cancel-software-upgrade 
+
+取消软件升级提案。
+
+```
+iris tx gov submit-proposal cancel-software-upgrade [flags]
+```
+**标识：**
+
 | 名称, 速记       | 类型   | 必须 | 默认 | 描述                                                   |
 | ---------------- | ------ | ---- | ---- | ------------------------------------------------------ |
 | --deposit        | Coin   | Yes  |      | 提案抵押的代币                                         |
 | --title          | string | Yes  |      | 提案的标题                                             |
 | --description    | string | Yes  |      | 提案的描述                                             |
-| --upgrade-height | int64  |      |      | 升级必须发生的高度（不要与`--upgrade-time`一起使用）   |
-| --time           | string |      |      | 升级必须发生的时间（不要与`--upgrade-height`一起使用） |
-| --info           | string |      |      | 计划升级的可选信息，例如提交哈希等。                   |
 
 ## iris tx gov deposit
 
@@ -254,7 +269,7 @@ iris tx gov deposit [proposal-id] [deposit]
 
 ## iris tx gov vote
 
-为一个活跃的提案投票， 可选值: yes/no/no_with_veto/abstain.
+为一个活跃的提案投票， 可选值: yes/no/no_with_veto/abstain。
 
 ```bash
 iris tx gov vote [proposal-id] [option] [flags]

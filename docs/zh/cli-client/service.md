@@ -353,8 +353,16 @@ iris query service request <request-id>
 ```
 
 :::tip
-你可以从[按高度获取区块信息](./tendermint.md#iris-query-tendermint-block)的结果中获取`request-id`。
+你可以通过两种方式获取`request-id`：[通过rpc接口查询request_id](#通过rpc接口查询request_id) 和 [iris query service requests](#iris query service requests)。
 :::
+
+##### 通过rpc接口查询request_id
+
+通过`rpc接口`按`区块高度`查询`block_results`，在`end_block_events`找到`new_batch_request_provider`，将结果进行base64解码，获取`request_id`。
+
+```
+curl -X POST -d '{"jsonrpc":"2.0","id":1,"method":"block_results","params":["10604"]}' http://localhost:26657
+```
 
 ## iris query service requests
 
@@ -405,7 +413,7 @@ iris tx service respond \
 ```
 
 :::tip
-你可以从[按高度获取区块信息](./tendermint.md#iris-query-tendermint-block)的结果中获取`request-id`。
+你可以通过两种方式获取`request-id`：[通过rpc接口查询request_id](#通过rpc接口查询request_id) 和 [iris query service requests](#iris query service requests)。
 :::
 
 ### 响应结果示例
@@ -445,7 +453,7 @@ iris query service response [request-id] [flags]
 ```
 
 :::tip
-你可以从[按高度获取区块信息](./tendermint.md#iris-query-tendermint-block)的结果中获取`request-id`。
+你可以通过两种方式获取`request-id`：[通过rpc接口查询request_id](#通过rpc接口查询request_id) 和 [iris query service requests](#iris query service requests)。
 :::
 
 ## iris query service responses

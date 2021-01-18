@@ -22,7 +22,7 @@ This module provides the basic functionalities for [Governance](../features/gove
 
 ## iris query gov proposal
 
-Query details of a proposal
+Query details of a proposal.
 
 ```bash
 iris query gov proposal [proposal-id] [flags]
@@ -36,7 +36,7 @@ iris query gov proposal <proposal-id>
 
 ## iris query gov proposals
 
-Query proposals with optional filter
+Query proposals with optional filter.
 
 ```bash
 iris query gov proposals [flags]
@@ -65,7 +65,7 @@ iris query gov proposals --limit=3 --status=Passed --depositor=<iaa...>
 
 ## iris query gov vote
 
-Query details of a single vote
+Query details of a single vote.
 
 ```bash
 iris query gov vote [proposal-id] [voter-addr] [flags]
@@ -79,7 +79,7 @@ iris query gov vote <proposal-id> <iaa...>
 
 ## iris query gov votes
 
-Query votes on a proposal
+Query votes on a proposal.
 
 ```bash
 iris query gov votes [proposal-id] [flags]
@@ -89,12 +89,11 @@ iris query gov votes [proposal-id] [flags]
 
 ```bash
 iris query gov votes <proposal-id>
-
 ```
 
 ## iris query gov deposit
 
-Query details for a single proposal deposit on a proposal by its identifier
+Query details for a single proposal deposit on a proposal by its identifier.
 
 ```bash
 iris query gov deposit [proposal-id] [depositer-addr] [flags]
@@ -108,7 +107,7 @@ iris query gov deposit <proposal-id> <iaa...>
 
 ## iris query gov deposits
 
-Query details for all deposits on a proposal
+Query details for all deposits on a proposal.
 
 ```bash
 iris query gov deposits [proposal-id] [flags]
@@ -155,7 +154,7 @@ Example:
 Query the all the parameters for the governance process.
 
 ```bash
-iris query gov param [param-type] [flags]
+iris query gov params [flags]
 ```
 
 ## iris query gov proposer
@@ -169,7 +168,7 @@ iris query gov proposer [proposal-id] [flags]
 ## iris tx gov submit-proposal
 
 Submit a proposal along with an initial deposit. Proposal title, description, type and deposit can be given directly or through a proposal JSON file.
-Available Commands: `community-pool-spend`、`param-change`、`software-upgrade`
+Available Commands:  `community-pool-spend`, `param-change`, `software-upgrade`, `cancel-software-upgrade` .
 
 ### iris tx gov submit-proposal community-pool-spend
 
@@ -187,24 +186,19 @@ Where proposal.json contains:
     "title": "Community Pool Spend",
     "description": "Pay me some Atoms!",
     "recipient": "iaa1mjk4p68mmulwla3x5uzlgjwsc3zrms448rel3q",
-    "amount": "1000stake",
-    "deposit": "1000stake"
+    "amount": "1000uiris",
+    "deposit": "1000uiris"
 }
 ```
 
 ### iris tx gov submit-proposal param-change
 
 Submit a parameter proposal along with an initial deposit.
-The proposal details must be supplied via a JSON file. For values that contains
-objects, only non-empty fields will be updated.
+The proposal details must be supplied via a JSON file. For values that contains objects, only non-empty fields will be updated.
 
-IMPORTANT: Currently parameter changes are evaluated but not validated, so it is
-very important that any "value" change is valid (ie. correct type and within bounds)
-for its respective parameter, eg. "MaxValidators" should be an integer and not a decimal.
+IMPORTANT: Currently parameter changes are evaluated but not validated, so it is very important that any "value" change is valid (ie. correct type and within bounds) for its respective parameter, eg. "MaxValidators" should be an integer and not a decimal.
 
-Proper vetting of a parameter change proposal should prevent this from happening
-(no deposits should occur during the governance process), but it should be noted
-regardless.
+Proper vetting of a parameter change proposal should prevent this from happening (no deposits should occur during the governance process), but it should be noted regardless.
 
 ```bash
 iris tx gov submit-proposal param-change <path/to/proposal.json> --from=<key_or_address>
@@ -223,7 +217,7 @@ Where proposal.json contains:
         "value": 105
         }
     ],
-    "deposit": "1000stake"
+    "deposit": "1000uiris"
 }
 ```
 
@@ -246,6 +240,24 @@ iris tx gov submit-proposal software-upgrade [name] (--upgrade-height [height] |
 | --upgrade-height | int64  |          |         | The height at which the upgrade must happen (not to be used together with --upgrade-time) |
 | --time           | string |          |         | The time at which the upgrade must happen (not to be used together with --upgrade-height) |
 | --info           | string |          |         | Optional info for the planned upgrade such as commit hash, etc.                           |
+
+### iris tx gov submit-proposal cancel-software-upgrade 
+
+Cancel a software upgrade along with an initial deposit.
+
+```
+iris tx gov submit-proposal cancel-software-upgrade [flags]
+```
+
+**Flags:**
+
+| Name, shorthand  | Type   | Required | Default | Description                                                  |
+| ---------------- | ------ | -------- | ------- | ------------------------------------------------------------ |
+| --deposit        | Coin   | Yes      |         | Deposit of the proposal                                      |
+| --title          | string | Yes      |         | Title of proposal                                            |
+| --description    | string | Yes      |         | Description of proposal                                      |
+
+
 
 ## iris tx gov deposit
 

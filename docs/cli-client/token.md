@@ -4,17 +4,18 @@ Token module allows you to manage assets on IRIS Hub
 
 ## Available Commands
 
-| Name                                | Description                        |
-| ----------------------------------- | ---------------------------------- |
-| [issue](#iris-tx-token-issue)       | Issue a new token                  |
-| [edit](#iris-tx-token-edit)         | Edit an existing token             |
-| [transfer](#iris-tx-token-transfer) | Transfer the ownership of a token  |
-| [mint](#iris-tx-token-mint)         | Mint tokens to a specified address |
-| [burn](#iris-tx-token-burn)         | Burn some tokens                   |
-| [token](#iris-query-token-token)    | Query a token by symbol            |
-| [tokens](#iris-query-token-tokens)  | Query tokens by owner              |
-| [fee](#iris-query-token-fee)        | Query the token related fees       |
-| [params](#iris-query-token-params)  | Query the token related params     |
+| Name                                       | Description                                |
+| ------------------------------------------ | ------------------------------------------ |
+| [issue](#iris-tx-token-issue)              | Issue a new token                          |
+| [edit](#iris-tx-token-edit)                | Edit an existing token                     |
+| [transfer](#iris-tx-token-transfer)        | Transfer the ownership of a token          |
+| [mint](#iris-tx-token-mint)                | Mint tokens to a specified address         |
+| [burn](#iris-tx-token-burn)                | Burn some tokens                           |
+| [token](#iris-query-token-token)           | Query a token by symbol                    |
+| [tokens](#iris-query-token-tokens)         | Query tokens by owner                      |
+| [fee](#iris-query-token-fee)               | Query the token related fees               |
+| [params](#iris-query-token-params)         | Query the token related params             |
+| [total-burn](#iris-query-token-total-burn) | Query the total amount of all burn tokens. |
 
 ## iris tx token issue
 
@@ -189,7 +190,7 @@ Query the token related fees, including token issuance and minting
 iris query token fee [symbol] [flags]
 ```
 
-### query fees of issuing and minting a token
+### Query fees of issuing and minting a token
 
 ```bash
 iris query token fee kitty
@@ -203,8 +204,22 @@ Query token module params
 iris query token params [flags]
 ```
 
-### query token module params
+### Query token module params
 
 ```bash
 iris query token params
+```
+
+## iris query token total-burn
+
+Query the total amount of all burn tokens
+
+```bash
+iris query token total-burn [flags]
+```
+
+### Query the total amount of all burn tokens
+
+```bash
+iris query token total-burn
 ```
