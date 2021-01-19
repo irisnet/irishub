@@ -4,11 +4,13 @@ order: 4
 
 # Join The Testnet
 
-We have 2 testnets: Fuxi and Nyancat.
+We have 3 testnets: Fuxi, Nyancat and Bifrost.
 
 Since the launch of mainnet, **Fuxi Testnet** starts to operate as a stable application testnet which has the same version as the mainnet, so that the service providers of IRISnet can develop their apps on or interact with IRIShub without running a node or lcd instance.
 
 However there is also a need for validators to test the new version of IRIShub before it can be relased to production, and this is **Nyancat Testnet**'s focus. And new validators can also use the Nyancat Testnet to practice the validator operations.
+
+IRISnet’s DeFi and interchain **Bifrost Testnet** will run side by side with Stargate’s testnet in order to test the new DeFi features of IRIS Hub, the integration with the new version of Cosmos SDK and also the multi-Hub collaboration through the IBC protocol.
 
 ## Install
 
@@ -31,3 +33,7 @@ There are no options to run nodes to connect to the Fuxi Testnet, you can use th
 ## Nyancat Testnet
 
 Please refer to [How to join nyancat testnet](https://github.com/irisnet/testnets/tree/master/nyancat#how-to-join-nyancat-testnet)
+
+## Bifrost Testnet
+
+Please refer to [How to join bifrost testnet](https://github.com/irisnet/testnets/blob/master/bifrost/README.md)

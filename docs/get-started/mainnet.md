@@ -12,7 +12,7 @@ order: 3
 
 ```bash
 # initialize node configurations
-iris init <moniker> --chain-id=irishub
+iris init <moniker> --chain-id=irishub-1
 
 # download mainnet public config.toml and genesis.json
 curl -o ~/.iris/config/config.toml https://raw.githubusercontent.com/irisnet/mainnet/master/config/config.toml
@@ -68,10 +68,13 @@ iris tx staking create-validator \
     --pubkey=$(iris tendermint show-validator) \
     --moniker=<your-validator-name> \
     --amount=<amount-to-be-delegated, e.g. 10000iris> \
+    --min-self-delegation=1 \
+    --commission-max-change-rate=0.1 \
+    --commission-max-rate=0.1 \
     --commission-rate=0.1 \
     --gas=100000 \
     --fees=0.6iris \
-    --chain-id=irishub \
+    --chain-id=irishub-1 \
     --from=<key-name>
 ```
 

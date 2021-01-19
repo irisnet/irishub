@@ -6,12 +6,12 @@ order: 2
 
 ## Latest Version
 
-The Latest IRIShub version for Mainnet is [v0.16.3](https://github.com/irisnet/irishub/releases/v0.16.3)
+The Latest IRIShub version for Mainnet is [v1.0.0](https://github.com/irisnet/irishub/releases/v1.0.0)
 
 ## Install `go`
 
 ::: tip
-**Go 1.14+** is required for building and installing the IRIShub software.
+**Go 1.15+** is required for building and installing the IRIShub software.
 :::
 
 Install `go` by following the [official docs](https://golang.org/doc/install).
@@ -41,7 +41,7 @@ After setting up `go` correctly, you should be able to compile and run `iris`.
 Make sure that your server can access to google.com because our project depends on some libraries provided by google. (If you are not able to access google.com, you can also try to add a proxy: `export GOPROXY=https://goproxy.io`)
 
 ```bash
-git clone --branch v0.16.3 https://github.com/irisnet/irishub
+git clone --branch v1.0.0 https://github.com/irisnet/irishub
 cd irishub
 make install
 ```

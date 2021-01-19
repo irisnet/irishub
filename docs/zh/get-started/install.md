@@ -6,12 +6,12 @@ order: 2
 
 ## 最新版本
 
-IRIShub 主网的最新版本是[v0.16.3](https://github.com/irisnet/irishub/releases/v0.16.3)
+IRIShub 主网的最新版本是[v1.0.0](https://github.com/irisnet/irishub/releases/v1.0.0)
 
 ## 安装`go`
 
 :::tip
-编译安装 IRIShub 软件依赖 **Go 1.14+**。
+编译安装 IRIShub 软件依赖 **Go 1.15+**。
 :::
 
 按照[官方文档](https://golang.org/doc/install) 安装`go`。
@@ -41,7 +41,7 @@ go version
 请确保您的服务器可以访问 google.com，因为我们的项目依赖于google提供的某些库（如果您无法访问google.com，也可以尝试添加代理：`export GOPROXY=https://goproxy.io`）
 
 ```bash
-git clone --branch v0.16.3 https://github.com/irisnet/irishub
+git clone --branch v1.0.0 https://github.com/irisnet/irishub
 cd irishub
 make install
 ```
