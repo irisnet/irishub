@@ -22,7 +22,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		}
 	}
 
-	for _, coin := range data.BurnCoins {
+	for _, coin := range data.BurnedCoins {
 		k.AddBurnCoin(ctx, coin)
 	}
 }
@@ -35,13 +35,13 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		tokens = append(tokens, *t)
 	}
 	return &types.GenesisState{
-		Params:    k.GetParamSet(ctx),
-		Tokens:    tokens,
-		BurnCoins: k.GetAllBurnCoin(ctx),
+		Params:      k.GetParamSet(ctx),
+		Tokens:      tokens,
+		BurnedCoins: k.GetAllBurnCoin(ctx),
 	}
 }
 
-// get raw genesis raw message for testing
+// DefaultGenesisState return raw genesis raw message for testing
 func DefaultGenesisState() *types.GenesisState {
 	return &types.GenesisState{
 		Params: types.DefaultParams(),
@@ -64,7 +64,7 @@ func ValidateGenesis(data types.GenesisState) error {
 	}
 
 	// validate token
-	for _, coin := range data.BurnCoins {
+	for _, coin := range data.BurnedCoins {
 		if err := coin.Validate(); err != nil {
 			return err
 		}

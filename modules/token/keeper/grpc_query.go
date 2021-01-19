@@ -153,5 +153,5 @@ func (k Keeper) TotalBurn(c context.Context, req *types.QueryTotalBurnRequest) (
 
 		coins[i] = mainCoin
 	}
-	return &types.QueryTotalBurnResponse{BurnCoins: coins}, nil
+	return &types.QueryTotalBurnResponse{BurnedCoins: coins}, nil
 }

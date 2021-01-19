@@ -92,6 +92,6 @@ message QueryTotalBurnRequest {}
 
 // QueryTotalBurnResponse is response type for the Query/TotalBurn RPC method
 message QueryTotalBurnResponse {
-  repeated cosmos.base.v1beta1.DecCoin burnCoins = 1
+  repeated cosmos.base.v1beta1.DecCoin burned_coins = 1
       [ (gogoproto.nullable) = false ];
 }

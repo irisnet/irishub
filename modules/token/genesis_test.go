@@ -42,9 +42,9 @@ func TestInitGenesis(t *testing.T) {
 		{Denom: ft.MinUnit, Amount: sdk.NewInt(1000)},
 	}
 	genesis := types.GenesisState{
-		Params:    types.DefaultParams(),
-		Tokens:    []types.Token{ft},
-		BurnCoins: burnCoins,
+		Params:      types.DefaultParams(),
+		Tokens:      []types.Token{ft},
+		BurnedCoins: burnCoins,
 	}
 
 	// initialize genesis
