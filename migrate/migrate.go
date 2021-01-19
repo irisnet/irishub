@@ -184,7 +184,7 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens, notBondedTok
 	var balances []banktypes.Balance
 	var communityTax sdk.Coins
 	var serviceTax sdk.Coins
-	var burnCoins sdk.Coins
+	var burnedCoins sdk.Coins
 	for _, acc := range initialState.Accounts {
 		var coins sdk.Coins
 		for _, c := range acc.Coins {
@@ -199,8 +199,7 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens, notBondedTok
 
 		switch acc.Address.String() {
 		case auth.BurnedCoinsAccAddr.String():
-			burnCoins = coins
-			coins = sdk.NewCoins()
+			burnedCoins = coins
 			continue
 		case auth.GovDepositCoinsAccAddr.String():
 			baseAccount.Address = authtypes.NewModuleAddress(govtypes.ModuleName).String()
@@ -255,7 +254,7 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens, notBondedTok
 	}
 
 	tokenGenesisState := token.DefaultGenesisState()
-	tokenGenesisState.BurnCoins = burnCoins
+	tokenGenesisState.BurnedCoins = burnedCoins
 
 	return *authGenesisState, bankGenesisState, communityTax, *tokenGenesisState
 }
