@@ -36,7 +36,7 @@ If you need to support [cosmovisor](#https://github.com/cosmos/cosmos-sdk/tree/m
 ```json
 {
   "binaries": {
-    "linux/amd64":"https://example.com/gaia.zip?checksum=sha256:aec070645fe53ee3b3763059376134f058cc337247c978add178b6ccdfb0019f"
+    "linux/amd64":"https://example.com/irishub.zip?checksum=sha256:aec070645fe53ee3b3763059376134f058cc337247c978add178b6ccdfb0019f"
   }
 }
 ```
