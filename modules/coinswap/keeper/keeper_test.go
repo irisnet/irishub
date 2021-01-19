@@ -20,7 +20,9 @@ import (
 const (
 	denomStandard = types.StandardDenom
 	denomBTC      = "btc"
+	denomETH      = "eth"
 	unidenomBTC   = types.FormatUniABSPrefix + denomBTC
+	unidenomETH   = types.FormatUniABSPrefix + denomETH
 )
 
 var (

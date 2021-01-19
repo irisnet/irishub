@@ -188,13 +188,10 @@ func swapOrderHandlerFn(cliCtx client.Context, isBuyOrder bool) http.HandlerFunc
 			return
 		}
 
-		var recipientAddress sdk.AccAddress
-		if len(req.Output.Address) > 0 {
-			recipientAddress, err = sdk.AccAddressFromBech32(req.Output.Address)
-			if err != nil {
-				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
+		recipientAddress, err := sdk.AccAddressFromBech32(req.Output.Address)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
 		}
 
 		duration, err := time.ParseDuration(req.Deadline)
