@@ -17,8 +17,8 @@ const (
 	// TypeMsgRefundHTLC is the type for MsgRefundHTLC
 	TypeMsgRefundHTLC = "refund_htlc"
 
-	SecretLength                    = 64    // length for the secret in bytes
-	HashLockLength                  = 64    // length for the hash lock in bytes
+	SecretLength                    = 64    // length for the secret in hex string
+	HashLockLength                  = 64    // length for the hash lock in hex string
 	MaxLengthForAddressOnOtherChain = 128   // maximum length for the address on other chains
 	MinTimeLock                     = 50    // minimum time span for HTLC
 	MaxTimeLock                     = 25480 // maximum time span for HTLC
