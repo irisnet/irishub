@@ -4,12 +4,12 @@
 
 ## 可用命令
 
-| 名称                                                                            | 描述                         |
-| ------------------------------------------------------------------------------- | ---------------------------- |
-| [software-upgrade](#iris-tx-gov-submit-proposal-software-upgrade)               | 发起软件升级提案             |
-| [cancel-software-upgrade](#iris-tx-gov-submit-proposal-cancel-software-upgrade) | 取消当前升级提案             |
-| [plan](#iris-query-upgrade-plan)                                                | 查询当前正在进行的软件升级填 |
-| [applied](#iris-query-upgrade-applied)                                          | 查询已经执行的软件升级提案   |
+| 名称                                                                            | 描述                           |
+| ------------------------------------------------------------------------------- | ------------------------------ |
+| [software-upgrade](#iris-tx-gov-submit-proposal-software-upgrade)               | 发起软件升级提案               |
+| [cancel-software-upgrade](#iris-tx-gov-submit-proposal-cancel-software-upgrade) | 取消当前升级提案               |
+| [plan](#iris-query-upgrade-plan)                                                | 查询当前正在进行的软件升级提案 |
+| [applied](#iris-query-upgrade-applied)                                          | 查询已经执行的软件升级提案     |
 
 ## iris tx gov submit-proposal software-upgrade
 
