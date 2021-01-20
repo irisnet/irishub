@@ -11,8 +11,8 @@ Mint module is in charge of calculating the inflated token amount and add the in
 
 ### iris query mint params
 
-Query the current auth parameters.
+Query the current mint parameters.
 
 ```bash
-iris query auth params [flags]
+iris query mint params [flags]
 ```
