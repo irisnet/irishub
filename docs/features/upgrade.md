@@ -11,21 +11,15 @@ may contain various metadata about the upgrade, typically application specific u
 
 #### Sidecar Process
 
-If an operator running the application binary also runs a sidecar process to assist
-in the automatic download and upgrade of a binary, the `Info` allows this process to
-be seamless. Namely, the `Upgrade` module fulfills the
-[Irisd Upgradeable Binary Specification](https://github.com/regen-network/cosmosd#upgradeable-binary-specification)
-specification and `cosmosd` can optionally be used to fully automate the upgrade
-process for node operators. By populating the `Info` field with the necessary information,
-binaries can automatically be downloaded. See [here](https://github.com/regen-network/cosmosd#auto-download)
-for more info.
+If an operator running the application binary also runs a sidecar process to assist in the automatic download and upgrade of the binary, `Info` allows this process to be frictionless. That is, the upgrade module implements the specification specified by [cosmovisor upgradeable binary specification](https://github.com/cosmos/cosmos-sdk/tree/master/cosmovisor#upgradeable-binary-specification), and `cosmovisor` can Site selection is used to fully automate the upgrade process for node operators. By filling the `Info` field with the necessary information, the binary can be downloaded automatically. Refer to [here](https://github.com/cosmos/cosmos-sdk/tree/master/cosmovisor#auto-download).
 
 ```go
 type Plan struct {
-    Name   string
-    Time   Time
-    Height int64
-    Info   string
+ Name string
+ Time time.Time
+ Height int64
+ Info string
+ UpgradedClientState *types.Any
 }
 ```
 
@@ -37,8 +31,7 @@ The `Upgrade` module facilitates upgrading from major version X to major version
 type UpgradeHandler func(Context, Plan)
 ```
 
-During each `EndBlock` execution, the `Upgrade` module checks if there exists a `Plan` that should execute (is scheduled at that time or height). If so, the corresponding
-`Handler` is executed. If the `Plan` is expected to execute but no `Handler` is registered or if the binary was upgraded too early, the node will gracefully panic and exit.
+During the execution of each `BeginBlock`, the `Upgrade` module checks whether there is a `plan` that should be executed (the block height or time when the `BeginBlock` is scheduled to run). If it exists, execute the corresponding `processor`. If the plan is expected to be executed but the corresponding processor is not registered, or the binary upgrade is too early, the node will gracefully panic and exit.
 
 ### StoreLoader
 
@@ -59,6 +52,20 @@ type UpgradeInfo struct {
 
 This information is critical to ensure the `StoreUpgrades` happens smoothly at correct height and expected upgrade. It eliminates the chances for the new binary to execute `StoreUpgrades` multiple times everytime on restart. Also if there are multiple upgrades planned on same height, the `Name` will ensure these `StoreUpgrades` takes place only in planned upgrade handler.
 
+Currently in the upgrade process, the state transition methods involved mainly support the following three types: `Renamed`, `Deleted`, and `Added`
+
+#### Renamed
+
+The user can specify to migrate all data under oldKey (prefix) to storage under newKey (prefix) during the upgrade process.
+
+#### Deleted
+
+Users can delete all data under the specified key (prefix) during the upgrade process.
+
+#### Added
+
+Users can apply for a new storage area with the specified key as the prefix during the upgrade process.
+
 ### Proposal
 
 Typically, a `Plan` is proposed and submitted through governance via a `SoftwareUpgradeProposal`. This proposal prescribes to the standard governance process. If the proposal passes,
@@ -76,22 +83,27 @@ type SoftwareUpgradeProposal struct {
 
 When a upgrade proposal is accepted, the upgrade process is devided into two steps.
 
-##### Signal
+##### Stop network consensus
 
-After a SoftwareUpgradeProposal is accepted, validators are expected to download and install the new version of the software while continuing to run the previous version. Once a validator has downloaded and installed the upgrade, it will start signaling to the network that it is ready to switch by including the proposal's proposalID in its precommits.
+After the software upgrade proposal is accepted, the system will perform pre-upgrade preparations at the designated height of the BeginBlock stage, including downloading the upgrade plan and suspending network consensus.
 
-Note: There is only one signal slot per precommit. If several SoftwareUpgradeProposals are accepted in a short timeframe, a pipeline will form and they will be implemented one after the other in the order that they were accepted.
+###### Download the upgrade plan
 
-##### Switch
+In order to be able to upgrade the software smoothly, the information required for the upgrade must be recorded before stopping the network consensus: `plan name`, `upgrade height`.
+  
+-`Plan name`: When the network restarts, it needs to be routed to the corresponding `UpgradeHandler` and `UpgradeStoreLoader` according to the plan name.
+-`Upgrade height`: When the network restarts, check whether the network upgrade plan is required.
 
-Once a block contains more than 2/3rd precommits where a common SoftwareUpgradeProposal is signaled, all the nodes (including validator nodes, non-validating full nodes and light-nodes) are expected to switch to the new version of the software.
+###### Suspend network consensus
+
+After the software upgrade proposal is accepted, the system will gracefully suspend the network consensus at the specified height of the `BeginBlock` stage.
+
+##### Restart the new software
+
+The user replaces the software with the specified version and restarts the network. The system will detect whether the `processor` specified by the `plan name` is included. If it is included, the system first executes the `processor` program, and then starts the network consensus. If not, the system report an error and exit.
 
 #### Cancelling Upgrade Proposals
 
-Upgrade proposals can be cancelled. There exists a `CancelSoftwareUpgrade` proposal type, which can be voted on and passed and will remove the scheduled upgrade `Plan`.
-Of course this requires that the upgrade was known to be a bad idea well before the upgrade itself, to allow time for a vote.
+The upgrade proposal can be cancelled. There is a proposal type of `Cancel Software Upgrade (CancelSoftwareUpgrade)`. When this type of proposal is voted through, the currently ongoing upgrade plan will be removed. Of course, this needs to be voted and executed before the upgrade plan is executed.
 
-If such a possibility is desired, the upgrade height is to be `2 * (VotingPeriod + DepositPeriod) + (SafetyDelta)` from the beginning of the
-upgrade proposal. The `SafetyDelta` is the time available from the success of an upgrade proposal and the realization it was a bad idea (due to external social consensus).
-
-A `CancelSoftwareUpgrade` proposal can also be made while the original `SoftwareUpgradeProposal` is still being voted upon, as long as the `VotingPeriod` ends after the `SoftwareUpgradeProposal`.
+If the current upgrade plan has been executed, but there are problems with the upgrade plan, then the proposal of `Cancel Software Upgrade` is invalid (because the network has stopped consensus). At this time, there is another solution to make up for this mistake, which is to use the `--unsafe-skip-upgrades` parameter to skip the specified upgrade height when restarting the network (not really skip the height, but jump via software upgrade `processor`). Of course, this requires that 2/3 of the validators participating in the consensus perform the same operation, otherwise the network consensus cannot be reached.
