@@ -10,7 +10,8 @@
             "url": "./lite/cosmos_swagger_legacy.yaml",
             "paths":{
                 "exclude": [
-                    "minting/*"
+                    "minting/*",
+                    "supply/*"
                 ]
             },
             "dereference": {

@@ -4506,57 +4506,6 @@ paths:
                 type: string
         '500':
           description: Internal Server Error
-  /supply/total:
-    get:
-      deprecated: true
-      summary: Total supply of coins in the chain
-      tags:
-        - Supply
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: object
-            properties:
-              total:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    denom:
-                      type: string
-                      example: stake
-                    amount:
-                      type: string
-                      example: '50'
-        '500':
-          description: Internal Server Error
-  '/supply/total/{denomination}':
-    parameters:
-      - in: path
-        name: denomination
-        description: Coin denomination
-        required: true
-        type: string
-        x-example: uatom
-    get:
-      deprecated: true
-      summary: Total supply of a single coin denomination
-      tags:
-        - Supply
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: string
-        '400':
-          description: Invalid coin denomination
-        '500':
-          description: Internal Server Error
   '/cosmos/auth/v1beta1/accounts/{address}':
     get:
       summary: Account returns account details based on address.
