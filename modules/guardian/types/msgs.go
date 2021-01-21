@@ -44,11 +44,11 @@ func (msg MsgAddSuper) ValidateBasic() error {
 	if len(msg.Description) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "description missing")
 	}
-	if len(msg.Address) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "added address missing")
+	if _, err := sdk.AccAddressFromBech32(msg.Address); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s)", err)
 	}
-	if len(msg.AddedBy) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "operator address missing")
+	if _, err := sdk.AccAddressFromBech32(msg.AddedBy); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid operator address (%s)", err)
 	}
 	if err := msg.EnsureLength(); err != nil {
 		return err
@@ -92,11 +92,11 @@ func (msg MsgDeleteSuper) GetSignBytes() []byte {
 
 // RoValidateBasicute implements Msg.
 func (msg MsgDeleteSuper) ValidateBasic() error {
-	if len(msg.Address) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "deleted address missing")
+	if _, err := sdk.AccAddressFromBech32(msg.Address); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s)", err)
 	}
-	if len(msg.DeletedBy) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "operator address missing")
+	if _, err := sdk.AccAddressFromBech32(msg.DeletedBy); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid operator address (%s)", err)
 	}
 	return nil
 }
