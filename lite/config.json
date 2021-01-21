@@ -3,11 +3,16 @@
     "info": {
         "title": "IRISHub - Legacy REST and gRPC Gateway docs",
         "description": "A REST interface for state queries, legacy transactions",
-        "version": "1.0.0-beta"
+        "version": "1.0.0"
     },
     "apis": [
         {
             "url": "./lite/cosmos_swagger_legacy.yaml",
+            "paths":{
+                "exclude": [
+                    "minting/*"
+                ]
+            },
             "dereference": {
                 "circular": "ignore"
             }

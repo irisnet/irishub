@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: IRISHub - Legacy REST and gRPC Gateway docs
   description: 'A REST interface for state queries, legacy transactions'
-  version: 1.0.0-beta
+  version: 1.0.0
 paths:
   /node_info:
     get:
@@ -4504,63 +4504,6 @@ paths:
                 type: string
               community_tax:
                 type: string
-        '500':
-          description: Internal Server Error
-  /minting/parameters:
-    get:
-      deprecated: true
-      summary: Minting module parameters
-      tags:
-        - Mint
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: OK
-          schema:
-            properties:
-              mint_denom:
-                type: string
-              inflation_rate_change:
-                type: string
-              inflation_max:
-                type: string
-              inflation_min:
-                type: string
-              goal_bonded:
-                type: string
-              blocks_per_year:
-                type: string
-        '500':
-          description: Internal Server Error
-  /minting/inflation:
-    get:
-      deprecated: true
-      summary: Current minting inflation value
-      tags:
-        - Mint
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: string
-        '500':
-          description: Internal Server Error
-  /minting/annual-provisions:
-    get:
-      deprecated: true
-      summary: Current minting annual provisions value
-      tags:
-        - Mint
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: string
         '500':
           description: Internal Server Error
   /supply/total:
