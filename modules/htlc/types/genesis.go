@@ -25,7 +25,7 @@ func DefaultGenesisState() *GenesisState {
 func ValidateGenesis(data GenesisState) error {
 	for hashLockStr, htlc := range data.PendingHtlcs {
 		if len(hashLockStr) != HashLockLength {
-			return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d in bytes", HashLockLength)
+			return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d", HashLockLength)
 		}
 
 		if _, err := hex.DecodeString(hashLockStr); err != nil {

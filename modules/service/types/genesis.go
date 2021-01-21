@@ -3,6 +3,8 @@ package types
 import (
 	"encoding/hex"
 	"fmt"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // NewGenesisState constructs a GenesisState
@@ -10,7 +12,7 @@ func NewGenesisState(
 	params Params,
 	definitions []ServiceDefinition,
 	bindings []ServiceBinding,
-	withdrawAddresses map[string][]byte,
+	withdrawAddresses map[string]string,
 	requestContexts map[string]*RequestContext,
 ) *GenesisState {
 	return &GenesisState{
@@ -48,8 +50,11 @@ func ValidateGenesis(data GenesisState) error {
 		}
 	}
 
-	for providerAddressStr := range data.WithdrawAddresses {
-		if _, err := hex.DecodeString(providerAddressStr); err != nil {
+	for providerAddressStr, withdrawAddress := range data.WithdrawAddresses {
+		if _, err := sdk.AccAddressFromBech32(providerAddressStr); err != nil {
+			return err
+		}
+		if _, err := sdk.AccAddressFromBech32(withdrawAddress); err != nil {
 			return err
 		}
 	}

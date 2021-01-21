@@ -32,6 +32,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 
 	for ownerAddressStr, withdrawAddress := range data.WithdrawAddresses {
 		ownerAddress, _ := sdk.AccAddressFromBech32(ownerAddressStr)
+		withdrawAddress, _ := sdk.AccAddressFromBech32(withdrawAddress)
 		k.SetWithdrawAddress(ctx, ownerAddress, withdrawAddress)
 	}
 
@@ -45,7 +46,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	var definitions []types.ServiceDefinition
 	var bindings []types.ServiceBinding
-	withdrawAddresses := make(map[string][]byte)
+	withdrawAddresses := make(map[string]string)
 	requestContexts := make(map[string]*types.RequestContext)
 
 	k.IterateServiceDefinitions(
@@ -67,7 +68,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	k.IterateWithdrawAddresses(
 		ctx,
 		func(ownerAddress sdk.AccAddress, withdrawAddress sdk.AccAddress) bool {
-			withdrawAddresses[ownerAddress.String()] = withdrawAddress
+			withdrawAddresses[ownerAddress.String()] = withdrawAddress.String()
 			return false
 		},
 	)

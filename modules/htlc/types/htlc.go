@@ -55,7 +55,7 @@ func (h HTLC) Validate() error {
 	}
 
 	if h.State == Completed && len(h.Secret) != SecretLength {
-		return sdkerrors.Wrapf(ErrInvalidSecret, "length of the secret must be %d in bytes", SecretLength)
+		return sdkerrors.Wrapf(ErrInvalidSecret, "length of the secret must be %d", SecretLength)
 	}
 
 	return nil

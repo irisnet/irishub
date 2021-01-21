@@ -62,8 +62,8 @@ func (msg MsgCreateHTLC) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
-	if len(msg.To) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "recipient missing")
+	if _, err := sdk.AccAddressFromBech32(msg.To); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
 	if len(msg.ReceiverOnOtherChain) > MaxLengthForAddressOnOtherChain {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "length of the receiver on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain)
@@ -75,7 +75,7 @@ func (msg MsgCreateHTLC) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidHashLock, "hash lock must be a hex encoded string")
 	}
 	if len(msg.HashLock) != HashLockLength {
-		return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d in bytes", HashLockLength)
+		return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d", HashLockLength)
 	}
 	if msg.TimeLock < MinTimeLock || msg.TimeLock > MaxTimeLock {
 		return sdkerrors.Wrapf(ErrInvalidTimeLock, "the time lock must be between [%d,%d]", MinTimeLock, MaxTimeLock)
@@ -128,13 +128,13 @@ func (msg MsgClaimHTLC) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidHashLock, "hash lock must be a hex encoded string")
 	}
 	if len(msg.HashLock) != HashLockLength {
-		return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d in bytes", HashLockLength)
+		return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d", HashLockLength)
 	}
 	if _, err := hex.DecodeString(msg.Secret); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidSecret, "secret must be a hex encoded string")
 	}
 	if len(msg.Secret) != SecretLength {
-		return sdkerrors.Wrapf(ErrInvalidSecret, "length of the secret must be %d in bytes", SecretLength)
+		return sdkerrors.Wrapf(ErrInvalidSecret, "length of the secret must be %d", SecretLength)
 	}
 	return nil
 }
@@ -182,7 +182,7 @@ func (msg MsgRefundHTLC) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidHashLock, "hash lock must be a hex encoded string")
 	}
 	if len(msg.HashLock) != HashLockLength {
-		return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d in bytes", HashLockLength)
+		return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d", HashLockLength)
 	}
 	return nil
 }
