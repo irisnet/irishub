@@ -33,6 +33,8 @@ import (
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	randomtypes "github.com/irisnet/irismod/modules/random/types"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
+	"github.com/irisnet/irismod/modules/token"
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/migrate/v0_16"
@@ -149,7 +151,7 @@ func Migrate(cdc codec.JSONMarshaler, initialState v0_16.GenesisFileState) (appS
 	// sdk modules
 	// ------------------------------------------------------------
 	stakingGenesis, bondedTokens, notBondedTokens := migrateStaking(initialState)
-	authGenesisState, bankGenesisState, communityTax := migrateAuth(initialState, bondedTokens, notBondedTokens)
+	authGenesisState, bankGenesisState, communityTax, tokenGenesisState := migrateAuth(initialState, bondedTokens, notBondedTokens)
 	appState[stakingtypes.ModuleName] = cdc.MustMarshalJSON(stakingGenesis)
 	appState[authtypes.ModuleName] = cdc.MustMarshalJSON(&authGenesisState)
 	appState[banktypes.ModuleName] = cdc.MustMarshalJSON(&bankGenesisState)
@@ -157,6 +159,7 @@ func Migrate(cdc codec.JSONMarshaler, initialState v0_16.GenesisFileState) (appS
 	appState[distributiontypes.ModuleName] = cdc.MustMarshalJSON(migrateDistribution(initialState, communityTax))
 	appState[govtypes.ModuleName] = cdc.MustMarshalJSON(migrateGov(initialState))
 	appState[crisistypes.ModuleName] = cdc.MustMarshalJSON(genCrisis())
+	appState[tokentypes.ModuleName] = cdc.MustMarshalJSON(&tokenGenesisState)
 
 	// ------------------------------------------------------------
 	// irishub modules
@@ -172,12 +175,16 @@ func Migrate(cdc codec.JSONMarshaler, initialState v0_16.GenesisFileState) (appS
 
 }
 
-func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens, notBondedTokens sdk.Coins) (authtypes.GenesisState, banktypes.GenesisState, sdk.Coins) {
+func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens, notBondedTokens sdk.Coins) (authtypes.GenesisState,
+	banktypes.GenesisState,
+	sdk.Coins,
+	tokentypes.GenesisState) {
 	params := authtypes.DefaultParams()
 	var accounts authtypes.GenesisAccounts
 	var balances []banktypes.Balance
 	var communityTax sdk.Coins
 	var serviceTax sdk.Coins
+	var burnedCoins sdk.Coins
 	for _, acc := range initialState.Accounts {
 		var coins sdk.Coins
 		for _, c := range acc.Coins {
@@ -192,6 +199,7 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens, notBondedTok
 
 		switch acc.Address.String() {
 		case auth.BurnedCoinsAccAddr.String():
+			burnedCoins = coins
 			continue
 		case auth.GovDepositCoinsAccAddr.String():
 			baseAccount.Address = authtypes.NewModuleAddress(govtypes.ModuleName).String()
@@ -245,7 +253,10 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens, notBondedTok
 		Balances: balances,
 	}
 
-	return *authGenesisState, bankGenesisState, communityTax
+	tokenGenesisState := token.DefaultGenesisState()
+	tokenGenesisState.BurnedCoins = burnedCoins
+
+	return *authGenesisState, bankGenesisState, communityTax, *tokenGenesisState
 }
 
 func migrateStaking(initialState v0_16.GenesisFileState) (*stakingtypes.GenesisState, sdk.Coins, sdk.Coins) {
