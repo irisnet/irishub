@@ -165,7 +165,7 @@ func Migrate(cdc codec.JSONMarshaler, initialState v0_16.GenesisFileState) (appS
 	// irishub modules
 	// ------------------------------------------------------------
 	appState[minttypes.ModuleName] = cdc.MustMarshalJSON(migrateMint(initialState))
-	appState[randomtypes.ModuleName] = cdc.MustMarshalJSON(migrateRand(initialState))
+	// appState[randomtypes.ModuleName] = cdc.MustMarshalJSON(migrateRand(initialState))
 	appState[htlctypes.ModuleName] = cdc.MustMarshalJSON(migrateHTLC(initialState))
 	appState[coinswaptypes.ModuleName] = cdc.MustMarshalJSON(migrateCoinswap(initialState))
 	appState[guardiantypes.ModuleName] = cdc.MustMarshalJSON(migrateGuardian(initialState))
