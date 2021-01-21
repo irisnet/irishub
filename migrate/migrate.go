@@ -212,8 +212,7 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens, notBondedTok
 			account = authtypes.NewModuleAccount(baseAccount, servicetypes.RequestAccName)
 		case auth.ServiceTaxCoinsAccAddr.String():
 			serviceTax = coins
-			account = baseAccount
-			coins = sdk.NewCoins()
+			continue
 		case auth.CommunityTaxCoinsAccAddr.String():
 			communityTax = coins
 			baseAccount.Address = authtypes.NewModuleAddress(distributiontypes.ModuleName).String()
@@ -610,7 +609,7 @@ func migrateService(initialState v0_16.GenesisFileState) *servicetypes.GenesisSt
 	params := servicetypes.Params{
 		MaxRequestTimeout:    initialState.ServiceData.Params.MaxRequestTimeout,
 		MinDepositMultiple:   initialState.ServiceData.Params.MinDepositMultiple,
-		MinDeposit:           convertCoins(initialState.ServiceData.Params.MinDeposit),
+		MinDeposit:           sdk.NewCoins(sdk.NewCoin(UIRIS, sdk.NewInt(6000))),
 		ServiceFeeTax:        initialState.ServiceData.Params.ServiceFeeTax,
 		SlashFraction:        initialState.ServiceData.Params.SlashFraction,
 		ComplaintRetrospect:  initialState.ServiceData.Params.ComplaintRetrospect,

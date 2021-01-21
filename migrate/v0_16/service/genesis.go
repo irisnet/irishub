@@ -22,7 +22,6 @@ type GenesisState struct {
 type Params struct {
 	MaxRequestTimeout    int64         `json:"max_request_timeout"`
 	MinDepositMultiple   int64         `json:"min_deposit_multiple"`
-	MinDeposit           sdk.Coins     `json:"min_deposit"`
 	ServiceFeeTax        sdk.Dec       `json:"service_fee_tax"`
 	SlashFraction        sdk.Dec       `json:"slash_fraction"`
 	ComplaintRetrospect  time.Duration `json:"complaint_retrospect"`
