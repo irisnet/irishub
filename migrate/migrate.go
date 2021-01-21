@@ -183,8 +183,8 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens, notBondedTok
 	var accounts authtypes.GenesisAccounts
 	var balances []banktypes.Balance
 	var communityTax sdk.Coins
-	var serviceTax sdk.Coins
 	var burnedCoins sdk.Coins
+
 	for _, acc := range initialState.Accounts {
 		var coins sdk.Coins
 		for _, c := range acc.Coins {
@@ -211,12 +211,14 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens, notBondedTok
 			baseAccount.Address = authtypes.NewModuleAddress(servicetypes.RequestAccName).String()
 			account = authtypes.NewModuleAccount(baseAccount, servicetypes.RequestAccName)
 		case auth.ServiceTaxCoinsAccAddr.String():
-			serviceTax = coins
+			communityTax = communityTax.Add(coins...)
+			continue
+		case auth.HTLCLockedCoinsAccAddr.String():
+			communityTax = communityTax.Add(coins...)
 			continue
 		case auth.CommunityTaxCoinsAccAddr.String():
-			communityTax = coins
-			baseAccount.Address = authtypes.NewModuleAddress(distributiontypes.ModuleName).String()
-			account = authtypes.NewModuleAccount(baseAccount, distributiontypes.ModuleName)
+			communityTax = communityTax.Add(coins...)
+			continue
 		default:
 			account = baseAccount
 		}
@@ -240,8 +242,8 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens, notBondedTok
 	)
 	balances = append(balances, banktypes.Balance{Address: notBondedPoolAddress.String(), Coins: notBondedTokens})
 
-	feeCollectorAddress := authtypes.NewModuleAddress(authtypes.FeeCollectorName)
-	balances = append(balances, banktypes.Balance{Address: feeCollectorAddress.String(), Coins: serviceTax})
+	communityTaxAddress := authtypes.NewModuleAddress(distributiontypes.ModuleName)
+	balances = append(balances, banktypes.Balance{Address: communityTaxAddress.String(), Coins: convertCoins(communityTax)})
 
 	authGenesisState := authtypes.NewGenesisState(
 		params, accounts,
@@ -609,7 +611,7 @@ func migrateService(initialState v0_16.GenesisFileState) *servicetypes.GenesisSt
 	params := servicetypes.Params{
 		MaxRequestTimeout:    initialState.ServiceData.Params.MaxRequestTimeout,
 		MinDepositMultiple:   initialState.ServiceData.Params.MinDepositMultiple,
-		MinDeposit:           sdk.NewCoins(sdk.NewCoin(UIRIS, sdk.NewInt(6000))),
+		MinDeposit:           sdk.NewCoins(sdk.NewCoin(UIRIS, sdk.NewInt(6000000000))),
 		ServiceFeeTax:        initialState.ServiceData.Params.ServiceFeeTax,
 		SlashFraction:        initialState.ServiceData.Params.SlashFraction,
 		ComplaintRetrospect:  initialState.ServiceData.Params.ComplaintRetrospect,
