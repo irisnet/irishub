@@ -100,10 +100,10 @@ After the software upgrade proposal is accepted, the system will gracefully susp
 
 ##### Restart the new software
 
-The user replaces the software with the specified version and restarts the network. The system will detect whether the `processor` specified by the `plan name` is included. If it is included, the system first executes the `processor` program, and then starts the network consensus. If not, the system report an error and exit.
+The user replaces the software with the specified version and restarts the network. The system will detect whether the `processor` specified by the `plan name` is included. If it is included, the system first executes the `Handler` program, and then starts the network consensus. If not, the system report an error and exit.
 
 #### Cancelling Upgrade Proposals
 
 The upgrade proposal can be cancelled. There is a proposal type of `Cancel Software Upgrade (CancelSoftwareUpgrade)`. When this type of proposal is voted through, the currently ongoing upgrade plan will be removed. Of course, this needs to be voted and executed before the upgrade plan is executed.
 
-If the current upgrade plan has been executed, but there are problems with the upgrade plan, then the proposal of `Cancel Software Upgrade` is invalid (because the network has stopped consensus). At this time, there is another solution to make up for this mistake, which is to use the `--unsafe-skip-upgrades` parameter to skip the specified upgrade height when restarting the network (not really skip the height, but jump via software upgrade `processor`). Of course, this requires that 2/3 of the validators participating in the consensus perform the same operation, otherwise the network consensus cannot be reached.
+If the current upgrade plan has been executed, but there are problems with the upgrade plan, then the proposal of `Cancel Software Upgrade` is invalid (because the network has stopped consensus). At this time, there is another solution to make up for this mistake, which is to use the `--unsafe-skip-upgrades` parameter to skip the specified upgrade height when restarting the network (not really skip the height, but jump via software upgrade `Handler`). Of course, this requires that 2/3 of the validators participating in the consensus perform the same operation, otherwise the network consensus cannot be reached.
