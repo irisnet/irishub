@@ -3,11 +3,17 @@
     "info": {
         "title": "IRISHub - Legacy REST and gRPC Gateway docs",
         "description": "A REST interface for state queries, legacy transactions",
-        "version": "1.0.0-beta"
+        "version": "1.0.0"
     },
     "apis": [
         {
             "url": "./lite/cosmos_swagger_legacy.yaml",
+            "paths":{
+                "exclude": [
+                    "minting/*",
+                    "supply/*"
+                ]
+            },
             "dereference": {
                 "circular": "ignore"
             }
@@ -25,6 +31,14 @@
             "operationIds": {
                 "rename": {
                     "Params": "BankParams"
+                }
+            }
+        },
+        {
+            "url": "./tmp-swagger-gen/cosmos/base/tendermint/v1beta1/query.swagger.json",
+            "operationIds": {
+                "rename": {
+                    "Params": "BaseParams"
                 }
             }
         },
@@ -75,6 +89,12 @@
                     "Params": "StakingParams",
                     "DelegatorValidators": "StakingDelegatorValidators"
                 }
+            }
+        },
+        {
+            "url": "./tmp-swagger-gen/cosmos/tx/v1beta1/service.swagger.json",
+            "dereference": {
+                "circular": "ignore"
             }
         },
         {
