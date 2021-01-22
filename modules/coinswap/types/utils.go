@@ -7,7 +7,6 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // GetReservePoolAddr returns the poor address for the provided provided liquidity denomination.
@@ -30,16 +29,8 @@ func GetUniDenomFromDenom(denom string) (string, error) {
 
 // GetCoinDenomFromUniDenom returns the token denom by uni denom
 func GetCoinDenomFromUniDenom(uniDenom string) (string, error) {
-	if err := CheckUniDenom(uniDenom); err != nil {
+	if err := ValidateUniDenom(uniDenom); err != nil {
 		return "", err
 	}
 	return strings.TrimPrefix(uniDenom, FormatUniABSPrefix), nil
-}
-
-// CheckUniDenom returns nil if the uni denom is valid
-func CheckUniDenom(uniDenom string) error {
-	if !strings.HasPrefix(uniDenom, FormatUniABSPrefix) {
-		return sdkerrors.Wrap(ErrInvalidDenom, uniDenom)
-	}
-	return nil
 }

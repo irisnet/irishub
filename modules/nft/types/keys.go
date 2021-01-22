@@ -70,7 +70,6 @@ func KeyOwner(address sdk.AccAddress, denomID, tokenID string) []byte {
 	}
 
 	if address != nil && len(denomID) > 0 && len(tokenID) > 0 {
-
 		key = append(key, []byte(tokenID)...)
 	}
 	return key

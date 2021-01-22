@@ -60,7 +60,7 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuer
 		return nil, err
 	}
 
-	if err := types.CheckSymbol(params.Symbol); err != nil {
+	if err := types.ValidateSymbol(params.Symbol); err != nil {
 		return nil, err
 	}
 

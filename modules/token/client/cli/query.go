@@ -47,7 +47,7 @@ func GetCmdQueryToken() *cobra.Command {
 				return err
 			}
 
-			if err := types.CheckSymbol(args[0]); err != nil {
+			if err := types.ValidateSymbol(args[0]); err != nil {
 				return err
 			}
 
@@ -137,7 +137,7 @@ func GetCmdQueryFee() *cobra.Command {
 			}
 
 			symbol := args[0]
-			if err := types.CheckSymbol(symbol); err != nil {
+			if err := types.ValidateSymbol(symbol); err != nil {
 				return err
 			}
 

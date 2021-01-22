@@ -209,7 +209,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg *types.MsgEditFeed) error {
 		feed.LatestHistory = msg.LatestHistory
 	}
 
-	if types.IsModified(msg.Description) {
+	if types.Modified(msg.Description) {
 		feed.Description = strings.TrimSpace(msg.Description)
 	}
 

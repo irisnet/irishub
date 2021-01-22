@@ -41,7 +41,7 @@ func (k Keeper) SetDenom(ctx sdk.Context, denom types.Denom) error {
 	return nil
 }
 
-// SetDenom is responsible for saving the definition of denomID
+// GetDenom return the denom by id
 func (k Keeper) GetDenom(ctx sdk.Context, id string) (denom types.Denom, err error) {
 	store := ctx.KVStore(k.storeKey)
 

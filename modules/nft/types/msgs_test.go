@@ -18,10 +18,11 @@ func TestNewMsgTransferNFT(t *testing.T) {
 		fmt.Sprintf("     %s     ", id),
 		tokenURI, tokenData, address.String(), address2.String(),
 	)
-	require.Equal(t, newMsgTransferNFT.Sender, address.String())
-	require.Equal(t, newMsgTransferNFT.Recipient, address2.String())
-	require.Equal(t, newMsgTransferNFT.DenomId, denom)
-	require.Equal(t, newMsgTransferNFT.Id, denomID)
+	msgTransferNFT := newMsgTransferNFT.Normalize()
+	require.Equal(t, msgTransferNFT.Sender, address.String())
+	require.Equal(t, msgTransferNFT.Recipient, address2.String())
+	require.Equal(t, msgTransferNFT.DenomId, denom)
+	require.Equal(t, msgTransferNFT.Id, denomID)
 }
 
 func TestMsgTransferNFTValidateBasicMethod(t *testing.T) {
@@ -64,11 +65,11 @@ func TestNewMsgEditNFT(t *testing.T) {
 		fmt.Sprintf("     %s     ", tokenURI),
 		tokenData, address.String(),
 	)
-
-	require.Equal(t, newMsgEditNFT.Sender, address.String())
-	require.Equal(t, newMsgEditNFT.Id, id)
-	require.Equal(t, newMsgEditNFT.DenomId, denom)
-	require.Equal(t, newMsgEditNFT.URI, tokenURI)
+	msgEditNFT := newMsgEditNFT.Normalize()
+	require.Equal(t, msgEditNFT.Sender, address.String())
+	require.Equal(t, msgEditNFT.Id, id)
+	require.Equal(t, msgEditNFT.DenomId, denom)
+	require.Equal(t, msgEditNFT.URI, tokenURI)
 }
 
 func TestMsgEditNFTValidateBasicMethod(t *testing.T) {
@@ -112,12 +113,12 @@ func TestNewMsgMintNFT(t *testing.T) {
 		fmt.Sprintf("     %s     ", tokenURI),
 		tokenData, address.String(), address2.String(),
 	)
-
-	require.Equal(t, newMsgMintNFT.Sender, address.String())
-	require.Equal(t, newMsgMintNFT.Recipient, address2.String())
-	require.Equal(t, newMsgMintNFT.Id, id)
-	require.Equal(t, newMsgMintNFT.DenomId, denom)
-	require.Equal(t, newMsgMintNFT.URI, tokenURI)
+	msgMintNFT := newMsgMintNFT.Normalize()
+	require.Equal(t, msgMintNFT.Sender, address.String())
+	require.Equal(t, msgMintNFT.Recipient, address2.String())
+	require.Equal(t, msgMintNFT.Id, id)
+	require.Equal(t, msgMintNFT.DenomId, denom)
+	require.Equal(t, msgMintNFT.URI, tokenURI)
 }
 
 func TestMsgMsgMintNFTValidateBasicMethod(t *testing.T) {
@@ -151,10 +152,10 @@ func TestNewMsgBurnNFT(t *testing.T) {
 		fmt.Sprintf("     %s     ", id),
 		fmt.Sprintf("     %s     ", denom),
 	)
-
-	require.Equal(t, newMsgBurnNFT.Sender, address.String())
-	require.Equal(t, newMsgBurnNFT.Id, id)
-	require.Equal(t, newMsgBurnNFT.DenomId, denom)
+	msgBurnNFT := newMsgBurnNFT.Normalize()
+	require.Equal(t, msgBurnNFT.Sender, address.String())
+	require.Equal(t, msgBurnNFT.Id, id)
+	require.Equal(t, msgBurnNFT.DenomId, denom)
 }
 
 func TestMsgMsgBurnNFTValidateBasicMethod(t *testing.T) {

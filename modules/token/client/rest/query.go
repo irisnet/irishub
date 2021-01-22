@@ -108,7 +108,7 @@ func queryTokenFeesHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		vars := mux.Vars(r)
 		symbol := vars[RestParamSymbol]
 
-		if err := types.CheckSymbol(symbol); err != nil {
+		if err := types.ValidateSymbol(symbol); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}

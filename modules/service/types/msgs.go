@@ -1,13 +1,9 @@
 package types
 
 import (
-	"encoding/hex"
-	"encoding/json"
-	"fmt"
-	"regexp"
+	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // Message types for the service module
@@ -26,17 +22,7 @@ const (
 	TypeMsgKillRequestContext    = "kill_request_context"    // type for MsgKillRequestContext
 	TypeMsgUpdateRequestContext  = "update_request_context"  // type for MsgUpdateRequestContext
 	TypeMsgWithdrawEarnedFees    = "withdraw_earned_fees"    // type for MsgWithdrawEarnedFees
-
-	MaxNameLength        = 70  // maximum length of the service name
-	MaxDescriptionLength = 280 // maximum length of the service and author description
-	MaxTagsNum           = 10  // maximum total number of the tags
-	MaxTagLength         = 70  // maximum length of the tag
-
-	MaxProvidersNum = 10 // maximum total number of the providers to request
 )
-
-// the service name only accepts alphanumeric characters, _ and -, beginning with alpha character
-var reServiceName = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_-]*$`)
 
 var (
 	_ sdk.Msg = &MsgDefineService{}
@@ -84,22 +70,35 @@ func (msg MsgDefineService) Type() string { return TypeMsgDefineService }
 
 // ValidateBasic implements Msg
 func (msg MsgDefineService) ValidateBasic() error {
-	if _, err := sdk.AccAddressFromBech32(msg.Author); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid author address (%s)", err)
+	msg = msg.Normalize()
+
+	if err := ValidateAuthor(msg.Author); err != nil {
+		return err
 	}
+
 	if err := ValidateServiceName(msg.Name); err != nil {
 		return err
 	}
+
 	if err := ValidateServiceDescription(msg.Description); err != nil {
 		return err
 	}
+
 	if err := ValidateAuthorDescription(msg.AuthorDescription); err != nil {
 		return err
 	}
+
 	if err := ValidateTags(msg.Tags); err != nil {
 		return err
 	}
 	return ValidateServiceSchemas(msg.Schemas)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgDefineService) Normalize() MsgDefineService {
+	msg.Name = strings.TrimSpace(msg.Name)
+	msg.Schemas = strings.TrimSpace(msg.Schemas)
+	return msg
 }
 
 // GetSignBytes implements Msg
@@ -162,25 +161,40 @@ func (msg MsgBindService) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgBindService) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
+
 	if err := ValidateOwner(msg.Owner); err != nil {
 		return err
 	}
+
 	if err := ValidateServiceName(msg.ServiceName); err != nil {
 		return err
 	}
+
 	if err := ValidateServiceDeposit(msg.Deposit); err != nil {
 		return err
 	}
+
 	if err := ValidateQoS(msg.QoS); err != nil {
 		return err
 	}
+
 	if err := ValidateOptions(msg.Options); err != nil {
 		return err
 	}
 	return ValidateBindingPricing(msg.Pricing)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgBindService) Normalize() MsgBindService {
+	msg.ServiceName = strings.TrimSpace(msg.ServiceName)
+	msg.Pricing = strings.TrimSpace(msg.Pricing)
+	msg.Options = strings.TrimSpace(msg.Options)
+	return msg
 }
 
 // GetSigners implements Msg.
@@ -233,29 +247,44 @@ func (msg MsgUpdateServiceBinding) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgUpdateServiceBinding) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
+
 	if err := ValidateOwner(msg.Owner); err != nil {
 		return err
 	}
+
 	if err := ValidateServiceName(msg.ServiceName); err != nil {
 		return err
 	}
+
 	if !msg.Deposit.Empty() {
 		if err := ValidateServiceDeposit(msg.Deposit); err != nil {
 			return err
 		}
 	}
+
 	if len(msg.Options) != 0 {
 		if err := ValidateOptions(msg.Options); err != nil {
 			return err
 		}
 	}
+
 	if len(msg.Pricing) != 0 {
 		return ValidateBindingPricing(msg.Pricing)
 	}
 	return nil
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgUpdateServiceBinding) Normalize() MsgUpdateServiceBinding {
+	msg.ServiceName = strings.TrimSpace(msg.ServiceName)
+	msg.Pricing = strings.TrimSpace(msg.Pricing)
+	msg.Options = strings.TrimSpace(msg.Options)
+	return msg
 }
 
 // GetSigners implements Msg.
@@ -291,10 +320,17 @@ func (msg MsgSetWithdrawAddress) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgSetWithdrawAddress) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	if err := ValidateOwner(msg.Owner); err != nil {
 		return err
 	}
 	return ValidateWithdrawAddress(msg.WithdrawAddress)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgSetWithdrawAddress) Normalize() MsgSetWithdrawAddress {
+	return msg
 }
 
 // GetSigners implements Msg.
@@ -331,13 +367,23 @@ func (msg MsgDisableServiceBinding) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgDisableServiceBinding) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
+
 	if err := ValidateOwner(msg.Owner); err != nil {
 		return err
 	}
+
 	return ValidateServiceName(msg.ServiceName)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgDisableServiceBinding) Normalize() MsgDisableServiceBinding {
+	msg.ServiceName = strings.TrimSpace(msg.ServiceName)
+	return msg
 }
 
 // GetSigners implements Msg.
@@ -384,21 +430,32 @@ func (msg MsgEnableServiceBinding) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgEnableServiceBinding) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
+
 	if err := ValidateOwner(msg.Owner); err != nil {
 		return err
 	}
+
 	if err := ValidateServiceName(msg.ServiceName); err != nil {
 		return err
 	}
+
 	if !msg.Deposit.Empty() {
 		if err := ValidateServiceDeposit(msg.Deposit); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgEnableServiceBinding) Normalize() MsgEnableServiceBinding {
+	msg.ServiceName = strings.TrimSpace(msg.ServiceName)
+	return msg
 }
 
 // GetSigners implements Msg.
@@ -435,13 +492,22 @@ func (msg MsgRefundServiceDeposit) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgRefundServiceDeposit) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
+
 	if err := ValidateOwner(msg.Owner); err != nil {
 		return err
 	}
 	return ValidateServiceName(msg.ServiceName)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgRefundServiceDeposit) Normalize() MsgRefundServiceDeposit {
+	msg.ServiceName = strings.TrimSpace(msg.ServiceName)
+	return msg
 }
 
 // GetSigners implements Msg.
@@ -505,6 +571,8 @@ func (msg MsgCallService) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgCallService) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	if err := ValidateConsumer(msg.Consumer); err != nil {
 		return err
 	}
@@ -528,6 +596,13 @@ func (msg MsgCallService) ValidateBasic() error {
 		msg.RepeatedFrequency,
 		msg.RepeatedTotal,
 	)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgCallService) Normalize() MsgCallService {
+	msg.ServiceName = strings.TrimSpace(msg.ServiceName)
+	msg.Input = strings.TrimSpace(msg.Input)
+	return msg
 }
 
 // GetSigners implements Msg.
@@ -565,20 +640,33 @@ func (msg MsgRespondService) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgRespondService) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
+
 	if err := ValidateRequestID(msg.RequestId); err != nil {
 		return err
 	}
+
 	if err := ValidateResponseResult(msg.Result); err != nil {
 		return err
 	}
+
 	result, err := ParseResult(msg.Result)
 	if err != nil {
 		return err
 	}
 	return ValidateOutput(result.Code, msg.Output)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgRespondService) Normalize() MsgRespondService {
+	msg.RequestId = strings.TrimSpace(msg.RequestId)
+	msg.Output = strings.TrimSpace(msg.Output)
+	msg.Result = strings.TrimSpace(msg.Result)
+	return msg
 }
 
 // GetSigners implements Msg.
@@ -614,10 +702,18 @@ func (msg MsgPauseRequestContext) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgPauseRequestContext) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	if err := ValidateConsumer(msg.Consumer); err != nil {
 		return err
 	}
 	return ValidateContextID(msg.RequestContextId)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgPauseRequestContext) Normalize() MsgPauseRequestContext {
+	msg.RequestContextId = strings.TrimSpace(msg.RequestContextId)
+	return msg
 }
 
 // GetSigners implements Msg.
@@ -653,10 +749,17 @@ func (msg MsgStartRequestContext) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgStartRequestContext) ValidateBasic() error {
+	msg = msg.Normalize()
 	if err := ValidateConsumer(msg.Consumer); err != nil {
 		return err
 	}
 	return ValidateContextID(msg.RequestContextId)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgStartRequestContext) Normalize() MsgStartRequestContext {
+	msg.RequestContextId = strings.TrimSpace(msg.RequestContextId)
+	return msg
 }
 
 // GetSigners implements Msg.
@@ -692,10 +795,17 @@ func (msg MsgKillRequestContext) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgKillRequestContext) ValidateBasic() error {
+	msg = msg.Normalize()
 	if err := ValidateConsumer(msg.Consumer); err != nil {
 		return err
 	}
 	return ValidateContextID(msg.RequestContextId)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgKillRequestContext) Normalize() MsgKillRequestContext {
+	msg.RequestContextId = strings.TrimSpace(msg.RequestContextId)
+	return msg
 }
 
 // GetSigners implements Msg.
@@ -753,6 +863,8 @@ func (msg MsgUpdateRequestContext) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgUpdateRequestContext) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	if err := ValidateConsumer(msg.Consumer); err != nil {
 		return err
 	}
@@ -777,6 +889,12 @@ func (msg MsgUpdateRequestContext) ValidateBasic() error {
 		msg.RepeatedFrequency,
 		msg.RepeatedTotal,
 	)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgUpdateRequestContext) Normalize() MsgUpdateRequestContext {
+	msg.RequestContextId = strings.TrimSpace(msg.RequestContextId)
+	return msg
 }
 
 // GetSigners implements Msg.
@@ -812,7 +930,13 @@ func (msg MsgWithdrawEarnedFees) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgWithdrawEarnedFees) ValidateBasic() error {
+	msg = msg.Normalize()
 	return ValidateOwner(msg.Owner)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgWithdrawEarnedFees) Normalize() MsgWithdrawEarnedFees {
+	return msg
 }
 
 // GetSigners implements Msg.
@@ -822,264 +946,4 @@ func (msg MsgWithdrawEarnedFees) GetSigners() []sdk.AccAddress {
 		panic(err)
 	}
 	return []sdk.AccAddress{from}
-}
-
-func ValidateAuthor(author string) error {
-	if _, err := sdk.AccAddressFromBech32(author); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid author address (%s)", err)
-	}
-	return nil
-}
-
-// ValidateServiceName validates the service name
-func ValidateServiceName(name string) error {
-	if !reServiceName.MatchString(name) || len(name) > MaxNameLength {
-		return sdkerrors.Wrap(ErrInvalidServiceName, name)
-	}
-	return nil
-}
-
-func ValidateTags(tags []string) error {
-	if len(tags) > MaxTagsNum {
-		return sdkerrors.Wrap(ErrInvalidTags, fmt.Sprintf("invalid tags size; got: %d, max: %d", len(tags), MaxTagsNum))
-	}
-	if HasDuplicate(tags) {
-		return sdkerrors.Wrap(ErrInvalidTags, "duplicate tag")
-	}
-	for i, tag := range tags {
-		if len(tag) == 0 {
-			return sdkerrors.Wrap(ErrInvalidTags, fmt.Sprintf("invalid tag[%d] length: tag must not be empty", i))
-		}
-		if len(tag) > MaxTagLength {
-			return sdkerrors.Wrap(ErrInvalidTags, fmt.Sprintf("invalid tag[%d] length; got: %d, max: %d", i, len(tag), MaxTagLength))
-		}
-	}
-	return nil
-}
-
-func ValidateServiceDescription(svcDescription string) error {
-	if len(svcDescription) > MaxDescriptionLength {
-		return sdkerrors.Wrap(ErrInvalidDescription, fmt.Sprintf("invalid service description length; got: %d, max: %d", len(svcDescription), MaxDescriptionLength))
-	}
-	return nil
-}
-
-func ValidateAuthorDescription(authorDescription string) error {
-	if len(authorDescription) > MaxDescriptionLength {
-		return sdkerrors.Wrap(ErrInvalidDescription, fmt.Sprintf("invalid author description length; got: %d, max: %d", len(authorDescription), MaxDescriptionLength))
-	}
-	return nil
-}
-
-func ValidateProvider(provider string) error {
-	if _, err := sdk.AccAddressFromBech32(provider); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid provider address (%s)", err)
-	}
-	return nil
-}
-
-func ValidateOwner(owner string) error {
-	if _, err := sdk.AccAddressFromBech32(owner); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
-	}
-	return nil
-}
-
-func ValidateServiceDeposit(deposit sdk.Coins) error {
-	if !deposit.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "invalid deposit")
-	}
-	if deposit.IsAnyNegative() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "invalid deposit")
-	}
-	return nil
-}
-
-func ValidateQoS(qos uint64) error {
-	if qos == 0 {
-		return sdkerrors.Wrap(ErrInvalidQoS, "qos must be greater than 0")
-	}
-	return nil
-}
-
-func ValidateOptions(options string) error {
-	if !json.Valid([]byte(options)) {
-		return sdkerrors.Wrap(ErrInvalidOptions, "options is not valid JSON")
-	}
-	return nil
-}
-
-func ValidateWithdrawAddress(withdrawAddress string) error {
-	if _, err := sdk.AccAddressFromBech32(withdrawAddress); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid withdrawal address (%s)", err)
-	}
-	return nil
-}
-
-// ______________________________________________________________________
-
-// ValidateRequest validates the request params
-func ValidateRequest(
-	serviceName string,
-	serviceFeeCap sdk.Coins,
-	providers []sdk.AccAddress,
-	input string,
-	timeout int64,
-	repeated bool,
-	repeatedFrequency uint64,
-	repeatedTotal int64,
-) error {
-	if err := ValidateServiceName(serviceName); err != nil {
-		return err
-	}
-	if err := ValidateServiceFeeCap(serviceFeeCap); err != nil {
-		return err
-	}
-	if err := ValidateProviders(providers); err != nil {
-		return err
-	}
-	if err := ValidateInput(input); err != nil {
-		return err
-	}
-	if timeout <= 0 {
-		return sdkerrors.Wrapf(ErrInvalidTimeout, "timeout [%d] must be greater than 0", timeout)
-	}
-	if repeated {
-		if repeatedFrequency > 0 && repeatedFrequency < uint64(timeout) {
-			return sdkerrors.Wrapf(ErrInvalidRepeatedFreq, "repeated frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout)
-		}
-		if repeatedTotal < -1 || repeatedTotal == 0 {
-			return sdkerrors.Wrapf(ErrInvalidRepeatedTotal, "repeated total number [%d] must be greater than 0 or equal to -1", repeatedTotal)
-		}
-	}
-	return nil
-}
-
-// ValidateRequestContextUpdating validates the request context updating operation
-func ValidateRequestContextUpdating(
-	providers []sdk.AccAddress,
-	serviceFeeCap sdk.Coins,
-	timeout int64,
-	repeatedFrequency uint64,
-	repeatedTotal int64,
-) error {
-	if err := ValidateProvidersCanEmpty(providers); err != nil {
-		return err
-	}
-	if !serviceFeeCap.Empty() {
-		if err := ValidateServiceFeeCap(serviceFeeCap); err != nil {
-			return err
-		}
-	}
-	if timeout < 0 {
-		return sdkerrors.Wrapf(ErrInvalidTimeout, "timeout must not be less than 0: %d", timeout)
-	}
-	if timeout != 0 && repeatedFrequency != 0 && repeatedFrequency < uint64(timeout) {
-		return sdkerrors.Wrapf(ErrInvalidRepeatedFreq, "frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout)
-	}
-	if repeatedTotal < -1 {
-		return sdkerrors.Wrapf(ErrInvalidRepeatedFreq, "repeated total number must not be less than -1: %d", repeatedTotal)
-	}
-	return nil
-}
-
-func ValidateConsumer(consumer string) error {
-	if _, err := sdk.AccAddressFromBech32(consumer); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid consumer address (%s)", err)
-	}
-	return nil
-}
-
-func ValidateProviders(providers []sdk.AccAddress) error {
-	if len(providers) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "providers missing")
-	}
-	if len(providers) > MaxProvidersNum {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "total number of the providers must not be greater than %d", MaxProvidersNum)
-	}
-	if err := checkDuplicateProviders(providers); err != nil {
-		return err
-	}
-	return nil
-}
-
-func ValidateProvidersCanEmpty(providers []sdk.AccAddress) error {
-	if len(providers) > MaxProvidersNum {
-		return sdkerrors.Wrapf(ErrInvalidProviders, "total number of the providers must not be greater than %d", MaxProvidersNum)
-	}
-	if len(providers) > 0 {
-		if err := checkDuplicateProviders(providers); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func ValidateServiceFeeCap(serviceFeeCap sdk.Coins) error {
-	if !serviceFeeCap.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid service fee cap: %s", serviceFeeCap))
-	}
-	return nil
-}
-
-func ValidateRequestID(reqID string) error {
-	if len(reqID) != RequestIDLen {
-		return sdkerrors.Wrapf(ErrInvalidRequestID, "length of the request ID must be %d", RequestIDLen)
-	}
-	if _, err := hex.DecodeString(reqID); err != nil {
-		return sdkerrors.Wrap(ErrInvalidRequestID, "request ID must be a hex encoded string")
-	}
-	return nil
-}
-
-func ValidateContextID(contextID string) error {
-	if len(contextID) != ContextIDLen {
-		return sdkerrors.Wrapf(ErrInvalidRequestContextID, "length of the request context ID must be %d in bytes", ContextIDLen)
-	}
-	if _, err := hex.DecodeString(contextID); err != nil {
-		return sdkerrors.Wrap(ErrInvalidRequestContextID, "request context ID must be a hex encoded string")
-	}
-	return nil
-}
-
-func ValidateInput(input string) error {
-	if len(input) == 0 {
-		return sdkerrors.Wrap(ErrInvalidRequestInput, "input missing")
-	}
-
-	if ValidateRequestInput(input) != nil {
-		return sdkerrors.Wrap(ErrInvalidRequestInput, "invalid input")
-	}
-
-	return nil
-}
-
-func ValidateOutput(code ResultCode, output string) error {
-	if code == ResultOK && len(output) == 0 {
-		return sdkerrors.Wrapf(ErrInvalidResponse, "output must be specified when the result code is %v", ResultOK)
-	}
-
-	if code != ResultOK && len(output) != 0 {
-		return sdkerrors.Wrapf(ErrInvalidResponse, "output should not be specified when the result code is not %v", ResultOK)
-	}
-
-	if len(output) > 0 && ValidateResponseOutput(output) != nil {
-		return sdkerrors.Wrap(ErrInvalidResponse, "invalid output")
-	}
-
-	return nil
-}
-
-func checkDuplicateProviders(providers []sdk.AccAddress) error {
-	providerArr := make([]string, len(providers))
-
-	for i, provider := range providers {
-		providerArr[i] = provider.String()
-	}
-
-	if HasDuplicate(providerArr) {
-		return sdkerrors.Wrap(ErrInvalidProviders, "there exists duplicate providers")
-	}
-
-	return nil
 }

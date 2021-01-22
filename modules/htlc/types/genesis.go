@@ -1,8 +1,6 @@
 package types
 
 import (
-	"encoding/hex"
-
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
@@ -24,11 +22,7 @@ func DefaultGenesisState() *GenesisState {
 // expected invariants holds.
 func ValidateGenesis(data GenesisState) error {
 	for hashLockStr, htlc := range data.PendingHtlcs {
-		if len(hashLockStr) != HashLockLength {
-			return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d", HashLockLength)
-		}
-
-		if _, err := hex.DecodeString(hashLockStr); err != nil {
+		if err := ValidateHashLock(hashLockStr); err != nil {
 			return err
 		}
 

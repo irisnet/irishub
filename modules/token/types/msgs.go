@@ -1,8 +1,6 @@
 package types
 
 import (
-	"fmt"
-	"regexp"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -21,29 +19,6 @@ const (
 
 	// DoNotModify used to indicate that some field should not be updated
 	DoNotModify = "[do-not-modify]"
-
-	MaximumMaxSupply  = uint64(1000000000000) // maximal limitation for token max supply，1000 billion
-	MaximumInitSupply = uint64(100000000000)  // maximal limitation for token initial supply，100 billion
-	MaximumScale      = uint32(9)             // maximal limitation for token decimal
-	MinimumSymbolLen  = 3                     // minimal limitation for the length of the token's symbol / canonical_symbol
-	MaximumSymbolLen  = 64                    // maximal limitation for the length of the token's symbol / canonical_symbol
-	MaximumNameLen    = 32                    // maximal limitation for the length of the token's name
-	MinimumMinUnitLen = 3                     // minimal limitation for the length of the token's min_unit
-	MaximumMinUnitLen = 64                    // maximal limitation for the length of the token's min_unit
-)
-
-var (
-	keywords = strings.Join([]string{
-		"peg", "ibc", "swap",
-	}, "|")
-	keywordsRegex = fmt.Sprintf("^(%s).*", keywords)
-
-	// IsAlphaNumeric only accepts alphanumeric characters
-	IsAlphaNumeric = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString
-	// IsBeginWithAlpha only begin with chars [a-zA-Z]
-	IsBeginWithAlpha = regexp.MustCompile(`^[a-zA-Z].*`).MatchString
-	// IsBeginWithKeyword define a group of keyword and denom shoule not begin with it
-	IsBeginWithKeyword = regexp.MustCompile(keywordsRegex).MatchString
 )
 
 var (
@@ -72,16 +47,21 @@ func NewMsgIssueToken(
 	}
 }
 
-// Implements Msg.
+// Route Implements Msg.
 func (msg MsgIssueToken) Route() string { return MsgRoute }
-func (msg MsgIssueToken) Type() string  { return TypeMsgIssueToken }
 
-// Implements Msg.
+// Type Implements Msg.
+func (msg MsgIssueToken) Type() string { return TypeMsgIssueToken }
+
+// ValidateBasic Implements Msg.
 func (msg MsgIssueToken) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
+
 	return ValidateToken(
 		NewToken(
 			msg.Symbol,
@@ -96,7 +76,15 @@ func (msg MsgIssueToken) ValidateBasic() error {
 	)
 }
 
-// Implements Msg.
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgIssueToken) Normalize() MsgIssueToken {
+	msg.Symbol = strings.TrimSpace(msg.Symbol)
+	msg.Name = strings.TrimSpace(msg.Name)
+	msg.MinUnit = strings.TrimSpace(msg.MinUnit)
+	return msg
+}
+
+// GetSignBytes Implements Msg.
 func (msg MsgIssueToken) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(&msg)
 	if err != nil {
@@ -105,7 +93,7 @@ func (msg MsgIssueToken) GetSignBytes() []byte {
 	return sdk.MustSortJSON(b)
 }
 
-// Implements Msg.
+// GetSigners Implements Msg.
 func (msg MsgIssueToken) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
@@ -114,6 +102,7 @@ func (msg MsgIssueToken) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
+// NewMsgTransferTokenOwner return a instance of MsgTransferTokenOwner
 func NewMsgTransferTokenOwner(srcOwner, dstOwner, symbol string) *MsgTransferTokenOwner {
 	return &MsgTransferTokenOwner{
 		SrcOwner: srcOwner,
@@ -141,7 +130,10 @@ func (msg MsgTransferTokenOwner) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
+// ValidateBasic implements Msg
 func (msg MsgTransferTokenOwner) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	srcOwner, err := sdk.AccAddressFromBech32(msg.SrcOwner)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid source owner address (%s)", err)
@@ -158,11 +150,17 @@ func (msg MsgTransferTokenOwner) ValidateBasic() error {
 	}
 
 	// check the symbol
-	if err := CheckSymbol(msg.Symbol); err != nil {
+	if err := ValidateSymbol(msg.Symbol); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgTransferTokenOwner) Normalize() MsgTransferTokenOwner {
+	msg.Symbol = strings.TrimSpace(msg.Symbol)
+	return msg
 }
 
 // Route implements Msg
@@ -209,22 +207,30 @@ func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
 
 // ValidateBasic implements Msg
 func (msg MsgEditToken) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	// check owner
 	if _, err := sdk.AccAddressFromBech32(msg.Owner); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
-	if DoNotModify != msg.Name && len(msg.Name) > MaximumNameLen {
-		return sdkerrors.Wrapf(ErrInvalidName, "invalid token name %s, only accepts length (0, %d]", msg.Name, MaximumNameLen)
+	if err := ValidateName(msg.Name); err != nil {
+		return err
 	}
 
-	// check max_supply for fast failed
-	if msg.MaxSupply > MaximumMaxSupply {
-		return sdkerrors.Wrapf(ErrInvalidMaxSupply, "invalid token max supply %d, must be less than %d", msg.MaxSupply, MaximumMaxSupply)
+	if err := ValidateMaxSupply(msg.MaxSupply); err != nil {
+		return err
 	}
 
 	// check symbol
-	return CheckSymbol(msg.Symbol)
+	return ValidateSymbol(msg.Symbol)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgEditToken) Normalize() MsgEditToken {
+	msg.Symbol = strings.TrimSpace(msg.Symbol)
+	msg.Name = strings.TrimSpace(msg.Name)
+	return msg
 }
 
 // NewMsgMintToken creates a MsgMintToken
@@ -263,6 +269,8 @@ func (msg MsgMintToken) GetSigners() []sdk.AccAddress {
 
 // ValidateBasic implements Msg
 func (msg MsgMintToken) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	// check the owner
 	if _, err := sdk.AccAddressFromBech32(msg.Owner); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
@@ -275,11 +283,17 @@ func (msg MsgMintToken) ValidateBasic() error {
 		}
 	}
 
-	if msg.Amount == 0 || msg.Amount > MaximumMaxSupply {
-		return sdkerrors.Wrapf(ErrInvalidMaxSupply, "invalid token amount %d, only accepts value (0, %d]", msg.Amount, MaximumMaxSupply)
+	if err := ValidateAmount(msg.Amount); err != nil {
+		return err
 	}
 
-	return CheckSymbol(msg.Symbol)
+	return ValidateSymbol(msg.Symbol)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgMintToken) Normalize() MsgMintToken {
+	msg.Symbol = strings.TrimSpace(msg.Symbol)
+	return msg
 }
 
 // NewMsgBurnToken creates a MsgMintToken
@@ -317,14 +331,22 @@ func (msg MsgBurnToken) GetSigners() []sdk.AccAddress {
 
 // ValidateBasic implements Msg
 func (msg MsgBurnToken) ValidateBasic() error {
+	msg = msg.Normalize()
+
 	// check the owner
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
-	if msg.Amount == 0 || msg.Amount > MaximumMaxSupply {
-		return sdkerrors.Wrapf(ErrInvalidMaxSupply, "invalid token amount %d, only accepts value (0, %d]", msg.Amount, MaximumMaxSupply)
+	if err := ValidateAmount(msg.Amount); err != nil {
+		return err
 	}
 
-	return CheckSymbol(msg.Symbol)
+	return ValidateSymbol(msg.Symbol)
+}
+
+// Normalize return a string with spaces removed and lowercase
+func (msg MsgBurnToken) Normalize() MsgBurnToken {
+	msg.Symbol = strings.TrimSpace(msg.Symbol)
+	return msg
 }

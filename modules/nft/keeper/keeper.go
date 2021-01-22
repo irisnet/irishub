@@ -80,15 +80,15 @@ func (k Keeper) EditNFT(
 		return err
 	}
 
-	if tokenNm != types.DoNotModify {
+	if types.Modified(tokenNm) {
 		nft.Name = tokenNm
 	}
 
-	if tokenURI != types.DoNotModify {
+	if types.Modified(tokenURI) {
 		nft.URI = tokenURI
 	}
 
-	if tokenData != types.DoNotModify {
+	if types.Modified(tokenData) {
 		nft.Data = tokenData
 	}
 
@@ -113,15 +113,15 @@ func (k Keeper) TransferOwner(
 
 	nft.Owner = dstOwner.String()
 
-	if tokenNm != types.DoNotModify {
+	if types.Modified(tokenNm) {
 		nft.Name = tokenNm
 	}
 
-	if tokenURI != types.DoNotModify {
+	if types.Modified(tokenURI) {
 		nft.URI = tokenURI
 	}
 
-	if tokenData != types.DoNotModify {
+	if types.Modified(tokenData) {
 		nft.Data = tokenData
 	}
 

@@ -38,7 +38,7 @@ func (k Keeper) GetOwner(ctx sdk.Context, address sdk.AccAddress, denom string) 
 	return owner
 }
 
-// GetOwner gets all the ID Collections
+// GetOwners gets all the ID Collections
 func (k Keeper) GetOwners(ctx sdk.Context) (owners types.Owners) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStoreReversePrefixIterator(store, types.KeyOwner(nil, "", ""))

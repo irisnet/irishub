@@ -17,19 +17,23 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		switch msg := msg.(type) {
 		case *types.MsgCreateFeed:
-			res, err := msgServer.CreateFeed(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.CreateFeed(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgStartFeed:
-			res, err := msgServer.StartFeed(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.StartFeed(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgPauseFeed:
-			res, err := msgServer.PauseFeed(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.PauseFeed(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgEditFeed:
-			res, err := msgServer.EditFeed(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.EditFeed(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:

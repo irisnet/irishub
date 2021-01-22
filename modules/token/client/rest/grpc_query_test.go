@@ -56,7 +56,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	// ---------------------------------------------------------------------------
 
 	from := val.Address
-	symbol := "Kitty"
+	symbol := "kitty"
 	name := "Kitty Token"
 	minUnit := "kitty"
 	scale := 0

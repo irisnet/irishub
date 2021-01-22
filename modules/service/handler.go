@@ -17,59 +17,73 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		switch msg := msg.(type) {
 		case *types.MsgDefineService:
-			res, err := msgServer.DefineService(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.DefineService(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgBindService:
-			res, err := msgServer.BindService(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.BindService(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgUpdateServiceBinding:
-			res, err := msgServer.UpdateServiceBinding(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.UpdateServiceBinding(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgSetWithdrawAddress:
-			res, err := msgServer.SetWithdrawAddress(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.SetWithdrawAddress(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgDisableServiceBinding:
-			res, err := msgServer.DisableServiceBinding(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.DisableServiceBinding(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgEnableServiceBinding:
-			res, err := msgServer.EnableServiceBinding(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.EnableServiceBinding(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgRefundServiceDeposit:
-			res, err := msgServer.RefundServiceDeposit(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.RefundServiceDeposit(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgCallService:
-			res, err := msgServer.CallService(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.CallService(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgRespondService:
-			res, err := msgServer.RespondService(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.RespondService(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgPauseRequestContext:
-			res, err := msgServer.PauseRequestContext(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.PauseRequestContext(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgStartRequestContext:
-			res, err := msgServer.StartRequestContext(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.StartRequestContext(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgKillRequestContext:
-			res, err := msgServer.KillRequestContext(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.KillRequestContext(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgUpdateRequestContext:
-			res, err := msgServer.UpdateRequestContext(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.UpdateRequestContext(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgWithdrawEarnedFees:
-			res, err := msgServer.WithdrawEarnedFees(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.WithdrawEarnedFees(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:

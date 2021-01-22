@@ -45,13 +45,8 @@ func ValidateGenesis(data types.GenesisState) error {
 			return fmt.Errorf("invalid record creator address (%s)", err)
 		}
 
-		for _, content := range record.Contents {
-			if len(content.Digest) == 0 {
-				return errors.New("digest missing")
-			}
-			if len(content.DigestAlgo) == 0 {
-				return errors.New("digest algo missing")
-			}
+		if err := types.ValidateContents(record.Contents...); err != nil {
+			return nil
 		}
 	}
 	return nil

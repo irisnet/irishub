@@ -1,8 +1,6 @@
 package types
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -21,9 +19,6 @@ func DefaultGenesisState() *GenesisState {
 
 // ValidateGenesis - placeholder function
 func ValidateGenesis(data GenesisState) error {
-	if data.StandardDenom == "" {
-		return fmt.Errorf("coinswap standard denom can't be an empty string")
-	}
 	if err := sdk.ValidateDenom(data.StandardDenom); err != nil {
 		return err
 	}

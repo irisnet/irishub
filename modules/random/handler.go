@@ -17,7 +17,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		switch msg := msg.(type) {
 		case *types.MsgRequestRandom:
-			res, err := msgServer.RequestRandom(sdk.WrapSDKContext(ctx), msg)
+			m := msg.Normalize()
+			res, err := msgServer.RequestRandom(sdk.WrapSDKContext(ctx), &m)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:

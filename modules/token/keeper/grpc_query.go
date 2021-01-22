@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/gogo/protobuf/proto"
 	"google.golang.org/grpc/codes"
@@ -27,7 +26,7 @@ func (k Keeper) Token(c context.Context, req *types.QueryTokenRequest) (*types.Q
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	token, err := k.GetToken(ctx, strings.ToLower(req.Denom))
+	token, err := k.GetToken(ctx, req.Denom)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "token %s not found", req.Denom)
 	}
@@ -111,16 +110,15 @@ func (k Keeper) Fees(c context.Context, req *types.QueryFeesRequest) (*types.Que
 
 	ctx := sdk.UnwrapSDKContext(c)
 
-	if err := types.CheckSymbol(req.Symbol); err != nil {
+	if err := types.ValidateSymbol(req.Symbol); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	symbol := strings.ToLower(req.Symbol)
-	issueFee := k.GetTokenIssueFee(ctx, symbol)
-	mintFee := k.GetTokenMintFee(ctx, symbol)
+	issueFee := k.GetTokenIssueFee(ctx, req.Symbol)
+	mintFee := k.GetTokenMintFee(ctx, req.Symbol)
 
 	return &types.QueryFeesResponse{
-		Exist:    k.HasToken(ctx, symbol),
+		Exist:    k.HasToken(ctx, req.Symbol),
 		IssueFee: issueFee,
 		MintFee:  mintFee,
 	}, nil
