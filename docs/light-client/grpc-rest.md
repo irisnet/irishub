@@ -1,0 +1,195 @@
+# gRPC Gateway JSON REST
+
+In IRISHub v1.0.0, the node continues to serve a REST server. However, the existing routes present in version v0.16.3 and earlier are now marked as deprecated, and new routes have been added via gRPC-gateway.
+
+## API Port, Activation and Configuration
+
+All routes are configured under the following fields in `~/.iris/config/app.toml`:
+
+- `api.enable = true|false` field defines if the REST server should be enabled. Defaults to `true`.
+- `api.address = {string}` field defines the address (really, the port, since the host should be kept at `0.0.0.0`) the server should bind to. Defaults to `tcp://0.0.0.0:1317`.
+- some additional API configuration options are defined in `~/.iris/config/app.toml`, along with comments, please refer to that file directly.
+
+### gRPC-gateway REST Routes
+
+If, for various reasons, you cannot use gRPC (for example, you are building a web application, and browsers don't support HTTP2 on which gRPC is built), then the SDK offers REST routes via gRPC-gateway.
+
+[gRPC-gateway](https://grpc-ecosystem.github.io/grpc-gateway/) is a tool to expose gRPC endpoints as REST endpoints. For each RPC endpoint defined in a Protobuf service, the SDK offers a REST equivalent. For instance, querying token list could be done via the `/irismod.token.Query/Tokens` gRPC endpoint, or alternatively via the gRPC-gateway `"/irismod/token/tokens"` REST endpoint: both will return the same result. For each RPC method defined in a Protobuf service, the corresponding REST endpoint is defined as an option:
+
++++ https://github.com/irisnet/irismod/blob/master/proto/token/query.proto#L22
+
+For application developers, gRPC-gateway REST routes needs to be wired up to the REST server, this is done by calling the `RegisterGRPCGatewayRoutes` function on the ModuleManager.
+
+### Swagger
+
+A [Swagger](https://swagger.io/) (or OpenAPIv2) specification file is exposed under the `/swagger` route on the API server. Swagger is an open specification describing the API endpoints a server serves, including description, input arguments, return types and much more about each endpoint.
+
+Enabling the `/swagger` endpoint is configurable inside `~/.iris/config/app.toml` via the `api.swagger` field, which is set to true by default.
+
+For application developers, you may want to generate your own Swagger definitions based on your custom modules. The SDK's [Swagger generation script](https://github.com/irisnet/irishub/blob/master/scripts/protoc-swagger-gen.sh) is a good place to start.
+
+## API Endpoints
+
+**IRISHub API Endpoints**
+
+| API Endpoints                                                                                                                               | Description                                                                                                                | Legacy REST Endpoint |
+| :------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------- | :------------------- |
+| `GET` `/cosmos/auth/v1beta1/accounts/{address}`                                                                                             | Account returns account details based on address.                                                                          |                      |
+| `GET` `/cosmos/auth/v1beta1/params`                                                                                                         | Params queries all parameters.                                                                                             |                      |
+| `GET` `/cosmos/bank/v1beta1/balances/{address}`                                                                                             | AllBalances queries the balance of all coins for a single account.                                                         |                      |
+| `GET` `/cosmos/bank/v1beta1/balances/{address}/{denom}`                                                                                     | Balance queries the balance of a single coin for a single account.                                                         |                      |
+| `GET` `/cosmos/bank/v1beta1/denoms_metadata`                                                                                                | DenomsMetadata queries the client metadata for all registered coin denominations.                                          |                      |
+| `GET` `/cosmos/bank/v1beta1/denoms_metadata/{denom}`                                                                                        | DenomsMetadata queries the client metadata of a given coin denomination.                                                   |                      |
+| `GET` `/cosmos/bank/v1beta1/params`                                                                                                         | Params queries the parameters of x/bank module.                                                                            |                      |
+| `GET` `/cosmos/bank/v1beta1/supply`                                                                                                         | TotalSupply queries the total supply of all coins.                                                                         |                      |
+| `GET` `/cosmos/bank/v1beta1/supply/{denom}`                                                                                                 | SupplyOf queries the supply of a single coin.                                                                              |                      |
+| `GET` `/cosmos/distribution/v1beta1/community_pool`                                                                                         | CommunityPool queries the community pool coins.                                                                            |                      |
+| `GET` `/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards`                                                                 | DelegationTotalRewards queries the total rewards accrued by a each validator.                                              |                      |
+| `GET` `/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards/{validator_address}`                                             | DelegationRewards queries the total rewards accrued by a delegation.                                                       |                      |
+| `GET` `/cosmos/distribution/v1beta1/delegators/{delegator_address}/validators`                                                              | DelegatorValidators queries the validators of a delegator.                                                                 |                      |
+| `GET` `/cosmos/distribution/v1beta1/delegators/{delegator_address}/withdraw_address`                                                        | DelegatorWithdrawAddress queries withdraw address of a delegator.                                                          |                      |
+| `GET` `/cosmos/distribution/v1beta1/params`                                                                                                 | Params queries params of the distribution module.                                                                          |                      |
+| `GET` `/cosmos/distribution/v1beta1/validators/{validator_address}/commission`                                                              | ValidatorCommission queries accumulated commission for a validator.                                                        |                      |
+| `GET` `/cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards`                                                     | ValidatorOutstandingRewards queries rewards of a validator address.                                                        |                      |
+| `GET` `/cosmos/distribution/v1beta1/validators/{validator_address}/slashes`                                                                 | ValidatorSlashes queries slash events of a validator.                                                                      |                      |
+| `GET` `/cosmos/evidence/v1beta1/evidence`                                                                                                   | AllEvidence queries all evidence.                                                                                          |                      |
+| `GET` `/cosmos/evidence/v1beta1/evidence/{evidence_hash}`                                                                                   | Evidence queries evidence based on evidence hash.                                                                          |                      |
+| `GET` `/cosmos/gov/v1beta1/params/{params_type}`                                                                                            | Params queries all parameters of the gov module.                                                                           |                      |
+| `GET` `/cosmos/gov/v1beta1/proposals`                                                                                                       | Proposals queries all proposals based on given status.                                                                     |                      |
+| `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}`                                                                                         | Proposal queries proposal details based on ProposalID.                                                                     |                      |
+| `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits`                                                                                | Deposits queries all deposits of a single proposal.                                                                        |                      |
+| `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}`                                                                    | Deposit queries single deposit information based proposalID, depositAddr.                                                  |                      |
+| `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/tally`                                                                                   | TallyResult queries the tally of a proposal vote.                                                                          |                      |
+| `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/votes`                                                                                   | Votes queries votes of a given proposal.                                                                                   |                      |
+| `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}`                                                                           | Vote queries voted information based on proposalID, voterAddr.                                                             |                      |
+| `GET` `/cosmos/params/v1beta1/params`                                                                                                       | Params queries a specific parameter of a module, given its subspace and key.                                               |                      |
+| `GET` `/cosmos/slashing/v1beta1/params`                                                                                                     | Params queries the parameters of slashing module                                                                           |                      |
+| `GET` `/cosmos/slashing/v1beta1/signing_infos`                                                                                              | SigningInfos queries signing info of all validators                                                                        |                      |
+| `GET` `/cosmos/slashing/v1beta1/signing_infos/{cons_address}`                                                                               | SigningInfo queries the signing info of given cons address                                                                 |                      |
+| `GET` `/cosmos/staking/v1beta1/delegations/{delegator_addr}`                                                                                | DelegatorDelegations queries all delegations of a given delegator address.                                                 |                      |
+| `GET` `/cosmos/staking/v1beta1/delegators/{delegator_addr}/redelegations`                                                                   | Redelegations queries redelegations of given address.                                                                      |                      |
+| `GET` `/cosmos/staking/v1beta1/delegators/{delegator_addr}/unbonding_delegations`                                                           | DelegatorUnbondingDelegations queries all unbonding delegations of a given delegator address.                              |                      |
+| `GET` `/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators`                                                                      | DelegatorValidators queries all validators info for given delegator address.                                               |                      |
+| `GET` `/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/{validator_addr}`                                                     | DelegatorValidator queries validator info for given delegator validator pair.                                              |                      |
+| `GET` `/cosmos/staking/v1beta1/historical_info/{height}`                                                                                    | HistoricalInfo queries the historical info for given height.                                                               |                      |
+| `GET` `/cosmos/staking/v1beta1/params`                                                                                                      | Parameters queries the staking parameters.                                                                                 |                      |
+| `GET` `/cosmos/staking/v1beta1/pool`                                                                                                        | Pool queries the pool info.                                                                                                |                      |
+| `GET` `/cosmos/staking/v1beta1/validators`                                                                                                  | Validators queries all validators that match the given status.                                                             |                      |
+| `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}`                                                                                 | Validator queries validator info for given validator address.                                                              |                      |
+| `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}/delegations`                                                                     | ValidatorDelegations queries delegate info for given validator.                                                            |                      |
+| `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}`                                                    | Delegation queries delegate info for given validator delegator pair.                                                       |                      |
+| `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}/unbonding_delegation`                               | UnbondingDelegation queries unbonding info for given validator delegator pair.                                             |                      |
+| `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}/unbonding_delegations`                                                           | ValidatorUnbondingDelegations queries unbonding delegations of a validator.                                                |                      |
+| `GET` `/cosmos/upgrade/v1beta1/applied_plan/{name}`                                                                                         | AppliedPlan queries a previously applied upgrade plan by its name.                                                         |                      |
+| `GET` `/cosmos/upgrade/v1beta1/current_plan`                                                                                                | CurrentPlan queries the current upgrade plan.                                                                              |                      |
+| `GET` `/cosmos/upgrade/v1beta1/upgraded_consensus_state/{last_height}`                                                                      | UpgradedConsensusState queries the consensus state that will serve as a trusted kernel for the next version of this chain. |                      |
+| `GET` `/ibc/core/channel/v1beta1/channels`                                                                                                  | Channels queries all the IBC channels of a chain.                                                                          |                      |
+| `GET` `/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}`                                                                     | Channel queries an IBC Channel.                                                                                            |                      |
+| `GET` `/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/client_state`                                                        | ChannelClientState queries for the client state for the channel associated with the provided channel identifiers.          |                      |
+| `GET` `/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}` | ChannelConsensusState queries for the consensus state for the channel associated with the provided channel identifiers.    |                      |
+| `GET` `/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/next_sequence`                                                       | NextSequenceReceive returns the next receive sequence for a given channel.                                                 |                      |
+| `GET` `/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements`                                             | PacketAcknowledgements returns all the packet acknowledgements associated with a channel.                                  |                      |
+| `GET` `/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}`                                              | PacketAcknowledgement queries a stored packet acknowledgement hash.                                                        |                      |
+| `GET` `/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments`                                                  | PacketCommitments returns all the packet commitments hashes associated with a channel.                                     |                      |
+| `GET` `/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks`           | UnreceivedAcks returns all the unreceived IBC acknowledgements associated with a channel and sequences.                    |                      |
+| `GET` `/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets` | UnreceivedPackets returns all the unreceived IBC packets associated with a channel and sequences.                          |                      |
+| `GET` `/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}`                                       | PacketCommitment queries a stored packet commitment hash.                                                                  |                      |
+| `GET` `/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}`                                          | PacketReceipt queries if a given packet sequence has been received on the queried chain                                    |                      |
+| `GET` `/ibc/core/channel/v1beta1/connections/{connection}/channels`                                                                         | ConnectionChannels queries all the channels associated with a connection end.                                              |                      |
+| `GET` `/ibc/client/v1beta1/params`                                                                                                          | ClientParams queries all parameters of the ibc client.                                                                     |                      |
+| `GET` `/ibc/core/client/v1beta1/client_states`                                                                                              | ClientStates queries all the IBC light clients of a chain.                                                                 |                      |
+| `GET` `/ibc/core/client/v1beta1/client_states/{client_id}`                                                                                  | ClientState queries an IBC light client.                                                                                   |                      |
+| `GET` `/ibc/core/client/v1beta1/consensus_states/{client_id}`                                                                               | ConsensusStates queries all the consensus state associated with a given client.                                            |                      |
+| `GET` `/ibc/core/client/v1beta1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}`                           | ConsensusState queries a consensus state associated with a client state at a given height.                                 |                      |
+| `GET` `/ibc/core/connection/v1beta1/client_connections/{client_id}`                                                                         | ClientConnections queries the connection paths associated with a client state.                                             |                      |
+| `GET` `/ibc/core/connection/v1beta1/connections`                                                                                            | Connections queries all the IBC connections of a chain.                                                                    |                      |
+| `GET` `/ibc/core/connection/v1beta1/connections/{connection_id}`                                                                            | Connection queries an IBC connection end.                                                                                  |                      |
+| `GET` `/ibc/core/connection/v1beta1/connections/{connection_id}/client_state`                                                               | ConnectionClientState queries the client state associated with the connection.                                             |                      |
+| `GET` `/ibc/core/connection/v1beta1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}`        | ConnectionConsensusState queries the consensus state associated with the connection.                                       |                      |
+| `GET` `/ibc/applications/transfer/v1beta1/denom_traces`                                                                                     | DenomTraces queries all denomination traces.                                                                               |                      |
+| `GET` `/ibc/applications/transfer/v1beta1/denom_traces/{hash}`                                                                              | DenomTrace queries a denomination trace information.                                                                       |                      |
+| `GET` `/ibc/applications/transfer/v1beta1/params`                                                                                           | Params queries all parameters of the ibc-transfer module.                                                                  |                      |
+| `GET` `/irismod/token/params`                                                                                                               | Params queries the token parameters                                                                                        |                      |
+| `GET` `/irismod/token/tokens`                                                                                                               | Tokens returns the token list                                                                                              |                      |
+| `GET` `/irismod/token/tokens/{denom}`                                                                                                       | Token returns token with token name                                                                                        |                      |
+| `GET` `/irismod/token/tokens/{symbol}/fees`                                                                                                 | Fees returns the fees to issue or mint a token                                                                             |                      |
+| `GET` `/irismod/token/total_burn`                                                                                                           | TotalBurn returns all burnt coins                                                                                          |                      |
+| `GET` `/irismod/htlc/htlcs/{hash_lock}`                                                                                                     | Balance queries the balance of a single coin for a single account                                                          |                      |
+| `GET` `/irismod/coinswap/liquidities/{denom}`                                                                                               | Liquidity returns the total liquidity available for the provided denomination                                              |                      |
+| `GET` `/irismod/nft/collections/{denom_id}`                                                                                                 | Collection queries the NFTs of the specified denom                                                                         |                      |
+| `GET` `/irismod/nft/collections/{denom_id}/supply`                                                                                          | Supply queries the total supply of a given denom or owner                                                                  |                      |
+| `GET` `/irismod/nft/denoms`                                                                                                                 | Denoms queries all the denoms                                                                                              |                      |
+| `GET` `/irismod/nft/denoms/{denom_id}`                                                                                                      | Denom queries the definition of a given denom                                                                              |                      |
+| `GET` `/irismod/nft/nfts`                                                                                                                   | Owner queries the NFTs of the specified owner                                                                              |                      |
+| `GET` `/irismod/nft/nfts/{denom_id}/{token_id}`                                                                                             | NFT queries the NFT for the given denom and token ID                                                                       |                      |
+| `GET` `/irismod/service/bindings/{service_name}`                                                                                            | Bindings returns all service Bindings with service name and owner                                                          |                      |
+| `GET` `/irismod/service/bindings/{service_name}/{provider}`                                                                                 | Binding returns service Binding with service name and provider                                                             |                      |
+| `GET` `/irismod/service/contexts/{request_context_id}`                                                                                      | RequestContext returns the request context                                                                                 |                      |
+| `GET` `/irismod/service/definitions/{service_name}`                                                                                         | Definition returns service definition                                                                                      |                      |
+| `GET` `/irismod/service/fees/{provider}`                                                                                                    | EarnedFees returns the earned service fee of one provider                                                                  |                      |
+| `GET` `/irismod/service/owners/{owner}/withdraw-address`                                                                                    | WithdrawAddress returns the withdraw address of the binding owner                                                          |                      |
+| `GET` `/irismod/service/params`                                                                                                             | Params queries the service parameters                                                                                      |                      |
+| `GET` `/irismod/service/requests/{request_context_id}/{batch_counter}`                                                                      | RequestsByReqCtx returns all requests of one service call batch                                                            |                      |
+| `GET` `/irismod/service/requests/{request_id}`                                                                                              | Request returns the request                                                                                                |                      |
+| `GET` `/irismod/service/requests/{service_name}/{provider}`                                                                                 | Request returns all requests of one service with provider                                                                  |                      |
+| `GET` `/irismod/service/responses/{request_context_id}/{batch_counter}`                                                                     | Responses returns all responses of one service call batch                                                                  |                      |
+| `GET` `/irismod/service/responses/{request_id}`                                                                                             | Response returns the response of request                                                                                   |                      |
+| `GET` `/irismod/service/schemas/{schema_name}`                                                                                              | Schema returns the schema                                                                                                  |                      |
+| `GET` `/irismod/oracle/feeds`                                                                                                               | QueryFeedsRequest queries the feed list                                                                                    |                      |
+| `GET` `/irismod/oracle/feeds/{feed_name}`                                                                                                   | Feed queries the feed                                                                                                      |                      |
+| `GET` `/irismod/oracle/feeds/{feed_name}/values`                                                                                            | FeedValue queries the feed value                                                                                           |                      |
+| `GET` `/irismod/random/queue`                                                                                                               | RandomRequestQueue queries the random request queue                                                                        |                      |
+| `GET` `/irismod/random/randoms/{req_id}`                                                                                                    | Random queries the random result                                                                                           |                      |
+| `GET` `/irismod/record/records/{record_id}`                                                                                                 | Record queries the record by the given record ID                                                                           |                      |
+| `GET` `/irishub/mint/params`                                                                                                                | Parameters queries the mint parameters                                                                                     |                      |
+| `GET` `/irishub/guardian/supers`                                                                                                            | Supers returns all Supers                                                                                                  |                      |
+
+**Tendermint API Endpoints**
+
+| API Endpoints                                                  | Description                                                          | Legacy REST Endpoint            |
+| :------------------------------------------------------------- | :------------------------------------------------------------------- | :------------------------------ |
+| `GET` `/cosmos/base/tendermint/v1beta1/blocks/latest`          | GetLatestBlock returns the latest block.                             | `GET` `/blocks/latest`          |
+| `GET` `/cosmos/base/tendermint/v1beta1/blocks/{height}`        | GetBlockByHeight queries block for given height.                     | `GET` `/blocks/{height}`        |
+| `GET` `/cosmos/base/tendermint/v1beta1/node_info`              | GetNodeInfo queries the current node info.                           | `GET` `/node_info`              |
+| `GET` `/cosmos/base/tendermint/v1beta1/syncing`                | GetSyncing queries node syncing.                                     | `GET` `/syncing`                |
+| `GET` `/cosmos/base/tendermint/v1beta1/validatorsets/latest`   | GetLatestValidatorSet queries latest validator-set.                  | `GET` `/validatorsets/latest`   |
+| `GET` `/cosmos/base/tendermint/v1beta1/validatorsets/{height}` | GetValidatorSetByHeight queries validator-set at a given height.     | `GET` `/validatorsets/{height}` |
+| `POST` `/cosmos/tx/v1beta1/simulate`                           | Simulate simulates executing a transaction for estimating gas usage. |                                 |
+| `GET` `/cosmos/tx/v1beta1/txs`                                 | GetTxsEvent fetches txs by event.                                    | `GET` `/txs`                    |
+| `POST` `/cosmos/tx/v1beta1/txs`                                | BroadcastTx broadcast transaction.                                   | `POST` `/txs`                   |
+| `GET` `/cosmos/tx/v1beta1/txs/{hash}`                          | GetTx fetches a tx by hash.                                          | `GET` `/txs/{hash}`             |
+
+## Generating and Signing Transactions
+
+It is not possible to generate or sign a transaction using REST, only to broadcast one. You can generating and signing transactions using [gRPC Client](grpc-client.md).
+
+## Broadcasting Transactions
+
+Broadcasting a transaction using the gRPC-gateway REST endpoint `cosmos/tx/v1beta1/txs` can be done by sending a POST request as follows, where the `txBytes` are the protobuf-encoded bytes of a signed transaction:
+
+```bash
+curl -X POST \
+    -H "Content-Type: application/json" \
+    -d'{"tx_bytes":"{{txBytes}}","mode":"BROADCAST_MODE_SYNC"}' \
+    "localhost:1317/cosmos/tx/v1beta1/txs"
+```
+
+## Querying Transactions
+
+Querying transactions using the gRPC-gateway REST endpoint can be done by sending a GET request as follows:
+
+- **Query tx by hash:** `/cosmos/tx/v1beta1/txs/{hash}`
+
+    ```bash
+    curl -X GET \
+        -H "accept: application/json" \
+        "http://localhost:1317/cosmos/tx/v1beta1/txs/{hash}"
+    ```
+
+- **Query tx by events:** `/cosmos/tx/v1beta1/txs`
+
+    ``` bash
+    curl -X GET \
+        -H "accept: application/json" \
+        "http://localhost:1317/cosmos/tx/v1beta1/txs?events={event_content}"
+    ```
