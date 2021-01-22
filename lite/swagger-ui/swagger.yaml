@@ -30219,7 +30219,7 @@ paths:
         - Query
   /irismod/token/total_burn:
     get:
-      summary: Params queries the token parameters
+      summary: TotalBurn returns all burnt coins
       operationId: TotalBurn
       responses:
         '200':
