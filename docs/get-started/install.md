@@ -43,7 +43,7 @@ Make sure that your server can access to google.com because our project depends 
 ```bash
 git clone --branch v0.16.3 https://github.com/irisnet/irishub
 cd irishub
-make install
+make
 ```
 
 If your environment variables have set up correctly, you should not get any errors by running the above commands.
