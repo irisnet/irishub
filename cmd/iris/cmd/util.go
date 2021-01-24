@@ -310,7 +310,7 @@ func queryToken(cmd *cobra.Command, denom string) (ft tokentypes.TokenI, err err
 		return nil, err
 	}
 
-	if err := tokentypes.CheckSymbol(denom); err != nil {
+	if err := tokentypes.ValidateSymbol(denom); err != nil {
 		return nil, err
 	}
 
