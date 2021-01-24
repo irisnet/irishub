@@ -64,7 +64,11 @@ func TestKeeperSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestIssueToken() {
-	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 21000000, 21000000, false, owner.String())
+	symbol := "btc"
+	minUnit := "satoshi"
+	name := "Bitcoin Network"
+	scale := uint32(18)
+	msg := types.NewMsgIssueToken(symbol, minUnit, name, scale, 21000000, 21000000, false, owner.String())
 
 	err := suite.keeper.IssueToken(suite.ctx, *msg)
 	require.NoError(suite.T(), err)
@@ -80,25 +84,39 @@ func (suite *KeeperTestSuite) TestIssueToken() {
 	ftJson, _ := json.Marshal(msg)
 	tokenJson, _ := json.Marshal(token)
 	suite.Equal(ftJson, tokenJson)
+
+	metadata := suite.bk.GetDenomMetaData(suite.ctx, minUnit)
+	suite.Equal(metadata.Base, minUnit)
+	suite.Equal(metadata.Description, name)
+	suite.Equal(metadata.Display, symbol)
+	suite.Len(metadata.DenomUnits, 2)
+	suite.EqualValues(metadata.DenomUnits[0].Denom, minUnit)
+	suite.EqualValues(metadata.DenomUnits[0].Exponent, 0)
+	suite.EqualValues(metadata.DenomUnits[1].Denom, symbol)
+	suite.EqualValues(metadata.DenomUnits[1].Exponent, scale)
 }
 
 func (suite *KeeperTestSuite) TestEditToken() {
 
 	suite.TestIssueToken()
 
+	name := "Bitcoin Token Network"
 	mintable := types.True
-	msgEditToken := types.NewMsgEditToken("Bitcoin Token", "btc", 22000000, mintable, owner.String())
+	msgEditToken := types.NewMsgEditToken(name, "btc", 22000000, mintable, owner.String())
 	err := suite.keeper.EditToken(suite.ctx, *msgEditToken)
 	require.NoError(suite.T(), err)
 
 	token2, err := suite.keeper.GetToken(suite.ctx, msgEditToken.Symbol)
 	require.NoError(suite.T(), err)
 
-	expToken := types.NewToken("btc", "Bitcoin Token", "satoshi", 18, 21000000, 22000000, mintable.ToBool(), owner)
+	expToken := types.NewToken("btc", name, "satoshi", 18, 21000000, 22000000, mintable.ToBool(), owner)
 
 	expJson, _ := json.Marshal(expToken)
 	actJson, _ := json.Marshal(token2)
 	suite.Equal(expJson, actJson)
+
+	metadata := suite.app.BankKeeper.GetDenomMetaData(suite.ctx, "satoshi")
+	suite.Equal(metadata.Description, name)
 
 }
 

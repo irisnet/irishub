@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -106,7 +105,10 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) error {
 	}
 
 	if msg.Name != types.DoNotModify {
-		token.Name = strings.TrimSpace(msg.Name)
+		token.Name = msg.Name
+		metadata := k.bankKeeper.GetDenomMetaData(ctx, token.MinUnit)
+		metadata.Description = msg.Name
+		k.bankKeeper.SetDenomMetaData(ctx, metadata)
 	}
 
 	if msg.Mintable != types.Nil {
