@@ -93,7 +93,7 @@ func (s *IntegrationTestSuite) TestService() {
 	respOutput := `{"header":{},"body":{}}`
 	timeout := qos
 
-	expectedEarnedFees := fmt.Sprintf("45%s", serviceDenom)
+	expectedEarnedFees := fmt.Sprintf("48%s", serviceDenom)
 
 	//------test GetCmdDefineService()-------------
 	args := []string{

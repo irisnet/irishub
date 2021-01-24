@@ -561,19 +561,19 @@ func (suite *KeeperTestSuite) TestGetMinDeposit() {
 	suite.NoError(err)
 
 	minDeposit, err := suite.keeper.GetMinDeposit(suite.ctx, pricing)
-	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(6000))), minDeposit)
+	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000))), minDeposit)
 
 	pricing1, err := suite.keeper.ParsePricing(suite.ctx, testPricing1)
 	suite.NoError(err)
 
 	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing1)
-	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10000))), minDeposit)
+	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(50000))), minDeposit)
 
 	pricing2, err := suite.keeper.ParsePricing(suite.ctx, testPricing2)
 	suite.NoError(err)
 
 	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing2)
-	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(6000))), minDeposit)
+	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000))), minDeposit)
 
 	pricing3, err := suite.keeper.ParsePricing(suite.ctx, testPricing3)
 	suite.NoError(err)
@@ -597,13 +597,13 @@ func (suite *KeeperTestSuite) TestGetMinDeposit() {
 	suite.NoError(err)
 
 	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing6)
-	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000))), minDeposit)
+	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(500000))), minDeposit)
 
 	pricing7, err := suite.keeper.ParsePricing(suite.ctx, testPricing7)
 	suite.NoError(err)
 
 	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing7)
-	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(20000))), minDeposit)
+	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000))), minDeposit)
 }
 
 func callback(ctx sdk.Context, requestContextID tmbytes.HexBytes, responses []string, err error) {
