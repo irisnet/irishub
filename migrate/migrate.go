@@ -213,9 +213,6 @@ func migrateAuth(initialState v0_16.GenesisFileState, bondedTokens, notBondedTok
 		case auth.ServiceTaxCoinsAccAddr.String():
 			communityTax = communityTax.Add(coins...)
 			continue
-		case auth.HTLCLockedCoinsAccAddr.String():
-			communityTax = communityTax.Add(coins...)
-			continue
 		case auth.CommunityTaxCoinsAccAddr.String():
 			communityTax = communityTax.Add(coins...)
 			continue
@@ -610,9 +607,9 @@ func migrateGuardian(initialState v0_16.GenesisFileState) *guardiantypes.Genesis
 func migrateService(initialState v0_16.GenesisFileState) *servicetypes.GenesisState {
 	params := servicetypes.Params{
 		MaxRequestTimeout:    initialState.ServiceData.Params.MaxRequestTimeout,
-		MinDepositMultiple:   initialState.ServiceData.Params.MinDepositMultiple,
-		MinDeposit:           sdk.NewCoins(sdk.NewCoin(UIRIS, sdk.NewInt(6000000000))),
-		ServiceFeeTax:        initialState.ServiceData.Params.ServiceFeeTax,
+		MinDepositMultiple:   servicetypes.DefaultMinDepositMultiple,
+		MinDeposit:           sdk.NewCoins(sdk.NewCoin(UIRIS, sdk.NewInt(5000000000))),
+		ServiceFeeTax:        servicetypes.DefaultServiceFeeTax,
 		SlashFraction:        initialState.ServiceData.Params.SlashFraction,
 		ComplaintRetrospect:  initialState.ServiceData.Params.ComplaintRetrospect,
 		ArbitrationTimeLimit: initialState.ServiceData.Params.ArbitrationTimeLimit,
