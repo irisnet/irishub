@@ -15,6 +15,21 @@ All routes are configured under the following fields in `~/.iris/config/app.toml
 - `api.address = {string}` field defines the address (really, the port, since the host should be kept at `0.0.0.0`) the server should bind to. Defaults to `tcp://0.0.0.0:1317`.
 - some additional API configuration options are defined in `~/.iris/config/app.toml`, along with comments, please refer to that file directly.
 
+### Legacy REST API Routes
+
+The REST routes present in Irishub v0.16 and earlier are marked as deprecated via a [HTTP deprecation header](https://tools.ietf.org/id/draft-dalal-deprecation-header-01.html). They are still maintained to keep backwards compatibility, but will be removed in v1.0.0. For updating from Legacy REST routes to new gRPC-gateway REST routes, please refer to our [migration guide](https://github.com/cosmos/cosmos-sdk/blob/master/docs/migrations/rest.md).
+
+For application developers, Legacy REST API routes needs to be wired up to the REST server, this is done by calling the `RegisterRESTRoutes` function on the ModuleManager.
+
+### Swagger
+
+A [Swagger](https://swagger.io/) (or OpenAPIv2) specification file is exposed under the `/swagger` route on the API server. Swagger is an open specification describing the API endpoints a server serves, including description, input arguments, return types and much more about each endpoint.
+
+Enabling the `/swagger` endpoint is configurable inside `~/.iris/config/app.toml` via the `api.swagger` field, which is set to true by default.
+
+For application developers, you may want to generate your own Swagger definitions based on your custom modules. The SDK's [Swagger generation script](https://github.com/irisnet/irishub/blob/master/scripts/protoc-swagger-gen.sh) is a good place to start.
+
+
 ## Legacy REST Endpoint
 
 ### Breaking Changes in Legacy REST Endpoints
@@ -103,367 +118,270 @@ All routes are configured under the following fields in `~/.iris/config/app.toml
 | `POST /txs/encode`            | Encodes an Amino JSON tx to an Amino binary tx   | N/A, use Protobuf directly                                   |
 | `POST /txs/decode`            | Decodes an Amino binary tx into an Amino JSON tx | N/A, use Protobuf directly                                   |
 
-## 高优先级查询端点的 breaking changes
+## Breaking changes in High Priority Endpoints for Queries
 
-- `GET /blocks/latest`&&`GET /blocks/{height}`
+### Here are the High Priority Endpoints for Queries
 
-  - Specific changes:
-    - The block_meta field is no longer used, the block_id in the original block_meta field structure is moved to the first level, and the header field is moved to the block
-    - The num_txs and total_txs fields are no longer used, and the transaction number can be obtained by traversing the txs field
+* Staking
+  * Validators
+  * Delegators
+* Bank
+  * Balances
+* Gov
+* Auth
+* Distributions
 
-  - json example:
+We intend to audit the Transaction Encoding/Broadcast interface shortly but we are waiting on [this issues](https://github.com/cosmos/cosmos-sdk/issues/6213) for a full audit.
 
-    ```json
-    {
-        "block_id": {
-            "hash": "DC2EEC73C327BD338EE5667827A4EECA2A2A4752B38D5669CD17EDE07CFB6F30",
-            "parts": {
-                "total": 1,
-                "hash": "1F794EA5185AE489A3D53FD6E19A690373CAB510B981B23E672668CBE0B668E5"
+### Audit Results
+
+#### Bank
+
+* **Endpoint Name:** QueryBalance
+* **Endpoint Path:**
+```"/bank/balances/{address}"```
+* **What Changed:**
+  * No Changes observed.
+  * See [coin cross-chain transfer source tracing](https://github.com/cosmos/cosmos-sdk/pull/6662) for details on how on non-native IBC coins will written into the denom value. This will include a hash of source trace for each coin. The core decision if the hash should replace the denom or be prepended to the denom.
+
+#### Validators
+
+* **Endpoint Name:** QueryValidators
+* **Endpoint Path:**
+```"/staking/validators"```
+* **What Changed:**
+  * The fields ```"unbonding_height"``` and ```"jailed"``` are no longer supported
+  * The fields in description are now omit if empty. Rather than returning fields with empty strings. We now don't return the field if the validator has chosen not to configure it. For instance at launch, no validator will have a security contact filled out and the field will only appear once they do.
+* **Sample JSON:**
+
+```JSON
+{
+      "commission": {
+          "commission_rates": {
+              "max_change_rate": "0.000000000000000000",
+              "max_rate": "0.000000000000000000",
+              "rate": "0.000000000000000000"
+          },
+          "update_time": "1970-01-01T00:00:00Z"
+      },
+      "consensus_pubkey": "cosmosvalconspub1zcjduepqwuxd2yevzmsrmrjx2su8kdlk44eqfdzeqx27zejuen6m0nkcpzps0qavpw",
+      "delegator_shares": "0.000000000000000000",
+      "description": {
+          "details": "security",
+          "identity": "identity",
+          "moniker": "moniker",
+          "security_contact": "details",
+          "website": "website"
+      },
+      "min_self_delegation": "1",
+      "operator_address": "cosmosvaloper1pcpl7xhxq0wm72e9ljls2sxr5h3vqwytnq44sr",
+      "status": 1,
+      "tokens": "0",
+      "unbonding_time": "1970-01-01T00:00:00Z"
+
+  }
+```
+
+#### Delegators
+
+* **Endpoint Name:** QueryDelegatorDelegations
+* **Endpoint Path:** ```"/staking/delegators/delegations"```
+* **What Changed:**
+  * ```“balance”``` now is no longer a number. It is a field with two values: ```"amount"``` and ```"Denom”```
+
+  * ```“delegator_address”``` is no longer a string. It’s a field called ```“delegation”``` with three values: ```"delegator_address", "shares", "validator_address"```
+
+  * The old field ```“validator_address”``` is no longer used. A new field ```“validator_dst_address”``` and```“validator_src_address”``` replace this in the new ```“redelegation”``` field.
+
+****Sample JSON:**
+
+```JSON
+      {
+          "balance": {
+              "amount": "5",
+              "denom": "stake"
+          },
+          "delegation": {
+              "delegator_address": "cosmos1n2k9ygw2ws9sg86mrx84pdcre5geqd5ugt44h0",
+              "shares": "5.000000000000000000",
+              "validator_address": "cosmosvaloper155998a4hv5kqvuxr9jryjxrtnlydvqu8c0cy03"
+          }
+      }
+```
+
+
+
+* **Endpoint Name:** QueryRedelegations
+* **Endpoint Path:**
+```"/staking/redelegations"```
+* **What Changed:** The following old fields are now sub fields of a new field called ```“redelegation_entry”```:
+  * ```"completion_time"```
+  * ```"initial_balance"```
+  * ```"shares_dst"```
+* The old field ```“creation_height"``` is no longer supported.
+* The following are new fields:
+  * ```“redelegation”``` which holds the sub-fields.
+    * ```delegator_address``` (new)
+    * ```entries``` (new)
+    * ```valdiator_dst_address```
+    * ```validator_src_address```
+* **Sample JSON:**
+
+```JSON
+{
+    "entries": [
+        {
+            "balance": "5",
+            "redelegation_entry": {
+                "completion_time": "1969-12-31T16:00:00-08:00",
+                "initial_balance": "5",
+                "shares_dst": "5.000000000000000000"
             }
         },
-        "block": {
-            "header": {
-            "version": {
-                "block": "11"
-            },
-            "chain_id": "irishub-1",
-            "height": "5",
-            "time": "2021-01-18T07:29:21.918234Z",
-            "last_block_id": {
-                "hash": "889428AAB1975F94C39F44F1BD9C94B2A46E0BC0EFF9AD625939DCB763E82D1F",
-                "parts": {
-                    "total": 1,
-                    "hash": "A9FEDF247839148459E12CD0D8A495A9EE663F7C9E719D85133B27F1D810D52B"
-                }
-            },
-            "last_commit_hash": "35084203D333AF835637F7D9F1FEAA03554AECAB9786EECC6EB5F236156A19F1",
-            "data_hash": "A2853A6749C904A8C26C5DB8CB0DD731C44EEAF2AD6AEE2E633DF8F8FD0CA04F",
-            "validators_hash": "79E608E448B5B9D0784FDE890506DDE025E0E079CE10B7E01687B9C0E2DFC124",
-            "next_validators_hash": "79E608E448B5B9D0784FDE890506DDE025E0E079CE10B7E01687B9C0E2DFC124",
-            "consensus_hash": "048091BC7DDC283F77BFBF91D73C44DA58C3DF8A9CBC867405D8B7F3DAADA22F",
-            "app_hash": "8F668541D8D565B40373E1492ED6729674539FCB1705437E309522DD491E46DC",
-            "last_results_hash": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
-            "evidence_hash": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
-            "proposer_address": "86C89798CEA6D07FB8550AFDD8DEEA0DA52BFEF4"
-            },
-            "data": {
-                "txs": [
-                    "CowBCokBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEmkKKmlhYTE4YXduM2s3MHUwNXRsY3VsOHcycW5sNjRnMDAydWo0a2puOTNybhIqaWFhMXc5NzZhNWpyaHNqMDZkcW1yaDJ4OXF4emVsNzRxdGNtYXBrbHhjGg8KBXN0YWtlEgYxMDAwMDASZQpQCkYKHy9jb3Ntb3MuY3J5cHRvLnNlY3AyNTZrMS5QdWJLZXkSIwohA01sYgbsLpw+B9M+p6vyJCh1wfigTWbLpnhNfeDKxKIlEgQKAggBGAESEQoLCgVzdGFrZRICMTAQwJoMGkC+qpaBhJ20qboyU0HWBL0zVlW4klBXGZGsa8n2W1rxIVbq39DZUskGSI8WKNl1stM7QGhycu7YLU30z8vsg8N5"
-                ]
-            },
-            "evidence": {
-                "evidence": []
-            },
-            "last_commit": {
-                "height": "4",
-                "round": 0,
-                "block_id": {
-                    "hash": "889428AAB1975F94C39F44F1BD9C94B2A46E0BC0EFF9AD625939DCB763E82D1F",
-                    "parts": {
-                        "total": 1,
-                        "hash": "A9FEDF247839148459E12CD0D8A495A9EE663F7C9E719D85133B27F1D810D52B"
-                    }
-                },
-                "signatures": [
-                    {
-                        "block_id_flag": 2,
-                        "validator_address": "86C89798CEA6D07FB8550AFDD8DEEA0DA52BFEF4",
-                        "timestamp": "2021-01-18T07:29:21.918234Z",
-                        "signature": "UGqkOIqSSzaW/2YzkzfoobcUIizzPcl9BVECl+jwhyMJSkrMnD3DdPUlS2Vd1IAU3u8qQOmP09+m/r5R0gp6CQ=="
-                    }
-                ]
+        {
+            "balance": "5",
+            "redelegation_entry": {
+                "completion_time": "1969-12-31T16:00:00-08:00",
+                "initial_balance": "5",
+                "shares_dst": "5.000000000000000000"
             }
         }
+    ],
+    "redelegation": {
+        "delegator_address": "cosmos104yggz5x4ype50c59vu84ze2w36pc3swm2u698",
+        "entries": null,
+        "validator_dst_address": "cosmosvaloper1td8yl7g5662m0mpptaxjmcn9jtzvl0wgulvv23",
+        "validator_src_address": "cosmosvaloper1gqv70e79a8q0yz5s5qhsjhdl2c79496faer0vz"
     }
-    ```
+}
+```
 
-- `GET /block-results/latest`&&`GET /block-results/{height}`
+* **Endpoint Name:** QueryUnbondingDelegation
+* **Endpoint Path:**
+```"/staking/unbondingDelegation"```
+* **What Changed:**
+  * The old field ```“creation_height"``` is no longer supported.
 
-  - Specific changes:
-    - These two interfaces have been cancelled
-    - Tendermint RPC's block_results interface can be directly called to obtain relevant data (key and value in the events field of the query result are all base64 encoded)
+* **Sample JSON:**
 
-  - json example:
+#### Distributions
 
-    ```json
+* **Endpoint Name:** getQueriedValidatorOutstandingRewards
+* **Endpoint Path:**
+```"/distribution/validators/{validatorAddr}/outstanding_rewards"```
+* **What Changed:**
+  * The new field ```“rewards"``` is the new root level field for the output
+
+* **Sample JSON:**
+
+```JSON
+{
+  "rewards": [
     {
-        "jsonrpc":"2.0",
-        "id":-1,
-        "result":{
-            "height":"5",
-            "txs_results":[
-                {
-                    "code":0,
-                    "data":"CgYKBHNlbmQ=",
-                    "log":"[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"iaa18awn3k70u05tlcul8w2qnl64g002uj4kjn93rn\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"iaa1w976a5jrhsj06dqmrh2x9qxzel74qtcmapklxc\"},{\"key\":\"sender\",\"value\":\"iaa18awn3k70u05tlcul8w2qnl64g002uj4kjn93rn\"},{\"key\":\"amount\",\"value\":\"1000000uiris\"}]}]}]",
-                    "info":"",
-                    "gas_wanted":"200000",
-                    "gas_used":"69256",
-                    "events":[
+      "denom": "mytoken",
+      "amount": "3.000000000000000000"
+    },
+    {
+      "denom": "myothertoken",
+      "amount": "0.000000300000000000"
+    }
+  ]
+}
+```
+
+* **Endpoint Name:** getQueriedValidatorCommission
+* **Endpoint Path:**
+```"/distribution/validators/{validatorAddr}"```
+* **What Changed:**
+  * The new field ```“commission"``` is the new root level field for the output
+
+* **Sample JSON:**
+
+```JSON
+  "commission": [
+    {
+      "denom": "token1",
+      "amount": "4.000000000000000000"
+    },
+    {
+      "denom": "token2",
+      "amount": "2.000000000000000000"
+    }
+  ]
+}
+```
+
+
+
+* **Endpoint Name:** getQueriedValidatorSlashes
+* **Endpoint Path:**
+```"/distribution/validators/{validatorAddr}"```
+* **What Changed:**
+  * No change
+  
+* **Endpoint Name:** getQueriedDelegationRewards
+* **Endpoint Path:**
+```"/distribution/delegators/{delegatorAddr}/rewards"```
+* **What Changed:**
+  * No change
+
+## Generating and Signing Transactions
+
+The same code as integrating with cosmoshub-3 mainnet. The transaction structure is as follows:
+
+```json
+{
+    "type": "cosmos-sdk/StdTx",
+    "value": {
+        "msg": [
+            {
+                "type": "cosmos-sdk/MsgSend",
+                "value": {
+                    "from_address": "iaa1rkgdpj6fyyyu7pnhmc3v7gw9uls4mnajvzdwkt",
+                    "to_address": "iaa1q6t5439f0rkvkzl38m0f43e0kpv3mx7x2shlq8",
+                    "amount": [
                         {
-                            "type":"transfer",
-                            "attributes":[
-                                {
-                                    "key":"cmVjaXBpZW50",
-                                    "value":"aWFhMTd4cGZ2YWttMmFtZzk2MnlsczZmODR6M2tlbGw4YzVsOW1yM2Z2",
-                                    "index":true
-                                },
-                                {
-                                    "key":"c2VuZGVy",
-                                    "value":"aWFhMThhd24zazcwdTA1dGxjdWw4dzJxbmw2NGcwMDJ1ajRram45M3Ju",
-                                    "index":true
-                                },
-                                {
-                                    "key":"YW1vdW50",
-                                    "value":"MTBzdGFrZQ==",
-                                    "index":true
-                                }
-                            ]
-                        },
-                        {
-                            "type":"message",
-                            "attributes":[
-                                {
-                                    "key":"c2VuZGVy",
-                                    "value":"aWFhMThhd24zazcwdTA1dGxjdWw4dzJxbmw2NGcwMDJ1ajRram45M3Ju",
-                                    "index":true
-                                }
-                            ]
-                        },
-                        {
-                            "type":"message",
-                            "attributes":[
-                                {
-                                    "key":"YWN0aW9u",
-                                    "value":"c2VuZA==",
-                                    "index":true
-                                }
-                            ]
-                        },
-                        {
-                            "type":"transfer",
-                            "attributes":[
-                                {
-                                    "key":"cmVjaXBpZW50",
-                                    "value":"aWFhMXc5NzZhNWpyaHNqMDZkcW1yaDJ4OXF4emVsNzRxdGNtYXBrbHhj",
-                                    "index":true
-                                },
-                                {
-                                    "key":"c2VuZGVy",
-                                    "value":"aWFhMThhd24zazcwdTA1dGxjdWw4dzJxbmw2NGcwMDJ1ajRram45M3Ju",
-                                    "index":true
-                                },
-                                {
-                                    "key":"YW1vdW50",
-                                    "value":"MTAwMDAwc3Rha2U=",
-                                    "index":true
-                                }
-                            ]
-                        },
-                        {
-                            "type":"message",
-                            "attributes":[
-                                {
-                                    "key":"c2VuZGVy",
-                                    "value":"aWFhMThhd24zazcwdTA1dGxjdWw4dzJxbmw2NGcwMDJ1ajRram45M3Ju",
-                                    "index":true
-                                }
-                            ]
-                        },
-                        {
-                            "type":"message",
-                            "attributes":[
-                                {
-                                    "key":"bW9kdWxl",
-                                    "value":"YmFuaw==",
-                                    "index":true
-                                }
-                            ]
+                            "denom": "uiris",
+                            "amount": "1000000"
                         }
-                    ],
-                    "codespace":""
-                }
-            ],
-            "begin_block_events":[
-                {
-                    "type":"transfer",
-                    "attributes":[
-                        {
-                            "key":"cmVjaXBpZW50",
-                            "value":"aWFhMTd4cGZ2YWttMmFtZzk2MnlsczZmODR6M2tlbGw4YzVsOW1yM2Z2",
-                            "index":true
-                        },
-                        {
-                            "key":"c2VuZGVy",
-                            "value":"aWFhMW0zaDMwd2x2c2Y4bGxydXh0cHVrZHZzeTBrbTJrdW04YW44Zjkz",
-                            "index":true
-                        },
-                        {
-                            "key":"YW1vdW50",
-                            "value":"MTI2NzUyMzVzdGFrZQ==",
-                            "index":true
-                        }
-                    ]
-                },
-                {
-                    "type":"message",
-                    "attributes":[
-                        {
-                            "key":"c2VuZGVy",
-                            "value":"aWFhMW0zaDMwd2x2c2Y4bGxydXh0cHVrZHZzeTBrbTJrdW04YW44Zjkz",
-                            "index":true
-                        }
-                    ]
-                },
-                {
-                    "type":"mint",
-                    "attributes":[
-                        {
-                            "key":"bGFzdF9pbmZsYXRpb25fdGltZQ==",
-                            "value":"MjAyMS0wMS0xOCAwNzoyOToxNi43NjIyMSArMDAwMCBVVEM=",
-                            "index":true
-                        },
-                        {
-                            "key":"aW5mbGF0aW9uX3RpbWU=",
-                            "value":"MjAyMS0wMS0xOCAwNzoyOToyMS45MTgyMzQgKzAwMDAgVVRD",
-                            "index":true
-                        },
-                        {
-                            "key":"bWludF9jb2lu",
-                            "value":"MTI2NzUyMzU=",
-                            "index":true
-                        }
-                    ]
-                },
-                {
-                    "type":"transfer",
-                    "attributes":[
-                        {
-                            "key":"cmVjaXBpZW50",
-                            "value":"aWFhMWp2NjVzM2dycWY2djZqbDNkcDR0NmM5dDlyazk5Y2Q4amF5ZHR3",
-                            "index":true
-                        },
-                        {
-                            "key":"c2VuZGVy",
-                            "value":"aWFhMTd4cGZ2YWttMmFtZzk2MnlsczZmODR6M2tlbGw4YzVsOW1yM2Z2",
-                            "index":true
-                        },
-                        {
-                            "key":"YW1vdW50",
-                            "value":"MTI2NzUyMzVzdGFrZQ==",
-                            "index":true
-                        }
-                    ]
-                },
-                {
-                    "type":"message",
-                    "attributes":[
-                        {
-                            "key":"c2VuZGVy",
-                            "value":"aWFhMTd4cGZ2YWttMmFtZzk2MnlsczZmODR6M2tlbGw4YzVsOW1yM2Z2",
-                            "index":true
-                        }
-                    ]
-                },
-                {
-                    "type":"proposer_reward",
-                    "attributes":[
-                        {
-                            "key":"YW1vdW50",
-                            "value":"NjMzNzYxLjc1MDAwMDAwMDAwMDAwMDAwMHN0YWtl",
-                            "index":true
-                        },
-                        {
-                            "key":"dmFsaWRhdG9y",
-                            "value":"aXZhMThhd24zazcwdTA1dGxjdWw4dzJxbmw2NGcwMDJ1ajRrOHowNzc1",
-                            "index":true
-                        }
-                    ]
-                },
-                {
-                    "type":"commission",
-                    "attributes":[
-                        {
-                            "key":"YW1vdW50",
-                            "value":"NjMzNzYxLjc1MDAwMDAwMDAwMDAwMDAwMHN0YWtl",
-                            "index":true
-                        },
-                        {
-                            "key":"dmFsaWRhdG9y",
-                            "value":"aXZhMThhd24zazcwdTA1dGxjdWw4dzJxbmw2NGcwMDJ1ajRrOHowNzc1",
-                            "index":true
-                        }
-                    ]
-                },
-                {
-                    "type":"rewards",
-                    "attributes":[
-                        {
-                            "key":"YW1vdW50",
-                            "value":"NjMzNzYxLjc1MDAwMDAwMDAwMDAwMDAwMHN0YWtl",
-                            "index":true
-                        },
-                        {
-                            "key":"dmFsaWRhdG9y",
-                            "value":"aXZhMThhd24zazcwdTA1dGxjdWw4dzJxbmw2NGcwMDJ1ajRrOHowNzc1",
-                            "index":true
-                        }
-                    ]
-                },
-                {
-                    "type":"commission",
-                    "attributes":[
-                        {
-                            "key":"YW1vdW50",
-                            "value":"MTE3ODc5NjguNTUwMDAwMDAwMDAwMDAwMDAwc3Rha2U=",
-                            "index":true
-                        },
-                        {
-                            "key":"dmFsaWRhdG9y",
-                            "value":"aXZhMThhd24zazcwdTA1dGxjdWw4dzJxbmw2NGcwMDJ1ajRrOHowNzc1",
-                            "index":true
-                        }
-                    ]
-                },
-                {
-                    "type":"rewards",
-                    "attributes":[
-                        {
-                            "key":"YW1vdW50",
-                            "value":"MTE3ODc5NjguNTUwMDAwMDAwMDAwMDAwMDAwc3Rha2U=",
-                            "index":true
-                        },
-                        {
-                            "key":"dmFsaWRhdG9y",
-                            "value":"aXZhMThhd24zazcwdTA1dGxjdWw4dzJxbmw2NGcwMDJ1ajRrOHowNzc1",
-                            "index":true
-                        }
-                    ]
-                }
-            ],
-            "end_block_events":null,
-            "validator_updates":null,
-            "consensus_param_updates":{
-                "block":{
-                    "max_bytes":"22020096",
-                    "max_gas":"-1"
-                },
-                "evidence":{
-                    "max_age_num_blocks":"100000",
-                    "max_age_duration":"172800000000000",
-                    "max_bytes":"1048576"
-                },
-                "validator":{
-                    "pub_key_types":[
-                        "ed25519"
                     ]
                 }
             }
-        }
+        ],
+        "fee": {
+            "amount": [
+                {
+                    "denom": "uiris",
+                    "amount": "30000"
+                }
+            ],
+            "gas": "200000"
+        },
+        "signatures": null,
+        "memo": "Sent via irishub client"
     }
-    ```
+}
+```
 
+Where the IRISHub address prefix uses `iaa` instead, which affects the fields:
+
+- value.msg.value.from_adress
+- value.msg.value.to_address
+
+Denom uses `uiris` instead (1iris = 10<sup>6</sup>uiris), which affects fields:
+
+- value.msg.value.amount.denom
+- value.fee.amount.denom
+
+## Broadcasting a transaction
+
+The same code as integrating with cosmoshub-3 mainnet, call `POST /txs` to send a transaction, as the example below:
+
+```bash
+curl -X POST "http://localhost:1317/txs" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"tx\": {\"msg\":[{\"type\":\"cosmos-sdk/MsgSend\",\"value\":{\"from_address\":\"iaa1rkgdpj6fyyyu7pnhmc3v7gw9uls4mnajvzdwkt\",\"to_address\":\"iaa1q6t5439f0rkvkzl38m0f43e0kpv3mx7x2shlq8\",\"amount\":[{\"denom\":\"uiris\",\"amount\":\"1000000\"}]}}],\"fee\":{\"amount\":[{\"denom\":\"uiris\",\"amount\":\"30000\"}],\"gas\":\"200000\"},\"signatures\":[{\"pub_key\":{\"type\":\"tendermint/PubKeySecp256k1\",\"value\":\"AxGagdsRTKni/h1+vCFzTpNltwoiU7SwIR2dg6Jl5a//\"},\"signature\":\"Pu8yiRVO8oB2YDDHyB047dXNArbVImasmKBrm8Kr+6B08y8QQ7YG1eVgHi5OIYYclccCf3Ju/BQ78qsMWMniNQ==\"}],\"memo\":\"Sent via irishub client\"}, \"mode\": \"block\"}"
+```
+
+## Breaking Changes in Querying Transactions
 - `GET /txs`&&`GET /txs/{hash}`
 
   - Specific changes:
@@ -556,272 +474,3 @@ All routes are configured under the following fields in `~/.iris/config/app.toml
         "timestamp": "2021-01-18T07:29:21Z"
     }
     ```
-
-- `GET /bank/accounts/{address}`
-
-  - Specific changes:
-
-    - This interface has been cancelled
-    - The coins field in the original interface can be queried through the /bank/balances/{address} interface
-    - Other fields in the original interface can be queried through the /auth/accounts/{address} interface
-
-  - json example:
-    - /bank/balances/{address}
-
-        ```json
-        {
-            "height": "98",
-            "result": [
-                {
-                    "denom": "node0token",
-                    "amount": "1000000000"
-                },
-                {
-                    "denom": "uiris",
-                    "amount": "4999999999999899899990"
-                }
-            ]
-        }
-        ```
-
-    - /auth/accounts/{address}
-
-        ```json
-        {
-            "height": "142",
-            "result": {
-                "type": "cosmos-sdk/BaseAccount",
-                "value": {
-                    "address": "iaa18awn3k70u05tlcul8w2qnl64g002uj4kjn93rn",
-                    "public_key": {
-                        "type": "tendermint/PubKeySecp256k1",
-                        "value": "A01sYgbsLpw+B9M+p6vyJCh1wfigTWbLpnhNfeDKxKIl"
-                    },
-                    "sequence": "2"
-                }
-            }
-        }
-        ```
-
-## 构造未签名交易（完全向后兼容）
-
-The same code as integrating with cosmoshub-3 mainnet. The transaction structure is as follows:
-
-```json
-{
-    "type": "cosmos-sdk/StdTx",
-    "value": {
-        "msg": [
-            {
-                "type": "cosmos-sdk/MsgSend",
-                "value": {
-                    "from_address": "iaa1rkgdpj6fyyyu7pnhmc3v7gw9uls4mnajvzdwkt",
-                    "to_address": "iaa1q6t5439f0rkvkzl38m0f43e0kpv3mx7x2shlq8",
-                    "amount": [
-                        {
-                            "denom": "uiris",
-                            "amount": "1000000"
-                        }
-                    ]
-                }
-            }
-        ],
-        "fee": {
-            "amount": [
-                {
-                    "denom": "uiris",
-                    "amount": "30000"
-                }
-            ],
-            "gas": "200000"
-        },
-        "signatures": null,
-        "memo": "Sent via irishub client"
-    }
-}
-```
-
-Where the IRISHub address prefix uses `iaa` instead, which affects the fields:
-
-- value.msg.value.from_adress
-- value.msg.value.to_address
-
-Denom uses `uiris` instead (1iris = 10<sup>6</sup>uiris), which affects fields:
-
-- value.msg.value.amount.denom
-- value.fee.amount.denom
-
-## Broadcasting a transaction（完全向后兼容）
-
-The same code as integrating with cosmoshub-3 mainnet, call `POST /txs` to send a transaction, as the example below:
-
-```bash
-curl -X POST "http://localhost:1317/txs" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"tx\": {\"msg\":[{\"type\":\"cosmos-sdk/MsgSend\",\"value\":{\"from_address\":\"iaa1rkgdpj6fyyyu7pnhmc3v7gw9uls4mnajvzdwkt\",\"to_address\":\"iaa1q6t5439f0rkvkzl38m0f43e0kpv3mx7x2shlq8\",\"amount\":[{\"denom\":\"uiris\",\"amount\":\"1000000\"}]}}],\"fee\":{\"amount\":[{\"denom\":\"uiris\",\"amount\":\"30000\"}],\"gas\":\"200000\"},\"signatures\":[{\"pub_key\":{\"type\":\"tendermint/PubKeySecp256k1\",\"value\":\"AxGagdsRTKni/h1+vCFzTpNltwoiU7SwIR2dg6Jl5a//\"},\"signature\":\"Pu8yiRVO8oB2YDDHyB047dXNArbVImasmKBrm8Kr+6B08y8QQ7YG1eVgHi5OIYYclccCf3Ju/BQ78qsMWMniNQ==\"}],\"memo\":\"Sent via irishub client\"}, \"mode\": \"block\"}"
-```
-
-## 查询交易（breaking changes）
-
-### 1. Query and parse the latest block information
-
-```json
-{
-    "block_id": {
-        "hash": "DC2EEC73C327BD338EE5667827A4EECA2A2A4752B38D5669CD17EDE07CFB6F30",
-        "parts": {
-            "total": 1,
-            "hash": "1F794EA5185AE489A3D53FD6E19A690373CAB510B981B23E672668CBE0B668E5"
-        }
-    },
-    "block": {
-        "header": {
-            "version": {
-                "block": "11"
-            },
-            "chain_id": "irishub-1",
-            "height": "5",
-            "time": "2021-01-18T07:29:21.918234Z",
-            "last_block_id": {
-                "hash": "889428AAB1975F94C39F44F1BD9C94B2A46E0BC0EFF9AD625939DCB763E82D1F",
-                "parts": {
-                    "total": 1,
-                    "hash": "A9FEDF247839148459E12CD0D8A495A9EE663F7C9E719D85133B27F1D810D52B"
-                }
-            },
-            "last_commit_hash": "35084203D333AF835637F7D9F1FEAA03554AECAB9786EECC6EB5F236156A19F1",
-            "data_hash": "A2853A6749C904A8C26C5DB8CB0DD731C44EEAF2AD6AEE2E633DF8F8FD0CA04F",
-            "validators_hash": "79E608E448B5B9D0784FDE890506DDE025E0E079CE10B7E01687B9C0E2DFC124",
-            "next_validators_hash": "79E608E448B5B9D0784FDE890506DDE025E0E079CE10B7E01687B9C0E2DFC124",
-            "consensus_hash": "048091BC7DDC283F77BFBF91D73C44DA58C3DF8A9CBC867405D8B7F3DAADA22F",
-            "app_hash": "8F668541D8D565B40373E1492ED6729674539FCB1705437E309522DD491E46DC",
-            "last_results_hash": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
-            "evidence_hash": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
-            "proposer_address": "86C89798CEA6D07FB8550AFDD8DEEA0DA52BFEF4"
-        },
-        "data": {
-            "txs": [
-                "CowBCokBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEmkKKmlhYTE4YXduM2s3MHUwNXRsY3VsOHcycW5sNjRnMDAydWo0a2puOTNybhIqaWFhMXc5NzZhNWpyaHNqMDZkcW1yaDJ4OXF4emVsNzRxdGNtYXBrbHhjGg8KBXN0YWtlEgYxMDAwMDASZQpQCkYKHy9jb3Ntb3MuY3J5cHRvLnNlY3AyNTZrMS5QdWJLZXkSIwohA01sYgbsLpw+B9M+p6vyJCh1wfigTWbLpnhNfeDKxKIlEgQKAggBGAESEQoLCgVzdGFrZRICMTAQwJoMGkC+qpaBhJ20qboyU0HWBL0zVlW4klBXGZGsa8n2W1rxIVbq39DZUskGSI8WKNl1stM7QGhycu7YLU30z8vsg8N5"
-            ]
-        },
-        "evidence": {
-            "evidence": []
-        },
-        "last_commit": {
-            "height": "4",
-            "round": 0,
-            "block_id": {
-                "hash": "889428AAB1975F94C39F44F1BD9C94B2A46E0BC0EFF9AD625939DCB763E82D1F",
-                "parts": {
-                    "total": 1,
-                    "hash": "A9FEDF247839148459E12CD0D8A495A9EE663F7C9E719D85133B27F1D810D52B"
-                }
-            },
-            "signatures": [
-                {
-                    "block_id_flag": 2,
-                    "validator_address": "86C89798CEA6D07FB8550AFDD8DEEA0DA52BFEF4",
-                    "timestamp": "2021-01-18T07:29:21.918234Z",
-                    "signature": "UGqkOIqSSzaW/2YzkzfoobcUIizzPcl9BVECl+jwhyMJSkrMnD3DdPUlS2Vd1IAU3u8qQOmP09+m/r5R0gp6CQ=="
-                }
-            ]
-        }
-    }
-}
-```
-
-### 2. Process the transfer transactions included in the block
-
-Step 1: Analyze tx from the block information obtained in [5.1.2.1. Query and parse the latest block information](#5121-Query-and-parse-the-latest-block-information), and decode it in base64
-
-Step 2: Use SHA256 to hash the decoded result to get txhash
-
-```go
-tx := "CowBCokBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEmkKKmlhYTE4YXduM2s3MHUwNXRsY3VsOHcycW5sNjRnMDAydWo0a2puOTNybhIqaWFhMXc5NzZhNWpyaHNqMDZkcW1yaDJ4OXF4emVsNzRxdGNtYXBrbHhjGg8KBXN0YWtlEgYxMDAwMDASZQpQCkYKHy9jb3Ntb3MuY3J5cHRvLnNlY3AyNTZrMS5QdWJLZXkSIwohA01sYgbsLpw+B9M+p6vyJCh1wfigTWbLpnhNfeDKxKIlEgQKAggBGAESEQoLCgVzdGFrZRICMTAQwJoMGkC+qpaBhJ20qboyU0HWBL0zVlW4klBXGZGsa8n2W1rxIVbq39DZUskGSI8WKNl1stM7QGhycu7YLU30z8vsg8N5"
-txbytes, _ := base64.StdEncoding.DecodeString(tx)
-txhash := sha256.Sum256(txbytes)
-```
-
-Step 3: Use the txhash to query the corresponding tx information (**Note: There are two types of transfer messages in IRISHub, `cosmos-sdk/MsgSend` and `cosmos-sdk/MsgMultiSend`**)
-
-```json
-{
-    "height": "5",
-    "txhash": "E663768B616B1ACD2912E47C36FEBC7DB0E0974D6DB3823D4C656E0EAB8C679D",
-    "data": "0A060A0473656E64",
-    "raw_log": "[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"iaa18awn3k70u05tlcul8w2qnl64g002uj4kjn93rn\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"iaa1w976a5jrhsj06dqmrh2x9qxzel74qtcmapklxc\"},{\"key\":\"sender\",\"value\":\"iaa18awn3k70u05tlcul8w2qnl64g002uj4kjn93rn\"},{\"key\":\"amount\",\"value\":\"1000000uiris\"}]}]}]",
-    "logs": [
-        {
-            "events": [
-                {
-                    "type": "message",
-                    "attributes": [
-                        {
-                            "key": "action",
-                            "value": "send"
-                        },
-                        {
-                            "key": "sender",
-                            "value": "iaa18awn3k70u05tlcul8w2qnl64g002uj4kjn93rn"
-                        },
-                        {
-                            "key": "module",
-                            "value": "bank"
-                        }
-                    ]
-                },
-                {
-                    "type": "transfer",
-                    "attributes": [
-                        {
-                            "key": "recipient",
-                            "value": "iaa1w976a5jrhsj06dqmrh2x9qxzel74qtcmapklxc"
-                        },
-                        {
-                            "key": "sender",
-                            "value": "iaa18awn3k70u05tlcul8w2qnl64g002uj4kjn93rn"
-                        },
-                        {
-                            "key": "amount",
-                            "value": "1000000uiris"
-                        }
-                    ]
-                }
-            ]
-        }
-    ],
-    "gas_wanted": "200000",
-    "gas_used": "69256",
-    "tx": {
-        "type": "cosmos-sdk/StdTx",
-        "value": {
-            "msg": [
-                {
-                    "type": "cosmos-sdk/MsgSend",
-                    "value": {
-                        "from_address": "iaa18awn3k70u05tlcul8w2qnl64g002uj4kjn93rn",
-                        "to_address": "iaa1w976a5jrhsj06dqmrh2x9qxzel74qtcmapklxc",
-                        "amount": [
-                            {
-                                "denom": "uiris",
-                                "amount": "1000000"
-                            }
-                        ]
-                    }
-                }
-            ],
-            "fee": {
-                "amount": [
-                    {
-                        "denom": "uiris",
-                        "amount": "30000"
-                    }
-                ],
-                "gas": "200000"
-            },
-            "signatures": [],
-            "memo": "",
-            "timeout_height": "0"
-        }
-    },
-    "timestamp": "2021-01-18T07:29:21Z"
-}
-```
