@@ -1,10 +1,37 @@
 # Legacy Amino JSON REST
 
-In IRISHub v1.0.0, the node continues to serve a REST server. However, the existing routes present in version v0.16.3 and earlier are now marked as deprecated, and new routes have been added via gRPC-gateway.
+The IRISHub versions v1.0.0 (depends on Cosmos-SDK v0.40) and earlier provided REST endpoints to query the state and broadcast transactions. These endpoints are kept in IRISHub v1.0, but they are marked as deprecated, and will be removed in v1.1 We therefore call these endpoints legacy REST endpoints.
+
+Some important information concerning all legacy REST endpoints:
+
+- Most of these endpoints are backwards-comptatible. All breaking changes are described in the next section.
+- In particular, these endpoints still output Amino JSON. Cosmos-SDK v0.40 introduced Protobuf as the default encoding library throughout the codebase, but legacy REST endpoints are one of the few places where the encoding is hardcoded to Amino.
 
 ## API Port, Activation and Configuration
 
-## API Endpoints
+All routes are configured under the following fields in `~/.iris/config/app.toml`:
+
+- `api.enable = true|false` field defines if the REST server should be enabled. Defaults to `true`.
+- `api.address = {string}` field defines the address (really, the port, since the host should be kept at `0.0.0.0`) the server should bind to. Defaults to `tcp://0.0.0.0:1317`.
+- some additional API configuration options are defined in `~/.iris/config/app.toml`, along with comments, please refer to that file directly.
+
+## Legacy REST Endpoint
+
+### Breaking Changes in Legacy REST Endpoints
+
+| Legacy REST Endpoint                                                     | Description                                 | Breaking Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------------------ | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /txs`                                                              | Broadcast tx                                | Endpoint will error when trying to broadcast transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                           |
+| `POST /txs/encode`, `POST /txs/decode`                                   | Encode/decode Amino txs from JSON to binary | Endpoint will error when trying to encode/decode transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                       |
+| `GET /txs/{hash}`                                                        | Query tx by hash                            | Endpoint will error when trying to output transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                              |
+| `GET /txs`                                                               | Query tx by events                          | Endpoint will error when trying to output transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                              |
+| `GET /gov/proposals/{id}/votes`, `GET /gov/proposals/{id}/votes/{voter}` | Gov endpoints for querying votes            | All gov endpoints which return votes return int32 in the `option` field instead of string: `1=VOTE_OPTION_YES, 2=VOTE_OPTION_ABSTAIN, 3=VOTE_OPTION_NO, 4=VOTE_OPTION_NO_WITH_VETO`.                                                                                                                                                                                                                                                                                                   |
+| `GET /staking/*`                                                         | Staking query endpoints                     | All staking endpoints which return validators have two breaking changes. First, the validator's `consensus_pubkey` field returns an Amino-encoded struct representing an `Any` instead of a bech32-encoded string representing the pubkey. The `value` field of the `Any` is the pubkey's raw key as base64-encoded bytes. Second, the validator's `status` field now returns an int32 instead of string: `1=BOND_STATUS_UNBONDED`, `2=BOND_STATUS_UNBONDING`, `3=BOND_STATUS_BONDED`. |
+| `GET /staking/validators`                                                | Get all validators                          | BondStatus is now a protobuf enum instead of an int32, and JSON serialized using its protobuf name, so expect query parameters like `?status=BOND_STATUS_{BONDED,UNBONDED,UNBONDING}` as opposed to `?status={bonded,unbonded,unbonding}`.                                                                                                                                                                                                                                             |
+
+<sup>1</sup>: Transactions that don't support Amino serialization are the ones that contain one or more `Msg`s that are not registered with the Amino codec. Currently in the SDK, only IBC `Msg`s fall into this case.
+
+### Migrating to New REST Endpoints
 
 **IRISHub API Endpoints**
 
