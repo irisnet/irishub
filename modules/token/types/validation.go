@@ -49,8 +49,7 @@ func ValidateToken(token Token) error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
-	nameLen := len(token.Name)
-	if nameLen == 0 || nameLen > MaximumNameLen {
+	if len(token.Name) == 0 || len(token.Name) > MaximumNameLen {
 		return sdkerrors.Wrapf(ErrInvalidName, "invalid token name %s, only accepts length (0, %d]", token.Name, MaximumNameLen)
 	}
 
@@ -110,8 +109,7 @@ func ValidateScale(scale uint32) error {
 
 // ValidateMinUnit checks if the given minUnit is valid
 func ValidateMinUnit(minUnit string) error {
-	minUnitLen := len(strings.TrimSpace(minUnit))
-	if minUnitLen < MinimumMinUnitLen || minUnitLen > MaximumMinUnitLen {
+	if len(minUnit) < MinimumMinUnitLen || len(minUnit) > MaximumMinUnitLen {
 		return sdkerrors.Wrapf(ErrInvalidMinUnit, "invalid min_unit %s, only accepts length [%d, %d]", minUnit, MinimumMinUnitLen, MaximumMinUnitLen)
 	}
 

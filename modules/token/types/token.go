@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"math"
 	"strconv"
-	"strings"
 
 	"github.com/gogo/protobuf/proto"
 	"gopkg.in/yaml.v2"
@@ -40,10 +39,6 @@ func NewToken(
 	mintable bool,
 	owner sdk.AccAddress,
 ) Token {
-	symbol = strings.ToLower(strings.TrimSpace(symbol))
-	minUnit = strings.ToLower(strings.TrimSpace(minUnit))
-	name = strings.TrimSpace(name)
-
 	if maxSupply == 0 {
 		if mintable {
 			maxSupply = MaximumMaxSupply
