@@ -50,26 +50,32 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 // IssueToken issues a new token
-func (k Keeper) IssueToken(ctx sdk.Context, msg types.MsgIssueToken) error {
-	owner, err := sdk.AccAddressFromBech32(msg.Owner)
-	if err != nil {
-		return err
-	}
+func (k Keeper) IssueToken(
+	ctx sdk.Context,
+	symbol string,
+	name string,
+	minUnit string,
+	scale uint32,
+	initialSupply uint64,
+	maxSupply uint64,
+	mintable bool,
+	owner sdk.AccAddress,
+) error {
 	token := types.NewToken(
-		msg.Symbol, msg.Name, msg.MinUnit, msg.Scale, msg.InitialSupply,
-		msg.MaxSupply, msg.Mintable, owner,
+		symbol, name, minUnit, scale, initialSupply,
+		maxSupply, mintable, owner,
 	)
 
 	if err := k.AddToken(ctx, token); err != nil {
 		return err
 	}
 
-	initialSupply := sdk.NewCoin(
+	initialCoin := sdk.NewCoin(
 		token.MinUnit,
-		sdk.NewIntWithDecimal(int64(msg.InitialSupply), int(msg.Scale)),
+		sdk.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)),
 	)
 
-	mintCoins := sdk.NewCoins(initialSupply)
+	mintCoins := sdk.NewCoins(initialCoin)
 
 	// mint coins into module account
 	if err := k.bankKeeper.MintCoins(ctx, types.ModuleName, mintCoins); err != nil {
@@ -81,94 +87,125 @@ func (k Keeper) IssueToken(ctx sdk.Context, msg types.MsgIssueToken) error {
 }
 
 // EditToken edits the specified token
-func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) error {
+func (k Keeper) EditToken(
+	ctx sdk.Context,
+	symbol string,
+	name string,
+	maxSupply uint64,
+	mintable types.Bool,
+	owner sdk.AccAddress,
+) error {
 	// get the destination token
-	tokenI, err := k.GetToken(ctx, msg.Symbol)
+	tokenI, err := k.GetToken(ctx, symbol)
 	if err != nil {
 		return err
 	}
 
 	token := tokenI.(*types.Token)
 
-	if msg.Owner != token.Owner {
-		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", msg.Owner, msg.Symbol)
+	if owner.String() != token.Owner {
+		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", owner, symbol)
 	}
 
-	if msg.MaxSupply > 0 {
+	if maxSupply > 0 {
 		issuedAmt := k.getTokenSupply(ctx, token.MinUnit)
 		issuedMainUnitAmt := uint64(issuedAmt.Quo(sdk.NewIntWithDecimal(1, int(token.Scale))).Int64())
-		if msg.MaxSupply < issuedMainUnitAmt {
+
+		if maxSupply < issuedMainUnitAmt {
 			return sdkerrors.Wrapf(types.ErrInvalidMaxSupply, "max supply must not be less than %d", issuedMainUnitAmt)
 		}
 
-		token.MaxSupply = msg.MaxSupply
+		token.MaxSupply = maxSupply
 	}
 
-	if msg.Name != types.DoNotModify {
-		token.Name = msg.Name
+	if name != types.DoNotModify {
+		token.Name = name
+
 		metadata := k.bankKeeper.GetDenomMetaData(ctx, token.MinUnit)
-		metadata.Description = msg.Name
+		metadata.Description = name
+
 		k.bankKeeper.SetDenomMetaData(ctx, metadata)
 	}
 
-	if msg.Mintable != types.Nil {
-		token.Mintable = msg.Mintable.ToBool()
+	if mintable != types.Nil {
+		token.Mintable = mintable.ToBool()
 	}
 
-	return k.setToken(ctx, *token)
+	k.setToken(ctx, *token)
+
+	return nil
 }
 
 // TransferTokenOwner transfers the owner of the specified token to a new one
-func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOwner) error {
-	tokenI, err := k.GetToken(ctx, msg.Symbol)
+func (k Keeper) TransferTokenOwner(
+	ctx sdk.Context,
+	symbol string,
+	srcOwner sdk.AccAddress,
+	dstOwner sdk.AccAddress,
+) error {
+	tokenI, err := k.GetToken(ctx, symbol)
 	if err != nil {
 		return err
 	}
 
 	token := tokenI.(*types.Token)
 
-	if msg.SrcOwner != token.Owner {
-		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", msg.SrcOwner, msg.Symbol)
+	if srcOwner.String() != token.Owner {
+		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", srcOwner, symbol)
 	}
 
-	token.Owner = msg.DstOwner
-	// update token information
-	if err := k.setToken(ctx, *token); err != nil {
-		return err
-	}
+	token.Owner = dstOwner.String()
 
-	// reset all index for query-token
-	return k.resetStoreKeyForQueryToken(ctx, msg, *token)
+	// update token
+	k.setToken(ctx, *token)
+
+	// reset all indices
+	k.resetStoreKeyForQueryToken(ctx, token.Symbol, srcOwner, dstOwner)
+
+	return nil
 }
 
-// MintToken mints specified amount token to a specified owner
-func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) error {
-	tokenI, err := k.GetToken(ctx, msg.Symbol)
+// MintToken mints the specified amount of token to the specified recipient
+// NOTE: empty owner means that the external caller is responsible to manage the token authority
+func (k Keeper) MintToken(
+	ctx sdk.Context,
+	symbol string,
+	amount uint64,
+	recipient sdk.AccAddress,
+	owner sdk.AccAddress,
+) error {
+	tokenI, err := k.GetToken(ctx, symbol)
 	if err != nil {
 		return err
 	}
 
-	if msg.Owner != tokenI.GetOwner().String() {
-		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", msg.Owner, msg.Symbol)
+	token := tokenI.(*types.Token)
+
+	if owner.String() != token.Owner {
+		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", owner, symbol)
 	}
 
-	if !tokenI.GetMintable() {
-		return sdkerrors.Wrapf(types.ErrNotMintable, "the token %s is set to be non-mintable", msg.Symbol)
+	if !token.Mintable {
+		return sdkerrors.Wrapf(types.ErrNotMintable, "%s", symbol)
 	}
 
-	issuedAmt := k.getTokenSupply(ctx, tokenI.GetMinUnit())
-	mintableMaxAmt := sdk.NewIntWithDecimal(int64(tokenI.GetMaxSupply()), int(tokenI.GetScale())).Sub(issuedAmt)
-	mintableMaxMainUnitAmt := uint64(mintableMaxAmt.Quo(sdk.NewIntWithDecimal(1, int(tokenI.GetScale()))).Int64())
+	supply := k.getTokenSupply(ctx, token.MinUnit)
+	maxSupply := token.MaxSupply
 
-	if msg.Amount > mintableMaxMainUnitAmt {
-		return sdkerrors.Wrapf(
-			types.ErrInvalidMaxSupply,
-			"The amount of minting tokens plus the total amount of issued tokens has exceeded the maximum supply, only accepts amount (0, %d]",
-			mintableMaxMainUnitAmt,
-		)
+	if maxSupply > 0 {
+		mintableAmt := sdk.NewIntWithDecimal(int64(maxSupply), int(token.Scale)).Sub(supply)
+		mintableMainAmt := uint64(mintableAmt.Quo(sdk.NewIntWithDecimal(1, int(token.Scale))).Int64())
+
+		if amount > mintableMainAmt {
+			return sdkerrors.Wrapf(
+				types.ErrInvalidAmount,
+				"the amount exceeds the mintable token amount; expected (0, %d], got %d",
+				mintableMainAmt, amount,
+			)
+		}
 	}
 
-	mintCoin := sdk.NewCoin(tokenI.GetMinUnit(), sdk.NewIntWithDecimal(int64(msg.Amount), int(tokenI.GetScale())))
+	mintCoin := sdk.NewCoin(token.MinUnit, sdk.NewIntWithDecimal(int64(amount), int(token.Scale)))
 	mintCoins := sdk.NewCoins(mintCoin)
 
 	// mint coins
@@ -176,40 +213,35 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) error {
 		return err
 	}
 
-	mintAddr := msg.To
-	if len(mintAddr) == 0 {
-		mintAddr = tokenI.GetOwner().String()
+	if recipient.Empty() {
+		recipient = owner
 	}
 
-	mintAcc, err := sdk.AccAddressFromBech32(mintAddr)
-	if err != nil {
-		return err
-	}
-
-	// sent coins to owner's account
-	return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, mintAcc, mintCoins)
+	// sent coins to the recipient account
+	return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, recipient, mintCoins)
 }
 
-// BurnToken burns specified amount token
-func (k Keeper) BurnToken(ctx sdk.Context, msg types.MsgBurnToken) error {
-	tokenI, err := k.GetToken(ctx, msg.Symbol)
+// BurnToken burns the specified amount of token
+func (k Keeper) BurnToken(
+	ctx sdk.Context,
+	symbol string,
+	amount uint64,
+	owner sdk.AccAddress,
+) error {
+	token, err := k.GetToken(ctx, symbol)
 	if err != nil {
 		return err
 	}
 
-	burnCoin := sdk.NewCoin(tokenI.GetMinUnit(), sdk.NewIntWithDecimal(int64(msg.Amount), int(tokenI.GetScale())))
+	burnCoin := sdk.NewCoin(token.GetMinUnit(), sdk.NewIntWithDecimal(int64(amount), int(token.GetScale())))
 	burnCoins := sdk.NewCoins(burnCoin)
 
-	burnAcc, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
-		return err
-	}
-
 	// burn coins
-	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, burnAcc, types.ModuleName, burnCoins); err != nil {
+	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, owner, types.ModuleName, burnCoins); err != nil {
 		return err
 	}
 
 	k.AddBurnCoin(ctx, burnCoin)
+
 	return k.bankKeeper.BurnCoins(ctx, types.ModuleName, burnCoins)
 }

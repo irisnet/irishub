@@ -1,10 +1,8 @@
 package keeper_test
 
 import (
-	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/tendermint/tendermint/crypto/tmhash"
@@ -63,116 +61,124 @@ func TestKeeperSuite(t *testing.T) {
 	suite.Run(t, new(KeeperTestSuite))
 }
 
+func (suite *KeeperTestSuite) setToken(token types.Token) {
+	err := suite.keeper.AddToken(suite.ctx, token)
+	suite.NoError(err)
+}
+
+func (suite *KeeperTestSuite) issueToken(token types.Token) {
+	suite.setToken(token)
+
+	mintCoins := sdk.NewCoins(
+		sdk.NewCoin(
+			token.MinUnit,
+			sdk.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)),
+		),
+	)
+
+	err := suite.bk.MintCoins(suite.ctx, types.ModuleName, mintCoins)
+	suite.NoError(err)
+
+	err = suite.bk.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, owner, mintCoins)
+	suite.NoError(err)
+}
+
 func (suite *KeeperTestSuite) TestIssueToken() {
-	symbol := "btc"
-	minUnit := "satoshi"
-	name := "Bitcoin Network"
-	scale := uint32(18)
-	msg := types.NewMsgIssueToken(symbol, minUnit, name, scale, 21000000, 21000000, false, owner.String())
+	token := types.NewToken("btc", "Bitcoin Network", "satoshi", 18, 21000000, 21000000, false, owner)
 
-	err := suite.keeper.IssueToken(suite.ctx, *msg)
-	require.NoError(suite.T(), err)
+	err := suite.keeper.IssueToken(
+		suite.ctx, token.Symbol, token.Name,
+		token.MinUnit, token.Scale, token.InitialSupply,
+		token.MaxSupply, token.Mintable, token.GetOwner(),
+	)
+	suite.NoError(err)
 
-	suite.True(suite.keeper.HasToken(suite.ctx, msg.Symbol))
+	suite.True(suite.keeper.HasToken(suite.ctx, token.Symbol))
 
-	token, err := suite.keeper.GetToken(suite.ctx, msg.Symbol)
-	require.NoError(suite.T(), err)
+	issuedToken, err := suite.keeper.GetToken(suite.ctx, token.Symbol)
+	suite.NoError(err)
 
-	suite.Equal(msg.MinUnit, token.GetMinUnit())
-	suite.Equal(msg.Owner, token.GetOwner().String())
+	suite.Equal(token.MinUnit, issuedToken.GetMinUnit())
+	suite.Equal(token.Owner, issuedToken.GetOwner().String())
 
-	ftJson, _ := json.Marshal(msg)
-	tokenJson, _ := json.Marshal(token)
-	suite.Equal(ftJson, tokenJson)
-
-	metadata := suite.bk.GetDenomMetaData(suite.ctx, minUnit)
-	suite.Equal(metadata.Base, minUnit)
-	suite.Equal(metadata.Description, name)
-	suite.Equal(metadata.Display, symbol)
-	suite.Len(metadata.DenomUnits, 2)
-	suite.EqualValues(metadata.DenomUnits[0].Denom, minUnit)
-	suite.EqualValues(metadata.DenomUnits[0].Exponent, 0)
-	suite.EqualValues(metadata.DenomUnits[1].Denom, symbol)
-	suite.EqualValues(metadata.DenomUnits[1].Exponent, scale)
+	suite.EqualValues(&token, issuedToken.(*types.Token))
 }
 
 func (suite *KeeperTestSuite) TestEditToken() {
+	token := types.NewToken("btc", "Bitcoin Network", "satoshi", 18, 21000000, 21000000, false, owner)
+	suite.setToken(token)
 
-	suite.TestIssueToken()
-
-	name := "Bitcoin Token Network"
+	symbol := "btc"
+	name := "Bitcoin Token"
 	mintable := types.True
-	msgEditToken := types.NewMsgEditToken(name, "btc", 22000000, mintable, owner.String())
-	err := suite.keeper.EditToken(suite.ctx, *msgEditToken)
-	require.NoError(suite.T(), err)
+	maxSupply := uint64(22000000)
 
-	token2, err := suite.keeper.GetToken(suite.ctx, msgEditToken.Symbol)
-	require.NoError(suite.T(), err)
+	err := suite.keeper.EditToken(suite.ctx, symbol, name, maxSupply, mintable, owner)
+	suite.NoError(err)
 
-	expToken := types.NewToken("btc", name, "satoshi", 18, 21000000, 22000000, mintable.ToBool(), owner)
+	newToken, err := suite.keeper.GetToken(suite.ctx, symbol)
+	suite.NoError(err)
 
-	expJson, _ := json.Marshal(expToken)
-	actJson, _ := json.Marshal(token2)
-	suite.Equal(expJson, actJson)
+	expToken := types.NewToken("btc", "Bitcoin Token", "satoshi", 18, 21000000, 22000000, mintable.ToBool(), owner)
 
-	metadata := suite.app.BankKeeper.GetDenomMetaData(suite.ctx, "satoshi")
-	suite.Equal(metadata.Description, name)
-
+	suite.EqualValues(newToken.(*types.Token), &expToken)
 }
 
 func (suite *KeeperTestSuite) TestMintToken() {
+	token := types.NewToken("btc", "Bitcoin Network", "satoshi", 18, 1000, 2000, true, owner)
+	suite.issueToken(token)
 
-	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 1000, 2000, true, owner.String())
-
-	err := suite.keeper.IssueToken(suite.ctx, *msg)
-	require.NoError(suite.T(), err)
-
-	suite.True(suite.keeper.HasToken(suite.ctx, msg.Symbol))
-
-	amt := suite.bk.GetBalance(suite.ctx, owner, msg.MinUnit)
+	amt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit)
 	suite.Equal("1000000000000000000000satoshi", amt.String())
 
-	msgMintToken := types.NewMsgMintToken(msg.Symbol, owner.String(), "", 1000)
-	err = suite.keeper.MintToken(suite.ctx, *msgMintToken)
-	require.NoError(suite.T(), err)
+	mintAmount := uint64(1000)
+	recipient := sdk.AccAddress{}
 
-	amt = suite.bk.GetBalance(suite.ctx, owner, msg.MinUnit)
+	err := suite.keeper.MintToken(suite.ctx, token.Symbol, mintAmount, recipient, token.GetOwner())
+	suite.NoError(err)
+
+	amt = suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit)
 	suite.Equal("2000000000000000000000satoshi", amt.String())
+
+	// mint token without owner
+
+	err = suite.keeper.MintToken(suite.ctx, token.Symbol, mintAmount, owner, sdk.AccAddress{})
+	suite.Error(err, "can not mint token without owner when the owner exists")
+
+	token = types.NewToken("atom", "Cosmos Hub", "uatom", 6, 1000, 2000, true, sdk.AccAddress{})
+	suite.issueToken(token)
+
+	err = suite.keeper.MintToken(suite.ctx, token.Symbol, mintAmount, owner, sdk.AccAddress{})
+	suite.NoError(err)
 }
 
 func (suite *KeeperTestSuite) TestBurnToken() {
-	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 1000, 2000, true, owner.String())
+	token := types.NewToken("btc", "Bitcoin Network", "satoshi", 18, 1000, 2000, true, owner)
+	suite.issueToken(token)
 
-	err := suite.keeper.IssueToken(suite.ctx, *msg)
-	require.NoError(suite.T(), err)
-
-	suite.True(suite.keeper.HasToken(suite.ctx, msg.Symbol))
-
-	amt := suite.bk.GetBalance(suite.ctx, owner, msg.MinUnit)
+	amt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit)
 	suite.Equal("1000000000000000000000satoshi", amt.String())
 
-	msgBurnToken := types.NewMsgBurnToken(msg.Symbol, owner.String(), 200)
-	err = suite.keeper.BurnToken(suite.ctx, *msgBurnToken)
-	require.NoError(suite.T(), err)
+	burnedAmount := uint64(200)
 
-	amt = suite.bk.GetBalance(suite.ctx, owner, msg.MinUnit)
+	err := suite.keeper.BurnToken(suite.ctx, token.Symbol, burnedAmount, token.GetOwner())
+	suite.NoError(err)
+
+	amt = suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit)
 	suite.Equal("800000000000000000000satoshi", amt.String())
 }
 
 func (suite *KeeperTestSuite) TestTransferToken() {
-
-	suite.TestIssueToken()
+	token := types.NewToken("btc", "Bitcoin Network", "satoshi", 18, 21000000, 21000000, false, owner)
+	suite.setToken(token)
 
 	dstOwner := sdk.AccAddress(tmhash.SumTruncated([]byte("TokenDstOwner")))
-	msg := types.MsgTransferTokenOwner{
-		SrcOwner: owner.String(),
-		DstOwner: dstOwner.String(),
-		Symbol:   "btc",
-	}
-	err := suite.keeper.TransferTokenOwner(suite.ctx, msg)
-	require.NoError(suite.T(), err)
 
-	token, err := suite.keeper.GetToken(suite.ctx, "btc")
-	require.NoError(suite.T(), err)
-	suite.Equal(dstOwner, token.GetOwner())
+	err := suite.keeper.TransferTokenOwner(suite.ctx, token.Symbol, token.GetOwner(), dstOwner)
+	suite.NoError(err)
+
+	newToken, err := suite.keeper.GetToken(suite.ctx, token.Symbol)
+	suite.NoError(err)
+
+	suite.Equal(dstOwner, newToken.GetOwner())
 }

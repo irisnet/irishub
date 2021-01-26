@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/token/types"
 )
@@ -25,16 +24,20 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 func (m msgServer) IssueToken(goCtx context.Context, msg *types.MsgIssueToken) (*types.MsgIssueTokenResponse, error) {
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return nil, err
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
 	// handle fee for token
 	if err := m.Keeper.DeductIssueTokenFee(ctx, owner, msg.Symbol); err != nil {
 		return nil, err
 	}
 
-	if err := m.Keeper.IssueToken(ctx, *msg); err != nil {
+	if err := m.Keeper.IssueToken(
+		ctx, msg.Symbol, msg.Name, msg.MinUnit, msg.Scale,
+		msg.InitialSupply, msg.MaxSupply, msg.Mintable, owner,
+	); err != nil {
 		return nil, err
 	}
 
@@ -55,8 +58,17 @@ func (m msgServer) IssueToken(goCtx context.Context, msg *types.MsgIssueToken) (
 }
 
 func (m msgServer) EditToken(goCtx context.Context, msg *types.MsgEditToken) (*types.MsgEditTokenResponse, error) {
+	owner, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.EditToken(ctx, *msg); err != nil {
+
+	if err := m.Keeper.EditToken(
+		ctx, msg.Symbol, msg.Name,
+		msg.MaxSupply, msg.Mintable, owner,
+	); err != nil {
 		return nil, err
 	}
 
@@ -82,12 +94,24 @@ func (m msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 		return nil, err
 	}
 
+	var recipient sdk.AccAddress
+
+	if len(msg.To) != 0 {
+		recipient, err = sdk.AccAddressFromBech32(msg.To)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		recipient = owner
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
 	if err := m.Keeper.DeductMintTokenFee(ctx, owner, msg.Symbol); err != nil {
 		return nil, err
 	}
 
-	if err := m.Keeper.MintToken(ctx, *msg); err != nil {
+	if err := m.Keeper.MintToken(ctx, msg.Symbol, msg.Amount, recipient, owner); err != nil {
 		return nil, err
 	}
 
@@ -96,7 +120,7 @@ func (m msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 			types.EventTypeMintToken,
 			sdk.NewAttribute(types.AttributeKeySymbol, msg.Symbol),
 			sdk.NewAttribute(types.AttributeKeyAmount, strconv.FormatUint(msg.Amount, 10)),
-			sdk.NewAttribute(types.AttributeKeyRecipient, msg.To),
+			sdk.NewAttribute(types.AttributeKeyRecipient, recipient.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -115,11 +139,12 @@ func (m msgServer) BurnToken(goCtx context.Context, msg *types.MsgBurnToken) (*t
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
 	if err := m.Keeper.DeductMintTokenFee(ctx, owner, msg.Symbol); err != nil {
 		return nil, err
 	}
 
-	if err := m.Keeper.BurnToken(ctx, *msg); err != nil {
+	if err := m.Keeper.BurnToken(ctx, msg.Symbol, msg.Amount, owner); err != nil {
 		return nil, err
 	}
 
@@ -140,8 +165,19 @@ func (m msgServer) BurnToken(goCtx context.Context, msg *types.MsgBurnToken) (*t
 }
 
 func (m msgServer) TransferTokenOwner(goCtx context.Context, msg *types.MsgTransferTokenOwner) (*types.MsgTransferTokenOwnerResponse, error) {
+	srcOwner, err := sdk.AccAddressFromBech32(msg.SrcOwner)
+	if err != nil {
+		return nil, err
+	}
+
+	dstOwner, err := sdk.AccAddressFromBech32(msg.DstOwner)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.TransferTokenOwner(ctx, *msg); err != nil {
+
+	if err := m.Keeper.TransferTokenOwner(ctx, msg.Symbol, srcOwner, dstOwner); err != nil {
 		return nil, err
 	}
 

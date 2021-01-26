@@ -61,6 +61,7 @@ func (k Keeper) GetToken(ctx sdk.Context, denom string) (types.TokenI, error) {
 
 	var symbol gogotypes.StringValue
 	k.cdc.MustUnmarshalBinaryBare(bz, &symbol)
+
 	token, err := k.getToken(ctx, symbol.Value)
 	if err != nil {
 		return nil, err
@@ -80,13 +81,14 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.Token) error {
 	}
 
 	// set token
-	if err := k.setToken(ctx, token); err != nil {
-		return err
-	}
+	k.setToken(ctx, token)
 
-	// Set token to be prefixed with owner
-	if err := k.setWithOwner(ctx, token.GetOwner(), token.Symbol); err != nil {
-		return err
+	// set token to be prefixed with min unit
+	k.setWithMinUnit(ctx, token.MinUnit, token.Symbol)
+
+	if len(token.Owner) != 0 {
+		// set token to be prefixed with owner
+		k.setWithOwner(ctx, token.GetOwner(), token.Symbol)
 	}
 
 	denomMetaData := banktypes.Metadata{
@@ -101,15 +103,16 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.Token) error {
 	k.bankKeeper.SetDenomMetaData(ctx, denomMetaData)
 
 	// Set token to be prefixed with min_unit
-	return k.setWithMinUnit(ctx, token.MinUnit, token.Symbol)
+	k.setWithMinUnit(ctx, token.MinUnit, token.Symbol)
+
+	return nil
 }
 
 // HasToken asserts a token exists
 func (k Keeper) HasToken(ctx sdk.Context, denom string) bool {
 	store := ctx.KVStore(k.storeKey)
-	existed := store.Has(types.KeySymbol(denom))
-	if existed {
-		return existed
+	if store.Has(types.KeySymbol(denom)) {
+		return true
 	}
 
 	return store.Has(types.KeyMinUint(denom))
@@ -125,19 +128,21 @@ func (k Keeper) GetOwner(ctx sdk.Context, denom string) (sdk.AccAddress, error) 
 	return token.GetOwner(), nil
 }
 
-// AddBurnCoin save the total amount of tokens burned
+// AddBurnCoin saves the total amount of the burned tokens
 func (k Keeper) AddBurnCoin(ctx sdk.Context, coin sdk.Coin) {
 	var total = coin
 	if hasCoin, err := k.GetBurnCoin(ctx, coin.Denom); err == nil {
 		total = total.Add(hasCoin)
 	}
+
 	bz := k.cdc.MustMarshalBinaryBare(&total)
 	key := types.KeyBurnTokenAmt(coin.Denom)
+
 	store := ctx.KVStore(k.storeKey)
 	store.Set(key, bz)
 }
 
-// GetBurnCoin return the total amount of tokens burned
+// GetBurnCoin returns the total amount of the burned tokens
 func (k Keeper) GetBurnCoin(ctx sdk.Context, minUint string) (sdk.Coin, error) {
 	key := types.KeyBurnTokenAmt(minUint)
 	store := ctx.KVStore(k.storeKey)
@@ -146,12 +151,14 @@ func (k Keeper) GetBurnCoin(ctx sdk.Context, minUint string) (sdk.Coin, error) {
 	if len(bz) == 0 {
 		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrNotFoundTokenAmt, "not found symbol:%s", minUint)
 	}
+
 	var coin sdk.Coin
 	k.cdc.MustUnmarshalBinaryBare(bz, &coin)
+
 	return coin, nil
 }
 
-// GetAllBurnCoin return all the total amount of tokens burned
+// GetAllBurnCoin returns the total amount of all the burned tokens
 func (k Keeper) GetAllBurnCoin(ctx sdk.Context) []sdk.Coin {
 	store := ctx.KVStore(k.storeKey)
 
@@ -162,6 +169,7 @@ func (k Keeper) GetAllBurnCoin(ctx sdk.Context) []sdk.Coin {
 		k.cdc.MustUnmarshalBinaryBare(it.Value(), &coin)
 		coins = append(coins, coin)
 	}
+
 	return coins
 }
 
@@ -172,35 +180,32 @@ func (k Keeper) GetParamSet(ctx sdk.Context) types.Params {
 	return p
 }
 
-// SetParamSet set token params from the global param store
+// SetParamSet sets token params to the global param store
 func (k Keeper) SetParamSet(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }
 
-func (k Keeper) setWithOwner(ctx sdk.Context, owner sdk.AccAddress, symbol string) error {
+func (k Keeper) setWithOwner(ctx sdk.Context, owner sdk.AccAddress, symbol string) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.StringValue{Value: symbol})
 
 	store.Set(types.KeyTokens(owner, symbol), bz)
-	return nil
 }
 
-func (k Keeper) setWithMinUnit(ctx sdk.Context, minUnit, symbol string) error {
+func (k Keeper) setWithMinUnit(ctx sdk.Context, minUnit, symbol string) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.StringValue{Value: symbol})
 
 	store.Set(types.KeyMinUint(minUnit), bz)
-	return nil
 }
 
-func (k Keeper) setToken(ctx sdk.Context, token types.Token) error {
+func (k Keeper) setToken(ctx sdk.Context, token types.Token) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryBare(&token)
 
 	store.Set(types.KeySymbol(token.Symbol), bz)
-	return nil
 }
 
 func (k Keeper) getToken(ctx sdk.Context, symbol string) (token types.Token, err error) {
@@ -210,32 +215,23 @@ func (k Keeper) getToken(ctx sdk.Context, symbol string) (token types.Token, err
 	if bz == nil {
 		return token, sdkerrors.Wrap(types.ErrTokenNotExists, fmt.Sprintf("token %s does not exist", symbol))
 	}
+
 	k.cdc.MustUnmarshalBinaryBare(bz, &token)
 	return token, nil
 }
 
-// reset all index by DstOwner of token for query-token command
-func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg types.MsgTransferTokenOwner, token types.Token) error {
+// reset all indices by the new owner for token query
+func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, symbol string, srcOwner, dstOwner sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
 
-	srcOwner, err := sdk.AccAddressFromBech32(msg.SrcOwner)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid source owner address (%s)", err)
-	}
-
-	dstOwner, err := sdk.AccAddressFromBech32(msg.DstOwner)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid destination owner address (%s)", err)
-	}
-
 	// delete the old key
-	store.Delete(types.KeyTokens(srcOwner, token.Symbol))
+	store.Delete(types.KeyTokens(srcOwner, symbol))
 
 	// add the new key
-	return k.setWithOwner(ctx, dstOwner, token.Symbol)
+	k.setWithOwner(ctx, dstOwner, symbol)
 }
 
-// getTokenSupply query issued tokens supply from the total supply
+// getTokenSupply queries the token supply from the total supply
 func (k Keeper) getTokenSupply(ctx sdk.Context, denom string) sdk.Int {
 	return k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(denom)
 }
