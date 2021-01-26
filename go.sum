@@ -312,6 +312,8 @@ github.com/irisnet/irismod v1.2.1-0.20210124020907-085753d41025 h1:+gImhXbHl+SU0
 github.com/irisnet/irismod v1.2.1-0.20210124020907-085753d41025/go.mod h1:wVU9KNSJwWgJ/jVroGENDe96QOk690EisCi9jPo+9m4=
 github.com/irisnet/irismod v1.2.1-0.20210124022409-7097c59fc1a1 h1:fKhHG3tCKeYKZKSs840ATJjCkQlPI4NbQsuZnTIwSto=
 github.com/irisnet/irismod v1.2.1-0.20210124022409-7097c59fc1a1/go.mod h1:wVU9KNSJwWgJ/jVroGENDe96QOk690EisCi9jPo+9m4=
+github.com/irisnet/irismod v1.2.1-0.20210126080025-925e463c2b4c h1:xrWfdMWmB5m1grGySWjzT+I0j2yuAS1hdaJFDL7NK5g=
+github.com/irisnet/irismod v1.2.1-0.20210126080025-925e463c2b4c/go.mod h1:wVU9KNSJwWgJ/jVroGENDe96QOk690EisCi9jPo+9m4=
 github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=
