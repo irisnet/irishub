@@ -39,6 +39,49 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ### Bug Fixes
 
+* (modules/htlc) [\#79](https://github.com/irisnet/irismod/pull/79) Fix HTLC hash-lock length check.
+
+### Improvements
+
+* [\#83](https://github.com/irisnet/irismod/pull/83) Bump cosmos-sdk version to [v0.40.1](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.40.1).
+* [\#83](https://github.com/irisnet/irismod/pull/83) Bump tendermint verion to [v0.34.3](https://github.com/tendermint/tendermint/releases/tag/v0.34.3).
+* [\#92](https://github.com/irisnet/irismod/issues/92) Normalize msg and genesis validation.
+* (modules/service)[\#86](https://github.com/irisnet/irismod/pull/86) Update service default params.
+* (modules/token)[\#85](https://github.com/irisnet/irismod/pull/85) Register denomMetadata to bank module.
+* (modules/nft)[\#78](https://github.com/irisnet/irismod/pull/78) File can be used as schema parameters of `GetCmdIssueDenom`.
+
+## [v1.2.0] - 2021-01-22
+
+### Bug Fixes
+
+* (modules/htlc) [\#71](https://github.com/irisnet/irismod/pull/71) Empty owner is allowed in endpoint `/ndt/collections/{denom-id}/supply`.
+* (modules/service) [\#70](https://github.com/irisnet/irismod/pull/70) Fix minimum deposit calculation.
+* (modules/nft) [\#53](https://github.com/irisnet/irismod/pull/53) Automatically generate key if not specified.
+* (modules/service) [\#41](https://github.com/irisnet/irismod/issues/41) Fix update options in `CmdUpdateServiceBinding`.
+* (modules/token) [\#36](https://github.com/irisnet/irismod/pull/36) Fix REST API `GET /token/params` .
+* [\#33](https://github.com/irisnet/irismod/pull/33) Fix the type of CLI flags.
+* (modules/service) [\#32](https://github.com/irisnet/irismod/pull/32) Fix service response validate.
+* (modules/service) [\#30](https://github.com/irisnet/irismod/pull/30) Fix random and oracle processing service response.
+
+### Improvements
+
+
+* [\#66](https://github.com/irisnet/irismod/pull/66) Bump cosmos-sdk version to [v0.40.0](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.40.0).
+* [\#66](https://github.com/irisnet/irismod/pull/66) Bump tendermint verion to [v0.34.1](https://github.com/tendermint/tendermint/releases/tag/v0.34.1).
+* (modules/coinswap)[\#68](https://github.com/irisnet/irismod/pull/68) Remove standard denom from params and replace prefix ”uni:“ with ”swap/“
+* (modules/token)[\#67](https://github.com/irisnet/irismod/pull/67) Add token burn.
+* [\#64](https://github.com/irisnet/irismod/pull/64) Add preprocessing before exporting the app state.
+* [\#62](https://github.com/irisnet/irismod/pull/62) Add paginate to modules.
+* [\#39](https://github.com/irisnet/irismod/issues/39) Change bytes to string in proto.
+* (modules/service) [\#38](https://github.com/irisnet/irismod/pull/38) Replace msg_index by internal_index to generate request_context_id.
+* [\#37](https://github.com/irisnet/irismod/issues/37) Refactor gRPC gateway REST endpiont.
+* [\#22](https://github.com/irisnet/irismod/issues/22) Refactor viper.GetXXX() to cmd.Flags().GetXXX() in CLI.
+
+
+## [v1.1.1] - 2020-10-20
+
+### Bug Fixes
+
 * (modules/coinswap) [\#27](https://github.com/irisnet/irismod/issues/27) Get liquidity reserve via total supply.
 * (modules/service) [\#26](https://github.com/irisnet/irismod/pull/26) Fix deduct service fees and optimized code.
 * (modules/coinswap) [\#25](https://github.com/irisnet/irismod/pull/25) Integrate htlc beginblock.
