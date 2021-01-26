@@ -1,7 +1,7 @@
 syntax = "proto3";
 package irishub.mint;
 
-import "cosmos/query/pagination.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
 import "mint/mint.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
@@ -24,5 +24,5 @@ message QueryParamsRequest {
 message QueryParamsResponse {
     Params params = 1 [ (gogoproto.nullable) = false ];
 
-    cosmos.query.PageResponse res = 2;
+    cosmos.base.query.v1beta1.PageResponse res = 2;
 }
