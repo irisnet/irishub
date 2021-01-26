@@ -500,6 +500,28 @@
     - [Period](#cosmos.vesting.v1beta1.Period)
     - [PeriodicVestingAccount](#cosmos.vesting.v1beta1.PeriodicVestingAccount)
   
+- [guardian/guardian.proto](#guardian/guardian.proto)
+    - [Super](#irishub.guardian.Super)
+  
+    - [AccountType](#irishub.guardian.AccountType)
+  
+- [guardian/genesis.proto](#guardian/genesis.proto)
+    - [GenesisState](#irishub.guardian.GenesisState)
+  
+- [guardian/query.proto](#guardian/query.proto)
+    - [QuerySupersRequest](#irishub.guardian.QuerySupersRequest)
+    - [QuerySupersResponse](#irishub.guardian.QuerySupersResponse)
+  
+    - [Query](#irishub.guardian.Query)
+  
+- [guardian/tx.proto](#guardian/tx.proto)
+    - [MsgAddSuper](#irishub.guardian.MsgAddSuper)
+    - [MsgAddSuperResponse](#irishub.guardian.MsgAddSuperResponse)
+    - [MsgDeleteSuper](#irishub.guardian.MsgDeleteSuper)
+    - [MsgDeleteSuperResponse](#irishub.guardian.MsgDeleteSuperResponse)
+  
+    - [Msg](#irishub.guardian.Msg)
+  
 - [htlc/htlc.proto](#htlc/htlc.proto)
     - [HTLC](#irismod.htlc.HTLC)
   
@@ -734,6 +756,19 @@
     - [Fraction](#ibc.lightclients.tendermint.v1.Fraction)
     - [Header](#ibc.lightclients.tendermint.v1.Header)
     - [Misbehaviour](#ibc.lightclients.tendermint.v1.Misbehaviour)
+  
+- [mint/mint.proto](#mint/mint.proto)
+    - [Minter](#irishub.mint.Minter)
+    - [Params](#irishub.mint.Params)
+  
+- [mint/genesis.proto](#mint/genesis.proto)
+    - [GenesisState](#irishub.mint.GenesisState)
+  
+- [mint/query.proto](#mint/query.proto)
+    - [QueryParamsRequest](#irishub.mint.QueryParamsRequest)
+    - [QueryParamsResponse](#irishub.mint.QueryParamsResponse)
+  
+    - [Query](#irishub.mint.Query)
   
 - [nft/nft.proto](#nft/nft.proto)
     - [BaseNFT](#irismod.nft.BaseNFT)
@@ -7521,6 +7556,220 @@ periodically vests by unlocking coins during each specified period.
 
 
 
+<a name="guardian/guardian.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## guardian/guardian.proto
+
+
+
+<a name="irishub.guardian.Super"></a>
+
+### Super
+Super defines the super standard
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `description` | [string](#string) |  |  |
+| `account_type` | [AccountType](#irishub.guardian.AccountType) |  |  |
+| `address` | [string](#string) |  |  |
+| `added_by` | [string](#string) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+
+<a name="irishub.guardian.AccountType"></a>
+
+### AccountType
+AccountType defines the super account type
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| GENESIS | 0 | GENESIS defines a genesis account type |
+| ORDINARY | 1 | ORDINARY defines a ordinary account type |
+
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="guardian/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## guardian/genesis.proto
+
+
+
+<a name="irishub.guardian.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the guardian module's genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `supers` | [Super](#irishub.guardian.Super) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="guardian/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## guardian/query.proto
+
+
+
+<a name="irishub.guardian.QuerySupersRequest"></a>
+
+### QuerySupersRequest
+QuerySupersRequest is request type for the Query/Supers RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request. |
+
+
+
+
+
+
+<a name="irishub.guardian.QuerySupersResponse"></a>
+
+### QuerySupersResponse
+QuerySupersResponse is response type for the Query/Supers RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `supers` | [Super](#irishub.guardian.Super) | repeated |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="irishub.guardian.Query"></a>
+
+### Query
+Query creates service with guardian as rpc
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `Supers` | [QuerySupersRequest](#irishub.guardian.QuerySupersRequest) | [QuerySupersResponse](#irishub.guardian.QuerySupersResponse) | Supers returns all Supers | GET|/irishub/guardian/supers|
+
+ <!-- end services -->
+
+
+
+<a name="guardian/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## guardian/tx.proto
+
+
+
+<a name="irishub.guardian.MsgAddSuper"></a>
+
+### MsgAddSuper
+AddSuper defines the properties of add super account message
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `description` | [string](#string) |  |  |
+| `address` | [string](#string) |  |  |
+| `added_by` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irishub.guardian.MsgAddSuperResponse"></a>
+
+### MsgAddSuperResponse
+MsgAddSuperResponse defines the Msg/AddSuper response type
+
+
+
+
+
+
+<a name="irishub.guardian.MsgDeleteSuper"></a>
+
+### MsgDeleteSuper
+DeleteSuper defines the properties of delete super account message
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `address` | [string](#string) |  |  |
+| `deleted_by` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irishub.guardian.MsgDeleteSuperResponse"></a>
+
+### MsgDeleteSuperResponse
+MsgDeleteSuperResponse defines the Msg/DeleteSuper response type
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="irishub.guardian.Msg"></a>
+
+### Msg
+Msg defines the guardian Msg service.
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `AddSuper` | [MsgAddSuper](#irishub.guardian.MsgAddSuper) | [MsgAddSuperResponse](#irishub.guardian.MsgAddSuperResponse) | AddSuper defines a method for adding a super account | |
+| `DeleteSuper` | [MsgDeleteSuper](#irishub.guardian.MsgDeleteSuper) | [MsgDeleteSuperResponse](#irishub.guardian.MsgDeleteSuperResponse) | DeleteSuper defines a method for deleting a super account | |
+
+ <!-- end services -->
+
+
+
 <a name="htlc/htlc.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -10779,6 +11028,138 @@ that implements Misbehaviour interface expected by ICS-02
  <!-- end enums -->
 
  <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="mint/mint.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## mint/mint.proto
+
+
+
+<a name="irishub.mint.Minter"></a>
+
+### Minter
+Minter represents the minting state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `last_update` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | time which the last update was made to the minter |
+| `inflation_base` | [string](#string) |  | base inflation |
+
+
+
+
+
+
+<a name="irishub.mint.Params"></a>
+
+### Params
+mint parameters
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `mint_denom` | [string](#string) |  | type of coin to mint |
+| `inflation` | [string](#string) |  | inflation rate |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="mint/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## mint/genesis.proto
+
+
+
+<a name="irishub.mint.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the guardian module's genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `minter` | [Minter](#irishub.mint.Minter) |  |  |
+| `params` | [Params](#irishub.mint.Params) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="mint/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## mint/query.proto
+
+
+
+<a name="irishub.mint.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+QueryParametersRequest is request type for the Query/Parameters RPC method
+
+
+
+
+
+
+<a name="irishub.mint.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+QueryParametersResponse is response type for the Query/Parameters RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#irishub.mint.Params) |  |  |
+| `res` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="irishub.mint.Query"></a>
+
+### Query
+Query creates service with guardian as rpc
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `Params` | [QueryParamsRequest](#irishub.mint.QueryParamsRequest) | [QueryParamsResponse](#irishub.mint.QueryParamsResponse) | Parameters queries the mint parameters | GET|/irishub/mint/params|
 
  <!-- end services -->
 
