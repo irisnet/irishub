@@ -1,5 +1,5 @@
 syntax = "proto3";
-package cosmos.query;
+package cosmos.base.query.v1beta1;
 
 option go_package = "github.com/cosmos/cosmos-sdk/types/query";
 
