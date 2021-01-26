@@ -138,5 +138,5 @@ func (m MemoryDB) Has(name string) bool {
 The docs of IRISnet SDKs are as follows:
 
 - [Go SDK docs](https://github.com/irisnet/irishub-sdk-go/blob/master/README.md)
-- [JavaScript SDK docs](https://github.com/irisnet/irishub-sdk-js/blob/master/README.md)
-- [Java SDK docs](https://github.com/irisnet/irishub-sdk-java/blob/master/README.md)
+- [JavaScript SDK docs](sdk-js.irisnet.org)
+- Java SDK docs (coming soon)
