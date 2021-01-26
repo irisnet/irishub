@@ -44,9 +44,10 @@ var (
 
 // ValidateToken checks if the given token is valid
 func ValidateToken(token Token) error {
-	_, err := sdk.AccAddressFromBech32(token.Owner)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+	if len(token.Owner) > 0 {
+		if _, err := sdk.AccAddressFromBech32(token.Owner); err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		}
 	}
 
 	if len(token.Name) == 0 || len(token.Name) > MaximumNameLen {

@@ -63,7 +63,7 @@ func ValidateGenesis(data types.GenesisState) error {
 		}
 	}
 
-	// validate token
+	// validate burned coins
 	for _, coin := range data.BurnedCoins {
 		if err := coin.Validate(); err != nil {
 			return err
