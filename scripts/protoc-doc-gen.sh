@@ -18,6 +18,8 @@ cp -r ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/third_party/
 cp -r ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto ./tmp
 cp -r ./proto ./tmp
 
+rm -rf ./tmp/proto/cosmos/mint
+
 # command to generate docs using protoc-doc-gen
 buf protoc \
     -I "tmp/proto" \
