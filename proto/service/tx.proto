@@ -1,7 +1,7 @@
 syntax = "proto3";
 package irismod.service;
 
-import "cosmos_proto/coin.proto";
+import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/service/types";

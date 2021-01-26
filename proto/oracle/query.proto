@@ -5,8 +5,8 @@ import "oracle/oracle.proto";
 import "service/service.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "cosmos_proto/coin.proto";
-import "cosmos/query/pagination.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/oracle/types";
 
@@ -42,14 +42,14 @@ message QueryFeedResponse {
 message QueryFeedsRequest {
     string state = 1;
     // pagination defines an optional pagination for the request.
-    cosmos.query.PageRequest pagination = 2;
+    cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 // QueryFeedsResponse is response type for the Query/Feeds RPC method
 message QueryFeedsResponse {
     repeated FeedContext feeds = 1 [ (gogoproto.nullable) = false ];
 
-    cosmos.query.PageResponse pagination = 2;
+    cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // QueryFeedValueRequest is request type for the Query/FeedValue RPC method

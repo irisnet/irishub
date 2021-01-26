@@ -2,7 +2,7 @@ syntax = "proto3";
 package irismod.oracle;
 
 import "gogoproto/gogo.proto";
-import "cosmos_proto/coin.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/oracle/types";
 

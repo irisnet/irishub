@@ -3,7 +3,7 @@ package irismod.token;
 
 import "gogoproto/gogo.proto";
 import "token/token.proto";
-import "cosmos_proto/coin.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/token/types";
 

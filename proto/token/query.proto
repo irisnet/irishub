@@ -1,9 +1,9 @@
 syntax = "proto3";
 package irismod.token;
 
-import "cosmos_proto/coin.proto";
+import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
-import "cosmos_proto/pagination.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
@@ -13,68 +13,72 @@ option go_package = "github.com/irisnet/irismod/modules/token/types";
 
 // Query creates service with token as rpc
 service Query {
-  // Token returns token with token name
-  rpc Token(QueryTokenRequest) returns (QueryTokenResponse) {
-    option (google.api.http).get = "/irismod/token/tokens/{denom}";
-  }
-  // Tokens returns the token list
-  rpc Tokens(QueryTokensRequest) returns (QueryTokensResponse) {
-    option (google.api.http).get = "/irismod/token/tokens";
-  }
-  // Fees returns the fees to issue or mint a token
-  rpc Fees(QueryFeesRequest) returns (QueryFeesResponse) {
-    option (google.api.http).get = "/irismod/token/tokens/{symbol}/fees";
-  }
-  // Params queries the token parameters
-  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/irismod/token/params";
-  }
-  // Params queries the token parameters
-  rpc TotalBurn(QueryTotalBurnRequest) returns (QueryTotalBurnResponse) {
-    option (google.api.http).get = "/irismod/token/total_burn";
-  }
+    // Token returns token with token name
+    rpc Token(QueryTokenRequest) returns (QueryTokenResponse) {
+        option (google.api.http).get = "/irismod/token/tokens/{denom}";
+    }
+    // Tokens returns the token list
+    rpc Tokens(QueryTokensRequest) returns (QueryTokensResponse) {
+        option (google.api.http).get = "/irismod/token/tokens";
+    }
+    // Fees returns the fees to issue or mint a token
+    rpc Fees(QueryFeesRequest) returns (QueryFeesResponse) {
+        option (google.api.http).get = "/irismod/token/tokens/{symbol}/fees";
+    }
+    // Params queries the token parameters
+    rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+        option (google.api.http).get = "/irismod/token/params";
+    }
+    // Params queries the token parameters
+    rpc TotalBurn(QueryTotalBurnRequest) returns (QueryTotalBurnResponse) {
+        option (google.api.http).get = "/irismod/token/total_burn";
+    }
 }
 
 // QueryTokenRequest is request type for the Query/Token RPC method
-message QueryTokenRequest { string denom = 1; }
+message QueryTokenRequest {
+    string denom = 1;
+}
 
 // QueryTokenResponse is response type for the Query/Token RPC method
 message QueryTokenResponse {
-  google.protobuf.Any Token = 1
-      [ (cosmos_proto.accepts_interface) = "ContentI" ];
+    google.protobuf.Any Token = 1
+        [ (cosmos_proto.accepts_interface) = "ContentI" ];
 }
 
 // QueryTokensRequest is request type for the Query/Tokens RPC method
 message QueryTokensRequest {
-  string owner = 1;
-  // pagination defines an optional pagination for the request.
-  cosmos.query.PageRequest pagination = 2;
+    string owner = 1;
+    // pagination defines an optional pagination for the request.
+    cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 // QueryTokensResponse is response type for the Query/Tokens RPC method
 message QueryTokensResponse {
-  repeated google.protobuf.Any Tokens = 1
-      [ (cosmos_proto.accepts_interface) = "ContentI" ];
+    repeated google.protobuf.Any Tokens = 1
+        [ (cosmos_proto.accepts_interface) = "ContentI" ];
 
-  cosmos.query.PageResponse pagination = 2;
+    cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // QueryFeesRequest is request type for the Query/Fees RPC method
-message QueryFeesRequest { string symbol = 1; }
+message QueryFeesRequest {
+    string symbol = 1;
+}
 
 // QueryFeesResponse is response type for the Query/Fees RPC method
 message QueryFeesResponse {
-  bool exist = 1;
-  cosmos.base.v1beta1.Coin issue_fee = 2 [
-    (gogoproto.nullable) = false,
-    (gogoproto.moretags) = "yaml:\"issue_fee\"",
-    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.Coin"
-  ];
-  cosmos.base.v1beta1.Coin mint_fee = 3 [
-    (gogoproto.nullable) = false,
-    (gogoproto.moretags) = "yaml:\"mint_fee\"",
-    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.Coin"
-  ];
+    bool exist = 1;
+    cosmos.base.v1beta1.Coin issue_fee = 2 [
+        (gogoproto.nullable) = false,
+        (gogoproto.moretags) = "yaml:\"issue_fee\"",
+        (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.Coin"
+    ];
+    cosmos.base.v1beta1.Coin mint_fee = 3 [
+        (gogoproto.nullable) = false,
+        (gogoproto.moretags) = "yaml:\"mint_fee\"",
+        (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.Coin"
+    ];
 }
 
 // QueryParametersRequest is request type for the Query/Parameters RPC method
@@ -82,9 +86,9 @@ message QueryParamsRequest {}
 
 // QueryParametersResponse is response type for the Query/Parameters RPC method
 message QueryParamsResponse {
-  token.Params params = 1 [ (gogoproto.nullable) = false ];
+    token.Params params = 1 [ (gogoproto.nullable) = false ];
 
-  cosmos.query.PageResponse res = 2;
+    cosmos.base.query.v1beta1.PageResponse res = 2;
 }
 
 // QueryTokenRequest is request type for the Query/TotalBurn RPC method
@@ -92,6 +96,6 @@ message QueryTotalBurnRequest {}
 
 // QueryTotalBurnResponse is response type for the Query/TotalBurn RPC method
 message QueryTotalBurnResponse {
-  repeated cosmos.base.v1beta1.DecCoin burned_coins = 1
-      [ (gogoproto.nullable) = false ];
+    repeated cosmos.base.v1beta1.DecCoin burned_coins = 1
+        [ (gogoproto.nullable) = false ];
 }
