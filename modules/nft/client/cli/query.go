@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -49,11 +48,11 @@ func GetCmdQuerySupply() *cobra.Command {
 			}
 
 			var owner sdk.AccAddress
-			rawOwner, err := cmd.Flags().GetString(FlagOwner)
+			ownerStr, err := cmd.Flags().GetString(FlagOwner)
 			if err != nil {
 				return err
 			}
-			ownerStr := strings.TrimSpace(rawOwner)
+
 			if len(ownerStr) > 0 {
 				owner, err = sdk.AccAddressFromBech32(ownerStr)
 				if err != nil {
@@ -61,14 +60,13 @@ func GetCmdQuerySupply() *cobra.Command {
 				}
 			}
 
-			denomID := strings.TrimSpace(args[0])
-			if err := types.ValidateDenomID(denomID); err != nil {
+			if err := types.ValidateDenomID(args[0]); err != nil {
 				return err
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.Supply(context.Background(), &types.QuerySupplyRequest{
-				DenomId: denomID,
+				DenomId: args[0],
 				Owner:   owner.String(),
 			})
 			if err != nil {
@@ -139,8 +137,7 @@ func GetCmdQueryCollection() *cobra.Command {
 				return err
 			}
 
-			denomID := strings.TrimSpace(args[0])
-			if err := types.ValidateDenomID(denomID); err != nil {
+			if err := types.ValidateDenomID(args[0]); err != nil {
 				return err
 			}
 			pageReq, err := client.ReadPageRequest(cmd.Flags())
@@ -151,7 +148,7 @@ func GetCmdQueryCollection() *cobra.Command {
 			resp, err := queryClient.Collection(
 				context.Background(),
 				&types.QueryCollectionRequest{
-					DenomId:    denomID,
+					DenomId:    args[0],
 					Pagination: pageReq,
 				},
 			)
@@ -196,7 +193,7 @@ func GetCmdQueryDenoms() *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryDenoms queries the specified denoms
+// GetCmdQueryDenom queries the specified denoms
 func GetCmdQueryDenom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "denom [denom-id]",
@@ -209,15 +206,14 @@ func GetCmdQueryDenom() *cobra.Command {
 				return err
 			}
 
-			denomID := strings.TrimSpace(args[0])
-			if err := types.ValidateDenomID(denomID); err != nil {
+			if err := types.ValidateDenomID(args[0]); err != nil {
 				return err
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.Denom(
 				context.Background(),
-				&types.QueryDenomRequest{DenomId: denomID},
+				&types.QueryDenomRequest{DenomId: args[0]},
 			)
 			if err != nil {
 				return err
@@ -243,20 +239,18 @@ func GetCmdQueryNFT() *cobra.Command {
 				return err
 			}
 
-			denomID := strings.TrimSpace(args[0])
-			if err := types.ValidateDenomID(denomID); err != nil {
+			if err := types.ValidateDenomID(args[0]); err != nil {
 				return err
 			}
 
-			tokenID := strings.TrimSpace(args[1])
-			if err := types.ValidateTokenID(tokenID); err != nil {
+			if err := types.ValidateTokenID(args[1]); err != nil {
 				return err
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.NFT(context.Background(), &types.QueryNFTRequest{
-				DenomId: denomID,
-				TokenId: tokenID,
+				DenomId: args[0],
+				TokenId: args[1],
 			})
 			if err != nil {
 				return err

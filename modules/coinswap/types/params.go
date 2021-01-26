@@ -1,9 +1,7 @@
 package types
 
 import (
-	"errors"
 	"fmt"
-	"strings"
 
 	"gopkg.in/yaml.v2"
 
@@ -82,9 +80,6 @@ func validateStandardDenom(i interface{}) error {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if strings.TrimSpace(v) == "" {
-		return errors.New("standard denom cannot be blank")
-	}
 	if err := sdk.ValidateDenom(v); err != nil {
 		return err
 	}

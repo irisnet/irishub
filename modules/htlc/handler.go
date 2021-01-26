@@ -17,18 +17,15 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		switch msg := msg.(type) {
 		case *types.MsgCreateHTLC:
-			m := msg.Normalize()
-			res, err := msgServer.CreateHTLC(sdk.WrapSDKContext(ctx), &m)
+			res, err := msgServer.CreateHTLC(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgClaimHTLC:
-			m := msg.Normalize()
-			res, err := msgServer.ClaimHTLC(sdk.WrapSDKContext(ctx), &m)
+			res, err := msgServer.ClaimHTLC(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgRefundHTLC:
-			m := msg.Normalize()
-			res, err := msgServer.RefundHTLC(sdk.WrapSDKContext(ctx), &m)
+			res, err := msgServer.RefundHTLC(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:

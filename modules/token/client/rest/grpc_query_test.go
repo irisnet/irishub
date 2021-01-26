@@ -3,7 +3,6 @@ package rest_test
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/gogo/protobuf/proto"
@@ -109,7 +108,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	err = clientCtx.InterfaceRegistry.UnpackAny(tokenResp.Token, &token)
 	s.Require().NoError(err)
 	s.Require().Equal(name, token.GetName())
-	s.Require().Equal(strings.ToLower(symbol), token.GetSymbol())
+	s.Require().Equal(symbol, token.GetSymbol())
 	s.Require().Equal(uint64(initialSupply), token.GetInitialSupply())
 
 	//------test GetCmdQueryFee()-------------

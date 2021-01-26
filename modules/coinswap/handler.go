@@ -17,18 +17,15 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		switch msg := msg.(type) {
 		case *types.MsgAddLiquidity:
-			m := msg.Normalize()
-			res, err := msgServer.AddLiquidity(sdk.WrapSDKContext(ctx), &m)
+			res, err := msgServer.AddLiquidity(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgSwapOrder:
-			m := msg.Normalize()
-			res, err := msgServer.SwapCoin(sdk.WrapSDKContext(ctx), &m)
+			res, err := msgServer.SwapCoin(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgRemoveLiquidity:
-			m := msg.Normalize()
-			res, err := msgServer.RemoveLiquidity(sdk.WrapSDKContext(ctx), &m)
+			res, err := msgServer.RemoveLiquidity(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:

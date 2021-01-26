@@ -9,7 +9,7 @@ import (
 
 // InitGenesis - store genesis parameters
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
-	if err := ValidateGenesis(data); err != nil {
+	if err := types.ValidateGenesis(data); err != nil {
 		panic(err.Error())
 	}
 
@@ -47,27 +47,4 @@ func DefaultGenesisState() *types.GenesisState {
 		Params: types.DefaultParams(),
 		Tokens: []types.Token{types.GetNativeToken()},
 	}
-}
-
-// ValidateGenesis validates the provided token genesis state to ensure the
-// expected invariants holds.
-func ValidateGenesis(data types.GenesisState) error {
-	if err := types.ValidateParams(data.Params); err != nil {
-		return err
-	}
-
-	// validate token
-	for _, token := range data.Tokens {
-		if err := types.ValidateToken(token); err != nil {
-			return err
-		}
-	}
-
-	// validate burned coins
-	for _, coin := range data.BurnedCoins {
-		if err := coin.Validate(); err != nil {
-			return err
-		}
-	}
-	return nil
 }

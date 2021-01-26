@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/gorilla/mux"
 
@@ -32,7 +31,7 @@ func registerQueryRoutes(cliCtx client.Context, r *mux.Router, queryRoute string
 
 func querySupply(cliCtx client.Context, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		denomID := strings.TrimSpace(mux.Vars(r)[RestParamDenomID])
+		denomID := mux.Vars(r)[RestParamDenomID]
 		err := types.ValidateDenomID(denomID)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

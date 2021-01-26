@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"strings"
-
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -37,7 +35,7 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQue
 		return nil, err
 	}
 
-	token, err := keeper.GetToken(ctx, strings.ToLower(params.Denom))
+	token, err := keeper.GetToken(ctx, params.Denom)
 	if err != nil {
 		return nil, err
 	}
@@ -64,12 +62,11 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuer
 		return nil, err
 	}
 
-	symbol := strings.ToLower(params.Symbol)
-	issueFee := keeper.GetTokenIssueFee(ctx, symbol)
-	mintFee := keeper.GetTokenMintFee(ctx, symbol)
+	issueFee := keeper.GetTokenIssueFee(ctx, params.Symbol)
+	mintFee := keeper.GetTokenMintFee(ctx, params.Symbol)
 
 	fees := types.QueryFeesResponse{
-		Exist:    keeper.HasToken(ctx, symbol),
+		Exist:    keeper.HasToken(ctx, params.Symbol),
 		IssueFee: issueFee,
 		MintFee:  mintFee,
 	}

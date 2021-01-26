@@ -17,8 +17,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		switch msg := msg.(type) {
 		case *types.MsgCreateRecord:
-			m := msg.Normalize()
-			res, err := msgServer.CreateRecord(sdk.WrapSDKContext(ctx), &m)
+			res, err := msgServer.CreateRecord(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:

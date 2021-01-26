@@ -3,8 +3,6 @@ package keeper
 import (
 	"context"
 
-	"strings"
-
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -40,12 +38,11 @@ func (k Keeper) Feeds(c context.Context, req *types.QueryFeedsRequest) (*types.Q
 	}
 	ctx := sdk.UnwrapSDKContext(c)
 
-	state := strings.TrimSpace(req.State)
 	var result types.FeedsContext
 	var pageRes *query.PageResponse
 	var err error
 	store := ctx.KVStore(k.storeKey)
-	if len(state) == 0 {
+	if len(req.State) == 0 {
 		feedStore := prefix.NewStore(store, types.GetFeedPrefixKey())
 		pageRes, err = query.Paginate(feedStore, req.Pagination, func(key []byte, value []byte) error {
 			var feed types.Feed

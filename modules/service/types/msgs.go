@@ -1,8 +1,6 @@
 package types
 
 import (
-	"strings"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -70,8 +68,6 @@ func (msg MsgDefineService) Type() string { return TypeMsgDefineService }
 
 // ValidateBasic implements Msg
 func (msg MsgDefineService) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	if err := ValidateAuthor(msg.Author); err != nil {
 		return err
 	}
@@ -92,13 +88,6 @@ func (msg MsgDefineService) ValidateBasic() error {
 		return err
 	}
 	return ValidateServiceSchemas(msg.Schemas)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgDefineService) Normalize() MsgDefineService {
-	msg.Name = strings.TrimSpace(msg.Name)
-	msg.Schemas = strings.TrimSpace(msg.Schemas)
-	return msg
 }
 
 // GetSignBytes implements Msg
@@ -161,8 +150,6 @@ func (msg MsgBindService) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgBindService) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
@@ -187,14 +174,6 @@ func (msg MsgBindService) ValidateBasic() error {
 		return err
 	}
 	return ValidateBindingPricing(msg.Pricing)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgBindService) Normalize() MsgBindService {
-	msg.ServiceName = strings.TrimSpace(msg.ServiceName)
-	msg.Pricing = strings.TrimSpace(msg.Pricing)
-	msg.Options = strings.TrimSpace(msg.Options)
-	return msg
 }
 
 // GetSigners implements Msg.
@@ -247,8 +226,6 @@ func (msg MsgUpdateServiceBinding) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgUpdateServiceBinding) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
@@ -277,14 +254,6 @@ func (msg MsgUpdateServiceBinding) ValidateBasic() error {
 		return ValidateBindingPricing(msg.Pricing)
 	}
 	return nil
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgUpdateServiceBinding) Normalize() MsgUpdateServiceBinding {
-	msg.ServiceName = strings.TrimSpace(msg.ServiceName)
-	msg.Pricing = strings.TrimSpace(msg.Pricing)
-	msg.Options = strings.TrimSpace(msg.Options)
-	return msg
 }
 
 // GetSigners implements Msg.
@@ -320,8 +289,6 @@ func (msg MsgSetWithdrawAddress) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgSetWithdrawAddress) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	if err := ValidateOwner(msg.Owner); err != nil {
 		return err
 	}
@@ -367,8 +334,6 @@ func (msg MsgDisableServiceBinding) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgDisableServiceBinding) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
@@ -378,12 +343,6 @@ func (msg MsgDisableServiceBinding) ValidateBasic() error {
 	}
 
 	return ValidateServiceName(msg.ServiceName)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgDisableServiceBinding) Normalize() MsgDisableServiceBinding {
-	msg.ServiceName = strings.TrimSpace(msg.ServiceName)
-	return msg
 }
 
 // GetSigners implements Msg.
@@ -430,8 +389,6 @@ func (msg MsgEnableServiceBinding) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgEnableServiceBinding) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
@@ -450,12 +407,6 @@ func (msg MsgEnableServiceBinding) ValidateBasic() error {
 		}
 	}
 	return nil
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgEnableServiceBinding) Normalize() MsgEnableServiceBinding {
-	msg.ServiceName = strings.TrimSpace(msg.ServiceName)
-	return msg
 }
 
 // GetSigners implements Msg.
@@ -492,8 +443,6 @@ func (msg MsgRefundServiceDeposit) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgRefundServiceDeposit) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
@@ -502,12 +451,6 @@ func (msg MsgRefundServiceDeposit) ValidateBasic() error {
 		return err
 	}
 	return ValidateServiceName(msg.ServiceName)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgRefundServiceDeposit) Normalize() MsgRefundServiceDeposit {
-	msg.ServiceName = strings.TrimSpace(msg.ServiceName)
-	return msg
 }
 
 // GetSigners implements Msg.
@@ -571,8 +514,6 @@ func (msg MsgCallService) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgCallService) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	if err := ValidateConsumer(msg.Consumer); err != nil {
 		return err
 	}
@@ -596,13 +537,6 @@ func (msg MsgCallService) ValidateBasic() error {
 		msg.RepeatedFrequency,
 		msg.RepeatedTotal,
 	)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgCallService) Normalize() MsgCallService {
-	msg.ServiceName = strings.TrimSpace(msg.ServiceName)
-	msg.Input = strings.TrimSpace(msg.Input)
-	return msg
 }
 
 // GetSigners implements Msg.
@@ -640,8 +574,6 @@ func (msg MsgRespondService) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgRespondService) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
@@ -659,14 +591,6 @@ func (msg MsgRespondService) ValidateBasic() error {
 		return err
 	}
 	return ValidateOutput(result.Code, msg.Output)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgRespondService) Normalize() MsgRespondService {
-	msg.RequestId = strings.TrimSpace(msg.RequestId)
-	msg.Output = strings.TrimSpace(msg.Output)
-	msg.Result = strings.TrimSpace(msg.Result)
-	return msg
 }
 
 // GetSigners implements Msg.
@@ -702,18 +626,10 @@ func (msg MsgPauseRequestContext) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgPauseRequestContext) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	if err := ValidateConsumer(msg.Consumer); err != nil {
 		return err
 	}
 	return ValidateContextID(msg.RequestContextId)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgPauseRequestContext) Normalize() MsgPauseRequestContext {
-	msg.RequestContextId = strings.TrimSpace(msg.RequestContextId)
-	return msg
 }
 
 // GetSigners implements Msg.
@@ -749,17 +665,10 @@ func (msg MsgStartRequestContext) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgStartRequestContext) ValidateBasic() error {
-	msg = msg.Normalize()
 	if err := ValidateConsumer(msg.Consumer); err != nil {
 		return err
 	}
 	return ValidateContextID(msg.RequestContextId)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgStartRequestContext) Normalize() MsgStartRequestContext {
-	msg.RequestContextId = strings.TrimSpace(msg.RequestContextId)
-	return msg
 }
 
 // GetSigners implements Msg.
@@ -795,17 +704,10 @@ func (msg MsgKillRequestContext) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgKillRequestContext) ValidateBasic() error {
-	msg = msg.Normalize()
 	if err := ValidateConsumer(msg.Consumer); err != nil {
 		return err
 	}
 	return ValidateContextID(msg.RequestContextId)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgKillRequestContext) Normalize() MsgKillRequestContext {
-	msg.RequestContextId = strings.TrimSpace(msg.RequestContextId)
-	return msg
 }
 
 // GetSigners implements Msg.
@@ -863,8 +765,6 @@ func (msg MsgUpdateRequestContext) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgUpdateRequestContext) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	if err := ValidateConsumer(msg.Consumer); err != nil {
 		return err
 	}
@@ -889,12 +789,6 @@ func (msg MsgUpdateRequestContext) ValidateBasic() error {
 		msg.RepeatedFrequency,
 		msg.RepeatedTotal,
 	)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgUpdateRequestContext) Normalize() MsgUpdateRequestContext {
-	msg.RequestContextId = strings.TrimSpace(msg.RequestContextId)
-	return msg
 }
 
 // GetSigners implements Msg.
@@ -930,13 +824,7 @@ func (msg MsgWithdrawEarnedFees) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgWithdrawEarnedFees) ValidateBasic() error {
-	msg = msg.Normalize()
 	return ValidateOwner(msg.Owner)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgWithdrawEarnedFees) Normalize() MsgWithdrawEarnedFees {
-	return msg
 }
 
 // GetSigners implements Msg.

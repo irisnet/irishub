@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/tidwall/gjson"
@@ -17,10 +16,10 @@ import (
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/irisnet/irismod/modules/oracle/types"
-	servicetypes "github.com/irisnet/irismod/modules/service/types"
+	serviceexported "github.com/irisnet/irismod/modules/service/exported"
 )
 
-// Keeper
+// Keeper define a struct for oracle keeper
 type Keeper struct {
 	cdc        codec.Marshaler
 	storeKey   sdk.StoreKey
@@ -28,7 +27,7 @@ type Keeper struct {
 	paramSpace paramtypes.Subspace
 }
 
-// NewKeeper
+// NewKeeper return a instance of oracle Keeper
 func NewKeeper(
 	cdc codec.Marshaler,
 	storeKey sdk.StoreKey,
@@ -45,10 +44,10 @@ func NewKeeper(
 	_ = sk.RegisterResponseCallback(types.ModuleName, keeper.HandlerResponse)
 	_ = sk.RegisterStateCallback(types.ModuleName, keeper.HandlerStateChanged)
 	_ = sk.RegisterModuleService(
-		servicetypes.RegisterModuleName,
-		&servicetypes.ModuleService{
-			ServiceName:     servicetypes.OraclePriceServiceName,
-			Provider:        servicetypes.OraclePriceServiceProvider,
+		serviceexported.RegisterModuleName,
+		&serviceexported.ModuleService{
+			ServiceName:     serviceexported.OraclePriceServiceName,
+			Provider:        serviceexported.OraclePriceServiceProvider,
 			ReuquestService: keeper.ModuleServiceRequest,
 		},
 	)
@@ -81,7 +80,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg *types.MsgCreateFeed) error {
 		true,
 		msg.RepeatedFrequency,
 		-1,
-		servicetypes.PAUSED,
+		serviceexported.PAUSED,
 		msg.ResponseThreshold,
 		types.ModuleName,
 	)
@@ -98,7 +97,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg *types.MsgCreateFeed) error {
 		Description:      msg.Description,
 		Creator:          msg.Creator,
 	})
-	k.Enqueue(ctx, msg.FeedName, servicetypes.PAUSED)
+	k.Enqueue(ctx, msg.FeedName, serviceexported.PAUSED)
 
 	return nil
 }
@@ -123,7 +122,7 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg *types.MsgStartFeed) error {
 	}
 
 	// Can not start feed in "running" state
-	if reqCtx.State == servicetypes.RUNNING {
+	if reqCtx.State == serviceexported.RUNNING {
 		return sdkerrors.Wrapf(types.ErrInvalidFeedState, msg.FeedName)
 	}
 
@@ -131,7 +130,7 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg *types.MsgStartFeed) error {
 		return err
 	}
 
-	k.dequeueAndEnqueue(ctx, msg.FeedName, servicetypes.PAUSED, servicetypes.RUNNING)
+	k.dequeueAndEnqueue(ctx, msg.FeedName, serviceexported.PAUSED, serviceexported.RUNNING)
 	return nil
 }
 
@@ -155,7 +154,7 @@ func (k Keeper) PauseFeed(ctx sdk.Context, msg *types.MsgPauseFeed) error {
 	}
 
 	// Can only pause feed in "running" state
-	if reqCtx.State != servicetypes.RUNNING {
+	if reqCtx.State != serviceexported.RUNNING {
 		return sdkerrors.Wrapf(types.ErrInvalidFeedState, msg.FeedName)
 	}
 
@@ -163,7 +162,7 @@ func (k Keeper) PauseFeed(ctx sdk.Context, msg *types.MsgPauseFeed) error {
 		return err
 	}
 
-	k.dequeueAndEnqueue(ctx, msg.FeedName, servicetypes.RUNNING, servicetypes.PAUSED)
+	k.dequeueAndEnqueue(ctx, msg.FeedName, serviceexported.RUNNING, serviceexported.PAUSED)
 	return nil
 }
 
@@ -210,7 +209,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg *types.MsgEditFeed) error {
 	}
 
 	if types.Modified(msg.Description) {
-		feed.Description = strings.TrimSpace(msg.Description)
+		feed.Description = msg.Description
 	}
 
 	k.SetFeed(ctx, feed)
@@ -260,7 +259,7 @@ func (k Keeper) HandlerResponse(
 
 	var data []types.ArgsType
 	for _, jsonStr := range responseOutput {
-		result := gjson.Get(jsonStr, servicetypes.PATH_BODY).Get(feed.ValueJsonPath)
+		result := gjson.Get(jsonStr, serviceexported.PATH_BODY).Get(feed.ValueJsonPath)
 		data = append(data, result)
 	}
 
@@ -300,13 +299,13 @@ func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID tmbytes.He
 		return
 	}
 
-	var oldState servicetypes.RequestContextState
+	var oldState serviceexported.RequestContextState
 	switch reqCtx.State {
-	case servicetypes.PAUSED:
-		oldState = servicetypes.RUNNING
-	case servicetypes.RUNNING:
-		oldState = servicetypes.PAUSED
-	case servicetypes.COMPLETED:
+	case serviceexported.PAUSED:
+		oldState = serviceexported.RUNNING
+	case serviceexported.RUNNING:
+		oldState = serviceexported.PAUSED
+	case serviceexported.COMPLETED:
 		ctx.Logger().Error(
 			"Feed state invalid",
 			"requestContextID", requestContextID.String(),
@@ -324,12 +323,12 @@ func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID tmbytes.He
 	k.dequeueAndEnqueue(ctx, feed.FeedName, oldState, reqCtx.State)
 }
 
-func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes) (servicetypes.RequestContext, bool) {
+func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes) (serviceexported.RequestContext, bool) {
 	return k.sk.GetRequestContext(ctx, requestContextID)
 }
 
 func (k Keeper) ModuleServiceRequest(ctx sdk.Context, input string) (result string, output string) {
-	feedName := gjson.Get(input, servicetypes.PATH_BODY).Get("pair").String()
+	feedName := gjson.Get(input, serviceexported.PATH_BODY).Get("pair").String()
 	if _, found := k.GetFeed(ctx, feedName); !found {
 		result = `{"code":"400","message":"feed not found"}`
 		return

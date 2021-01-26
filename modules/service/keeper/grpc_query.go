@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"encoding/hex"
-	"strings"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -296,9 +295,8 @@ func (k Keeper) Schema(c context.Context, req *types.QuerySchemaRequest) (*types
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
 
-	var schemaName = strings.ToLower(req.SchemaName)
 	var schema string
-	switch schemaName {
+	switch req.SchemaName {
 	case "pricing":
 		schema = types.PricingSchema
 	case "result":

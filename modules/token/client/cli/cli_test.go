@@ -3,7 +3,6 @@ package cli_test
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/gogo/protobuf/proto"
@@ -106,7 +105,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*types.Any), &token)
 	s.Require().NoError(err)
 	s.Require().Equal(name, token.GetName())
-	s.Require().Equal(strings.ToLower(symbol), token.GetSymbol())
+	s.Require().Equal(symbol, token.GetSymbol())
 	s.Require().Equal(uint64(initialSupply), token.GetInitialSupply())
 
 	//------test GetCmdQueryFee()-------------
@@ -133,7 +132,7 @@ func (s *IntegrationTestSuite) TestToken() {
 
 	//------test GetCmdMintToken()-------------
 	coinType := proto.Message(&sdk.Coin{})
-	out, err := simapp.QueryBalanceExec(clientCtx, from.String(), strings.ToLower(symbol))
+	out, err := simapp.QueryBalanceExec(clientCtx, from.String(), symbol)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
 	balance := coinType.(*sdk.Coin)
@@ -156,7 +155,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-	out, err = simapp.QueryBalanceExec(clientCtx, from.String(), strings.ToLower(symbol))
+	out, err = simapp.QueryBalanceExec(clientCtx, from.String(), symbol)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
 	balance = coinType.(*sdk.Coin)
@@ -182,7 +181,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-	out, err = simapp.QueryBalanceExec(clientCtx, from.String(), strings.ToLower(symbol))
+	out, err = simapp.QueryBalanceExec(clientCtx, from.String(), symbol)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
 	balance = coinType.(*sdk.Coin)

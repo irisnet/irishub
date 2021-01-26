@@ -1,27 +1,29 @@
 package types
 
 import (
-	"strings"
+	"regexp"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	"github.com/irisnet/irismod/modules/service/exported"
 )
 
 const (
 	MaxLatestHistory    = 100
-	MaxNameLen          = 70
 	MaxAggregateFuncLen = 10
 	MaxValueJsonPath    = 70
 	MaxDescriptionLen   = 280
 )
 
+var (
+	// the feed name only accepts alphanumeric characters, _ and -
+	regexpFeedName = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_-]*$`)
+)
+
 // ValidateFeedName verify that the feedName is legal
 func ValidateFeedName(feedName string) error {
-	if len(feedName) == 0 || len(feedName) > MaxNameLen {
-		return sdkerrors.Wrap(ErrInvalidFeedName, feedName)
-	}
-
-	if !regPlainText.MatchString(feedName) {
+	if !regexpFeedName.MatchString(feedName) {
 		return sdkerrors.Wrap(ErrInvalidFeedName, feedName)
 	}
 	return nil
@@ -49,7 +51,6 @@ func ValidateAggregateFunc(aggregateFunc string) error {
 
 // ValidateValueJSONPath verify that the valueJsonPath is legal
 func ValidateValueJSONPath(valueJSONPath string) error {
-	valueJSONPath = strings.TrimSpace(valueJSONPath)
 	if len(valueJSONPath) == 0 || len(valueJSONPath) > MaxValueJsonPath {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the length of valueJson path func must less than %d, got: %d", MaxAggregateFuncLen, len(valueJSONPath))
 	}
@@ -74,13 +75,7 @@ func ValidateCreator(creator string) error {
 
 // ValidateServiceName verifies whether the  parameters are legal
 func ValidateServiceName(serviceName string) error {
-	if len(serviceName) == 0 || len(serviceName) > MaxNameLen {
-		return sdkerrors.Wrapf(ErrInvalidServiceName, serviceName)
-	}
-	if !regPlainText.MatchString(serviceName) {
-		return sdkerrors.Wrapf(ErrInvalidServiceName, serviceName)
-	}
-	return nil
+	return exported.ValidateServiceName(serviceName)
 }
 
 // ValidateResponseThreshold verifies whether the  parameters are legal

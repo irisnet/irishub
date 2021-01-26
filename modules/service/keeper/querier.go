@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"strings"
-
 	gogotypes "github.com/gogo/protobuf/types"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -314,10 +312,9 @@ func querySchema(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerier
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
-	var schemaName = strings.ToLower(params.SchemaName)
 	var schema string
 
-	switch schemaName {
+	switch params.SchemaName {
 	case "pricing":
 		schema = types.PricingSchema
 	case "result":

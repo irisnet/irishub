@@ -1,8 +1,6 @@
 package types
 
 import (
-	"strings"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -55,8 +53,6 @@ func (msg MsgIssueToken) Type() string { return TypeMsgIssueToken }
 
 // ValidateBasic Implements Msg.
 func (msg MsgIssueToken) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
@@ -74,14 +70,6 @@ func (msg MsgIssueToken) ValidateBasic() error {
 			owner,
 		),
 	)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgIssueToken) Normalize() MsgIssueToken {
-	msg.Symbol = strings.TrimSpace(msg.Symbol)
-	msg.Name = strings.TrimSpace(msg.Name)
-	msg.MinUnit = strings.TrimSpace(msg.MinUnit)
-	return msg
 }
 
 // GetSignBytes Implements Msg.
@@ -132,8 +120,6 @@ func (msg MsgTransferTokenOwner) GetSigners() []sdk.AccAddress {
 
 // ValidateBasic implements Msg
 func (msg MsgTransferTokenOwner) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	srcOwner, err := sdk.AccAddressFromBech32(msg.SrcOwner)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid source owner address (%s)", err)
@@ -155,12 +141,6 @@ func (msg MsgTransferTokenOwner) ValidateBasic() error {
 	}
 
 	return nil
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgTransferTokenOwner) Normalize() MsgTransferTokenOwner {
-	msg.Symbol = strings.TrimSpace(msg.Symbol)
-	return msg
 }
 
 // Route implements Msg
@@ -207,8 +187,6 @@ func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
 
 // ValidateBasic implements Msg
 func (msg MsgEditToken) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	// check owner
 	if _, err := sdk.AccAddressFromBech32(msg.Owner); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
@@ -224,13 +202,6 @@ func (msg MsgEditToken) ValidateBasic() error {
 
 	// check symbol
 	return ValidateSymbol(msg.Symbol)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgEditToken) Normalize() MsgEditToken {
-	msg.Symbol = strings.TrimSpace(msg.Symbol)
-	msg.Name = strings.TrimSpace(msg.Name)
-	return msg
 }
 
 // NewMsgMintToken creates a MsgMintToken
@@ -269,8 +240,6 @@ func (msg MsgMintToken) GetSigners() []sdk.AccAddress {
 
 // ValidateBasic implements Msg
 func (msg MsgMintToken) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	// check the owner
 	if _, err := sdk.AccAddressFromBech32(msg.Owner); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
@@ -288,12 +257,6 @@ func (msg MsgMintToken) ValidateBasic() error {
 	}
 
 	return ValidateSymbol(msg.Symbol)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgMintToken) Normalize() MsgMintToken {
-	msg.Symbol = strings.TrimSpace(msg.Symbol)
-	return msg
 }
 
 // NewMsgBurnToken creates a MsgMintToken
@@ -331,8 +294,6 @@ func (msg MsgBurnToken) GetSigners() []sdk.AccAddress {
 
 // ValidateBasic implements Msg
 func (msg MsgBurnToken) ValidateBasic() error {
-	msg = msg.Normalize()
-
 	// check the owner
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
@@ -343,10 +304,4 @@ func (msg MsgBurnToken) ValidateBasic() error {
 	}
 
 	return ValidateSymbol(msg.Symbol)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgBurnToken) Normalize() MsgBurnToken {
-	msg.Symbol = strings.TrimSpace(msg.Symbol)
-	return msg
 }

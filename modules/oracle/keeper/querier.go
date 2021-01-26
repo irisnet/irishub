@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"encoding/hex"
-	"strings"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -54,9 +53,8 @@ func queryFeeds(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierC
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
-	state := strings.TrimSpace(params.State)
 	var result types.FeedsContext
-	if len(state) == 0 {
+	if len(params.State) == 0 {
 		k.IteratorFeeds(ctx, func(feed types.Feed) {
 			result = append(result, BuildFeedContext(ctx, k, feed))
 		})

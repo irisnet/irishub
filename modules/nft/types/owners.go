@@ -2,7 +2,6 @@ package types
 
 import (
 	"bytes"
-	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -10,7 +9,7 @@ import (
 // NewIDCollection creates a new IDCollection instance
 func NewIDCollection(denomID string, tokenIDs []string) IDCollection {
 	return IDCollection{
-		DenomId:  strings.TrimSpace(denomID),
+		DenomId:  denomID,
 		TokenIds: tokenIDs,
 	}
 }

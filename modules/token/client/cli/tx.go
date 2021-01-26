@@ -228,7 +228,7 @@ func GetCmdMintToken() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if len(strings.TrimSpace(addr)) > 0 {
+			if len(addr) > 0 {
 				if _, err = sdk.AccAddressFromBech32(addr); err != nil {
 					return err
 				}
@@ -303,7 +303,7 @@ func GetCmdBurnToken() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if len(strings.TrimSpace(addr)) > 0 {
+			if len(addr) > 0 {
 				if _, err = sdk.AccAddressFromBech32(addr); err != nil {
 					return err
 				}

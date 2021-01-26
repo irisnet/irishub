@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"strings"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -18,19 +17,18 @@ import (
 var _ types.QueryServer = Keeper{}
 
 func (k Keeper) Supply(c context.Context, request *types.QuerySupplyRequest) (*types.QuerySupplyResponse, error) {
-	denom := strings.ToLower(strings.TrimSpace(request.DenomId))
 	ctx := sdk.UnwrapSDKContext(c)
 
 	var supply uint64
 	switch {
-	case len(request.Owner) == 0 && len(denom) > 0:
-		supply = k.GetTotalSupply(ctx, denom)
+	case len(request.Owner) == 0 && len(request.DenomId) > 0:
+		supply = k.GetTotalSupply(ctx, request.DenomId)
 	default:
 		owner, err := sdk.AccAddressFromBech32(request.Owner)
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "invalid owner address %s", request.Owner)
 		}
-		supply = k.GetTotalSupplyOfOwner(ctx, denom, owner)
+		supply = k.GetTotalSupplyOfOwner(ctx, request.DenomId, owner)
 	}
 	return &types.QuerySupplyResponse{Amount: supply}, nil
 }
@@ -74,10 +72,9 @@ func (k Keeper) Owner(c context.Context, request *types.QueryOwnerRequest) (*typ
 }
 
 func (k Keeper) Collection(c context.Context, request *types.QueryCollectionRequest) (*types.QueryCollectionResponse, error) {
-	denom := strings.ToLower(strings.TrimSpace(request.DenomId))
 	ctx := sdk.UnwrapSDKContext(c)
 
-	collection, pageRes, err := k.GetPaginateCollection(ctx, request, denom)
+	collection, pageRes, err := k.GetPaginateCollection(ctx, request, request.DenomId)
 	if err != nil {
 		return nil, err
 	}
@@ -85,10 +82,9 @@ func (k Keeper) Collection(c context.Context, request *types.QueryCollectionRequ
 }
 
 func (k Keeper) Denom(c context.Context, request *types.QueryDenomRequest) (*types.QueryDenomResponse, error) {
-	denom := strings.ToLower(strings.TrimSpace(request.DenomId))
 	ctx := sdk.UnwrapSDKContext(c)
 
-	denomObject, err := k.GetDenom(ctx, denom)
+	denomObject, err := k.GetDenom(ctx, request.DenomId)
 	if err != nil {
 		return nil, err
 	}
@@ -119,11 +115,9 @@ func (k Keeper) Denoms(c context.Context, req *types.QueryDenomsRequest) (*types
 }
 
 func (k Keeper) NFT(c context.Context, request *types.QueryNFTRequest) (*types.QueryNFTResponse, error) {
-	denom := strings.ToLower(strings.TrimSpace(request.DenomId))
-	tokenID := strings.ToLower(strings.TrimSpace(request.TokenId))
 	ctx := sdk.UnwrapSDKContext(c)
 
-	nft, err := k.GetNFT(ctx, denom, tokenID)
+	nft, err := k.GetNFT(ctx, request.DenomId, request.TokenId)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrUnknownNFT, "invalid NFT %s from collection %s", request.TokenId, request.DenomId)
 	}

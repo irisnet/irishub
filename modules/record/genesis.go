@@ -1,9 +1,6 @@
 package record
 
 import (
-	"errors"
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irismod/modules/record/keeper"
@@ -12,6 +9,10 @@ import (
 
 // InitGenesis stores genesis data
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
+	if err := types.ValidateGenesis(data); err != nil {
+		panic(err.Error())
+	}
+
 	for _, record := range data.Records {
 		k.AddRecord(ctx, record)
 	}
@@ -30,24 +31,4 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	}
 
 	return types.NewGenesisState(records)
-}
-
-// ValidateGenesis validates the provided record genesis state to ensure the
-// expected invariants holds.
-func ValidateGenesis(data types.GenesisState) error {
-	for _, record := range data.Records {
-		if len(record.Contents) == 0 {
-			return errors.New("contents missing")
-		}
-
-		_, err := sdk.AccAddressFromBech32(record.Creator)
-		if err != nil {
-			return fmt.Errorf("invalid record creator address (%s)", err)
-		}
-
-		if err := types.ValidateContents(record.Contents...); err != nil {
-			return nil
-		}
-	}
-	return nil
 }

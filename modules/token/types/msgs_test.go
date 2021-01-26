@@ -33,7 +33,6 @@ func TestMsgIssueAsset(t *testing.T) {
 		{"symbol too long", NewMsgIssueToken("stake123456789012345678901234567890123456789012345678901234567890", "satoshi", "Bitcoin Network", 9, 1, 1, true, addr), false},
 		{"symbol too short", NewMsgIssueToken("ht", "satoshi", "Bitcoin Network", 9, 1, 1, true, addr), false},
 		{"name empty", NewMsgIssueToken("stake", "satoshi", "", 9, 1, 1, true, addr), false},
-		{"name blank", NewMsgIssueToken("stake", "satoshi", " ", 9, 1, 1, true, addr), false},
 		{"name too long", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 9, 1, 1, true, addr), false},
 		{"initial supply is zero", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network", 9, 0, 1, true, addr), true},
 		{"max supply is zero", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network", 9, 1, 0, true, addr), true},

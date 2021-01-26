@@ -2,7 +2,6 @@ package types
 
 import (
 	"regexp"
-	"strings"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/irisnet/irismod/modules/token/types"
@@ -36,7 +35,6 @@ func ValidateDenomID(denomID string) error {
 
 // ValidateTokenID verify that the tokenID is legal
 func ValidateTokenID(tokenID string) error {
-	tokenID = strings.TrimSpace(tokenID)
 	if len(tokenID) < MinDenomLen || len(tokenID) > MaxDenomLen {
 		return sdkerrors.Wrapf(ErrInvalidTokenID, "invalid tokenID %s, only accepts value [%d, %d]", tokenID, MinDenomLen, MaxDenomLen)
 	}

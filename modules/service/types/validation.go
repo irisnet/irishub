@@ -25,7 +25,8 @@ const (
 
 var (
 	// the service name only accepts alphanumeric characters, _ and -, beginning with alpha character
-	reServiceName = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_-]*$`)
+	regexpServiceName = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_-]*$`)
+	regexpTag         = regexp.MustCompile(`^[\S]{1,70}$`)
 )
 
 // ValidateAuthor verifies whether the  parameters are legal
@@ -38,7 +39,7 @@ func ValidateAuthor(author string) error {
 
 // ValidateServiceName validates the service name
 func ValidateServiceName(name string) error {
-	if !reServiceName.MatchString(name) || len(name) > MaxNameLength {
+	if !regexpServiceName.MatchString(name) || len(name) > MaxNameLength {
 		return sdkerrors.Wrap(ErrInvalidServiceName, name)
 	}
 	return nil
@@ -53,11 +54,8 @@ func ValidateTags(tags []string) error {
 		return sdkerrors.Wrap(ErrInvalidTags, "duplicate tag")
 	}
 	for i, tag := range tags {
-		if len(tag) == 0 {
-			return sdkerrors.Wrap(ErrInvalidTags, fmt.Sprintf("invalid tag[%d] length: tag must not be empty", i))
-		}
-		if len(tag) > MaxTagLength {
-			return sdkerrors.Wrap(ErrInvalidTags, fmt.Sprintf("invalid tag[%d] length; got: %d, max: %d", i, len(tag), MaxTagLength))
+		if !regexpTag.MatchString(tag) {
+			return sdkerrors.Wrapf(ErrInvalidTags, "invalid tag[%d], must match regexp: %s", i, regexpTag.String())
 		}
 	}
 	return nil

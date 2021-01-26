@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"encoding/binary"
-	"strings"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -43,14 +42,11 @@ func querySupply(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerier
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
-	denom := strings.ToLower(strings.TrimSpace(params.Denom))
-
 	var supply uint64
-	switch {
-	case params.Owner.Empty() && len(denom) > 0:
-		supply = k.GetTotalSupply(ctx, denom)
-	default:
-		supply = k.GetTotalSupplyOfOwner(ctx, denom, params.Owner)
+	if params.Owner.Empty() && len(params.Denom) > 0 {
+		supply = k.GetTotalSupply(ctx, params.Denom)
+	} else {
+		supply = k.GetTotalSupplyOfOwner(ctx, params.Denom, params.Owner)
 	}
 
 	bz := make([]byte, 8)
@@ -83,8 +79,7 @@ func queryCollection(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQue
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
-	denom := strings.ToLower(strings.TrimSpace(params.Denom))
-	collection, err := k.GetCollection(ctx, denom)
+	collection, err := k.GetCollection(ctx, params.Denom)
 	if err != nil {
 		return nil, err
 	}
@@ -132,9 +127,7 @@ func queryNFT(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierCdc
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
-	denom := strings.ToLower(strings.TrimSpace(params.Denom))
-	tokenID := strings.ToLower(strings.TrimSpace(params.TokenID))
-	nft, err := k.GetNFT(ctx, denom, tokenID)
+	nft, err := k.GetNFT(ctx, params.Denom, params.TokenID)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrUnknownNFT, "invalid NFT %s from collection %s", params.TokenID, params.Denom)
 	}

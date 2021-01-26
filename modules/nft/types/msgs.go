@@ -1,8 +1,6 @@
 package types
 
 import (
-	"strings"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -42,7 +40,6 @@ func (msg MsgIssueDenom) Type() string { return TypeMsgIssueDenom }
 
 // ValidateBasic Implements Msg.
 func (msg MsgIssueDenom) ValidateBasic() error {
-	msg = msg.Normalize()
 	if err := ValidateDenomID(msg.Id); err != nil {
 		return err
 	}
@@ -51,14 +48,6 @@ func (msg MsgIssueDenom) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgIssueDenom) Normalize() MsgIssueDenom {
-	msg.Id = strings.TrimSpace(msg.Id)
-	msg.Name = strings.TrimSpace(msg.Name)
-	msg.Schema = strings.TrimSpace(msg.Schema)
-	return msg
 }
 
 // GetSignBytes Implements Msg.
@@ -99,7 +88,6 @@ func (msg MsgTransferNFT) Type() string { return TypeMsgTransferNFT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgTransferNFT) ValidateBasic() error {
-	msg = msg.Normalize()
 	if err := ValidateDenomID(msg.DenomId); err != nil {
 		return err
 	}
@@ -112,16 +100,6 @@ func (msg MsgTransferNFT) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
 	return ValidateTokenID(msg.Id)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgTransferNFT) Normalize() MsgTransferNFT {
-	msg.Id = strings.TrimSpace(msg.Id)
-	msg.DenomId = strings.TrimSpace(msg.DenomId)
-	msg.Name = strings.TrimSpace(msg.Name)
-	msg.URI = strings.TrimSpace(msg.URI)
-	msg.Data = strings.TrimSpace(msg.Data)
-	return msg
 }
 
 // GetSignBytes Implements Msg.
@@ -161,7 +139,6 @@ func (msg MsgEditNFT) Type() string { return TypeMsgEditNFT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgEditNFT) ValidateBasic() error {
-	msg = msg.Normalize()
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
@@ -174,16 +151,6 @@ func (msg MsgEditNFT) ValidateBasic() error {
 		return err
 	}
 	return ValidateTokenID(msg.Id)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgEditNFT) Normalize() MsgEditNFT {
-	msg.Id = strings.TrimSpace(msg.Id)
-	msg.DenomId = strings.TrimSpace(msg.DenomId)
-	msg.Name = strings.TrimSpace(msg.Name)
-	msg.URI = strings.TrimSpace(msg.URI)
-	msg.Data = strings.TrimSpace(msg.Data)
-	return msg
 }
 
 // GetSignBytes Implements Msg.
@@ -224,7 +191,6 @@ func (msg MsgMintNFT) Type() string { return TypeMsgMintNFT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgMintNFT) ValidateBasic() error {
-	msg = msg.Normalize()
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
@@ -238,16 +204,6 @@ func (msg MsgMintNFT) ValidateBasic() error {
 		return err
 	}
 	return ValidateTokenID(msg.Id)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgMintNFT) Normalize() MsgMintNFT {
-	msg.Id = strings.TrimSpace(msg.Id)
-	msg.DenomId = strings.TrimSpace(msg.DenomId)
-	msg.Name = strings.TrimSpace(msg.Name)
-	msg.URI = strings.TrimSpace(msg.URI)
-	msg.Data = strings.TrimSpace(msg.Data)
-	return msg
 }
 
 // GetSignBytes Implements Msg.
@@ -282,7 +238,6 @@ func (msg MsgBurnNFT) Type() string { return TypeMsgBurnNFT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgBurnNFT) ValidateBasic() error {
-	msg = msg.Normalize()
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
@@ -290,13 +245,6 @@ func (msg MsgBurnNFT) ValidateBasic() error {
 		return err
 	}
 	return ValidateTokenID(msg.Id)
-}
-
-// Normalize return a string with spaces removed and lowercase
-func (msg MsgBurnNFT) Normalize() MsgBurnNFT {
-	msg.Id = strings.TrimSpace(msg.Id)
-	msg.DenomId = strings.TrimSpace(msg.DenomId)
-	return msg
 }
 
 // GetSignBytes Implements Msg.

@@ -1,7 +1,6 @@
 package types_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -9,21 +8,7 @@ import (
 	"github.com/irisnet/irismod/modules/nft/types"
 )
 
-// ---------------------------------------- Msgs ---------------------------------------------------
-
-func TestNewMsgTransferNFT(t *testing.T) {
-	newMsgTransferNFT := types.NewMsgTransferNFT(
-		fmt.Sprintf("     %s     ", denomID),
-		fmt.Sprintf("     %s     ", denom),
-		fmt.Sprintf("     %s     ", id),
-		tokenURI, tokenData, address.String(), address2.String(),
-	)
-	msgTransferNFT := newMsgTransferNFT.Normalize()
-	require.Equal(t, msgTransferNFT.Sender, address.String())
-	require.Equal(t, msgTransferNFT.Recipient, address2.String())
-	require.Equal(t, msgTransferNFT.DenomId, denom)
-	require.Equal(t, msgTransferNFT.Id, denomID)
-}
+// ---------------------------------------- Msgs --------------------------------------------------
 
 func TestMsgTransferNFTValidateBasicMethod(t *testing.T) {
 	newMsgTransferNFT := types.NewMsgTransferNFT(denomID, "", id, tokenURI, tokenData, address.String(), address2.String())
@@ -55,21 +40,6 @@ func TestMsgTransferNFTGetSignersMethod(t *testing.T) {
 	signers := newMsgTransferNFT.GetSigners()
 	require.Equal(t, 1, len(signers))
 	require.Equal(t, address.String(), signers[0].String())
-}
-
-func TestNewMsgEditNFT(t *testing.T) {
-	newMsgEditNFT := types.NewMsgEditNFT(
-		fmt.Sprintf("     %s     ", id),
-		fmt.Sprintf("     %s     ", denom),
-		fmt.Sprintf("     %s     ", nftName),
-		fmt.Sprintf("     %s     ", tokenURI),
-		tokenData, address.String(),
-	)
-	msgEditNFT := newMsgEditNFT.Normalize()
-	require.Equal(t, msgEditNFT.Sender, address.String())
-	require.Equal(t, msgEditNFT.Id, id)
-	require.Equal(t, msgEditNFT.DenomId, denom)
-	require.Equal(t, msgEditNFT.URI, tokenURI)
 }
 
 func TestMsgEditNFTValidateBasicMethod(t *testing.T) {
@@ -105,22 +75,6 @@ func TestMsgEditNFTGetSignersMethod(t *testing.T) {
 	require.Equal(t, address.String(), signers[0].String())
 }
 
-func TestNewMsgMintNFT(t *testing.T) {
-	newMsgMintNFT := types.NewMsgMintNFT(
-		fmt.Sprintf("     %s     ", id),
-		fmt.Sprintf("     %s     ", denom),
-		fmt.Sprintf("     %s     ", nftName),
-		fmt.Sprintf("     %s     ", tokenURI),
-		tokenData, address.String(), address2.String(),
-	)
-	msgMintNFT := newMsgMintNFT.Normalize()
-	require.Equal(t, msgMintNFT.Sender, address.String())
-	require.Equal(t, msgMintNFT.Recipient, address2.String())
-	require.Equal(t, msgMintNFT.Id, id)
-	require.Equal(t, msgMintNFT.DenomId, denom)
-	require.Equal(t, msgMintNFT.URI, tokenURI)
-}
-
 func TestMsgMsgMintNFTValidateBasicMethod(t *testing.T) {
 	newMsgMintNFT := types.NewMsgMintNFT(id, denom, nftName, tokenURI, tokenData, "", address2.String())
 	err := newMsgMintNFT.ValidateBasic()
@@ -144,18 +98,6 @@ func TestMsgMintNFTGetSignBytesMethod(t *testing.T) {
 	sortedBytes := newMsgMintNFT.GetSignBytes()
 	expected := `{"type":"irismod/nft/MsgMintNFT","value":{"data":"https://google.com/token-1.json","denom_id":"denom","id":"id1","name":"report","recipient":"cosmos15ky9du8a2wlstz6fpx3p4mqpjyrm5cgp0ctjdj","sender":"cosmos15ky9du8a2wlstz6fpx3p4mqpjyrm5cgqjwl8sq","uri":"https://google.com/token-1.json"}}`
 	require.Equal(t, expected, string(sortedBytes))
-}
-
-func TestNewMsgBurnNFT(t *testing.T) {
-	newMsgBurnNFT := types.NewMsgBurnNFT(
-		address.String(),
-		fmt.Sprintf("     %s     ", id),
-		fmt.Sprintf("     %s     ", denom),
-	)
-	msgBurnNFT := newMsgBurnNFT.Normalize()
-	require.Equal(t, msgBurnNFT.Sender, address.String())
-	require.Equal(t, msgBurnNFT.Id, id)
-	require.Equal(t, msgBurnNFT.DenomId, denom)
 }
 
 func TestMsgMsgBurnNFTValidateBasicMethod(t *testing.T) {
