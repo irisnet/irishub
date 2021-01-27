@@ -9,7 +9,7 @@ const (
 	EventTypeEnableBinding           = "enable_binding"
 	EventTypeRefundDeposit           = "refund_deposit"
 	EventTypeSetWithdrawAddress      = "set_withdraw_address"
-	EventTypeRespondService          = "response_service"
+	EventTypeRespondService          = "respond_service"
 	EventTypeCreateContext           = "create_context"
 	EventTypePauseContext            = "pause_context"
 	EventTypeStartContext            = "start_context"
