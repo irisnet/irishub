@@ -56,7 +56,7 @@ write the seed phrase in a safe place! It is the only way to recover your accoun
 # apt-get update && apt-get install -y jq
 
 # if the output is false, means your node has caught-up
-iris status | jq .sync_info.catching_up
+iris status 2>&1 | jq '.SyncInfo.catching_up'
 ```
 
 ### Create Validator
