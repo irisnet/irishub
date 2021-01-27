@@ -10,9 +10,9 @@ nft metadata (`metadata`) can be stored directly on the chain, or the `URI` of i
 
 nft need to be issued before creation to declare their abstract properties:
 
--_Denom_: the globally unique asset class name
+-_Denom_: the globally unique nft category name
 
--_Denom ID_: the globally unique asset class identifier of Denom
+-_Denom ID_: the globally unique nft category identifier of Denom
 
 -_Metadata Specification_: The JSON Schema that nft metadata should follow
 
@@ -30,7 +30,7 @@ Each specific nft is described by the following elements:
 
 ### issued
 
-Specify the nft Denom (nft category), metadata JSON Schema, sender, chain ID and fee to issue nft.
+Specify the nft Denom (nft category) and metadata JSON Schema to issue nft.
 
 `CLI`
 
@@ -40,7 +40,7 @@ iris tx nft issue <denom-id> --from=<key-name> --name=<denom-name> --schema=<sch
 
 ### Additional issuance
 
-After the nft is issued, additional issuance (create) of specific nft of this type can be made. The denom ID, token ID, recipient address, chain ID, sender address, schema or URI must be specified.
+After the nft is issued, additional issuance (create) of specific nft of this type can be made. The denom ID, token ID, recipient address and URI must be specified.
 
 `CLI`
 

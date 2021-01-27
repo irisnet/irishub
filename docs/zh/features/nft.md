@@ -30,7 +30,7 @@
 
 ### 发行
 
-指定资产 Denom ID（资产类别ID）、元数据 JSON Schema、链名chain ID、发送者地址，即可发行资产。
+指定资产 Denom ID（资产类别ID）、元数据 JSON Schema，即可发行资产。
 
 `CLI`
 
@@ -40,7 +40,7 @@ iris tx nft issue <denom-id> --from=<key-name> --schema=<schema-content or path/
 
 ### 增发
 
-在发行资产之后即可增发（创建）该类型的具体资产。需指定资产 ID、接收者地址、发送者地址、链名chain ID、元数据或其 URI。
+在发行资产之后即可增发（创建）该类型的具体资产。需指定资产 ID、接收者地址和URI。
 
 `CLI`
 
