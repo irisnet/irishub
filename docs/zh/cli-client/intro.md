@@ -52,12 +52,15 @@ order: 1
 | --trust-node      | bool   |      | true                  | 是否信任全节点返回的数据，如果不信任，客户端会验证查询结果的正确性                                                  |
 | --yes             | bool   |      | true                  | 跳过交易广播提示确认                                                                                                |
 | --chain-id        | string |      |                       | tendermint节点的`Chain ID`                                                                                          |
+| --home            | string |      |                       | 配置文件和数据文件目录 (默认 "~/.iris")                                                                             |
+| --trace           | string |      |                       | 打印出完整的堆栈跟踪错误                                                                                            |
 
 ## 模块命令列表
 
 | **子命令**                        | **描述**                           |
 | --------------------------------- | ---------------------------------- |
 | [bank](./bank.md)                 | 用于查询帐户和转账等的 Bank 子命令 |
+| [debug](./debug.md)               | 调试子命令                         |
 | [distribution](./distribution.md) | 收益管理子命令                     |
 | [gov](./gov.md)                   | 治理和投票子命令                   |
 | [htlc](./htlc.md)                 | HTLC 子命令                        |
@@ -68,7 +71,6 @@ order: 1
 | [random](./rand.md)               | 随机数子命令                       |
 | [record](./record.md)             | Record 子命令                      |
 | [slashing](./slashing.md)         | Slashing 子命令                    |
-| [rand](./rand.md)                 | 随机数子命令                       |
 | [service](./service.md)           | 服务子命令                         |
 | [staking](./staking.md)           | Staking 子命令                     |
 | [status](./status.md)             | 查询远程节点的状态                 |

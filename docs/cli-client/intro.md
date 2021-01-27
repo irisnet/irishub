@@ -60,6 +60,7 @@ All POST commands have the following global flags:
 | **Subcommand**                    | **Description**                                                |
 | --------------------------------- | -------------------------------------------------------------- |
 | [bank](./bank.md)                 | Bank subcommands for querying acccounts and sending coins etc. |
+| [debug](./debug.md)               | Debug subcommands                                              |
 | [distribution](./distribution.md) | Distribution subcommands for rewards management                |
 | [gov](./gov.md)                   | Governance and voting subcommands                              |
 | [htlc](./htlc.md)                 | HTLC transaction subcommands                                   |
