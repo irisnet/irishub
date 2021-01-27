@@ -69,6 +69,9 @@ iris tx staking create-validator \
     --moniker=<your-validator-name> \
     --amount=<amount-to-be-delegated, e.g. 10000iris> \
     --commission-rate=0.1 \
+    --commission-max-rate=0.5 \
+    --commission-max-change-rate=0.1 \
+    --min-self-delegation=<required-self-delegation, e.g. 90> \
     --gas=100000 \
     --fees=0.6iris \
     --chain-id=irishub \
