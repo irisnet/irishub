@@ -32,14 +32,14 @@ var (
 	keywords = strings.Join([]string{
 		"peg", "ibc", "swap",
 	}, "|")
-	keywordsRegex = fmt.Sprintf("^(%s).*", keywords)
+	regexpKeywordsFmt = fmt.Sprintf("^(%s).*", keywords)
+	regexpKeyword     = regexp.MustCompile(regexpKeywordsFmt).MatchString
 
-	// IsAlphaNumeric only accepts [a-z0-9]
-	IsAlphaNumeric = regexp.MustCompile(`^[a-z0-9]+$`).MatchString
-	// IsBeginWithAlpha only begin with chars [a-z]
-	IsBeginWithAlpha = regexp.MustCompile(`^[a-z].*`).MatchString
-	// IsBeginWithKeyword define a group of keyword and denom shoule not begin with it
-	IsBeginWithKeyword = regexp.MustCompile(keywordsRegex).MatchString
+	regexpSymbolFmt = fmt.Sprintf("^[a-z][a-z0-9]{%d,%d}$", MinimumSymbolLen-1, MaximumSymbolLen-1)
+	regexpSymbol    = regexp.MustCompile(regexpSymbolFmt).MatchString
+
+	regexpMinUintFmt = fmt.Sprintf("^[a-z][a-z0-9]{%d,%d}$", MinimumMinUnitLen-1, MaximumMinUnitLen-1)
+	regexpMinUint    = regexp.MustCompile(regexpMinUintFmt).MatchString
 )
 
 // ValidateToken checks if the given token is valid
@@ -110,31 +110,23 @@ func ValidateScale(scale uint32) error {
 
 // ValidateMinUnit checks if the given minUnit is valid
 func ValidateMinUnit(minUnit string) error {
-	if len(minUnit) < MinimumMinUnitLen || len(minUnit) > MaximumMinUnitLen {
-		return sdkerrors.Wrapf(ErrInvalidMinUnit, "invalid min_unit %s, only accepts length [%d, %d]", minUnit, MinimumMinUnitLen, MaximumMinUnitLen)
-	}
-
-	if !IsBeginWithAlpha(minUnit) || !IsAlphaNumeric(minUnit) {
-		return sdkerrors.Wrapf(ErrInvalidSymbol, "invalid min_unit: %s, only accepts alphanumeric characters, and begin with an english letter", minUnit)
+	if !regexpMinUint(minUnit) {
+		return sdkerrors.Wrapf(ErrInvalidMinUnit, "invalid minUnit: %s, only accepts english lowercase letters and numbers, length [%d, %d], and begin with an english letter, regexp: %s", minUnit, MinimumMinUnitLen, MaximumMinUnitLen, regexpMinUintFmt)
 	}
 	return ValidateKeywords(minUnit)
 }
 
 // ValidateSymbol checks if the given symbol is valid
 func ValidateSymbol(symbol string) error {
-	if len(symbol) < MinimumSymbolLen || len(symbol) > MaximumSymbolLen {
-		return sdkerrors.Wrapf(ErrInvalidSymbol, "invalid symbol: %s,  only accepts length [%d, %d]", symbol, MinimumSymbolLen, MaximumSymbolLen)
-	}
-
-	if !IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) {
-		return sdkerrors.Wrapf(ErrInvalidSymbol, "invalid symbol: %s, only accepts alphanumeric characters, and begin with an english letter", symbol)
+	if !regexpSymbol(symbol) {
+		return sdkerrors.Wrapf(ErrInvalidSymbol, "invalid symbol: %s, only accepts english lowercase letters and numbers, length [%d, %d], and begin with an english letter, regexp: %s", symbol, MinimumSymbolLen, MaximumSymbolLen, regexpSymbolFmt)
 	}
 	return ValidateKeywords(symbol)
 }
 
 // ValidateKeywords checks if the given denom begin with `TokenKeywords`
 func ValidateKeywords(denom string) error {
-	if IsBeginWithKeyword(denom) {
+	if regexpKeyword(denom) {
 		return sdkerrors.Wrapf(ErrInvalidSymbol, "invalid token: %s, can not begin with keyword: (%s)", denom, keywords)
 	}
 	return nil

@@ -2,7 +2,7 @@ package types
 
 import (
 	"encoding/json"
-	"math"
+	"math/big"
 	"strconv"
 
 	"github.com/gogo/protobuf/proto"
@@ -12,6 +12,12 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+var (
+	_      proto.Message = &Token{}
+	tenInt               = big.NewInt(10)
+)
+
+// TokenI define a interface for Token
 type TokenI interface {
 	GetSymbol() string
 	GetName() string
@@ -25,8 +31,6 @@ type TokenI interface {
 	ToMainCoin(coin sdk.Coin) (sdk.DecCoin, error)
 	ToMinCoin(coin sdk.DecCoin) (sdk.Coin, error)
 }
-
-var _ proto.Message = &Token{}
 
 // NewToken constructs a new Token instance
 func NewToken(
@@ -115,15 +119,9 @@ func (t Token) ToMainCoin(coin sdk.Coin) (sdk.DecCoin, error) {
 		return sdk.NewDecCoin(coin.Denom, coin.Amount), nil
 	}
 
-	precision := math.Pow10(int(t.Scale))
-	precisionStr := strconv.FormatFloat(precision, 'f', 0, 64)
-	precisionDec, err := sdk.NewDecFromStr(precisionStr)
-	if err != nil {
-		return sdk.DecCoin{}, err
-	}
-
+	precision := new(big.Int).Exp(tenInt, big.NewInt(int64(t.Scale)), nil)
 	// dest amount = src amount / 10^(scale)
-	amount := sdk.NewDecFromInt(coin.Amount).Quo(precisionDec)
+	amount := sdk.NewDecFromInt(coin.Amount).Quo(sdk.NewDecFromBigInt(precision))
 	return sdk.NewDecCoinFromDec(t.Symbol, amount), nil
 }
 
@@ -137,15 +135,9 @@ func (t Token) ToMinCoin(coin sdk.DecCoin) (newCoin sdk.Coin, err error) {
 		return sdk.NewCoin(coin.Denom, coin.Amount.TruncateInt()), nil
 	}
 
-	precision := math.Pow10(int(t.Scale))
-	precisionStr := strconv.FormatFloat(precision, 'f', 0, 64)
-	precisionDec, err := sdk.NewDecFromStr(precisionStr)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-
+	precision := new(big.Int).Exp(tenInt, big.NewInt(int64(t.Scale)), nil)
 	// dest amount = src amount * 10^(dest scale)
-	amount := coin.Amount.Mul(precisionDec)
+	amount := coin.Amount.Mul(sdk.NewDecFromBigInt(precision))
 	return sdk.NewCoin(t.MinUnit, amount.TruncateInt()), nil
 }
 
