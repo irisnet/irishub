@@ -78,6 +78,9 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
+	store "github.com/cosmos/cosmos-sdk/store/types"
+	sdkupgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+
 	"github.com/irisnet/irismod/modules/coinswap"
 	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
@@ -536,6 +539,19 @@ func NewIrisApp(
 	))
 	app.SetEndBlocker(app.EndBlocker)
 
+	// Set software upgrade execution logic
+	app.RegisterUpgradePlan("bifrost-rc1",
+		store.StoreUpgrades{},
+		func(ctx sdk.Context, plan sdkupgrade.Plan) {
+			app.Logger().Info("Upgrade success",
+				"plan_name", plan.Name,
+				"plan_height", plan.Height,
+				"plan_info", plan.Info,
+				"plan_time", plan.Time.String(),
+			)
+		},
+	)
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
@@ -706,6 +722,23 @@ func (app *IrisApp) RegisterTxService(clientCtx client.Context) {
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *IrisApp) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
+}
+
+// RegisterUpgradePlan implements the upgrade execution logic of the upgrade module
+func (app *IrisApp) RegisterUpgradePlan(planName string,
+	upgrades store.StoreUpgrades, upgradeHandler sdkupgrade.UpgradeHandler) {
+	upgradeInfo, err := app.upgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		app.Logger().Info("not found upgrade plan", "planName", planName, "err", err.Error())
+		return
+	}
+
+	if upgradeInfo.Name == planName && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		// this configures a no-op upgrade handler for the planName upgrade
+		app.upgradeKeeper.SetUpgradeHandler(planName, upgradeHandler)
+		// configure store loader that checks if version+1 == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(sdkupgrade.UpgradeStoreLoader(upgradeInfo.Height, &upgrades))
+	}
 }
 
 // GetMaccPerms returns a copy of the module account permissions
