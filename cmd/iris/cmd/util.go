@@ -222,11 +222,9 @@ func parseArgs(cmd *cobra.Command, args []string) {
 }
 
 func parseYAML(cmd *cobra.Command, in []byte) string {
-	srcYaml := string(in)
-	dstStr := strings.ReplaceAll(srcYaml, "|", "")
-	cfg, err := config.ParseYaml(dstStr)
+	cfg, err := config.ParseYamlBytes(in)
 	if err != nil {
-		return srcYaml
+		return string(in)
 	}
 	for k, v := range cmdCfg.getFromResponse(cmd.Name()) {
 		switch v.typ {
@@ -238,7 +236,7 @@ func parseYAML(cmd *cobra.Command, in []byte) string {
 	}
 	s, err := config.RenderYaml(cfg.Root)
 	if err != nil {
-		return srcYaml
+		return string(in)
 	}
 	return s
 }
