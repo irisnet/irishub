@@ -42,7 +42,9 @@ var (
 		appendFromArgs("distribution", "fund-community-pool", 0).
 		appendFromArgs("gov", "deposit", 1).
 		appendFromResponse("bank", "balances", "balances", filedTypeArray).
-		appendFromResponse("gov", "params", "deposit_params.min_deposit", filedTypeArray)
+		appendFromResponse("gov", "params", "deposit_params.min_deposit", filedTypeArray).
+		appendFromResponse("distribution", "validator-outstanding-rewards", "rewards", filedTypeArray).
+		appendFromResponse("token", "total-burn", "burned_coins", filedTypeArray)
 
 	rescueStdout = os.Stdout
 	r, w         *os.File
@@ -177,7 +179,7 @@ func handleResponsePreRun(cmd *cobra.Command) {
 	os.Stdout = w
 }
 
-func handleResponsePostRun(cdc codec.JSONMarshaler, cmd *cobra.Command) {
+func handleResponsePostRun(_ codec.JSONMarshaler, cmd *cobra.Command) {
 	if !isOutputYAML(cmd) {
 		return
 	}
@@ -256,15 +258,19 @@ func handleMap(cmd *cobra.Command, cfg *config.Config, path string) {
 	if err != nil {
 		return
 	}
+
 	bz, err := json.Marshal(cMap)
 	if err != nil {
 		return
 	}
-	var srcCoin sdk.Coin
+
+	var srcCoin sdk.DecCoin
 	if err := json.Unmarshal(bz, &srcCoin); err != nil {
 		return
 	}
-	dstCoin, err := convertToMainCoin(cmd, srcCoin)
+
+	truncCoin, _ := srcCoin.TruncateDecimal()
+	dstCoin, err := convertToMainCoin(cmd, truncCoin)
 	if err != nil {
 		return
 	}
