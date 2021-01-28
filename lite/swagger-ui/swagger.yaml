@@ -28939,16 +28939,16 @@ paths:
                       PageRequest.count_total
 
                       was set, its value is undefined otherwise
-                description: |-
-                  message SomeResponse {
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
-                title: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the corresponding
-
-                  request message has used PageRequest
             title: >-
               QueryParametersResponse is response type for the Query/Parameters
               RPC method
@@ -29347,16 +29347,16 @@ paths:
                       PageRequest.count_total
 
                       was set, its value is undefined otherwise
-                description: |-
-                  message SomeResponse {
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
-                title: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the corresponding
-
-                  request message has used PageRequest
             title: >-
               QueryTokensResponse is response type for the Query/Tokens RPC
               method
@@ -29591,10 +29591,12 @@ paths:
             include
 
             a count of the total number of items available for pagination in
-            UIs. count_total
+            UIs.
 
-            is only respected when offset is used. It is ignored when key is
-            set.
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
           in: query
           required: false
           type: boolean
@@ -30219,7 +30221,7 @@ paths:
         - Query
   /irismod/token/total_burn:
     get:
-      summary: TotalBurn returns all burnt coins
+      summary: Params queries the token parameters
       operationId: TotalBurn
       responses:
         '200':
@@ -30680,16 +30682,16 @@ paths:
                       PageRequest.count_total
 
                       was set, its value is undefined otherwise
-                description: |-
-                  message SomeResponse {
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
-                title: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the corresponding
-
-                  request message has used PageRequest
             title: >-
               QueryCollectionResponse is the response type for the
               Query/Collection RPC method
@@ -30757,10 +30759,12 @@ paths:
             include
 
             a count of the total number of items available for pagination in
-            UIs. count_total
+            UIs.
 
-            is only respected when offset is used. It is ignored when key is
-            set.
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
           in: query
           required: false
           type: boolean
@@ -30856,16 +30860,16 @@ paths:
                       PageRequest.count_total
 
                       was set, its value is undefined otherwise
-                description: |-
-                  message SomeResponse {
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
-                title: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the corresponding
-
-                  request message has used PageRequest
             title: >-
               QueryDenomsResponse is the response type for the Query/Denoms RPC
               method
@@ -30929,10 +30933,12 @@ paths:
             include
 
             a count of the total number of items available for pagination in
-            UIs. count_total
+            UIs.
 
-            is only respected when offset is used. It is ignored when key is
-            set.
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
           in: query
           required: false
           type: boolean
@@ -31035,16 +31041,16 @@ paths:
                       PageRequest.count_total
 
                       was set, its value is undefined otherwise
-                description: |-
-                  message SomeResponse {
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
-                title: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the corresponding
-
-                  request message has used PageRequest
             title: >-
               QueryOwnerResponse is the response type for the Query/Owner RPC
               method
@@ -31116,10 +31122,12 @@ paths:
             include
 
             a count of the total number of items available for pagination in
-            UIs. count_total
+            UIs.
 
-            is only respected when offset is used. It is ignored when key is
-            set.
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
           in: query
           required: false
           type: boolean
@@ -31252,16 +31260,16 @@ paths:
                       PageRequest.count_total
 
                       was set, its value is undefined otherwise
-                description: |-
-                  message SomeResponse {
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
-                title: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the corresponding
-
-                  request message has used PageRequest
             title: >-
               QueryDefinitionsResponse is response type for the Query/Bindings
               RPC method
@@ -31333,10 +31341,12 @@ paths:
             include
 
             a count of the total number of items available for pagination in
-            UIs. count_total
+            UIs.
 
-            is only respected when offset is used. It is ignored when key is
-            set.
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
           in: query
           required: false
           type: boolean
@@ -31788,16 +31798,16 @@ paths:
                       PageRequest.count_total
 
                       was set, its value is undefined otherwise
-                description: |-
-                  message SomeResponse {
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
-                title: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the corresponding
-
-                  request message has used PageRequest
             title: >-
               QueryParametersResponse is response type for the Query/Parameters
               RPC method
@@ -31899,16 +31909,16 @@ paths:
                       PageRequest.count_total
 
                       was set, its value is undefined otherwise
-                description: |-
-                  message SomeResponse {
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
-                title: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the corresponding
-
-                  request message has used PageRequest
             title: >-
               QueryRequestsByReqCtxResponse is response type for the
               Query/RequestsByReqCtx RPC method
@@ -31981,10 +31991,12 @@ paths:
             include
 
             a count of the total number of items available for pagination in
-            UIs. count_total
+            UIs.
 
-            is only respected when offset is used. It is ignored when key is
-            set.
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
           in: query
           required: false
           type: boolean
@@ -32150,16 +32162,16 @@ paths:
                       PageRequest.count_total
 
                       was set, its value is undefined otherwise
-                description: |-
-                  message SomeResponse {
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
-                title: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the corresponding
-
-                  request message has used PageRequest
             title: >-
               QueryRequestsResponse is response type for the Query/Requests RPC
               method
@@ -32231,10 +32243,12 @@ paths:
             include
 
             a count of the total number of items available for pagination in
-            UIs. count_total
+            UIs.
 
-            is only respected when offset is used. It is ignored when key is
-            set.
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
           in: query
           required: false
           type: boolean
@@ -32286,16 +32300,16 @@ paths:
                       PageRequest.count_total
 
                       was set, its value is undefined otherwise
-                description: |-
-                  message SomeResponse {
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
-                title: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the corresponding
-
-                  request message has used PageRequest
             title: >-
               QueryResponsesResponse is response type for the Query/Responses
               RPC method
@@ -32368,10 +32382,12 @@ paths:
             include
 
             a count of the total number of items available for pagination in
-            UIs. count_total
+            UIs.
 
-            is only respected when offset is used. It is ignored when key is
-            set.
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
           in: query
           required: false
           type: boolean
@@ -32582,16 +32598,16 @@ paths:
                       PageRequest.count_total
 
                       was set, its value is undefined otherwise
-                description: |-
-                  message SomeResponse {
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
-                title: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the corresponding
-
-                  request message has used PageRequest
             title: QueryFeedsResponse is response type for the Query/Feeds RPC method
         default:
           description: An unexpected error response.
@@ -32657,10 +32673,12 @@ paths:
             include
 
             a count of the total number of items available for pagination in
-            UIs. count_total
+            UIs.
 
-            is only respected when offset is used. It is ignored when key is
-            set.
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
           in: query
           required: false
           type: boolean
@@ -33062,16 +33080,16 @@ paths:
                       PageRequest.count_total
 
                       was set, its value is undefined otherwise
-                description: |-
-                  message SomeResponse {
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
-                title: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the corresponding
-
-                  request message has used PageRequest
             title: >-
               QueryParametersResponse is response type for the Query/Parameters
               RPC method
@@ -33148,16 +33166,16 @@ paths:
                       PageRequest.count_total
 
                       was set, its value is undefined otherwise
-                description: |-
-                  message SomeResponse {
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
-                title: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the corresponding
-
-                  request message has used PageRequest
             title: >-
               QuerySupersResponse is response type for the Query/Supers RPC
               method
@@ -33221,10 +33239,12 @@ paths:
             include
 
             a count of the total number of items available for pagination in
-            UIs. count_total
+            UIs.
 
-            is only respected when offset is used. It is ignored when key is
-            set.
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
           in: query
           required: false
           type: boolean
@@ -51848,74 +51868,6 @@ definitions:
 
               chain.
     description: QueryParamsResponse is the response type for the Query/Params RPC method.
-  cosmos.query.PageRequest:
-    type: object
-    properties:
-      key:
-        type: string
-        format: byte
-        description: |-
-          key is a value returned in PageResponse.next_key to begin
-          querying the next page most efficiently. Only one of offset or key
-          should be set.
-      offset:
-        type: string
-        format: uint64
-        description: |-
-          offset is a numeric offset that can be used when key is unavailable.
-          It is less efficient than using key. Only one of offset or key should
-          be set.
-      limit:
-        type: string
-        format: uint64
-        description: >-
-          limit is the total number of results to be returned in the result
-          page.
-
-          If left empty it will default to a value to be set by each app.
-      count_total:
-        type: boolean
-        description: >-
-          count_total is set to true  to indicate that the result set should
-          include
-
-          a count of the total number of items available for pagination in UIs.
-          count_total
-
-          is only respected when offset is used. It is ignored when key is set.
-    description: |-
-      message SomeRequest {
-               Foo some_parameter = 1;
-               PageRequest page = 2;
-       }
-    title: |-
-      PageRequest is to be embedded in gRPC request messages for efficient
-      pagination. Ex:
-  cosmos.query.PageResponse:
-    type: object
-    properties:
-      next_key:
-        type: string
-        format: byte
-        title: |-
-          next_key is the key to be passed to PageRequest.key to
-          query the next page most efficiently
-      total:
-        type: string
-        format: uint64
-        title: |-
-          total is total number of results available if PageRequest.count_total
-          was set, its value is undefined otherwise
-    description: |-
-      message SomeResponse {
-               repeated Bar results = 1;
-               PageResponse page = 2;
-       }
-    title: >-
-      PageResponse is to be embedded in gRPC response messages where the
-      corresponding
-
-      request message has used PageRequest
   irismod.token.Params:
     type: object
     properties:
@@ -52010,15 +51962,13 @@ definitions:
 
               was set, its value is undefined otherwise
         description: |-
-          message SomeResponse {
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-        title: >-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding
-
-          request message has used PageRequest
     title: >-
       QueryParametersResponse is response type for the Query/Parameters RPC
       method
@@ -52370,15 +52320,13 @@ definitions:
 
               was set, its value is undefined otherwise
         description: |-
-          message SomeResponse {
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-        title: >-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding
-
-          request message has used PageRequest
     title: QueryTokensResponse is response type for the Query/Tokens RPC method
   irismod.token.QueryTotalBurnResponse:
     type: object
@@ -52687,15 +52635,13 @@ definitions:
 
               was set, its value is undefined otherwise
         description: |-
-          message SomeResponse {
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-        title: >-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding
-
-          request message has used PageRequest
     title: >-
       QueryCollectionResponse is the response type for the Query/Collection RPC
       method
@@ -52750,15 +52696,13 @@ definitions:
 
               was set, its value is undefined otherwise
         description: |-
-          message SomeResponse {
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-        title: >-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding
-
-          request message has used PageRequest
     title: QueryDenomsResponse is the response type for the Query/Denoms RPC method
   irismod.nft.QueryNFTResponse:
     type: object
@@ -52815,15 +52759,13 @@ definitions:
 
               was set, its value is undefined otherwise
         description: |-
-          message SomeResponse {
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-        title: >-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding
-
-          request message has used PageRequest
     title: QueryOwnerResponse is the response type for the Query/Owner RPC method
   irismod.nft.QuerySupplyResponse:
     type: object
@@ -52974,15 +52916,13 @@ definitions:
 
               was set, its value is undefined otherwise
         description: |-
-          message SomeResponse {
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-        title: >-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding
-
-          request message has used PageRequest
     title: >-
       QueryDefinitionsResponse is response type for the Query/Bindings RPC
       method
@@ -53091,15 +53031,13 @@ definitions:
 
               was set, its value is undefined otherwise
         description: |-
-          message SomeResponse {
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-        title: >-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding
-
-          request message has used PageRequest
     title: >-
       QueryParametersResponse is response type for the Query/Parameters RPC
       method
@@ -53311,15 +53249,13 @@ definitions:
 
               was set, its value is undefined otherwise
         description: |-
-          message SomeResponse {
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-        title: >-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding
-
-          request message has used PageRequest
     title: >-
       QueryRequestsByReqCtxResponse is response type for the
       Query/RequestsByReqCtx RPC method
@@ -53390,15 +53326,13 @@ definitions:
 
               was set, its value is undefined otherwise
         description: |-
-          message SomeResponse {
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-        title: >-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding
-
-          request message has used PageRequest
     title: QueryRequestsResponse is response type for the Query/Requests RPC method
   irismod.service.QueryResponseResponse:
     type: object
@@ -53461,15 +53395,13 @@ definitions:
 
               was set, its value is undefined otherwise
         description: |-
-          message SomeResponse {
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-        title: >-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding
-
-          request message has used PageRequest
     title: QueryResponsesResponse is response type for the Query/Responses RPC method
   irismod.service.QuerySchemaResponse:
     type: object
@@ -53987,15 +53919,13 @@ definitions:
 
               was set, its value is undefined otherwise
         description: |-
-          message SomeResponse {
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-        title: >-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding
-
-          request message has used PageRequest
     title: QueryFeedsResponse is response type for the Query/Feeds RPC method
   irismod.random.QueryRandomRequestQueueResponse:
     type: object
@@ -54191,15 +54121,13 @@ definitions:
 
               was set, its value is undefined otherwise
         description: |-
-          message SomeResponse {
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-        title: >-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding
-
-          request message has used PageRequest
     title: >-
       QueryParametersResponse is response type for the Query/Parameters RPC
       method
@@ -54256,15 +54184,13 @@ definitions:
 
               was set, its value is undefined otherwise
         description: |-
-          message SomeResponse {
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-        title: >-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding
-
-          request message has used PageRequest
     title: QuerySupersResponse is response type for the Query/Supers RPC method
   irishub.guardian.Super:
     type: object
