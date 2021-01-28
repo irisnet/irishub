@@ -30,6 +30,7 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 		p.prepForZeroHeightGenesis(ctx)
 	}
 
+	htlcGenesis := htlc.ExportGenesis(ctx, p.htlcKeeper)
 	// iterate to get the accounts
 	accounts := []GenesisAccount{}
 	appendAccount := func(acc auth.Account) (stop bool) {
@@ -55,8 +56,6 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 				AccountNumber: acc.AccountNumber,
 			})
 	}
-
-	htlcGenesis := htlc.ExportGenesis(ctx, p.htlcKeeper)
 
 	genState := NewGenesisFileState(
 		fileAccounts,
