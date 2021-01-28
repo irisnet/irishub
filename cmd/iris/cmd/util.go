@@ -17,7 +17,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
@@ -31,35 +30,36 @@ const (
 )
 
 var (
-	cmdCfg = cmd().appendFromFlag(cmdScopeGlobal, cmdScopeGlobal, "fees").
-		appendFromFlag(cmdScopeGlobal, cmdScopeGlobal, "amount").
-		appendFromFlag(cmdScopeGlobal, cmdScopeGlobal, "deposit").
-		appendFromFlag(cmdScopeGlobal, cmdScopeGlobal, "service-fee-cap").
-		appendFromArgs("bank", "send", 2).
-		appendFromArgs("staking", "delegate", 1).
-		appendFromArgs("staking", "redelegate", 2).
-		appendFromArgs("staking", "unbond", 1).
-		appendFromArgs("distribution", "fund-community-pool", 0).
-		appendFromArgs("gov", "deposit", 1).
-		appendFromResponse("bank", "balances", "balances", filedTypeArray).
-		appendFromResponse("gov", "params", "deposit_params.min_deposit", filedTypeArray).
-		appendFromResponse("distribution", "validator-outstanding-rewards", "rewards", filedTypeArray).
-		appendFromResponse("token", "total-burn", "burned_coins", filedTypeArray)
+	converter = NewConverter().registerGlobalFlag("fees").
+			registerGlobalFlag("amount").
+			registerGlobalFlag("deposit").
+			registerGlobalFlag("service-fee-cap").
+			registerCmdWithArgs("bank", "send", 2).
+			registerCmdWithArgs("staking", "delegate", 1).
+			registerCmdWithArgs("staking", "redelegate", 2).
+			registerCmdWithArgs("staking", "unbond", 1).
+			registerCmdWithArgs("distribution", "fund-community-pool", 0).
+			registerCmdWithArgs("gov", "deposit", 1).
+			registerCmdForResponse("bank", "balances", "balances", filedTypeArray).
+			registerCmdForResponse("gov", "params", "deposit_params.min_deposit", filedTypeArray).
+			registerCmdForResponse("distribution", "validator-outstanding-rewards", "rewards", filedTypeArray).
+			registerCmdForResponse("token", "total-burn", "burned_coins", filedTypeArray)
 
 	rescueStdout = os.Stdout
-	r, w         *os.File
 )
 
-type field struct {
-	name  string
-	index int
-	typ   string
-}
+type (
+	field struct {
+		name  string
+		index int
+		typ   string
+	}
 
-type command struct {
-	parentCmd string
-	fields    map[string]field
-}
+	command struct {
+		parentCmd string
+		fields    map[string]field
+	}
+)
 
 func (c command) append(name, typ string, index int) command {
 	c.fields[name] = field{
@@ -70,21 +70,25 @@ func (c command) append(name, typ string, index int) command {
 	return c
 }
 
-type cmdConfig struct {
-	cmds map[string]command
+type coinConverter struct {
+	cmds   map[string]command
+	tokens map[string]tokentypes.TokenI
+	r, w   *os.File
 }
 
-func cmd() *cmdConfig {
-	return &cmdConfig{
-		cmds: map[string]command{},
+// NewConverter return a instance of coinConverter
+func NewConverter() *coinConverter {
+	return &coinConverter{
+		cmds:   make(map[string]command),
+		tokens: make(map[string]tokentypes.TokenI),
 	}
 }
 
-func (it *cmdConfig) key(parentCmd, cmd string) string {
+func (it *coinConverter) key(parentCmd, cmd string) string {
 	return fmt.Sprintf("%s/%s", parentCmd, cmd)
 }
 
-func (it *cmdConfig) appendFromArgs(parentCmd, cmd string, index int) *cmdConfig {
+func (it *coinConverter) registerCmdWithArgs(parentCmd, cmd string, argsIdx int) *coinConverter {
 	commands, ok := it.cmds[cmd]
 	if !ok {
 		commands = command{
@@ -92,12 +96,25 @@ func (it *cmdConfig) appendFromArgs(parentCmd, cmd string, index int) *cmdConfig
 			fields:    map[string]field{},
 		}
 	}
-	commands = commands.append("ARGS", "", index)
+	commands = commands.append("ARGS", "", argsIdx)
 	it.cmds[cmd] = commands
 	return it
 }
 
-func (it *cmdConfig) appendFromFlag(parentCmd, cmd, flagNm string) *cmdConfig {
+func (it *coinConverter) registerGlobalFlag(flagNm string) *coinConverter {
+	commands, ok := it.cmds[cmdScopeGlobal]
+	if !ok {
+		commands = command{
+			parentCmd: cmdScopeGlobal,
+			fields:    map[string]field{},
+		}
+	}
+	commands = commands.append(flagNm, "", -1)
+	it.cmds[cmdScopeGlobal] = commands
+	return it
+}
+
+func (it *coinConverter) registerCmdWithFlag(parentCmd, cmd, flagNm string) *coinConverter {
 	commands, ok := it.cmds[cmd]
 	if !ok {
 		commands = command{
@@ -110,7 +127,7 @@ func (it *cmdConfig) appendFromFlag(parentCmd, cmd, flagNm string) *cmdConfig {
 	return it
 }
 
-func (it *cmdConfig) appendFromResponse(parentCmd, cmd, flagNm, typ string) *cmdConfig {
+func (it *coinConverter) registerCmdForResponse(parentCmd, cmd, jsonPath, typ string) *coinConverter {
 	commands, ok := it.cmds[cmd]
 	if !ok {
 		commands = command{
@@ -118,12 +135,12 @@ func (it *cmdConfig) appendFromResponse(parentCmd, cmd, flagNm, typ string) *cmd
 			fields:    map[string]field{},
 		}
 	}
-	commands = commands.append(flagNm, typ, -1)
+	commands = commands.append(jsonPath, typ, -1)
 	it.cmds[cmd] = commands
 	return it
 }
 
-func (it cmdConfig) hasFromFlag(cmdNm, flagNm string) bool {
+func (it coinConverter) hasFromFlag(cmdNm, flagNm string) bool {
 	if cmd, ok := it.cmds[cmdNm]; ok {
 		if _, ok = cmd.fields[flagNm]; ok {
 			return ok
@@ -134,7 +151,7 @@ func (it cmdConfig) hasFromFlag(cmdNm, flagNm string) bool {
 	return ok
 }
 
-func (it cmdConfig) getFromArgs(cmdNm string) (field, bool) {
+func (it coinConverter) getFromArgs(cmdNm string) (field, bool) {
 	cmd, ok := it.cmds[cmdNm]
 	if !ok {
 		return field{}, false
@@ -146,7 +163,7 @@ func (it cmdConfig) getFromArgs(cmdNm string) (field, bool) {
 	return cmd.fields["ARGS"], true
 }
 
-func (it cmdConfig) getFromResponse(cmdNm string) map[string]field {
+func (it coinConverter) getFromResponse(cmdNm string) map[string]field {
 	cmd, ok := it.cmds[cmdNm]
 	if !ok {
 		return map[string]field{}
@@ -154,7 +171,7 @@ func (it cmdConfig) getFromResponse(cmdNm string) map[string]field {
 	return cmd.fields
 }
 
-func handleRequestPreRun(cmd *cobra.Command, args []string) {
+func (it *coinConverter) handlePreRun(cmd *cobra.Command, args []string) {
 	if b, _ := cmd.Flags().GetBool(flags.FlagGenerateOnly); b {
 		return
 	}
@@ -164,74 +181,59 @@ func handleRequestPreRun(cmd *cobra.Command, args []string) {
 		if flag.Changed {
 			viper.SetDefault(flag.Name, flag.Value)
 		}
-		parseFlags(cmd, flag, cmdNm)
+		it.parseFlags(cmd, flag, cmdNm)
 	})
 
 	//handle field
-	parseArgs(cmd, args[:])
-}
+	it.parseArgs(cmd, args[:])
 
-func handleResponsePreRun(cmd *cobra.Command) {
-	if !isOutputYAML(cmd) {
+	if !it.isOutputYAML(cmd) {
 		return
 	}
-	r, w, _ = os.Pipe()
-	os.Stdout = w
+	it.r, it.w, _ = os.Pipe()
+	os.Stdout = it.w
 }
 
-func handleResponsePostRun(_ codec.JSONMarshaler, cmd *cobra.Command) {
-	if !isOutputYAML(cmd) {
+func (it *coinConverter) handlePostRun(cmd *cobra.Command) {
+	if !it.isOutputYAML(cmd) {
 		return
 	}
-	if w != nil {
-		_ = w.Close()
+	if it.w != nil {
+		_ = it.w.Close()
 	}
-	out, _ := ioutil.ReadAll(r)
+	out, _ := ioutil.ReadAll(it.r)
 	os.Stdout = rescueStdout
-	fmt.Println(parseYAML(cmd, out))
+	fmt.Println(it.parseYAML(cmd, out))
 }
 
-func isOutputYAML(cmd *cobra.Command) bool {
-	output1, err := cmd.Flags().GetString(cli.OutputFlag)
-	output2 := viper.GetString(cli.OutputFlag)
-	if output2 == formatJSON || (err == nil && output1 == formatJSON) {
-		return false
-	}
-	cmdPath := cmd.CommandPath()
-	if !strings.Contains(cmdPath, queryCommand().CommandPath()) {
-		return false
-	}
-	return true
-}
-
-func parseFlags(cmd *cobra.Command, flag *pflag.Flag, cmdNm string) {
-	if cmdCfg.hasFromFlag(cmdNm, flag.Name) {
+func (it coinConverter) parseFlags(cmd *cobra.Command, flag *pflag.Flag, cmdNm string) {
+	if it.hasFromFlag(cmdNm, flag.Name) {
 		srcCoinStr := flag.Value.String()
-		if res, err := convertCoins(cmd, srcCoinStr); err == nil {
+		if res, err := it.convertCoins(cmd, srcCoinStr); err == nil {
 			_ = flag.Value.Set(res)
 		}
 	}
 }
 
-func parseArgs(cmd *cobra.Command, args []string) {
-	if field, ok := cmdCfg.getFromArgs(cmd.Name()); ok && len(args) > 0 {
-		if res, err := convertCoins(cmd, args[field.index]); err == nil {
+func (it coinConverter) parseArgs(cmd *cobra.Command, args []string) {
+	if field, ok := it.getFromArgs(cmd.Name()); ok && len(args) > 0 {
+		if res, err := it.convertCoins(cmd, args[field.index]); err == nil {
 			args[field.index] = res
 		}
 	}
 }
 
-func parseYAML(cmd *cobra.Command, in []byte) string {
+func (it coinConverter) parseYAML(cmd *cobra.Command, in []byte) string {
 	cfg, err := config.ParseYamlBytes(in)
 	if err != nil {
 		return string(in)
 	}
-	for k, v := range cmdCfg.getFromResponse(cmd.Name()) {
+	for k, v := range it.getFromResponse(cmd.Name()) {
 		switch v.typ {
 		case filedTypeArray:
-			handleList(cmd, cfg, k)
+			it.handleList(cmd, cfg, k)
 		case filedTypeMap:
-			handleMap(cmd, cfg, k)
+			it.handleMap(cmd, cfg, k)
 		}
 	}
 	s, err := config.RenderYaml(cfg.Root)
@@ -241,74 +243,11 @@ func parseYAML(cmd *cobra.Command, in []byte) string {
 	return s
 }
 
-func handleList(cmd *cobra.Command, cfg *config.Config, path string) {
-	list, err := cfg.List(path)
-	if err != nil {
-		return
-	}
-	for i := range list {
-		handleMap(cmd, cfg, fmt.Sprintf("%s.%d", path, i))
-	}
-}
-
-func handleMap(cmd *cobra.Command, cfg *config.Config, path string) {
-	cMap, err := cfg.Map(path)
-	if err != nil {
-		return
+func (it *coinConverter) queryToken(cmd *cobra.Command, denom string) (ft tokentypes.TokenI, err error) {
+	if ft, ok := it.tokens[denom]; ok {
+		return ft, nil
 	}
 
-	bz, err := json.Marshal(cMap)
-	if err != nil {
-		return
-	}
-
-	var srcCoin sdk.DecCoin
-	if err := json.Unmarshal(bz, &srcCoin); err != nil {
-		return
-	}
-
-	truncCoin, _ := srcCoin.TruncateDecimal()
-	dstCoin, err := convertToMainCoin(cmd, truncCoin)
-	if err != nil {
-		return
-	}
-	_ = cfg.Set(path, dstCoin)
-}
-
-func convertCoins(cmd *cobra.Command, coinsStr string) (dstCoinsStr string, err error) {
-	cs, err := parseCoins(coinsStr)
-	if err != nil {
-		return coinsStr, err
-	}
-	dstCoins := sdk.Coins{}
-	for _, coin := range cs {
-		if c, err := convertToMinCoin(cmd, coin); err == nil {
-			dstCoins = append(dstCoins, c)
-			continue
-		}
-		c, _ := coin.TruncateDecimal()
-		dstCoins = append(dstCoins, c)
-	}
-	return dstCoins.String(), nil
-}
-
-func convertToMinCoin(cmd *cobra.Command, srcCoin sdk.DecCoin) (coin sdk.Coin, err error) {
-	ft, err := queryToken(cmd, srcCoin.Denom)
-	if err != nil {
-		return coin, err
-	}
-	return ft.ToMinCoin(srcCoin)
-}
-
-func convertToMainCoin(cmd *cobra.Command, srcCoin sdk.Coin) (coin sdk.DecCoin, err error) {
-	ft, err := queryToken(cmd, srcCoin.Denom)
-	if err != nil {
-		return coin, err
-	}
-	return ft.ToMainCoin(srcCoin)
-}
-
-func queryToken(cmd *cobra.Command, denom string) (ft tokentypes.TokenI, err error) {
 	clientCtx, err := client.GetClientQueryContext(cmd)
 	if err != nil {
 		return nil, err
@@ -333,10 +272,91 @@ func queryToken(cmd *cobra.Command, denom string) (ft tokentypes.TokenI, err err
 		return nil, err
 	}
 
+	it.tokens[denom] = evi
 	return evi, nil
 }
 
-func parseCoins(srcCoinsStr string) (sdk.DecCoins, error) {
+func (it *coinConverter) isOutputYAML(cmd *cobra.Command) bool {
+	output1, err := cmd.Flags().GetString(cli.OutputFlag)
+	output2 := viper.GetString(cli.OutputFlag)
+	if output2 == formatJSON || (err == nil && output1 == formatJSON) {
+		return false
+	}
+	cmdPath := cmd.CommandPath()
+	if !strings.Contains(cmdPath, queryCommand().CommandPath()) {
+		return false
+	}
+	return true
+}
+
+func (it *coinConverter) handleList(cmd *cobra.Command, cfg *config.Config, path string) {
+	list, err := cfg.List(path)
+	if err != nil {
+		return
+	}
+	for i := range list {
+		it.handleMap(cmd, cfg, fmt.Sprintf("%s.%d", path, i))
+	}
+}
+
+func (it *coinConverter) handleMap(cmd *cobra.Command, cfg *config.Config, path string) {
+	cMap, err := cfg.Map(path)
+	if err != nil {
+		return
+	}
+
+	bz, err := json.Marshal(cMap)
+	if err != nil {
+		return
+	}
+
+	var srcCoin sdk.DecCoin
+	if err := json.Unmarshal(bz, &srcCoin); err != nil {
+		return
+	}
+
+	truncCoin, _ := srcCoin.TruncateDecimal()
+	dstCoin, err := it.convertToMainCoin(cmd, truncCoin)
+	if err != nil {
+		return
+	}
+	_ = cfg.Set(path, dstCoin)
+}
+
+func (it *coinConverter) convertCoins(cmd *cobra.Command, coinsStr string) (dstCoinsStr string, err error) {
+	cs, err := it.parseCoins(coinsStr)
+	if err != nil {
+		return coinsStr, err
+	}
+	dstCoins := sdk.Coins{}
+	for _, coin := range cs {
+		if c, err := it.convertToMinCoin(cmd, coin); err == nil {
+			dstCoins = append(dstCoins, c)
+			continue
+		}
+		c, _ := coin.TruncateDecimal()
+		dstCoins = append(dstCoins, c)
+	}
+	return dstCoins.String(), nil
+}
+
+func (it *coinConverter) convertToMinCoin(cmd *cobra.Command, srcCoin sdk.DecCoin) (coin sdk.Coin, err error) {
+	ft, err := it.queryToken(cmd, srcCoin.Denom)
+	if err != nil {
+		return coin, err
+	}
+	return ft.ToMinCoin(srcCoin)
+}
+
+func (it *coinConverter) convertToMainCoin(cmd *cobra.Command, srcCoin sdk.Coin) (coin sdk.DecCoin, err error) {
+	ft, err := it.queryToken(cmd, srcCoin.Denom)
+	if err != nil {
+		return coin, err
+	}
+	return ft.ToMainCoin(srcCoin)
+}
+
+func (it *coinConverter) parseCoins(srcCoinsStr string) (sdk.DecCoins, error) {
 	if cs, err := sdk.ParseDecCoins(srcCoinsStr); err == nil {
 		return cs, nil
 	}
