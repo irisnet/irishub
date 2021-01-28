@@ -24,14 +24,14 @@ import (
 )
 
 const (
-	formatJson     = "json"
+	formatJSON     = "json"
 	cmdScopeGlobal = "global"
 	filedTypeMap   = "map"
 	filedTypeArray = "array"
 )
 
 var (
-	cmdCfg = NewCmdConfig().appendFromFlag(cmdScopeGlobal, cmdScopeGlobal, "fees").
+	cmdCfg = cmd().appendFromFlag(cmdScopeGlobal, cmdScopeGlobal, "fees").
 		appendFromFlag(cmdScopeGlobal, cmdScopeGlobal, "amount").
 		appendFromFlag(cmdScopeGlobal, cmdScopeGlobal, "deposit").
 		appendFromFlag(cmdScopeGlobal, cmdScopeGlobal, "service-fee-cap").
@@ -41,8 +41,8 @@ var (
 		appendFromArgs("staking", "unbond", 1).
 		appendFromArgs("distribution", "fund-community-pool", 0).
 		appendFromArgs("gov", "deposit", 1).
-		appendFromResponse("query", "account", "coins", filedTypeArray).
-		appendFromResponse("gov", "params", "deposit_parmas.min_deposit", filedTypeArray)
+		appendFromResponse("bank", "balances", "balances", filedTypeArray).
+		appendFromResponse("gov", "params", "deposit_params.min_deposit", filedTypeArray)
 
 	rescueStdout = os.Stdout
 	r, w         *os.File
@@ -72,7 +72,7 @@ type cmdConfig struct {
 	cmds map[string]command
 }
 
-func NewCmdConfig() *cmdConfig {
+func cmd() *cmdConfig {
 	return &cmdConfig{
 		cmds: map[string]command{},
 	}
@@ -192,7 +192,7 @@ func handleResponsePostRun(cdc codec.JSONMarshaler, cmd *cobra.Command) {
 func isOutputYAML(cmd *cobra.Command) bool {
 	output1, err := cmd.Flags().GetString(cli.OutputFlag)
 	output2 := viper.GetString(cli.OutputFlag)
-	if output2 == formatJson || (err == nil && output1 == formatJson) {
+	if output2 == formatJSON || (err == nil && output1 == formatJSON) {
 		return false
 	}
 	cmdPath := cmd.CommandPath()
