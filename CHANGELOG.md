@@ -37,6 +37,8 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ## [Unreleased]
 
+## [v1.2.1] - 2021-01-28
+
 ### Bug Fixes
 
 * (modules/htlc) [\#79](https://github.com/irisnet/irismod/pull/79) Fix HTLC hash-lock length check.
@@ -45,6 +47,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 * [\#83](https://github.com/irisnet/irismod/pull/83) Bump cosmos-sdk version to [v0.40.1](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.40.1).
 * [\#83](https://github.com/irisnet/irismod/pull/83) Bump tendermint verion to [v0.34.3](https://github.com/tendermint/tendermint/releases/tag/v0.34.3).
+* (modules/service)[\#96](https://github.com/irisnet/irismod/pull/96) Change the event key `response_service` to `respond_service`.
 * [\#92](https://github.com/irisnet/irismod/issues/92) Normalize msg and genesis validation.
 * (modules/service)[\#86](https://github.com/irisnet/irismod/pull/86) Update service default params.
 * (modules/token)[\#85](https://github.com/irisnet/irismod/pull/85) Register denomMetadata to bank module.
@@ -68,7 +71,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 * [\#66](https://github.com/irisnet/irismod/pull/66) Bump cosmos-sdk version to [v0.40.0](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.40.0).
 * [\#66](https://github.com/irisnet/irismod/pull/66) Bump tendermint verion to [v0.34.1](https://github.com/tendermint/tendermint/releases/tag/v0.34.1).
-* (modules/coinswap)[\#68](https://github.com/irisnet/irismod/pull/68) Remove standard denom from params and replace prefix ”uni:“ with ”swap/“
+* (modules/coinswap)[\#68](https://github.com/irisnet/irismod/pull/68) Remove standard denom from params and replace prefix `uni:` with `swap/`
 * (modules/token)[\#67](https://github.com/irisnet/irismod/pull/67) Add token burn.
 * [\#64](https://github.com/irisnet/irismod/pull/64) Add preprocessing before exporting the app state.
 * [\#62](https://github.com/irisnet/irismod/pull/62) Add paginate to modules.
@@ -96,3 +99,6 @@ Ref: https://keepachangelog.com/en/1.0.0/
 <!-- Release links -->
 
 [v1.1.0]: https://github.com/irisnet/irismod/releases/tag/v1.1.0
+[v1.1.1]: https://github.com/irisnet/irismod/releases/tag/v1.1.1
+[v1.2.0]: https://github.com/irisnet/irismod/releases/tag/v1.2.0
+[v1.2.1]: https://github.com/irisnet/irismod/releases/tag/v1.2.1
