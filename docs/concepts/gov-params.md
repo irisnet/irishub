@@ -5,55 +5,55 @@ All the IRIS holders may participate in the on-chain governance. If the communit
 
 ## Parameters in Auth
 
-| key                           | Description | Range | Current |
-| ----------------------------- | ----------- | ----- | ------- |
-| `auth/MaxMemoCharacters`      |             |       | 256     |
-| `auth/TxSigLimit`             |             |       | 7       |
-| `auth/TxSizeCostPerByte`      |             |       | 10      |
-| `auth/SigVerifyCostED25519`   |             |       | 590     |
-| `auth/SigVerifyCostSecp256k1` |             |       | 1000    |
+| key                           | Description                  | Range   | Current |
+| ----------------------------- | ---------------------------- | ------- | ------- |
+| `auth/MaxMemoCharacters`      | maximum number of characters | (0, +∞) | 256     |
+| `auth/TxSigLimit`             | tx signature limit           | (0, +∞) | 7       |
+| `auth/TxSizeCostPerByte`      |                              | (0, +∞) | 10      |
+| `auth/SigVerifyCostED25519`   |                              | (0, +∞) | 590     |
+| `auth/SigVerifyCostSecp256k1` |                              | (0, +∞) | 1000    |
 
 ## Parameters in Bank
 
-| key                       | Description | Range | Current |
-| ------------------------- | ----------- | ----- | ------- |
-| `bank/SendEnabled`        |             |       |         |
-| `bank/DefaultSendEnabled` |             |       |         |
+| key                       | Description | Range        | Current |
+| ------------------------- | ----------- | ------------ | ------- |
+| `bank/SendEnabled`        |             |              | []      |
+| `bank/DefaultSendEnabled` |             | {true,false} | true    |
 
 Details in [Bank](../features/bank.md)
 
 ## Parameters in Coinswap
 
-| key            | Description | Range | Current |
-| -------------- | ----------- | ----- | ------- |
-| `coinswap/Fee` |             |       |         |
+| key            | Description | Range | Current              |
+| -------------- | ----------- | ----- | -------------------- |
+| `coinswap/Fee` |             | (0,1) | 0.003000000000000000 |
 
 Details in [Coinswap](../features/coinswap.md)
 
 ## Parameters in Crisis
 
-| key                  | Description | Range | Current |
-| -------------------- | ----------- | ----- | ------- |
-| `crisis/ConstantFee` |             |       |         |
+| key                  | Description | Range   | Current                                |
+| -------------------- | ----------- | ------- | -------------------------------------- |
+| `crisis/ConstantFee` |             | amount: (0, +∞) | {"denom": "uiris",   "amount": "1000"} |
 
 ## Parameters in Distribution
 
-| key                                | Description                                    | Range     | Current |
-| ---------------------------------- | ---------------------------------------------- | --------- | ------- |
-| `distribution/communitytax`        | proportion of contributions to community funds | (0, 0.2]  | 0.02    |
-| `distribution/baseproposerreward`  | standard ratio of the block reward             | (0, 0.02] | 0.01    |
-| `distribution/bonusproposerreward` | maximum additional bonus ratio                 | (0, 0.08] | 0.04    |
-| `distribution/withdrawaddrenabled` |                                                |           |         |
+| key                                | Description                                    | Range        | Current |
+| ---------------------------------- | ---------------------------------------------- | ------------ | ------- |
+| `distribution/communitytax`        | proportion of contributions to community funds | (0, 0.2]     | 0.02    |
+| `distribution/baseproposerreward`  | standard ratio of the block reward             | (0, 0.02]    | 0.01    |
+| `distribution/bonusproposerreward` | maximum additional bonus ratio                 | (0, 0.08]    | 0.04    |
+| `distribution/withdrawaddrenabled` |                                                | {true,false} | true    |
 
 Details in [Distribution](../features/distribution.md)
 
 ## Parameters in Gov
 
-| key                 | Description           | Range    | Current |
-| ------------------- | --------------------- | -------- | ------- |
-| `gov/depositparams` | Inflation coefficient | [0, 0.2] | 0.04    |
-| `gov/votingparams`  |                       |          |         |
-| `gov/tallyparams`   |                       |          |         |
+| key                 | Description | Range                                                    | Current                                                      |
+| ------------------- | ----------- | -------------------------------------------------------- | ------------------------------------------------------------ |
+| `gov/depositparams` |             | max_deposit_period:(0, +∞)                               | {"min_deposit": [{"denom": "uiris", "amount": "1000000000"}], "max_deposit_period": "86400s" }, |
+| `gov/votingparams`  |             | voting_period:(0, +∞)                                    | {"voting_period": "432000s"}                                 |
+| `gov/tallyparams`   |             | quorum:[0,1]<br>threshold:(0,1]<br/>veto_threshold:(0,1] | {"quorum":"0.500000000000000000","threshold": "0.500000000000000000","veto_threshold": "0.330000000000000000"} |
 
 Details in [Governance](../features/governance.md)
 
@@ -61,14 +61,14 @@ Details in [Governance](../features/governance.md)
 
 | key              | Description           | Range    | Current |
 | ---------------- | --------------------- | -------- | ------- |
-| `ibc/AllowedClients` |  |       |         |
+| `ibc/AllowedClients` |  |       | ["06-solomachine","07-tendermint"] |
 
 ## Parameters in Mint
 
 | key              | Description           | Range    | Current |
 | ---------------- | --------------------- | -------- | ------- |
 | `mint/Inflation` | Inflation coefficient | [0, 0.2] | 0.04    |
-| `mint/MintDenom` |                       |          |         |
+| `mint/MintDenom` |                       |          | uiris   |
 
 Details in [Mint](../features/mint.md)
 
@@ -83,8 +83,8 @@ Details in [Mint](../features/mint.md)
 | `service/ServiceFeeTax`        | tax rate of service fee                                     | (0, 0.2]         | 0.01     |
 | `service/SlashFraction`        | slash fraction                                              | (0, 0.01]        | 0.001    |
 | `service/TxSizeLimit`          | the limit of the service tx size                            | [2000, 6000]     | 4000     |
-| `service/MinDeposit`          |                                                             |                  |          |
-| `service/BaseDenom`          |                                                             |                  |          |
+| `service/MinDeposit`          |                                                             |                  | [{"denom": "uiris","amount": "5000000000"}] |
+| `service/BaseDenom`          |                                                             |                  | uiris |
 
 Details in [Service](../features/service.md)
 
@@ -104,11 +104,11 @@ Details in [Slashing](../features/slashing.md)
 
 | key                       | Description                  | Range   | Current          |
 | ------------------------- | ---------------------------- | ------- | ---------------- |
-| `staking/UnbondingTime`      | unbonding time               | [2week,)   |         |
-| `staking/MaxValidators` | maximum number of validators | [100, 200] |         |
-| `staking/MaxEntries` |                              |            |         |
-| `staking/BondDenom` |                              |            |         |
-| `staking/HistoricalEntries` |                              |            |         |
+| `staking/UnbondingTime`      | unbonding time               | [2week,)   | 1814400s |
+| `staking/MaxValidators` | maximum number of validators | [100, 200] | 100 |
+| `staking/MaxEntries` |                              | (0, +∞) | 7 |
+| `staking/BondDenom` |                              |            | uiris |
+| `staking/HistoricalEntries` |                              | [0, +∞) | 10000 |
 
 Details in [Staking](../features/staking.md)
 
@@ -126,5 +126,5 @@ Details in [Token](../features/token.md)
 
 | key                       | Description                  | Range   | Current          |
 | ------------------------- | ---------------------------- | ------- | ---------------- |
-| `transfer/SendEnabled`      |                |       |         |
-| `transfer/ReceiveEnabled` |             |       |         |
+| `transfer/SendEnabled`      |                | {true,false} | true |
+| `transfer/ReceiveEnabled` |             | {true,false} | true |
