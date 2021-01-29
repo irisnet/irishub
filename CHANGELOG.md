@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.16.4
+
+*January 28th, 2021*
+
+### Application
+
+* [\#2530](https://github.com/irisnet/irishub/pull/2530) Refund claimed token when exporting expired htlc
+
 ## 0.16.3
 
 *Aug 25th, 2020*
