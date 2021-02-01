@@ -41,6 +41,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ### Bug Fixes
 
+* (modules/token) [\#99](https://github.com/irisnet/irismod/issues/99) Fix incorrect calculation of deduction amount in `iris tx token burn`
 * (modules/htlc) [\#79](https://github.com/irisnet/irismod/pull/79) Fix HTLC hash-lock length check.
 
 ### Improvements
