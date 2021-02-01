@@ -32,14 +32,22 @@ func (dtf ValidateTokenFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 
 		switch msg := msg.(type) {
 		case *types.MsgIssueToken:
-			fee := dtf.k.GetTokenIssueFee(ctx, msg.Symbol)
+			fee, err := dtf.k.GetTokenIssueFee(ctx, msg.Symbol)
+			if err != nil {
+				return ctx, sdkerrors.Wrap(types.ErrInvalidBaseFee, err.Error())
+			}
+
 			if fe, ok := feeMap[msg.Owner]; ok {
 				feeMap[msg.Owner] = fe.Add(fee)
 			} else {
 				feeMap[msg.Owner] = fee
 			}
 		case *types.MsgMintToken:
-			fee := dtf.k.GetTokenMintFee(ctx, msg.Symbol)
+			fee, err := dtf.k.GetTokenMintFee(ctx, msg.Symbol)
+			if err != nil {
+				return ctx, sdkerrors.Wrap(types.ErrInvalidBaseFee, err.Error())
+			}
+
 			if fe, ok := feeMap[msg.Owner]; ok {
 				feeMap[msg.Owner] = fe.Add(fee)
 			} else {

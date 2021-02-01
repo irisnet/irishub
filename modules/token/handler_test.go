@@ -91,7 +91,8 @@ func (suite *HandlerSuite) TestIssueToken() {
 
 	nativeTokenAmt2 := suite.bk.GetBalance(suite.ctx, owner, denom).Amount
 
-	fee := suite.keeper.GetTokenIssueFee(suite.ctx, msg.Symbol)
+	fee, err := suite.keeper.GetTokenIssueFee(suite.ctx, msg.Symbol)
+	suite.NoError(err)
 
 	suite.Equal(nativeTokenAmt1.Sub(fee.Amount), nativeTokenAmt2)
 
@@ -121,7 +122,9 @@ func (suite *HandlerSuite) TestMintToken() {
 	mintBtcAmt := sdk.NewIntWithDecimal(int64(msgMintToken.Amount), int(token.Scale))
 	suite.Equal(beginBtcAmt.Add(mintBtcAmt), endBtcAmt)
 
-	fee := suite.keeper.GetTokenMintFee(suite.ctx, token.Symbol)
+	fee, err := suite.keeper.GetTokenMintFee(suite.ctx, token.Symbol)
+	suite.NoError(err)
+
 	endNativeAmt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), denom).Amount
 
 	suite.Equal(beginNativeAmt.Sub(fee.Amount), endNativeAmt)

@@ -62,8 +62,15 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuer
 		return nil, err
 	}
 
-	issueFee := keeper.GetTokenIssueFee(ctx, params.Symbol)
-	mintFee := keeper.GetTokenMintFee(ctx, params.Symbol)
+	issueFee, err := keeper.GetTokenIssueFee(ctx, params.Symbol)
+	if err != nil {
+		return nil, err
+	}
+
+	mintFee, err := keeper.GetTokenMintFee(ctx, params.Symbol)
+	if err != nil {
+		return nil, err
+	}
 
 	fees := types.QueryFeesResponse{
 		Exist:    keeper.HasToken(ctx, params.Symbol),

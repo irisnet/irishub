@@ -19,19 +19,25 @@ const (
 // DeductIssueTokenFee performs fee handling for issuing token
 func (k Keeper) DeductIssueTokenFee(ctx sdk.Context, owner sdk.AccAddress, symbol string) error {
 	// get the required issuance fee
-	fee := k.GetTokenIssueFee(ctx, symbol)
+	fee, err := k.GetTokenIssueFee(ctx, symbol)
+	if err != nil {
+		return err
+	}
 	return feeHandler(ctx, k, owner, fee)
 }
 
 // DeductMintTokenFee performs fee handling for minting token
 func (k Keeper) DeductMintTokenFee(ctx sdk.Context, owner sdk.AccAddress, symbol string) error {
 	// get the required minting fee
-	fee := k.GetTokenMintFee(ctx, symbol)
+	fee, err := k.GetTokenMintFee(ctx, symbol)
+	if err != nil {
+		return err
+	}
 	return feeHandler(ctx, k, owner, fee)
 }
 
 // GetTokenIssueFee returns the token issurance fee
-func (k Keeper) GetTokenIssueFee(ctx sdk.Context, symbol string) sdk.Coin {
+func (k Keeper) GetTokenIssueFee(ctx sdk.Context, symbol string) (sdk.Coin, error) {
 	// get params
 	params := k.GetParamSet(ctx)
 	issueTokenBaseFee := params.IssueTokenBaseFee
@@ -43,20 +49,27 @@ func (k Keeper) GetTokenIssueFee(ctx sdk.Context, symbol string) sdk.Coin {
 }
 
 // GetTokenMintFee returns the token minting fee
-func (k Keeper) GetTokenMintFee(ctx sdk.Context, symbol string) sdk.Coin {
+func (k Keeper) GetTokenMintFee(ctx sdk.Context, symbol string) (sdk.Coin, error) {
 	// get params
 	params := k.GetParamSet(ctx)
 	mintTokenFeeRatio := params.MintTokenFeeRatio
 
 	// compute the insurance and minting fees
-	issueFee := k.GetTokenIssueFee(ctx, symbol)
+	issueFee, err := k.GetTokenIssueFee(ctx, symbol)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
 	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(mintTokenFeeRatio)
 
 	return k.truncateFee(ctx, issueFee.Denom, mintFee)
 }
 
-func (k Keeper) truncateFee(ctx sdk.Context, denom string, feeAmt sdk.Dec) sdk.Coin {
-	token, _ := k.GetToken(ctx, denom)
+func (k Keeper) truncateFee(ctx sdk.Context, denom string, feeAmt sdk.Dec) (sdk.Coin, error) {
+	token, err := k.GetToken(ctx, denom)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
 	precision := sdk.NewIntWithDecimal(1, int(token.GetScale()))
 	feeNativeToken := feeAmt.Quo(sdk.NewDecFromInt(precision))
 
@@ -66,7 +79,7 @@ func (k Keeper) truncateFee(ctx sdk.Context, denom string, feeAmt sdk.Dec) sdk.C
 	} else {
 		amount = sdk.NewInt(1).Mul(precision)
 	}
-	return sdk.NewCoin(token.GetMinUnit(), amount)
+	return sdk.NewCoin(token.GetMinUnit(), amount), nil
 }
 
 // feeHandler handles the fee of token

@@ -298,7 +298,11 @@ func selectOneToken(
 			return t, nil
 		}
 
-		mintFee := k.GetTokenMintFee(ctx, t.GetSymbol())
+		mintFee, err := k.GetTokenMintFee(ctx, t.GetSymbol())
+		if err != nil {
+			panic(err)
+		}
+
 		account := ak.GetAccount(ctx, t.GetOwner())
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 		spendableStake := spendable.AmountOf(nativeToken.MinUnit)
@@ -333,7 +337,10 @@ func genToken(ctx sdk.Context,
 		token = randToken(r, accs)
 	}
 
-	issueFee := k.GetTokenIssueFee(ctx, token.Symbol)
+	issueFee, err := k.GetTokenIssueFee(ctx, token.Symbol)
+	if err != nil {
+		panic(err)
+	}
 
 	account, maxFees := filterAccount(ctx, r, ak, bk, accs, issueFee)
 	token.Owner = account.String()

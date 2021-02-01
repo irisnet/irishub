@@ -114,8 +114,15 @@ func (k Keeper) Fees(c context.Context, req *types.QueryFeesRequest) (*types.Que
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	issueFee := k.GetTokenIssueFee(ctx, req.Symbol)
-	mintFee := k.GetTokenMintFee(ctx, req.Symbol)
+	issueFee, err := k.GetTokenIssueFee(ctx, req.Symbol)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	mintFee, err := k.GetTokenMintFee(ctx, req.Symbol)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 
 	return &types.QueryFeesResponse{
 		Exist:    k.HasToken(ctx, req.Symbol),
