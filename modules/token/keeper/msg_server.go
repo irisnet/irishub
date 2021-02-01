@@ -143,7 +143,6 @@ func (m msgServer) BurnToken(goCtx context.Context, msg *types.MsgBurnToken) (*t
 	if err := m.Keeper.DeductMintTokenFee(ctx, owner, msg.Symbol); err != nil {
 		return nil, err
 	}
-
 	if err := m.Keeper.BurnToken(ctx, msg.Symbol, msg.Amount, owner); err != nil {
 		return nil, err
 	}

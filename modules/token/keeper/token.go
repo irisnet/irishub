@@ -37,7 +37,7 @@ func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress) (tokens []types
 		var symbol gogotypes.StringValue
 		k.cdc.MustUnmarshalBinaryBare(it.Value(), &symbol)
 
-		token, err := k.GetToken(ctx, symbol.Value)
+		token, err := k.getTokenBySymbol(ctx, symbol.Value)
 		if err != nil {
 			continue
 		}
@@ -48,26 +48,17 @@ func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress) (tokens []types
 
 // GetToken returns the token of the specified symbol or minUint
 func (k Keeper) GetToken(ctx sdk.Context, denom string) (types.TokenI, error) {
-	store := ctx.KVStore(k.storeKey)
-
-	if token, err := k.getToken(ctx, denom); err == nil {
+	// query token by symbol
+	if token, err := k.getTokenBySymbol(ctx, denom); err == nil {
 		return &token, nil
 	}
 
-	bz := store.Get(types.KeyMinUint(denom))
-	if bz == nil {
-		return nil, sdkerrors.Wrap(types.ErrTokenNotExists, fmt.Sprintf("token %s does not exist", denom))
+	// query token by minUnit
+	if token, err := k.getTokenByMinUnit(ctx, denom); err == nil {
+		return &token, nil
 	}
 
-	var symbol gogotypes.StringValue
-	k.cdc.MustUnmarshalBinaryBare(bz, &symbol)
-
-	token, err := k.getToken(ctx, symbol.Value)
-	if err != nil {
-		return nil, err
-	}
-
-	return &token, nil
+	return nil, sdkerrors.Wrapf(types.ErrTokenNotExists, "token: %s does not exist", denom)
 }
 
 // AddToken saves a new token
@@ -208,15 +199,34 @@ func (k Keeper) setToken(ctx sdk.Context, token types.Token) {
 	store.Set(types.KeySymbol(token.Symbol), bz)
 }
 
-func (k Keeper) getToken(ctx sdk.Context, symbol string) (token types.Token, err error) {
+func (k Keeper) getTokenBySymbol(ctx sdk.Context, symbol string) (token types.Token, err error) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := store.Get(types.KeySymbol(symbol))
 	if bz == nil {
-		return token, sdkerrors.Wrap(types.ErrTokenNotExists, fmt.Sprintf("token %s does not exist", symbol))
+		return token, sdkerrors.Wrap(types.ErrTokenNotExists, fmt.Sprintf("token symbol %s does not exist", symbol))
 	}
 
 	k.cdc.MustUnmarshalBinaryBare(bz, &token)
+	return token, nil
+}
+
+func (k Keeper) getTokenByMinUnit(ctx sdk.Context, minUnit string) (token types.Token, err error) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(types.KeyMinUint(minUnit))
+	if bz == nil {
+		return token, sdkerrors.Wrap(types.ErrTokenNotExists, fmt.Sprintf("token minUnit %s does not exist", minUnit))
+	}
+
+	var symbol gogotypes.StringValue
+	k.cdc.MustUnmarshalBinaryBare(bz, &symbol)
+
+	token, err = k.getTokenBySymbol(ctx, symbol.Value)
+	if err != nil {
+		return token, err
+	}
+
 	return token, nil
 }
 
