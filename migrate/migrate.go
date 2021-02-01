@@ -459,6 +459,12 @@ func migrateDistribution(initialState v0_16.GenesisFileState, communityTax sdk.C
 	feePool := distributiontypes.FeePool{CommunityPool: sdk.NewDecCoinsFromCoins(communityTax...)}
 
 	var delegatorWithdrawInfos []distributiontypes.DelegatorWithdrawInfo
+	for _, delegatorWithdrawInfo := range initialState.DistrData.DelegatorWithdrawInfos {
+		delegatorWithdrawInfos = append(delegatorWithdrawInfos, distributiontypes.DelegatorWithdrawInfo{
+			DelegatorAddress: delegatorWithdrawInfo.DelegatorAddr.String(),
+			WithdrawAddress:  delegatorWithdrawInfo.WithdrawAddr.String(),
+		})
+	}
 	previousProposer := initialState.DistrData.PreviousProposer
 	var outstandingRewards []distributiontypes.ValidatorOutstandingRewardsRecord
 	var validatorAccumulatedCommissions []distributiontypes.ValidatorAccumulatedCommissionRecord
