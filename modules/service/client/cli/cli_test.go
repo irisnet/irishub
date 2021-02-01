@@ -18,6 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/client/testutil"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
@@ -94,6 +95,7 @@ func (s *IntegrationTestSuite) TestService() {
 	timeout := qos
 
 	expectedEarnedFees := fmt.Sprintf("48%s", serviceDenom)
+	expectedTaxFees := fmt.Sprintf("2%s", serviceDenom)
 
 	withdrawalAddress := sdk.AccAddress(crypto.AddressHash([]byte("withdrawalAddress")))
 
@@ -375,6 +377,13 @@ func (s *IntegrationTestSuite) TestService() {
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	withdrawalFees := respType.(*banktypes.QueryAllBalancesResponse).Balances
 	s.Require().Equal(expectedEarnedFees, withdrawalFees.String())
+
+	//------check service tax account-------------
+	bz, err = banktestutil.QueryBalancesExec(val.ClientCtx, authtypes.NewModuleAddress(servicetypes.TaxAccName))
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	taxFees := respType.(*banktypes.QueryAllBalancesResponse).Balances
+	s.Require().Equal(expectedTaxFees, taxFees.String())
 
 	//------GetCmdQueryRequestContext()-------------
 	contextId := request.RequestContextId
