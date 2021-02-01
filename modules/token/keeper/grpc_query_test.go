@@ -76,11 +76,8 @@ func (suite *KeeperTestSuite) TestGRPCQueryTotalBurn() {
 	buinCoin := sdk.NewInt64Coin("satoshi", 1000000000000000000)
 	app.TokenKeeper.AddBurnCoin(ctx, buinCoin)
 
-	expCoin, err := token.ToMainCoin(buinCoin)
-	suite.Require().NoError(err)
-
 	resp, err := queryClient.TotalBurn(gocontext.Background(), &types.QueryTotalBurnRequest{})
 	suite.Require().NoError(err)
 	suite.Len(resp.BurnedCoins, 1)
-	suite.EqualValues(expCoin, resp.BurnedCoins[0])
+	suite.EqualValues(buinCoin, resp.BurnedCoins[0])
 }
