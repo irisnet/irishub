@@ -10,7 +10,7 @@ IRIShub-Chain-SDK是根据IRIShub提供的API制作的一个简单的软件开�
 
 ClientConfig组件主要包含SDK中使用的参数，具体含义如下表所示：
 
-| Iterm     | Type          | Description                                             |
+| 参数     | 类型          | 描述                                             |
 | --------- | ------------- | ------------------------------------------------------- |
 | NodeURI   | string        | 连接到SDK的irishub节点的RPC地址，例如：localhost：26657 |
 | GRPCAddr  | string        | 连接到SDK的irishub节点的GRPC地址，例如：localhost：9090 |
