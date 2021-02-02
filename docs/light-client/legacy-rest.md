@@ -21,14 +21,6 @@ The REST routes present in Irishub v0.16 and earlier are marked as deprecated vi
 
 For application developers, Legacy REST API routes needs to be wired up to the REST server, this is done by calling the `RegisterRESTRoutes` function on the ModuleManager.
 
-### Swagger
-
-A [Swagger](https://swagger.io/) (or OpenAPIv2) specification file is exposed under the `/swagger` route on the API server. Swagger is an open specification describing the API endpoints a server serves, including description, input arguments, return types and much more about each endpoint.
-
-Enabling the `/swagger` endpoint is configurable inside `~/.iris/config/app.toml` via the `api.swagger` field, which is set to true by default.
-
-For application developers, you may want to generate your own Swagger definitions based on your custom modules. The IRISHub's [Swagger generation script](https://github.com/irisnet/irishub/blob/master/scripts/protoc-swagger-gen.sh) is a good place to start.
-
 ## Legacy REST Endpoint
 
 ### Breaking Changes in Legacy REST Endpoints (Contrast with Cosmos-SDK v0.39 and earlier versions)
@@ -85,7 +77,7 @@ For application developers, you may want to generate your own Swagger definition
 | `GET` `/gov/proposals/{proposal-id}/deposits/{depositor}`                         | Get depositor a of deposit                                          | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}`                                      |
 | `GET` `/gov/proposals/{proposal-id}/votes`                                        | Get votes of a proposal                                             | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/votes`                                                     |
 | `POST` `/gov/proposals/{proposal-id}/votes`                                       | Vote a proposal                                                     | N/A, use Protobuf directly                                                                                    |
-| `GET` `/gov/proposals/{proposal-id}/votes/{voter}`                                | Get voted information by voterAddr.                                 | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}`                                             |
+| `GET` `/gov/proposals/{proposal-id}/votes/{voter}`                                | Get voted information by voterAddr                                  | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}`                                             |
 | `GET` `/gov/proposals/{proposal-id}/tally`                                        | Get tally of a proposal                                             | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/tally`                                                     |
 | `GET` `/gov/parameters/deposit`                                                   | Get governance deposit parameters                                   | `GET` `/cosmos/gov/v1beta1/params/{params_type}`                                                              |
 | `GET` `/gov/parameters/tallying`                                                  | Query governance tally parameters                                   | `GET` `/cosmos/gov/v1beta1/params/{params_type}`                                                              |

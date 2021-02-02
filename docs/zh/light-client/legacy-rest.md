@@ -21,14 +21,6 @@ IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 
 对于应用程序开发人员而言，传统的 REST API 路由需要连接到 REST 服务器，这是通过在 ModuleManager 上调用 `RegisterRESTRoutes` 方法来完成的。
 
-### Swagger
-
-[Swagger](https://swagger.io/)（或 OpenAPIv2 ）规范文件在 API 服务器上的 `/swagger` 路径下。 Swagger 是一个开放的规范，描述服务器服务的 API 端点，包括描述、输入参数、返回类型以及有关每个端点的更多信息。
-
-可以通过 `~/.iris/config/app.toml` 中的 `api.swagger` 字段配置启用 `/swagger` 端点，默认为 true。
-
-对于应用程序开发人员，您可能希望基于自定义模块生成自己的 Swagger 定义。可以从 IRIShub 的 [Swagger 生成脚本](https://github.com/irisnet/irishub/blob/master/scripts/protoc-swagger-gen.sh)开始。
-
 ## Legacy REST 端点
 
 ### Legacy REST 端点的中不兼容更新 (对比 Cosmos-SDK v0.39 及更早的版本)
