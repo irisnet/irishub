@@ -1,27 +1,27 @@
 # gRPC Client
 
-IRISHub v1.0.0 (depends on Cosmos-SDK v0.40) introduced Protobuf as the main [encoding](https://github.com/cosmos/cosmos-sdk/blob/master/docs/core/encoding.md) library, and this brings a wide range of Protobuf-based tools that can be plugged into the SDK. One such tool is [gRPC](https://grpc.io), a modern open source high performance RPC framework that has decent client support in several languages.
+IRISHub v1.0.0（依赖Cosmos-SDK v0.41）引入了 Protobuf 作为主要的[编码](https://github.com/cosmos/cosmos-sdk/blob/master/docs/core/encoding.md)库，这带来了可插入 SDK 的各种基于 Protobuf 的工具。一种这样的工具是 [gRPC](https://grpc.io)，这是一种现代的开源高性能 RPC 框架，具有多语言客户端支持。
 
-## gRPC Server Port, Activation and Configuration
+## gRPC 服务端口、激活方式和配置
 
-The `grpc.Server` is a concrete gRPC server, which spawns and serves any gRPC requests. This server can be configured inside `~/.iris/config/app.toml`:
+`grpc.Server` 是一个具体的 gRPC 服务，它产生并服务任何gRPC请求。可以在 `~/.iris/config/app.toml` 中配置：
 
-- `grpc.enable = true|false` field defines if the gRPC server should be enabled. Defaults to `true`.
-- `grpc.address = {string}` field defines the address (really, the port, since the host should be kept at `0.0.0.0`) the server should bind to. Defaults to `0.0.0.0:9000`.
+- `grpc.enable = true|false` 字段定义了 gRPC 服务是否可用，默认为 `true`。
+- `grpc.address = {string}` 字段定义了服务绑定的地址（实际上是端口，因为主机必须保持为 `0.0.0.0`），默认为 `0.0.0.0:9000`。
 
-Once the gRPC server is started, you can send requests to it using a gRPC client.
+gRPC 服务启动后，您可以使用 gRPC 客户端向其发送请求。
 
-## gRPC endpoints
+## gRPC 端点
 
-An overview of all available gRPC endpoints shipped with the IRISHub is [Protobuf documention](./proto-docs.md).
+IRISHub 附带的所有可用 gRPC 端点的概述见[Protobuf 文档](./proto-docs.md)。
 
-## Generating, Signing and Broadcasting Transactions
+## 构造、签名和广播交易
 
-It is possible to manipulate transactions programmatically via Go using the Cosmos SDK's `TxBuilder` interface.
+可以使用 Cosmos SDK 的 `TxBuilder` 接口，通过 Golang 以编程方式处理交易。
 
-### Generating a Transaction
+### 构造一个交易
 
-Before generating a transaction, a new instance of a `TxBuilder` needs to be created. Since the SDK supports both Amino and Protobuf transactions, the first step would be to decide which encoding scheme to use. All the subsequent steps remain unchanged, whether you're using Amino or Protobuf, as `TxBuilder` abstracts the encoding mechanisms. In the following snippet, we will use Protobuf.
+在生成交易之前，需要创建一个新的 `TxBuilder` 实例。 由于 SDK 支持 Amino 和 Protobuf 交易，因此第一步将是确定要使用哪种编码方案。无论您使用的是 Amino 还是 Protobuf，所有后续步骤均保持不变，因为 `TxBuilder` 抽象了编码机制。在以下代码段中，我们将使用 Protobuf。
 
 ```go
 import (
@@ -39,7 +39,7 @@ func sendTx() error {
 }
 ```
 
-We can also set up some keys and addresses that will send and receive the transactions. Here, for the purpose of the tutorial, we will be using some dummy data to create keys.
+我们还可以设置一些密钥和地址来发送和接收交易。在此，出于本教程的目的，我们将使用一些虚拟数据来创建密钥。
 
 ```go
 import (
@@ -51,7 +51,7 @@ priv2, _, addr2 := testdata.KeyTestPubAddr()
 priv3, _, addr3 := testdata.KeyTestPubAddr()
 ```
 
-Populating the `TxBuilder` can be done via its [methods](https://github.com/cosmos/cosmos-sdk/blob/v0.40.1/client/tx_config.go#L32-L45):
+可以通过这些[方法](https://github.com/cosmos/cosmos-sdk/blob/v0.41.0/client/tx_config.go#L32-L45)来配置 `TxBuilder`：
 
 ```go
 import (
@@ -80,16 +80,16 @@ func sendTx() error {
 }
 ```
 
-At this point, `TxBuilder`'s underlying transaction is ready to be signed.
+至此，以 `TxBuilder` 为基础的交易已经准备好进行签名。
 
-### Signing a Transaction
+### 签名一个交易
 
-We set encoding config to use Protobuf, which will use `SIGN_MODE_DIRECT` by default. As per [ADR-020](https://github.com/cosmos/cosmos-sdk/blob/v0.40.1/docs/architecture/adr-020-protobuf-transaction-encoding.md), each signer needs to sign the `SignerInfo`s of all other signers. This means that we need to perform two steps sequentially:
+我们将编码设置为使用 Protobuf，默认情况下将使用 `SIGN_MODE_DIRECT`。 根据[ADR-020](https://github.com/cosmos/cosmos-sdk/blob/v0.41.0/docs/architecture/adr-020-protobuf-transaction-encoding.md)，每个签名者都需要对所有其他签名者的 `SignerInfo`s 进行签名。这意味着我们需要依次执行两个步骤：
 
-- for each signer, populate the signer's `SignerInfo` inside `TxBuilder`,
-- once all `SignerInfo`s are populated, for each signer, sign the `SignDoc` (the payload to be signed).
+- 对于每个签名者，在 `TxBuilder` 中设置签名者的 `SignerInfo`，
+- 设置所有 `SignerInfo` 之后，每个签名者对 `SignDoc`（要签名的有效数据）进行签名。
 
-In the current `TxBuilder`'s API, both steps are done using the same method: `SetSignatures()`. The current API requires us to first perform a round of `SetSignatures()` _with empty signatures_, only to populate `SignerInfo`s, and a second round of `SetSignatures()` to actually sign the correct payload.
+在当前的 `TxBuilder` API中，两个步骤都使用相同的方法 `SetSignatures()` 完成。当前的 API 要求我们首先循环执行带不带签名的 `SetSignatures()`，仅设置 `SignerInfo`s，然后进行第二轮 `SetSignatures()` 来对正确的有效数据进行签名。
 
 ```go
 import (
@@ -149,7 +149,7 @@ func sendTx() error {
 }
 ```
 
-The `TxBuilder` is now correctly populated. To print it, you can use the `TxConfig` interface from the initial encoding config `encCfg`:
+现在已经正确配置了 `TxBuilder`。 要打印它，您可以使用初始编码配置 `encCfg` 中的 `TxConfig` 接口：
 
 ```go
 func sendTx() error {
@@ -170,9 +170,9 @@ func sendTx() error {
 }
 ```
 
-### Broadcasting a Transaction
+### 广播一个交易
 
-The preferred way to broadcast a transaction is to use gRPC, though using REST (via `gRPC-gateway`) or the Tendermint RPC is also posible. For this tutorial, we will only describe the gRPC method.
+广播交易的首选方法是使用 gRPC，尽管也可以使用 REST（通过 `gRPC-gateway`）或 Tendermint RPC。 本教程中，我们仅介绍 gRPC 方法。
 
 ```go
 import (

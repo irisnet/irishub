@@ -1,6 +1,6 @@
 # gRPC Client
 
-IRISHub v1.0.0 (depends on Cosmos-SDK v0.40) introduced Protobuf as the main [encoding](https://github.com/cosmos/cosmos-sdk/blob/master/docs/core/encoding.md) library, and this brings a wide range of Protobuf-based tools that can be plugged into the SDK. One such tool is [gRPC](https://grpc.io), a modern open source high performance RPC framework that has decent client support in several languages.
+IRISHub v1.0.0 (depends on Cosmos-SDK v0.41) introduced Protobuf as the main [encoding](https://github.com/cosmos/cosmos-sdk/blob/master/docs/core/encoding.md) library, and this brings a wide range of Protobuf-based tools that can be plugged into the SDK. One such tool is [gRPC](https://grpc.io), a modern open source high performance RPC framework that has decent client support in several languages.
 
 ## gRPC Server Port, Activation and Configuration
 
@@ -11,7 +11,7 @@ The `grpc.Server` is a concrete gRPC server, which spawns and serves any gRPC re
 
 Once the gRPC server is started, you can send requests to it using a gRPC client.
 
-## gRPC endpoints
+## gRPC Endpoints
 
 An overview of all available gRPC endpoints shipped with the IRISHub is [Protobuf documention](./proto-docs.md).
 
@@ -51,7 +51,7 @@ priv2, _, addr2 := testdata.KeyTestPubAddr()
 priv3, _, addr3 := testdata.KeyTestPubAddr()
 ```
 
-Populating the `TxBuilder` can be done via its [methods](https://github.com/cosmos/cosmos-sdk/blob/v0.40.1/client/tx_config.go#L32-L45):
+Populating the `TxBuilder` can be done via its [methods](https://github.com/cosmos/cosmos-sdk/blob/v0.41.0/client/tx_config.go#L32-L45):
 
 ```go
 import (
@@ -84,7 +84,7 @@ At this point, `TxBuilder`'s underlying transaction is ready to be signed.
 
 ### Signing a Transaction
 
-We set encoding config to use Protobuf, which will use `SIGN_MODE_DIRECT` by default. As per [ADR-020](https://github.com/cosmos/cosmos-sdk/blob/v0.40.1/docs/architecture/adr-020-protobuf-transaction-encoding.md), each signer needs to sign the `SignerInfo`s of all other signers. This means that we need to perform two steps sequentially:
+We set encoding config to use Protobuf, which will use `SIGN_MODE_DIRECT` by default. As per [ADR-020](https://github.com/cosmos/cosmos-sdk/blob/v0.41.0/docs/architecture/adr-020-protobuf-transaction-encoding.md), each signer needs to sign the `SignerInfo`s of all other signers. This means that we need to perform two steps sequentially:
 
 - for each signer, populate the signer's `SignerInfo` inside `TxBuilder`,
 - once all `SignerInfo`s are populated, for each signer, sign the `SignDoc` (the payload to be signed).

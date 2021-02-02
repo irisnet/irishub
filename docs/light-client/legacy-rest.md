@@ -1,11 +1,11 @@
 # Legacy Amino JSON REST
 
-The IRISHub versions v1.0.0 (depends on Cosmos-SDK v0.40) and earlier provided REST endpoints to query the state and broadcast transactions. These endpoints are kept in IRISHub v1.0, but they are marked as deprecated, and will be removed in v1.1 We therefore call these endpoints legacy REST endpoints.
+The IRISHub versions v1.0.0 (depends on Cosmos-SDK v0.41) and earlier provided REST endpoints to query the state and broadcast transactions. These endpoints are kept in IRISHub v1.0, but they are marked as deprecated, and will be removed in v1.1 We therefore call these endpoints legacy REST endpoints.
 
 Some important information concerning all legacy REST endpoints:
 
 - Most of these endpoints are backwards-comptatible. All breaking changes are described in the next section.
-- In particular, these endpoints still output Amino JSON. Cosmos-SDK v0.40 introduced Protobuf as the default encoding library throughout the codebase, but legacy REST endpoints are one of the few places where the encoding is hardcoded to Amino.
+- In particular, these endpoints still output Amino JSON. Cosmos-SDK v0.41 introduced Protobuf as the default encoding library throughout the codebase, but legacy REST endpoints are one of the few places where the encoding is hardcoded to Amino.
 
 ## API Port, Activation and Configuration
 

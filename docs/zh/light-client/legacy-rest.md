@@ -1,11 +1,11 @@
 # Legacy Amino JSON REST
 
-IRISHub v1.0.0（依赖Cosmos-SDK v0.40）和更早版本提供了 REST 端点来查询状态和广播交易。 这些端点在 IRISHub v1.0 中仍然保留，但已标记为已弃用，并将在 v1.1 中删除。因此，我们将这些端点称为 Legacy REST 端点。
+IRISHub v1.0.0（依赖Cosmos-SDK v0.41）和更早版本提供了 REST 端点来查询状态和广播交易。 这些端点在 IRISHub v1.0 中仍然保留，但已标记为已弃用，并将在 v1.1 中删除。因此，我们将这些端点称为 Legacy REST 端点。
 
 Legacy REST 端点相关的重要信息：
 
 - 这些端点中的大多数都是向后兼容的。下一部分将介绍所有的不兼容更新。
-- 值得注意的是，这些端点仍会输出 Amino JSON。 Cosmos-SDK v0.40 引入了 Protobuf 作为整个代码库的默认编码库，但是传统的 REST 端点是少数几个使用 Amino 编码的部分之一。
+- 值得注意的是，这些端点仍会输出 Amino JSON。 Cosmos-SDK v0.41 引入了 Protobuf 作为整个代码库的默认编码库，但是传统的 REST 端点是少数几个使用 Amino 编码的部分之一。
 
 ## API 端口、激活方式和配置
 
