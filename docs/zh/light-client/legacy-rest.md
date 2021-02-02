@@ -33,91 +33,91 @@ IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 
 ### Legacy REST 端点的中不兼容更新 (对比 Cosmos-SDK v0.39 及更早的版本)
 
-| Legacy REST 端点                                                             | 描述                                         | 不兼容更新                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ---------------------------------------------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `POST` `/txs`                                                                | 广播交易                                     | Endpoint will error when trying to broadcast transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                           |
-| `POST` `/txs/encode`, `POST` `/txs/decode`                                   | Amino 格式交易在 JSON 与二进制文件间的编解码 | Endpoint will error when trying to encode/decode transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                       |
-| `GET` `/txs/{hash}`                                                          | 通过哈希查询交易                             | Endpoint will error when trying to output transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                              |
-| `GET` `/txs`                                                                 | 通过事件查询交易                             | Endpoint will error when trying to output transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                              |
-| `GET` `/gov/proposals/{id}/votes`, `GET` `/gov/proposals/{id}/votes/{voter}` | Gov 模块查询投票信息的端点                   | All gov endpoints which return votes return int32 in the `option` field instead of string: `1=VOTE_OPTION_YES, 2=VOTE_OPTION_ABSTAIN, 3=VOTE_OPTION_NO, 4=VOTE_OPTION_NO_WITH_VETO`.                                                                                                                                                                                                                                                                                                   |
-| `GET` `/staking/*`                                                           | Staking 模块查询端点                         | All staking endpoints which return validators have two breaking changes. First, the validator's `consensus_pubkey` field returns an Amino-encoded struct representing an `Any` instead of a bech32-encoded string representing the pubkey. The `value` field of the `Any` is the pubkey's raw key as base64-encoded bytes. Second, the validator's `status` field now returns an int32 instead of string: `1=BOND_STATUS_UNBONDED`, `2=BOND_STATUS_UNBONDING`, `3=BOND_STATUS_BONDED`. |
-| `GET` `/staking/validators`                                                  | 获取所有的验证人                             | BondStatus is now a protobuf enum instead of an int32, and JSON serialized using its protobuf name, so expect query parameters like `?status=BOND_STATUS_{BONDED,UNBONDED,UNBONDING}` as opposed to `?status={bonded,unbonded,unbonding}`.                                                                                                                                                                                                                                             |
+| Legacy REST 端点                                                             | 描述                                         | 不兼容更新                                                                                                                                                                                                                                                                                                                                                   |
+| ---------------------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `POST` `/txs`                                                                | 广播交易                                     | 尝试广播不支持 Amino 序列化的交易时端点将返回错误（例如 IBC 交易）<sup>1</sup>。                                                                                                                                                                                                                                                                             |
+| `POST` `/txs/encode`，`POST` `/txs/decode`                                   | Amino 格式交易在 JSON 与二进制文件间的编解码 | 尝试编/解码不支持 Amino 序列化的交易时端点将返回错误（例如 IBC 交易）<sup>1</sup>。                                                                                                                                                                                                                                                                          |
+| `GET` `/txs/{hash}`                                                          | 通过哈希查询交易                             | 尝试输出不支持 Amino 序列化的交易时端点将返回错误（例如 IBC 交易）<sup>1</sup>。                                                                                                                                                                                                                                                                             |
+| `GET` `/txs`                                                                 | 通过事件查询交易                             | 尝试输出不支持 Amino 序列化的交易时端点将返回错误（例如 IBC 交易）<sup>1</sup>。                                                                                                                                                                                                                                                                             |
+| `GET` `/gov/proposals/{id}/votes`，`GET` `/gov/proposals/{id}/votes/{voter}` | Gov 模块查询投票信息的端点                   | 所有 gov 模块端点返回值中含有投票信息的，值为 int32 而不是 string：`1=VOTE_OPTION_YES，2=VOTE_OPTION_ABSTAIN，3=VOTE_OPTION_NO，4=VOTE_OPTION_NO_WITH_VETO`.                                                                                                                                                                                                 |
+| `GET` `/staking/*`                                                           | Staking 模块查询端点                         | Staking 模块中所有返回验证人的端点都有两处不兼容更新。第一，验证人 `consensus_pubkey` 字段返回 Amino 编码的 `Any` 结构，而不是 bech32 编码的公钥字符串。`Any` 的 `value` 字段是公钥原始密钥的 base64 编码的字节数组。第二，验证人的 `status` 字段目前为 int32 类型而不是 string：`1=BOND_STATUS_UNBONDED`,`2=BOND_STATUS_UNBONDING`,`3=BOND_STATUS_BONDED`。 |
+| `GET` `/staking/validators`                                                  | 获取所有的验证人                             | BondStatus 现在是一个 protobuf 枚举值而不是 int32，并且 JSON 序列化时使用它的 protobuf 字段名，所以期望查询参数像 `?status=BOND_STATUS_{BONDED,UNBONDED,UNBONDING}` 而不是 `?status={bonded,unbonded,unbonding}`。                                                                                                                                           |
 
-<sup>1</sup>: Transactions that don't support Amino serialization are the ones that contain one or more `Msg`s that are not registered with the Amino codec. Currently in the SDK, only IBC `Msg`s fall into this case.
+<sup>1</sup>： 不支持 Amino 序列化的交易是那些包含一个或多个未在 Amino 编解码器中注册的 `Msg` 的交易。 当前在 IRIShub 中，只有 IBC `Msg`s 属于这种情况。
 
 ### 迁移到新的 REST 端点 (从 Cosmos-SDK v0.39)
 
 **IRISHub API 端点**
 
-| Legacy REST 端点                                                                  | 描述                                                                | 新的 gGPC-gateway REST 端点                                                                                   |
-| --------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `GET` `/bank/balances/{address}`                                                  | Get the balance of an address                                       | `GET` `/cosmos/bank/v1beta1/balances/{address}`                                                               |
-| `POST` `/bank/accounts/{address}/transfers`                                       | Send coins from one account to another                              | N/A, use Protobuf directly                                                                                    |
-| `GET` `/bank/total`                                                               | Get the total supply of all coins                                   | `GET` `/cosmos/bank/v1beta1/supply`                                                                           |
-| `GET` `/bank/total/{denom}`                                                       | Get the total supply of one coin                                    | `GET` `/cosmos/bank/v1beta1/supply/{denom}`                                                                   |
-| `GET auth/accounts/{address}`                                                     | Get the account information on blockchain                           | `GET` `/cosmos/auth/v1beta1/accounts/{address}`                                                               |
-| `GET` `/staking/delegators/{delegatorAddr}/delegations`                           | Get all delegations from a delegator                                | `GET` `/cosmos/staking/v1beta1/delegations/{delegator_addr}`                                                  |
-| `POST` `/staking/delegators/{delegatorAddr}/delegations`                          | Submit delegation                                                   | N/A, use Protobuf directly                                                                                    |
-| `GET` `/staking/delegators/{delegatorAddr}/delegations/{validatorAddr}`           | Query a delegation between a delegator and a validator              | `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}`                      |
-| `GET` `/staking/delegators/{delegatorAddr}/unbonding_delegations`                 | Get all unbonding delegations from a delegator                      | `GET` `/cosmos/staking/v1beta1/delegators/{delegator_addr}/unbonding_delegations`                             |
-| `POST` `/staking/delegators/{delegatorAddr}/unbonding_delegations`                | Submit an unbonding delegation                                      | N/A, use Protobuf directly                                                                                    |
-| `GET` `/staking/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}` | Query all unbonding delegations between a delegator and a validator | `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}/unbonding_delegation` |
-| `GET` `/staking/redelegations`                                                    | Query redelegations                                                 | `GET` `/cosmos/staking/v1beta1/delegators/{delegator_addr}/redelegations`                                     |
-| `POST` `/staking/delegators/{delegatorAddr}/redelegations`                        | Submit a redelegations                                              | N/A, use Protobuf directly                                                                                    |
-| `GET` `/staking/delegators/{delegatorAddr}/validators`                            | Query all validators that a delegator is bonded to                  | `GET` `/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators`                                        |
-| `GET` `/staking/delegators/{delegatorAddr}/validators/{validatorAddr}`            | Query a validator that a delegator is bonded to                     | `GET` `/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/{validator_addr}`                       |
-| `GET` `/staking/validators`                                                       | Get all validators                                                  | `GET` `/cosmos/staking/v1beta1/validators`                                                                    |
-| `GET` `/staking/validators/{validatorAddr}`                                       | Get a single validator info                                         | `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}`                                                   |
-| `GET` `/staking/validators/{validatorAddr}/delegations`                           | Get all delegations to a validator                                  | `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}/delegations`                                       |
-| `GET` `/staking/validators/{validatorAddr}/unbonding_delegations`                 | Get all unbonding delegations from a validator                      | `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}/unbonding_delegations`                             |
-| `GET` `/staking/pool`                                                             | Get the current state of the staking pool                           | `GET` `/cosmos/staking/v1beta1/pool`                                                                          |
-| `GET` `/staking/parameters`                                                       | Get the current staking parameter values                            | `GET` `/cosmos/staking/v1beta1/params`                                                                        |
-| `GET` `/slashing/signing_infos`                                                   | Get all signing infos                                               | `GET` `/cosmos/slashing/v1beta1/signing_infos`                                                                |
-| `POST` `/slashing/validators/{validatorAddr}/unjail`                              | Unjail a jailed validator                                           | N/A, use Protobuf directly                                                                                    |
-| `GET` `/slashing/parameters`                                                      | Get slashing parameters                                             | `GET` `/cosmos/slashing/v1beta1/params`                                                                       |
-| `POST` `/gov/proposals`                                                           | Submit a proposal                                                   | N/A, use Protobuf directly                                                                                    |
-| `GET` `/gov/proposals`                                                            | Get all proposals                                                   | `GET` `/cosmos/gov/v1beta1/proposals`                                                                         |
-| `POST` `/gov/proposals/param_change`                                              | Generate a parameter change proposal transactionl                   | N/A, use Protobuf directly                                                                                    |
-| `GET` `/gov/proposals/{proposal-id}`                                              | Get proposal by id                                                  | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}`                                                           |
-| `GET` `/gov/proposals/{proposal-id}/proposer`                                     | Get proposer of a proposal                                          | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}` (Get proposer from `Proposal` struct)                     |
-| `GET` `/gov/proposals/{proposal-id}/deposits`                                     | Get deposits of a proposal                                          | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits`                                                  |
-| `POST` `/gov/proposals/{proposal-id}/deposits`                                    | Deposit tokens to a proposal                                        | N/A, use Protobuf directly                                                                                    |
-| `GET` `/gov/proposals/{proposal-id}/deposits/{depositor}`                         | Get depositor a of deposit                                          | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}`                                      |
-| `GET` `/gov/proposals/{proposal-id}/votes`                                        | Get votes of a proposal                                             | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/votes`                                                     |
-| `POST` `/gov/proposals/{proposal-id}/votes`                                       | Vote a proposal                                                     | N/A, use Protobuf directly                                                                                    |
-| `GET` `/gov/proposals/{proposal-id}/votes/{voter}`                                | Get voted information by voterAddr.                                 | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}`                                             |
-| `GET` `/gov/proposals/{proposal-id}/tally`                                        | Get tally of a proposal                                             | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/tally`                                                     |
-| `GET` `/gov/parameters/deposit`                                                   | Get governance deposit parameters                                   | `GET` `/cosmos/gov/v1beta1/params/{params_type}`                                                              |
-| `GET` `/gov/parameters/tallying`                                                  | Query governance tally parameters                                   | `GET` `/cosmos/gov/v1beta1/params/{params_type}`                                                              |
-| `GET` `/gov/parameters/voting`                                                    | Get governance voting parameters                                    | `GET` `/cosmos/gov/v1beta1/params/{params_type}`                                                              |
-| `GET` `/distribution/delegators/{delegatorAddr}/rewards`                          | Get the total rewards balance from all delegations                  | `GET` `/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards`                                   |
-| `POST` `/distribution/delegators/{delegatorAddr}/rewards`                         | Withdraw all delegator rewards                                      | N/A, use Protobuf directly                                                                                    |
-| `GET` `/distribution/delegators/{delegatorAddr}/rewards/{validatorAddr}`          | Query a delegation reward                                           | `GET` `/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards/{validator_address}`               |
-| `POST` `/distribution/delegators/{delegatorAddr}/rewards/{validatorAddr}`         | Withdraw a delegation reward                                        | N/A, use Protobuf directly                                                                                    |
-| `GET` `/distribution/delegators/{delegatorAddr}/withdraw_address`                 | Get the rewards withdrawal address                                  | `GET` `/cosmos/distribution/v1beta1/delegators/{delegator_address}/withdraw_address`                          |
-| `POST` `/distribution/delegators/{delegatorAddr}/withdraw_address`                | Replace the rewards withdrawal address                              | N/A, use Protobuf directly                                                                                    |
-| `GET` `/distribution/validators/{validatorAddr}`                                  | Validator distribution information                                  | N/A, use Protobuf directly                                                                                    |
-| `GET` `/distribution/validators/{validatorAddr}/outstanding_rewards`              | Outstanding rewards of a single validator                           | `GET` `/cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards`                       |
-| `GET` `/distribution/validators/{validatorAddr}/rewards`                          | Commission and self-delegation rewards of a single a validator      | N/A, use Protobuf directly                                                                                    |
-| `POST` `/distribution/validators/{validatorAddr}/rewards`                         | Withdraw the validator's rewards                                    | N/A, use Protobuf directly                                                                                    |
-| `GET` `/distribution/community_pool`                                              | Get the amount held in the community pool                           | `GET` `/cosmos/distribution/v1beta1/community_pool`                                                           |
-| `GET` `/distribution/parameters`                                                  | Get the current distribution parameter values                       | `GET` `/cosmos/distribution/v1beta1/params`                                                                   |
+| Legacy REST 端点                                                                  | 描述                                 | 新的 gGPC-gateway REST 端点                                                                                   |
+| --------------------------------------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `GET` `/bank/balances/{address}`                                                  | 查询一个地址的余额                   | `GET` `/cosmos/bank/v1beta1/balances/{address}`                                                               |
+| `POST` `/bank/accounts/{address}/transfers`                                       | 从一个账户向另一个账户转账           | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/bank/total`                                                               | 获取所有资产的总量                   | `GET` `/cosmos/bank/v1beta1/supply`                                                                           |
+| `GET` `/bank/total/{denom}`                                                       | 获取一种资产的总量                   | `GET` `/cosmos/bank/v1beta1/supply/{denom}`                                                                   |
+| `GET` `/auth/accounts/{address}`                                                  | 获取账户信息                         | `GET` `/cosmos/auth/v1beta1/accounts/{address}`                                                               |
+| `GET` `/staking/delegators/{delegatorAddr}/delegations`                           | 获取一个委托人的所有委托信息         | `GET` `/cosmos/staking/v1beta1/delegations/{delegator_addr}`                                                  |
+| `POST` `/staking/delegators/{delegatorAddr}/delegations`                          | 提交委托                             | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/staking/delegators/{delegatorAddr}/delegations/{validatorAddr}`           | 查询一个委托人和验证人之间的委托     | `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}`                      |
+| `GET` `/staking/delegators/{delegatorAddr}/unbonding_delegations`                 | 获取一个委托人的所有解委托信息       | `GET` `/cosmos/staking/v1beta1/delegators/{delegator_addr}/unbonding_delegations`                             |
+| `POST` `/staking/delegators/{delegatorAddr}/unbonding_delegations`                | 提交一个解委托                       | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/staking/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}` | 查询委托人和验证人之间的所有解委托   | `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}/unbonding_delegation` |
+| `GET` `/staking/redelegations`                                                    | 查询重委托                           | `GET` `/cosmos/staking/v1beta1/delegators/{delegator_addr}/redelegations`                                     |
+| `POST` `/staking/delegators/{delegatorAddr}/redelegations`                        | 提交一个重委托                       | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/staking/delegators/{delegatorAddr}/validators`                            | 查询一个委托人委托的所有验证人       | `GET` `/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators`                                        |
+| `GET` `/staking/delegators/{delegatorAddr}/validators/{validatorAddr}`            | 查询一个委托人委托的验证人           | `GET` `/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/{validator_addr}`                       |
+| `GET` `/staking/validators`                                                       | 获取所有验证人                       | `GET` `/cosmos/staking/v1beta1/validators`                                                                    |
+| `GET` `/staking/validators/{validatorAddr}`                                       | 获取一个验证人信息                   | `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}`                                                   |
+| `GET` `/staking/validators/{validatorAddr}/delegations`                           | 获取一个验证人的所有委托信息         | `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}/delegations`                                       |
+| `GET` `/staking/validators/{validatorAddr}/unbonding_delegations`                 | 查询一个验证人所有未解绑的委托       | `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}/unbonding_delegations`                             |
+| `GET` `/staking/pool`                                                             | 获取当前抵押池的状态                 | `GET` `/cosmos/staking/v1beta1/pool`                                                                          |
+| `GET` `/staking/parameters`                                                       | 获取当前 staking 模块参数值          | `GET` `/cosmos/staking/v1beta1/params`                                                                        |
+| `GET` `/slashing/signing_infos`                                                   | 获取所有签名信息                     | `GET` `/cosmos/slashing/v1beta1/signing_infos`                                                                |
+| `POST` `/slashing/validators/{validatorAddr}/unjail`                              | 解禁一个被监禁的验证人               | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/slashing/parameters`                                                      | 查询 slashing 模块参数值             | `GET` `/cosmos/slashing/v1beta1/params`                                                                       |
+| `POST` `/gov/proposals`                                                           | 提交一个提议                         | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/gov/proposals`                                                            | 获取所有的提议                       | `GET` `/cosmos/gov/v1beta1/proposals`                                                                         |
+| `POST` `/gov/proposals/param_change`                                              | 构造一个发起修改参数的提议的交易     | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/gov/proposals/{proposal-id}`                                              | 根据 ID 查询提议                     | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}`                                                           |
+| `GET` `/gov/proposals/{proposal-id}/proposer`                                     | 查询一个提议的发起者                 | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}` (Get proposer from `Proposal` struct)                     |
+| `GET` `/gov/proposals/{proposal-id}/deposits`                                     | 获取一个提议的抵押金额               | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits`                                                  |
+| `POST` `/gov/proposals/{proposal-id}/deposits`                                    | 向一个提议抵押代币                   | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/gov/proposals/{proposal-id}/deposits/{depositor}`                         | 获取一个抵押者在一个提议中的抵押信息 | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}`                                      |
+| `GET` `/gov/proposals/{proposal-id}/votes`                                        | 获取一个提议的投票信息               | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/votes`                                                     |
+| `POST` `/gov/proposals/{proposal-id}/votes`                                       | 对一个提议投票                       | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/gov/proposals/{proposal-id}/votes/{voter}`                                | 获取一个投票者的投票信息             | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}`                                             |
+| `GET` `/gov/proposals/{proposal-id}/tally`                                        | 获取一个提议的统计信息               | `GET` `/cosmos/gov/v1beta1/proposals/{proposal_id}/tally`                                                     |
+| `GET` `/gov/parameters/deposit`                                                   | 获取 gov 模块抵押参数                | `GET` `/cosmos/gov/v1beta1/params/{params_type}`                                                              |
+| `GET` `/gov/parameters/tallying`                                                  | 获取 gov 模块统计参数                | `GET` `/cosmos/gov/v1beta1/params/{params_type}`                                                              |
+| `GET` `/gov/parameters/voting`                                                    | 获取 gov 模块投票参数                | `GET` `/cosmos/gov/v1beta1/params/{params_type}`                                                              |
+| `GET` `/distribution/delegators/{delegatorAddr}/rewards`                          | 获取所有委托的奖励金额               | `GET` `/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards`                                   |
+| `POST` `/distribution/delegators/{delegatorAddr}/rewards`                         | 取出所有委托人奖励                   | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/distribution/delegators/{delegatorAddr}/rewards/{validatorAddr}`          | 查询委托奖励                         | `GET` `/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards/{validator_address}`               |
+| `POST` `/distribution/delegators/{delegatorAddr}/rewards/{validatorAddr}`         | 取出委托奖励                         | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/distribution/delegators/{delegatorAddr}/withdraw_address`                 | 获取奖励提取地址                     | `GET` `/cosmos/distribution/v1beta1/delegators/{delegator_address}/withdraw_address`                          |
+| `POST` `/distribution/delegators/{delegatorAddr}/withdraw_address`                | 重设奖励提取地址                     | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/distribution/validators/{validatorAddr}`                                  | 获取一个验证人奖励分配信息           | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/distribution/validators/{validatorAddr}/outstanding_rewards`              | 获取一个验证人所有未偿付的奖励       | `GET` `/cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards`                       |
+| `GET` `/distribution/validators/{validatorAddr}/rewards`                          | 获取一个验证人的佣金和自委托奖励     | N/A，直接使用 Protobuf                                                                                        |
+| `POST` `/distribution/validators/{validatorAddr}/rewards`                         | 取出验证人的奖励                     | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/distribution/community_pool`                                              | 获取社区池中持有的金额               | `GET` `/cosmos/distribution/v1beta1/community_pool`                                                           |
+| `GET` `/distribution/parameters`                                                  | 获取 distribution 模块参数值         | `GET` `/cosmos/distribution/v1beta1/params`                                                                   |
 
 **Tendermint API 端点**
 
-| Legacy REST 端点                | 描述                                             | 新的 gGPC-gateway REST 端点                                    |
-| ------------------------------- | ------------------------------------------------ | -------------------------------------------------------------- |
-| `GET` `/node_info`              | Get the properties of the connected node         | `GET` `/cosmos/base/tendermint/v1beta1/node_info`              |
-| `GET` `/syncing`                | Get syncing state of node                        | `GET` `/cosmos/base/tendermint/v1beta1/syncing`                |
-| `GET` `/blocks/latest`          | Get the latest block                             | `GET` `/cosmos/base/tendermint/v1beta1/blocks/latest`          |
-| `GET` `/blocks/{height}`        | Get a block at a certain height                  | `GET` `/cosmos/base/tendermint/v1beta1/blocks/{height}`        |
-| `GET` `/validatorsets/latest`   | Get the latest validator set                     | `GET` `/cosmos/base/tendermint/v1beta1/validatorsets/latest`   |
-| `GET` `/validatorsets/{height}` | Get a validator set a certain height             | `GET` `/cosmos/base/tendermint/v1beta1/validatorsets/{height}` |
-| `GET` `/txs/{hash}`             | Query tx by hash                                 | `GET` `/cosmos/tx/v1beta1/txs/{hash}`                          |
-| `GET` `/txs`                    | Query tx by events                               | `GET` `/cosmos/tx/v1beta1/txs`                                 |
-| `POST` `/txs`                   | Broadcast tx                                     | `POST` `/cosmos/tx/v1beta1/txs`                                |
-| `POST` `/txs/encode`            | Encodes an Amino JSON tx to an Amino binary tx   | N/A, use Protobuf directly                                     |
-| `POST` `/txs/decode`            | Decodes an Amino binary tx into an Amino JSON tx | N/A, use Protobuf directly                                     |
+| Legacy REST 端点                | 描述                                            | 新的 gGPC-gateway REST 端点                                    |
+| ------------------------------- | ----------------------------------------------- | -------------------------------------------------------------- |
+| `GET` `/node_info`              | 获取连接的节点的属性值                          | `GET` `/cosmos/base/tendermint/v1beta1/node_info`              |
+| `GET` `/syncing`                | 获取节点的同步状态                              | `GET` `/cosmos/base/tendermint/v1beta1/syncing`                |
+| `GET` `/blocks/latest`          | 获取最新高度的区块                              | `GET` `/cosmos/base/tendermint/v1beta1/blocks/latest`          |
+| `GET` `/blocks/{height}`        | 获取指定高度的区块                              | `GET` `/cosmos/base/tendermint/v1beta1/blocks/{height}`        |
+| `GET` `/validatorsets/latest`   | 获取最新高度的验证人集合                        | `GET` `/cosmos/base/tendermint/v1beta1/validatorsets/latest`   |
+| `GET` `/validatorsets/{height}` | 获取指定高度的验证人集合                        | `GET` `/cosmos/base/tendermint/v1beta1/validatorsets/{height}` |
+| `GET` `/txs/{hash}`             | 通过哈希查询交易                                | `GET` `/cosmos/tx/v1beta1/txs/{hash}`                          |
+| `GET` `/txs`                    | 通过事件查询交易                                | `GET` `/cosmos/tx/v1beta1/txs`                                 |
+| `POST` `/txs`                   | 广播交易                                        | `POST` `/cosmos/tx/v1beta1/txs`                                |
+| `POST` `/txs/encode`            | 将 Amino JSON 格式的交易编码为 Amino 二进制格式 | N/A，直接使用 Protobuf                                         |
+| `POST` `/txs/decode`            | 将 Amino 二进制格式的交易解码为 Amino JSON 格式 | N/A，直接使用 Protobuf                                         |
 
 ## 高优先级查询端点的不兼容更新
 
@@ -136,19 +136,20 @@ IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 
 **端点名称：** QueryBalance
 
-- **端点路径：** `"/bank/balances/{address}"`
+- **端点路径：** `/bank/balances/{address}`
 - **更新内容：**
-  - 无更改。
-  - See [coin cross-chain transfer source tracing](https://github.com/cosmos/cosmos-sdk/pull/6662) for details on how on non-native IBC coins will written into the denom value. This will include a hash of source trace for each coin. The core decision if the hash should replace the denom or be prepended to the denom.
+  - 无更改
+  - 有关如何为非原生的 IBC 资产创建 Token，请参见[跨链资产源路径](https://github.com/cosmos/cosmos-sdk/pull/6662)。 这将包括每种 Token 源路径的哈希值。核心决定了哈希值替换 Denom 还是在 Denom 之前
 
 ### Validators
 
 **端点名称：** QueryValidators
 
-- **端点路径：** `"/staking/validators"`
+- **端点路径：** `/staking/validators`
 - **更新内容：**
-  - The fields ```"unbonding_height"``` and ```"jailed"``` are no longer supported
-  - The fields in description are now omit if empty. Rather than returning fields with empty strings. We now don't return the field if the validator has chosen not to configure it. For instance at launch, no validator will have a security contact filled out and the field will only appear once they do.
+  - `unbonding_height` 和 `jailed` 字段不再支持。
+  - 如果字段为空则将被忽略，而不是返回一个职位空字符串的字段。如果验证人不配置该字段则不返回该字段。例如，在启动时验证人没有填写安全联系人，只有在他们配置之后该字段才会出现
+
 - **JSON 示例：**
 
     ```JSON
@@ -182,11 +183,11 @@ IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 
 **端点名称：** QueryDelegatorDelegations
 
-- **端点路径：** `"/staking/delegators/delegations"`
+- **端点路径：** `/staking/delegators/delegations`
 - **更新内容：**
-  - `"balance"` now is no longer a number. It is a field with two values: `"amount"` and `"Denom"`
-  - `"delegator_address"` is no longer a string. It’s a field called `"delegation"` with three values: `"delegator_address", "shares", "validator_address"`
-  - The old field `"validator_address"` is no longer used. A new field `"validator_dst_address"` and`"validator_src_address"` replace this in the new `"redelegation"` field.
+  - `balance` 不再是数字类型，它包含两个子字段：`amount` 和 `Denom`
+  - `delegator_address` 不再是字符串类型。更改为 `delegation` 并包含以下三个子字段：`delegator_address"、"shares"和"validator_address`
+  - 旧字段 `validator_address` 不再使用。在 `redelegation` 中使用 `validator_dst_address` and `validator_src_address` 这两个新字段代替
 - **JSON 示例：**
 
     ```JSON
@@ -205,14 +206,14 @@ IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 
 **端点名称：** QueryRedelegations
 
-- **端点路径：** `"/staking/redelegations"`
-- **更新内容：** The following old fields are now sub fields of a new field called `"redelegation_entry"`:
-  - `"completion_time"`
-  - `"initial_balance"`
-  - `"shares_dst"`
-- The old field `"creation_height"` is no longer supported.
-- The following are new fields:
-  - `"redelegation"` which holds the sub-fields.
+- **端点路径：** `/staking/redelegations`
+- **更新内容：** 以下旧字段更改为新字段 `redelegation_entry` 的子字段:
+  - `completion_time`
+  - `initial_balance`
+  - `shares_dst`
+- `creation_height` 字段不再支持
+- 以下为新字段:
+  - `redelegation` 包含以下子字段
     - `delegator_address` (new)
     - `entries` (new)
     - `valdiator_dst_address`
@@ -250,17 +251,17 @@ IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 
 **端点名称：** QueryUnbondingDelegation
 
-- **端点路径：** `"/staking/unbondingDelegation"`
+- **端点路径：** `/staking/unbondingDelegation`
 - **更新内容：**
-  - The old field `"creation_height"` is no longer supported
+  - 字段 `creation_height` 不再支持
 
 ### Distributions
 
 **端点名称：** getQueriedValidatorOutstandingRewards
 
-- **端点路径：** `"/distribution/validators/{validatorAddr}/outstanding_rewards"`
+- **端点路径：** `/distribution/validators/{validatorAddr}/outstanding_rewards`
 - **更新内容：**
-  - The new field `"rewards"` is the new root level field for the output
+  - 新字段 `rewards` 是输出中的根字段
 - **JSON 示例：**
 
     ```JSON
@@ -280,10 +281,9 @@ IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 
 **端点名称：** getQueriedValidatorCommission
 
-- **端点路径：** `"/distribution/validators/{validatorAddr}"`
+- **端点路径：** `/distribution/validators/{validatorAddr}`
 - **更新内容：**
-  - The new field `"commission"` is the new root level field for the output
-
+  - 新字段 `commission` 是输出中的根字段
 - **JSON 示例：**
 
     ```JSON
@@ -303,16 +303,16 @@ IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 
 **端点名称：** getQueriedValidatorSlashes
 
-- **端点路径：** `"/distribution/validators/{validatorAddr}"`
-- **更新内容：** No change
+- **端点路径：** `/distribution/validators/{validatorAddr}`
+- **更新内容：** 无更改
   
 - **端点名称：** getQueriedDelegationRewards
-- **端点路径：** `"/distribution/delegators/{delegatorAddr}/rewards"`
-- **更新内容：** No change
+- **端点路径：** `/distribution/delegators/{delegatorAddr}/rewards`
+- **更新内容：** 无更改
 
 ## 构造和签名交易（完全向后兼容）
 
-The same code as integrating with cosmoshub-3 mainnet. The transaction structure is as follows:
+与 IRIShub 主网集成的代码相同，交易结构如下：
 
 ```json
 {
@@ -348,19 +348,19 @@ The same code as integrating with cosmoshub-3 mainnet. The transaction structure
 }
 ```
 
-Where the IRISHub address prefix uses `iaa` instead, which affects the fields:
+IRISHub 地址前缀使用 `iaa` 代替，这会影响以下字段：
 
 - value.msg.value.from_adress
 - value.msg.value.to_address
 
-Denom uses `uiris` instead (1iris = 10<sup>6</sup>uiris), which affects fields:
+Denom 替换为 `uiris` (1iris = 10<sup>6</sup>uiris)，这会影响到以下字段：
 
 - value.msg.value.amount.denom
 - value.fee.amount.denom
 
 ## 广播交易（完全向后兼容）
 
-The same code as integrating with irishub mainnet, call `POST` `/txs` to send a transaction, as the example below:
+与 IRIShub 主网集成的代码相同，调用`POST` `/txs` 发送交易，示例如下：
 
 ```bash
 curl -X POST "http://localhost:1317/txs" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"tx\": {\"msg\":[{\"type\":\"cosmos-sdk/MsgSend\",\"value\":{\"from_address\":\"iaa1rkgdpj6fyyyu7pnhmc3v7gw9uls4mnajvzdwkt\",\"to_address\":\"iaa1q6t5439f0rkvkzl38m0f43e0kpv3mx7x2shlq8\",\"amount\":[{\"denom\":\"uiris\",\"amount\":\"1000000\"}]}}],\"fee\":{\"amount\":[{\"denom\":\"uiris\",\"amount\":\"30000\"}],\"gas\":\"200000\"},\"signatures\":[{\"pub_key\":{\"type\":\"tendermint/PubKeySecp256k1\",\"value\":\"AxGagdsRTKni/h1+vCFzTpNltwoiU7SwIR2dg6Jl5a//\"},\"signature\":\"Pu8yiRVO8oB2YDDHyB047dXNArbVImasmKBrm8Kr+6B08y8QQ7YG1eVgHi5OIYYclccCf3Ju/BQ78qsMWMniNQ==\"}],\"memo\":\"Sent via irishub client\"}, \"mode\": \"block\"}"
@@ -373,9 +373,9 @@ curl -X POST "http://localhost:1317/txs" -H "accept: application/json" -H "Conte
 - **端点名称：** QueryTx
 - **端点路径：** `GET /txs`&&`GET /txs/{hash}`
 - **更新内容：**
-  - Tags are no longer used; use the events field instead
-  - The result field is no longer used, and the field in the original result is moved to the first level
-  - The coin_flow field is no longer used
+  - `tags` 字段不再使用，使用 `event` 字段代替
+  - `result` 字段不再使用，result 中原有字段移到第一级
+  - `coin_flow` 字段不再使用
 
 - **JSON 示例：**
 

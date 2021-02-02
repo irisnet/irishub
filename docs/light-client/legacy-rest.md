@@ -43,7 +43,7 @@ For application developers, you may want to generate your own Swagger definition
 | `GET` `/staking/*`                                                           | Staking query endpoints                     | All staking endpoints which return validators have two breaking changes. First, the validator's `consensus_pubkey` field returns an Amino-encoded struct representing an `Any` instead of a bech32-encoded string representing the pubkey. The `value` field of the `Any` is the pubkey's raw key as base64-encoded bytes. Second, the validator's `status` field now returns an int32 instead of string: `1=BOND_STATUS_UNBONDED`, `2=BOND_STATUS_UNBONDING`, `3=BOND_STATUS_BONDED`. |
 | `GET` `/staking/validators`                                                  | Get all validators                          | BondStatus is now a protobuf enum instead of an int32, and JSON serialized using its protobuf name, so expect query parameters like `?status=BOND_STATUS_{BONDED,UNBONDED,UNBONDING}` as opposed to `?status={bonded,unbonded,unbonding}`.                                                                                                                                                                                                                                             |
 
-<sup>1</sup>: Transactions that don't support Amino serialization are the ones that contain one or more `Msg`s that are not registered with the Amino codec. Currently in the SDK, only IBC `Msg`s fall into this case.
+<sup>1</sup>: Transactions that don't support Amino serialization are the ones that contain one or more `Msg`s that are not registered with the Amino codec. Currently in the IRISHub, only IBC `Msg`s fall into this case.
 
 ### Migrating to New REST Endpoints (from Cosmos-SDK v0.39)
 
@@ -55,7 +55,7 @@ For application developers, you may want to generate your own Swagger definition
 | `POST` `/bank/accounts/{address}/transfers`                                       | Send coins from one account to another                              | N/A, use Protobuf directly                                                                                    |
 | `GET` `/bank/total`                                                               | Get the total supply of all coins                                   | `GET` `/cosmos/bank/v1beta1/supply`                                                                           |
 | `GET` `/bank/total/{denom}`                                                       | Get the total supply of one coin                                    | `GET` `/cosmos/bank/v1beta1/supply/{denom}`                                                                   |
-| `GET auth/accounts/{address}`                                                     | Get the account information on blockchain                           | `GET` `/cosmos/auth/v1beta1/accounts/{address}`                                                               |
+| `GET` `/auth/accounts/{address}`                                                  | Get the account information on blockchain                           | `GET` `/cosmos/auth/v1beta1/accounts/{address}`                                                               |
 | `GET` `/staking/delegators/{delegatorAddr}/delegations`                           | Get all delegations from a delegator                                | `GET` `/cosmos/staking/v1beta1/delegations/{delegator_addr}`                                                  |
 | `POST` `/staking/delegators/{delegatorAddr}/delegations`                          | Submit delegation                                                   | N/A, use Protobuf directly                                                                                    |
 | `GET` `/staking/delegators/{delegatorAddr}/delegations/{validatorAddr}`           | Query a delegation between a delegator and a validator              | `GET` `/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}`                      |
@@ -136,7 +136,7 @@ For application developers, you may want to generate your own Swagger definition
 
 **Endpoint Name:** QueryBalance
 
-- **Endpoint Path:** `"/bank/balances/{address}"`
+- **Endpoint Path:** `/bank/balances/{address}`
 - **What Changed:**
   - No Changes observed.
   - See [coin cross-chain transfer source tracing](https://github.com/cosmos/cosmos-sdk/pull/6662) for details on how on non-native IBC coins will written into the denom value. This will include a hash of source trace for each coin. The core decision if the hash should replace the denom or be prepended to the denom.
@@ -145,9 +145,9 @@ For application developers, you may want to generate your own Swagger definition
 
 **Endpoint Name:** QueryValidators
 
-- **Endpoint Path:** `"/staking/validators"`
+- **Endpoint Path:** `/staking/validators`
 - **What Changed:**
-  - The fields ```"unbonding_height"``` and ```"jailed"``` are no longer supported
+  - The fields `unbonding_height` and `jailed` are no longer supported
   - The fields in description are now omit if empty. Rather than returning fields with empty strings. We now don't return the field if the validator has chosen not to configure it. For instance at launch, no validator will have a security contact filled out and the field will only appear once they do.
 - **Sample JSON:**
 
@@ -182,11 +182,11 @@ For application developers, you may want to generate your own Swagger definition
 
 **Endpoint Name:** QueryDelegatorDelegations
 
-- **Endpoint Path:** `"/staking/delegators/delegations"`
+- **Endpoint Path:** `/staking/delegators/delegations`
 - **What Changed:**
-  - `"balance"` now is no longer a number. It is a field with two values: `"amount"` and `"Denom"`
-  - `"delegator_address"` is no longer a string. It’s a field called `"delegation"` with three values: `"delegator_address", "shares", "validator_address"`
-  - The old field `"validator_address"` is no longer used. A new field `"validator_dst_address"` and`"validator_src_address"` replace this in the new `"redelegation"` field.
+  - `balance` now is no longer a number. It is a field with two values: `amount` and `Denom`
+  - `delegator_address` is no longer a string. It’s a field called `delegation` with three values: `delegator_address", "shares", "validator_address`
+  - The old field `validator_address` is no longer used. Two new fields `validator_dst_address` and `validator_src_address` replace this in the new `redelegation` field.
 - **Sample JSON:**
 
     ```JSON
@@ -205,14 +205,14 @@ For application developers, you may want to generate your own Swagger definition
 
 **Endpoint Name:** QueryRedelegations
 
-- **Endpoint Path:** `"/staking/redelegations"`
-- **What Changed:** The following old fields are now sub fields of a new field called `"redelegation_entry"`:
-  - `"completion_time"`
-  - `"initial_balance"`
-  - `"shares_dst"`
-- The old field `"creation_height"` is no longer supported.
+- **Endpoint Path:** `/staking/redelegations`
+- **What Changed:** The following old fields are now sub fields of a new field called `redelegation_entry`:
+  - `completion_time`
+  - `initial_balance`
+  - `shares_dst`
+- The old field `creation_height` is no longer supported.
 - The following are new fields:
-  - `"redelegation"` which holds the sub-fields.
+  - `redelegation` which holds the sub-fields.
     - `delegator_address` (new)
     - `entries` (new)
     - `valdiator_dst_address`
@@ -250,17 +250,17 @@ For application developers, you may want to generate your own Swagger definition
 
 **Endpoint Name:** QueryUnbondingDelegation
 
-- **Endpoint Path:** `"/staking/unbondingDelegation"`
+- **Endpoint Path:** `/staking/unbondingDelegation`
 - **What Changed:**
-  - The old field `"creation_height"` is no longer supported
+  - The old field `creation_height` is no longer supported
 
 ### Distributions
 
 **Endpoint Name:** getQueriedValidatorOutstandingRewards
 
-- **Endpoint Path:** `"/distribution/validators/{validatorAddr}/outstanding_rewards"`
+- **Endpoint Path:** `/distribution/validators/{validatorAddr}/outstanding_rewards`
 - **What Changed:**
-  - The new field `"rewards"` is the new root level field for the output
+  - The new field `rewards` is the new root level field for the output
 - **Sample JSON:**
 
     ```JSON
@@ -280,9 +280,9 @@ For application developers, you may want to generate your own Swagger definition
 
 **Endpoint Name:** getQueriedValidatorCommission
 
-- **Endpoint Path:** `"/distribution/validators/{validatorAddr}"`
+- **Endpoint Path:** `/distribution/validators/{validatorAddr}`
 - **What Changed:**
-  - The new field `"commission"` is the new root level field for the output
+  - The new field `commission` is the new root level field for the output
 
 - **Sample JSON:**
 
@@ -303,16 +303,16 @@ For application developers, you may want to generate your own Swagger definition
 
 **Endpoint Name:** getQueriedValidatorSlashes
 
-- **Endpoint Path:** `"/distribution/validators/{validatorAddr}"`
+- **Endpoint Path:** `/distribution/validators/{validatorAddr}`
 - **What Changed:** No change
   
 - **Endpoint Name:** getQueriedDelegationRewards
-- **Endpoint Path:** `"/distribution/delegators/{delegatorAddr}/rewards"`
+- **Endpoint Path:** `/distribution/delegators/{delegatorAddr}/rewards`
 - **What Changed:** No change
 
 ## Generating and Signing Transactions (Fully Backward Compatible)
 
-The same code as integrating with cosmoshub-3 mainnet. The transaction structure is as follows:
+The same code as integrating with irishub-v0.16.3 mainnet. The transaction structure is as follows:
 
 ```json
 {
