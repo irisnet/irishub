@@ -37,11 +37,23 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ## [Unreleased]
 
+### Bug Fixes
+
+* (modules/token) [\#102](https://github.com/irisnet/irismod/issues/102) Return error if token baseFee is not a native token.
+* (modules/token) [\#100](https://github.com/irisnet/irismod/issues/100) Mint&Edit&Burn only accept symbol as denom.
+* (modules/token) [\#99](https://github.com/irisnet/irismod/issues/99) Fix incorrect calculation of deduction amount for burning token.
+
+### Improvements
+
+* [\#111](https://github.com/irisnet/irismod/pull/111) Bump cosmos-sdk version to [v0.41.0](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.41.0).
+* (modules/oracle) [\#109](https://github.com/irisnet/irismod/pull/109) Adjust oracle FeedName and ValueJsonPath validation.
+* (modules/token) [\#107](https://github.com/irisnet/irismod/issues/107) Use symbol to calculate the default amount of IssueTokenBaseFee.
+* (modules/service) [\#105](https://github.com/irisnet/irismod/pull/105) Add service tax account.
+
 ## [v1.2.1] - 2021-01-28
 
 ### Bug Fixes
 
-* (modules/token) [\#99](https://github.com/irisnet/irismod/issues/99) Fix incorrect calculation of deduction amount in `iris tx token burn`
 * (modules/htlc) [\#79](https://github.com/irisnet/irismod/pull/79) Fix HTLC hash-lock length check.
 
 ### Improvements
