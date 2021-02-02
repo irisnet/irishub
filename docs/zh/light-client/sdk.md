@@ -1,12 +1,12 @@
 # IRISnet SDKs
 
-IRIShub-Chain-SDK是根据IRIShub提供的API制作的一个简单的软件开发工具包，为用户快速开发基于irishub链的应用程序提供了极大的便利。
+IRISHub-Chain-SDK是根据IRISHub提供的API制作的一个简单的软件开发工具包，为用户快速开发基于irishub链的应用程序提供了极大的便利。
 
 ## 设计目标和概念
 
 包客户端是整个SDK功能的入口。 SDKConfig用于配置SDK参数。
 
-该SDK主要提供以下模块的功能，包括：auth，bank，gov，htlc，keys，nft，oracle，random，record，service，staking，token。
+该SDK主要提供以下模块的功能，包括：auth、bank、gov、htlc、keys、nft、oracle、random、record、service、staking、token。
 
 `ClientConfig`组件主要包含SDK中使用的参数，具体含义如下表所示：
 
@@ -14,19 +14,19 @@ IRIShub-Chain-SDK是根据IRIShub提供的API制作的一个简单的软件开�
 | --------- | ------------- | ------------------------------------------------------- |
 | NodeURI   | string        | 连接到SDK的irishub节点的RPC地址，例如：localhost：26657 |
 | GRPCAddr  | string        | 连接到SDK的irishub节点的GRPC地址，例如：localhost：9090 |
-| Network   | enum          | irishub网络类型，值：` Testnet`，` Mainnet`             |
+| Network   | enum          | irishub网络类型，值：`Testnet`，`Mainnet`             |
 | ChainID   | string        | irishub的ChainID，例如：`irishub`                       |
 | Gas       | uint64        | 交易所需支付的最大汽油费用，例如：`20000`               |
 | Fee       | DecCoins      | 交易须支付的交易费                                      |
 | KeyDAO    | KeyDAO        | 私钥管理界面，如果用户不提供，则使用默认的` LevelDB`    |
-| Mode      | enum          | 交易广播模式，值：`Sync`,`Async`, `Commit`              |
-| StoreType | enum          | 私钥存储方法，值：`Keystore`,`PrivKey`                  |
+| Mode      | enum          | 交易广播模式，值：`Sync`，`Async`，`Commit`              |
+| StoreType | enum          | 私钥存储方法，值：`Keystore`，`PrivKey`                 |
 | Timeout   | time.Duration | 事务超时时间，例如：`5s`                                |
 | Level     | string        | 日志等级例如：`info`                                    |
 
 ## 构造，签名和广播交易
 
-如果要使用`SDK`发送转账交易，使用` irishub-sdk-go`的示例如下：
+如果要使用`SDK`发送转账交易，使用`irishub-sdk-go`的示例如下：
 
 还有更多查询和发送交易的示例：
 
@@ -50,7 +50,7 @@ result, err := client.Bank.Send(to, coins, baseTx)
 block, err := client.BaseClient.Block(context.Background(),nil)
 ```
 
-根据指定 TxHash查询交易:
+根据指定 TxHash查询交易：
 
 ```go
 txHash := "D9280C9217B5626107DF9BC97A44C42357537806343175F869F0D8A5A0D94ADD"
@@ -61,7 +61,7 @@ txResult, err := client.BaseClient.QueryTx(txHash)
 
 ## 私钥管理
 
-以 irishub-sdk-go为例，接口定义如下:
+以 irishub-sdk-go为例，接口定义如下：
 
 ```go
 type KeyDAO interface {
@@ -80,7 +80,7 @@ type Crypto interface {
 }
 ```
 
-其中，`Store`包括两种存储方法，一种基于私钥，定义如下： 
+其中，`Store`包括两种存储方法，一种基于私钥，定义如下：
 
 ```go
 type KeyInfo struct {
@@ -133,9 +133,9 @@ func (m MemoryDB) Has(name string) bool {
 }
 ```
 
-## Go, JS, Java SDK 文档
+## Go、JS、Java SDK 文档
 
-IRISnet SDK的文档如下：
+IRISNet SDK的文档如下：
 
 - [Go SDK docs](https://github.com/irisnet/irishub-sdk-go/blob/master/README.md)
 - [JavaScript SDK docs](sdk-js.irisnet.org)
