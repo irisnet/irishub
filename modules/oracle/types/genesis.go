@@ -21,9 +21,6 @@ func ValidateGenesis(data GenesisState) error {
 		if err := ValidateAggregateFunc(feed.AggregateFunc); err != nil {
 			return err
 		}
-		if err := ValidateValueJSONPath(feed.ValueJsonPath); err != nil {
-			return err
-		}
 		if err := ValidateLatestHistory(feed.LatestHistory); err != nil {
 			return err
 		}

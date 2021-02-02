@@ -10,15 +10,17 @@ import (
 )
 
 const (
-	MaxLatestHistory    = 100
-	MaxAggregateFuncLen = 10
-	MaxValueJsonPath    = 70
-	MaxDescriptionLen   = 280
+	//MaxLatestHistory define the the maximum number of feed value saved
+	MaxLatestHistory = 100
+	//MaxAggregateFuncNameLen define the the maximum lenght of the ggregate function name
+	MaxAggregateFuncNameLen = 10
+	//MaxDescriptionLen define the the maximum lenght of the description
+	MaxDescriptionLen = 280
 )
 
 var (
-	// the feed name only accepts alphanumeric characters, _ and -
-	regexpFeedName = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_-]*$`)
+	// the feed name only accepts alphanumeric characters, _ and - /
+	regexpFeedName = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9/_-]*$`)
 )
 
 // ValidateFeedName verify that the feedName is legal
@@ -39,20 +41,12 @@ func ValidateDescription(desc string) error {
 
 // ValidateAggregateFunc verify that the aggregateFunc is legal
 func ValidateAggregateFunc(aggregateFunc string) error {
-	if len(aggregateFunc) == 0 || len(aggregateFunc) > MaxAggregateFuncLen {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "aggregate func must between [1, %d], got: %d", MaxAggregateFuncLen, len(aggregateFunc))
+	if len(aggregateFunc) == 0 || len(aggregateFunc) > MaxAggregateFuncNameLen {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "aggregate func must between [1, %d], got: %d", MaxAggregateFuncNameLen, len(aggregateFunc))
 	}
 
 	if _, err := GetAggregateFunc(aggregateFunc); err != nil {
 		return err
-	}
-	return nil
-}
-
-// ValidateValueJSONPath verify that the valueJsonPath is legal
-func ValidateValueJSONPath(valueJSONPath string) error {
-	if len(valueJSONPath) == 0 || len(valueJSONPath) > MaxValueJsonPath {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the length of valueJson path func must less than %d, got: %d", MaxAggregateFuncLen, len(valueJSONPath))
 	}
 	return nil
 }

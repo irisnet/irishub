@@ -76,24 +76,6 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 		},
 		false,
 	}, {
-		"wrong ValueJsonPath",
-		MsgCreateFeed{
-			FeedName:          "feedEthPrice",
-			AggregateFunc:     "avg",
-			ValueJsonPath:     "",
-			LatestHistory:     10,
-			Description:       "feed eth price",
-			ServiceName:       "GetEthPrice",
-			Providers:         []string{addr1, addr2},
-			Input:             "eth",
-			Timeout:           5,
-			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
-			RepeatedFrequency: 5,
-			ResponseThreshold: 1,
-			Creator:           addr1,
-		},
-		false,
-	}, {
 		"wrong MaxLatestHistory(=0)",
 		MsgCreateFeed{
 			FeedName:          "feedEthPrice",

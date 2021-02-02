@@ -62,10 +62,6 @@ func (msg MsgCreateFeed) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateValueJSONPath(msg.ValueJsonPath); err != nil {
-		return err
-	}
-
 	if !msg.ServiceFeeCap.IsValid() {
 		return sdkerrors.Wrapf(ErrInvalidServiceFeeCap, msg.ServiceFeeCap.String())
 	}
