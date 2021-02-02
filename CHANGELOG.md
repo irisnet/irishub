@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Application
+
+* [\#2542](https://github.com/irisnet/irishub/pull/2542) Migrate withdraw infos
+
 ## 1.0.0-rc1
 
 *January 28th, 2021*
@@ -12,12 +16,12 @@
 
 ### Application
 
-* [\#2515](https://github.com/irisnet/irishub/pull/2515) Bump cosmos-sdk version to [v0.40.1](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.40.1).
-* [\#2515](https://github.com/irisnet/irishub/pull/2515) Bump tendermint verion to [v0.34.3](https://github.com/tendermint/tendermint/releases/tag/v0.34.3).
+* [\#2515](https://github.com/irisnet/irishub/pull/2515) Bump cosmos-sdk version to [v0.40.1](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.40.1)
+* [\#2515](https://github.com/irisnet/irishub/pull/2515) Bump tendermint verion to [v0.34.3](https://github.com/tendermint/tendermint/releases/tag/v0.34.3)
 * [\#2532](https://github.com/irisnet/irishub/pull/2532) Bump irismod version to [v1.2.1](https://github.com/irisnet/irismod/releases/tag/v1.2.1)
 * [\#2524](https://github.com/irisnet/irishub/pull/2524) Fix proto package and path
 * [\#2518](https://github.com/irisnet/irishub/pull/2518) Move abandoned tokens to communityTax
-* [\#2512](https://github.com/irisnet/irishub/pull/2512) Normalize msg and genesis validation.
+* [\#2512](https://github.com/irisnet/irishub/pull/2512) Normalize msg and genesis validation
 
 ## 1.0.0-rc0
 
