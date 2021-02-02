@@ -3,7 +3,7 @@
 set -eo pipefail
 
 SDK_VERSION=v0.40.1
-IRISMOD_VERSION=v1.2.1-0.20210125095922-efbed3ccefba
+IRISMOD_VERSION=v1.2.1
 
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/third_party/proto
@@ -24,6 +24,8 @@ buf protoc \
     --doc_opt=./docs/light-client/protodoc-markdown.tmpl,proto-docs.md \
     $(find "$(pwd)/tmp/proto" -maxdepth 5 -name '*.proto')
 go mod tidy
+
+cp ./docs/light-client/proto-docs.md ./docs/zh/light-client/proto-docs.md 
 
 # clean proto files
 rm -rf ./tmp

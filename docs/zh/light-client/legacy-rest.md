@@ -1,55 +1,55 @@
 # Legacy Amino JSON REST
 
-The IRISHub versions v1.0.0 (depends on Cosmos-SDK v0.40) and earlier provided REST endpoints to query the state and broadcast transactions. These endpoints are kept in IRISHub v1.0, but they are marked as deprecated, and will be removed in v1.1 We therefore call these endpoints legacy REST endpoints.
+IRISHub v1.0.0（依赖Cosmos-SDK v0.40）和更早版本提供了 REST 端点来查询状态和广播交易。 这些端点在 IRISHub v1.0 中仍然保留，但已标记为已弃用，并将在 v1.1 中删除。因此，我们将这些端点称为 Legacy REST 端点。
 
-Some important information concerning all legacy REST endpoints:
+Legacy REST 端点相关的重要信息：
 
-- Most of these endpoints are backwards-comptatible. All breaking changes are described in the next section.
-- In particular, these endpoints still output Amino JSON. Cosmos-SDK v0.40 introduced Protobuf as the default encoding library throughout the codebase, but legacy REST endpoints are one of the few places where the encoding is hardcoded to Amino.
+- 这些端点中的大多数都是向后兼容的。下一部分将介绍所有的不兼容更新。
+- 值得注意的是，这些端点仍会输出 Amino JSON。 Cosmos-SDK v0.40 引入了 Protobuf 作为整个代码库的默认编码库，但是传统的 REST 端点是少数几个使用 Amino 编码的部分之一。
 
-## API Port, Activation and Configuration
+## API 端口、激活方式和配置
 
-All routes are configured under the following fields in `~/.iris/config/app.toml`:
+所有路由都在 `~/.iris/config/app.toml` 中的以下字段中配置：
 
-- `api.enable = true|false` field defines if the REST server should be enabled. Defaults to `true`.
-- `api.address = {string}` field defines the address (really, the port, since the host should be kept at `0.0.0.0`) the server should bind to. Defaults to `tcp://0.0.0.0:1317`.
-- some additional API configuration options are defined in `~/.iris/config/app.toml`, along with comments, please refer to that file directly.
+- `api.enable = true|false` 字段定义是否启用 REST 服务，默认为 `true`。
+- `api.address = {string}` 字段定义服务器应绑定到的地址（实际为端口，因为主机应保持在 `0.0.0.0`）。 默认为 `tcp://0.0.0.0:1317`。
+- 在 `~/.iris/config/app.toml` 中定义了一些其他 API 配置选项并附有注释，请直接参考该文件。
 
-### Legacy REST API Routes
+### Legacy REST API 路由
 
-The REST routes present in Irishub v0.16 and earlier are marked as deprecated via a [HTTP deprecation header](https://tools.ietf.org/id/draft-dalal-deprecation-header-01.html). They are still maintained to keep backwards compatibility, but will be removed in v1.1.0.
+IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](https://tools.ietf.org/id/draft-dalal-deprecation-header-01.html)标记为已弃用，它们仍然被维护以保持向后兼容，但是将在 v1.1.0 中删除。
 
-For application developers, Legacy REST API routes needs to be wired up to the REST server, this is done by calling the `RegisterRESTRoutes` function on the ModuleManager.
+对于应用程序开发人员而言，传统的 REST API 路由需要连接到 REST 服务器，这是通过在 ModuleManager 上调用 `RegisterRESTRoutes` 方法来完成的。
 
 ### Swagger
 
-A [Swagger](https://swagger.io/) (or OpenAPIv2) specification file is exposed under the `/swagger` route on the API server. Swagger is an open specification describing the API endpoints a server serves, including description, input arguments, return types and much more about each endpoint.
+[Swagger](https://swagger.io/)（或 OpenAPIv2 ）规范文件在 API 服务器上的 `/swagger` 路径下。 Swagger 是一个开放的规范，描述服务器服务的 API 端点，包括描述、输入参数、返回类型以及有关每个端点的更多信息。
 
-Enabling the `/swagger` endpoint is configurable inside `~/.iris/config/app.toml` via the `api.swagger` field, which is set to true by default.
+可以通过 `~/.iris/config/app.toml` 中的 `api.swagger` 字段配置启用 `/swagger` 端点，默认为 true。
 
-For application developers, you may want to generate your own Swagger definitions based on your custom modules. The IRISHub's [Swagger generation script](https://github.com/irisnet/irishub/blob/master/scripts/protoc-swagger-gen.sh) is a good place to start.
+对于应用程序开发人员，您可能希望基于自定义模块生成自己的 Swagger 定义。可以从 IRIShub 的 [Swagger 生成脚本](https://github.com/irisnet/irishub/blob/master/scripts/protoc-swagger-gen.sh)开始。
 
-## Legacy REST Endpoint
+## Legacy REST 端点
 
-### Breaking Changes in Legacy REST Endpoints (Contrast with Cosmos-SDK v0.39 and earlier versions)
+### Legacy REST 端点的中不兼容更新 (对比 Cosmos-SDK v0.39 及更早的版本)
 
-| Legacy REST Endpoint                                                         | Description                                 | Breaking Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ---------------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `POST` `/txs`                                                                | Broadcast tx                                | Endpoint will error when trying to broadcast transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                           |
-| `POST` `/txs/encode`, `POST` `/txs/decode`                                   | Encode/decode Amino txs from JSON to binary | Endpoint will error when trying to encode/decode transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                       |
-| `GET` `/txs/{hash}`                                                          | Query tx by hash                            | Endpoint will error when trying to output transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                              |
-| `GET` `/txs`                                                                 | Query tx by events                          | Endpoint will error when trying to output transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                              |
-| `GET` `/gov/proposals/{id}/votes`, `GET` `/gov/proposals/{id}/votes/{voter}` | Gov endpoints for querying votes            | All gov endpoints which return votes return int32 in the `option` field instead of string: `1=VOTE_OPTION_YES, 2=VOTE_OPTION_ABSTAIN, 3=VOTE_OPTION_NO, 4=VOTE_OPTION_NO_WITH_VETO`.                                                                                                                                                                                                                                                                                                   |
-| `GET` `/staking/*`                                                           | Staking query endpoints                     | All staking endpoints which return validators have two breaking changes. First, the validator's `consensus_pubkey` field returns an Amino-encoded struct representing an `Any` instead of a bech32-encoded string representing the pubkey. The `value` field of the `Any` is the pubkey's raw key as base64-encoded bytes. Second, the validator's `status` field now returns an int32 instead of string: `1=BOND_STATUS_UNBONDED`, `2=BOND_STATUS_UNBONDING`, `3=BOND_STATUS_BONDED`. |
-| `GET` `/staking/validators`                                                  | Get all validators                          | BondStatus is now a protobuf enum instead of an int32, and JSON serialized using its protobuf name, so expect query parameters like `?status=BOND_STATUS_{BONDED,UNBONDED,UNBONDING}` as opposed to `?status={bonded,unbonded,unbonding}`.                                                                                                                                                                                                                                             |
+| Legacy REST 端点                                                             | 描述                                         | 不兼容更新                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ---------------------------------------------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST` `/txs`                                                                | 广播交易                                     | Endpoint will error when trying to broadcast transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                           |
+| `POST` `/txs/encode`, `POST` `/txs/decode`                                   | Amino 格式交易在 JSON 与二进制文件间的编解码 | Endpoint will error when trying to encode/decode transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                       |
+| `GET` `/txs/{hash}`                                                          | 通过哈希查询交易                             | Endpoint will error when trying to output transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                              |
+| `GET` `/txs`                                                                 | 通过事件查询交易                             | Endpoint will error when trying to output transactions that don't support Amino serialization (e.g. IBC txs)<sup>1</sup>.                                                                                                                                                                                                                                                                                                                                                              |
+| `GET` `/gov/proposals/{id}/votes`, `GET` `/gov/proposals/{id}/votes/{voter}` | Gov 模块查询投票信息的端点                   | All gov endpoints which return votes return int32 in the `option` field instead of string: `1=VOTE_OPTION_YES, 2=VOTE_OPTION_ABSTAIN, 3=VOTE_OPTION_NO, 4=VOTE_OPTION_NO_WITH_VETO`.                                                                                                                                                                                                                                                                                                   |
+| `GET` `/staking/*`                                                           | Staking 模块查询端点                         | All staking endpoints which return validators have two breaking changes. First, the validator's `consensus_pubkey` field returns an Amino-encoded struct representing an `Any` instead of a bech32-encoded string representing the pubkey. The `value` field of the `Any` is the pubkey's raw key as base64-encoded bytes. Second, the validator's `status` field now returns an int32 instead of string: `1=BOND_STATUS_UNBONDED`, `2=BOND_STATUS_UNBONDING`, `3=BOND_STATUS_BONDED`. |
+| `GET` `/staking/validators`                                                  | 获取所有的验证人                             | BondStatus is now a protobuf enum instead of an int32, and JSON serialized using its protobuf name, so expect query parameters like `?status=BOND_STATUS_{BONDED,UNBONDED,UNBONDING}` as opposed to `?status={bonded,unbonded,unbonding}`.                                                                                                                                                                                                                                             |
 
 <sup>1</sup>: Transactions that don't support Amino serialization are the ones that contain one or more `Msg`s that are not registered with the Amino codec. Currently in the SDK, only IBC `Msg`s fall into this case.
 
-### Migrating to New REST Endpoints (from Cosmos-SDK v0.39)
+### 迁移到新的 REST 端点 (从 Cosmos-SDK v0.39)
 
-**IRISHub API Endpoints**
+**IRISHub API 端点**
 
-| Legacy REST Endpoint                                                              | Description                                                         | New gGPC-gateway REST Endpoint                                                                                |
+| Legacy REST 端点                                                                  | 描述                                                                | 新的 gGPC-gateway REST 端点                                                                                   |
 | --------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `GET` `/bank/balances/{address}`                                                  | Get the balance of an address                                       | `GET` `/cosmos/bank/v1beta1/balances/{address}`                                                               |
 | `POST` `/bank/accounts/{address}/transfers`                                       | Send coins from one account to another                              | N/A, use Protobuf directly                                                                                    |
@@ -103,9 +103,9 @@ For application developers, you may want to generate your own Swagger definition
 | `GET` `/distribution/community_pool`                                              | Get the amount held in the community pool                           | `GET` `/cosmos/distribution/v1beta1/community_pool`                                                           |
 | `GET` `/distribution/parameters`                                                  | Get the current distribution parameter values                       | `GET` `/cosmos/distribution/v1beta1/params`                                                                   |
 
-**Tendermint API Endpoints**
+**Tendermint API 端点**
 
-| Legacy REST Endpoint            | Description                                      | New gGPC-gateway REST Endpoint                                 |
+| Legacy REST 端点                | 描述                                             | 新的 gGPC-gateway REST 端点                                    |
 | ------------------------------- | ------------------------------------------------ | -------------------------------------------------------------- |
 | `GET` `/node_info`              | Get the properties of the connected node         | `GET` `/cosmos/base/tendermint/v1beta1/node_info`              |
 | `GET` `/syncing`                | Get syncing state of node                        | `GET` `/cosmos/base/tendermint/v1beta1/syncing`                |
@@ -119,9 +119,9 @@ For application developers, you may want to generate your own Swagger definition
 | `POST` `/txs/encode`            | Encodes an Amino JSON tx to an Amino binary tx   | N/A, use Protobuf directly                                     |
 | `POST` `/txs/decode`            | Decodes an Amino binary tx into an Amino JSON tx | N/A, use Protobuf directly                                     |
 
-## Breaking changes in High Priority Endpoints for Queries
+## 高优先级查询端点的不兼容更新
 
-**Here are the High Priority Endpoints for Queries**
+**高优先级查询端点**
 
 - Staking
   - Validators
@@ -134,22 +134,22 @@ For application developers, you may want to generate your own Swagger definition
 
 ### Bank
 
-**Endpoint Name:** QueryBalance
+**端点名称：** QueryBalance
 
-- **Endpoint Path:** `"/bank/balances/{address}"`
-- **What Changed:**
-  - No Changes observed.
+- **端点路径：** `"/bank/balances/{address}"`
+- **更新内容：**
+  - 无更改。
   - See [coin cross-chain transfer source tracing](https://github.com/cosmos/cosmos-sdk/pull/6662) for details on how on non-native IBC coins will written into the denom value. This will include a hash of source trace for each coin. The core decision if the hash should replace the denom or be prepended to the denom.
 
 ### Validators
 
-**Endpoint Name:** QueryValidators
+**端点名称：** QueryValidators
 
-- **Endpoint Path:** `"/staking/validators"`
-- **What Changed:**
+- **端点路径：** `"/staking/validators"`
+- **更新内容：**
   - The fields ```"unbonding_height"``` and ```"jailed"``` are no longer supported
   - The fields in description are now omit if empty. Rather than returning fields with empty strings. We now don't return the field if the validator has chosen not to configure it. For instance at launch, no validator will have a security contact filled out and the field will only appear once they do.
-- **Sample JSON:**
+- **JSON 示例：**
 
     ```JSON
     {
@@ -180,14 +180,14 @@ For application developers, you may want to generate your own Swagger definition
 
 ### Delegators
 
-**Endpoint Name:** QueryDelegatorDelegations
+**端点名称：** QueryDelegatorDelegations
 
-- **Endpoint Path:** `"/staking/delegators/delegations"`
-- **What Changed:**
+- **端点路径：** `"/staking/delegators/delegations"`
+- **更新内容：**
   - `"balance"` now is no longer a number. It is a field with two values: `"amount"` and `"Denom"`
   - `"delegator_address"` is no longer a string. It’s a field called `"delegation"` with three values: `"delegator_address", "shares", "validator_address"`
   - The old field `"validator_address"` is no longer used. A new field `"validator_dst_address"` and`"validator_src_address"` replace this in the new `"redelegation"` field.
-- **Sample JSON:**
+- **JSON 示例：**
 
     ```JSON
     {
@@ -203,10 +203,10 @@ For application developers, you may want to generate your own Swagger definition
     }
     ```
 
-**Endpoint Name:** QueryRedelegations
+**端点名称：** QueryRedelegations
 
-- **Endpoint Path:** `"/staking/redelegations"`
-- **What Changed:** The following old fields are now sub fields of a new field called `"redelegation_entry"`:
+- **端点路径：** `"/staking/redelegations"`
+- **更新内容：** The following old fields are now sub fields of a new field called `"redelegation_entry"`:
   - `"completion_time"`
   - `"initial_balance"`
   - `"shares_dst"`
@@ -217,7 +217,7 @@ For application developers, you may want to generate your own Swagger definition
     - `entries` (new)
     - `valdiator_dst_address`
     - `validator_src_address`
-- **Sample JSON:**
+- **JSON 示例：**
 
     ```JSON
     {
@@ -248,20 +248,20 @@ For application developers, you may want to generate your own Swagger definition
     }
     ```
 
-**Endpoint Name:** QueryUnbondingDelegation
+**端点名称：** QueryUnbondingDelegation
 
-- **Endpoint Path:** `"/staking/unbondingDelegation"`
-- **What Changed:**
+- **端点路径：** `"/staking/unbondingDelegation"`
+- **更新内容：**
   - The old field `"creation_height"` is no longer supported
 
 ### Distributions
 
-**Endpoint Name:** getQueriedValidatorOutstandingRewards
+**端点名称：** getQueriedValidatorOutstandingRewards
 
-- **Endpoint Path:** `"/distribution/validators/{validatorAddr}/outstanding_rewards"`
-- **What Changed:**
+- **端点路径：** `"/distribution/validators/{validatorAddr}/outstanding_rewards"`
+- **更新内容：**
   - The new field `"rewards"` is the new root level field for the output
-- **Sample JSON:**
+- **JSON 示例：**
 
     ```JSON
     {
@@ -278,13 +278,13 @@ For application developers, you may want to generate your own Swagger definition
     }
     ```
 
-**Endpoint Name:** getQueriedValidatorCommission
+**端点名称：** getQueriedValidatorCommission
 
-- **Endpoint Path:** `"/distribution/validators/{validatorAddr}"`
-- **What Changed:**
+- **端点路径：** `"/distribution/validators/{validatorAddr}"`
+- **更新内容：**
   - The new field `"commission"` is the new root level field for the output
 
-- **Sample JSON:**
+- **JSON 示例：**
 
     ```JSON
     {
@@ -301,16 +301,16 @@ For application developers, you may want to generate your own Swagger definition
     }
     ```
 
-**Endpoint Name:** getQueriedValidatorSlashes
+**端点名称：** getQueriedValidatorSlashes
 
-- **Endpoint Path:** `"/distribution/validators/{validatorAddr}"`
-- **What Changed:** No change
+- **端点路径：** `"/distribution/validators/{validatorAddr}"`
+- **更新内容：** No change
   
-- **Endpoint Name:** getQueriedDelegationRewards
-- **Endpoint Path:** `"/distribution/delegators/{delegatorAddr}/rewards"`
-- **What Changed:** No change
+- **端点名称：** getQueriedDelegationRewards
+- **端点路径：** `"/distribution/delegators/{delegatorAddr}/rewards"`
+- **更新内容：** No change
 
-## Generating and Signing Transactions (Fully Backward Compatible)
+## 构造和签名交易（完全向后兼容）
 
 The same code as integrating with cosmoshub-3 mainnet. The transaction structure is as follows:
 
@@ -358,7 +358,7 @@ Denom uses `uiris` instead (1iris = 10<sup>6</sup>uiris), which affects fields:
 - value.msg.value.amount.denom
 - value.fee.amount.denom
 
-## Broadcasting a transaction (Fully Backward Compatible)
+## 广播交易（完全向后兼容）
 
 The same code as integrating with irishub mainnet, call `POST` `/txs` to send a transaction, as the example below:
 
@@ -366,18 +366,18 @@ The same code as integrating with irishub mainnet, call `POST` `/txs` to send a 
 curl -X POST "http://localhost:1317/txs" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"tx\": {\"msg\":[{\"type\":\"cosmos-sdk/MsgSend\",\"value\":{\"from_address\":\"iaa1rkgdpj6fyyyu7pnhmc3v7gw9uls4mnajvzdwkt\",\"to_address\":\"iaa1q6t5439f0rkvkzl38m0f43e0kpv3mx7x2shlq8\",\"amount\":[{\"denom\":\"uiris\",\"amount\":\"1000000\"}]}}],\"fee\":{\"amount\":[{\"denom\":\"uiris\",\"amount\":\"30000\"}],\"gas\":\"200000\"},\"signatures\":[{\"pub_key\":{\"type\":\"tendermint/PubKeySecp256k1\",\"value\":\"AxGagdsRTKni/h1+vCFzTpNltwoiU7SwIR2dg6Jl5a//\"},\"signature\":\"Pu8yiRVO8oB2YDDHyB047dXNArbVImasmKBrm8Kr+6B08y8QQ7YG1eVgHi5OIYYclccCf3Ju/BQ78qsMWMniNQ==\"}],\"memo\":\"Sent via irishub client\"}, \"mode\": \"block\"}"
 ```
 
-## Breaking Changes in Querying Transactions
+## 查询交易的不兼容更新
 
 ### Tx
 
-- **Endpoint Name:** QueryTx
-- **Endpoint Path:** `GET /txs`&&`GET /txs/{hash}`
-- **What Changed:**
+- **端点名称：** QueryTx
+- **端点路径：** `GET /txs`&&`GET /txs/{hash}`
+- **更新内容：**
   - Tags are no longer used; use the events field instead
   - The result field is no longer used, and the field in the original result is moved to the first level
   - The coin_flow field is no longer used
 
-- **Sample JSON:**
+- **JSON 示例：**
 
   ```json
   {
