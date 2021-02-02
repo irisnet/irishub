@@ -2,6 +2,7 @@ package types
 
 import (
 	fmt "fmt"
+	"math"
 	"regexp"
 	"strings"
 
@@ -11,7 +12,7 @@ import (
 
 const (
 	// MaximumMaxSupply limitation for token max supply，1000 billion
-	MaximumMaxSupply = uint64(1000000000000)
+	MaximumMaxSupply = math.MaxUint64
 	// MaximumInitSupply limitation for token initial supply，100 billion
 	MaximumInitSupply = uint64(100000000000)
 	// MaximumScale limitation for token decimal
@@ -66,12 +67,8 @@ func ValidateToken(token Token) error {
 		return err
 	}
 
-	if err := ValidateMaxSupply(token.MaxSupply); err != nil {
-		return err
-	}
-
 	if token.MaxSupply < token.InitialSupply {
-		return sdkerrors.Wrapf(ErrInvalidMaxSupply, "invalid token max supply %d, only accepts value [%d, %d]", token.MaxSupply, token.InitialSupply, MaximumMaxSupply)
+		return sdkerrors.Wrapf(ErrInvalidMaxSupply, "invalid token max supply %d, only accepts value [%d, %d]", token.MaxSupply, token.InitialSupply, uint64(MaximumMaxSupply))
 	}
 	return ValidateScale(token.Scale)
 }
@@ -80,14 +77,6 @@ func ValidateToken(token Token) error {
 func ValidateInitialSupply(initialSupply uint64) error {
 	if initialSupply > MaximumInitSupply {
 		return sdkerrors.Wrapf(ErrInvalidInitSupply, "invalid token initial supply %d, only accepts value [0, %d]", initialSupply, MaximumInitSupply)
-	}
-	return nil
-}
-
-// ValidateMaxSupply verifies whether the  parameters are legal
-func ValidateMaxSupply(maxSupply uint64) error {
-	if maxSupply > MaximumMaxSupply {
-		return sdkerrors.Wrapf(ErrInvalidMaxSupply, "invalid token max supply %d, maxSupply %d", maxSupply, MaximumMaxSupply)
 	}
 	return nil
 }
@@ -134,8 +123,8 @@ func ValidateKeywords(denom string) error {
 
 // ValidateAmount checks if the given denom begin with `TokenKeywords`
 func ValidateAmount(amount uint64) error {
-	if amount == 0 || amount > MaximumMaxSupply {
-		return sdkerrors.Wrapf(ErrInvalidMaxSupply, "invalid token amount %d, only accepts value (0, %d]", amount, MaximumMaxSupply)
+	if amount == 0 {
+		return sdkerrors.Wrapf(ErrInvalidMaxSupply, "invalid token amount %d, only accepts value (0, %d]", amount, uint64(MaximumMaxSupply))
 	}
 	return nil
 }

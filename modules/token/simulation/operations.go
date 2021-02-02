@@ -374,7 +374,7 @@ func randToken(r *rand.Rand, accs []simtypes.Account) types.Token {
 	name := randStringBetween(r, 1, types.MaximumNameLen)
 	scale := simtypes.RandIntBetween(r, 1, int(types.MaximumScale))
 	initialSupply := r.Int63n(int64(types.MaximumInitSupply))
-	maxSupply := r.Int63n(int64(types.MaximumMaxSupply-types.MaximumInitSupply)) + initialSupply
+	maxSupply := 2 * initialSupply
 	simAccount, _ := simtypes.RandomAcc(r, accs)
 
 	return types.Token{

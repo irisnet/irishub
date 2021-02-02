@@ -99,10 +99,16 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.Token) error {
 	return nil
 }
 
+// HasSymbol asserts a token exists by symbol
+func (k Keeper) HasSymbol(ctx sdk.Context, symbol string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.KeySymbol(symbol))
+}
+
 // HasToken asserts a token exists
 func (k Keeper) HasToken(ctx sdk.Context, denom string) bool {
 	store := ctx.KVStore(k.storeKey)
-	if store.Has(types.KeySymbol(denom)) {
+	if k.HasSymbol(ctx, denom) {
 		return true
 	}
 

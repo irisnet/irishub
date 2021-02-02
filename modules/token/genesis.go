@@ -1,6 +1,8 @@
 package token
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irismod/modules/token/keeper"
@@ -25,6 +27,12 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	for _, coin := range data.BurnedCoins {
 		k.AddBurnCoin(ctx, coin)
 	}
+
+	//assert symbol exist
+	if !k.HasSymbol(ctx, data.Params.IssueTokenBaseFee.Denom) {
+		panic(fmt.Sprintf("Token: %s not exist", data.Params.IssueTokenBaseFee.Denom))
+	}
+
 }
 
 // ExportGenesis - output genesis parameters

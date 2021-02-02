@@ -195,11 +195,6 @@ func (msg MsgEditToken) ValidateBasic() error {
 	if err := ValidateName(msg.Name); err != nil {
 		return err
 	}
-
-	if err := ValidateMaxSupply(msg.MaxSupply); err != nil {
-		return err
-	}
-
 	// check symbol
 	return ValidateSymbol(msg.Symbol)
 }

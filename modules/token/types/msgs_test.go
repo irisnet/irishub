@@ -61,7 +61,6 @@ func TestMsgEditToken(t *testing.T) {
 	}{
 		{"native basic good", NewMsgEditToken("BTC Token", "btc", 10000, mintable, owner), true},
 		{"wrong symbol", NewMsgEditToken("BTC Token", "BT", 10000, mintable, owner), false},
-		{"wrong max_supply", NewMsgEditToken("BTC Token", "btc", 10000000000000, mintable, owner), false},
 		{"loss owner", NewMsgEditToken("BTC Token", "btc", 10000, mintable, ""), false},
 	}
 
@@ -120,7 +119,6 @@ func TestMsgMintTokenValidateBasic(t *testing.T) {
 		{"empty to", "btc", addr1, emptyAddr, 1000, true},
 		{"not empty to", "btc", addr1, addr2, 1000, true},
 		{"invalid amount", "btc", addr1, addr2, 0, false},
-		{"exceed max supply", "btc", addr1, addr2, 100000000000000, false},
 		{"basic good", "btc", addr1, addr2, 1000, true},
 	}
 

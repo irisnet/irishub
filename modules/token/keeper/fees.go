@@ -64,20 +64,18 @@ func (k Keeper) GetTokenMintFee(ctx sdk.Context, symbol string) (sdk.Coin, error
 	return k.truncateFee(ctx, issueFee.Denom, mintFee)
 }
 
-func (k Keeper) truncateFee(ctx sdk.Context, denom string, feeAmt sdk.Dec) (sdk.Coin, error) {
-	token, err := k.GetToken(ctx, denom)
+func (k Keeper) truncateFee(ctx sdk.Context, symbol string, feeAmt sdk.Dec) (sdk.Coin, error) {
+	token, err := k.getTokenBySymbol(ctx, symbol)
 	if err != nil {
 		return sdk.Coin{}, err
 	}
 
-	precision := sdk.NewIntWithDecimal(1, int(token.GetScale()))
-	feeNativeToken := feeAmt.Quo(sdk.NewDecFromInt(precision))
-
 	var amount sdk.Int
-	if feeNativeToken.GT(sdk.NewDec(1)) {
-		amount = feeNativeToken.TruncateInt().Mul(precision)
+	if feeAmt.GT(sdk.NewDec(1)) {
+		precision := sdk.NewIntWithDecimal(1, int(token.GetScale()))
+		amount = feeAmt.TruncateInt().Mul(precision)
 	} else {
-		amount = sdk.NewInt(1).Mul(precision)
+		amount = sdk.NewIntWithDecimal(1, int(token.GetScale()))
 	}
 	return sdk.NewCoin(token.GetMinUnit(), amount), nil
 }
@@ -88,7 +86,8 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 	tokenTaxRate := params.TokenTaxRate
 
 	// compute community tax and burned coin
-	communityTaxCoin := sdk.NewCoin(fee.Denom, sdk.NewDecFromInt(fee.Amount).Mul(tokenTaxRate).TruncateInt())
+	communityTaxCoin := sdk.NewCoin(fee.Denom,
+		sdk.NewDecFromInt(fee.Amount).Mul(tokenTaxRate).TruncateInt())
 	burnedCoins := sdk.NewCoins(fee.Sub(communityTaxCoin))
 
 	// send all fees to module account
