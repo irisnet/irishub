@@ -1,6 +1,6 @@
 # Introduction
 
-This document presents an overview of all the endpoints and SDKs a node exposes.
+This document presents an overview of all the endpoints and IRISHub-SDK a node exposes.
 
 ## An Overview of All Endpoints
 
