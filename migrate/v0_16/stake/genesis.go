@@ -163,6 +163,9 @@ func (v *Validator) UnmarshalJSON(data []byte) error {
 	}
 
 	consPubKey, err := codec.ToTmPubKeyInterface(pubkey)
+	if err != nil {
+		return err
+	}
 
 	*v = Validator{
 		OperatorAddr:     bv.OperatorAddr,
