@@ -2,33 +2,37 @@
 
 set -eo pipefail
 
-SDK_VERSION=v0.40.0
-IRISMOD_VERSION=v1.2.0
+SDK_VERSION=v0.40.1
+IRISMOD_VERSION=v1.2.1
 
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/cosmos
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/ibc
+chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/third_party/proto
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto
 
 cp -r ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/cosmos ./proto
 cp -r ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/ibc ./proto
+cp -r ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/third_party/proto/* ./proto
 cp -r ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto ./
 
 mkdir -p ./tmp-swagger-gen
 
-proto_dirs=$(find ./proto -path -prune -o -name 'query.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+proto_dirs=$(find ./proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
 
-    # generate swagger files (filter query files)
-    query_file=$(find "${dir}" -maxdepth 1 -name 'query.proto')
-    echo $query_file
-    if [[ ! -z "$query_file" ]]; then
-        protoc \
-            -I "proto" \
-            -I "third_party/proto" \
-            "$query_file" \
-            --swagger_out ./tmp-swagger-gen \
-            --swagger_opt logtostderr=true --swagger_opt fqn_for_swagger_name=true --swagger_opt simple_operation_ids=true
-    fi
+  # generate swagger files (filter query files)
+  query_file=$(find "${dir}" -maxdepth 1 -name 'query.proto')
+  if [[ $dir =~ "cosmos" ]]; then
+    query_file=$(find "${dir}" -maxdepth 1 \( -name 'query.proto' -o -name 'service.proto' \))
+  fi
+  if [[ ! -z "$query_file" ]]; then
+    protoc  \
+    -I "proto" \
+    -I "third_party/proto" \
+    "$query_file" \
+    --swagger_out=./tmp-swagger-gen \
+    --swagger_opt=logtostderr=true --swagger_opt=fqn_for_swagger_name=true --swagger_opt=simple_operation_ids=true
+  fi
 done
 
 # copy cosmos swagger_legacy.yaml
@@ -54,6 +58,11 @@ rm -rf ./tmp-swagger-gen
 # clean proto files
 rm -rf ./proto/cosmos
 rm -rf ./proto/ibc
+rm -rf ./proto/confio
+rm -rf ./proto/cosmos_proto
+rm -fr ./proto/gogoproto
+rm -fr ./proto/google
+rm -fr ./proto/tendermint
 
 rm -rf ./proto/coinswap
 rm -rf ./proto/htlc
