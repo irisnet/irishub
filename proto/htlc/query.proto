@@ -8,7 +8,7 @@ option go_package = "github.com/irisnet/irismod/modules/htlc/types";
 
 // Query provides defines the gRPC querier service
 service Query {
-    // Balance queries the balance of a single coin for a single account
+    // HTLC queries the HTLC by the specified hash lock
     rpc HTLC (QueryHTLCRequest) returns (QueryHTLCResponse) {
         option (google.api.http).get = "/irismod/htlc/htlcs/{hash_lock}";
     }

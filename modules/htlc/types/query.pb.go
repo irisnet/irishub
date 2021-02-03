@@ -160,7 +160,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
-	// Balance queries the balance of a single coin for a single account
+	// HTLC queries the HTLC by the specified hash lock
 	HTLC(ctx context.Context, in *QueryHTLCRequest, opts ...grpc.CallOption) (*QueryHTLCResponse, error)
 }
 
@@ -183,7 +183,7 @@ func (c *queryClient) HTLC(ctx context.Context, in *QueryHTLCRequest, opts ...gr
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
-	// Balance queries the balance of a single coin for a single account
+	// HTLC queries the HTLC by the specified hash lock
 	HTLC(context.Context, *QueryHTLCRequest) (*QueryHTLCResponse, error)
 }
 
