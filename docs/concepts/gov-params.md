@@ -59,9 +59,11 @@ Details in [Governance](../features/governance.md)
 
 ## Parameters in IBC
 
-| key                  | Description              | Range    | Current                            |
-| -------------------- | ------------------------ | -------- | ---------------------------------- |
-| `ibc/AllowedClients` | Clients that support ibc |          | ["06-solomachine","07-tendermint"] |
+| key                       | Description                             | Range        | Current                            |
+| ------------------------- | --------------------------------------- | ------------ | ---------------------------------- |
+| `ibc/AllowedClients`      | Clients that support ibc                |              | ["06-solomachine","07-tendermint"] |
+| `transfer/SendEnabled`    | Whether to enable the transfer function | {true,false} | true             |
+| `transfer/ReceiveEnabled` | Whether to enable the receive function  | {true,false} | true             |
 
 ## Parameters in Mint
 
@@ -80,11 +82,11 @@ Details in [Mint](../features/mint.md)
 | `service/ComplaintRetrospect`  | Maximum time for submitting a dispute                       | (0, 9223372036854775807]  | 360h0m0s |
 | `service/MaxRequestTimeout`    | Maximum number of blocks to wait for service invocation     | (0, 9223372036854775807]  | 100      |
 | `service/MinDepositMultiple`   | A multiple of the minimum deposit amount of service binding | (0, 9223372036854775807]  | 1000     |
-| `service/ServiceFeeTax`        | Tax rate of service fee                                     | [0, 1)                    | 0.01     |
+| `service/ServiceFeeTax`        | Tax rate of service fee                                     | [0, 1)                    | 0.05     |
 | `service/SlashFraction`        | Slash fraction                                              | [0, 1]                    | 0.001    |
 | `service/TxSizeLimit`          | The limit of the service tx size                            | (0, 18446744073709551615] | 4000     |
 | `service/MinDeposit`           | Minimum deposit amount                                      | amount: (0, +∞)           | [{"denom": "uiris","amount": "5000000000"}] |
-| `service/BaseDenom`            | Tokens supported by service fees                            |                           | uiris    |
+| `service/BaseDenom`            | Token denom that must be used for deposits                  |                           | uiris    |
 
 Details in [Service](../features/service.md)
 
@@ -117,14 +119,7 @@ Details in [Staking](../features/staking.md)
 | key                       | Description                       | Range           | Current          |
 | ------------------------- | --------------------------------- | --------------- | ---------------- |
 | `token/TokenTaxRate`      | Base rate for issuing/mint tokens | [0, 1]          | 0.4              |
-| `token/IssueTokenBaseFee` | Base token for issuing tokens     | amount: (0, +∞) | [{"denom": "iris","amount": "60000000000"}] |
+| `token/IssueTokenBaseFee` | Base token for issuing tokens     | amount: (0, +∞) | {"denom": "iris","amount": "60000"} |
 | `token/MintTokenFeeRatio` | Rate for mint tokens              | [0, 1]          | 0.1              |
 
 Details in [Token](../features/token.md)
-
-## Parameters in Transfer
-
-| key                       | Description                             | Range        | Current          |
-| ------------------------- | --------------------------------------- | ------------ | ---------------- |
-| `transfer/SendEnabled`    | Whether to enable the transfer function | {true,false} | true             |
-| `transfer/ReceiveEnabled` | Whether to enable the receive function  | {true,false} | true             |

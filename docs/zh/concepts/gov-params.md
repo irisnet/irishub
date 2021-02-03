@@ -1,16 +1,16 @@
 # 治理参数
 
-在IRISNet中，存在一些特殊的参数，它们可通过链上治理被修改。持有IRIS通证的用户都可以参与到参数修改的链上治理。
+在IRISnet中，存在一些特殊的参数，它们可通过链上治理被修改。持有IRIS通证的用户都可以参与到参数修改的链上治理。
 如果社区对某些可修改的参数不满意，可以发起[参数修改提案](../features/governance.md#usage-scenario-of-parameter-change)，社区投票通过后即可在线自动完成修改。
 
 ## Auth 模块可治理参数
 
 | 字段                           | 描述                              | 有效范围                   | 当前值   |
 | ----------------------------- | -------------------------------- | ------------------------- | ------- |
-| `auth/MaxMemoCharacters`      | 交易的meno字段的最大字符数           | (0, 18446744073709551615] | 256     |
+| `auth/MaxMemoCharacters`      | 交易的memo字段的最大字符数           | (0, 18446744073709551615] | 256     |
 | `auth/TxSigLimit`             | 每个交易的最大签名数                 | (0, 18446744073709551615] | 7       |
 | `auth/TxSizeCostPerByte`      | 交易每个字节消耗的gas量              | (0, 18446744073709551615] | 10      |
-| `auth/SigVerifyCostED25519`   | 在EDD2519算法签名验证上花费的gas     | (0, 18446744073709551615] | 590     |
+| `auth/SigVerifyCostED25519`   | 在ED25519算法签名验证上花费的gas     | (0, 18446744073709551615] | 590     |
 | `auth/SigVerifyCostSecp256k1` | 在Secp256k1算法签名验证上花费的gas   | (0, 18446744073709551615] | 1000    |
 
 ## Bank 模块可治理参数
@@ -59,9 +59,11 @@
 
 ## IBC 模块可治理参数
 
-| 字段                  | 描述          | 有效范围 | 当前值          |
-| -------------------- | ------------- | ------ | --- ---------- |
-| `ibc/AllowedClients` | 支持ibc的客户端 |        | ["06-solomachine","07-tendermint"] |
+| 字段                       | 描述             | 有效范围      | 当前值   |
+| ------------------------- | --------------- | ------------ | ------- |
+| `ibc/AllowedClients`      | 支持ibc的客户端   |              | ["06-solomachine","07-tendermint"] |
+| `transfer/SendEnabled`    | 是否支持transfer | {true,false} | true    |
+| `transfer/ReceiveEnabled` | 是否支持Receive  | {true,false} | true    |
 
 ## Mint 模块可治理参数
 
@@ -80,11 +82,11 @@
 | `service/ComplaintRetrospect`  | 投诉周期                  | (0, 9223372036854775807]  | 360h0m0s |
 | `service/MaxRequestTimeout`    | 最大请求超时时间            | (0, 9223372036854775807]  | 100      |
 | `service/MinDepositMultiple`   | 最小抵押倍数               | (0, 9223372036854775807]  | 1000     |
-| `service/ServiceFeeTax`        | 服务费率                  | [0, 1)                    | 0.01     |
+| `service/ServiceFeeTax`        | 服务费率                  | [0, 1)                    | 0.05     |
 | `service/SlashFraction`        | 惩罚系数                  | [0, 1]                    | 0.001    |
 | `service/TxSizeLimit`          | 交易最大字节数(service模块) | (0, 18446744073709551615] | 4000     |
 | `service/MinDeposit`           | 最小抵押数量               | amount: (0, +∞)           | [{"denom": "uiris","amount": "5000000000"}] |
-| `service/BaseDenom`            | 服务费支持的代币            |                           | uiris    |
+| `service/BaseDenom`            | 必须用于抵押的代币          |                           | uiris    |
 
 详见 [Service](../features/service.md)
 
@@ -117,14 +119,7 @@
 | 字段                       | 描述                    | 有效范围         | 当前值   |
 | ------------------------- | ---------------------- | --------------- | ------- |
 | `token/TokenTaxRate`      | 发行、增发代币的费率       | [0, 1]          | 0.4     |
-| `token/IssueTokenBaseFee` | 发行代币所需支付的基准费用  | amount: (0, +∞) | [{"denom": "iris","amount": "60000000000"}] |
+| `token/IssueTokenBaseFee` | 发行代币所需支付的基准费用  | amount: (0, +∞) | {"denom": "iris","amount": "60000"} |
 | `token/MintTokenFeeRatio` | 增发代币的费率            | [0, 1]          | 0.1     |
 
 详见  [Token](../features/token.md)
-
-## Transfer 模块可治理参数
-
-| key                       | Description     | Range        | Current |
-| ------------------------- | --------------- | ------------ | ------- |
-| `transfer/SendEnabled`    | 是否支持transfer  | {true,false} | true    |
-| `transfer/ReceiveEnabled` | 是否支持Receive   | {true,false} | true    |
