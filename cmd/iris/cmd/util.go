@@ -47,7 +47,7 @@ var (
 			registerCmdForResponse("distribution", "validator-outstanding-rewards", "rewards", filedTypeArray).
 			registerCmdForResponses("distribution", "rewards",
 			field{name: "total", typ: filedTypeArray},
-			field{name: "rewards.0.reward", typ: filedTypeArray},
+			field{name: "rewards.*.reward", typ: filedTypeArray},
 			field{name: "rewards", typ: filedTypeArray},
 		).
 		registerCmdForResponse("token", "total-burn", "burned_coins", filedTypeArray)
@@ -257,11 +257,13 @@ func (it coinConverter) parseYAML(cmd *cobra.Command, in []byte) string {
 
 	fields := it.getFromResponse(cmd.Name())
 	for path, field := range fields {
-		switch field.typ {
-		case filedTypeArray:
-			it.handleList(cmd, cfg, path)
-		case filedTypeMap:
-			it.handleMap(cmd, cfg, path)
+		for _, p := range it.resolvePath(cfg, path) {
+			switch field.typ {
+			case filedTypeArray:
+				it.handleList(cmd, cfg, p)
+			case filedTypeMap:
+				it.handleMap(cmd, cfg, p)
+			}
 		}
 	}
 	s, err := config.RenderYaml(cfg.Root)
@@ -269,6 +271,27 @@ func (it coinConverter) parseYAML(cmd *cobra.Command, in []byte) string {
 		return string(in)
 	}
 	return s
+}
+
+func (it coinConverter) resolvePath(cfg *config.Config, path string) (paths []string) {
+	subPaths := strings.Split(path, "*")
+	if len(subPaths) == 1 {
+		return []string{path}
+	}
+
+	if len(subPaths) != 2 {
+		return paths
+	}
+
+	list, err := cfg.List(subPaths[0][:len(subPaths[0])-1])
+	if err != nil {
+		return paths
+	}
+
+	for i := 0; i < len(list); i++ {
+		paths = append(paths, fmt.Sprintf("%s%d%s", subPaths[0], i, subPaths[1]))
+	}
+	return paths
 }
 
 func (it *coinConverter) queryToken(cmd *cobra.Command, denom string) (ft tokentypes.TokenI, err error) {
