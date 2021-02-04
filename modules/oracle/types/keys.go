@@ -23,7 +23,7 @@ const (
 
 var (
 	// Keys for store prefixes
-	separator                 = []byte("/")
+	delimiter                 = []byte{0x00}
 	PrefixFeedKey             = []byte{0x01}
 	PrefixReqCtxIdKey         = []byte{0x02}
 	PrefixFeedValueKey        = []byte{0x03}
@@ -32,15 +32,15 @@ var (
 )
 
 func GetFeedKey(feedName string) []byte {
-	return append(append(PrefixFeedKey, separator...), []byte(feedName)...)
+	return append(append(PrefixFeedKey, delimiter...), []byte(feedName)...)
 }
 
 func GetFeedPrefixKey() []byte {
-	return append(PrefixFeedKey, separator...)
+	return append(PrefixFeedKey, delimiter...)
 }
 
 func GetReqCtxIDKey(requestContextID []byte) []byte {
-	return append(append(PrefixReqCtxIdKey, separator...), requestContextID...)
+	return append(append(PrefixReqCtxIdKey, delimiter...), requestContextID...)
 }
 
 func GetFeedValueKey(feedName string, batchCounter uint64) []byte {
@@ -50,11 +50,11 @@ func GetFeedValueKey(feedName string, batchCounter uint64) []byte {
 }
 
 func GetFeedValuePrefixKey(feedName string) []byte {
-	return append(append(PrefixFeedValueKey, []byte(feedName)...), separator...)
+	return append(append(PrefixFeedValueKey, []byte(feedName)...), delimiter...)
 }
 
 func GetFeedStateKey(feedName string, state servicetypes.RequestContextState) []byte {
-	return append(append(GetFeedStatePrefixKey(state), separator...), []byte(feedName)...)
+	return append(append(GetFeedStatePrefixKey(state), delimiter...), []byte(feedName)...)
 }
 
 func GetFeedStatePrefixKey(state servicetypes.RequestContextState) []byte {

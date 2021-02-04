@@ -14,12 +14,12 @@ import (
 func NewDecodeStore(cdc codec.Marshaler) func(kvA, kvB kv.Pair) string {
 	return func(kvA, kvB kv.Pair) string {
 		switch {
-		case bytes.Equal(kvA.Key[:6], types.PrefixRandom):
+		case bytes.Equal(kvA.Key[:1], types.RandomKey):
 			var randomA, randomB types.Random
 			cdc.MustUnmarshalBinaryBare(kvA.Value, &randomA)
 			cdc.MustUnmarshalBinaryBare(kvB.Value, &randomB)
 			return fmt.Sprintf("randA: %v\nrandB: %v", randomA, randomB)
-		case bytes.Equal(kvA.Key[:17], types.PrefixRandomRequestQueue):
+		case bytes.Equal(kvA.Key[:1], types.RandomRequestQueueKey):
 			var requestA, requestB types.Request
 			cdc.MustUnmarshalBinaryBare(kvA.Value, &requestA)
 			cdc.MustUnmarshalBinaryBare(kvB.Value, &requestB)

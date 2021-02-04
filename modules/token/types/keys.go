@@ -23,13 +23,13 @@ const (
 
 var (
 	// PrefixTokenForSymbol define a symbol prefix for the token
-	PrefixTokenForSymbol = []byte{0x1}
+	PrefixTokenForSymbol = []byte{0x01}
 	// PrefixTokenForMinUint a define min_unit prefix for the token
-	PrefixTokenForMinUint = []byte{0x2}
+	PrefixTokenForMinUint = []byte{0x02}
 	// PrefixTokens define a prefix for the tokens
-	PrefixTokens = []byte{0x3}
+	PrefixTokens = []byte{0x03}
 	// PeffixBurnTokenAmt define a prefix for the amount of token burt
-	PeffixBurnTokenAmt = []byte{0x4}
+	PeffixBurnTokenAmt = []byte{0x04}
 )
 
 // KeySymbol returns the key of the token with the specified symbol

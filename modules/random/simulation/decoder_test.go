@@ -47,7 +47,7 @@ func TestDecodeStore(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.pass {
-				require.Equal(t, tt.expectedLog, simulation.NewDecodeStore(cdc), tt.name)
+				require.Equal(t, tt.expectedLog, dec(kvPairs.Pairs[i], kvPairs.Pairs[i]), tt.name)
 			} else {
 				require.Panics(t, func() { dec(kvPairs.Pairs[i], kvPairs.Pairs[i]) }, tt.name)
 			}

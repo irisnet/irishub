@@ -32,7 +32,7 @@ const (
 
 var (
 	// Separator for string key
-	EmptyByte = []byte{0x00}
+	Delimiter = []byte{0x00}
 
 	// Keys for store prefixes
 	ServiceDefinitionKey         = []byte{0x01} // prefix for service definition
@@ -72,7 +72,7 @@ func GetServiceBindingKey(serviceName string, provider sdk.AccAddress) []byte {
 // GetOwnerServiceBindingKey gets the key for the service binding with the specified owner
 // VALUE: []byte{}
 func GetOwnerServiceBindingKey(owner sdk.AccAddress, serviceName string, provider sdk.AccAddress) []byte {
-	return append(append(append(append(OwnerServiceBindingKey, owner.Bytes()...), []byte(serviceName)...), EmptyByte...), provider.Bytes()...)
+	return append(append(append(append(OwnerServiceBindingKey, owner.Bytes()...), []byte(serviceName)...), Delimiter...), provider.Bytes()...)
 }
 
 // GetOwnerKey gets the key for the specified provider
@@ -101,12 +101,12 @@ func GetWithdrawAddrKey(provider sdk.AccAddress) []byte {
 
 // GetBindingsSubspace gets the key prefix for iterating through all bindings of the specified service name
 func GetBindingsSubspace(serviceName string) []byte {
-	return append(append(ServiceBindingKey, []byte(serviceName)...), EmptyByte...)
+	return append(append(ServiceBindingKey, []byte(serviceName)...), Delimiter...)
 }
 
 // GetOwnerBindingsSubspace gets the key prefix for iterating through all bindings of the specified service name and owner
 func GetOwnerBindingsSubspace(owner sdk.AccAddress, serviceName string) []byte {
-	return append(append(append(OwnerServiceBindingKey, owner.Bytes()...), []byte(serviceName)...), EmptyByte...)
+	return append(append(append(OwnerServiceBindingKey, owner.Bytes()...), []byte(serviceName)...), Delimiter...)
 }
 
 // GetOwnerProvidersSubspace gets the key prefix for iterating through providers of the specified owner
@@ -163,13 +163,13 @@ func GetRequestSubspaceByReqCtx(requestContextID []byte, batchCounter uint64) []
 
 // GetActiveRequestKey returns the key for the active request with the specified request ID in the given height
 func GetActiveRequestKey(serviceName string, provider sdk.AccAddress, expirationHeight int64, requestID []byte) []byte {
-	activeRequest := append(append(append(getStringsKey([]string{serviceName, provider.String()}), EmptyByte...), sdk.Uint64ToBigEndian(uint64(expirationHeight))...), requestID...)
+	activeRequest := append(append(append(getStringsKey([]string{serviceName, provider.String()}), Delimiter...), sdk.Uint64ToBigEndian(uint64(expirationHeight))...), requestID...)
 	return append(ActiveRequestKey, activeRequest...)
 }
 
 // GetActiveRequestSubspace returns the key prefix for iterating through the active requests for the specified provider
 func GetActiveRequestSubspace(serviceName string, provider sdk.AccAddress) []byte {
-	return append(append(ActiveRequestKey, getStringsKey([]string{serviceName, provider.String()})...), EmptyByte...)
+	return append(append(ActiveRequestKey, getStringsKey([]string{serviceName, provider.String()})...), Delimiter...)
 }
 
 // GetActiveRequestKeyByID returns the key for the active request with the specified request ID
@@ -184,7 +184,7 @@ func GetActiveRequestSubspaceByReqCtx(requestContextID []byte, batchCounter uint
 
 // GetRequestVolumeKey returns the key for the request volume for the specified consumer and binding
 func GetRequestVolumeKey(consumer sdk.AccAddress, serviceName string, provider sdk.AccAddress) []byte {
-	return append(append(RequestVolumeKey, getStringsKey([]string{consumer.String(), serviceName, provider.String()})...), EmptyByte...)
+	return append(append(RequestVolumeKey, getStringsKey([]string{consumer.String(), serviceName, provider.String()})...), Delimiter...)
 }
 
 // GetResponseKey returns the key for the response for the given request ID
@@ -219,7 +219,7 @@ func GetOwnerEarnedFeesSubspace(owner sdk.AccAddress) []byte {
 
 func getStringsKey(ss []string) (result []byte) {
 	for _, s := range ss {
-		result = append(append(result, []byte(s)...), EmptyByte...)
+		result = append(append(result, []byte(s)...), Delimiter...)
 	}
 
 	if len(result) > 0 {

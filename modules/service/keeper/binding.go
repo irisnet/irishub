@@ -459,7 +459,7 @@ func (k Keeper) GetOwnerServiceBindings(ctx sdk.Context, owner sdk.AccAddress, s
 
 	for ; iterator.Valid(); iterator.Next() {
 		bindingKey := iterator.Key()[sdk.AddrLen+1:]
-		sepIndex := bytes.Index(bindingKey, types.EmptyByte)
+		sepIndex := bytes.Index(bindingKey, types.Delimiter)
 		serviceName := string(bindingKey[0:sepIndex])
 		provider := sdk.AccAddress(bindingKey[sepIndex+1:])
 
