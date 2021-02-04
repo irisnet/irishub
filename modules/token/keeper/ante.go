@@ -25,11 +25,6 @@ func (dtf ValidateTokenFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 	// total fee
 	feeMap := make(map[string]sdk.Coin)
 	for _, msg := range tx.GetMsgs() {
-		// only check consecutive msgs which are routed to token from the beginning
-		if msg.Route() != types.ModuleName {
-			break
-		}
-
 		switch msg := msg.(type) {
 		case *types.MsgIssueToken:
 			fee, err := dtf.k.GetTokenIssueFee(ctx, msg.Symbol)
