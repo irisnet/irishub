@@ -20,14 +20,14 @@ type TokenAuthDecorator struct {
 	tk tokenkeeper.Keeper
 }
 
-// NewTokenAuthDecorator return a instance of CheckTokenDecorator
+// NewTokenAuthDecorator returns an instance of CheckTokenDecorator
 func NewTokenAuthDecorator(tk tokenkeeper.Keeper) TokenAuthDecorator {
 	return TokenAuthDecorator{
 		tk: tk,
 	}
 }
 
-// AnteHandle check the transaction
+// AnteHandle checks the transaction
 func (tad TokenAuthDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	for _, msg := range tx.GetMsgs() {
 		switch msg := msg.(type) {
@@ -61,14 +61,14 @@ type ServiceAuthDecorator struct {
 	gk guardiankeeper.Keeper
 }
 
-// NewServiceAuthDecorator return a instance of ServiceAuthDecorator
+// NewServiceAuthDecorator returns an instance of ServiceAuthDecorator
 func NewServiceAuthDecorator(gk guardiankeeper.Keeper) ServiceAuthDecorator {
 	return ServiceAuthDecorator{
 		gk: gk,
 	}
 }
 
-// AnteHandle check the transaction
+// AnteHandle checks the transaction
 func (sad ServiceAuthDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	for _, msg := range tx.GetMsgs() {
 		switch msg := msg.(type) {
