@@ -28,7 +28,7 @@ At the core of a ledger device, there is a mnemonic used to generate accounts on
 
 Next, learn how to generate an account.
 
-## Generate an account
+## Create an account
 
 To create an account, you just need to have `iris` installed. Before creating it, you need to know where you intend to store and interact with your private keys. The best options are to store them in an offline dedicated computer or a ledger device. Storing them on your regular online computer involves more risk, since anyone who infiltrates your computer through the internet could exfiltrate your private keys and steal your funds.
 
@@ -38,7 +38,7 @@ To create an account, you just need to have `iris` installed. Before creating it
 Only use Ledger devices that you bought factory new or trust fully
 :::
 
-When you initialize your ledger, a 24-word mnemonic is generated and stored in the device. This mnemonic is compatible with IRISnet and IRISnet accounts can be derived from it. Therefore, all you have to do is make your ledger compatible with `iris`. To do so, you need to go through the following steps:
+When you initialize your Ledger, a 24-word mnemonic is generated and stored in the device. This mnemonic is compatible with IRISnet and IRISnet accounts can be derived from it. Therefore, all you have to do is make your ledger compatible with `iris`. To do so, you need to go through the following steps:
 
 1. Install [Ledger Live](https://www.ledger.com/pages/ledger-live) on your machine.
 2. Using Ledger Live, [update your Ledger Nano S with the latest firmware](https://support.ledger.com/hc/en-us/articles/360002731113-Update-device-firmware).
@@ -73,13 +73,13 @@ iris tx bank send --help # to see all available options.
 
 Use the keyName you set for your Ledger key and iris will connect with the Cosmos Ledger app to then sign your transaction.
 
-::: tip The `Cosmos` app only support amino-json sign mode now, you must add the flag `--sign-mode amino-json` to use it :::
+::: tip The Cosmos app only support amino-json sign mode now, you must add the flag `--sign-mode amino-json` to use it :::
 
 ```bash
 iris tx send <keyName> <destinationAddress> <amount><denomination> --sign-mode amino-json
 ```
 When prompted with confirm transaction before signing, Answer Y.
 
-Next you will be prompted to review and approve the transaction on your Ledger device. Be sure to inspect the transaction JSON displayed on the screen. You can scroll through each field and each message. Scroll down to read more about the data fields of a standard transaction object.
+Next you will be prompted to review and approve the transaction on your Ledger device. Be sure to inspect the transaction JSON displayed on the screen. You can scroll through each field and each message.
 
 Now, you are all set to start [sending transactions on the network](../cli-client/tx.md).
