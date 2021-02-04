@@ -7,8 +7,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
+	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	oraclekeeper "github.com/irisnet/irismod/modules/oracle/keeper"
-	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 )
 
@@ -20,7 +20,7 @@ func NewAnteHandler(
 	bk bankkeeper.Keeper,
 	tk tokenkeeper.Keeper,
 	ok oraclekeeper.Keeper,
-	oak oracletypes.AuthKeeper,
+	gk guardiankeeper.Keeper,
 	sigGasConsumer ante.SignatureVerificationGasConsumer,
 	signModeHandler signing.SignModeHandler,
 ) sdk.AnteHandler {
@@ -39,8 +39,9 @@ func NewAnteHandler(
 		ante.NewSigGasConsumeDecorator(ak, sigGasConsumer),
 		ante.NewSigVerificationDecorator(ak, signModeHandler),
 		ante.NewIncrementSequenceDecorator(ak),
-		NewCheckTokenDecorator(tk),
+		NewTokenAuthDecorator(tk),
 		tokenkeeper.NewValidateTokenFeeDecorator(tk, bk),
-		oraclekeeper.NewValidateOracleAuthDecorator(ok, oak),
+		oraclekeeper.NewValidateOracleAuthDecorator(ok, gk),
+		NewServiceAuthDecorator(gk),
 	)
 }
