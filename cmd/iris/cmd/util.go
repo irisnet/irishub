@@ -30,7 +30,8 @@ const (
 )
 
 var (
-	converter = NewConverter().registerGlobalFlag("fees").
+	converter = NewConverter().
+			registerGlobalFlag("fees").
 			registerGlobalFlag("amount").
 			registerGlobalFlag("deposit").
 			registerGlobalFlag("service-fee-cap").
@@ -41,9 +42,15 @@ var (
 			registerCmdWithArgs("distribution", "fund-community-pool", 0).
 			registerCmdWithArgs("gov", "deposit", 1).
 			registerCmdForResponse("bank", "balances", "balances", filedTypeArray).
+			registerCmdForResponse("bank", "total", "supply", filedTypeArray).
 			registerCmdForResponse("gov", "params", "deposit_params.min_deposit", filedTypeArray).
 			registerCmdForResponse("distribution", "validator-outstanding-rewards", "rewards", filedTypeArray).
-			registerCmdForResponse("token", "total-burn", "burned_coins", filedTypeArray)
+			registerCmdForResponses("distribution", "rewards",
+			field{name: "total", typ: filedTypeArray},
+			field{name: "rewards.0.reward", typ: filedTypeArray},
+			field{name: "rewards", typ: filedTypeArray},
+		).
+		registerCmdForResponse("token", "total-burn", "burned_coins", filedTypeArray)
 
 	rescueStdout = os.Stdout
 )
@@ -135,7 +142,26 @@ func (it *coinConverter) registerCmdForResponse(parentCmd, cmd, jsonPath, typ st
 			fields:    map[string]field{},
 		}
 	}
+
 	commands = commands.append(jsonPath, typ, -1)
+
+	it.cmds[cmd] = commands
+	return it
+}
+
+func (it *coinConverter) registerCmdForResponses(parentCmd, cmd string, fields ...field) *coinConverter {
+	commands, ok := it.cmds[cmd]
+	if !ok {
+		commands = command{
+			parentCmd: parentCmd,
+			fields:    map[string]field{},
+		}
+	}
+
+	for _, field := range fields {
+		commands = commands.append(field.name, field.typ, -1)
+	}
+
 	it.cmds[cmd] = commands
 	return it
 }
@@ -228,6 +254,7 @@ func (it coinConverter) parseYAML(cmd *cobra.Command, in []byte) string {
 	if err != nil {
 		return string(in)
 	}
+
 	for k, v := range it.getFromResponse(cmd.Name()) {
 		switch v.typ {
 		case filedTypeArray:
@@ -311,7 +338,7 @@ func (it *coinConverter) handleMap(cmd *cobra.Command, cfg *config.Config, path 
 	}
 
 	var srcCoin sdk.DecCoin
-	if err := json.Unmarshal(bz, &srcCoin); err != nil {
+	if err := json.Unmarshal(bz, &srcCoin); err != nil || !srcCoin.IsValid() {
 		return
 	}
 
