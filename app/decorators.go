@@ -15,20 +15,20 @@ import (
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 )
 
-// CheckTokenDecorator is responsible for restricting the token participation of the swap prefix
-type CheckTokenDecorator struct {
+// TokenAuthDecorator is responsible for restricting the token participation of the swap prefix
+type TokenAuthDecorator struct {
 	tk tokenkeeper.Keeper
 }
 
-// NewCheckTokenDecorator return a instance of CheckTokenDecorator
-func NewCheckTokenDecorator(tk tokenkeeper.Keeper) CheckTokenDecorator {
-	return CheckTokenDecorator{
+// NewTokenAuthDecorator return a instance of CheckTokenDecorator
+func NewTokenAuthDecorator(tk tokenkeeper.Keeper) TokenAuthDecorator {
+	return TokenAuthDecorator{
 		tk: tk,
 	}
 }
 
 // AnteHandle check the transaction
-func (ctd CheckTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
+func (tad TokenAuthDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	for _, msg := range tx.GetMsgs() {
 		switch msg := msg.(type) {
 		case *ibctransfertypes.MsgTransfer:
@@ -37,7 +37,7 @@ func (ctd CheckTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 					sdkerrors.ErrInvalidRequest, "can't transfer coinswap liquidity tokens through the IBC module")
 			}
 		case *tokentypes.MsgBurnToken:
-			if _, err := ctd.tk.GetToken(ctx, msg.Symbol); err != nil {
+			if _, err := tad.tk.GetToken(ctx, msg.Symbol); err != nil {
 				return ctx, sdkerrors.Wrap(
 					sdkerrors.ErrInvalidRequest, "burnt failed, only native tokens can be burnt")
 			}
