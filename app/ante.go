@@ -39,10 +39,10 @@ func NewAnteHandler(
 		ante.NewDeductFeeDecorator(ak, bk),
 		ante.NewSigGasConsumeDecorator(ak, sigGasConsumer),
 		ante.NewSigVerificationDecorator(ak, signModeHandler),
-		ante.NewIncrementSequenceDecorator(ak),
 		NewValidateTokenDecorator(tk),
 		tokenkeeper.NewValidateTokenFeeDecorator(tk, bk),
 		oraclekeeper.NewValidateOracleAuthDecorator(ok, gk),
 		servicekeeper.NewValidateServiceAuthDecorator(gk),
+		ante.NewIncrementSequenceDecorator(ak),
 	)
 }
