@@ -48,8 +48,7 @@ var (
 			registerCmdForResponses("distribution", "rewards",
 			field{name: "total", typ: filedTypeArray},
 			field{name: "rewards.*.reward", typ: filedTypeArray},
-			field{name: "rewards", typ: filedTypeArray},
-		).
+			field{name: "rewards", typ: filedTypeArray}).
 		registerCmdForResponse("token", "total-burn", "burned_coins", filedTypeArray)
 
 	rescueStdout = os.Stdout
@@ -189,7 +188,7 @@ func (it coinConverter) getFromArgs(cmdNm string) (field, bool) {
 	return cmd.fields["ARGS"], true
 }
 
-func (it coinConverter) getFromResponse(cmdNm string) map[string]field {
+func (it coinConverter) getFields(cmdNm string) map[string]field {
 	cmd, ok := it.cmds[cmdNm]
 	if !ok {
 		return map[string]field{}
@@ -255,7 +254,7 @@ func (it coinConverter) parseYAML(cmd *cobra.Command, in []byte) string {
 		return string(in)
 	}
 
-	fields := it.getFromResponse(cmd.Name())
+	fields := it.getFields(cmd.Name())
 	for path, field := range fields {
 		for _, p := range it.resolvePath(cfg, path) {
 			switch field.typ {
