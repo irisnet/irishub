@@ -255,12 +255,13 @@ func (it coinConverter) parseYAML(cmd *cobra.Command, in []byte) string {
 		return string(in)
 	}
 
-	for k, v := range it.getFromResponse(cmd.Name()) {
-		switch v.typ {
+	fields := it.getFromResponse(cmd.Name())
+	for path, field := range fields {
+		switch field.typ {
 		case filedTypeArray:
-			it.handleList(cmd, cfg, k)
+			it.handleList(cmd, cfg, path)
 		case filedTypeMap:
-			it.handleMap(cmd, cfg, k)
+			it.handleMap(cmd, cfg, path)
 		}
 	}
 	s, err := config.RenderYaml(cfg.Root)
