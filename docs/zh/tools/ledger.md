@@ -43,6 +43,7 @@ order: 4
 1. 在你的机器上安装[Ledger Live](https://www.ledger.com/pages/ledger-live)。
 2. 使用Ledger Live，[更新至最新的firmware](https://support.ledger.com/hc/en-us/articles/360002731113-Update-device-firmware)。
 3. 在Ledger Live应用中，导航到`Manager`菜单。
+   ![manager](../pics/ledger-manager.png)
 4. 连接你的Ledger Nano设备并允许Ledger Manager接入。
 5. 在Ledger Live应用中，搜索`Cosmos`. 
     ![search](../pics/ledger-search.png)
@@ -54,13 +55,13 @@ order: 4
 iris keys add <keyName> --ledger
 ```
 
-IRISnet使用[分层确定性钱包](../concepts/key.md）。这意味着你可以使用相同的Ledger种子派生出多个帐户。通过Ledger设备创建另一个帐户，请运行（将整数i更改为某个 >=0 的值以用于HD推导账户）：
+IRISnet使用[HD Wallets](../concepts/key.md)。这意味着你可以使用相同的Ledger种子派生出多个帐户。通过Ledger设备创建另一个帐户，请运行（将整数i更改为某个 >=0 的值以用于HD推导账户）：
 
 ```bash
 iris keys add <secondKeyName> --ledger --account <i>
 ```
 
-### 发送交易
+## 发送交易
 
 现在你可以开始签名和发送交易了。以下是使用iris发送转账交易的示例。
 
@@ -68,18 +69,22 @@ iris keys add <secondKeyName> --ledger --account <i>
 iris tx bank send --help # to see all available options.
 ```
 
-::: tip 在尝试运行以下命令之前，请确保使用PIN解锁你的设备并打开Cosmos应用程序 :::
+::: tip 
+在尝试运行以下命令之前，请确保使用PIN解锁你的设备并打开Cosmos应用程序
+:::
 
 使用你为Ledger密钥设置的keyName，iris将与Cosmos Ledger应用程序连接以签名交易。
 
-::: tip Cosmos应用程序现在仅支持amino-json签名模式，你必须添加标志`--sign-mode amino-json`才能使用 :::
+::: tip 
+Cosmos应用程序现在仅支持amino-json签名模式，你必须添加标志`--sign-mode amino-json`才能使用
+:::
 
 ```bash
 iris tx send <keyName> <destinationAddress> <amount><denomination> --sign-mode amino-json
 ```
 
-当提示您在签名前确认交易时，键入Y。
+当提示你在签名前确认交易时，键入Y。
 
-接下来，在Ledger设备上将提示你审查及批准交易。确保检查屏幕上显示的JSON格式的交易。您可以滚动浏览每个字段和每个消息。
+接下来，Ledger设备将提示你检查及批准交易。确认屏幕上显示的JSON格式的交易。你可以滚动浏览每个字段和每个消息。
 
 现在，你已经准备好开始[在网络上发送交易](../cli-client/tx.md)。

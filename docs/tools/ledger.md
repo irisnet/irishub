@@ -61,7 +61,7 @@ IRISnet uses [HD Wallets](../concepts/key.md). This means you can setup many acc
 iris keys add <secondKeyName> --ledger --account <i>
 ```
 
-### Send transaction
+## Send transaction
 
 You are now ready to start signing and sending transactions. The following is an example of using iris to send a token transfer transaction.
 
@@ -69,11 +69,15 @@ You are now ready to start signing and sending transactions. The following is an
 iris tx bank send --help # to see all available options.
 ```
 
-::: tip Be sure to unlock your device with the PIN and open the Cosmos app before trying to run these commands :::
+::: tip 
+Be sure to unlock your device with the PIN and open the Cosmos app before trying to run these commands
+:::
 
 Use the keyName you set for your Ledger key and iris will connect with the Cosmos Ledger app to then sign your transaction.
 
-::: tip The Cosmos app only support amino-json sign mode now, you must add the flag `--sign-mode amino-json` to use it :::
+::: tip 
+The Cosmos app only support amino-json sign mode now, you must add the flag `--sign-mode amino-json` to use it 
+:::
 
 ```bash
 iris tx send <keyName> <destinationAddress> <amount><denomination> --sign-mode amino-json
