@@ -182,7 +182,7 @@ func GetCmdEditToken() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgEditToken(strings.TrimSpace(name), args[0], maxSupply, mintable, owner)
+			msg := types.NewMsgEditToken(name, args[0], maxSupply, mintable, owner)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
