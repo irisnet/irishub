@@ -273,7 +273,7 @@ func (it coinConverter) parseYAML(cmd *cobra.Command, in []byte) string {
 }
 
 func (it coinConverter) resolvePath(cfg *config.Config, path string) (paths []string) {
-	subPaths := strings.Split(path, "*")
+	subPaths := strings.SplitN(path, "*", 2)
 	if len(subPaths) == 1 {
 		return []string{path}
 	}
@@ -288,7 +288,8 @@ func (it coinConverter) resolvePath(cfg *config.Config, path string) (paths []st
 	}
 
 	for i := 0; i < len(list); i++ {
-		paths = append(paths, fmt.Sprintf("%s%d%s", subPaths[0], i, subPaths[1]))
+		p := fmt.Sprintf("%s%d%s", subPaths[0], i, subPaths[1])
+		paths = append(paths, it.resolvePath(cfg, p)...)
 	}
 	return paths
 }
