@@ -9,7 +9,6 @@ import (
 
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	oraclekeeper "github.com/irisnet/irismod/modules/oracle/keeper"
-	servicekeeper "github.com/irisnet/irismod/modules/service/keeper"
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 )
 
@@ -42,7 +41,7 @@ func NewAnteHandler(
 		NewValidateTokenDecorator(tk),
 		tokenkeeper.NewValidateTokenFeeDecorator(tk, bk),
 		oraclekeeper.NewValidateOracleAuthDecorator(ok, gk),
-		servicekeeper.NewValidateServiceAuthDecorator(gk),
+		NewValidateServiceDecorator(),
 		ante.NewIncrementSequenceDecorator(ak),
 	)
 }
