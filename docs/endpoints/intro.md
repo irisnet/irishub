@@ -9,4 +9,4 @@ Each node exposes the following endpoints and SDKs for users to interact with a 
 - [Legacy Amino JSON REST](./legacy-rest.md)
 - [gRPC Gateway JSON REST](./grpc-rest.md)
 - [gRPC Client](./grpc-client.md)
-- [IRISnet SDKs](./sdks.md)
+- [Client SDKs](./sdk.md)
