@@ -256,7 +256,7 @@ func GetCmdEditFeed() *cobra.Command {
 				`--service-fee-cap=1iris ` +
 				`--timeout=2 ` +
 				`--frequency=10 ` +
-				`--threshold=5 ` +
+				`--threshold=5 `,
 				version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
