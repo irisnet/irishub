@@ -7712,7 +7712,7 @@ Query provides defines the gRPC querier service
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `HTLC` | [QueryHTLCRequest](#irismod.htlc.QueryHTLCRequest) | [QueryHTLCResponse](#irismod.htlc.QueryHTLCResponse) | Balance queries the balance of a single coin for a single account | GET|/irismod/htlc/htlcs/{hash_lock}|
+| `HTLC` | [QueryHTLCRequest](#irismod.htlc.QueryHTLCRequest) | [QueryHTLCResponse](#irismod.htlc.QueryHTLCResponse) | HTLC queries the HTLC by the specified hash lock | GET|/irismod/htlc/htlcs/{hash_lock}|
 
  <!-- end services -->
 
