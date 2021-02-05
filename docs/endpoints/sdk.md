@@ -21,5 +21,5 @@ The SDK mainly implements the encapsulation of the functions of IRISHub modules,
 The document link of IRISHub SDKs is as follows:
 
 - [Go SDK docs](https://github.com/irisnet/irishub-sdk-go/blob/master/README.md)
-- [JavaScript SDK docs](sdk-js.irisnet.org)
+- [JavaScript SDK docs](https://github.com/irisnet/irishub-sdk-js/blob/master/README.md)
 - Java SDK docs (coming soon)
