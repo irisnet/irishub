@@ -51,6 +51,17 @@ sed -i '' 's/Gaia/IRISHub/g' ./lite/swagger-ui/swagger.yaml
 sed -i '' 's/gaia/irishub/g' ./lite/swagger-ui/swagger.yaml
 sed -i '' 's/cosmoshub/irishub/g' ./lite/swagger-ui/swagger.yaml
 
+# generate proto doc
+buf protoc \
+    -I "tmp/proto" \
+    -I "tmp/third_party/proto" \
+    --doc_out=./docs/endpoints \
+    --doc_opt=./docs/endpoints/protodoc-markdown.tmpl,proto-docs.md \
+    $(find "$(pwd)/tmp/proto" -maxdepth 5 -name '*.proto')
+go mod tidy
+
+cp ./docs/endpoints/proto-docs.md ./docs/zh/endpoints/proto-docs.md
+
 # clean swagger files
 rm -rf ./tmp-swagger-gen
 
