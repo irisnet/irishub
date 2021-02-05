@@ -212,7 +212,7 @@ func (m msgServer) DisableServiceBinding(goCtx context.Context, msg *types.MsgDi
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeUpdateBinding,
+			types.EventTypeDisableBinding,
 			sdk.NewAttribute(types.AttributeKeyServiceName, msg.ServiceName),
 			sdk.NewAttribute(types.AttributeKeyProvider, msg.Provider),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Owner),
