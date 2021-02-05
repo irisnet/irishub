@@ -1,6 +1,6 @@
 # Legacy Amino JSON REST
 
-The IRISHub versions v1.0.0 (depends on Cosmos-SDK v0.41) and earlier provided REST endpoints to query the state and broadcast transactions. These endpoints are kept in IRISHub v1.0, but they are marked as deprecated, and will be removed in v1.1 We therefore call these endpoints legacy REST endpoints.
+The IRISHub versions v1.0.0 (depends on Cosmos-SDK v0.41) and earlier provided REST endpoints to query the state and broadcast transactions. These endpoints are kept in IRISHub v1.0, but they are marked as deprecated, and will be removed after a few versions therefore call these endpoints legacy REST endpoints.
 
 Some important information concerning all legacy REST endpoints:
 
@@ -17,7 +17,7 @@ All routes are configured under the following fields in `~/.iris/config/app.toml
 
 ### Legacy REST API Routes
 
-The REST routes present in Irishub v0.16 and earlier are marked as deprecated via a [HTTP deprecation header](https://tools.ietf.org/id/draft-dalal-deprecation-header-01.html). They are still maintained to keep backwards compatibility, but will be removed in v1.1.0.
+The REST routes present in Irishub v0.16 and earlier are marked as deprecated via a [HTTP deprecation header](https://tools.ietf.org/id/draft-dalal-deprecation-header-01.html). They are still maintained to keep backwards compatibility, but will be removed after a few versions.
 
 For application developers, Legacy REST API routes needs to be wired up to the REST server, this is done by calling the `RegisterRESTRoutes` function on the ModuleManager.
 
