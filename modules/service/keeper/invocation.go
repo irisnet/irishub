@@ -47,7 +47,6 @@ func (k Keeper) CreateRequestContext(
 	input string,
 	serviceFeeCap sdk.Coins,
 	timeout int64,
-	superMode bool,
 	repeated bool,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
@@ -113,7 +112,7 @@ func (k Keeper) CreateRequestContext(
 
 	requestContext := types.NewRequestContext(
 		serviceName, providers, consumer, input, serviceFeeCap, timeout,
-		superMode, repeated, repeatedFrequency, repeatedTotal, batchCounter,
+		repeated, repeatedFrequency, repeatedTotal, batchCounter,
 		batchRequestCount, batchResponseCount, batchResponseThreshold,
 		batchState, state, responseThreshold, moduleName,
 	)
@@ -394,7 +393,7 @@ func (k Keeper) InitiateRequests(
 	for providerIndex, provider := range providers {
 		request := k.buildRequest(
 			ctx, requestContextID, requestContext.BatchCounter,
-			requestContext.ServiceName, provider, requestContext.SuperMode,
+			requestContext.ServiceName, provider,
 			consumer, requestContext.Timeout,
 		)
 
@@ -457,16 +456,11 @@ func (k Keeper) buildRequest(
 	batchCounter uint64,
 	serviceName string,
 	provider sdk.AccAddress,
-	superMode bool,
 	consumer sdk.AccAddress,
 	timeout int64,
 ) types.CompactRequest {
-	var serviceFee sdk.Coins
-
-	if !superMode {
-		binding, _ := k.GetServiceBinding(ctx, serviceName, provider)
-		serviceFee = k.GetPrice(ctx, consumer, binding)
-	}
+	binding, _ := k.GetServiceBinding(ctx, serviceName, provider)
+	serviceFee := k.GetPrice(ctx, consumer, binding)
 
 	return types.NewCompactRequest(
 		requestContextID,
@@ -540,7 +534,6 @@ func (k Keeper) GetRequest(ctx sdk.Context, requestID tmbytes.HexBytes) (request
 		consumer,
 		requestContext.Input,
 		compactRequest.ServiceFee,
-		requestContext.SuperMode,
 		compactRequest.RequestHeight,
 		compactRequest.ExpirationHeight,
 		requestContextId,
@@ -1122,7 +1115,7 @@ func (k Keeper) CheckAuthority(
 		return sdkerrors.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
 	}
 
-	if !consumer.Equals(consumer) {
+	if consumer.String() != requestContext.Consumer {
 		return sdkerrors.Wrapf(types.ErrNotAuthorized, "consumer not matching")
 	}
 

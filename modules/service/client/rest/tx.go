@@ -358,7 +358,7 @@ func requestServiceHandlerFn(cliCtx client.Context) http.HandlerFunc {
 
 		msg := types.NewMsgCallService(
 			req.ServiceName, req.Providers, req.Consumer, req.Input, serviceFeeCap,
-			req.Timeout, req.SuperMode, req.Repeated, req.RepeatedFrequency, req.RepeatedTotal,
+			req.Timeout, req.Repeated, req.RepeatedFrequency, req.RepeatedTotal,
 		)
 		if err = msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

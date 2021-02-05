@@ -144,10 +144,9 @@ message MsgCallService {
     string input = 4;
     repeated cosmos.base.v1beta1.Coin service_fee_cap = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
     int64 timeout = 6;
-    bool super_mode = 7 [(gogoproto.moretags) = "yaml:\"super_mode\""];
-    bool repeated = 8;
-    uint64 repeated_frequency = 9 [(gogoproto.moretags) = "yaml:\"repeated_frequency\""];
-    int64 repeated_total = 10 [(gogoproto.moretags) = "yaml:\"repeated_total\""];
+    bool repeated = 7;
+    uint64 repeated_frequency = 8 [(gogoproto.moretags) = "yaml:\"repeated_frequency\""];
+    int64 repeated_total = 9 [(gogoproto.moretags) = "yaml:\"repeated_total\""];
 }
 
 // MsgCallServiceResponse defines the Msg/CallService response type.

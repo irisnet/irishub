@@ -212,7 +212,6 @@ type MsgCallService struct {
     Input             string
     ServiceFeeCap     sdk.Coins
     Timeout           int64
-    SuperMode         bool
     Repeated          bool
     RepeatedFrequency uint64
     RepeatedTotal     int64

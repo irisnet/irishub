@@ -22,7 +22,6 @@ const (
 	FlagServiceFeeCap     = "service-fee-cap"
 	FlagTimeout           = "timeout"
 	FlagData              = "data"
-	FlagSuperMode         = "super-mode"
 	FlagRepeated          = "repeated"
 	FlagFrequency         = "frequency"
 	FlagTotal             = "total"
@@ -68,7 +67,6 @@ func init() {
 	FsCallService.String(FlagServiceFeeCap, "", "maximum service fee to pay for a single request")
 	FsCallService.String(FlagData, "", "content or file path of the request input, which is an Input JSON schema instance")
 	FsCallService.Int64(FlagTimeout, 0, "request timeout")
-	FsCallService.Bool(FlagSuperMode, false, "indicate if the signer is a super user")
 	FsCallService.Bool(FlagRepeated, false, "indicate if the request is repetitive")
 	FsCallService.Uint64(FlagFrequency, 0, "request frequency when repeated, default to timeout")
 	FsCallService.Int64(FlagTotal, 0, "request count when repeated, -1 means unlimited")

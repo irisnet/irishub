@@ -76,7 +76,6 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg *types.MsgCreateFeed) error {
 		msg.Input,
 		msg.ServiceFeeCap,
 		msg.Timeout,
-		false,
 		true,
 		msg.RepeatedFrequency,
 		-1,

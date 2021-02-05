@@ -590,10 +590,7 @@ func GetCmdCallService() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			superMode, err := cmd.Flags().GetBool(FlagSuperMode)
-			if err != nil {
-				return err
-			}
+
 			repeated, err := cmd.Flags().GetBool(FlagRepeated)
 			if err != nil {
 				return err
@@ -615,7 +612,7 @@ func GetCmdCallService() *cobra.Command {
 
 			msg := types.NewMsgCallService(
 				serviceName, providers, consumer, input, serviceFeeCap,
-				timeout, superMode, repeated, frequency, total,
+				timeout, repeated, frequency, total,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

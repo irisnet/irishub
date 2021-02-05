@@ -44,7 +44,7 @@ func (k Keeper) RequestService(ctx sdk.Context, consumer sdk.AccAddress, service
 
 	return k.serviceKeeper.CreateRequestContext(
 		ctx, types.ServiceName, []sdk.AccAddress{provider}, consumer, `{"header":{}}`, serviceFeeCap,
-		timeout, false, false, 0, 0, exported.PAUSED, 1, types.ModuleName,
+		timeout, false, 0, 0, exported.PAUSED, 1, types.ModuleName,
 	)
 }
 

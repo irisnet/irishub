@@ -27,8 +27,3 @@ type AccountKeeper interface {
 	GetModuleAddress(name string) sdk.AccAddress
 	GetModuleAccount(ctx sdk.Context, name string) authtypes.ModuleAccountI
 }
-
-// AuthKeeper defines the expected auth keeper (noalias)
-type AuthKeeper interface {
-	Authorized(ctx sdk.Context, addr sdk.AccAddress) bool
-}

@@ -24,11 +24,9 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 
 	// handler for the active request on expired
 	expiredRequestHandler := func(requestID tmbytes.HexBytes, request types.Request) {
-		if !request.SuperMode {
-			_ = k.Slash(ctx, requestID)
-			consumer, _ := sdk.AccAddressFromBech32(request.Consumer)
-			_ = k.RefundServiceFee(ctx, consumer, request.ServiceFee)
-		}
+		_ = k.Slash(ctx, requestID)
+		consumer, _ := sdk.AccAddressFromBech32(request.Consumer)
+		_ = k.RefundServiceFee(ctx, consumer, request.ServiceFee)
 
 		provider, _ := sdk.AccAddressFromBech32(request.Provider)
 		k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, requestID)
@@ -94,10 +92,8 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 			}
 
 			if len(providers) > 0 && len(providers) >= int(requestContext.ResponseThreshold) {
-				if !requestContext.SuperMode {
-					if err := k.DeductServiceFees(ctx, consumer, totalPrices); err != nil {
-						k.OnRequestContextPaused(ctx, requestContext, requestContextID, "insufficient balances")
-					}
+				if err := k.DeductServiceFees(ctx, consumer, totalPrices); err != nil {
+					k.OnRequestContextPaused(ctx, requestContext, requestContextID, "insufficient balances")
 				}
 
 				if requestContext.State == types.RUNNING {

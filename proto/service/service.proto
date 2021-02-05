@@ -41,17 +41,16 @@ message RequestContext {
     repeated cosmos.base.v1beta1.Coin service_fee_cap = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
     string module_name = 6 [(gogoproto.moretags) = "yaml:\"module_name\""];
     int64 timeout = 7;
-    bool super_mode = 8 [(gogoproto.moretags) = "yaml:\"super_mode\""];
-    bool repeated = 9;
-    uint64 repeated_frequency = 10 [(gogoproto.moretags) = "yaml:\"repeated_frequency\""];
-    int64 repeated_total = 11 [(gogoproto.moretags) = "yaml:\"repeated_total\""];
-    uint64 batch_counter = 12 [(gogoproto.moretags) = "yaml:\"batch_counter\""];
-    uint32 batch_request_count = 13 [(gogoproto.moretags) = "yaml:\"batch_request_count\""];
-    uint32 batch_response_count = 14 [(gogoproto.moretags) = "yaml:\"batch_response_count\""];
-    uint32 batch_response_threshold = 15 [(gogoproto.moretags) = "yaml:\"batch_response_threshold\""];
-    uint32 response_threshold = 16 [(gogoproto.moretags) = "yaml:\"response_threshold\""];
-    RequestContextBatchState batch_state = 17 [(gogoproto.moretags) = "yaml:\"batch_state\""];
-    RequestContextState state = 18;
+    bool repeated = 8;
+    uint64 repeated_frequency = 9 [(gogoproto.moretags) = "yaml:\"repeated_frequency\""];
+    int64 repeated_total = 10 [(gogoproto.moretags) = "yaml:\"repeated_total\""];
+    uint64 batch_counter = 11 [(gogoproto.moretags) = "yaml:\"batch_counter\""];
+    uint32 batch_request_count = 12 [(gogoproto.moretags) = "yaml:\"batch_request_count\""];
+    uint32 batch_response_count = 13 [(gogoproto.moretags) = "yaml:\"batch_response_count\""];
+    uint32 batch_response_threshold = 14 [(gogoproto.moretags) = "yaml:\"batch_response_threshold\""];
+    uint32 response_threshold = 15 [(gogoproto.moretags) = "yaml:\"response_threshold\""];
+    RequestContextBatchState batch_state = 16 [(gogoproto.moretags) = "yaml:\"batch_state\""];
+    RequestContextState state = 17;
 }
 
 // Request defines a standard for request.
@@ -62,11 +61,10 @@ message Request {
     string consumer = 4;
     string input = 5;
     repeated cosmos.base.v1beta1.Coin service_fee = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee\""];
-    bool super_mode = 7 [(gogoproto.moretags) = "yaml:\"super_mode\""];
-    int64 request_height = 8 [(gogoproto.moretags) = "yaml:\"request_height\""];
-    int64 expiration_height = 9 [(gogoproto.moretags) = "yaml:\"expiration_height\""];
-    string request_context_id = 10 [(gogoproto.moretags) = "yaml:\"request_context_id\""];
-    uint64 request_context_batch_counter = 11 [(gogoproto.moretags) = "yaml:\"request_context_batch_counter\""];
+    int64 request_height = 7 [(gogoproto.moretags) = "yaml:\"request_height\""];
+    int64 expiration_height = 8 [(gogoproto.moretags) = "yaml:\"expiration_height\""];
+    string request_context_id = 9 [(gogoproto.moretags) = "yaml:\"request_context_id\""];
+    uint64 request_context_batch_counter = 10 [(gogoproto.moretags) = "yaml:\"request_context_batch_counter\""];
 }
 
 // CompactRequest defines a standard for compact request.

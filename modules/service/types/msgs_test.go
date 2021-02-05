@@ -575,7 +575,7 @@ func TestMsgRefundServiceDepositGetSigners(t *testing.T) {
 func TestMsgCallServiceRoute(t *testing.T) {
 	msg := NewMsgCallService(
 		testServiceName, testProviders, testConsumer,
-		testInput, testServiceFeeCap, testTimeout, false,
+		testInput, testServiceFeeCap, testTimeout,
 		true, testRepeatedFreq, testRepeatedTotal,
 	)
 
@@ -586,7 +586,7 @@ func TestMsgCallServiceRoute(t *testing.T) {
 func TestMsgCallServiceType(t *testing.T) {
 	msg := NewMsgCallService(
 		testServiceName, testProviders, testConsumer,
-		testInput, testServiceFeeCap, testTimeout, false,
+		testInput, testServiceFeeCap, testTimeout,
 		true, testRepeatedFreq, testRepeatedTotal,
 	)
 
@@ -608,63 +608,63 @@ func TestMsgCallServiceValidation(t *testing.T) {
 	testMsgs := []*MsgCallService{
 		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
-			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
+			testTimeout, true, testRepeatedFreq, testRepeatedTotal,
 		), // valid msg
 		NewMsgCallService(
 			testServiceName, testProviders, emptyAddress, testInput, testServiceFeeCap,
-			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
+			testTimeout, true, testRepeatedFreq, testRepeatedTotal,
 		), // missing consumer address
 		NewMsgCallService(
 			invalidName, testProviders, testConsumer, testInput, testServiceFeeCap,
-			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
+			testTimeout, true, testRepeatedFreq, testRepeatedTotal,
 		), // service name contains illegal characters
 		NewMsgCallService(
 			invalidLongName, testProviders, testConsumer, testInput, testServiceFeeCap,
-			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
+			testTimeout, true, testRepeatedFreq, testRepeatedTotal,
 		), // too long service name
 		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, invalidDenomCoins,
-			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
+			testTimeout, true, testRepeatedFreq, testRepeatedTotal,
 		), // invalid service fee denom
 		NewMsgCallService(
 			testServiceName, nil, testConsumer, testInput, testServiceFeeCap,
-			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
+			testTimeout, true, testRepeatedFreq, testRepeatedTotal,
 		), // missing providers
 		NewMsgCallService(
 			testServiceName, invalidDuplicateProviders, testConsumer, testInput, testServiceFeeCap,
-			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
+			testTimeout, true, testRepeatedFreq, testRepeatedTotal,
 		), // duplicate providers
 		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, "", testServiceFeeCap,
-			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
+			testTimeout, true, testRepeatedFreq, testRepeatedTotal,
 		), // missing input
 		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, invalidInput, testServiceFeeCap,
-			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
+			testTimeout, true, testRepeatedFreq, testRepeatedTotal,
 		), // invalid input
 		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
-			invalidTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
+			invalidTimeout, true, testRepeatedFreq, testRepeatedTotal,
 		), // invalid timeout
 		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
-			testTimeout, false, true, invalidLessRepeatedFreq, testRepeatedTotal,
+			testTimeout, true, invalidLessRepeatedFreq, testRepeatedTotal,
 		), // invalid repeated frequency
 		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
-			testTimeout, false, true, testRepeatedFreq, invalidRepeatedTotal1,
+			testTimeout, true, testRepeatedFreq, invalidRepeatedTotal1,
 		), // repeated total can not be less than -1
 		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
-			testTimeout, false, true, testRepeatedFreq, invalidRepeatedTotal2,
+			testTimeout, true, testRepeatedFreq, invalidRepeatedTotal2,
 		), // repeated total can not be zero
 		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
-			testTimeout, false, true, uint64(0), testRepeatedTotal,
+			testTimeout, true, uint64(0), testRepeatedTotal,
 		), // frequency can be zero
 		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
-			testTimeout, false, false, invalidLessRepeatedFreq, invalidRepeatedTotal1,
+			testTimeout, false, invalidLessRepeatedFreq, invalidRepeatedTotal1,
 		), // do not check the repeated frequency and total when not repeated
 	}
 
@@ -704,12 +704,12 @@ func TestMsgCallServiceValidation(t *testing.T) {
 func TestMsgCallServiceGetSignBytes(t *testing.T) {
 	msg := NewMsgCallService(
 		testServiceName, testProviders, testConsumer,
-		testInput, testServiceFeeCap, testTimeout, true,
+		testInput, testServiceFeeCap, testTimeout,
 		true, testRepeatedFreq, testRepeatedTotal,
 	)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgCallService","value":{"consumer":"cosmos1d8ydkv60gkj3sc98lvnxpddlfwwluvp6jc59a0","input":"{\"header\":{},\"body\":{\"pair\":\"iris-usdt\"}}","providers":["cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe"],"repeated":true,"repeated_frequency":"120","repeated_total":"100","service_fee_cap":[{"amount":"100","denom":"stake"}],"service_name":"test-service","super_mode":true,"timeout":"100"}}`
+	expected := `{"type":"irismod/service/MsgCallService","value":{"consumer":"cosmos1d8ydkv60gkj3sc98lvnxpddlfwwluvp6jc59a0","input":"{\"header\":{},\"body\":{\"pair\":\"iris-usdt\"}}","providers":["cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe"],"repeated":true,"repeated_frequency":"120","repeated_total":"100","service_fee_cap":[{"amount":"100","denom":"stake"}],"service_name":"test-service","timeout":"100"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -718,7 +718,7 @@ func TestMsgCallServiceGetSigners(t *testing.T) {
 	msg := NewMsgCallService(
 		testServiceName, testProviders, testConsumer,
 		testInput, testServiceFeeCap, testTimeout,
-		false, true, testRepeatedFreq, testRepeatedTotal,
+		true, testRepeatedFreq, testRepeatedTotal,
 	)
 	res := msg.GetSigners()
 	require.Equal(t, "[69C8DB334F45A51860A7FB2660B5BF4B9DFE303A]", fmt.Sprintf("%v", res))

@@ -102,7 +102,7 @@ I:
 			return types.NewRequestContext(
 				requestMsg.ServiceName, pds, consumer,
 				requestMsg.Input, requestMsg.ServiceFeeCap, requestMsg.Timeout,
-				requestMsg.SuperMode, requestMsg.Repeated, requestMsg.RepeatedFrequency,
+				requestMsg.Repeated, requestMsg.RepeatedFrequency,
 				requestMsg.RepeatedTotal, uint64(requestMsg.RepeatedTotal),
 				0, 0, 0, types.BATCHCOMPLETED, types.COMPLETED, 0, "",
 			), nil
@@ -185,7 +185,6 @@ func QueryRequestByTxQuery(
 						consumer,
 						requestContext.Input,
 						compactRequest.ServiceFee,
-						requestContext.SuperMode,
 						compactRequest.RequestHeight,
 						compactRequest.ExpirationHeight,
 						requestContextId,

@@ -271,8 +271,8 @@ func (suite *KeeperTestSuite) TestKeeperRequestContext() {
 	// create
 	requestContextID, err := suite.keeper.CreateRequestContext(
 		ctx, testServiceName, providers, consumer, testInput,
-		testServiceFeeCap, testTimeout, false, true,
-		testRepeatedFreq, testRepeatedTotal, types.RUNNING, 0, "",
+		testServiceFeeCap, testTimeout, true, testRepeatedFreq,
+		testRepeatedTotal, types.RUNNING, 0, "",
 	)
 	suite.NoError(err)
 
@@ -617,7 +617,7 @@ func (suite *KeeperTestSuite) setRequestContext(
 ) (tmbytes.HexBytes, types.RequestContext) {
 	requestContext := types.NewRequestContext(
 		testServiceName, providers, consumer, testInput,
-		testServiceFeeCap, testTimeout, false, true, testRepeatedFreq,
+		testServiceFeeCap, testTimeout, true, testRepeatedFreq,
 		testRepeatedTotal, 0, 0, 0, threshold, types.BATCHCOMPLETED,
 		state, threshold, moduleName,
 	)
