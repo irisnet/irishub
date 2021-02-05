@@ -132,9 +132,6 @@ proto-gen:
 proto-swagger-gen:
 	@./scripts/protoc-swagger-gen.sh
 
-proto-doc-gen:
-	@./scripts/protoc-doc-gen.sh
-
 ########################################
 ### Testing
 
