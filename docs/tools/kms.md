@@ -6,11 +6,19 @@ order: 3
 
 ## Introduction
 
-KMS is short for Key Management System, please refer to the [Tendermint KMS](https://github.com/tendermint/kms) for more details.
+[Tendermint KMS](https://github.com/iqlusioninc/tmkms) is a key management service that allows separating key management from Tendermint nodes. In addition it provides other advantages such as:
+
+- Improved security and risk management policies
+- Unified API and support for various HSM (hardware security modules)
+- Double signing protection (software or hardware based)
 
 ## Building
 
-Detailed build instructions can be found [here](https://github.com/tendermint/kms#installation).
+Detailed build instructions can be found [here](https://github.com/iqlusioninc/tmkms#installation.
+
+```bash
+cargo install tmkms --features=yubihsm --version=0.10.0-beta2
+```
 
 :::tip
 When compiling the KMS, ensure you have enabled the applicable features:
@@ -18,12 +26,18 @@ When compiling the KMS, ensure you have enabled the applicable features:
 
 | Backend               | Recommended Command line              |
 | --------------------- | ------------------------------------- |
-| YubiHSM               | ```cargo build --features yubihsm```  |
-| Ledger+Tendermint App | ```cargo build --features ledgertm``` |
+| YubiHSM               | ```cargo install --features yubihsm```  |
+| Ledger+Tendermint App | ```cargo install --features ledgertm``` |
+
+## Initialization
+
+Initialize IRISHub config
+
+```bash
+tmkms init -n irishub /path/to/kms/home
+```
 
 ## Configuration
-
-[Tendermint KMS](https://github.com/tendermint/kms) supports all blockchains built on the [tendermint](https://github.com/tendermint/tendermint) consensus engine, including IRIShub.
 
 To enable KMS, you need to edit the `priv_validator_laddr` in your `<iris-home>/config/config.toml` file first. E.g.:
 
@@ -33,29 +47,32 @@ To enable KMS, you need to edit the `priv_validator_laddr` in your `<iris-home>/
 priv_validator_laddr = "localhost:26658"
 ```
 
-You can download the [example config file](https://github.com/tendermint/kms/blob/master/tmkms.toml.example) which supports IRIShub, you just need to edit it as follows:
+Then, you just need to edit the config file as follows:
 
-- Edit `addr` to point to your `iris` instance.
+- DownLoad [priv_validator_state.json example](https://github.com/irisnet/irishub/blob/master/docs/tools/priv_validator_state.json) and config `state_file` to it. Then open `priv_validator_state.json` to modify all field values to match your `<iris-home>/data/priv_validator_state.json` values.
+- Write your yubihsm password to file `yubihsm-password.txt` and config `password_file` to it.
+- Edit `addr` to point to your `iris` instance(tip: no need to specify the connection id, just like tcp://localhost:26658).
 - Adjust `chain-id` to match your `<iris-home>/config/genesis.json` settings.
 - Edit `auth` to authorize access to your yubihsm.
 - Edit `keys` to determine which pubkey you will be using.
+- Edit `protocol_version` to v0.34.
 
 Then start tmkms:
 
 ```bash
-tmkms start
+tmkms start -c /path/to/kms/home
 ```
 
 A KMS can be configured in various ways:
 
 ### Using a YubiHSM
 
-Detailed information on how to setup a KMS with YubiHSM2 can be found [here](https://github.com/tendermint/kms/blob/master/README.yubihsm.md).
+Detailed information on how to setup a KMS with YubiHSM2 can be found [here](https://github.com/iqlusioninc/tmkms/blob/master/README.yubihsm.md).
 
 If you want to import an existing IRIShub private_key:
 
 ```bash
-tmkms yubihsm keys import <iris_home>/config/priv_validator.json -i <id>
+tmkms yubihsm keys import <iris_home>/config/priv_validator.json -i <id> -t json -c /path/to/kms/home
 ```
 
 ### Using a Ledger device running the Tendermint app
