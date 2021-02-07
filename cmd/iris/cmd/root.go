@@ -56,12 +56,11 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
-			handleRequestPreRun(cmd, args)
-			handleResponsePreRun(cmd)
+			converter.handlePreRun(cmd, args)
 			return server.InterceptConfigsPreRunHandler(cmd)
 		},
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {
-			handleResponsePostRun(encodingConfig.Marshaler, cmd)
+			converter.handlePostRun(cmd)
 		},
 	}
 
