@@ -30239,11 +30239,10 @@ paths:
                     amount:
                       type: string
                   description: >-
-                    DecCoin defines a token with a denomination and a decimal
-                    amount.
+                    Coin defines a token with a denomination and an amount.
 
 
-                    NOTE: The amount field is an Dec which implements the custom
+                    NOTE: The amount field is an Int which implements the custom
                     method
 
                     signatures required by gogoproto.
@@ -30443,7 +30442,7 @@ paths:
         - Query
   '/irismod/htlc/htlcs/{hash_lock}':
     get:
-      summary: Balance queries the balance of a single coin for a single account
+      summary: HTLC queries the HTLC by the specified hash lock
       operationId: HTLC
       responses:
         '200':
@@ -31482,8 +31481,6 @@ paths:
                   timeout:
                     type: string
                     format: int64
-                  super_mode:
-                    type: boolean
                   repeated:
                     type: boolean
                   repeated_frequency:
@@ -31878,8 +31875,6 @@ paths:
                           custom method
 
                           signatures required by gogoproto.
-                    super_mode:
-                      type: boolean
                     request_height:
                       type: string
                       format: int64
@@ -32042,8 +32037,6 @@ paths:
                         custom method
 
                         signatures required by gogoproto.
-                  super_mode:
-                    type: boolean
                   request_height:
                     type: string
                     format: int64
@@ -32131,8 +32124,6 @@ paths:
                           custom method
 
                           signatures required by gogoproto.
-                    super_mode:
-                      type: boolean
                     request_height:
                       type: string
                       format: int64
@@ -52341,9 +52332,9 @@ definitions:
             amount:
               type: string
           description: |-
-            DecCoin defines a token with a denomination and a decimal amount.
+            Coin defines a token with a denomination and an amount.
 
-            NOTE: The amount field is an Dec which implements the custom method
+            NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
     title: QueryTotalBurnResponse is response type for the Query/TotalBurn RPC method
   irismod.htlc.HTLC:
@@ -53079,8 +53070,6 @@ definitions:
           timeout:
             type: string
             format: int64
-          super_mode:
-            type: boolean
           repeated:
             type: boolean
           repeated_frequency:
@@ -53167,8 +53156,6 @@ definitions:
                 method
 
                 signatures required by gogoproto.
-          super_mode:
-            type: boolean
           request_height:
             type: string
             format: int64
@@ -53217,8 +53204,6 @@ definitions:
                   method
 
                   signatures required by gogoproto.
-            super_mode:
-              type: boolean
             request_height:
               type: string
               format: int64
@@ -53294,8 +53279,6 @@ definitions:
                   method
 
                   signatures required by gogoproto.
-            super_mode:
-              type: boolean
             request_height:
               type: string
               format: int64
@@ -53444,8 +53427,6 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
-      super_mode:
-        type: boolean
       request_height:
         type: string
         format: int64
@@ -53490,8 +53471,6 @@ definitions:
       timeout:
         type: string
         format: int64
-      super_mode:
-        type: boolean
       repeated:
         type: boolean
       repeated_frequency:

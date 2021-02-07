@@ -1,11 +1,11 @@
-# Migrate IRISHub to v1.0.0 from v0.16.3
+# Migrate IRISHub from v0.16 to v1.0.0
 
 ## 1. Export genesis file
 
-Stop irishub v0.16.3 daemon and use irishub v0.16.3 to export mainnet state genesis with `--for-zero-height` at the upgrade block height
+Stop irishub v0.16 daemon and use `irishub v0.16.4 (which fixed bugs in export)` to export mainnet state genesis with `--for-zero-height` at the upgrade block height
 
 ```bash
-iris export --home [v0.16.3_node_home] --height [upgrade-height] --for-zero-height
+iris export --home [v0.16_node_home] --height [upgrade-height] --for-zero-height
 ```
 
 ## 2. Migrate genesis file
@@ -16,10 +16,10 @@ Migrate the exported genesis.json with irishub v1.0.0
 iris migrate genesis.json --chain-id irishub-1 > genesis_v1.0.0.json
 ```
 
-Check if md5 is correct
+Check if sha256sum is correct
 
 ```bash
-md5sum genesis_v1.0.0.json
+sha256sum genesis_v1.0.0.json
 ```
 
 ## 3. Initialize new node
@@ -35,7 +35,7 @@ iris init [moniker] --home [v1.0.0_node_home]
 Migrate privkey file with irishub v1.0.0
 
 ```bash
-go run migrate/scripts/privValUpgrade.go [v0.16.3_node_home]/config/priv_validator.json [v1.0.0_node_home]/config/priv_validator_key.json [v1.0.0_node_home]/data/priv_validator_state.json
+go run migrate/scripts/privValUpgrade.go [v0.16_node_home]/config/priv_validator.json [v1.0.0_node_home]/config/priv_validator_key.json [v1.0.0_node_home]/data/priv_validator_state.json
 ```
 
 ## 5. Migrate node key file
@@ -43,7 +43,7 @@ go run migrate/scripts/privValUpgrade.go [v0.16.3_node_home]/config/priv_validat
 Migrate node key file with irishub v1.0.0
 
 ```bash
-cp [v0.16.3_node_home]/config/node_key.json [v1.0.0_node_home]/config/node_key.json
+cp [v0.16_node_home]/config/node_key.json [v1.0.0_node_home]/config/node_key.json
 ```
 
 ## 6. Copy migrated genesis file
@@ -67,7 +67,7 @@ minimum-gas-prices = "0.2uiris"
 
 ```
 
-Copy `persistent_peers` in `[v0.16.3_node_home]/config/config.toml` to `[v1.0.0_node_home]/config/config.toml`
+Copy `persistent_peers` in `[v0.16_node_home]/config/config.toml` to `[v1.0.0_node_home]/config/config.toml`
 
 ```toml
 
@@ -76,7 +76,7 @@ persistent_peers = ""
 
 ```
 
-And configure other fields refer to `[v0.16.3_node_home]/config/config.toml`
+And configure other fields refer to `[v0.16_node_home]/config/config.toml`
 
 ## 8. Start new node
 
