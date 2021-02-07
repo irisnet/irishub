@@ -14,7 +14,7 @@ order: 3
 
 ## Building
 
-Detailed build instructions can be found [here](https://github.com/iqlusioninc/tmkms#installation.
+Detailed build instructions can be found [here](https://github.com/iqlusioninc/tmkms#installation).
 
 ```bash
 cargo install tmkms --features=yubihsm --version=0.10.0-beta2
@@ -52,9 +52,9 @@ Then, downLoad [priv_validator_state.json example](https://github.com/irisnet/ir
 Next, you just need to edit the configuration file `/path/to/kms/home/tmkms.toml` as follows:
 
 - Configure `state_file` as the `priv_validator_state.json` completed in the previous step.
-- Write your yubihsm password to file `yubihsm-password.txt` and configure `password_file` as it.
-- Edit `addr` to point to your `iris` instance(tip: no need to specify the connection id, just like tcp://localhost:26658).
-- Adjust `chain-id` to match your `<iris-home>/config/genesis.json` settings.
+- Write your Yubihsm password to file `yubihsm-password.txt` and configure `password_file` as it.
+- Edit `addr` to point to your `iris` instance(note: no need to specify the connection id, just like tcp://localhost:26658).
+- Adjust `chain_id` to match your `<iris-home>/config/genesis.json` settings.
 - Edit `auth` to authorize access to your yubihsm.
 - Edit `keys` to determine which pubkey you will be using.
 - Edit `protocol_version` to v0.34.
