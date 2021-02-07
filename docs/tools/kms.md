@@ -31,7 +31,7 @@ When compiling the KMS, ensure you have enabled the applicable features:
 
 ## Initialization
 
-Initialize IRISHub config
+Initialize configuration files for IRISHub
 
 ```bash
 tmkms init -n irishub /path/to/kms/home
@@ -47,10 +47,12 @@ To enable KMS, you need to edit the `priv_validator_laddr` in your `<iris-home>/
 priv_validator_laddr = "localhost:26658"
 ```
 
-Then, you just need to edit the config file as follows:
+Then, downLoad [priv_validator_state.json example](https://github.com/irisnet/irishub/blob/master/docs/tools/priv_validator_state.json) and modify all field values to match your `<iris-home>/data/priv_validator_state.json` values.
 
-- DownLoad [priv_validator_state.json example](https://github.com/irisnet/irishub/blob/master/docs/tools/priv_validator_state.json) and config `state_file` to it. Then open `priv_validator_state.json` to modify all field values to match your `<iris-home>/data/priv_validator_state.json` values.
-- Write your yubihsm password to file `yubihsm-password.txt` and config `password_file` to it.
+Next, you just need to edit the configuration file `/path/to/kms/home/tmkms.toml` as follows:
+
+- Configure `state_file` as the `priv_validator_state.json` completed in the previous step.
+- Write your yubihsm password to file `yubihsm-password.txt` and configure `password_file` as it.
 - Edit `addr` to point to your `iris` instance(tip: no need to specify the connection id, just like tcp://localhost:26658).
 - Adjust `chain-id` to match your `<iris-home>/config/genesis.json` settings.
 - Edit `auth` to authorize access to your yubihsm.
@@ -60,7 +62,7 @@ Then, you just need to edit the config file as follows:
 Then start tmkms:
 
 ```bash
-tmkms start -c /path/to/kms/home
+tmkms start -c /path/to/kms/home/tmkms.toml
 ```
 
 A KMS can be configured in various ways:
