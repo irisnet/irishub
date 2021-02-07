@@ -16,18 +16,13 @@ order: 3
 
 可以在[这里](https://github.com/iqlusioninc/tmkms#installation)找到详细的构建说明
 
+::: tip
+在编译KMS的时候，确保已启用`yubihsm`功能：
+:::
+
 ```bash
 cargo install tmkms --features=yubihsm --version=0.10.0-beta2
 ```
-
-::: tip
-在编译KMS的时候，确保您已启用适用的功能：
-:::
-
-| Backend               | Recommended Command line              |
-| --------------------- | ------------------------------------- |
-| YubiHSM               | ```cargo install --features yubihsm```  |
-| Ledger+Tendermint App | ```cargo install --features ledgertm``` |
 
 ## 初始化
 
@@ -55,7 +50,7 @@ priv_validator_laddr = "localhost:26658"
 - 将你的Yubihsm密码写入文件`yubihsm-password.txt`并将`password_file`设置为它。
 - 编辑`addr`指向你的`iris`实例（注意: 无需指定连接ID，仅让它保持格式如：tcp://localhost:26658）。
 - 调整`chain_id` 以匹配你的`<iris-home>/config/genesis.json`中的设置。
-- 编辑`auth`以授权访问你的yubihsm。
+- 编辑`auth`以授权访问你的Yubihsm。
 - 编辑`keys`确定你将使用的pubkey。
 - 编辑`protocol_version`为v0.34。
 
@@ -65,18 +60,12 @@ priv_validator_laddr = "localhost:26658"
 tmkms start -c /path/to/kms/home/tmkms.toml
 ```
 
-KMS提供了多种选择
-
-### 使用YubiHSM
+### 使用YubiHSM	
 
 有关如何使用YubiHSM2设置KMS的更多信息，请参阅[这里](https://github.com/iqlusioninc/tmkms/blob/master/README.yubihsm.md)。
 
 如果要导入已存在的IRIShub private_key，可以：
 
-```bash
-tmkms yubihsm keys import <iris_home>/config/priv_validator.json -i <id> -t json -c /path/to/kms/home
+```bash	
+tmkms yubihsm keys import <iris_home>/config/priv_validator.json -i <id> -t json -c /path/to/kms/home/tmkms.toml
 ```
-
-### 使用运行Tendermint app的ledger设备
-
-- [Using a Ledger device running the Tendermint Validator app](kms/kms_ledger.md)
