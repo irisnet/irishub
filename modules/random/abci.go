@@ -72,5 +72,7 @@ func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 		}
 	}
 
-	k.Logger(ctx).Info(fmt.Sprintf("%d random requests are handled", handledNormalRandReqNum))
+	if handledNormalRandReqNum > 0 {
+		k.Logger(ctx).Info(fmt.Sprintf("%d random requests are handled", handledNormalRandReqNum))
+	}
 }

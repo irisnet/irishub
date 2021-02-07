@@ -215,8 +215,8 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg *types.MsgEditFeed) error {
 	return nil
 }
 
-// HandlerResponse is responsible for processing the data returned from the servicetypes module,
-// processed by the aggregate function, and then saved
+// HandlerResponse is responsible for processing the data returned from the service module,
+// processed by the aggregation function, and then saved
 func (k Keeper) HandlerResponse(
 	ctx sdk.Context,
 	requestContextID tmbytes.HexBytes,
@@ -224,7 +224,7 @@ func (k Keeper) HandlerResponse(
 	err error,
 ) {
 	if len(responseOutput) == 0 || err != nil {
-		ctx.Logger().Error(
+		ctx.Logger().Info(
 			"Oracle feed failed",
 			"requestContextID", requestContextID.String(),
 			"err", err.Error(),
