@@ -16,18 +16,13 @@ order: 3
 
 Detailed build instructions can be found [here](https://github.com/iqlusioninc/tmkms#installation).
 
+:::tip
+When compiling the KMS, ensure you have enabled the `yubihsm` features:
+:::
+
 ```bash
 cargo install tmkms --features=yubihsm --version=0.10.0-beta2
 ```
-
-:::tip
-When compiling the KMS, ensure you have enabled the applicable features:
-:::
-
-| Backend               | Recommended Command line              |
-| --------------------- | ------------------------------------- |
-| YubiHSM               | ```cargo install --features yubihsm```  |
-| Ledger+Tendermint App | ```cargo install --features ledgertm``` |
 
 ## Initialization
 
@@ -55,7 +50,7 @@ Next, you just need to edit the configuration file `/path/to/kms/home/tmkms.toml
 - Write your Yubihsm password to file `yubihsm-password.txt` and configure `password_file` as it.
 - Edit `addr` to point to your `iris` instance(note: no need to specify the connection id, just like tcp://localhost:26658).
 - Adjust `chain_id` to match your `<iris-home>/config/genesis.json` settings.
-- Edit `auth` to authorize access to your yubihsm.
+- Edit `auth` to authorize access to your Yubihsm.
 - Edit `keys` to determine which pubkey you will be using.
 - Edit `protocol_version` to v0.34.
 
@@ -64,19 +59,12 @@ Then start tmkms:
 ```bash
 tmkms start -c /path/to/kms/home/tmkms.toml
 ```
-
-A KMS can be configured in various ways:
-
-### Using a YubiHSM
+### Using a YubiHSM	
 
 Detailed information on how to setup a KMS with YubiHSM2 can be found [here](https://github.com/iqlusioninc/tmkms/blob/master/README.yubihsm.md).
 
 If you want to import an existing IRIShub private_key:
 
-```bash
-tmkms yubihsm keys import <iris_home>/config/priv_validator.json -i <id> -t json -c /path/to/kms/home
+```bash	
+tmkms yubihsm keys import <iris_home>/config/priv_validator.json -i <id> -t json -c /path/to/kms/home/tmkms.toml
 ```
-
-### Using a Ledger device running the Tendermint app
-
-- [Using a Ledger device running the Tendermint Validator app](kms/kms_ledger.md)
