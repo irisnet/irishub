@@ -60,13 +60,17 @@ All POST commands have the following global flags:
 | **Subcommand**                    | **Description**                                                |
 | --------------------------------- | -------------------------------------------------------------- |
 | [bank](./bank.md)                 | Bank subcommands for querying acccounts and sending coins etc. |
+| [debug](./debug.md)               | Debug subcommands                                              |
 | [distribution](./distribution.md) | Distribution subcommands for rewards management                |
 | [gov](./gov.md)                   | Governance and voting subcommands                              |
 | [htlc](./htlc.md)                 | HTLC transaction subcommands                                   |
 | [keys](./keys.md)                 | Keys allows you to manage your local keystore for tendermint   |
+| [nft](./nft.md)                   | NFT subcommands                                                |
 | [oracle](./oracle.md)             | Oracle transaction subcommands                                 |
 | [params](./params.md)             | Query parameters of modules                                    |
-| [random](./random.md)             | Random Number subcommands                                      |
+| [random](./rand.md)               | Random number subcommands                                      |
+| [record](./record.md)             | Record subcommands                                             |
+| [slashing](./slashing.md)         | Slashing subcommands                                           |
 | [service](./service.md)           | Service subcommands                                            |
 | [staking](./staking.md)           | Staking subcommands for validators and delegators              |
 | [status](./status.md)             | Query remote node for status                                   |
