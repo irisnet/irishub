@@ -21,5 +21,5 @@ SDK 主要实现了 IRISHub 各模块功能的封装，包括：auth、bank、go
 IRISHub SDK 的文档连接如下：
 
 - [Go SDK docs](https://github.com/irisnet/irishub-sdk-go/blob/master/README.md)
-- [JavaScript SDK docs](sdk-js.irisnet.org)
+- [JavaScript SDK docs](https://github.com/irisnet/irishub-sdk-js/blob/master/README.md)
 - Java SDK docs (敬请期待)

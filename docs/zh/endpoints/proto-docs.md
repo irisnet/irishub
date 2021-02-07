@@ -11653,7 +11653,6 @@ Request defines a standard for request.
 | `consumer` | [string](#string) |  |  |
 | `input` | [string](#string) |  |  |
 | `service_fee` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
-| `super_mode` | [bool](#bool) |  |  |
 | `request_height` | [int64](#int64) |  |  |
 | `expiration_height` | [int64](#int64) |  |  |
 | `request_context_id` | [string](#string) |  |  |
@@ -11679,7 +11678,6 @@ RequestContext defines a standard for request context.
 | `service_fee_cap` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | `module_name` | [string](#string) |  |  |
 | `timeout` | [int64](#int64) |  |  |
-| `super_mode` | [bool](#bool) |  |  |
 | `repeated` | [bool](#bool) |  |  |
 | `repeated_frequency` | [uint64](#uint64) |  |  |
 | `repeated_total` | [int64](#int64) |  |  |
@@ -13142,7 +13140,6 @@ MsgCallService defines an SDK message to initiate a service request context.
 | `input` | [string](#string) |  |  |
 | `service_fee_cap` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | `timeout` | [int64](#int64) |  |  |
-| `super_mode` | [bool](#bool) |  |  |
 | `repeated` | [bool](#bool) |  |  |
 | `repeated_frequency` | [uint64](#uint64) |  |  |
 | `repeated_total` | [int64](#int64) |  |  |
