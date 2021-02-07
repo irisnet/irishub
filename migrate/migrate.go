@@ -518,7 +518,7 @@ func migrateGov(initialState v0_16.GenesisFileState) *govtypes.GenesisState {
 }
 
 func genCrisis() *crisistypes.GenesisState {
-	return crisistypes.NewGenesisState(sdk.NewCoin(UIRIS, sdk.NewInt(1000)))
+	return crisistypes.NewGenesisState(sdk.NewCoin(UIRIS, sdk.NewInt(10000_000_000)))
 }
 
 func migrateTransfer() *transfertypes.GenesisState {
