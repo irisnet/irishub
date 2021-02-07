@@ -55,7 +55,7 @@ func ValidateTags(tags []string) error {
 	}
 	for i, tag := range tags {
 		if !regexpTag.MatchString(tag) {
-			return sdkerrors.Wrapf(ErrInvalidTags, "invalid tag[%d], must match regexp: %s", i, regexpTag.String())
+			return sdkerrors.Wrapf(ErrInvalidTags, "tag [%d] is invalid, must match regexp: %s", i, regexpTag.String())
 		}
 	}
 	return nil
