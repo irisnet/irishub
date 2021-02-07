@@ -209,10 +209,10 @@ func GetEarnedFeesSubspace(provider sdk.AccAddress) []byte {
 
 // GetOwnerEarnedFeesKey returns the key for the earned fees of the specified owner and denom
 func GetOwnerEarnedFeesKey(owner sdk.AccAddress, denom string) []byte {
-	return append(OwnerEarnedFeesKey, owner.Bytes()...)
+	return append(append(OwnerEarnedFeesKey, owner.Bytes()...), []byte(denom)...)
 }
 
-// GetEarnedFeesSubspace gets the subspace for the earned fees of the specified provider
+// GetOwnerEarnedFeesSubspace gets the subspace for the earned fees of the specified provider
 func GetOwnerEarnedFeesSubspace(owner sdk.AccAddress) []byte {
 	return append(OwnerEarnedFeesKey, owner.Bytes()...)
 }
