@@ -2,8 +2,14 @@
 
 ## Unreleased
 
+## 1.0.0-rc2
+
+*February 7th, 2021*
+
 ### Application
 
+* [\#2560](https://github.com/irisnet/irishub/pull/2560) Bump irismod version to [v1.3.0](https://github.com/irisnet/irismod/releases/tag/v1.3.0)
+* [\#2551](https://github.com/irisnet/irishub/pull/2551) Disable repeated service invocation
 * [\#2542](https://github.com/irisnet/irishub/pull/2542) Migrate withdraw infos
 
 ## 1.0.0-rc1
