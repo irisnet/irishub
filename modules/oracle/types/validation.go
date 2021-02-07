@@ -12,9 +12,9 @@ import (
 const (
 	//MaxLatestHistory define the the maximum number of feed value saved
 	MaxLatestHistory = 100
-	//MaxAggregateFuncNameLen define the the maximum lenght of the ggregate function name
+	//MaxAggregateFuncNameLen define the the maximum length of the ggregate function name
 	MaxAggregateFuncNameLen = 10
-	//MaxDescriptionLen define the the maximum lenght of the description
+	//MaxDescriptionLen define the the maximum length of the description
 	MaxDescriptionLen = 280
 )
 

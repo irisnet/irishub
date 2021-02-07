@@ -54,8 +54,8 @@ func (k Keeper) GetTokenMintFee(ctx sdk.Context, symbol string) (sdk.Coin, error
 		return sdk.Coin{}, err
 	}
 
-	mintFee := sdk.NewDecFromInt(fee.Amount).Mul(params.MintTokenFeeRatio)
-	return token.ToMinCoin(sdk.NewDecCoinFromDec(params.IssueTokenBaseFee.Denom, mintFee))
+	mintFee := sdk.NewDecFromInt(fee.Amount).Mul(params.MintTokenFeeRatio).TruncateInt()
+	return token.ToMinCoin(sdk.NewDecCoinFromDec(params.IssueTokenBaseFee.Denom, sdk.NewDecFromInt(mintFee)))
 }
 
 func (k Keeper) calcTokenIssueFee(ctx sdk.Context, symbol string) (sdk.Coin, types.Params) {

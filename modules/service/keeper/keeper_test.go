@@ -29,7 +29,7 @@ var (
 	testDenom2 = "testdenom2"                                                           // testing the case in which the feed value is 0
 	testDenom3 = "testdenom3"                                                           // testing the case in which the feed is not existent
 	testDenom4 = "ibc/9ebf7ebe6f8ffd34617809f3cf00e04a10d8b7226048f68866371fb9dad8a25d" // testing the ibc case
-	testDenom5 = "peggy/0xdac17f958d2ee523a2206206994597c13d831ec7"                     // testing the ethpeg case
+	testDenom5 = "pegeth0xdac17f958d2ee523a2206206994597c13d831ec7"                     // testing the ethpeg case
 
 	testCoin1 = sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10000))
 	testCoin2 = sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))

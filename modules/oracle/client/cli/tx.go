@@ -250,14 +250,14 @@ func GetCmdEditFeed() *cobra.Command {
 		Short: "Modify the feed information and update service invocation parameters by feed creator.",
 		Args:  cobra.ExactArgs(1),
 		Example: fmt.Sprintf(
-			`%s tx oracle edit <feed-name> --chain-id=<chain-id> --from=<key-name> --fees=0.3iris ` +
-				`--latest-history=10 ` +
-				`--providers=<provide1_address>,<provider2_address> ` +
-				`--service-fee-cap=1iris ` +
-				`--timeout=2 ` +
-				`--frequency=10 ` +
+			`%s tx oracle edit <feed-name> --chain-id=<chain-id> --from=<key-name> --fees=0.3iris `+
+				`--latest-history=10 `+
+				`--providers=<provide1_address>,<provider2_address> `+
+				`--service-fee-cap=1iris `+
+				`--timeout=2 `+
+				`--frequency=10 `+
 				`--threshold=5 `,
-				version.AppName,
+			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
