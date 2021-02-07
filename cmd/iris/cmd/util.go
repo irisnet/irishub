@@ -30,7 +30,8 @@ const (
 )
 
 var (
-	converter = NewConverter().registerGlobalFlag("fees").
+	converter = NewConverter().
+			registerGlobalFlag("fees").
 			registerGlobalFlag("amount").
 			registerGlobalFlag("deposit").
 			registerGlobalFlag("service-fee-cap").
@@ -41,9 +42,14 @@ var (
 			registerCmdWithArgs("distribution", "fund-community-pool", 0).
 			registerCmdWithArgs("gov", "deposit", 1).
 			registerCmdForResponse("bank", "balances", "balances", filedTypeArray).
+			registerCmdForResponse("bank", "total", "supply", filedTypeArray).
 			registerCmdForResponse("gov", "params", "deposit_params.min_deposit", filedTypeArray).
 			registerCmdForResponse("distribution", "validator-outstanding-rewards", "rewards", filedTypeArray).
-			registerCmdForResponse("token", "total-burn", "burned_coins", filedTypeArray)
+			registerCmdForResponses("distribution", "rewards",
+			field{name: "total", typ: filedTypeArray},
+			field{name: "rewards.*.reward", typ: filedTypeArray},
+			field{name: "rewards", typ: filedTypeArray}).
+		registerCmdForResponse("token", "total-burn", "burned_coins", filedTypeArray)
 
 	rescueStdout = os.Stdout
 )
@@ -135,7 +141,26 @@ func (it *coinConverter) registerCmdForResponse(parentCmd, cmd, jsonPath, typ st
 			fields:    map[string]field{},
 		}
 	}
+
 	commands = commands.append(jsonPath, typ, -1)
+
+	it.cmds[cmd] = commands
+	return it
+}
+
+func (it *coinConverter) registerCmdForResponses(parentCmd, cmd string, fields ...field) *coinConverter {
+	commands, ok := it.cmds[cmd]
+	if !ok {
+		commands = command{
+			parentCmd: parentCmd,
+			fields:    map[string]field{},
+		}
+	}
+
+	for _, field := range fields {
+		commands = commands.append(field.name, field.typ, -1)
+	}
+
 	it.cmds[cmd] = commands
 	return it
 }
@@ -163,7 +188,7 @@ func (it coinConverter) getFromArgs(cmdNm string) (field, bool) {
 	return cmd.fields["ARGS"], true
 }
 
-func (it coinConverter) getFromResponse(cmdNm string) map[string]field {
+func (it coinConverter) getFields(cmdNm string) map[string]field {
 	cmd, ok := it.cmds[cmdNm]
 	if !ok {
 		return map[string]field{}
@@ -228,12 +253,16 @@ func (it coinConverter) parseYAML(cmd *cobra.Command, in []byte) string {
 	if err != nil {
 		return string(in)
 	}
-	for k, v := range it.getFromResponse(cmd.Name()) {
-		switch v.typ {
-		case filedTypeArray:
-			it.handleList(cmd, cfg, k)
-		case filedTypeMap:
-			it.handleMap(cmd, cfg, k)
+
+	fields := it.getFields(cmd.Name())
+	for path, field := range fields {
+		for _, p := range it.resolvePath(cfg, path) {
+			switch field.typ {
+			case filedTypeArray:
+				it.handleList(cmd, cfg, p)
+			case filedTypeMap:
+				it.handleMap(cmd, cfg, p)
+			}
 		}
 	}
 	s, err := config.RenderYaml(cfg.Root)
@@ -241,6 +270,28 @@ func (it coinConverter) parseYAML(cmd *cobra.Command, in []byte) string {
 		return string(in)
 	}
 	return s
+}
+
+func (it coinConverter) resolvePath(cfg *config.Config, path string) (paths []string) {
+	subPaths := strings.SplitN(path, "*", 2)
+	if len(subPaths) == 1 {
+		return []string{path}
+	}
+
+	if len(subPaths) != 2 {
+		return paths
+	}
+
+	list, err := cfg.List(subPaths[0][:len(subPaths[0])-1])
+	if err != nil {
+		return paths
+	}
+
+	for i := 0; i < len(list); i++ {
+		p := fmt.Sprintf("%s%d%s", subPaths[0], i, subPaths[1])
+		paths = append(paths, it.resolvePath(cfg, p)...)
+	}
+	return paths
 }
 
 func (it *coinConverter) queryToken(cmd *cobra.Command, denom string) (ft tokentypes.TokenI, err error) {
@@ -311,7 +362,7 @@ func (it *coinConverter) handleMap(cmd *cobra.Command, cfg *config.Config, path 
 	}
 
 	var srcCoin sdk.DecCoin
-	if err := json.Unmarshal(bz, &srcCoin); err != nil {
+	if err := json.Unmarshal(bz, &srcCoin); err != nil || !srcCoin.IsValid() {
 		return
 	}
 
