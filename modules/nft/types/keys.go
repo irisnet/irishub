@@ -101,7 +101,7 @@ func KeyDenomID(id string) []byte {
 	return append(key, []byte(id)...)
 }
 
-// KeyDenomID gets the storeKey by the denom name
+// KeyDenomName gets the storeKey by the denom name
 func KeyDenomName(name string) []byte {
 	key := append(PrefixDenomName, delimiter...)
 	return append(key, []byte(name)...)
