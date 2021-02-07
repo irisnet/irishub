@@ -171,6 +171,7 @@ var (
 		coinswaptypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
 		servicetypes.DepositAccName:    {authtypes.Burner},
 		servicetypes.RequestAccName:    nil,
+		servicetypes.TaxAccName:        {authtypes.Burner},
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -386,7 +387,7 @@ func NewSimApp(
 
 	app.ServiceKeeper = servicekeeper.NewKeeper(
 		appCodec, keys[servicetypes.StoreKey], app.AccountKeeper, app.BankKeeper,
-		app.GetSubspace(servicetypes.ModuleName), authtypes.FeeCollectorName,
+		app.GetSubspace(servicetypes.ModuleName), servicetypes.TaxAccName,
 	)
 
 	app.OracleKeeper = oracleKeeper.NewKeeper(

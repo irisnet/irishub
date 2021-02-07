@@ -26,6 +26,7 @@ import (
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	transfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
@@ -160,6 +161,7 @@ func Migrate(cdc codec.JSONMarshaler, initialState v0_16.GenesisFileState) (appS
 	appState[govtypes.ModuleName] = cdc.MustMarshalJSON(migrateGov(initialState))
 	appState[crisistypes.ModuleName] = cdc.MustMarshalJSON(genCrisis())
 	appState[tokentypes.ModuleName] = cdc.MustMarshalJSON(&tokenGenesisState)
+	appState[transfertypes.ModuleName] = cdc.MustMarshalJSON(migrateTransfer())
 
 	// ------------------------------------------------------------
 	// irishub modules
@@ -459,6 +461,12 @@ func migrateDistribution(initialState v0_16.GenesisFileState, communityTax sdk.C
 	feePool := distributiontypes.FeePool{CommunityPool: sdk.NewDecCoinsFromCoins(communityTax...)}
 
 	var delegatorWithdrawInfos []distributiontypes.DelegatorWithdrawInfo
+	for _, delegatorWithdrawInfo := range initialState.DistrData.DelegatorWithdrawInfos {
+		delegatorWithdrawInfos = append(delegatorWithdrawInfos, distributiontypes.DelegatorWithdrawInfo{
+			DelegatorAddress: delegatorWithdrawInfo.DelegatorAddr.String(),
+			WithdrawAddress:  delegatorWithdrawInfo.WithdrawAddr.String(),
+		})
+	}
 	previousProposer := initialState.DistrData.PreviousProposer
 	var outstandingRewards []distributiontypes.ValidatorOutstandingRewardsRecord
 	var validatorAccumulatedCommissions []distributiontypes.ValidatorAccumulatedCommissionRecord
@@ -511,6 +519,14 @@ func migrateGov(initialState v0_16.GenesisFileState) *govtypes.GenesisState {
 
 func genCrisis() *crisistypes.GenesisState {
 	return crisistypes.NewGenesisState(sdk.NewCoin(UIRIS, sdk.NewInt(1000)))
+}
+
+func migrateTransfer() *transfertypes.GenesisState {
+	return transfertypes.NewGenesisState(
+		transfertypes.PortID,
+		transfertypes.Traces{},
+		transfertypes.NewParams(false, false),
+	)
 }
 
 func migrateMint(initialState v0_16.GenesisFileState) *minttypes.GenesisState {
