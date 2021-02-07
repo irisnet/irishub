@@ -30,12 +30,6 @@
 
 详见 [Coinswap](../features/coinswap.md)
 
-## Crisis 模块可治理参数
-
-| 字段                  | 描述    | 有效范围         | 当前值                                |
-| -------------------- | ------ | --------------- | ------------------------------------ |
-| `crisis/ConstantFee` | 固定费用 | amount: (0, +∞) | {"denom": "uiris", "amount": "1000"} |
-
 ## Distribution 模块可治理参数
 
 | 字段                                | 描述                | 有效范围       | 当前值  |
@@ -62,8 +56,8 @@
 | 字段                       | 描述             | 有效范围      | 当前值   |
 | ------------------------- | --------------- | ------------ | ------- |
 | `ibc/AllowedClients`      | 支持ibc的客户端   |              | ["06-solomachine","07-tendermint"] |
-| `transfer/SendEnabled`    | 是否支持transfer | {true,false} | true    |
-| `transfer/ReceiveEnabled` | 是否支持Receive  | {true,false} | true    |
+| `transfer/SendEnabled`    | 是否支持transfer | {true,false} | false   |
+| `transfer/ReceiveEnabled` | 是否支持Receive  | {true,false} | false   |
 
 ## Mint 模块可治理参数
 
@@ -94,7 +88,7 @@
 
 | 字段                               | 描述                   | 有效范围       | 当前值  |
 | ---------------------------------- | -------------------- | ------------------------- | ------- |
-| `slashing/DowntimeJailDuration`    | 验证人最大的下线时间     | (0, 9223372036854775807]  | 0h10m0s |
+| `slashing/DowntimeJailDuration`    | 验证人最大的下线时间     | (0, 9223372036854775807]  | 10m0s   |
 | `slashing/MinSignedPerWindow`      | 每个窗口最低投票率       | [0, 1]                    | 0.7     |
 | `slashing/SignedBlocksWindow`      | 验证人下线的滑动窗口大小  | (0, 18446744073709551615] | 34560   |
 | `slashing/SlashFractionDoubleSign` | 双重签名的惩罚系数       | [0, 1]                    | 0.01    |

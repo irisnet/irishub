@@ -30,12 +30,6 @@ Details in [Bank](../features/bank.md)
 
 Details in [Coinswap](../features/coinswap.md)
 
-## Parameters in Crisis
-
-| key                  | Description | Range           | Current                                |
-| -------------------- | ----------- | --------------- | -------------------------------------- |
-| `crisis/ConstantFee` | Constant Fee| amount: (0, +∞) | {"denom": "uiris",   "amount": "1000"} |
-
 ## Parameters in Distribution
 
 | key                                | Description                                       | Range        | Current |
@@ -62,8 +56,8 @@ Details in [Governance](../features/governance.md)
 | key                       | Description                             | Range        | Current                            |
 | ------------------------- | --------------------------------------- | ------------ | ---------------------------------- |
 | `ibc/AllowedClients`      | Clients that support ibc                |              | ["06-solomachine","07-tendermint"] |
-| `transfer/SendEnabled`    | Whether to enable the transfer function | {true,false} | true             |
-| `transfer/ReceiveEnabled` | Whether to enable the receive function  | {true,false} | true             |
+| `transfer/SendEnabled`    | Whether to enable the transfer function | {true,false} | false             |
+| `transfer/ReceiveEnabled` | Whether to enable the receive function  | {true,false} | false             |
 
 ## Parameters in Mint
 
@@ -94,7 +88,7 @@ Details in [Service](../features/service.md)
 
 | key                                | Description                           | Range                     | Current |
 | ---------------------------------- | ------------------------------------- | ------------------------- | ------- |
-| `slashing/DowntimeJailDuration`    | Maximum downtime  (continuous)        | (0, 9223372036854775807]  | 0h10m0s |
+| `slashing/DowntimeJailDuration`    | Maximum downtime  (continuous)        | (0, 9223372036854775807]  | 10m0s   |
 | `slashing/MinSignedPerWindow`      | Minimum signature rate in each window | [0, 1]                    | 0.7     |
 | `slashing/SignedBlocksWindow`      | Sliding window for downtime slashing  | (0, 18446744073709551615] | 34560   |
 | `slashing/SlashFractionDoubleSign` | Penalty coefficient for double sign   | [0, 1]                    | 0.01    |
