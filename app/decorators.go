@@ -9,6 +9,7 @@ import (
 	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
 
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
+	servicetypes "github.com/irisnet/irismod/modules/service/types"
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 )
@@ -48,6 +49,28 @@ func (vtd ValidateTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulat
 			if containSwapCoin(msg.Amount...) {
 				return ctx, sdkerrors.Wrap(
 					sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
+			}
+		}
+	}
+	return next(ctx, tx, simulate)
+}
+
+// ValidateServiceDecorator is responsible for checking the permission to execute MsgCallService
+type ValidateServiceDecorator struct{}
+
+// NewValidateServiceDecorator returns an instance of ServiceAuthDecorator
+func NewValidateServiceDecorator() ValidateServiceDecorator {
+	return ValidateServiceDecorator{}
+}
+
+// AnteHandle checks the transaction
+func (vsd ValidateServiceDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
+	for _, msg := range tx.GetMsgs() {
+		switch msg := msg.(type) {
+		case *servicetypes.MsgCallService:
+			if msg.Repeated {
+				return ctx, sdkerrors.Wrap(
+					sdkerrors.ErrInvalidRequest, "currently does not support to create repeatable service invocation")
 			}
 		}
 	}

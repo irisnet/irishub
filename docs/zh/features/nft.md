@@ -10,7 +10,9 @@
 
 资产在创建前需要发行，用以声明其抽象属性：
 
-- _Denom_：即全局唯一的资产类别标识符
+- _Denom_：即全局唯一的资产类别名
+  
+- _Denom ID_：Demon的全局唯一标识符
 
 - _元数据规范_：资产元数据应遵循的 JSON Schema
 
@@ -28,22 +30,22 @@
 
 ### 发行
 
-指定资产 Denom（资产类别）、元数据 JSON Schema，即可发行资产。
+指定资产 Denom ID（资产类别ID）、元数据 JSON Schema，即可发行资产。
 
 `CLI`
 
 ```bash
-iris tx nft issue <denom> --schema=<schema-content or path/to/schema.json>
+iris tx nft issue <denom-id> --from=<key-name> --schema=<schema-content or path/to/schema.json> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### 增发
 
-在发行资产之后即可增发（创建）该类型的具体资产。需指定资产 ID、接收者地址、元数据或其 URI。
+在发行资产之后即可增发（创建）该类型的具体资产。需指定资产 ID、接收者地址和URI。
 
 `CLI`
 
 ```bash
-iris tx nft mint <denom> <token-id> --recipient=<recipient-address> --uri=<token-uri> --data=<token-data>
+iris tx nft mint <denom-id> <token-id> --uri=<uri> --recipient=<recipient> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### 编辑
@@ -53,7 +55,7 @@ iris tx nft mint <denom> <token-id> --recipient=<recipient-address> --uri=<token
 `CLI`
 
 ```bash
-iris tx nft edit <denom> <token-id> --uri=<token-uri> --data=<token-data>
+iris tx nft edit <denom-id> <token-id> --uri=<uri> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### 转移
@@ -63,7 +65,7 @@ iris tx nft edit <denom> <token-id> --uri=<token-uri> --data=<token-data>
 `CLI`
 
 ```bash
-iris tx nft transfer <recipient-address> <denom> <token-id>
+iris tx nft transfer <recipient-address> <denom-id> <token-id>
 ```
 
 ### 销毁
@@ -73,17 +75,17 @@ iris tx nft transfer <recipient-address> <denom> <token-id>
 `CLI`
 
 ```bash
-iris tx nft burn <denom> <token-id>
+iris tx nft burn <denom-id> <token-id> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### 查询指定的资产类别
 
-根据 Denom 查询资产类别信息。
+根据 Denom ID查询资产类别信息。
 
 `CLI`
 
 ```bash
-iris q nft denom <denom>
+iris q nft denom <denom-id>
 ```
 
 ### 查询所有资产类别信息
@@ -98,40 +100,40 @@ iris q nft denoms
 
 ### 查询指定类别资产的总量
 
-根据 Denom 查询资产总量；接受可选的 owner 参数。
+根据 Denom ID查询资产总量；接受可选的 owner 参数。
 
 `CLI`
 
 ```bash
-iris q nft supply <denom> --owner=<owner>
+iris q nft supply <denom-id> --owner=<owner>
 ```
 
 ### 查询指定账户的所有资产
 
-查询某一账户所拥有的全部资产；可以指定 Denom 参数。
+查询某一账户所拥有的全部资产；可以指定 Denom ID参数。
 
 `CLI`
 
 ```bash
-iris q nft owner <address> --denom=<denom>
+iris q nft owner <address> --denom-id=<denom-id>
 ```
 
 ### 查询指定类别的所有资产
 
-根据 Denom 查询所有资产。
+根据 Denom ID查询所有资产。
 
 `CLI`
 
 ```bash
-iris q nft collection <denom>
+iris q nft collection <denom-id>
 ```
 
 ### 查询指定资产
 
-根据 Denom 以及 ID 查询具体资产。
+根据 Denom ID以及 ID 查询具体资产。
 
 `CLI`
 
 ```bash
-iris q nft token <denom> <token-id>
+iris q nft token <denom-id> <token-id>
 ```
