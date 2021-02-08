@@ -103,3 +103,39 @@ type SoftwareUpgradeProposal struct {
 升级提议可以被取消。存在一个 `取消软件升级 （CancelSoftwareUpgrade）`的提议类型，当该类型提议投票通过时，将移除当前正在进行的升级计划。当然，这需要在升级计划执行之前被投票通过并执行。
 
 如果当前升级计划已经被执行，但是该升级计划存在问题，那么此时提出`取消软件升级`提议是无效的(因为网络已经停止共识)。这时还有另一方案来弥补这一过失，就是在重新启动网络时，使用`--unsafe-skip-upgrades`参数跳过指定的升级高度(并不是真的跳过该高度，而是跳过软件升级`处理器`)。当然这要求参与共识的2/3验证人都执行同样的操作，否则同样无法达成网络共识。
+
+## 升级流程
+
+### 提交升级提案
+
+执行软件升级流程的第一步是由治理模块发起一个软件升级提案，该提案详细说明了升级时间或者升级高度，具体见上面[概念](#概念)。发起提案的命令行示例如下：
+
+```bash
+iris tx gov submit-proposal software-upgrade <plan-name> \
+  --deposit <deposit> \
+  --upgrade-time <upgrade-time> \
+  --title <title> \
+  --upgrade-info <upgrade-info> \
+  --description <description>
+  --from=<from> --chain-id=<chain-id> --fees=0.3iris -b block -y
+```
+
+### 为提案抵押、投票
+
+软件升级提案和其他普通提案的执行流程基本一致，都需要验证人、委托人为该提案发表意见，具体信息请参考[治理模块](./governance.md)。为提案抵押的命令行示例如下：
+
+```bash
+iris tx gov deposit <proposal-id> <deposit> --from=<from> --chain-id=<chain-id> --fees=0.3iris -b block -y
+```
+
+一旦抵押金额达到最小抵押金额，提案将进入投票期，验证人或者委托人需要对该提案发起投票，发起投票的命令行示例如下：
+
+```bash
+iris tx gov vote <proposal-id> <option> --from=<from> --chain-id=<chain-id> --fees=0.3iris -b block -y
+```
+
+当软件升级提案被通过后，升级模块会创建一项升级计划，在指定高度或者时间使所有节点停止网络共识，等待新的软件重启网络。
+
+### 重启网络
+
+当升级提案通过，网络到达指定升级区块高度或时间时，所有节点会停止出块。用户需要根据在第一步[提交升级提案](#提交升级提案)中指明的新版本信息下载源码，编译新软件，具体参考[安装](./../get-started/install.md)。新软件安装完成后，使用新的版本重启节点。当全网超过2/3的权重的验证人使用新版本启动节点后，区块链网络将重新达成新的共识，继续产生区块。

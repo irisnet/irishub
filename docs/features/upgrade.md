@@ -107,3 +107,39 @@ The user replaces the software with the specified version and restarts the netwo
 The upgrade proposal can be cancelled. There is a proposal type of `Cancel Software Upgrade (CancelSoftwareUpgrade)`. When this type of proposal is voted through, the currently ongoing upgrade plan will be removed. Of course, this needs to be voted and executed before the upgrade plan is executed.
 
 If the current upgrade plan has been executed, but there are problems with the upgrade plan, then the proposal of `Cancel Software Upgrade` is invalid (because the network has stopped consensus). At this time, there is another solution to make up for this mistake, which is to use the `--unsafe-skip-upgrades` parameter to skip the specified upgrade height when restarting the network (not really skip the height, but jump via software upgrade `Handler`). Of course, this requires that 2/3 of the validators participating in the consensus perform the same operation, otherwise the network consensus cannot be reached.
+
+## Upgrade process
+
+### Submit an upgrade proposal
+
+The first step in the implementation of the software upgrade process is to initiate a software upgrade proposal by the governance module. The proposal details the upgrade height or time. For details, see the above [Concept](#Concepts). An example of the command line to initiate a proposal is as follows:
+
+```bash
+iris tx gov submit-proposal software-upgrade <plan-name> \
+  --deposit <deposit> \
+  --upgrade-time <upgrade-time> \
+  --title <title> \
+  --upgrade-info <upgrade-info> \
+  --description <description>
+  --from=<from> --chain-id=<chain-id> --fees=0.3iris -b block -y
+```
+
+### Deposit and vote for the proposal
+
+The execution process of the software upgrade proposal is basically the same as that of other ordinary proposals. Both validators and delegators are required to comment on the proposal. For specific information, please refer to [governance module](./governance.md). An example of the command line to deposit the proposal is as follows:
+
+```bash
+iris tx gov deposit <proposal-id> <deposit> --from=<from> --chain-id=<chain-id> --fees=0.3iris -b block -y
+```
+
+Once the deposit amount reaches the minimum deposit amount, the proposal will enter the voting period, and the validator or delegator needs to vote on the proposal. An example of the command line to initiate a vote is as follows:
+
+```bash
+iris tx gov vote <proposal-id> <option> --from=<from> --chain-id=<chain-id> --fees=0.3iris -b block -y
+```
+
+When the software upgrade proposal is passed, the upgrade module will create an upgrade plan to stop all nodes from the network consensus at a specified height or time, and wait for the new software to restart the network.
+
+### Restart the network
+
+When the upgrade proposal is passed and the network reaches the specified upgrade block height or time, all nodes will stop producing blocks. and the user needs to download the source code and compile the new software according to the new version information specified in the first step [Submit Upgrade Proposal](#submit-an-upgrade-proposal), refer to [Install](../get-started/install.md). After the new software is installed, restart the node with the new version, and the node will execute the upgrade logic corresponding to the plan name. Once the voting power of the entire network exceeds 2/3 and restarts the network using the new version, the blockchain network will re-reach a new consensus and continue to produce new blocks.
