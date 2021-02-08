@@ -108,7 +108,7 @@ type SoftwareUpgradeProposal struct {
 
 ### 提交升级提案
 
-执行软件升级流程的第一步是由治理模块发起一个软件升级提案，该提案详细说明了升级时间以及升级内容，具体见上面[概念](#概念)。发起提案的命令行示例如下：
+执行软件升级流程的第一步是由治理模块发起一个软件升级提案，该提案详细说明了升级时间或者升级高度，具体见上面[概念](#概念)。发起提案的命令行示例如下：
 
 ```bash
 iris tx gov submit-proposal software-upgrade <plan-name> \
