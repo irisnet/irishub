@@ -9,7 +9,7 @@ import (
 	"github.com/irisnet/irismod/modules/token/types"
 )
 
-// InitGenesis - store genesis parameters
+// InitGenesis stores the genesis state
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	if err := types.ValidateGenesis(data); err != nil {
 		panic(err.Error())
@@ -28,14 +28,14 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		k.AddBurnCoin(ctx, coin)
 	}
 
-	//assert symbol exist
+	// assert the symbol exists
 	if !k.HasSymbol(ctx, data.Params.IssueTokenBaseFee.Denom) {
-		panic(fmt.Sprintf("Token: %s not exist", data.Params.IssueTokenBaseFee.Denom))
+		panic(fmt.Sprintf("Token %s does not exist", data.Params.IssueTokenBaseFee.Denom))
 	}
 
 }
 
-// ExportGenesis - output genesis parameters
+// ExportGenesis outputs the genesis state
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	var tokens []types.Token
 	for _, token := range k.GetTokens(ctx, nil) {
@@ -49,7 +49,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	}
 }
 
-// DefaultGenesisState return raw genesis raw message for testing
+// DefaultGenesisState returns the default genesis state for testing
 func DefaultGenesisState() *types.GenesisState {
 	return &types.GenesisState{
 		Params: types.DefaultParams(),

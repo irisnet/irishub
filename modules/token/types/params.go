@@ -26,7 +26,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	}
 }
 
-// NewParams token params constructor
+// NewParams constructs a new Params instance
 func NewParams(tokenTaxRate sdk.Dec, issueTokenBaseFee sdk.Coin,
 	mintTokenFeeRatio sdk.Dec,
 ) Params {
@@ -37,12 +37,12 @@ func NewParams(tokenTaxRate sdk.Dec, issueTokenBaseFee sdk.Coin,
 	}
 }
 
-// ParamKeyTable returns the TypeTable for coinswap module
+// ParamKeyTable returns the TypeTable for the token module
 func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-// DefaultParams return a default params
+// DefaultParams return the default params
 func DefaultParams() Params {
 	defaultToken := GetNativeToken()
 	return Params{
@@ -58,7 +58,7 @@ func (p Params) String() string {
 	return string(out)
 }
 
-// ValidateParams validate Params
+// ValidateParams validates the given params
 func ValidateParams(p Params) error {
 	if err := validateTaxRate(p.TokenTaxRate); err != nil {
 		return err

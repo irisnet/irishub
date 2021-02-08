@@ -1,6 +1,6 @@
 package types
 
-// NewRandom constructs a Random
+// NewRandom constructs a new Random instance
 func NewRandom(requestTxHash string, height int64, value string) Random {
 	return Random{
 		RequestTxHash: requestTxHash,

@@ -19,7 +19,7 @@ import (
 func NewTxCmd() *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "Asset transaction subcommands",
+		Short:                      "Token transaction subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -106,7 +106,7 @@ func GetCmdIssueToken() *cobra.Command {
 				return err
 			}
 
-			var prompt = "The token issue transaction will consume extra fee"
+			var prompt = "The token issuance transaction will consume extra fee"
 
 			generateOnly, err := cmd.Flags().GetBool(flags.FlagGenerateOnly)
 			if err != nil {
@@ -116,10 +116,10 @@ func GetCmdIssueToken() *cobra.Command {
 				// query fee
 				fee, err1 := queryTokenFees(clientCtx, msg.Symbol)
 				if err1 != nil {
-					return fmt.Errorf("failed to query token issue fee: %s", err1.Error())
+					return fmt.Errorf("failed to query token issuance fee: %s", err1.Error())
 				}
 
-				// append issue fee to prompt
+				// append issuance fee to prompt
 				issueFeeMainUnit := sdk.Coins{fee.IssueFee}.String()
 				prompt += fmt.Sprintf(": %s", issueFeeMainUnit)
 			}
@@ -242,7 +242,7 @@ func GetCmdMintToken() *cobra.Command {
 				return err
 			}
 
-			var prompt = "The token mint transaction will consume extra fee"
+			var prompt = "The token minting transaction will consume extra fee"
 
 			generateOnly, err := cmd.Flags().GetBool(flags.FlagGenerateOnly)
 			if err != nil {
@@ -252,7 +252,7 @@ func GetCmdMintToken() *cobra.Command {
 				// query fee
 				fee, err1 := queryTokenFees(clientCtx, args[0])
 				if err1 != nil {
-					return fmt.Errorf("failed to query token mint fee: %s", err1.Error())
+					return fmt.Errorf("failed to query token minting fee: %s", err1.Error())
 				}
 
 				// append mint fee to prompt

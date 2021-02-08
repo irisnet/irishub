@@ -13,7 +13,7 @@ const (
 
 var _ sdk.Msg = &MsgRequestRandom{}
 
-// NewMsgRequestRandom constructs a MsgRequestRandom
+// NewMsgRequestRandom constructs a new MsgRequestRandom instance
 func NewMsgRequestRandom(
 	consumer string,
 	blockInterval uint64,

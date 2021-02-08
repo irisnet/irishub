@@ -11,21 +11,21 @@ import (
 )
 
 const (
-	// MaximumMaxSupply limitation for token max supply，1000 billion
+	// MaximumMaxSupply is the maximum limitation for the token max supply
 	MaximumMaxSupply = math.MaxUint64
-	// MaximumInitSupply limitation for token initial supply，100 billion
+	// MaximumInitSupply is maximum limitation for the token initial supply，100 billion
 	MaximumInitSupply = uint64(100000000000)
-	// MaximumScale limitation for token decimal
+	// MaximumScale is the maximum limitation for token decimals
 	MaximumScale = uint32(9)
-	// MinimumSymbolLen limitation for the length of the token's symbol / canonical_symbol
+	// MinimumSymbolLen is the minimum limitation for the length of the token's symbol
 	MinimumSymbolLen = 3
-	// MaximumSymbolLen limitation for the length of the token's symbol / canonical_symbol
+	// MaximumSymbolLen is the maximum limitation for the length of the token's symbol
 	MaximumSymbolLen = 64
-	// MaximumNameLen limitation for the length of the token's name
+	// MaximumNameLen is the maximum limitation for the length of the token's name
 	MaximumNameLen = 32
-	// MinimumMinUnitLen limitation for the length of the token's min_unit
+	// MinimumMinUnitLen is the minimum limitation for the length of the token's min unit
 	MinimumMinUnitLen = 3
-	// MaximumMinUnitLen limitation for the length of the token's min_unit
+	// MaximumMinUnitLen is the maximum limitation for the length of the token's min unit
 	MaximumMinUnitLen = 64
 )
 
@@ -73,7 +73,7 @@ func ValidateToken(token Token) error {
 	return ValidateScale(token.Scale)
 }
 
-// ValidateInitialSupply verifies whether the  parameters are legal
+// ValidateInitialSupply verifies whether the initial supply is legal
 func ValidateInitialSupply(initialSupply uint64) error {
 	if initialSupply > MaximumInitSupply {
 		return sdkerrors.Wrapf(ErrInvalidInitSupply, "invalid token initial supply %d, only accepts value [0, %d]", initialSupply, MaximumInitSupply)
@@ -81,7 +81,7 @@ func ValidateInitialSupply(initialSupply uint64) error {
 	return nil
 }
 
-// ValidateName verifies whether the  parameters are legal
+// ValidateName verifies whether the given name is legal
 func ValidateName(name string) error {
 	if len(name) == 0 || len(name) > MaximumNameLen {
 		return sdkerrors.Wrapf(ErrInvalidName, "invalid token name %s, only accepts length (0, %d]", name, MaximumNameLen)
@@ -89,7 +89,7 @@ func ValidateName(name string) error {
 	return nil
 }
 
-// ValidateScale verifies whether the parameters are legal
+// ValidateScale verifies whether the given scale is legal
 func ValidateScale(scale uint32) error {
 	if scale > MaximumScale {
 		return sdkerrors.Wrapf(ErrInvalidScale, "invalid token scale %d, only accepts value [0, %d]", scale, MaximumScale)
@@ -97,7 +97,7 @@ func ValidateScale(scale uint32) error {
 	return nil
 }
 
-// ValidateMinUnit checks if the given minUnit is valid
+// ValidateMinUnit checks if the given min unit is valid
 func ValidateMinUnit(minUnit string) error {
 	if !regexpMinUint(minUnit) {
 		return sdkerrors.Wrapf(ErrInvalidMinUnit, "invalid minUnit: %s, only accepts english lowercase letters and numbers, length [%d, %d], and begin with an english letter, regexp: %s", minUnit, MinimumMinUnitLen, MaximumMinUnitLen, regexpMinUintFmt)
@@ -113,7 +113,7 @@ func ValidateSymbol(symbol string) error {
 	return ValidateKeywords(symbol)
 }
 
-// ValidateKeywords checks if the given denom begin with `TokenKeywords`
+// ValidateKeywords checks if the given denom begins with `TokenKeywords`
 func ValidateKeywords(denom string) error {
 	if regexpKeyword(denom) {
 		return sdkerrors.Wrapf(ErrInvalidSymbol, "invalid token: %s, can not begin with keyword: (%s)", denom, keywords)
@@ -121,7 +121,7 @@ func ValidateKeywords(denom string) error {
 	return nil
 }
 
-// ValidateAmount checks if the given denom begin with `TokenKeywords`
+// ValidateAmount checks if the given denom begins with `TokenKeywords`
 func ValidateAmount(amount uint64) error {
 	if amount == 0 {
 		return sdkerrors.Wrapf(ErrInvalidMaxSupply, "invalid token amount %d, only accepts value (0, %d]", amount, uint64(MaximumMaxSupply))

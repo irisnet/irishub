@@ -8,7 +8,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// NewRequest constructs a request
+// NewRequest constructs a new Request instance
 func NewRequest(
 	height int64,
 	consumer string,
@@ -27,7 +27,7 @@ func NewRequest(
 	}
 }
 
-// GenerateRequestID generate a request id
+// GenerateRequestID generates a request id
 func GenerateRequestID(r Request) []byte {
 	reqID := make([]byte, 0)
 

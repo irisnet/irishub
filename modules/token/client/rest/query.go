@@ -14,7 +14,7 @@ import (
 )
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
-	// Query token by symbol or minUnit
+	// Query the token by symbol or min unit
 	r.HandleFunc(fmt.Sprintf("/%s/tokens/{%s}", types.ModuleName, RestParamDenom), queryTokenHandlerFn(cliCtx)).Methods("GET")
 	// Query tokens by owner
 	r.HandleFunc(fmt.Sprintf("/%s/tokens", types.ModuleName), queryTokensHandlerFn(cliCtx)).Methods("GET")
@@ -22,7 +22,7 @@ func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
 	r.HandleFunc(fmt.Sprintf("/%s/tokens/{%s}/fees", types.ModuleName, RestParamSymbol), queryTokenFeesHandlerFn(cliCtx)).Methods("GET")
 	// Query token params
 	r.HandleFunc(fmt.Sprintf("/%s/params", types.ModuleName), queryTokenParamsHandlerFn(cliCtx)).Methods("GET")
-	// Query the total amount of all burn tokens
+	// Query the total amount of all burned tokens
 	r.HandleFunc(fmt.Sprintf("/%s/total_burn", types.ModuleName), queryTotalBurnHandlerFn(cliCtx)).Methods("GET")
 }
 

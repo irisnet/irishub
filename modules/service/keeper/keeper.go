@@ -19,9 +19,8 @@ type Keeper struct {
 	cdc      codec.Marshaler
 
 	accountKeeper types.AccountKeeper
-	// The bankKeeper to reduce the supply of the network
-	bankKeeper types.BankKeeper
-	paramSpace paramstypes.Subspace
+	bankKeeper    types.BankKeeper
+	paramSpace    paramstypes.Subspace
 
 	// name of the service fee tax ModuleAccount
 	taxAccName string

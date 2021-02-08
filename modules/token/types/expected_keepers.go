@@ -7,7 +7,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
-// BankKeeper defines the expected bank keeper for module accounts (noalias)
+// BankKeeper defines the expected bank keeper (noalias)
 type BankKeeper interface {
 	MintCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error
 	BurnCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error
@@ -25,7 +25,7 @@ type BankKeeper interface {
 	GetDenomMetaData(ctx sdk.Context, denom string) banktypes.Metadata
 }
 
-// AccountKeeper defines the expected account keeper for query account
+// AccountKeeper defines the expected account keeper
 type AccountKeeper interface {
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
 	GetModuleAddress(name string) sdk.AccAddress

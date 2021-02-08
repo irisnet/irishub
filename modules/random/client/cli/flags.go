@@ -19,7 +19,7 @@ var (
 )
 
 func init() {
-	FsRequestRand.Uint64(FlagBlockInterval, randomtypes.DefaultBlockInterval, "the block interval")
-	FsRequestRand.Bool(FlagOracle, false, "indicate if request with oracle")
-	FsRequestRand.String(FlagServiceFeeCap, "", "maximal fee to pay for a service request")
+	FsRequestRand.Uint64(FlagBlockInterval, randomtypes.DefaultBlockInterval, "The block interval")
+	FsRequestRand.Bool(FlagOracle, false, "Indicate if the request is initiated with oracle")
+	FsRequestRand.String(FlagServiceFeeCap, "", "Maximum fee to pay for a service request")
 }

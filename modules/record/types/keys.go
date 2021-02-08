@@ -23,7 +23,7 @@ var (
 	IntraTxCounterKey = []byte{0x02} // key for intra-block tx index
 )
 
-// GetRecordKey returns record key bytes
+// GetRecordKey returns the record key
 func GetRecordKey(recordID []byte) []byte {
 	return append(RecordKey, recordID...)
 }

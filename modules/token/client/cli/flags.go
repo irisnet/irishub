@@ -26,20 +26,20 @@ var (
 )
 
 func init() {
-	FsIssueToken.String(FlagSymbol, "", "the token symbol. Once created, it cannot be modified")
-	FsIssueToken.String(FlagName, "", "the token name, e.g. IRIS Network")
-	FsIssueToken.String(FlagMinUnit, "", "the minimum unit name of the token, e.g. wei")
-	FsIssueToken.Uint32(FlagScale, 0, "the token decimal. The maximum value is 18")
-	FsIssueToken.Uint64(FlagInitialSupply, 0, "the initial supply of the token")
-	FsIssueToken.Uint64(FlagMaxSupply, types.MaximumMaxSupply, "the max supply of the token")
-	FsIssueToken.Bool(FlagMintable, false, "whether the token can be minted, default to false")
+	FsIssueToken.String(FlagSymbol, "", "The token symbol. Once created, it cannot be modified")
+	FsIssueToken.String(FlagName, "", "The token name, e.g. IRIS Network")
+	FsIssueToken.String(FlagMinUnit, "", "The minimum unit name of the token, e.g. wei")
+	FsIssueToken.Uint32(FlagScale, 0, "The token decimals. The maximum value is 18")
+	FsIssueToken.Uint64(FlagInitialSupply, 0, "The initial supply of the token")
+	FsIssueToken.Uint64(FlagMaxSupply, types.MaximumMaxSupply, "The maximum supply of the token")
+	FsIssueToken.Bool(FlagMintable, false, "Whether the token can be minted, default to false")
 
-	FsEditToken.String(FlagName, "[do-not-modify]", "the token name, e.g. IRIS Network")
-	FsEditToken.Uint64(FlagMaxSupply, 0, "the max supply of the token")
-	FsEditToken.String(FlagMintable, "", "whether the token can be minted, default to false")
+	FsEditToken.String(FlagName, "[do-not-modify]", "The token name, e.g. IRIS Network")
+	FsEditToken.Uint64(FlagMaxSupply, 0, "The maximum supply of the token")
+	FsEditToken.String(FlagMintable, "", "Whether the token can be minted, default to false")
 
-	FsTransferTokenOwner.String(FlagTo, "", "the new owner")
+	FsTransferTokenOwner.String(FlagTo, "", "The new owner")
 
-	FsMintToken.String(FlagTo, "", "address of minting token to")
-	FsMintToken.Uint64(FlagAmount, 0, "amount of minting token")
+	FsMintToken.String(FlagTo, "", "Address to which the token is to be minted")
+	FsMintToken.Uint64(FlagAmount, 0, "Amount of the token to be minted")
 }

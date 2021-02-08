@@ -17,7 +17,7 @@ import (
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
 )
 
-// RequestService request the service for oracle seed
+// RequestService requests the service for the oracle seed
 func (k Keeper) RequestService(ctx sdk.Context, consumer sdk.AccAddress, serviceFeeCap sdk.Coins) (tmbytes.HexBytes, error) {
 	iterator := k.serviceKeeper.ServiceBindingsIterator(ctx, types.ServiceName)
 	defer iterator.Close()
@@ -61,7 +61,7 @@ func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID tmbytes.He
 	reqCtx, existed := k.serviceKeeper.GetRequestContext(ctx, requestContextID)
 	if !existed {
 		ctx.Logger().Error(
-			"Not existed requestContext",
+			"Request context not found",
 			"requestContextID", requestContextID.String(),
 		)
 		return
@@ -94,7 +94,7 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID tmbytes.HexByt
 	request, err := k.GetOracleRandRequest(ctx, requestContextID)
 	if err != nil {
 		ctx.Logger().Error(
-			"can not find request",
+			"request not found",
 			"requestContextID", requestContextID.String(),
 			"err", err.Error(),
 		)

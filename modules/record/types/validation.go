@@ -4,7 +4,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// ValidateContents verifies whether the  parameters are legal
+// ValidateContents verifies whether the given contents are legal
 func ValidateContents(contents ...Content) error {
 	for i, content := range contents {
 		if len(content.Digest) == 0 {

@@ -10,12 +10,12 @@ const (
 	FlagMeta = "meta"
 )
 
-// common flagsets to add to various functions
+// common flag sets to add to various functions
 var (
 	FsCreateRecord = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
-	FsCreateRecord.String(FlagURI, "", "source uri of record, such as an ipfs link")
-	FsCreateRecord.String(FlagMeta, "", "meta data of record")
+	FsCreateRecord.String(FlagURI, "", "Source URI of the record, such as an IPFS link")
+	FsCreateRecord.String(FlagMeta, "", "Metadata of the record")
 }

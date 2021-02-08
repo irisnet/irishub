@@ -11,10 +11,10 @@ const (
 	// StoreKey is the string store representation
 	StoreKey = ModuleName
 
-	// QuerierRoute is the querier route for the asset module
+	// QuerierRoute is the querier route for the random module
 	QuerierRoute = ModuleName
 
-	// RouterKey is the msg router key for the asset module
+	// RouterKey is the msg router key for the random module
 	RouterKey = ModuleName
 )
 
@@ -34,12 +34,12 @@ func KeyRandomRequestQueue(height int64, reqID []byte) []byte {
 	return append(append(RandomRequestQueueKey, sdk.Uint64ToBigEndian(uint64(height))...), reqID...)
 }
 
-// KeyRandRequestQueueSubspace returns the key prefix for iterating through all requests at the specified height
+// KeyRandomRequestQueueSubspace returns the key prefix for iterating through all requests at the specified height
 func KeyRandomRequestQueueSubspace(height int64) []byte {
 	return append(RandomRequestQueueKey, sdk.Uint64ToBigEndian(uint64(height))...)
 }
 
-// KeyOracleRandRequest returns the key for an OracleRandRequest by the specified requestContextID
+// KeyOracleRandomRequest returns the key for an OracleRandRequest by the specified requestContextID
 func KeyOracleRandomRequest(requestContextID []byte) []byte {
 	return append(OracleRandomRequestKey, requestContextID...)
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/irisnet/irismod/modules/record/types"
 )
 
-// InitGenesis stores genesis data
+// InitGenesis stores the genesis state
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	if err := types.ValidateGenesis(data); err != nil {
 		panic(err.Error())
@@ -18,7 +18,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	}
 }
 
-// ExportGenesis outputs genesis data
+// ExportGenesis outputs the genesis state
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	recordsIterator := k.RecordsIterator(ctx)
 	defer recordsIterator.Close()

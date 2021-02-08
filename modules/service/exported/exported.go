@@ -17,7 +17,7 @@ type (
 	// StateCallback defines the state callback interface
 	StateCallback = types.StateCallback
 
-	// ModuleService defines the moduler service interface
+	// ModuleService defines the module service interface
 	ModuleService = types.ModuleService
 )
 
@@ -31,21 +31,21 @@ const (
 	// COMPLETED indicates the request context is completed
 	COMPLETED = types.COMPLETED
 
-	//RegisterModuleName export types.RegisterModuleName
+	// RegisterModuleName exports types.RegisterModuleName
 	RegisterModuleName = types.RegisterModuleName
 
-	//OraclePriceServiceName export types.OraclePriceServiceName
+	// OraclePriceServiceName exports types.OraclePriceServiceName
 	OraclePriceServiceName = types.OraclePriceServiceName
 
-	//PATH_BODY export types.PATH_BODY
+	// PATH_BODY exports types.PATH_BODY
 	PATH_BODY = types.PATH_BODY
 )
 
 var (
-	//RequestContextStateFromString export types.RequestContextStateFromString
+	// RequestContextStateFromString exports types.RequestContextStateFromString
 	RequestContextStateFromString = types.RequestContextStateFromString
-	//ValidateServiceName export types.ValidateServiceName
+	// ValidateServiceName exports types.ValidateServiceName
 	ValidateServiceName = types.ValidateServiceName
-	//OraclePriceServiceProvider export types.OraclePriceServiceProvider
+	// OraclePriceServiceProvider exports types.OraclePriceServiceProvider
 	OraclePriceServiceProvider = types.OraclePriceServiceProvider
 )

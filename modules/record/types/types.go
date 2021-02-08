@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// NewRecord constructs a record
+// NewRecord constructs a new Record instance
 func NewRecord(txHash bytes.HexBytes, contents []Content, creator sdk.AccAddress) Record {
 	return Record{
 		TxHash:   txHash.String(),

@@ -15,7 +15,7 @@ type RNG interface {
 	GetRand() big.Rat // interface which returns a random number between [0,1)
 }
 
-// PRNG represents a pseudo-random number implementation based on block for RNG
+// PRNG represents a pseudo-random number implementation based on block or oracle for RNG
 type PRNG struct {
 	BlockHash      []byte         // hash of some block
 	BlockTimestamp int64          // timestamp of the next block

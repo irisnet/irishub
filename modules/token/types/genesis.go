@@ -25,7 +25,7 @@ func NewGenesisState(params Params, tokens []Token) GenesisState {
 	}
 }
 
-//SetNativeToken reset the system's default native token
+// SetNativeToken resets the system's default native token
 func SetNativeToken(
 	symbol string,
 	name string,
@@ -39,7 +39,7 @@ func SetNativeToken(
 	nativeToken = NewToken(symbol, name, minUnit, decimal, initialSupply, maxSupply, mintable, owner)
 }
 
-//GetNativeToken return the system's default native token
+//GetNativeToken returns the system's default native token
 func GetNativeToken() Token {
 	return nativeToken
 }

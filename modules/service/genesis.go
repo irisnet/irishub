@@ -12,7 +12,7 @@ import (
 	"github.com/irisnet/irismod/modules/service/types"
 )
 
-// InitGenesis - store genesis parameters
+// InitGenesis stores the genesis state
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	if err := types.ValidateGenesis(data); err != nil {
 		panic(err.Error())
@@ -42,7 +42,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	}
 }
 
-// ExportGenesis - output genesis parameters
+// ExportGenesis outputs the genesis state
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	var definitions []types.ServiceDefinition
 	var bindings []types.ServiceBinding

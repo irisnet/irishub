@@ -6,12 +6,12 @@ import (
 )
 
 const (
-	TypeMsgCreateRecord = "create_record" // type for TypeMsgCreateRecord
+	TypeMsgCreateRecord = "create_record" // type for MsgCreateRecord
 )
 
 var _ sdk.Msg = &MsgCreateRecord{}
 
-// NewMsgCreateRecord constructs a MsgCreateRecord
+// NewMsgCreateRecord constructs a new MsgCreateRecord instance
 func NewMsgCreateRecord(contents []Content, Creator string) *MsgCreateRecord {
 	return &MsgCreateRecord{
 		Contents: contents,

@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// NewGenesisState constructs a GenesisState
+// NewGenesisState constructs a new GenesisState instance
 func NewGenesisState(
 	params Params,
 	definitions []ServiceDefinition,
@@ -24,7 +24,7 @@ func NewGenesisState(
 	}
 }
 
-// DefaultGenesisState gets the raw genesis raw message for testing
+// DefaultGenesisState gets the default genesis state for testing
 func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
 		Params: DefaultParams(),

@@ -17,7 +17,6 @@ type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      codec.Marshaler
 
-	// The bankKeeper to reduce the supply of the network
 	bankKeeper types.BankKeeper
 
 	feeCollectorName string

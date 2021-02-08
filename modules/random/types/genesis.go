@@ -4,7 +4,7 @@ import (
 	"strconv"
 )
 
-// NewGenesisState constructs a GenesisState
+// NewGenesisState constructs a new GenesisState instance
 func NewGenesisState(pendingRequests map[string]Requests) *GenesisState {
 	return &GenesisState{
 		PendingRandomRequests: pendingRequests,

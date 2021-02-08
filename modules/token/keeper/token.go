@@ -46,14 +46,14 @@ func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress) (tokens []types
 	return
 }
 
-// GetToken returns the token of the specified symbol or minUint
+// GetToken returns the token of the specified symbol or min uint
 func (k Keeper) GetToken(ctx sdk.Context, denom string) (types.TokenI, error) {
 	// query token by symbol
 	if token, err := k.getTokenBySymbol(ctx, denom); err == nil {
 		return &token, nil
 	}
 
-	// query token by minUnit
+	// query token by min unit
 	if token, err := k.getTokenByMinUnit(ctx, denom); err == nil {
 		return &token, nil
 	}

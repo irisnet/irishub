@@ -37,7 +37,7 @@ func GetQueryCmd() *cobra.Command {
 func GetCmdQueryToken() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "token [denom]",
-		Long:    "Query a token by symbol or minUnit.",
+		Long:    "Query a token by symbol or min unit.",
 		Example: fmt.Sprintf("$ %s query token token <denom>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -187,11 +187,11 @@ func GetCmdQueryParams() *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryTotalBurn return the total amount of all burn tokens
+// GetCmdQueryTotalBurn return the total amount of all burned tokens
 func GetCmdQueryTotalBurn() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "total-burn",
-		Long:    "Query the total amount of all burn tokens.",
+		Long:    "Query the total amount of all burned tokens.",
 		Example: fmt.Sprintf("$ %s query token params", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)

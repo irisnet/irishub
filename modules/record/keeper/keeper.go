@@ -35,7 +35,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("irismod/%s", types.ModuleName))
 }
 
-// AddRecord add a record
+// AddRecord adds a record
 func (k Keeper) AddRecord(ctx sdk.Context, record types.Record) []byte {
 	store := ctx.KVStore(k.storeKey)
 	recordBz := k.cdc.MustMarshalBinaryBare(&record)
@@ -53,7 +53,7 @@ func (k Keeper) AddRecord(ctx sdk.Context, record types.Record) []byte {
 	return recordID
 }
 
-// GetRecord retrieves the record by specified recordID
+// GetRecord retrieves the record by the specified record ID
 func (k Keeper) GetRecord(ctx sdk.Context, recordID []byte) (record types.Record, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	if bz := store.Get(types.GetRecordKey(recordID)); bz != nil {

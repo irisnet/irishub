@@ -8,7 +8,7 @@ import (
 	"github.com/irisnet/irismod/modules/token/types"
 )
 
-// NewHandler handle all "token" type messages.
+// NewHandler handles all "token" type messages.
 func NewHandler(k keeper.Keeper) sdk.Handler {
 	msgServer := keeper.NewMsgServerImpl(k)
 

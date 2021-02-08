@@ -17,7 +17,7 @@ var (
 	tenInt               = big.NewInt(10)
 )
 
-// TokenI define a interface for Token
+// TokenI defines an interface for Token
 type TokenI interface {
 	GetSymbol() string
 	GetName() string
@@ -109,7 +109,7 @@ func (t Token) String() string {
 	return string(bz)
 }
 
-//ToMainCoin return the main denom coin from args
+// ToMainCoin returns the main denom coin from args
 func (t Token) ToMainCoin(coin sdk.Coin) (sdk.DecCoin, error) {
 	if t.Symbol != coin.Denom && t.MinUnit != coin.Denom {
 		return sdk.NewDecCoinFromDec(coin.Denom, sdk.ZeroDec()), sdkerrors.Wrapf(ErrTokenNotExists, "token not match")
@@ -125,7 +125,7 @@ func (t Token) ToMainCoin(coin sdk.Coin) (sdk.DecCoin, error) {
 	return sdk.NewDecCoinFromDec(t.Symbol, amount), nil
 }
 
-//ToMinCoin return the min denom coin from args
+// ToMinCoin returns the min denom coin from args
 func (t Token) ToMinCoin(coin sdk.DecCoin) (newCoin sdk.Coin, err error) {
 	if t.Symbol != coin.Denom && t.MinUnit != coin.Denom {
 		return sdk.NewCoin(coin.Denom, sdk.ZeroInt()), sdkerrors.Wrapf(ErrTokenNotExists, "token not match")

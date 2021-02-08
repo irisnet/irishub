@@ -16,7 +16,7 @@ var (
 	ErrInvalidDeposit            = sdkerrors.Register(ModuleName, 8, "invalid deposit")
 	ErrInvalidMinDeposit         = sdkerrors.Register(ModuleName, 9, "invalid minimum deposit")
 	ErrInvalidPricing            = sdkerrors.Register(ModuleName, 10, "invalid pricing")
-	ErrInvalidQoS                = sdkerrors.Register(ModuleName, 11, "invalid qos")
+	ErrInvalidQoS                = sdkerrors.Register(ModuleName, 11, "invalid QoS")
 	ErrInvalidOptions            = sdkerrors.Register(ModuleName, 12, "invalid options")
 	ErrServiceBindingExists      = sdkerrors.Register(ModuleName, 13, "service binding already exists")
 	ErrUnknownServiceBinding     = sdkerrors.Register(ModuleName, 14, "unknown service binding")

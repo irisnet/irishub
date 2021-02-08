@@ -1,6 +1,6 @@
 package types
 
-// QueryRecordParams defines QueryRecord params
+// QueryRecordParams defines params to query a record
 type QueryRecordParams struct {
 	RecordID []byte `json:"record_id"`
 }
