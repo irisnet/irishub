@@ -108,12 +108,34 @@ type SoftwareUpgradeProposal struct {
 
 ### 提交升级提案
 
-执行软件升级流程的第一步是由治理模块发起一个软件升级提案，该提案详细说明了升级时间以及升级内容，具体见上面[概念](#概念)。
+执行软件升级流程的第一步是由治理模块发起一个软件升级提案，该提案详细说明了升级时间以及升级内容，具体见上面[概念](#概念)。发起提案的命令行示例如下：
+
+```bash
+iris tx gov submit-proposal software-upgrade bifrost-rc2 \
+  --deposit 10000000ubif \
+  --upgrade-time 2021-02-09T13:00:00Z \
+  --title "bifrost-2 software upgrade" \
+  --upgrade-info "Commit: 0ef5dd0b4d140a4788f05fc1a0bd409b3c6a0492. After the proposal is approved, please use the commit hash to build and restart your node." \
+  --description "Upgrade the bifrost-2 software version from v1.0.0-rc0 to v1.0.0-rc2."
+  --from=node0 --chain-id=test --fees=100ubif -b block -y
+```
 
 ### 为提案抵押、投票
 
-软件升级提案和其他普通提案的执行流程基本一致，都需要验证人、委托人为该提案发表意见，具体信息请参考[治理模块](./governance.md)。一旦当软件升级提案被通过后，升级模块会创建一项升级计划，在指定高度或者时间使所有节点停止网络共识，等待新的软件重启网络。
+软件升级提案和其他普通提案的执行流程基本一致，都需要验证人、委托人为该提案发表意见，具体信息请参考[治理模块](./governance.md)。为提案抵押的命令行示例如下：
+
+```bash
+iris tx gov deposit 1 1000ubif --from=node0 --chain-id=test --fees=100ubif -b block -y
+```
+
+一旦抵押金额达到最小抵押金额，提案将进入投票期，验证人或者委托人需要对该提案发起投票，发起投票的命令行示例如下：
+
+```bash
+iris tx gov vote 1 yes  --from=node0 --chain-id=test --fees=100ubif -b block -y
+```
+
+当软件升级提案被通过后，升级模块会创建一项升级计划，在指定高度或者时间使所有节点停止网络共识，等待新的软件重启网络。
 
 ### 重启网络
 
-在第一步[提交升级提案](#提交升级提案)中，会指明新版本软件的版本信息，根据版本信息下载新的源码，编译新软件，具体参考[安装](./../get-started/install.md)。新软件安装完成后，使用新的版本重启节点，节点会执行和计划名称相应的升级逻辑。一旦全网超过2/3的权重使用新的版本重启网络，区块链网络将重新达成新的共识，继续产生新区块。
+当升级提案通过，节点会停止出块，用户需要根据在第一步[提交升级提案](#提交升级提案)中指明的新版本信息下载源码，编译新软件，具体参考[安装](./../get-started/install.md)。新软件安装完成后，使用新的版本重启节点，节点会执行和计划名称相应的升级逻辑。一旦全网超过2/3的权重使用新的版本重启网络，区块链网络将重新达成新的共识，继续产生新区块。
