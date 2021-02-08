@@ -30,7 +30,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// MsgAddLiquidity represents a msg for adding liquidity to a reserve pool
+// MsgAddLiquidity defines a msg for adding liquidity to a reserve pool
 type MsgAddLiquidity struct {
 	MaxToken         types.Coin                             `protobuf:"bytes,1,opt,name=max_token,json=maxToken,proto3" json:"max_token" yaml:"max_token"`
 	ExactStandardAmt github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,2,opt,name=exact_standard_amt,json=exactStandardAmt,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"exact_standard_amt" yaml:"exact_standard_amt"`
@@ -72,7 +72,7 @@ func (m *MsgAddLiquidity) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgAddLiquidity proto.InternalMessageInfo
 
-// MsgAddLiquidityResponse defines the Msg/AddLiquidity response type.
+// MsgAddLiquidityResponse defines the Msg/AddLiquidity response type
 type MsgAddLiquidityResponse struct {
 	MintToken *types.Coin `protobuf:"bytes,1,opt,name=mint_token,json=mintToken,proto3" json:"mint_token,omitempty"`
 }
@@ -110,7 +110,7 @@ func (m *MsgAddLiquidityResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgAddLiquidityResponse proto.InternalMessageInfo
 
-// MsgRemoveLiquidity - struct for removing liquidity from a reserve pool
+// MsgRemoveLiquidity defines a msg for removing liquidity from a reserve pool
 type MsgRemoveLiquidity struct {
 	WithdrawLiquidity types.Coin                             `protobuf:"bytes,1,opt,name=withdraw_liquidity,json=withdrawLiquidity,proto3" json:"withdraw_liquidity" yaml:"withdraw_liquidity"`
 	MinToken          github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,2,opt,name=min_token,json=minToken,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"min_token" yaml:"min_token"`
@@ -152,7 +152,7 @@ func (m *MsgRemoveLiquidity) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRemoveLiquidity proto.InternalMessageInfo
 
-// MsgRemoveLiquidityResponse defines the Msg/RemoveLiquidity response type.
+// MsgRemoveLiquidityResponse defines the Msg/RemoveLiquidity response type
 type MsgRemoveLiquidityResponse struct {
 	WithdrawCoins []*types.Coin `protobuf:"bytes,1,rep,name=withdraw_coins,json=withdrawCoins,proto3" json:"withdraw_coins,omitempty"`
 }
@@ -190,7 +190,7 @@ func (m *MsgRemoveLiquidityResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRemoveLiquidityResponse proto.InternalMessageInfo
 
-// MsgSwapOrder represents a msg for swap order
+// MsgSwapOrder defines a msg for swap order
 type MsgSwapOrder struct {
 	Input      Input  `protobuf:"bytes,1,opt,name=input,proto3" json:"input"`
 	Output     Output `protobuf:"bytes,2,opt,name=output,proto3" json:"output"`
@@ -231,7 +231,7 @@ func (m *MsgSwapOrder) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSwapOrder proto.InternalMessageInfo
 
-// MsgSwapCoinResponse defines the Msg/SwapCoin response type.
+// MsgSwapCoinResponse defines the Msg/SwapCoin response type
 type MsgSwapCoinResponse struct {
 }
 
@@ -339,11 +339,11 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
-	// AddLiquidity defines a method for depositing some tokens to the liquidity pool.
+	// AddLiquidity defines a method for depositing some tokens to the liquidity pool
 	AddLiquidity(ctx context.Context, in *MsgAddLiquidity, opts ...grpc.CallOption) (*MsgAddLiquidityResponse, error)
-	// RemoveLiquidity defines a method for withdraw some tokens from the liquidity pool.
+	// RemoveLiquidity defines a method for withdraw some tokens from the liquidity pool
 	RemoveLiquidity(ctx context.Context, in *MsgRemoveLiquidity, opts ...grpc.CallOption) (*MsgRemoveLiquidityResponse, error)
-	// SwapCoin defines a method for swapping a token with the other token from the liquidity pool.
+	// SwapCoin defines a method for swapping a token with the other token from the liquidity pool
 	SwapCoin(ctx context.Context, in *MsgSwapOrder, opts ...grpc.CallOption) (*MsgSwapCoinResponse, error)
 }
 
@@ -384,11 +384,11 @@ func (c *msgClient) SwapCoin(ctx context.Context, in *MsgSwapOrder, opts ...grpc
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
-	// AddLiquidity defines a method for depositing some tokens to the liquidity pool.
+	// AddLiquidity defines a method for depositing some tokens to the liquidity pool
 	AddLiquidity(context.Context, *MsgAddLiquidity) (*MsgAddLiquidityResponse, error)
-	// RemoveLiquidity defines a method for withdraw some tokens from the liquidity pool.
+	// RemoveLiquidity defines a method for withdraw some tokens from the liquidity pool
 	RemoveLiquidity(context.Context, *MsgRemoveLiquidity) (*MsgRemoveLiquidityResponse, error)
-	// SwapCoin defines a method for swapping a token with the other token from the liquidity pool.
+	// SwapCoin defines a method for swapping a token with the other token from the liquidity pool
 	SwapCoin(context.Context, *MsgSwapOrder) (*MsgSwapCoinResponse, error)
 }
 

@@ -23,7 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// GenesisState defines the nft module's genesis state.
+// GenesisState defines the NFT module's genesis state
 type GenesisState struct {
 	Collections []Collection `protobuf:"bytes,1,rep,name=collections,proto3" json:"collections"`
 }

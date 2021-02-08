@@ -103,7 +103,7 @@ func (m *Output) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Output proto.InternalMessageInfo
 
-// token parameters
+// Params defines token module's parameters
 type Params struct {
 	Fee github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,1,opt,name=fee,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"fee"`
 }

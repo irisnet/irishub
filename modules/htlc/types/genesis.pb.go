@@ -23,7 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// GenesisState defines the htlc module's genesis state.
+// GenesisState defines the HTLC module's genesis state
 type GenesisState struct {
 	PendingHtlcs map[string]HTLC `protobuf:"bytes,1,rep,name=pending_htlcs,json=pendingHtlcs,proto3" json:"pending_htlcs" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }

@@ -6,8 +6,7 @@ import "record/record.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/record/types";
 
-// GenesisState defines the record module's genesis state.
+// GenesisState defines the record module's genesis state
 message GenesisState {
-    repeated Record records = 1 [(gogoproto.nullable) = false];
+    repeated Record records = 1 [ (gogoproto.nullable) = false ];
 }
-

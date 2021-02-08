@@ -23,7 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// BaseNFT defines a non fungible token.
+// BaseNFT defines a non-fungible token
 type BaseNFT struct {
 	Id    string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name  string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -65,7 +65,7 @@ func (m *BaseNFT) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_BaseNFT proto.InternalMessageInfo
 
-// Denom defines a type of NFT.
+// Denom defines a type of NFT
 type Denom struct {
 	Id      string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name    string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -106,6 +106,7 @@ func (m *Denom) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Denom proto.InternalMessageInfo
 
+// IDCollection defines a type of collection with specified ID
 type IDCollection struct {
 	DenomId  string   `protobuf:"bytes,1,opt,name=denom_id,json=denomId,proto3" json:"denom_id,omitempty" yaml:"denom_id"`
 	TokenIds []string `protobuf:"bytes,2,rep,name=token_ids,json=tokenIds,proto3" json:"token_ids,omitempty" yaml:"token_ids"`
@@ -144,6 +145,7 @@ func (m *IDCollection) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_IDCollection proto.InternalMessageInfo
 
+// Owner defines a type of owner
 type Owner struct {
 	Address       string         `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 	IDCollections []IDCollection `protobuf:"bytes,2,rep,name=id_collections,json=idCollections,proto3" json:"id_collections" yaml:"idcs"`
@@ -182,6 +184,7 @@ func (m *Owner) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Owner proto.InternalMessageInfo
 
+// Collection defines a type of collection
 type Collection struct {
 	Denom Denom     `protobuf:"bytes,1,opt,name=denom,proto3" json:"denom"`
 	NFTs  []BaseNFT `protobuf:"bytes,2,rep,name=nfts,proto3" json:"nfts"`

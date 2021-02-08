@@ -25,7 +25,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// HTLCState defines a state for an HTLC
+// HTLCState defines the state of an HTLC
 type HTLCState int32
 
 const (
@@ -61,7 +61,7 @@ func (HTLCState) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_c03699801a204f8b, []int{0}
 }
 
-// HTLC defines a struct for an HTLC
+// HTLC defines the struct of an HTLC
 type HTLC struct {
 	Sender               string                                   `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
 	To                   string                                   `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`

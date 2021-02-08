@@ -8,7 +8,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/nft/types";
 
-// Query defines the gRPC querier service for nft module
+// Query defines the gRPC querier service for NFT module
 service Query {
     // Supply queries the total supply of a given denom or owner
     rpc Supply(QuerySupplyRequest) returns (QuerySupplyResponse) {

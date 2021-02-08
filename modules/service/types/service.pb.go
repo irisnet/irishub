@@ -59,11 +59,11 @@ func (RequestContextBatchState) EnumDescriptor() ([]byte, []int) {
 type RequestContextState int32
 
 const (
-	// RUNNING defines the running request context status.
+	// RUNNING defines the running request context status
 	RUNNING RequestContextState = 0
-	// PAUSED defines the paused request context status.
+	// PAUSED defines the paused request context status
 	PAUSED RequestContextState = 1
-	// COMPLETED defines the completed request context status.
+	// COMPLETED defines the completed request context status
 	COMPLETED RequestContextState = 2
 )
 
@@ -83,7 +83,7 @@ func (RequestContextState) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_e51e679f9ae460e2, []int{1}
 }
 
-// ServiceDefinition defines a standard for service definition.
+// ServiceDefinition defines a standard for service definition
 type ServiceDefinition struct {
 	Name              string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description       string   `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
@@ -126,7 +126,7 @@ func (m *ServiceDefinition) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ServiceDefinition proto.InternalMessageInfo
 
-// ServiceBinding defines a standard for service binding.
+// ServiceBinding defines a standard for service binding
 type ServiceBinding struct {
 	ServiceName  string                                   `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty" yaml:"service_name"`
 	Provider     string                                   `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"`
@@ -172,7 +172,7 @@ func (m *ServiceBinding) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ServiceBinding proto.InternalMessageInfo
 
-// RequestContext defines a standard for request context.
+// RequestContext defines a standard for request context
 type RequestContext struct {
 	ServiceName            string                                   `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty" yaml:"service_name"`
 	Providers              []string                                 `protobuf:"bytes,2,rep,name=providers,proto3" json:"providers,omitempty"`
@@ -226,7 +226,7 @@ func (m *RequestContext) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RequestContext proto.InternalMessageInfo
 
-// Request defines a standard for request.
+// Request defines a standard for request
 type Request struct {
 	Id                         string                                   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	ServiceName                string                                   `protobuf:"bytes,2,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty" yaml:"service_name"`
@@ -273,7 +273,7 @@ func (m *Request) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Request proto.InternalMessageInfo
 
-// CompactRequest defines a standard for compact request.
+// CompactRequest defines a standard for compact request
 type CompactRequest struct {
 	RequestContextId           string                                   `protobuf:"bytes,1,opt,name=request_context_id,json=requestContextId,proto3" json:"request_context_id,omitempty" yaml:"request_context_id"`
 	RequestContextBatchCounter uint64                                   `protobuf:"varint,2,opt,name=request_context_batch_counter,json=requestContextBatchCounter,proto3" json:"request_context_batch_counter,omitempty" yaml:"request_context_batch_counter"`
@@ -316,7 +316,7 @@ func (m *CompactRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CompactRequest proto.InternalMessageInfo
 
-// Response defines a standard for response.
+// Response defines a standard for response
 type Response struct {
 	Provider                   string `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`
 	Consumer                   string `protobuf:"bytes,2,opt,name=consumer,proto3" json:"consumer,omitempty"`
@@ -359,7 +359,7 @@ func (m *Response) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Response proto.InternalMessageInfo
 
-// Pricing defines a standard for service pricing.
+// Pricing defines a standard for service pricing
 type Pricing struct {
 	Price              github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,6,rep,name=price,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"price"`
 	PromotionsByTime   []PromotionByTime                        `protobuf:"bytes,2,rep,name=promotions_by_time,json=promotionsByTime,proto3" json:"promotions_by_time" yaml:"promotions_by_time"`
@@ -399,7 +399,7 @@ func (m *Pricing) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Pricing proto.InternalMessageInfo
 
-// PromotionByTime defines a standard for service promotion by time.
+// PromotionByTime defines a standard for service promotion by time
 type PromotionByTime struct {
 	StartTime time.Time                              `protobuf:"bytes,1,opt,name=start_time,json=startTime,proto3,stdtime" json:"start_time" yaml:"start_time"`
 	EndTime   time.Time                              `protobuf:"bytes,2,opt,name=end_time,json=endTime,proto3,stdtime" json:"end_time" yaml:"end_time"`
@@ -439,7 +439,7 @@ func (m *PromotionByTime) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_PromotionByTime proto.InternalMessageInfo
 
-// PromotionByVolume defines a standard for service promotion by volume.
+// PromotionByVolume defines a standard for service promotion by volume
 type PromotionByVolume struct {
 	Volume   uint64                                 `protobuf:"varint,1,opt,name=volume,proto3" json:"volume,omitempty"`
 	Discount github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=discount,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"discount"`
@@ -478,7 +478,7 @@ func (m *PromotionByVolume) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_PromotionByVolume proto.InternalMessageInfo
 
-// service parameters
+// Params defines service module's parameters
 type Params struct {
 	MaxRequestTimeout    int64                                    `protobuf:"varint,1,opt,name=max_request_timeout,json=maxRequestTimeout,proto3" json:"max_request_timeout,omitempty" yaml:"max_request_timeout"`
 	MinDepositMultiple   int64                                    `protobuf:"varint,2,opt,name=min_deposit_multiple,json=minDepositMultiple,proto3" json:"min_deposit_multiple,omitempty" yaml:"min_deposit_multiple"`
@@ -2090,10 +2090,7 @@ func (m *ServiceDefinition) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthService
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthService
 			}
 			if (iNdEx + skippy) > l {
@@ -2409,10 +2406,7 @@ func (m *ServiceBinding) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthService
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthService
 			}
 			if (iNdEx + skippy) > l {
@@ -2866,10 +2860,7 @@ func (m *RequestContext) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthService
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthService
 			}
 			if (iNdEx + skippy) > l {
@@ -3202,10 +3193,7 @@ func (m *Request) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthService
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthService
 			}
 			if (iNdEx + skippy) > l {
@@ -3410,10 +3398,7 @@ func (m *CompactRequest) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthService
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthService
 			}
 			if (iNdEx + skippy) > l {
@@ -3642,10 +3627,7 @@ func (m *Response) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthService
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthService
 			}
 			if (iNdEx + skippy) > l {
@@ -3797,10 +3779,7 @@ func (m *Pricing) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthService
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthService
 			}
 			if (iNdEx + skippy) > l {
@@ -3950,10 +3929,7 @@ func (m *PromotionByTime) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthService
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthService
 			}
 			if (iNdEx + skippy) > l {
@@ -4056,10 +4032,7 @@ func (m *PromotionByVolume) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthService
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthService
 			}
 			if (iNdEx + skippy) > l {
@@ -4366,10 +4339,7 @@ func (m *Params) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthService
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthService
 			}
 			if (iNdEx + skippy) > l {

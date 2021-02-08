@@ -191,8 +191,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
-	// Liquidity returns the total liquidity available for the provided
-	// denomination
+	// Liquidity returns the total liquidity available for the provided denomination
 	Liquidity(ctx context.Context, in *QueryLiquidityRequest, opts ...grpc.CallOption) (*QueryLiquidityResponse, error)
 }
 
@@ -215,8 +214,7 @@ func (c *queryClient) Liquidity(ctx context.Context, in *QueryLiquidityRequest, 
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
-	// Liquidity returns the total liquidity available for the provided
-	// denomination
+	// Liquidity returns the total liquidity available for the provided denomination
 	Liquidity(context.Context, *QueryLiquidityRequest) (*QueryLiquidityResponse, error)
 }
 

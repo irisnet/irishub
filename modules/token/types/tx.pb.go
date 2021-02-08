@@ -28,7 +28,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// MsgIssueToken defines an SDK message for issuing a new token.
+// MsgIssueToken defines an SDK message for issuing a new token
 type MsgIssueToken struct {
 	Symbol        string `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`
 	Name          string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -73,7 +73,7 @@ func (m *MsgIssueToken) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgIssueToken proto.InternalMessageInfo
 
-// MsgIssueTokenResponse defines the Msg/IssueToken response type.
+// MsgIssueTokenResponse defines the Msg/IssueToken response type
 type MsgIssueTokenResponse struct {
 }
 
@@ -110,7 +110,7 @@ func (m *MsgIssueTokenResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgIssueTokenResponse proto.InternalMessageInfo
 
-// MsgMintToken defines an SDK message for transferring the token owner.
+// MsgTransferTokenOwner defines an SDK message for transferring the token owner
 type MsgTransferTokenOwner struct {
 	SrcOwner string `protobuf:"bytes,1,opt,name=src_owner,json=srcOwner,proto3" json:"src_owner,omitempty" yaml:"src_owner"`
 	DstOwner string `protobuf:"bytes,2,opt,name=dst_owner,json=dstOwner,proto3" json:"dst_owner,omitempty" yaml:"dst_owner"`
@@ -150,7 +150,7 @@ func (m *MsgTransferTokenOwner) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgTransferTokenOwner proto.InternalMessageInfo
 
-// MsgTransferTokenOwnerResponse defines the Msg/TransferTokenOwner response type.
+// MsgTransferTokenOwnerResponse defines the Msg/TransferTokenOwner response type
 type MsgTransferTokenOwnerResponse struct {
 }
 
@@ -187,7 +187,7 @@ func (m *MsgTransferTokenOwnerResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgTransferTokenOwnerResponse proto.InternalMessageInfo
 
-// MsgEditToken defines an SDK message for editing a new token.
+// MsgEditToken defines an SDK message for editing a new token
 type MsgEditToken struct {
 	Symbol    string `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`
 	Name      string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -229,7 +229,7 @@ func (m *MsgEditToken) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgEditToken proto.InternalMessageInfo
 
-// MsgEditTokenResponse defines the Msg/EditToken response type.
+// MsgEditTokenResponse defines the Msg/EditToken response type
 type MsgEditTokenResponse struct {
 }
 
@@ -266,7 +266,7 @@ func (m *MsgEditTokenResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgEditTokenResponse proto.InternalMessageInfo
 
-// MsgMintToken defines an SDK message for minting a new token.
+// MsgMintToken defines an SDK message for minting a new token
 type MsgMintToken struct {
 	Symbol string `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`
 	Amount uint64 `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
@@ -307,7 +307,7 @@ func (m *MsgMintToken) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgMintToken proto.InternalMessageInfo
 
-// MsgMintTokenResponse defines the Msg/MintToken response type.
+// MsgMintTokenResponse defines the Msg/MintToken response type
 type MsgMintTokenResponse struct {
 }
 
@@ -344,7 +344,7 @@ func (m *MsgMintTokenResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgMintTokenResponse proto.InternalMessageInfo
 
-// MsgBurnToken defines an SDK message for burning some tokens.
+// MsgBurnToken defines an SDK message for burning some tokens
 type MsgBurnToken struct {
 	Symbol string `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`
 	Amount uint64 `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
@@ -384,7 +384,7 @@ func (m *MsgBurnToken) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgBurnToken proto.InternalMessageInfo
 
-// MsgBurnTokenResponse defines the Msg/BurnToken response type.
+// MsgBurnTokenResponse defines the Msg/BurnToken response type
 type MsgBurnTokenResponse struct {
 }
 
@@ -491,15 +491,15 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
-	// IssueToken defines a method for issuing a new token.
+	// IssueToken defines a method for issuing a new token
 	IssueToken(ctx context.Context, in *MsgIssueToken, opts ...grpc.CallOption) (*MsgIssueTokenResponse, error)
-	// EditToken defines a method for editing a token.
+	// EditToken defines a method for editing a token
 	EditToken(ctx context.Context, in *MsgEditToken, opts ...grpc.CallOption) (*MsgEditTokenResponse, error)
-	// MintToken defines a method for minting some tokens.
+	// MintToken defines a method for minting some tokens
 	MintToken(ctx context.Context, in *MsgMintToken, opts ...grpc.CallOption) (*MsgMintTokenResponse, error)
-	// BurnToken defines a method for burning some tokens.
+	// BurnToken defines a method for burning some tokens
 	BurnToken(ctx context.Context, in *MsgBurnToken, opts ...grpc.CallOption) (*MsgBurnTokenResponse, error)
-	// TransferTokenOwner defines a method for minting some tokens.
+	// TransferTokenOwner defines a method for minting some tokens
 	TransferTokenOwner(ctx context.Context, in *MsgTransferTokenOwner, opts ...grpc.CallOption) (*MsgTransferTokenOwnerResponse, error)
 }
 
@@ -558,15 +558,15 @@ func (c *msgClient) TransferTokenOwner(ctx context.Context, in *MsgTransferToken
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
-	// IssueToken defines a method for issuing a new token.
+	// IssueToken defines a method for issuing a new token
 	IssueToken(context.Context, *MsgIssueToken) (*MsgIssueTokenResponse, error)
-	// EditToken defines a method for editing a token.
+	// EditToken defines a method for editing a token
 	EditToken(context.Context, *MsgEditToken) (*MsgEditTokenResponse, error)
-	// MintToken defines a method for minting some tokens.
+	// MintToken defines a method for minting some tokens
 	MintToken(context.Context, *MsgMintToken) (*MsgMintTokenResponse, error)
-	// BurnToken defines a method for burning some tokens.
+	// BurnToken defines a method for burning some tokens
 	BurnToken(context.Context, *MsgBurnToken) (*MsgBurnTokenResponse, error)
-	// TransferTokenOwner defines a method for minting some tokens.
+	// TransferTokenOwner defines a method for minting some tokens
 	TransferTokenOwner(context.Context, *MsgTransferTokenOwner) (*MsgTransferTokenOwnerResponse, error)
 }
 

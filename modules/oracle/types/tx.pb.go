@@ -171,7 +171,7 @@ func (m *MsgCreateFeed) GetResponseThreshold() uint32 {
 	return 0
 }
 
-// MsgCreateFeedResponse defines the Msg/CreateFeed response type.
+// MsgCreateFeedResponse defines the Msg/CreateFeed response type
 type MsgCreateFeedResponse struct {
 }
 
@@ -261,7 +261,7 @@ func (m *MsgStartFeed) GetCreator() string {
 	return ""
 }
 
-// MsgStartFeedResponse defines the Msg/StartFeed response type.
+// MsgStartFeedResponse defines the Msg/StartFeed response type
 type MsgStartFeedResponse struct {
 }
 
@@ -351,7 +351,7 @@ func (m *MsgPauseFeed) GetCreator() string {
 	return ""
 }
 
-// MsgPauseFeedResponse defines the Msg/PauseFeed response type.
+// MsgPauseFeedResponse defines the Msg/PauseFeed response type
 type MsgPauseFeedResponse struct {
 }
 
@@ -497,7 +497,7 @@ func (m *MsgEditFeed) GetCreator() string {
 	return ""
 }
 
-// MsgEditFeedResponse defines the Msg/EditFeed response type.
+// MsgEditFeedResponse defines the Msg/EditFeed response type
 type MsgEditFeedResponse struct {
 }
 
@@ -611,13 +611,13 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
-	// CreateFeed defines a method for creating a new feed.
+	// CreateFeed defines a method for creating a new feed
 	CreateFeed(ctx context.Context, in *MsgCreateFeed, opts ...grpc.CallOption) (*MsgCreateFeedResponse, error)
-	// EditFeed defines a method for editing a feed.
+	// EditFeed defines a method for editing a feed
 	EditFeed(ctx context.Context, in *MsgEditFeed, opts ...grpc.CallOption) (*MsgEditFeedResponse, error)
 	// StartFeed defines a method for starting a feed
 	StartFeed(ctx context.Context, in *MsgStartFeed, opts ...grpc.CallOption) (*MsgStartFeedResponse, error)
-	// PauseFeed defines a method for pausing a feed.
+	// PauseFeed defines a method for pausing a feed
 	PauseFeed(ctx context.Context, in *MsgPauseFeed, opts ...grpc.CallOption) (*MsgPauseFeedResponse, error)
 }
 
@@ -667,13 +667,13 @@ func (c *msgClient) PauseFeed(ctx context.Context, in *MsgPauseFeed, opts ...grp
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
-	// CreateFeed defines a method for creating a new feed.
+	// CreateFeed defines a method for creating a new feed
 	CreateFeed(context.Context, *MsgCreateFeed) (*MsgCreateFeedResponse, error)
-	// EditFeed defines a method for editing a feed.
+	// EditFeed defines a method for editing a feed
 	EditFeed(context.Context, *MsgEditFeed) (*MsgEditFeedResponse, error)
 	// StartFeed defines a method for starting a feed
 	StartFeed(context.Context, *MsgStartFeed) (*MsgStartFeedResponse, error)
-	// PauseFeed defines a method for pausing a feed.
+	// PauseFeed defines a method for pausing a feed
 	PauseFeed(context.Context, *MsgPauseFeed) (*MsgPauseFeedResponse, error)
 }
 

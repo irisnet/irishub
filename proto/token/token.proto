@@ -15,21 +15,21 @@ message Token {
     string symbol = 1;
     string name = 2;
     uint32 scale = 3;
-    string min_unit = 4 [(gogoproto.moretags) = "yaml:\"min_unit\""];
-    uint64 initial_supply = 5 [(gogoproto.moretags) = "yaml:\"initial_supply\""];
-    uint64 max_supply = 6 [(gogoproto.moretags) = "yaml:\"max_supply\""];
+    string min_unit = 4 [ (gogoproto.moretags) = "yaml:\"min_unit\"" ];
+    uint64 initial_supply = 5 [ (gogoproto.moretags) = "yaml:\"initial_supply\"" ];
+    uint64 max_supply = 6 [ (gogoproto.moretags) = "yaml:\"max_supply\"" ];
     bool mintable = 7;
     string owner = 8;
 }
 
-// token parameters
+// Params defines token module's parameters
 message Params {
     option (gogoproto.equal) = true;
     option (gogoproto.goproto_stringer) = false;
 
-    string token_tax_rate = 1 [(gogoproto.moretags) = "yaml:\"token_tax_rate\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+    string token_tax_rate = 1 [ (gogoproto.moretags) = "yaml:\"token_tax_rate\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false ];
 
-    cosmos.base.v1beta1.Coin issue_token_base_fee = 2 [(gogoproto.moretags) = "yaml:\"issue_token_base_fee\"", (gogoproto.nullable) = false];
+    cosmos.base.v1beta1.Coin issue_token_base_fee = 2 [ (gogoproto.moretags) = "yaml:\"issue_token_base_fee\"", (gogoproto.nullable) = false ];
 
-    string mint_token_fee_ratio = 3 [(gogoproto.moretags) = "yaml:\"mint_token_fee_ratio\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+    string mint_token_fee_ratio = 3 [ (gogoproto.moretags) = "yaml:\"mint_token_fee_ratio\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false ];
 }

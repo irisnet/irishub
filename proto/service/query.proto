@@ -102,7 +102,7 @@ message QueryBindingResponse {
 message QueryBindingsRequest {
     string service_name = 1;
     string owner = 2;
-    // pagination defines an optional pagination for the request.
+    // pagination defines an optional pagination for the request
     cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 

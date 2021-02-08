@@ -30,7 +30,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// MsgDefineService defines an SDK message for defining a new service.
+// MsgDefineService defines an SDK message for defining a new service
 type MsgDefineService struct {
 	Name              string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description       string   `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
@@ -73,7 +73,7 @@ func (m *MsgDefineService) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDefineService proto.InternalMessageInfo
 
-// MsgDefineServiceResponse defines the Msg/DefineService response type.
+// MsgDefineServiceResponse defines the Msg/DefineService response type
 type MsgDefineServiceResponse struct {
 }
 
@@ -110,7 +110,7 @@ func (m *MsgDefineServiceResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDefineServiceResponse proto.InternalMessageInfo
 
-// MsgBindService defines an SDK message for binding to an existing service.
+// MsgBindService defines an SDK message for binding to an existing service
 type MsgBindService struct {
 	ServiceName string                                   `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty" yaml:"service_name"`
 	Provider    string                                   `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"`
@@ -154,7 +154,7 @@ func (m *MsgBindService) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgBindService proto.InternalMessageInfo
 
-// MsgBindServiceResponse defines the Msg/BindService response type.
+// MsgBindServiceResponse defines the Msg/BindService response type
 type MsgBindServiceResponse struct {
 }
 
@@ -191,7 +191,7 @@ func (m *MsgBindServiceResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgBindServiceResponse proto.InternalMessageInfo
 
-// MsgUpdateServiceBinding defines an SDK message for updating an existing service binding.
+// MsgUpdateServiceBinding defines an SDK message for updating an existing service binding
 type MsgUpdateServiceBinding struct {
 	ServiceName string                                   `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty" yaml:"service_name"`
 	Provider    string                                   `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"`
@@ -235,7 +235,7 @@ func (m *MsgUpdateServiceBinding) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateServiceBinding proto.InternalMessageInfo
 
-// MsgUpdateServiceBindingResponse defines the Msg/UpdateServiceBinding response type.
+// MsgUpdateServiceBindingResponse defines the Msg/UpdateServiceBinding response type
 type MsgUpdateServiceBindingResponse struct {
 }
 
@@ -272,7 +272,7 @@ func (m *MsgUpdateServiceBindingResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateServiceBindingResponse proto.InternalMessageInfo
 
-// MsgSetWithdrawAddress defines an SDK message to set the withdrawal address for a provider.
+// MsgSetWithdrawAddress defines an SDK message to set the withdrawal address for a provider
 type MsgSetWithdrawAddress struct {
 	Owner           string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
 	WithdrawAddress string `protobuf:"bytes,2,opt,name=withdraw_address,json=withdrawAddress,proto3" json:"withdraw_address,omitempty" yaml:"withdraw_address"`
@@ -311,7 +311,7 @@ func (m *MsgSetWithdrawAddress) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetWithdrawAddress proto.InternalMessageInfo
 
-// MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response type.
+// MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response type
 type MsgSetWithdrawAddressResponse struct {
 }
 
@@ -348,7 +348,7 @@ func (m *MsgSetWithdrawAddressResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetWithdrawAddressResponse proto.InternalMessageInfo
 
-// MsgDisableServiceBinding defines an SDK message to disable a service binding.
+// MsgDisableServiceBinding defines an SDK message to disable a service binding
 type MsgDisableServiceBinding struct {
 	ServiceName string `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty" yaml:"service_name"`
 	Provider    string `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"`
@@ -388,7 +388,7 @@ func (m *MsgDisableServiceBinding) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDisableServiceBinding proto.InternalMessageInfo
 
-// MsgDisableServiceBindingResponse defines the Msg/DisableServiceBinding response type.
+// MsgDisableServiceBindingResponse defines the Msg/DisableServiceBinding response type
 type MsgDisableServiceBindingResponse struct {
 }
 
@@ -425,7 +425,7 @@ func (m *MsgDisableServiceBindingResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDisableServiceBindingResponse proto.InternalMessageInfo
 
-// MsgEnableServiceBinding defines an SDK message to enable a service binding.
+// MsgEnableServiceBinding defines an SDK message to enable a service binding
 type MsgEnableServiceBinding struct {
 	ServiceName string                                   `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty" yaml:"service_name"`
 	Provider    string                                   `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"`
@@ -466,7 +466,7 @@ func (m *MsgEnableServiceBinding) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgEnableServiceBinding proto.InternalMessageInfo
 
-// MsgEnableServiceBindingResponse defines the Msg/EnableServiceBinding response type.
+// MsgEnableServiceBindingResponse defines the Msg/EnableServiceBinding response type
 type MsgEnableServiceBindingResponse struct {
 }
 
@@ -503,7 +503,7 @@ func (m *MsgEnableServiceBindingResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgEnableServiceBindingResponse proto.InternalMessageInfo
 
-// MsgRefundServiceDeposit defines an SDK message to refund deposit from a service binding.
+// MsgRefundServiceDeposit defines an SDK message to refund deposit from a service binding
 type MsgRefundServiceDeposit struct {
 	ServiceName string `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty" yaml:"service_name"`
 	Provider    string `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"`
@@ -543,7 +543,7 @@ func (m *MsgRefundServiceDeposit) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRefundServiceDeposit proto.InternalMessageInfo
 
-// MsgRefundServiceDepositResponse defines the Msg/RefundServiceDeposit response type.
+// MsgRefundServiceDepositResponse defines the Msg/RefundServiceDeposit response type
 type MsgRefundServiceDepositResponse struct {
 }
 
@@ -580,7 +580,7 @@ func (m *MsgRefundServiceDepositResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRefundServiceDepositResponse proto.InternalMessageInfo
 
-// MsgCallService defines an SDK message to initiate a service request context.
+// MsgCallService defines an SDK message to initiate a service request context
 type MsgCallService struct {
 	ServiceName       string                                   `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty" yaml:"service_name"`
 	Providers         []string                                 `protobuf:"bytes,2,rep,name=providers,proto3" json:"providers,omitempty"`
@@ -626,7 +626,7 @@ func (m *MsgCallService) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCallService proto.InternalMessageInfo
 
-// MsgCallServiceResponse defines the Msg/CallService response type.
+// MsgCallServiceResponse defines the Msg/CallService response type
 type MsgCallServiceResponse struct {
 	RequestContextId string `protobuf:"bytes,1,opt,name=request_context_id,json=requestContextId,proto3" json:"request_context_id,omitempty" yaml:"request_context_id"`
 }
@@ -664,7 +664,7 @@ func (m *MsgCallServiceResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCallServiceResponse proto.InternalMessageInfo
 
-// MsgRespondService defines an SDK message to respond a service request.
+// MsgRespondService defines an SDK message to respond a service request
 type MsgRespondService struct {
 	RequestId string `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty" yaml:"request_id"`
 	Provider  string `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"`
@@ -705,7 +705,7 @@ func (m *MsgRespondService) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRespondService proto.InternalMessageInfo
 
-// MsgRespondService defines the Msg/RespondService response type.
+// MsgRespondServiceResponse defines the Msg/RespondService response type
 type MsgRespondServiceResponse struct {
 }
 
@@ -742,7 +742,7 @@ func (m *MsgRespondServiceResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRespondServiceResponse proto.InternalMessageInfo
 
-// MsgPauseRequestContext defines an SDK message to pause a service request.
+// MsgPauseRequestContext defines an SDK message to pause a service request
 type MsgPauseRequestContext struct {
 	RequestContextId string `protobuf:"bytes,1,opt,name=request_context_id,json=requestContextId,proto3" json:"request_context_id,omitempty" yaml:"request_context_id"`
 	Consumer         string `protobuf:"bytes,2,opt,name=consumer,proto3" json:"consumer,omitempty"`
@@ -781,7 +781,7 @@ func (m *MsgPauseRequestContext) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgPauseRequestContext proto.InternalMessageInfo
 
-// MsgPauseRequestContextResponse defines the Msg/PauseRequestContext response type.
+// MsgPauseRequestContextResponse defines the Msg/PauseRequestContext response type
 type MsgPauseRequestContextResponse struct {
 }
 
@@ -818,7 +818,7 @@ func (m *MsgPauseRequestContextResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgPauseRequestContextResponse proto.InternalMessageInfo
 
-// MsgStartRequestContext defines an SDK message to resume a service request.
+// MsgStartRequestContext defines an SDK message to resume a service request
 type MsgStartRequestContext struct {
 	RequestContextId string `protobuf:"bytes,1,opt,name=request_context_id,json=requestContextId,proto3" json:"request_context_id,omitempty" yaml:"request_context_id"`
 	Consumer         string `protobuf:"bytes,2,opt,name=consumer,proto3" json:"consumer,omitempty"`
@@ -857,7 +857,7 @@ func (m *MsgStartRequestContext) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgStartRequestContext proto.InternalMessageInfo
 
-// MsgStartRequestContextResponse defines the Msg/StartRequestContext response type.
+// MsgStartRequestContextResponse defines the Msg/StartRequestContext response type
 type MsgStartRequestContextResponse struct {
 }
 
@@ -894,7 +894,7 @@ func (m *MsgStartRequestContextResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgStartRequestContextResponse proto.InternalMessageInfo
 
-// MsgKillRequestContext defines an SDK message to terminate a service request.
+// MsgKillRequestContext defines an SDK message to terminate a service request
 type MsgKillRequestContext struct {
 	RequestContextId string `protobuf:"bytes,1,opt,name=request_context_id,json=requestContextId,proto3" json:"request_context_id,omitempty" yaml:"request_context_id"`
 	Consumer         string `protobuf:"bytes,2,opt,name=consumer,proto3" json:"consumer,omitempty"`
@@ -933,7 +933,7 @@ func (m *MsgKillRequestContext) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgKillRequestContext proto.InternalMessageInfo
 
-// MsgKillRequestContextResponse defines the Msg/KillRequestContext response type.
+// MsgKillRequestContextResponse defines the Msg/KillRequestContext response type
 type MsgKillRequestContextResponse struct {
 }
 
@@ -970,7 +970,7 @@ func (m *MsgKillRequestContextResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgKillRequestContextResponse proto.InternalMessageInfo
 
-// MsgUpdateRequestContext defines an SDK message to update a service request context.
+// MsgUpdateRequestContext defines an SDK message to update a service request context
 type MsgUpdateRequestContext struct {
 	RequestContextId  string                                   `protobuf:"bytes,1,opt,name=request_context_id,json=requestContextId,proto3" json:"request_context_id,omitempty" yaml:"request_context_id"`
 	Providers         []string                                 `protobuf:"bytes,2,rep,name=providers,proto3" json:"providers,omitempty"`
@@ -1014,7 +1014,7 @@ func (m *MsgUpdateRequestContext) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateRequestContext proto.InternalMessageInfo
 
-// MsgUpdateRequestContextResponse defines the Msg/UpdateRequestContext response type.
+// MsgUpdateRequestContextResponse defines the Msg/UpdateRequestContext response type
 type MsgUpdateRequestContextResponse struct {
 }
 
@@ -1051,7 +1051,7 @@ func (m *MsgUpdateRequestContextResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateRequestContextResponse proto.InternalMessageInfo
 
-// MsgWithdrawEarnedFees defines an SDK message to withdraw the fees earned by the provider or owner.
+// MsgWithdrawEarnedFees defines an SDK message to withdraw the fees earned by the provider or owner
 type MsgWithdrawEarnedFees struct {
 	Owner    string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
 	Provider string `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"`
@@ -1090,7 +1090,7 @@ func (m *MsgWithdrawEarnedFees) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgWithdrawEarnedFees proto.InternalMessageInfo
 
-// MsgWithdrawEarnedFeesResponse defines the Msg/WithdrawEarnedFees response type.
+// MsgWithdrawEarnedFeesResponse defines the Msg/WithdrawEarnedFees response type
 type MsgWithdrawEarnedFeesResponse struct {
 }
 
@@ -1255,33 +1255,33 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
-	// DefineService defines a method for define a new service.
+	// DefineService defines a method for define a new service
 	DefineService(ctx context.Context, in *MsgDefineService, opts ...grpc.CallOption) (*MsgDefineServiceResponse, error)
-	// BindService defines a method for bind a server.
+	// BindService defines a method for bind a server
 	BindService(ctx context.Context, in *MsgBindService, opts ...grpc.CallOption) (*MsgBindServiceResponse, error)
-	// UpdateServiceBinding defines a method for update a service binding.
+	// UpdateServiceBinding defines a method for update a service binding
 	UpdateServiceBinding(ctx context.Context, in *MsgUpdateServiceBinding, opts ...grpc.CallOption) (*MsgUpdateServiceBindingResponse, error)
-	// SetWithdrawAddress defines a method for setting a withdraw address.
+	// SetWithdrawAddress defines a method for setting a withdraw address
 	SetWithdrawAddress(ctx context.Context, in *MsgSetWithdrawAddress, opts ...grpc.CallOption) (*MsgSetWithdrawAddressResponse, error)
-	// EnableServiceBinding defines a method for enabling a service binding.
+	// EnableServiceBinding defines a method for enabling a service binding
 	EnableServiceBinding(ctx context.Context, in *MsgEnableServiceBinding, opts ...grpc.CallOption) (*MsgEnableServiceBindingResponse, error)
-	// DisableServiceBinding defines a method for disabling a service binding.
+	// DisableServiceBinding defines a method for disabling a service binding
 	DisableServiceBinding(ctx context.Context, in *MsgDisableServiceBinding, opts ...grpc.CallOption) (*MsgDisableServiceBindingResponse, error)
-	// RefundServiceDeposit defines a method for refunding a fee.
+	// RefundServiceDeposit defines a method for refunding a fee
 	RefundServiceDeposit(ctx context.Context, in *MsgRefundServiceDeposit, opts ...grpc.CallOption) (*MsgRefundServiceDepositResponse, error)
-	// CallService defines a method for calling a service.
+	// CallService defines a method for calling a service
 	CallService(ctx context.Context, in *MsgCallService, opts ...grpc.CallOption) (*MsgCallServiceResponse, error)
-	// RespondService defines a method for responding a service.
+	// RespondService defines a method for responding a service
 	RespondService(ctx context.Context, in *MsgRespondService, opts ...grpc.CallOption) (*MsgRespondServiceResponse, error)
-	// PauseRequestContext defines a method for pausing a service call.
+	// PauseRequestContext defines a method for pausing a service call
 	PauseRequestContext(ctx context.Context, in *MsgPauseRequestContext, opts ...grpc.CallOption) (*MsgPauseRequestContextResponse, error)
-	// StartRequestContext defines a method for starting a service call.
+	// StartRequestContext defines a method for starting a service call
 	StartRequestContext(ctx context.Context, in *MsgStartRequestContext, opts ...grpc.CallOption) (*MsgStartRequestContextResponse, error)
-	// KillRequestContext defines a method for killing a service call.
+	// KillRequestContext defines a method for killing a service call
 	KillRequestContext(ctx context.Context, in *MsgKillRequestContext, opts ...grpc.CallOption) (*MsgKillRequestContextResponse, error)
-	// UpdateRequestContext defines a method for updating a service call.
+	// UpdateRequestContext defines a method for updating a service call
 	UpdateRequestContext(ctx context.Context, in *MsgUpdateRequestContext, opts ...grpc.CallOption) (*MsgUpdateRequestContextResponse, error)
-	// WithdrawEarnedFees defines a method for Withdrawing a earned fees.
+	// WithdrawEarnedFees defines a method for Withdrawing a earned fees
 	WithdrawEarnedFees(ctx context.Context, in *MsgWithdrawEarnedFees, opts ...grpc.CallOption) (*MsgWithdrawEarnedFeesResponse, error)
 }
 
@@ -1421,33 +1421,33 @@ func (c *msgClient) WithdrawEarnedFees(ctx context.Context, in *MsgWithdrawEarne
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
-	// DefineService defines a method for define a new service.
+	// DefineService defines a method for define a new service
 	DefineService(context.Context, *MsgDefineService) (*MsgDefineServiceResponse, error)
-	// BindService defines a method for bind a server.
+	// BindService defines a method for bind a server
 	BindService(context.Context, *MsgBindService) (*MsgBindServiceResponse, error)
-	// UpdateServiceBinding defines a method for update a service binding.
+	// UpdateServiceBinding defines a method for update a service binding
 	UpdateServiceBinding(context.Context, *MsgUpdateServiceBinding) (*MsgUpdateServiceBindingResponse, error)
-	// SetWithdrawAddress defines a method for setting a withdraw address.
+	// SetWithdrawAddress defines a method for setting a withdraw address
 	SetWithdrawAddress(context.Context, *MsgSetWithdrawAddress) (*MsgSetWithdrawAddressResponse, error)
-	// EnableServiceBinding defines a method for enabling a service binding.
+	// EnableServiceBinding defines a method for enabling a service binding
 	EnableServiceBinding(context.Context, *MsgEnableServiceBinding) (*MsgEnableServiceBindingResponse, error)
-	// DisableServiceBinding defines a method for disabling a service binding.
+	// DisableServiceBinding defines a method for disabling a service binding
 	DisableServiceBinding(context.Context, *MsgDisableServiceBinding) (*MsgDisableServiceBindingResponse, error)
-	// RefundServiceDeposit defines a method for refunding a fee.
+	// RefundServiceDeposit defines a method for refunding a fee
 	RefundServiceDeposit(context.Context, *MsgRefundServiceDeposit) (*MsgRefundServiceDepositResponse, error)
-	// CallService defines a method for calling a service.
+	// CallService defines a method for calling a service
 	CallService(context.Context, *MsgCallService) (*MsgCallServiceResponse, error)
-	// RespondService defines a method for responding a service.
+	// RespondService defines a method for responding a service
 	RespondService(context.Context, *MsgRespondService) (*MsgRespondServiceResponse, error)
-	// PauseRequestContext defines a method for pausing a service call.
+	// PauseRequestContext defines a method for pausing a service call
 	PauseRequestContext(context.Context, *MsgPauseRequestContext) (*MsgPauseRequestContextResponse, error)
-	// StartRequestContext defines a method for starting a service call.
+	// StartRequestContext defines a method for starting a service call
 	StartRequestContext(context.Context, *MsgStartRequestContext) (*MsgStartRequestContextResponse, error)
-	// KillRequestContext defines a method for killing a service call.
+	// KillRequestContext defines a method for killing a service call
 	KillRequestContext(context.Context, *MsgKillRequestContext) (*MsgKillRequestContextResponse, error)
-	// UpdateRequestContext defines a method for updating a service call.
+	// UpdateRequestContext defines a method for updating a service call
 	UpdateRequestContext(context.Context, *MsgUpdateRequestContext) (*MsgUpdateRequestContextResponse, error)
-	// WithdrawEarnedFees defines a method for Withdrawing a earned fees.
+	// WithdrawEarnedFees defines a method for Withdrawing a earned fees
 	WithdrawEarnedFees(context.Context, *MsgWithdrawEarnedFees) (*MsgWithdrawEarnedFeesResponse, error)
 }
 
@@ -3665,10 +3665,7 @@ func (m *MsgDefineService) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -3718,10 +3715,7 @@ func (m *MsgDefineServiceResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -3984,10 +3978,7 @@ func (m *MsgBindService) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4037,10 +4028,7 @@ func (m *MsgBindServiceResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4303,10 +4291,7 @@ func (m *MsgUpdateServiceBinding) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4356,10 +4341,7 @@ func (m *MsgUpdateServiceBindingResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4473,10 +4455,7 @@ func (m *MsgSetWithdrawAddress) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4526,10 +4505,7 @@ func (m *MsgSetWithdrawAddressResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4675,10 +4651,7 @@ func (m *MsgDisableServiceBinding) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4728,10 +4701,7 @@ func (m *MsgDisableServiceBindingResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4911,10 +4881,7 @@ func (m *MsgEnableServiceBinding) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4964,10 +4931,7 @@ func (m *MsgEnableServiceBindingResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5113,10 +5077,7 @@ func (m *MsgRefundServiceDeposit) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5166,10 +5127,7 @@ func (m *MsgRefundServiceDepositResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5458,10 +5416,7 @@ func (m *MsgCallService) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5543,10 +5498,7 @@ func (m *MsgCallServiceResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5724,10 +5676,7 @@ func (m *MsgRespondService) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5777,10 +5726,7 @@ func (m *MsgRespondServiceResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5894,10 +5840,7 @@ func (m *MsgPauseRequestContext) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5947,10 +5890,7 @@ func (m *MsgPauseRequestContextResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6064,10 +6004,7 @@ func (m *MsgStartRequestContext) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6117,10 +6054,7 @@ func (m *MsgStartRequestContextResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6234,10 +6168,7 @@ func (m *MsgKillRequestContext) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6287,10 +6218,7 @@ func (m *MsgKillRequestContextResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6527,10 +6455,7 @@ func (m *MsgUpdateRequestContext) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6580,10 +6505,7 @@ func (m *MsgUpdateRequestContextResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6697,10 +6619,7 @@ func (m *MsgWithdrawEarnedFees) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6750,10 +6669,7 @@ func (m *MsgWithdrawEarnedFeesResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {

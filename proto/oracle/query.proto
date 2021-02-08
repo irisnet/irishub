@@ -17,7 +17,7 @@ service Query {
         option (google.api.http).get = "/irismod/oracle/feeds/{feed_name}";
     }
 
-    // QueryFeedsRequest queries the feed list
+    // Feeds queries the feed list
     rpc Feeds(QueryFeedsRequest) returns (QueryFeedsResponse) {
         option (google.api.http).get = "/irismod/oracle/feeds";
     }
@@ -41,14 +41,14 @@ message QueryFeedResponse {
 // QueryFeedsRequest is request type for the Query/Feeds RPC method
 message QueryFeedsRequest {
     string state = 1;
-    // pagination defines an optional pagination for the request.
+    // pagination defines an optional pagination for the request
     cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 // QueryFeedsResponse is response type for the Query/Feeds RPC method
 message QueryFeedsResponse {
     repeated FeedContext feeds = 1 [ (gogoproto.nullable) = false ];
-
+    // pagination defines an optional pagination for the request
     cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

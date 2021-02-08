@@ -597,7 +597,7 @@ type QueryClient interface {
 	Fees(ctx context.Context, in *QueryFeesRequest, opts ...grpc.CallOption) (*QueryFeesResponse, error)
 	// Params queries the token parameters
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
-	// Params queries the token parameters
+	// TotalBurn queries all the burnt coins
 	TotalBurn(ctx context.Context, in *QueryTotalBurnRequest, opts ...grpc.CallOption) (*QueryTotalBurnResponse, error)
 }
 
@@ -664,7 +664,7 @@ type QueryServer interface {
 	Fees(context.Context, *QueryFeesRequest) (*QueryFeesResponse, error)
 	// Params queries the token parameters
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
-	// Params queries the token parameters
+	// TotalBurn queries all the burnt coins
 	TotalBurn(context.Context, *QueryTotalBurnRequest) (*QueryTotalBurnResponse, error)
 }
 

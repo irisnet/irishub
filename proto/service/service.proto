@@ -9,102 +9,102 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/irisnet/irismod/modules/service/types";
 option (gogoproto.goproto_getters_all) = false;
 
-// ServiceDefinition defines a standard for service definition.
+// ServiceDefinition defines a standard for service definition
 message ServiceDefinition {
     string name = 1;
     string description = 2;
     repeated string tags = 3;
     string author = 4;
-    string author_description = 5 [(gogoproto.moretags) = "yaml:\"author_description\""];
+    string author_description = 5 [ (gogoproto.moretags) = "yaml:\"author_description\"" ];
     string schemas = 6;
 }
 
-// ServiceBinding defines a standard for service binding.
+// ServiceBinding defines a standard for service binding
 message ServiceBinding {
-    string service_name = 1 [(gogoproto.moretags) = "yaml:\"service_name\""];
+    string service_name = 1 [ (gogoproto.moretags) = "yaml:\"service_name\"" ];
     string provider = 2;
-    repeated cosmos.base.v1beta1.Coin deposit = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+    repeated cosmos.base.v1beta1.Coin deposit = 3 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins" ];
     string pricing = 4;
-    uint64 qos = 5 [(gogoproto.customname) = "QoS"];
+    uint64 qos = 5 [ (gogoproto.customname) = "QoS" ];
     string options = 6;
     bool available = 7;
-    google.protobuf.Timestamp disabled_time = 8 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"disabled_time\""];
+    google.protobuf.Timestamp disabled_time = 8 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"disabled_time\"" ];
     string owner = 9;
 }
 
-// RequestContext defines a standard for request context.
+// RequestContext defines a standard for request context
 message RequestContext {
-    string service_name = 1 [(gogoproto.moretags) = "yaml:\"service_name\""];
+    string service_name = 1 [ (gogoproto.moretags) = "yaml:\"service_name\"" ];
     repeated string providers = 2;
     string consumer = 3;
     string input = 4;
-    repeated cosmos.base.v1beta1.Coin service_fee_cap = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
-    string module_name = 6 [(gogoproto.moretags) = "yaml:\"module_name\""];
+    repeated cosmos.base.v1beta1.Coin service_fee_cap = 5 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\"" ];
+    string module_name = 6 [ (gogoproto.moretags) = "yaml:\"module_name\"" ];
     int64 timeout = 7;
     bool repeated = 8;
-    uint64 repeated_frequency = 9 [(gogoproto.moretags) = "yaml:\"repeated_frequency\""];
-    int64 repeated_total = 10 [(gogoproto.moretags) = "yaml:\"repeated_total\""];
-    uint64 batch_counter = 11 [(gogoproto.moretags) = "yaml:\"batch_counter\""];
-    uint32 batch_request_count = 12 [(gogoproto.moretags) = "yaml:\"batch_request_count\""];
-    uint32 batch_response_count = 13 [(gogoproto.moretags) = "yaml:\"batch_response_count\""];
-    uint32 batch_response_threshold = 14 [(gogoproto.moretags) = "yaml:\"batch_response_threshold\""];
-    uint32 response_threshold = 15 [(gogoproto.moretags) = "yaml:\"response_threshold\""];
-    RequestContextBatchState batch_state = 16 [(gogoproto.moretags) = "yaml:\"batch_state\""];
+    uint64 repeated_frequency = 9 [ (gogoproto.moretags) = "yaml:\"repeated_frequency\"" ];
+    int64 repeated_total = 10 [ (gogoproto.moretags) = "yaml:\"repeated_total\"" ];
+    uint64 batch_counter = 11 [ (gogoproto.moretags) = "yaml:\"batch_counter\"" ];
+    uint32 batch_request_count = 12 [ (gogoproto.moretags) = "yaml:\"batch_request_count\"" ];
+    uint32 batch_response_count = 13 [ (gogoproto.moretags) = "yaml:\"batch_response_count\"" ];
+    uint32 batch_response_threshold = 14 [ (gogoproto.moretags) = "yaml:\"batch_response_threshold\"" ];
+    uint32 response_threshold = 15 [ (gogoproto.moretags) = "yaml:\"response_threshold\"" ];
+    RequestContextBatchState batch_state = 16 [ (gogoproto.moretags) = "yaml:\"batch_state\"" ];
     RequestContextState state = 17;
 }
 
-// Request defines a standard for request.
+// Request defines a standard for request
 message Request {
     string id = 1;
-    string service_name = 2 [(gogoproto.moretags) = "yaml:\"service_name\""];
+    string service_name = 2 [ (gogoproto.moretags) = "yaml:\"service_name\"" ];
     string provider = 3;
     string consumer = 4;
     string input = 5;
-    repeated cosmos.base.v1beta1.Coin service_fee = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee\""];
-    int64 request_height = 7 [(gogoproto.moretags) = "yaml:\"request_height\""];
-    int64 expiration_height = 8 [(gogoproto.moretags) = "yaml:\"expiration_height\""];
-    string request_context_id = 9 [(gogoproto.moretags) = "yaml:\"request_context_id\""];
-    uint64 request_context_batch_counter = 10 [(gogoproto.moretags) = "yaml:\"request_context_batch_counter\""];
+    repeated cosmos.base.v1beta1.Coin service_fee = 6 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee\"" ];
+    int64 request_height = 7 [ (gogoproto.moretags) = "yaml:\"request_height\"" ];
+    int64 expiration_height = 8 [ (gogoproto.moretags) = "yaml:\"expiration_height\"" ];
+    string request_context_id = 9 [ (gogoproto.moretags) = "yaml:\"request_context_id\"" ];
+    uint64 request_context_batch_counter = 10 [ (gogoproto.moretags) = "yaml:\"request_context_batch_counter\"" ];
 }
 
-// CompactRequest defines a standard for compact request.
+// CompactRequest defines a standard for compact request
 message CompactRequest {
-    string request_context_id = 1 [(gogoproto.moretags) = "yaml:\"request_context_id\""];
-    uint64 request_context_batch_counter = 2 [(gogoproto.moretags) = "yaml:\"request_context_batch_counter\""];
+    string request_context_id = 1 [ (gogoproto.moretags) = "yaml:\"request_context_id\"" ];
+    uint64 request_context_batch_counter = 2 [ (gogoproto.moretags) = "yaml:\"request_context_batch_counter\"" ];
     string provider = 3;
-    repeated cosmos.base.v1beta1.Coin service_fee = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee\""];
-    int64 request_height = 5 [(gogoproto.moretags) = "yaml:\"request_height\""];
-    int64 expiration_height = 6 [(gogoproto.moretags) = "yaml:\"expiration_height\""];
+    repeated cosmos.base.v1beta1.Coin service_fee = 4 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee\"" ];
+    int64 request_height = 5 [ (gogoproto.moretags) = "yaml:\"request_height\"" ];
+    int64 expiration_height = 6 [ (gogoproto.moretags) = "yaml:\"expiration_height\"" ];
 }
 
-// Response defines a standard for response.
+// Response defines a standard for response
 message Response {
     string provider = 1;
     string consumer = 2;
     string result = 3;
     string output = 4;
-    string request_context_id = 5 [(gogoproto.moretags) = "yaml:\"request_context_id\""];
-    uint64 request_context_batch_counter = 6 [(gogoproto.moretags) = "yaml:\"request_context_batch_counter\""];
+    string request_context_id = 5 [ (gogoproto.moretags) = "yaml:\"request_context_id\"" ];
+    uint64 request_context_batch_counter = 6 [ (gogoproto.moretags) = "yaml:\"request_context_batch_counter\"" ];
 }
 
-// Pricing defines a standard for service pricing.
+// Pricing defines a standard for service pricing
 message Pricing {
-    repeated cosmos.base.v1beta1.Coin price = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-    repeated PromotionByTime promotions_by_time = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"promotions_by_time\""];
-    repeated PromotionByVolume promotions_by_volume = 3 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"promotions_by_volume\""];
+    repeated cosmos.base.v1beta1.Coin price = 6 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins" ];
+    repeated PromotionByTime promotions_by_time = 2 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"promotions_by_time\"" ];
+    repeated PromotionByVolume promotions_by_volume = 3 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"promotions_by_volume\"" ];
 }
 
-// PromotionByTime defines a standard for service promotion by time.
+// PromotionByTime defines a standard for service promotion by time
 message PromotionByTime {
-    google.protobuf.Timestamp start_time = 1 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"start_time\""];
-    google.protobuf.Timestamp end_time = 2 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"end_time\""];
-    string discount = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+    google.protobuf.Timestamp start_time = 1 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"start_time\"" ];
+    google.protobuf.Timestamp end_time = 2 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"end_time\"" ];
+    string discount = 3 [ (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false ];
 }
 
-// PromotionByVolume defines a standard for service promotion by volume.
+// PromotionByVolume defines a standard for service promotion by volume
 message PromotionByVolume {
     uint64 volume = 1;
-    string discount = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+    string discount = 2 [ (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false ];
 }
 
 // RequestContextBatchState is a type alias that represents a request batch status as a byte
@@ -114,9 +114,9 @@ enum RequestContextBatchState {
     option (gogoproto.goproto_enum_prefix) = false;
 
     // BATCH_RUNNING defines the running batch status.
-    BATCH_RUNNING = 0 [(gogoproto.enumvalue_customname) = "BATCHRUNNING"];
+    BATCH_RUNNING = 0 [ (gogoproto.enumvalue_customname) = "BATCHRUNNING" ];
     // BATCH_COMPLETED defines the completed batch status.
-    BATCH_COMPLETED = 1 [(gogoproto.enumvalue_customname) = "BATCHCOMPLETED"];
+    BATCH_COMPLETED = 1 [ (gogoproto.enumvalue_customname) = "BATCHCOMPLETED" ];
 }
 
 // RequestContextState is a type alias that represents a request status as a byte
@@ -125,26 +125,26 @@ enum RequestContextState {
     option (gogoproto.goproto_enum_stringer) = false;
     option (gogoproto.goproto_enum_prefix) = false;
 
-    // RUNNING defines the running request context status.
-    RUNNING = 0 [(gogoproto.enumvalue_customname) = "RUNNING"];
-    // PAUSED defines the paused request context status.
-    PAUSED = 1 [(gogoproto.enumvalue_customname) = "PAUSED"];
-    // COMPLETED defines the completed request context status.
-    COMPLETED = 2 [(gogoproto.enumvalue_customname) = "COMPLETED"];
+    // RUNNING defines the running request context status
+    RUNNING = 0 [ (gogoproto.enumvalue_customname) = "RUNNING" ];
+    // PAUSED defines the paused request context status
+    PAUSED = 1 [ (gogoproto.enumvalue_customname) = "PAUSED" ];
+    // COMPLETED defines the completed request context status
+    COMPLETED = 2 [ (gogoproto.enumvalue_customname) = "COMPLETED" ];
 }
 
-// service parameters
+// Params defines service module's parameters
 message Params {
     option (gogoproto.equal) = true;
     option (gogoproto.goproto_stringer) = false;
 
-    int64 max_request_timeout = 1 [(gogoproto.moretags) = "yaml:\"max_request_timeout\""];
-    int64 min_deposit_multiple = 2 [(gogoproto.moretags) = "yaml:\"min_deposit_multiple\""];
-    repeated cosmos.base.v1beta1.Coin min_deposit = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-    string service_fee_tax = 4 [(gogoproto.moretags) = "yaml:\"service_fee_tax\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
-    string slash_fraction = 5 [(gogoproto.moretags) = "yaml:\"slash_fraction\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
-    google.protobuf.Duration complaint_retrospect = 6 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (gogoproto.moretags) = "yaml:\"complaint_retrospect\""];
-    google.protobuf.Duration arbitration_time_limit = 7 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (gogoproto.moretags) = "yaml:\"arbitration_time_limit\""];
-    uint64 tx_size_limit = 8 [(gogoproto.moretags) = "yaml:\"tx_size_limit\""];
-    string base_denom = 9 [(gogoproto.moretags) = "yaml:\"base_denom\""];
+    int64 max_request_timeout = 1 [ (gogoproto.moretags) = "yaml:\"max_request_timeout\"" ];
+    int64 min_deposit_multiple = 2 [ (gogoproto.moretags) = "yaml:\"min_deposit_multiple\"" ];
+    repeated cosmos.base.v1beta1.Coin min_deposit = 3 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins" ];
+    string service_fee_tax = 4 [ (gogoproto.moretags) = "yaml:\"service_fee_tax\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false ];
+    string slash_fraction = 5 [ (gogoproto.moretags) = "yaml:\"slash_fraction\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false ];
+    google.protobuf.Duration complaint_retrospect = 6 [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true, (gogoproto.moretags) = "yaml:\"complaint_retrospect\"" ];
+    google.protobuf.Duration arbitration_time_limit = 7 [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true, (gogoproto.moretags) = "yaml:\"arbitration_time_limit\"" ];
+    uint64 tx_size_limit = 8 [ (gogoproto.moretags) = "yaml:\"tx_size_limit\"" ];
+    string base_denom = 9 [ (gogoproto.moretags) = "yaml:\"base_denom\"" ];
 }

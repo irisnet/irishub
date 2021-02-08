@@ -126,7 +126,7 @@ func (m *QueryFeedResponse) GetFeed() FeedContext {
 // QueryFeedsRequest is request type for the Query/Feeds RPC method
 type QueryFeedsRequest struct {
 	State string `protobuf:"bytes,1,opt,name=state,proto3" json:"state,omitempty"`
-	// pagination defines an optional pagination for the request.
+	// pagination defines an optional pagination for the request
 	Pagination *query.PageRequest `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
@@ -179,7 +179,8 @@ func (m *QueryFeedsRequest) GetPagination() *query.PageRequest {
 
 // QueryFeedsResponse is response type for the Query/Feeds RPC method
 type QueryFeedsResponse struct {
-	Feeds      []FeedContext       `protobuf:"bytes,1,rep,name=feeds,proto3" json:"feeds"`
+	Feeds []FeedContext `protobuf:"bytes,1,rep,name=feeds,proto3" json:"feeds"`
+	// pagination defines an optional pagination for the request
 	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
@@ -508,7 +509,7 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	// Feed queries the feed
 	Feed(ctx context.Context, in *QueryFeedRequest, opts ...grpc.CallOption) (*QueryFeedResponse, error)
-	// QueryFeedsRequest queries the feed list
+	// Feeds queries the feed list
 	Feeds(ctx context.Context, in *QueryFeedsRequest, opts ...grpc.CallOption) (*QueryFeedsResponse, error)
 	// FeedValue queries the feed value
 	FeedValue(ctx context.Context, in *QueryFeedValueRequest, opts ...grpc.CallOption) (*QueryFeedValueResponse, error)
@@ -553,7 +554,7 @@ func (c *queryClient) FeedValue(ctx context.Context, in *QueryFeedValueRequest, 
 type QueryServer interface {
 	// Feed queries the feed
 	Feed(context.Context, *QueryFeedRequest) (*QueryFeedResponse, error)
-	// QueryFeedsRequest queries the feed list
+	// Feeds queries the feed list
 	Feeds(context.Context, *QueryFeedsRequest) (*QueryFeedsResponse, error)
 	// FeedValue queries the feed value
 	FeedValue(context.Context, *QueryFeedValueRequest) (*QueryFeedValueResponse, error)

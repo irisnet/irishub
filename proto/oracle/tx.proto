@@ -6,18 +6,18 @@ import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/oracle/types";
 
-// Msg defines the oracle Msg service.
+// Msg defines the oracle Msg service
 service Msg {
-    // CreateFeed defines a method for creating a new feed.
+    // CreateFeed defines a method for creating a new feed
     rpc CreateFeed(MsgCreateFeed) returns (MsgCreateFeedResponse);
 
-    // EditFeed defines a method for editing a feed.
+    // EditFeed defines a method for editing a feed
     rpc EditFeed(MsgEditFeed) returns (MsgEditFeedResponse);
 
     // StartFeed defines a method for starting a feed
     rpc StartFeed(MsgStartFeed) returns (MsgStartFeedResponse);
 
-    // PauseFeed defines a method for pausing a feed.
+    // PauseFeed defines a method for pausing a feed
     rpc PauseFeed(MsgPauseFeed) returns (MsgPauseFeedResponse);
 }
 
@@ -38,7 +38,7 @@ message MsgCreateFeed {
     uint32 response_threshold = 13 [ (gogoproto.moretags) = "yaml:\"response_threshold\"" ];
 }
 
-// MsgCreateFeedResponse defines the Msg/CreateFeed response type.
+// MsgCreateFeedResponse defines the Msg/CreateFeed response type
 message MsgCreateFeedResponse {}
 
 // MsgPauseFeed defines an sdk.Msg type that supports stating a feed
@@ -47,7 +47,7 @@ message MsgStartFeed {
     string creator = 2;
 }
 
-// MsgStartFeedResponse defines the Msg/StartFeed response type.
+// MsgStartFeedResponse defines the Msg/StartFeed response type
 message MsgStartFeedResponse {}
 
 // MsgPauseFeed defines an sdk.Msg type that supports pausing a feed
@@ -56,7 +56,7 @@ message MsgPauseFeed {
     string creator = 2;
 }
 
-// MsgPauseFeedResponse defines the Msg/PauseFeed response type.
+// MsgPauseFeedResponse defines the Msg/PauseFeed response type
 message MsgPauseFeedResponse {}
 
 // MsgEditFeed defines an sdk.Msg type that supports editing a feed
@@ -72,5 +72,5 @@ message MsgEditFeed {
     string creator = 9;
 }
 
-// MsgEditFeedResponse defines the Msg/EditFeed response type.
+// MsgEditFeedResponse defines the Msg/EditFeed response type
 message MsgEditFeedResponse {}

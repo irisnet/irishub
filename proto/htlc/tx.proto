@@ -7,8 +7,7 @@ import "gogoproto/gogo.proto";
 option go_package = "github.com/irisnet/irismod/modules/htlc/types";
 option (gogoproto.goproto_getters_all) = false;
 
-
-// Msg defines the htlc Msg service.
+// Msg defines the HTLC Msg service.
 service Msg {
     // CreateHTLC defines a method for creating a HTLC.
     rpc CreateHTLC(MsgCreateHTLC) returns (MsgCreateHTLCResponse);
@@ -26,14 +25,14 @@ message MsgCreateHTLC {
 
     string sender = 1;
     string to = 2;
-    string receiver_on_other_chain = 3 [(gogoproto.moretags) = "yaml:\"receiver_on_other_chain\""];
-    repeated cosmos.base.v1beta1.Coin amount = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-    string hash_lock = 5 [(gogoproto.moretags) = "yaml:\"hash_lock\""];
+    string receiver_on_other_chain = 3 [ (gogoproto.moretags) = "yaml:\"receiver_on_other_chain\"" ];
+    repeated cosmos.base.v1beta1.Coin amount = 4 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins" ];
+    string hash_lock = 5 [ (gogoproto.moretags) = "yaml:\"hash_lock\"" ];
     uint64 timestamp = 6;
-    uint64 time_lock = 7 [(gogoproto.moretags) = "yaml:\"time_lock\""];
+    uint64 time_lock = 7 [ (gogoproto.moretags) = "yaml:\"time_lock\"" ];
 }
 
-// MsgCreateHTLCResponse defines the Msg/CreateHTLC response type.
+// MsgCreateHTLCResponse defines the Msg/CreateHTLC response type
 message MsgCreateHTLCResponse {}
 
 // MsgClaimHTLC defines a message to claim an HTLC
@@ -41,11 +40,11 @@ message MsgClaimHTLC {
     option (gogoproto.equal) = true;
 
     string sender = 1;
-    string hash_lock = 2 [(gogoproto.moretags) = "yaml:\"hash_lock\""];
+    string hash_lock = 2 [ (gogoproto.moretags) = "yaml:\"hash_lock\"" ];
     string secret = 3;
 }
 
-// MsgClaimHTLCResponse defines the Msg/ClaimHTLC response type.
+// MsgClaimHTLCResponse defines the Msg/ClaimHTLC response type
 message MsgClaimHTLCResponse {}
 
 // MsgRefundHTLC defines a message to refund an HTLC
@@ -53,8 +52,8 @@ message MsgRefundHTLC {
     option (gogoproto.equal) = true;
 
     string sender = 1;
-    string hash_lock = 2 [(gogoproto.moretags) = "yaml:\"hash_lock\""];
+    string hash_lock = 2 [ (gogoproto.moretags) = "yaml:\"hash_lock\"" ];
 }
 
-// MsgRefundHTLCResponse defines the Msg/RefundHTLC response type.
+// MsgRefundHTLCResponse defines the Msg/RefundHTLC response type
 message MsgRefundHTLCResponse {}

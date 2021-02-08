@@ -9,23 +9,23 @@ option (gogoproto.goproto_getters_all) = false;
 
 // Input defines the properties of order's input
 message Input {
-  string address = 1;
-  cosmos.base.v1beta1.Coin coin = 2 [ (gogoproto.nullable) = false ];
+    string address = 1;
+    cosmos.base.v1beta1.Coin coin = 2 [ (gogoproto.nullable) = false ];
 }
 
 // Output defines the properties of order's output
 message Output {
-  string address = 1;
-  cosmos.base.v1beta1.Coin coin = 2 [ (gogoproto.nullable) = false ];
+    string address = 1;
+    cosmos.base.v1beta1.Coin coin = 2 [ (gogoproto.nullable) = false ];
 }
 
-// token parameters
+// Params defines token module's parameters
 message Params {
-  option (gogoproto.equal) = true;
-  option (gogoproto.goproto_stringer) = false;
+    option (gogoproto.equal) = true;
+    option (gogoproto.goproto_stringer) = false;
 
-  cosmos.base.v1beta1.Coin fee = 1 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-    (gogoproto.nullable) = false
-  ];
+    cosmos.base.v1beta1.Coin fee = 1 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+        (gogoproto.nullable) = false
+    ];
 }

@@ -69,7 +69,7 @@ func (m *Token) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Token proto.InternalMessageInfo
 
-// token parameters
+// Params defines token module's parameters
 type Params struct {
 	TokenTaxRate      github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,1,opt,name=token_tax_rate,json=tokenTaxRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"token_tax_rate" yaml:"token_tax_rate"`
 	IssueTokenBaseFee types.Coin                             `protobuf:"bytes,2,opt,name=issue_token_base_fee,json=issueTokenBaseFee,proto3" json:"issue_token_base_fee" yaml:"issue_token_base_fee"`

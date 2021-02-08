@@ -6,20 +6,21 @@ import "gogoproto/gogo.proto";
 option go_package = "github.com/irisnet/irismod/modules/record/types";
 option (gogoproto.goproto_getters_all) = false;
 
-// Content defines the detailed information for a record.
+// Content defines the detailed information for a record
 message Content {
     option (gogoproto.equal) = true;
 
     string digest = 1;
-    string digest_algo = 2 [(gogoproto.moretags) = "yaml:\"digest_algo\""];
-    string uri = 3 [(gogoproto.customname) = "URI"];
+    string digest_algo = 2 [ (gogoproto.moretags) = "yaml:\"digest_algo\"" ];
+    string uri = 3 [ (gogoproto.customname) = "URI" ];
     string meta = 4;
 }
 
+// Record defines the record standard
 message Record {
     option (gogoproto.equal) = true;
 
-    string tx_hash = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
-    repeated Content contents = 2 [(gogoproto.nullable) = false];
+    string tx_hash = 1 [ (gogoproto.moretags) = "yaml:\"tx_hash\"" ];
+    repeated Content contents = 2 [ (gogoproto.nullable) = false ];
     string creator = 3;
 }

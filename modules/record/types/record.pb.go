@@ -23,7 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// Content defines the detailed information for a record.
+// Content defines the detailed information for a record
 type Content struct {
 	Digest     string `protobuf:"bytes,1,opt,name=digest,proto3" json:"digest,omitempty"`
 	DigestAlgo string `protobuf:"bytes,2,opt,name=digest_algo,json=digestAlgo,proto3" json:"digest_algo,omitempty" yaml:"digest_algo"`
@@ -64,6 +64,7 @@ func (m *Content) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Content proto.InternalMessageInfo
 
+// Record defines the record standard
 type Record struct {
 	TxHash   string    `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty" yaml:"tx_hash"`
 	Contents []Content `protobuf:"bytes,2,rep,name=contents,proto3" json:"contents"`

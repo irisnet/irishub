@@ -99,7 +99,7 @@ func (m *MsgRequestRandom) GetServiceFeeCap() github_com_cosmos_cosmos_sdk_types
 	return nil
 }
 
-// MsgRequestRandomResponse defines the Msg/RequestRandom response type.
+// MsgRequestRandomResponse defines the Msg/RequestRandom response type
 type MsgRequestRandomResponse struct {
 }
 
@@ -184,7 +184,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
-	// RequestRandom defines a method for requesting a new random number.
+	// RequestRandom defines a method for requesting a new random number
 	RequestRandom(ctx context.Context, in *MsgRequestRandom, opts ...grpc.CallOption) (*MsgRequestRandomResponse, error)
 }
 
@@ -207,7 +207,7 @@ func (c *msgClient) RequestRandom(ctx context.Context, in *MsgRequestRandom, opt
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
-	// RequestRandom defines a method for requesting a new random number.
+	// RequestRandom defines a method for requesting a new random number
 	RequestRandom(context.Context, *MsgRequestRandom) (*MsgRequestRandomResponse, error)
 }
 

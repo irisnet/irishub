@@ -6,9 +6,9 @@ import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/random/types";
 
-// Msg defines the oracle Msg service.
+// Msg defines the oracle Msg service
 service Msg {
-    // RequestRandom defines a method for requesting a new random number.
+    // RequestRandom defines a method for requesting a new random number
     rpc RequestRandom(MsgRequestRandom) returns (MsgRequestRandomResponse);
 }
 
@@ -20,7 +20,5 @@ message MsgRequestRandom {
     repeated cosmos.base.v1beta1.Coin service_fee_cap = 4 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\"" ];
 }
 
-
-// MsgRequestRandomResponse defines the Msg/RequestRandom response type.
+// MsgRequestRandomResponse defines the Msg/RequestRandom response type
 message MsgRequestRandomResponse {}
-

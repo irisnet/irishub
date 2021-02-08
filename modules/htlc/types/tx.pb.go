@@ -74,7 +74,7 @@ func (m *MsgCreateHTLC) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateHTLC proto.InternalMessageInfo
 
-// MsgCreateHTLCResponse defines the Msg/CreateHTLC response type.
+// MsgCreateHTLCResponse defines the Msg/CreateHTLC response type
 type MsgCreateHTLCResponse struct {
 }
 
@@ -151,7 +151,7 @@ func (m *MsgClaimHTLC) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgClaimHTLC proto.InternalMessageInfo
 
-// MsgClaimHTLCResponse defines the Msg/ClaimHTLC response type.
+// MsgClaimHTLCResponse defines the Msg/ClaimHTLC response type
 type MsgClaimHTLCResponse struct {
 }
 
@@ -227,7 +227,7 @@ func (m *MsgRefundHTLC) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRefundHTLC proto.InternalMessageInfo
 
-// MsgRefundHTLCResponse defines the Msg/RefundHTLC response type.
+// MsgRefundHTLCResponse defines the Msg/RefundHTLC response type
 type MsgRefundHTLCResponse struct {
 }
 

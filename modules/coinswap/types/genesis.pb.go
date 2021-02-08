@@ -23,7 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// GenesisState defines the coinswap module's genesis state.
+// GenesisState defines the coinswap module's genesis state
 type GenesisState struct {
 	Params        Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
 	StandardDenom string `protobuf:"bytes,2,opt,name=standard_denom,json=standardDenom,proto3" json:"standard_denom,omitempty" yaml:"standard_denom"`

@@ -9,7 +9,7 @@ option go_package = "github.com/irisnet/irismod/modules/htlc/types";
 // Query provides defines the gRPC querier service
 service Query {
     // HTLC queries the HTLC by the specified hash lock
-    rpc HTLC (QueryHTLCRequest) returns (QueryHTLCResponse) {
+    rpc HTLC(QueryHTLCRequest) returns (QueryHTLCResponse) {
         option (google.api.http).get = "/irismod/htlc/htlcs/{hash_lock}";
     }
 }

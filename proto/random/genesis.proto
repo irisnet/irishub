@@ -6,11 +6,12 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/random/types";
 
-// GenesisState defines the random module's genesis state.
+// GenesisState defines the random module's genesis state
 message GenesisState {
-    map<string, Requests> pending_random_requests = 1 [(gogoproto.nullable) = false];
+    map<string, Requests> pending_random_requests = 1 [ (gogoproto.nullable) = false ];
 }
 
+// Requests defines the random requests
 message Requests {
-    repeated Request requests = 1 [(gogoproto.nullable) = false];
+    repeated Request requests = 1 [ (gogoproto.nullable) = false ];
 }

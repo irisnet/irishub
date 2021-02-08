@@ -28,7 +28,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// MsgCreateRecord defines an SDK message for creating a new record.
+// MsgCreateRecord defines an SDK message for creating a new record
 type MsgCreateRecord struct {
 	Contents []Content `protobuf:"bytes,1,rep,name=contents,proto3" json:"contents"`
 	Creator  string    `protobuf:"bytes,2,opt,name=creator,proto3" json:"creator,omitempty"`
@@ -67,7 +67,7 @@ func (m *MsgCreateRecord) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateRecord proto.InternalMessageInfo
 
-// MsgCreateRecordResponse defines the Msg/CreateRecord response type.
+// MsgCreateRecordResponse defines the Msg/CreateRecord response type
 type MsgCreateRecordResponse struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
@@ -179,7 +179,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
-	// CreateRecord defines a method for creating a new record.
+	// CreateRecord defines a method for creating a new record
 	CreateRecord(ctx context.Context, in *MsgCreateRecord, opts ...grpc.CallOption) (*MsgCreateRecordResponse, error)
 }
 
@@ -202,7 +202,7 @@ func (c *msgClient) CreateRecord(ctx context.Context, in *MsgCreateRecord, opts 
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
-	// CreateRecord defines a method for creating a new record.
+	// CreateRecord defines a method for creating a new record
 	CreateRecord(context.Context, *MsgCreateRecord) (*MsgCreateRecordResponse, error)
 }
 

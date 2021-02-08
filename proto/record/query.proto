@@ -9,8 +9,8 @@ option go_package = "github.com/irisnet/irismod/modules/record/types";
 // Query defines the gRPC querier service for record module
 service Query {
     // Record queries the record by the given record ID
-    rpc Record (QueryRecordRequest) returns (QueryRecordResponse) {
-      option (google.api.http).get = "/irismod/record/records/{record_id}";
+    rpc Record(QueryRecordRequest) returns (QueryRecordResponse) {
+        option (google.api.http).get = "/irismod/record/records/{record_id}";
     }
 }
 

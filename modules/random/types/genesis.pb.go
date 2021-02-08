@@ -23,7 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// GenesisState defines the random module's genesis state.
+// GenesisState defines the random module's genesis state
 type GenesisState struct {
 	PendingRandomRequests map[string]Requests `protobuf:"bytes,1,rep,name=pending_random_requests,json=pendingRandomRequests,proto3" json:"pending_random_requests" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
@@ -68,6 +68,7 @@ func (m *GenesisState) GetPendingRandomRequests() map[string]Requests {
 	return nil
 }
 
+// Requests defines the random requests
 type Requests struct {
 	Requests []Request `protobuf:"bytes,1,rep,name=requests,proto3" json:"requests"`
 }

@@ -6,7 +6,7 @@ import "htlc/htlc.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/htlc/types";
 
-// GenesisState defines the htlc module's genesis state.
+// GenesisState defines the HTLC module's genesis state
 message GenesisState {
-    map<string, HTLC> pending_htlcs = 1 [(gogoproto.nullable) = false];
+    map<string, HTLC> pending_htlcs = 1 [ (gogoproto.nullable) = false ];
 }

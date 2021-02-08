@@ -24,7 +24,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// GenesisState defines the oracle module's genesis state.
+// GenesisState defines the oracle module's genesis state
 type GenesisState struct {
 	Entries []FeedEntry `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries"`
 }

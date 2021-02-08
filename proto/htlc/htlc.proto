@@ -7,30 +7,30 @@ import "gogoproto/gogo.proto";
 option go_package = "github.com/irisnet/irismod/modules/htlc/types";
 option (gogoproto.goproto_getters_all) = false;
 
-// HTLC defines a struct for an HTLC
+// HTLC defines the struct of an HTLC
 message HTLC {
     option (gogoproto.equal) = true;
 
     string sender = 1;
     string to = 2;
-    string receiver_on_other_chain = 3 [(gogoproto.moretags) = "yaml:\"receiver_on_other_chain\""];
-    repeated cosmos.base.v1beta1.Coin amount = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+    string receiver_on_other_chain = 3 [ (gogoproto.moretags) = "yaml:\"receiver_on_other_chain\"" ];
+    repeated cosmos.base.v1beta1.Coin amount = 4 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins" ];
     string secret = 5;
     uint64 timestamp = 6;
-    uint64 expiration_height = 7 [(gogoproto.moretags) = "yaml:\"expiration_height\""];
+    uint64 expiration_height = 7 [ (gogoproto.moretags) = "yaml:\"expiration_height\"" ];
     HTLCState state = 8;
 }
 
-// HTLCState defines a state for an HTLC
+// HTLCState defines the state of an HTLC
 enum HTLCState {
     option (gogoproto.goproto_enum_prefix) = false;
 
     // HTLC_STATE_OPEN defines an open state.
-    HTLC_STATE_OPEN = 0 [(gogoproto.enumvalue_customname) = "Open"];
+    HTLC_STATE_OPEN = 0 [ (gogoproto.enumvalue_customname) = "Open" ];
     // HTLC_STATE_COMPLETED defines a completed state.
-    HTLC_STATE_COMPLETED = 1 [(gogoproto.enumvalue_customname) = "Completed"];
+    HTLC_STATE_COMPLETED = 1 [ (gogoproto.enumvalue_customname) = "Completed" ];
     // HTLC_STATE_EXPIRED defines an expired state.
-    HTLC_STATE_EXPIRED = 2 [(gogoproto.enumvalue_customname) = "Expired"];
+    HTLC_STATE_EXPIRED = 2 [ (gogoproto.enumvalue_customname) = "Expired" ];
     // HTLC_STATE_REFUNDED defines a refunded state.
-    HTLC_STATE_REFUNDED = 3 [(gogoproto.enumvalue_customname) = "Refunded"];
+    HTLC_STATE_REFUNDED = 3 [ (gogoproto.enumvalue_customname) = "Refunded" ];
 }
