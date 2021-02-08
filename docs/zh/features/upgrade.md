@@ -108,16 +108,7 @@ type SoftwareUpgradeProposal struct {
 
 ### 提交升级提案
 
-执行软件升级流程的第一步是由治理模块发起一个软件升级提案，该提案详细说明了升级时间以及升级内容，具体见上面[概念](#概念)，发起升级提案的命令如下：
-
-```bash
-iris tx gov submit-proposal software-upgrade bifrost-rc2 \
-  --deposit 10000000ubif \
-  --upgrade-time 2021-02-09T13:00:00Z \
-  --title "bifrost-2 software upgrade" \
-  --upgrade-info "Commit: 0ef5dd0b4d140a4788f05fc1a0bd409b3c6a0492. After the proposal is approved, please use the commit hash to build and restart your node." \
-  --description "Upgrade the bifrost-2 software version from v1.0.0-rc0 to v1.0.0-rc2."
-```
+执行软件升级流程的第一步是由治理模块发起一个软件升级提案，该提案详细说明了升级时间以及升级内容，具体见上面[概念](#概念)。
 
 ### 为提案抵押、投票
 
