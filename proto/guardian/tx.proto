@@ -3,7 +3,7 @@ package irishub.guardian;
 
 option go_package = "github.com/irisnet/irishub/modules/guardian/types";
 
-// Msg defines the guardian Msg service.
+// Msg defines the guardian Msg service
 service Msg {
     // AddSuper defines a method for adding a super account
     rpc AddSuper(MsgAddSuper) returns (MsgAddSuperResponse);
@@ -12,7 +12,7 @@ service Msg {
     rpc DeleteSuper(MsgDeleteSuper) returns (MsgDeleteSuperResponse);
 }
 
-// AddSuper defines the properties of add super account message
+// MsgAddSuper defines the properties of add super account message
 message MsgAddSuper {
     string description = 1;
     string address = 2;
@@ -22,7 +22,7 @@ message MsgAddSuper {
 // MsgAddSuperResponse defines the Msg/AddSuper response type
 message MsgAddSuperResponse {}
 
-// DeleteSuper defines the properties of delete super account message
+// MsgDeleteSuper defines the properties of delete super account message
 message MsgDeleteSuper {
     string address = 2;
     string deleted_by = 3;
