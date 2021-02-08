@@ -23,7 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// GenesisState defines the guardian module's genesis state.
+// GenesisState defines the mint module's genesis state
 type GenesisState struct {
 	Minter Minter `protobuf:"bytes,1,opt,name=minter,proto3" json:"minter"`
 	Params Params `protobuf:"bytes,2,opt,name=params,proto3" json:"params"`

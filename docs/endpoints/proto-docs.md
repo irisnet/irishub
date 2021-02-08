@@ -1113,7 +1113,7 @@ Output defines the properties of order's output
 <a name="irismod.coinswap.Params"></a>
 
 ### Params
-token parameters
+Params defines token module's parameters
 
 
 | Field | Type | Label | Description |
@@ -1144,7 +1144,7 @@ token parameters
 <a name="irismod.coinswap.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the coinswap module's genesis state.
+GenesisState defines the coinswap module's genesis state
 
 
 | Field | Type | Label | Description |
@@ -1235,7 +1235,7 @@ Query creates service with coinswap as rpc
 <a name="irismod.coinswap.MsgAddLiquidity"></a>
 
 ### MsgAddLiquidity
-MsgAddLiquidity represents a msg for adding liquidity to a reserve pool
+MsgAddLiquidity defines a msg for adding liquidity to a reserve pool
 
 
 | Field | Type | Label | Description |
@@ -1254,7 +1254,7 @@ MsgAddLiquidity represents a msg for adding liquidity to a reserve pool
 <a name="irismod.coinswap.MsgAddLiquidityResponse"></a>
 
 ### MsgAddLiquidityResponse
-MsgAddLiquidityResponse defines the Msg/AddLiquidity response type.
+MsgAddLiquidityResponse defines the Msg/AddLiquidity response type
 
 
 | Field | Type | Label | Description |
@@ -1269,7 +1269,7 @@ MsgAddLiquidityResponse defines the Msg/AddLiquidity response type.
 <a name="irismod.coinswap.MsgRemoveLiquidity"></a>
 
 ### MsgRemoveLiquidity
-MsgRemoveLiquidity - struct for removing liquidity from a reserve pool
+MsgRemoveLiquidity defines a msg for removing liquidity from a reserve pool
 
 
 | Field | Type | Label | Description |
@@ -1288,7 +1288,7 @@ MsgRemoveLiquidity - struct for removing liquidity from a reserve pool
 <a name="irismod.coinswap.MsgRemoveLiquidityResponse"></a>
 
 ### MsgRemoveLiquidityResponse
-MsgRemoveLiquidityResponse defines the Msg/RemoveLiquidity response type.
+MsgRemoveLiquidityResponse defines the Msg/RemoveLiquidity response type
 
 
 | Field | Type | Label | Description |
@@ -1303,7 +1303,7 @@ MsgRemoveLiquidityResponse defines the Msg/RemoveLiquidity response type.
 <a name="irismod.coinswap.MsgSwapCoinResponse"></a>
 
 ### MsgSwapCoinResponse
-MsgSwapCoinResponse defines the Msg/SwapCoin response type.
+MsgSwapCoinResponse defines the Msg/SwapCoin response type
 
 
 
@@ -1313,7 +1313,7 @@ MsgSwapCoinResponse defines the Msg/SwapCoin response type.
 <a name="irismod.coinswap.MsgSwapOrder"></a>
 
 ### MsgSwapOrder
-MsgSwapOrder represents a msg for swap order
+MsgSwapOrder defines a msg for swap order
 
 
 | Field | Type | Label | Description |
@@ -1337,13 +1337,13 @@ MsgSwapOrder represents a msg for swap order
 <a name="irismod.coinswap.Msg"></a>
 
 ### Msg
-Msg defines the coinswap Msg service.
+Msg defines the coinswap Msg service
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `AddLiquidity` | [MsgAddLiquidity](#irismod.coinswap.MsgAddLiquidity) | [MsgAddLiquidityResponse](#irismod.coinswap.MsgAddLiquidityResponse) | AddLiquidity defines a method for depositing some tokens to the liquidity pool. | |
-| `RemoveLiquidity` | [MsgRemoveLiquidity](#irismod.coinswap.MsgRemoveLiquidity) | [MsgRemoveLiquidityResponse](#irismod.coinswap.MsgRemoveLiquidityResponse) | RemoveLiquidity defines a method for withdraw some tokens from the liquidity pool. | |
-| `SwapCoin` | [MsgSwapOrder](#irismod.coinswap.MsgSwapOrder) | [MsgSwapCoinResponse](#irismod.coinswap.MsgSwapCoinResponse) | SwapCoin defines a method for swapping a token with the other token from the liquidity pool. | |
+| `AddLiquidity` | [MsgAddLiquidity](#irismod.coinswap.MsgAddLiquidity) | [MsgAddLiquidityResponse](#irismod.coinswap.MsgAddLiquidityResponse) | AddLiquidity defines a method for depositing some tokens to the liquidity pool | |
+| `RemoveLiquidity` | [MsgRemoveLiquidity](#irismod.coinswap.MsgRemoveLiquidity) | [MsgRemoveLiquidityResponse](#irismod.coinswap.MsgRemoveLiquidityResponse) | RemoveLiquidity defines a method for withdraw some tokens from the liquidity pool | |
+| `SwapCoin` | [MsgSwapOrder](#irismod.coinswap.MsgSwapOrder) | [MsgSwapCoinResponse](#irismod.coinswap.MsgSwapCoinResponse) | SwapCoin defines a method for swapping a token with the other token from the liquidity pool | |
 
  <!-- end services -->
 
@@ -7405,7 +7405,7 @@ AccountType defines the super account type
 <a name="irishub.guardian.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the guardian module's genesis state.
+GenesisState defines the guardian module's genesis state
 
 
 | Field | Type | Label | Description |
@@ -7441,7 +7441,7 @@ QuerySupersRequest is request type for the Query/Supers RPC method
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request. |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request |
 
 
 
@@ -7473,7 +7473,7 @@ QuerySupersResponse is response type for the Query/Supers RPC method
 <a name="irishub.guardian.Query"></a>
 
 ### Query
-Query creates service with guardian as rpc
+Query creates service with guardian as RPC
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -7493,7 +7493,7 @@ Query creates service with guardian as rpc
 <a name="irishub.guardian.MsgAddSuper"></a>
 
 ### MsgAddSuper
-AddSuper defines the properties of add super account message
+MsgAddSuper defines the properties of add super account message
 
 
 | Field | Type | Label | Description |
@@ -7520,7 +7520,7 @@ MsgAddSuperResponse defines the Msg/AddSuper response type
 <a name="irishub.guardian.MsgDeleteSuper"></a>
 
 ### MsgDeleteSuper
-DeleteSuper defines the properties of delete super account message
+MsgDeleteSuper defines the properties of delete super account message
 
 
 | Field | Type | Label | Description |
@@ -7552,7 +7552,7 @@ MsgDeleteSuperResponse defines the Msg/DeleteSuper response type
 <a name="irishub.guardian.Msg"></a>
 
 ### Msg
-Msg defines the guardian Msg service.
+Msg defines the guardian Msg service
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -7573,7 +7573,7 @@ Msg defines the guardian Msg service.
 <a name="irismod.htlc.HTLC"></a>
 
 ### HTLC
-HTLC defines a struct for an HTLC
+HTLC defines the struct of an HTLC
 
 
 | Field | Type | Label | Description |
@@ -7597,7 +7597,7 @@ HTLC defines a struct for an HTLC
 <a name="irismod.htlc.HTLCState"></a>
 
 ### HTLCState
-HTLCState defines a state for an HTLC
+HTLCState defines the state of an HTLC
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -7625,7 +7625,7 @@ HTLCState defines a state for an HTLC
 <a name="irismod.htlc.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the htlc module's genesis state.
+GenesisState defines the HTLC module's genesis state
 
 
 | Field | Type | Label | Description |
@@ -7745,7 +7745,7 @@ MsgClaimHTLC defines a message to claim an HTLC
 <a name="irismod.htlc.MsgClaimHTLCResponse"></a>
 
 ### MsgClaimHTLCResponse
-MsgClaimHTLCResponse defines the Msg/ClaimHTLC response type.
+MsgClaimHTLCResponse defines the Msg/ClaimHTLC response type
 
 
 
@@ -7776,7 +7776,7 @@ MsgCreateHTLC defines a message to create an HTLC
 <a name="irismod.htlc.MsgCreateHTLCResponse"></a>
 
 ### MsgCreateHTLCResponse
-MsgCreateHTLCResponse defines the Msg/CreateHTLC response type.
+MsgCreateHTLCResponse defines the Msg/CreateHTLC response type
 
 
 
@@ -7802,7 +7802,7 @@ MsgRefundHTLC defines a message to refund an HTLC
 <a name="irismod.htlc.MsgRefundHTLCResponse"></a>
 
 ### MsgRefundHTLCResponse
-MsgRefundHTLCResponse defines the Msg/RefundHTLC response type.
+MsgRefundHTLCResponse defines the Msg/RefundHTLC response type
 
 
 
@@ -7818,7 +7818,7 @@ MsgRefundHTLCResponse defines the Msg/RefundHTLC response type.
 <a name="irismod.htlc.Msg"></a>
 
 ### Msg
-Msg defines the htlc Msg service.
+Msg defines the HTLC Msg service.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -10836,7 +10836,7 @@ that implements Misbehaviour interface expected by ICS-02
 <a name="irishub.mint.Minter"></a>
 
 ### Minter
-Minter represents the minting state.
+Minter represents the minting state
 
 
 | Field | Type | Label | Description |
@@ -10852,7 +10852,7 @@ Minter represents the minting state.
 <a name="irishub.mint.Params"></a>
 
 ### Params
-mint parameters
+Params defines mint module's parameters
 
 
 | Field | Type | Label | Description |
@@ -10884,7 +10884,7 @@ mint parameters
 <a name="irishub.mint.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the guardian module's genesis state.
+GenesisState defines the mint module's genesis state
 
 
 | Field | Type | Label | Description |
@@ -10916,7 +10916,7 @@ GenesisState defines the guardian module's genesis state.
 <a name="irishub.mint.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParametersRequest is request type for the Query/Parameters RPC method
+QueryParamsRequest is request type for the Query/Parameters RPC method
 
 
 
@@ -10926,7 +10926,7 @@ QueryParametersRequest is request type for the Query/Parameters RPC method
 <a name="irishub.mint.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParametersResponse is response type for the Query/Parameters RPC method
+QueryParamsResponse is response type for the Query/Parameters RPC method
 
 
 | Field | Type | Label | Description |
@@ -10952,7 +10952,7 @@ Query creates service with guardian as rpc
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `Params` | [QueryParamsRequest](#irishub.mint.QueryParamsRequest) | [QueryParamsResponse](#irishub.mint.QueryParamsResponse) | Parameters queries the mint parameters | GET|/irishub/mint/params|
+| `Params` | [QueryParamsRequest](#irishub.mint.QueryParamsRequest) | [QueryParamsResponse](#irishub.mint.QueryParamsResponse) | Params queries the mint parameters | GET|/irishub/mint/params|
 
  <!-- end services -->
 
@@ -10968,7 +10968,7 @@ Query creates service with guardian as rpc
 <a name="irismod.nft.BaseNFT"></a>
 
 ### BaseNFT
-BaseNFT defines a non fungible token.
+BaseNFT defines a non-fungible token
 
 
 | Field | Type | Label | Description |
@@ -10987,7 +10987,7 @@ BaseNFT defines a non fungible token.
 <a name="irismod.nft.Collection"></a>
 
 ### Collection
-
+Collection defines a type of collection
 
 
 | Field | Type | Label | Description |
@@ -11003,7 +11003,7 @@ BaseNFT defines a non fungible token.
 <a name="irismod.nft.Denom"></a>
 
 ### Denom
-Denom defines a type of NFT.
+Denom defines a type of NFT
 
 
 | Field | Type | Label | Description |
@@ -11021,7 +11021,7 @@ Denom defines a type of NFT.
 <a name="irismod.nft.IDCollection"></a>
 
 ### IDCollection
-
+IDCollection defines a type of collection with specified ID
 
 
 | Field | Type | Label | Description |
@@ -11037,7 +11037,7 @@ Denom defines a type of NFT.
 <a name="irismod.nft.Owner"></a>
 
 ### Owner
-
+Owner defines a type of owner
 
 
 | Field | Type | Label | Description |
@@ -11069,7 +11069,7 @@ Denom defines a type of NFT.
 <a name="irismod.nft.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the nft module's genesis state.
+GenesisState defines the NFT module's genesis state
 
 
 | Field | Type | Label | Description |
@@ -11294,7 +11294,7 @@ QuerySupplyResponse is the response type for the Query/Supply RPC method
 <a name="irismod.nft.Query"></a>
 
 ### Query
-Query defines the gRPC querier service for nft module
+Query defines the gRPC querier service for NFT module
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -11549,7 +11549,7 @@ FeedValue defines the feed result standard
 <a name="irismod.service.CompactRequest"></a>
 
 ### CompactRequest
-CompactRequest defines a standard for compact request.
+CompactRequest defines a standard for compact request
 
 
 | Field | Type | Label | Description |
@@ -11569,7 +11569,7 @@ CompactRequest defines a standard for compact request.
 <a name="irismod.service.Params"></a>
 
 ### Params
-service parameters
+Params defines service module's parameters
 
 
 | Field | Type | Label | Description |
@@ -11592,7 +11592,7 @@ service parameters
 <a name="irismod.service.Pricing"></a>
 
 ### Pricing
-Pricing defines a standard for service pricing.
+Pricing defines a standard for service pricing
 
 
 | Field | Type | Label | Description |
@@ -11609,7 +11609,7 @@ Pricing defines a standard for service pricing.
 <a name="irismod.service.PromotionByTime"></a>
 
 ### PromotionByTime
-PromotionByTime defines a standard for service promotion by time.
+PromotionByTime defines a standard for service promotion by time
 
 
 | Field | Type | Label | Description |
@@ -11626,7 +11626,7 @@ PromotionByTime defines a standard for service promotion by time.
 <a name="irismod.service.PromotionByVolume"></a>
 
 ### PromotionByVolume
-PromotionByVolume defines a standard for service promotion by volume.
+PromotionByVolume defines a standard for service promotion by volume
 
 
 | Field | Type | Label | Description |
@@ -11642,7 +11642,7 @@ PromotionByVolume defines a standard for service promotion by volume.
 <a name="irismod.service.Request"></a>
 
 ### Request
-Request defines a standard for request.
+Request defines a standard for request
 
 
 | Field | Type | Label | Description |
@@ -11666,7 +11666,7 @@ Request defines a standard for request.
 <a name="irismod.service.RequestContext"></a>
 
 ### RequestContext
-RequestContext defines a standard for request context.
+RequestContext defines a standard for request context
 
 
 | Field | Type | Label | Description |
@@ -11697,7 +11697,7 @@ RequestContext defines a standard for request context.
 <a name="irismod.service.Response"></a>
 
 ### Response
-Response defines a standard for response.
+Response defines a standard for response
 
 
 | Field | Type | Label | Description |
@@ -11717,7 +11717,7 @@ Response defines a standard for response.
 <a name="irismod.service.ServiceBinding"></a>
 
 ### ServiceBinding
-ServiceBinding defines a standard for service binding.
+ServiceBinding defines a standard for service binding
 
 
 | Field | Type | Label | Description |
@@ -11740,7 +11740,7 @@ ServiceBinding defines a standard for service binding.
 <a name="irismod.service.ServiceDefinition"></a>
 
 ### ServiceDefinition
-ServiceDefinition defines a standard for service definition.
+ServiceDefinition defines a standard for service definition
 
 
 | Field | Type | Label | Description |
@@ -11778,9 +11778,9 @@ RequestContextState is a type alias that represents a request status as a byte
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
-| RUNNING | 0 | RUNNING defines the running request context status. |
-| PAUSED | 1 | PAUSED defines the paused request context status. |
-| COMPLETED | 2 | COMPLETED defines the completed request context status. |
+| RUNNING | 0 | RUNNING defines the running request context status |
+| PAUSED | 1 | PAUSED defines the paused request context status |
+| COMPLETED | 2 | COMPLETED defines the completed request context status |
 
 
  <!-- end enums -->
@@ -11818,7 +11818,7 @@ RequestContextState is a type alias that represents a request status as a byte
 <a name="irismod.oracle.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the oracle module's genesis state.
+GenesisState defines the oracle module's genesis state
 
 
 | Field | Type | Label | Description |
@@ -11938,7 +11938,7 @@ QueryFeedsRequest is request type for the Query/Feeds RPC method
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `state` | [string](#string) |  |  |
-| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request. |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request |
 
 
 
@@ -11954,7 +11954,7 @@ QueryFeedsResponse is response type for the Query/Feeds RPC method
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `feeds` | [FeedContext](#irismod.oracle.FeedContext) | repeated |  |
-| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  | pagination defines an optional pagination for the request |
 
 
 
@@ -11975,7 +11975,7 @@ Query creates service with guardian as rpc
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
 | `Feed` | [QueryFeedRequest](#irismod.oracle.QueryFeedRequest) | [QueryFeedResponse](#irismod.oracle.QueryFeedResponse) | Feed queries the feed | GET|/irismod/oracle/feeds/{feed_name}|
-| `Feeds` | [QueryFeedsRequest](#irismod.oracle.QueryFeedsRequest) | [QueryFeedsResponse](#irismod.oracle.QueryFeedsResponse) | QueryFeedsRequest queries the feed list | GET|/irismod/oracle/feeds|
+| `Feeds` | [QueryFeedsRequest](#irismod.oracle.QueryFeedsRequest) | [QueryFeedsResponse](#irismod.oracle.QueryFeedsResponse) | Feeds queries the feed list | GET|/irismod/oracle/feeds|
 | `FeedValue` | [QueryFeedValueRequest](#irismod.oracle.QueryFeedValueRequest) | [QueryFeedValueResponse](#irismod.oracle.QueryFeedValueResponse) | FeedValue queries the feed value | GET|/irismod/oracle/feeds/{feed_name}/values|
 
  <!-- end services -->
@@ -12019,7 +12019,7 @@ MsgCreateFeed defines an sdk.Msg type that supports creating a feed
 <a name="irismod.oracle.MsgCreateFeedResponse"></a>
 
 ### MsgCreateFeedResponse
-MsgCreateFeedResponse defines the Msg/CreateFeed response type.
+MsgCreateFeedResponse defines the Msg/CreateFeed response type
 
 
 
@@ -12052,7 +12052,7 @@ MsgEditFeed defines an sdk.Msg type that supports editing a feed
 <a name="irismod.oracle.MsgEditFeedResponse"></a>
 
 ### MsgEditFeedResponse
-MsgEditFeedResponse defines the Msg/EditFeed response type.
+MsgEditFeedResponse defines the Msg/EditFeed response type
 
 
 
@@ -12078,7 +12078,7 @@ MsgPauseFeed defines an sdk.Msg type that supports pausing a feed
 <a name="irismod.oracle.MsgPauseFeedResponse"></a>
 
 ### MsgPauseFeedResponse
-MsgPauseFeedResponse defines the Msg/PauseFeed response type.
+MsgPauseFeedResponse defines the Msg/PauseFeed response type
 
 
 
@@ -12104,7 +12104,7 @@ MsgPauseFeed defines an sdk.Msg type that supports stating a feed
 <a name="irismod.oracle.MsgStartFeedResponse"></a>
 
 ### MsgStartFeedResponse
-MsgStartFeedResponse defines the Msg/StartFeed response type.
+MsgStartFeedResponse defines the Msg/StartFeed response type
 
 
 
@@ -12120,14 +12120,14 @@ MsgStartFeedResponse defines the Msg/StartFeed response type.
 <a name="irismod.oracle.Msg"></a>
 
 ### Msg
-Msg defines the oracle Msg service.
+Msg defines the oracle Msg service
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `CreateFeed` | [MsgCreateFeed](#irismod.oracle.MsgCreateFeed) | [MsgCreateFeedResponse](#irismod.oracle.MsgCreateFeedResponse) | CreateFeed defines a method for creating a new feed. | |
-| `EditFeed` | [MsgEditFeed](#irismod.oracle.MsgEditFeed) | [MsgEditFeedResponse](#irismod.oracle.MsgEditFeedResponse) | EditFeed defines a method for editing a feed. | |
+| `CreateFeed` | [MsgCreateFeed](#irismod.oracle.MsgCreateFeed) | [MsgCreateFeedResponse](#irismod.oracle.MsgCreateFeedResponse) | CreateFeed defines a method for creating a new feed | |
+| `EditFeed` | [MsgEditFeed](#irismod.oracle.MsgEditFeed) | [MsgEditFeedResponse](#irismod.oracle.MsgEditFeedResponse) | EditFeed defines a method for editing a feed | |
 | `StartFeed` | [MsgStartFeed](#irismod.oracle.MsgStartFeed) | [MsgStartFeedResponse](#irismod.oracle.MsgStartFeedResponse) | StartFeed defines a method for starting a feed | |
-| `PauseFeed` | [MsgPauseFeed](#irismod.oracle.MsgPauseFeed) | [MsgPauseFeedResponse](#irismod.oracle.MsgPauseFeedResponse) | PauseFeed defines a method for pausing a feed. | |
+| `PauseFeed` | [MsgPauseFeed](#irismod.oracle.MsgPauseFeed) | [MsgPauseFeedResponse](#irismod.oracle.MsgPauseFeedResponse) | PauseFeed defines a method for pausing a feed | |
 
  <!-- end services -->
 
@@ -12196,7 +12196,7 @@ Request defines the random request standard
 <a name="irismod.random.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the random module's genesis state.
+GenesisState defines the random module's genesis state
 
 
 | Field | Type | Label | Description |
@@ -12227,7 +12227,7 @@ GenesisState defines the random module's genesis state.
 <a name="irismod.random.Requests"></a>
 
 ### Requests
-
+Requests defines the random requests
 
 
 | Field | Type | Label | Description |
@@ -12363,7 +12363,7 @@ MsgRequestRandom defines an sdk.Msg type that supports requesting a random numbe
 <a name="irismod.random.MsgRequestRandomResponse"></a>
 
 ### MsgRequestRandomResponse
-MsgRequestRandomResponse defines the Msg/RequestRandom response type.
+MsgRequestRandomResponse defines the Msg/RequestRandom response type
 
 
 
@@ -12379,11 +12379,11 @@ MsgRequestRandomResponse defines the Msg/RequestRandom response type.
 <a name="irismod.random.Msg"></a>
 
 ### Msg
-Msg defines the oracle Msg service.
+Msg defines the oracle Msg service
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `RequestRandom` | [MsgRequestRandom](#irismod.random.MsgRequestRandom) | [MsgRequestRandomResponse](#irismod.random.MsgRequestRandomResponse) | RequestRandom defines a method for requesting a new random number. | |
+| `RequestRandom` | [MsgRequestRandom](#irismod.random.MsgRequestRandom) | [MsgRequestRandomResponse](#irismod.random.MsgRequestRandomResponse) | RequestRandom defines a method for requesting a new random number | |
 
  <!-- end services -->
 
@@ -12399,7 +12399,7 @@ Msg defines the oracle Msg service.
 <a name="irismod.record.Content"></a>
 
 ### Content
-Content defines the detailed information for a record.
+Content defines the detailed information for a record
 
 
 | Field | Type | Label | Description |
@@ -12417,7 +12417,7 @@ Content defines the detailed information for a record.
 <a name="irismod.record.Record"></a>
 
 ### Record
-
+Record defines the record standard
 
 
 | Field | Type | Label | Description |
@@ -12450,7 +12450,7 @@ Content defines the detailed information for a record.
 <a name="irismod.record.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the record module's genesis state.
+GenesisState defines the record module's genesis state
 
 
 | Field | Type | Label | Description |
@@ -12537,7 +12537,7 @@ Query defines the gRPC querier service for record module
 <a name="irismod.record.MsgCreateRecord"></a>
 
 ### MsgCreateRecord
-MsgCreateRecord defines an SDK message for creating a new record.
+MsgCreateRecord defines an SDK message for creating a new record
 
 
 | Field | Type | Label | Description |
@@ -12553,7 +12553,7 @@ MsgCreateRecord defines an SDK message for creating a new record.
 <a name="irismod.record.MsgCreateRecordResponse"></a>
 
 ### MsgCreateRecordResponse
-MsgCreateRecordResponse defines the Msg/CreateRecord response type.
+MsgCreateRecordResponse defines the Msg/CreateRecord response type
 
 
 | Field | Type | Label | Description |
@@ -12574,11 +12574,11 @@ MsgCreateRecordResponse defines the Msg/CreateRecord response type.
 <a name="irismod.record.Msg"></a>
 
 ### Msg
-Msg defines the oracle Msg service.
+Msg defines the oracle Msg service
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `CreateRecord` | [MsgCreateRecord](#irismod.record.MsgCreateRecord) | [MsgCreateRecordResponse](#irismod.record.MsgCreateRecordResponse) | CreateRecord defines a method for creating a new record. | |
+| `CreateRecord` | [MsgCreateRecord](#irismod.record.MsgCreateRecord) | [MsgCreateRecordResponse](#irismod.record.MsgCreateRecordResponse) | CreateRecord defines a method for creating a new record | |
 
  <!-- end services -->
 
@@ -12594,7 +12594,7 @@ Msg defines the oracle Msg service.
 <a name="irismod.service.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the service module's genesis state.
+GenesisState defines the service module's genesis state
 
 
 | Field | Type | Label | Description |
@@ -12699,7 +12699,7 @@ QueryBindingsRequest is request type for the Query/Bindings RPC method
 | ----- | ---- | ----- | ----------- |
 | `service_name` | [string](#string) |  |  |
 | `owner` | [string](#string) |  |  |
-| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request. |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request |
 
 
 
@@ -13098,7 +13098,7 @@ Query creates service with iservice as rpc
 <a name="irismod.service.MsgBindService"></a>
 
 ### MsgBindService
-MsgBindService defines an SDK message for binding to an existing service.
+MsgBindService defines an SDK message for binding to an existing service
 
 
 | Field | Type | Label | Description |
@@ -13119,7 +13119,7 @@ MsgBindService defines an SDK message for binding to an existing service.
 <a name="irismod.service.MsgBindServiceResponse"></a>
 
 ### MsgBindServiceResponse
-MsgBindServiceResponse defines the Msg/BindService response type.
+MsgBindServiceResponse defines the Msg/BindService response type
 
 
 
@@ -13129,7 +13129,7 @@ MsgBindServiceResponse defines the Msg/BindService response type.
 <a name="irismod.service.MsgCallService"></a>
 
 ### MsgCallService
-MsgCallService defines an SDK message to initiate a service request context.
+MsgCallService defines an SDK message to initiate a service request context
 
 
 | Field | Type | Label | Description |
@@ -13152,7 +13152,7 @@ MsgCallService defines an SDK message to initiate a service request context.
 <a name="irismod.service.MsgCallServiceResponse"></a>
 
 ### MsgCallServiceResponse
-MsgCallServiceResponse defines the Msg/CallService response type.
+MsgCallServiceResponse defines the Msg/CallService response type
 
 
 | Field | Type | Label | Description |
@@ -13167,7 +13167,7 @@ MsgCallServiceResponse defines the Msg/CallService response type.
 <a name="irismod.service.MsgDefineService"></a>
 
 ### MsgDefineService
-MsgDefineService defines an SDK message for defining a new service.
+MsgDefineService defines an SDK message for defining a new service
 
 
 | Field | Type | Label | Description |
@@ -13187,7 +13187,7 @@ MsgDefineService defines an SDK message for defining a new service.
 <a name="irismod.service.MsgDefineServiceResponse"></a>
 
 ### MsgDefineServiceResponse
-MsgDefineServiceResponse defines the Msg/DefineService response type.
+MsgDefineServiceResponse defines the Msg/DefineService response type
 
 
 
@@ -13197,7 +13197,7 @@ MsgDefineServiceResponse defines the Msg/DefineService response type.
 <a name="irismod.service.MsgDisableServiceBinding"></a>
 
 ### MsgDisableServiceBinding
-MsgDisableServiceBinding defines an SDK message to disable a service binding.
+MsgDisableServiceBinding defines an SDK message to disable a service binding
 
 
 | Field | Type | Label | Description |
@@ -13214,7 +13214,7 @@ MsgDisableServiceBinding defines an SDK message to disable a service binding.
 <a name="irismod.service.MsgDisableServiceBindingResponse"></a>
 
 ### MsgDisableServiceBindingResponse
-MsgDisableServiceBindingResponse defines the Msg/DisableServiceBinding response type.
+MsgDisableServiceBindingResponse defines the Msg/DisableServiceBinding response type
 
 
 
@@ -13224,7 +13224,7 @@ MsgDisableServiceBindingResponse defines the Msg/DisableServiceBinding response 
 <a name="irismod.service.MsgEnableServiceBinding"></a>
 
 ### MsgEnableServiceBinding
-MsgEnableServiceBinding defines an SDK message to enable a service binding.
+MsgEnableServiceBinding defines an SDK message to enable a service binding
 
 
 | Field | Type | Label | Description |
@@ -13242,7 +13242,7 @@ MsgEnableServiceBinding defines an SDK message to enable a service binding.
 <a name="irismod.service.MsgEnableServiceBindingResponse"></a>
 
 ### MsgEnableServiceBindingResponse
-MsgEnableServiceBindingResponse defines the Msg/EnableServiceBinding response type.
+MsgEnableServiceBindingResponse defines the Msg/EnableServiceBinding response type
 
 
 
@@ -13252,7 +13252,7 @@ MsgEnableServiceBindingResponse defines the Msg/EnableServiceBinding response ty
 <a name="irismod.service.MsgKillRequestContext"></a>
 
 ### MsgKillRequestContext
-MsgKillRequestContext defines an SDK message to terminate a service request.
+MsgKillRequestContext defines an SDK message to terminate a service request
 
 
 | Field | Type | Label | Description |
@@ -13268,7 +13268,7 @@ MsgKillRequestContext defines an SDK message to terminate a service request.
 <a name="irismod.service.MsgKillRequestContextResponse"></a>
 
 ### MsgKillRequestContextResponse
-MsgKillRequestContextResponse defines the Msg/KillRequestContext response type.
+MsgKillRequestContextResponse defines the Msg/KillRequestContext response type
 
 
 
@@ -13278,7 +13278,7 @@ MsgKillRequestContextResponse defines the Msg/KillRequestContext response type.
 <a name="irismod.service.MsgPauseRequestContext"></a>
 
 ### MsgPauseRequestContext
-MsgPauseRequestContext defines an SDK message to pause a service request.
+MsgPauseRequestContext defines an SDK message to pause a service request
 
 
 | Field | Type | Label | Description |
@@ -13294,7 +13294,7 @@ MsgPauseRequestContext defines an SDK message to pause a service request.
 <a name="irismod.service.MsgPauseRequestContextResponse"></a>
 
 ### MsgPauseRequestContextResponse
-MsgPauseRequestContextResponse defines the Msg/PauseRequestContext response type.
+MsgPauseRequestContextResponse defines the Msg/PauseRequestContext response type
 
 
 
@@ -13304,7 +13304,7 @@ MsgPauseRequestContextResponse defines the Msg/PauseRequestContext response type
 <a name="irismod.service.MsgRefundServiceDeposit"></a>
 
 ### MsgRefundServiceDeposit
-MsgRefundServiceDeposit defines an SDK message to refund deposit from a service binding.
+MsgRefundServiceDeposit defines an SDK message to refund deposit from a service binding
 
 
 | Field | Type | Label | Description |
@@ -13321,7 +13321,7 @@ MsgRefundServiceDeposit defines an SDK message to refund deposit from a service 
 <a name="irismod.service.MsgRefundServiceDepositResponse"></a>
 
 ### MsgRefundServiceDepositResponse
-MsgRefundServiceDepositResponse defines the Msg/RefundServiceDeposit response type.
+MsgRefundServiceDepositResponse defines the Msg/RefundServiceDeposit response type
 
 
 
@@ -13331,7 +13331,7 @@ MsgRefundServiceDepositResponse defines the Msg/RefundServiceDeposit response ty
 <a name="irismod.service.MsgRespondService"></a>
 
 ### MsgRespondService
-MsgRespondService defines an SDK message to respond a service request.
+MsgRespondService defines an SDK message to respond a service request
 
 
 | Field | Type | Label | Description |
@@ -13349,7 +13349,7 @@ MsgRespondService defines an SDK message to respond a service request.
 <a name="irismod.service.MsgRespondServiceResponse"></a>
 
 ### MsgRespondServiceResponse
-MsgRespondService defines the Msg/RespondService response type.
+MsgRespondServiceResponse defines the Msg/RespondService response type
 
 
 
@@ -13359,7 +13359,7 @@ MsgRespondService defines the Msg/RespondService response type.
 <a name="irismod.service.MsgSetWithdrawAddress"></a>
 
 ### MsgSetWithdrawAddress
-MsgSetWithdrawAddress defines an SDK message to set the withdrawal address for a provider.
+MsgSetWithdrawAddress defines an SDK message to set the withdrawal address for a provider
 
 
 | Field | Type | Label | Description |
@@ -13375,7 +13375,7 @@ MsgSetWithdrawAddress defines an SDK message to set the withdrawal address for a
 <a name="irismod.service.MsgSetWithdrawAddressResponse"></a>
 
 ### MsgSetWithdrawAddressResponse
-MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response type.
+MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response type
 
 
 
@@ -13385,7 +13385,7 @@ MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response type.
 <a name="irismod.service.MsgStartRequestContext"></a>
 
 ### MsgStartRequestContext
-MsgStartRequestContext defines an SDK message to resume a service request.
+MsgStartRequestContext defines an SDK message to resume a service request
 
 
 | Field | Type | Label | Description |
@@ -13401,7 +13401,7 @@ MsgStartRequestContext defines an SDK message to resume a service request.
 <a name="irismod.service.MsgStartRequestContextResponse"></a>
 
 ### MsgStartRequestContextResponse
-MsgStartRequestContextResponse defines the Msg/StartRequestContext response type.
+MsgStartRequestContextResponse defines the Msg/StartRequestContext response type
 
 
 
@@ -13411,7 +13411,7 @@ MsgStartRequestContextResponse defines the Msg/StartRequestContext response type
 <a name="irismod.service.MsgUpdateRequestContext"></a>
 
 ### MsgUpdateRequestContext
-MsgUpdateRequestContext defines an SDK message to update a service request context.
+MsgUpdateRequestContext defines an SDK message to update a service request context
 
 
 | Field | Type | Label | Description |
@@ -13432,7 +13432,7 @@ MsgUpdateRequestContext defines an SDK message to update a service request conte
 <a name="irismod.service.MsgUpdateRequestContextResponse"></a>
 
 ### MsgUpdateRequestContextResponse
-MsgUpdateRequestContextResponse defines the Msg/UpdateRequestContext response type.
+MsgUpdateRequestContextResponse defines the Msg/UpdateRequestContext response type
 
 
 
@@ -13442,7 +13442,7 @@ MsgUpdateRequestContextResponse defines the Msg/UpdateRequestContext response ty
 <a name="irismod.service.MsgUpdateServiceBinding"></a>
 
 ### MsgUpdateServiceBinding
-MsgUpdateServiceBinding defines an SDK message for updating an existing service binding.
+MsgUpdateServiceBinding defines an SDK message for updating an existing service binding
 
 
 | Field | Type | Label | Description |
@@ -13463,7 +13463,7 @@ MsgUpdateServiceBinding defines an SDK message for updating an existing service 
 <a name="irismod.service.MsgUpdateServiceBindingResponse"></a>
 
 ### MsgUpdateServiceBindingResponse
-MsgUpdateServiceBindingResponse defines the Msg/UpdateServiceBinding response type.
+MsgUpdateServiceBindingResponse defines the Msg/UpdateServiceBinding response type
 
 
 
@@ -13473,7 +13473,7 @@ MsgUpdateServiceBindingResponse defines the Msg/UpdateServiceBinding response ty
 <a name="irismod.service.MsgWithdrawEarnedFees"></a>
 
 ### MsgWithdrawEarnedFees
-MsgWithdrawEarnedFees defines an SDK message to withdraw the fees earned by the provider or owner.
+MsgWithdrawEarnedFees defines an SDK message to withdraw the fees earned by the provider or owner
 
 
 | Field | Type | Label | Description |
@@ -13489,7 +13489,7 @@ MsgWithdrawEarnedFees defines an SDK message to withdraw the fees earned by the 
 <a name="irismod.service.MsgWithdrawEarnedFeesResponse"></a>
 
 ### MsgWithdrawEarnedFeesResponse
-MsgWithdrawEarnedFeesResponse defines the Msg/WithdrawEarnedFees response type.
+MsgWithdrawEarnedFeesResponse defines the Msg/WithdrawEarnedFees response type
 
 
 
@@ -13505,24 +13505,24 @@ MsgWithdrawEarnedFeesResponse defines the Msg/WithdrawEarnedFees response type.
 <a name="irismod.service.Msg"></a>
 
 ### Msg
-Msg defines the oracle Msg service.
+Msg defines the oracle Msg service
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `DefineService` | [MsgDefineService](#irismod.service.MsgDefineService) | [MsgDefineServiceResponse](#irismod.service.MsgDefineServiceResponse) | DefineService defines a method for define a new service. | |
-| `BindService` | [MsgBindService](#irismod.service.MsgBindService) | [MsgBindServiceResponse](#irismod.service.MsgBindServiceResponse) | BindService defines a method for bind a server. | |
-| `UpdateServiceBinding` | [MsgUpdateServiceBinding](#irismod.service.MsgUpdateServiceBinding) | [MsgUpdateServiceBindingResponse](#irismod.service.MsgUpdateServiceBindingResponse) | UpdateServiceBinding defines a method for update a service binding. | |
-| `SetWithdrawAddress` | [MsgSetWithdrawAddress](#irismod.service.MsgSetWithdrawAddress) | [MsgSetWithdrawAddressResponse](#irismod.service.MsgSetWithdrawAddressResponse) | SetWithdrawAddress defines a method for setting a withdraw address. | |
-| `EnableServiceBinding` | [MsgEnableServiceBinding](#irismod.service.MsgEnableServiceBinding) | [MsgEnableServiceBindingResponse](#irismod.service.MsgEnableServiceBindingResponse) | EnableServiceBinding defines a method for enabling a service binding. | |
-| `DisableServiceBinding` | [MsgDisableServiceBinding](#irismod.service.MsgDisableServiceBinding) | [MsgDisableServiceBindingResponse](#irismod.service.MsgDisableServiceBindingResponse) | DisableServiceBinding defines a method for disabling a service binding. | |
-| `RefundServiceDeposit` | [MsgRefundServiceDeposit](#irismod.service.MsgRefundServiceDeposit) | [MsgRefundServiceDepositResponse](#irismod.service.MsgRefundServiceDepositResponse) | RefundServiceDeposit defines a method for refunding a fee. | |
-| `CallService` | [MsgCallService](#irismod.service.MsgCallService) | [MsgCallServiceResponse](#irismod.service.MsgCallServiceResponse) | CallService defines a method for calling a service. | |
-| `RespondService` | [MsgRespondService](#irismod.service.MsgRespondService) | [MsgRespondServiceResponse](#irismod.service.MsgRespondServiceResponse) | RespondService defines a method for responding a service. | |
-| `PauseRequestContext` | [MsgPauseRequestContext](#irismod.service.MsgPauseRequestContext) | [MsgPauseRequestContextResponse](#irismod.service.MsgPauseRequestContextResponse) | PauseRequestContext defines a method for pausing a service call. | |
-| `StartRequestContext` | [MsgStartRequestContext](#irismod.service.MsgStartRequestContext) | [MsgStartRequestContextResponse](#irismod.service.MsgStartRequestContextResponse) | StartRequestContext defines a method for starting a service call. | |
-| `KillRequestContext` | [MsgKillRequestContext](#irismod.service.MsgKillRequestContext) | [MsgKillRequestContextResponse](#irismod.service.MsgKillRequestContextResponse) | KillRequestContext defines a method for killing a service call. | |
-| `UpdateRequestContext` | [MsgUpdateRequestContext](#irismod.service.MsgUpdateRequestContext) | [MsgUpdateRequestContextResponse](#irismod.service.MsgUpdateRequestContextResponse) | UpdateRequestContext defines a method for updating a service call. | |
-| `WithdrawEarnedFees` | [MsgWithdrawEarnedFees](#irismod.service.MsgWithdrawEarnedFees) | [MsgWithdrawEarnedFeesResponse](#irismod.service.MsgWithdrawEarnedFeesResponse) | WithdrawEarnedFees defines a method for Withdrawing a earned fees. | |
+| `DefineService` | [MsgDefineService](#irismod.service.MsgDefineService) | [MsgDefineServiceResponse](#irismod.service.MsgDefineServiceResponse) | DefineService defines a method for define a new service | |
+| `BindService` | [MsgBindService](#irismod.service.MsgBindService) | [MsgBindServiceResponse](#irismod.service.MsgBindServiceResponse) | BindService defines a method for bind a server | |
+| `UpdateServiceBinding` | [MsgUpdateServiceBinding](#irismod.service.MsgUpdateServiceBinding) | [MsgUpdateServiceBindingResponse](#irismod.service.MsgUpdateServiceBindingResponse) | UpdateServiceBinding defines a method for update a service binding | |
+| `SetWithdrawAddress` | [MsgSetWithdrawAddress](#irismod.service.MsgSetWithdrawAddress) | [MsgSetWithdrawAddressResponse](#irismod.service.MsgSetWithdrawAddressResponse) | SetWithdrawAddress defines a method for setting a withdraw address | |
+| `EnableServiceBinding` | [MsgEnableServiceBinding](#irismod.service.MsgEnableServiceBinding) | [MsgEnableServiceBindingResponse](#irismod.service.MsgEnableServiceBindingResponse) | EnableServiceBinding defines a method for enabling a service binding | |
+| `DisableServiceBinding` | [MsgDisableServiceBinding](#irismod.service.MsgDisableServiceBinding) | [MsgDisableServiceBindingResponse](#irismod.service.MsgDisableServiceBindingResponse) | DisableServiceBinding defines a method for disabling a service binding | |
+| `RefundServiceDeposit` | [MsgRefundServiceDeposit](#irismod.service.MsgRefundServiceDeposit) | [MsgRefundServiceDepositResponse](#irismod.service.MsgRefundServiceDepositResponse) | RefundServiceDeposit defines a method for refunding a fee | |
+| `CallService` | [MsgCallService](#irismod.service.MsgCallService) | [MsgCallServiceResponse](#irismod.service.MsgCallServiceResponse) | CallService defines a method for calling a service | |
+| `RespondService` | [MsgRespondService](#irismod.service.MsgRespondService) | [MsgRespondServiceResponse](#irismod.service.MsgRespondServiceResponse) | RespondService defines a method for responding a service | |
+| `PauseRequestContext` | [MsgPauseRequestContext](#irismod.service.MsgPauseRequestContext) | [MsgPauseRequestContextResponse](#irismod.service.MsgPauseRequestContextResponse) | PauseRequestContext defines a method for pausing a service call | |
+| `StartRequestContext` | [MsgStartRequestContext](#irismod.service.MsgStartRequestContext) | [MsgStartRequestContextResponse](#irismod.service.MsgStartRequestContextResponse) | StartRequestContext defines a method for starting a service call | |
+| `KillRequestContext` | [MsgKillRequestContext](#irismod.service.MsgKillRequestContext) | [MsgKillRequestContextResponse](#irismod.service.MsgKillRequestContextResponse) | KillRequestContext defines a method for killing a service call | |
+| `UpdateRequestContext` | [MsgUpdateRequestContext](#irismod.service.MsgUpdateRequestContext) | [MsgUpdateRequestContextResponse](#irismod.service.MsgUpdateRequestContextResponse) | UpdateRequestContext defines a method for updating a service call | |
+| `WithdrawEarnedFees` | [MsgWithdrawEarnedFees](#irismod.service.MsgWithdrawEarnedFees) | [MsgWithdrawEarnedFeesResponse](#irismod.service.MsgWithdrawEarnedFeesResponse) | WithdrawEarnedFees defines a method for Withdrawing a earned fees | |
 
  <!-- end services -->
 
@@ -13538,7 +13538,7 @@ Msg defines the oracle Msg service.
 <a name="irismod.token.Params"></a>
 
 ### Params
-token parameters
+Params defines token module's parameters
 
 
 | Field | Type | Label | Description |
@@ -13593,7 +13593,7 @@ Token defines a standard for the fungible token
 <a name="irismod.token.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the token module's genesis state.
+GenesisState defines the token module's genesis state
 
 
 | Field | Type | Label | Description |
@@ -13777,7 +13777,7 @@ QueryTotalBurnResponse is response type for the Query/TotalBurn RPC method
 <a name="irismod.token.Query"></a>
 
 ### Query
-Query creates service with token as rpc
+Query creates service with token as RPC
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -13785,7 +13785,7 @@ Query creates service with token as rpc
 | `Tokens` | [QueryTokensRequest](#irismod.token.QueryTokensRequest) | [QueryTokensResponse](#irismod.token.QueryTokensResponse) | Tokens returns the token list | GET|/irismod/token/tokens|
 | `Fees` | [QueryFeesRequest](#irismod.token.QueryFeesRequest) | [QueryFeesResponse](#irismod.token.QueryFeesResponse) | Fees returns the fees to issue or mint a token | GET|/irismod/token/tokens/{symbol}/fees|
 | `Params` | [QueryParamsRequest](#irismod.token.QueryParamsRequest) | [QueryParamsResponse](#irismod.token.QueryParamsResponse) | Params queries the token parameters | GET|/irismod/token/params|
-| `TotalBurn` | [QueryTotalBurnRequest](#irismod.token.QueryTotalBurnRequest) | [QueryTotalBurnResponse](#irismod.token.QueryTotalBurnResponse) | Params queries the token parameters | GET|/irismod/token/total_burn|
+| `TotalBurn` | [QueryTotalBurnRequest](#irismod.token.QueryTotalBurnRequest) | [QueryTotalBurnResponse](#irismod.token.QueryTotalBurnResponse) | TotalBurn queries all the burnt coins | GET|/irismod/token/total_burn|
 
  <!-- end services -->
 
@@ -13801,7 +13801,7 @@ Query creates service with token as rpc
 <a name="irismod.token.MsgBurnToken"></a>
 
 ### MsgBurnToken
-MsgBurnToken defines an SDK message for burning some tokens.
+MsgBurnToken defines an SDK message for burning some tokens
 
 
 | Field | Type | Label | Description |
@@ -13818,7 +13818,7 @@ MsgBurnToken defines an SDK message for burning some tokens.
 <a name="irismod.token.MsgBurnTokenResponse"></a>
 
 ### MsgBurnTokenResponse
-MsgBurnTokenResponse defines the Msg/BurnToken response type.
+MsgBurnTokenResponse defines the Msg/BurnToken response type
 
 
 
@@ -13828,7 +13828,7 @@ MsgBurnTokenResponse defines the Msg/BurnToken response type.
 <a name="irismod.token.MsgEditToken"></a>
 
 ### MsgEditToken
-MsgEditToken defines an SDK message for editing a new token.
+MsgEditToken defines an SDK message for editing a new token
 
 
 | Field | Type | Label | Description |
@@ -13847,7 +13847,7 @@ MsgEditToken defines an SDK message for editing a new token.
 <a name="irismod.token.MsgEditTokenResponse"></a>
 
 ### MsgEditTokenResponse
-MsgEditTokenResponse defines the Msg/EditToken response type.
+MsgEditTokenResponse defines the Msg/EditToken response type
 
 
 
@@ -13857,7 +13857,7 @@ MsgEditTokenResponse defines the Msg/EditToken response type.
 <a name="irismod.token.MsgIssueToken"></a>
 
 ### MsgIssueToken
-MsgIssueToken defines an SDK message for issuing a new token.
+MsgIssueToken defines an SDK message for issuing a new token
 
 
 | Field | Type | Label | Description |
@@ -13879,7 +13879,7 @@ MsgIssueToken defines an SDK message for issuing a new token.
 <a name="irismod.token.MsgIssueTokenResponse"></a>
 
 ### MsgIssueTokenResponse
-MsgIssueTokenResponse defines the Msg/IssueToken response type.
+MsgIssueTokenResponse defines the Msg/IssueToken response type
 
 
 
@@ -13889,7 +13889,7 @@ MsgIssueTokenResponse defines the Msg/IssueToken response type.
 <a name="irismod.token.MsgMintToken"></a>
 
 ### MsgMintToken
-MsgMintToken defines an SDK message for minting a new token.
+MsgMintToken defines an SDK message for minting a new token
 
 
 | Field | Type | Label | Description |
@@ -13907,7 +13907,7 @@ MsgMintToken defines an SDK message for minting a new token.
 <a name="irismod.token.MsgMintTokenResponse"></a>
 
 ### MsgMintTokenResponse
-MsgMintTokenResponse defines the Msg/MintToken response type.
+MsgMintTokenResponse defines the Msg/MintToken response type
 
 
 
@@ -13917,7 +13917,7 @@ MsgMintTokenResponse defines the Msg/MintToken response type.
 <a name="irismod.token.MsgTransferTokenOwner"></a>
 
 ### MsgTransferTokenOwner
-MsgMintToken defines an SDK message for transferring the token owner.
+MsgTransferTokenOwner defines an SDK message for transferring the token owner
 
 
 | Field | Type | Label | Description |
@@ -13934,7 +13934,7 @@ MsgMintToken defines an SDK message for transferring the token owner.
 <a name="irismod.token.MsgTransferTokenOwnerResponse"></a>
 
 ### MsgTransferTokenOwnerResponse
-MsgTransferTokenOwnerResponse defines the Msg/TransferTokenOwner response type.
+MsgTransferTokenOwnerResponse defines the Msg/TransferTokenOwner response type
 
 
 
@@ -13950,15 +13950,15 @@ MsgTransferTokenOwnerResponse defines the Msg/TransferTokenOwner response type.
 <a name="irismod.token.Msg"></a>
 
 ### Msg
-Msg defines the oracle Msg service.
+Msg defines the oracle Msg service
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `IssueToken` | [MsgIssueToken](#irismod.token.MsgIssueToken) | [MsgIssueTokenResponse](#irismod.token.MsgIssueTokenResponse) | IssueToken defines a method for issuing a new token. | |
-| `EditToken` | [MsgEditToken](#irismod.token.MsgEditToken) | [MsgEditTokenResponse](#irismod.token.MsgEditTokenResponse) | EditToken defines a method for editing a token. | |
-| `MintToken` | [MsgMintToken](#irismod.token.MsgMintToken) | [MsgMintTokenResponse](#irismod.token.MsgMintTokenResponse) | MintToken defines a method for minting some tokens. | |
-| `BurnToken` | [MsgBurnToken](#irismod.token.MsgBurnToken) | [MsgBurnTokenResponse](#irismod.token.MsgBurnTokenResponse) | BurnToken defines a method for burning some tokens. | |
-| `TransferTokenOwner` | [MsgTransferTokenOwner](#irismod.token.MsgTransferTokenOwner) | [MsgTransferTokenOwnerResponse](#irismod.token.MsgTransferTokenOwnerResponse) | TransferTokenOwner defines a method for minting some tokens. | |
+| `IssueToken` | [MsgIssueToken](#irismod.token.MsgIssueToken) | [MsgIssueTokenResponse](#irismod.token.MsgIssueTokenResponse) | IssueToken defines a method for issuing a new token | |
+| `EditToken` | [MsgEditToken](#irismod.token.MsgEditToken) | [MsgEditTokenResponse](#irismod.token.MsgEditTokenResponse) | EditToken defines a method for editing a token | |
+| `MintToken` | [MsgMintToken](#irismod.token.MsgMintToken) | [MsgMintTokenResponse](#irismod.token.MsgMintTokenResponse) | MintToken defines a method for minting some tokens | |
+| `BurnToken` | [MsgBurnToken](#irismod.token.MsgBurnToken) | [MsgBurnTokenResponse](#irismod.token.MsgBurnTokenResponse) | BurnToken defines a method for burning some tokens | |
+| `TransferTokenOwner` | [MsgTransferTokenOwner](#irismod.token.MsgTransferTokenOwner) | [MsgTransferTokenOwnerResponse](#irismod.token.MsgTransferTokenOwnerResponse) | TransferTokenOwner defines a method for minting some tokens | |
 
  <!-- end services -->
 

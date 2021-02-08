@@ -6,8 +6,8 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/irisnet/irishub/modules/mint/types";
 
-// GenesisState defines the guardian module's genesis state.
+// GenesisState defines the mint module's genesis state
 message GenesisState {
-    Minter minter = 1 [(gogoproto.nullable) = false];
-    Params params = 2 [(gogoproto.nullable) = false];
+    Minter minter = 1 [ (gogoproto.nullable) = false ];
+    Params params = 2 [ (gogoproto.nullable) = false ];
 }

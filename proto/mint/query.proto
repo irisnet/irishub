@@ -10,17 +10,17 @@ option go_package = "github.com/irisnet/irishub/modules/mint/types";
 
 // Query creates service with guardian as rpc
 service Query {
-    // Parameters queries the mint parameters
+    // Params queries the mint parameters
     rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
         option (google.api.http).get = "/irishub/mint/params";
     }
 }
 
-// QueryParametersRequest is request type for the Query/Parameters RPC method
+// QueryParamsRequest is request type for the Query/Parameters RPC method
 message QueryParamsRequest {
 }
 
-// QueryParametersResponse is response type for the Query/Parameters RPC method
+// QueryParamsResponse is response type for the Query/Parameters RPC method
 message QueryParamsResponse {
     Params params = 1 [ (gogoproto.nullable) = false ];
 
