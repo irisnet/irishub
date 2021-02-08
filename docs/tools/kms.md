@@ -59,12 +59,13 @@ Then start tmkms:
 ```bash
 tmkms start -c /path/to/kms/home/tmkms.toml
 ```
-### Using a YubiHSM	
+
+### Using a YubiHSM
 
 Detailed information on how to setup a KMS with YubiHSM2 can be found [here](https://github.com/iqlusioninc/tmkms/blob/master/README.yubihsm.md).
 
 If you want to import an existing IRIShub private_key:
 
-```bash	
+```bash
 tmkms yubihsm keys import <iris_home>/config/priv_validator.json -i <id> -t json -c /path/to/kms/home/tmkms.toml
 ```

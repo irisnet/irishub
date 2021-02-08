@@ -41,16 +41,16 @@ iris tx token issue [flags]
 
 ```bash
 iris tx token issue \
-	--name="Kitty Token" \
-	--symbol="kitty" \
-	--min-unit="kitty" \
-	--scale=0 \
-	--initial-supply=100000000000 \
-	--max-supply=1000000000000 \
-	--mintable=true \
-	--from=<key-name> \
-	--chain-id=<chain-id> \
-	--fees=<fee>
+    --name="Kitty Token" \
+    --symbol="kitty" \
+    --min-unit="kitty" \
+    --scale=0 \
+    --initial-supply=100000000000 \
+    --max-supply=1000000000000 \
+    --mintable=true \
+    --from=<key-name> \
+    --chain-id=<chain-id> \
+    --fees=<fee>
 ```
 
 ### 发送通证

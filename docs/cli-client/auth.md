@@ -4,11 +4,10 @@ Auth module is responsible for specifying the base transaction and account types
 
 ## Available Commands
 
-| Name                                  | Description                                            |
-| ------------------------------------- | ------------------------------------------------------ |
-| [account](#iris-query-auth-account)| Query for account by address     |
-| [params](#iris-query-auth-params)| Query the current auth parameters  |
-
+| Name                                | Description                       |
+| ----------------------------------- | --------------------------------- |
+| [account](#iris-query-auth-account) | Query for account by address      |
+| [params](#iris-query-auth-params)   | Query the current auth parameters |
 
 ### iris query auth account
 

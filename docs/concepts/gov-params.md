@@ -56,8 +56,8 @@ Details in [Governance](../features/governance.md)
 | key                       | Description                             | Range        | Current                            |
 | ------------------------- | --------------------------------------- | ------------ | ---------------------------------- |
 | `ibc/AllowedClients`      | Clients that support ibc                |              | ["06-solomachine","07-tendermint"] |
-| `transfer/SendEnabled`    | Whether to enable the transfer function | {true,false} | false             |
-| `transfer/ReceiveEnabled` | Whether to enable the receive function  | {true,false} | false             |
+| `transfer/SendEnabled`    | Whether to enable the transfer function | {true,false} | false                              |
+| `transfer/ReceiveEnabled` | Whether to enable the receive function  | {true,false} | false                              |
 
 ## Parameters in Mint
 
@@ -70,17 +70,17 @@ Details in [Mint](../features/mint.md)
 
 ## Parameters in Service
 
-| key                            | Description                                                 | Range                     | Current  |
-| ------------------------------ | ----------------------------------------------------------- | ------------------------- | -------- |
-| `service/ArbitrationTimeLimit` | Maximum time of dispute resolution                          | (0, 9223372036854775807]  | 120h0m0s |
-| `service/ComplaintRetrospect`  | Maximum time for submitting a dispute                       | (0, 9223372036854775807]  | 360h0m0s |
-| `service/MaxRequestTimeout`    | Maximum number of blocks to wait for service invocation     | (0, 9223372036854775807]  | 100      |
-| `service/MinDepositMultiple`   | A multiple of the minimum deposit amount of service binding | (0, 9223372036854775807]  | 1000     |
-| `service/ServiceFeeTax`        | Tax rate of service fee                                     | [0, 1)                    | 0.05     |
-| `service/SlashFraction`        | Slash fraction                                              | [0, 1]                    | 0.001    |
-| `service/TxSizeLimit`          | The limit of the service tx size                            | (0, 18446744073709551615] | 4000     |
+| key                            | Description                                                 | Range                     | Current                                     |
+| ------------------------------ | ----------------------------------------------------------- | ------------------------- | ------------------------------------------- |
+| `service/ArbitrationTimeLimit` | Maximum time of dispute resolution                          | (0, 9223372036854775807]  | 120h0m0s                                    |
+| `service/ComplaintRetrospect`  | Maximum time for submitting a dispute                       | (0, 9223372036854775807]  | 360h0m0s                                    |
+| `service/MaxRequestTimeout`    | Maximum number of blocks to wait for service invocation     | (0, 9223372036854775807]  | 100                                         |
+| `service/MinDepositMultiple`   | A multiple of the minimum deposit amount of service binding | (0, 9223372036854775807]  | 1000                                        |
+| `service/ServiceFeeTax`        | Tax rate of service fee                                     | [0, 1)                    | 0.05                                        |
+| `service/SlashFraction`        | Slash fraction                                              | [0, 1]                    | 0.001                                       |
+| `service/TxSizeLimit`          | The limit of the service tx size                            | (0, 18446744073709551615] | 4000                                        |
 | `service/MinDeposit`           | Minimum deposit amount                                      | amount: (0, +∞)           | [{"denom": "uiris","amount": "5000000000"}] |
-| `service/BaseDenom`            | Token denom that must be used for deposits                  |                           | uiris    |
+| `service/BaseDenom`            | Token denom that must be used for deposits                  |                           | uiris                                       |
 
 Details in [Service](../features/service.md)
 
@@ -98,22 +98,22 @@ Details in [Slashing](../features/slashing.md)
 
 ## Parameters in Staking
 
-| key                         | Description                                                     | Range                     | Current  |
-| --------------------------- | --------------------------------------------------------------- | ------------------------- | -------- |
-| `staking/UnbondingTime`     | Mortgage redemption time                                        | (0, 9223372036854775807]  | 1814400s |
-| `staking/MaxValidators`     | Maximum number of validators                                    | (0, 4294967295]           | 100      |
-| `staking/MaxEntries`        | The maximum number of unbinding/redelegation orders in progress | (0, 4294967295]           | 7        |
-| `staking/BondDenom`         | Bond denom                                                      |                           | uiris    |
-| `staking/HistoricalEntries` | Historical entries                                              | [0, 4294967295]           | 10000    |
+| key                         | Description                                                     | Range                    | Current  |
+| --------------------------- | --------------------------------------------------------------- | ------------------------ | -------- |
+| `staking/UnbondingTime`     | Mortgage redemption time                                        | (0, 9223372036854775807] | 1814400s |
+| `staking/MaxValidators`     | Maximum number of validators                                    | (0, 4294967295]          | 100      |
+| `staking/MaxEntries`        | The maximum number of unbinding/redelegation orders in progress | (0, 4294967295]          | 7        |
+| `staking/BondDenom`         | Bond denom                                                      |                          | uiris    |
+| `staking/HistoricalEntries` | Historical entries                                              | [0, 4294967295]          | 10000    |
 
 Details in [Staking](../features/staking.md)
 
 ## Parameters in Token
 
-| key                       | Description                       | Range           | Current          |
-| ------------------------- | --------------------------------- | --------------- | ---------------- |
-| `token/TokenTaxRate`      | Base rate for issuing/mint tokens | [0, 1]          | 0.4              |
+| key                       | Description                       | Range           | Current                             |
+| ------------------------- | --------------------------------- | --------------- | ----------------------------------- |
+| `token/TokenTaxRate`      | Base rate for issuing/mint tokens | [0, 1]          | 0.4                                 |
 | `token/IssueTokenBaseFee` | Base token for issuing tokens     | amount: (0, +∞) | {"denom": "iris","amount": "60000"} |
-| `token/MintTokenFeeRatio` | Rate for mint tokens              | [0, 1]          | 0.1              |
+| `token/MintTokenFeeRatio` | Rate for mint tokens              | [0, 1]          | 0.1                                 |
 
 Details in [Token](../features/token.md)

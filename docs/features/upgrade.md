@@ -15,11 +15,11 @@ If an operator running the application binary also runs a sidecar process to ass
 
 ```go
 type Plan struct {
- Name string
- Time time.Time
- Height int64
- Info string
- UpgradedClientState *types.Any
+    Name                string
+    Time                time.Time
+    Height              int64
+    Info                string
+    UpgradedClientState *types.Any
 }
 ```
 
@@ -120,8 +120,11 @@ iris tx gov submit-proposal software-upgrade <plan-name> \
   --upgrade-time <upgrade-time> \
   --title <title> \
   --upgrade-info <upgrade-info> \
-  --description <description>
-  --from=<from> --chain-id=<chain-id> --fees=0.3iris -b block -y
+  --description <description>  \
+  --from=<from> \
+  --chain-id=<chain-id> \
+  --fees=0.3iris \
+  -b block
 ```
 
 ### Deposit and vote for the proposal

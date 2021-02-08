@@ -60,12 +60,12 @@ priv_validator_laddr = "localhost:26658"
 tmkms start -c /path/to/kms/home/tmkms.toml
 ```
 
-### 使用YubiHSM	
+### 使用YubiHSM
 
 有关如何使用YubiHSM2设置KMS的更多信息，请参阅[这里](https://github.com/iqlusioninc/tmkms/blob/master/README.yubihsm.md)。
 
 如果要导入已存在的IRIShub private_key，可以：
 
-```bash	
+```bash
 tmkms yubihsm keys import <iris_home>/config/priv_validator.json -i <id> -t json -c /path/to/kms/home/tmkms.toml
 ```

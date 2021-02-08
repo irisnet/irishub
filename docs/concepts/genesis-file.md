@@ -80,8 +80,6 @@ Each genesis state starts with a list of account balances. Social consensus on t
 
 * **vesting** Params related to vesting
 
-
-
 Parameters that can be governed: [Gov Parameters](gov-params.md)
 
 ## Gentxs
