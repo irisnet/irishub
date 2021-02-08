@@ -32,7 +32,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // QuerySupersRequest is request type for the Query/Supers RPC method
 type QuerySupersRequest struct {
-	// pagination defines an optional pagination for the request.
+	// pagination defines an optional pagination for the request
 	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
