@@ -111,13 +111,13 @@ type SoftwareUpgradeProposal struct {
 执行软件升级流程的第一步是由治理模块发起一个软件升级提案，该提案详细说明了升级时间以及升级内容，具体见上面[概念](#概念)。发起提案的命令行示例如下：
 
 ```bash
-iris tx gov submit-proposal software-upgrade bifrost-rc2 \
-  --deposit 1000iris \
-  --upgrade-time 2021-02-09T13:00:00Z \
-  --title "mainnet software upgrade" \
-  --upgrade-info "Commit: 0ef5dd0b4d140a4788f05fc1a0bd409b3c6a0492. After the proposal is approved, please use the commit hash to build and restart your node." \
-  --description "Upgrade the mainnet software version from v1.0.0-rc0 to v1.0.0-rc2."
-  --from=node0 --chain-id=test --fees=1iris -b block -y
+iris tx gov submit-proposal software-upgrade <plan-name> \
+  --deposit <deposit> \
+  --upgrade-time <upgrade-time> \
+  --title <title> \
+  --upgrade-info <upgrade-info> \
+  --description <description>
+  --from=<from> --chain-id=<chain-id> --fees=0.3iris -b block -y
 ```
 
 ### 为提案抵押、投票
@@ -125,13 +125,13 @@ iris tx gov submit-proposal software-upgrade bifrost-rc2 \
 软件升级提案和其他普通提案的执行流程基本一致，都需要验证人、委托人为该提案发表意见，具体信息请参考[治理模块](./governance.md)。为提案抵押的命令行示例如下：
 
 ```bash
-iris tx gov deposit 1 1000iris --from=node0 --chain-id=test --fees=1iris -b block -y
+iris tx gov deposit <proposal-id> <deposit> --from=<from> --chain-id=<chain-id> --fees=0.3iris -b block -y
 ```
 
 一旦抵押金额达到最小抵押金额，提案将进入投票期，验证人或者委托人需要对该提案发起投票，发起投票的命令行示例如下：
 
 ```bash
-iris tx gov vote 1 yes  --from=node0 --chain-id=test --fees=1iris -b block -y
+iris tx gov vote <proposal-id> <option> --from=<from> --chain-id=<chain-id> --fees=0.3iris -b block -y
 ```
 
 当软件升级提案被通过后，升级模块会创建一项升级计划，在指定高度或者时间使所有节点停止网络共识，等待新的软件重启网络。
