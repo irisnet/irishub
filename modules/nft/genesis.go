@@ -7,7 +7,7 @@ import (
 	"github.com/irisnet/irismod/modules/nft/types"
 )
 
-// InitGenesis sets nft information for genesis.
+// InitGenesis stores the NFT genesis.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	if err := types.ValidateGenesis(data); err != nil {
 		panic(err.Error())

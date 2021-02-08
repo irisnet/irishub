@@ -8,19 +8,19 @@ import (
 )
 
 const (
-	// SecretLength ength for the secret in hex string
+	// SecretLength is the length for the secret in hex string
 	SecretLength = 64
-	// HashLockLength for the hash lock in hex string
+	// HashLockLength is the length for the hash lock in hex string
 	HashLockLength = 64
-	// MaxLengthForAddressOnOtherChain length for the address on other chains
+	// MaxLengthForAddressOnOtherChain is the maximum length for the address on other chains
 	MaxLengthForAddressOnOtherChain = 128
-	// MinTimeLock time span for HTLC
+	// MinTimeLock is the minimum time span for HTLC in blocks
 	MinTimeLock = 50
-	// MaxTimeLock time span for HTLC
+	// MaxTimeLock is the maximum time span for HTLC in blocks
 	MaxTimeLock = 25480
 )
 
-// ValidateReceiverOnOtherChain verifies whether the  parameters are legal
+// ValidateReceiverOnOtherChain verifies if the receiver on the other chain is legal
 func ValidateReceiverOnOtherChain(receiverOnOtherChain string) error {
 	if len(receiverOnOtherChain) > MaxLengthForAddressOnOtherChain {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "length of the receiver on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain)
@@ -28,7 +28,7 @@ func ValidateReceiverOnOtherChain(receiverOnOtherChain string) error {
 	return nil
 }
 
-// ValidateAmount verifies whether the  parameters are legal
+// ValidateAmount verifies whether the given amount is legal
 func ValidateAmount(amount sdk.Coins) error {
 	if !(amount.IsValid() && amount.IsAllPositive()) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "the transferred amount must be valid")
@@ -36,7 +36,7 @@ func ValidateAmount(amount sdk.Coins) error {
 	return nil
 }
 
-// ValidateHashLock verifies whether the  parameters are legal
+// ValidateHashLock verifies whether the given hash lock is legal
 func ValidateHashLock(hashLock string) error {
 	if len(hashLock) != HashLockLength {
 		return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d", HashLockLength)
@@ -48,7 +48,7 @@ func ValidateHashLock(hashLock string) error {
 	return nil
 }
 
-// ValidateTimeLock verifies whether the  parameters are legal
+// ValidateTimeLock verifies whether the given time lock is legal
 func ValidateTimeLock(timeLock uint64) error {
 	if timeLock < MinTimeLock || timeLock > MaxTimeLock {
 		return sdkerrors.Wrapf(ErrInvalidTimeLock, "the time lock must be between [%d,%d]", MinTimeLock, MaxTimeLock)
@@ -56,7 +56,7 @@ func ValidateTimeLock(timeLock uint64) error {
 	return nil
 }
 
-// ValidateSecret verifies whether the  parameters are legal
+// ValidateSecret verifies whether the given secret is legal
 func ValidateSecret(secret string) error {
 	if len(secret) != SecretLength {
 		return sdkerrors.Wrapf(ErrInvalidSecret, "length of the secret must be %d", SecretLength)

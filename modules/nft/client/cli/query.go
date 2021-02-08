@@ -193,11 +193,11 @@ func GetCmdQueryDenoms() *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryDenom queries the specified denoms
+// GetCmdQueryDenom queries the specified denom
 func GetCmdQueryDenom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "denom [denom-id]",
-		Long:    "Query the denominations by the specified denmo name.",
+		Long:    "Query the denom by the specified denom id.",
 		Example: fmt.Sprintf("$ %s query nft denom <denom-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

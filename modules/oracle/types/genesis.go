@@ -1,13 +1,13 @@
 package types
 
-// get raw genesis raw message for testing
+// DefaultGenesisState returns the default genesis state for testing
 func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
 		Entries: []FeedEntry{},
 	}
 }
 
-// ValidateGenesis validates the provided asset genesis state to ensure the
+// ValidateGenesis validates the provided genesis state to ensure the
 // expected invariants holds.
 func ValidateGenesis(data GenesisState) error {
 	for _, entry := range data.Entries {

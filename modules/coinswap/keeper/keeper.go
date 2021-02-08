@@ -27,7 +27,7 @@ type Keeper struct {
 
 // NewKeeper returns a coinswap keeper. It handles:
 // - creating new ModuleAccounts for each trading pair
-// - burning minting liquidity coins
+// - burning and minting liquidity coins
 // - sending to and from ModuleAccounts
 func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, paramSpace paramstypes.Subspace, bk types.BankKeeper, ak types.AccountKeeper) Keeper {
 	// ensure coinswap module account is set
@@ -89,7 +89,7 @@ func (k Keeper) Swap(ctx sdk.Context, msg *types.MsgSwapOrder) error {
 	return nil
 }
 
-// AddLiquidity add liquidity to specified pool
+// AddLiquidity adds liquidity to the specified pool
 func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.Coin, error) {
 	standardDenom := k.GetStandardDenom(ctx)
 	uniDenom, err := types.GetUniDenomFromDenom(msg.MaxToken.Denom)
@@ -160,7 +160,7 @@ func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, standardCoi
 	return mintToken, nil
 }
 
-// RemoveLiquidity remove liquidity from specified pool
+// RemoveLiquidity removes liquidity from the specified pool
 func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) (sdk.Coins, error) {
 	standardDenom := k.GetStandardDenom(ctx)
 	uniDenom := msg.WithdrawLiquidity.Denom
@@ -229,18 +229,18 @@ func (k Keeper) removeLiquidity(ctx sdk.Context, poolAddr, sender sdk.AccAddress
 	if err := k.bk.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, deltaCoins); err != nil {
 		return nil, err
 	}
-	// burn liquidity vouchers of reserve pool form module account
+	// burn liquidity vouchers of reserve pool from module account
 	if err := k.bk.BurnCoins(ctx, types.ModuleName, deltaCoins); err != nil {
 		return nil, err
 	}
 
-	// transfer withdrawn liquidity from coinswaps reserve pool account to sender account
+	// transfer withdrawn liquidity from coinswap reserve pool account to sender account
 	coins := sdk.NewCoins(irisWithdrawCoin, tokenWithdrawCoin)
 
 	return coins, k.bk.SendCoins(ctx, poolAddr, sender, coins)
 }
 
-// GetReservePool returns the total balance of an reserve pool at the
+// GetReservePool returns the total balance of the reserve pool at the
 // provided denomination.
 func (k Keeper) GetReservePool(ctx sdk.Context, uniDenom string) (coins sdk.Coins) {
 	swapPoolAccAddr := types.GetReservePoolAddr(uniDenom)
@@ -263,7 +263,7 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }
 
-// SetStandardDenom sets the standardDenom for the coinswap module.
+// SetStandardDenom sets the standard denom for the coinswap module.
 func (k Keeper) SetStandardDenom(ctx sdk.Context, denom string) {
 	store := ctx.KVStore(k.storeKey)
 	denomWrap := gogotypes.StringValue{Value: denom}
@@ -271,7 +271,7 @@ func (k Keeper) SetStandardDenom(ctx sdk.Context, denom string) {
 	store.Set(types.KeyStandardDenom, bz)
 }
 
-// GetStandardDenom return the standard denom of the coinswap module.
+// GetStandardDenom returns the standard denom of the coinswap module.
 func (k Keeper) GetStandardDenom(ctx sdk.Context) string {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.KeyStandardDenom)

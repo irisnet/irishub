@@ -9,12 +9,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// GetReservePoolAddr returns the poor address for the provided provided liquidity denomination.
+// GetReservePoolAddr returns the pool address for the provided liquidity denomination.
 func GetReservePoolAddr(uniDenom string) sdk.AccAddress {
 	return sdk.AccAddress(crypto.AddressHash([]byte(uniDenom)))
 }
 
-// GetTokenPairByDenom return the token pair for the provided denominations
+// GetTokenPairByDenom returns the token pair for the provided denominations
 func GetTokenPairByDenom(inputDenom, outputDenom string) string {
 	return fmt.Sprintf("%s-%s", outputDenom, inputDenom)
 }

@@ -19,7 +19,7 @@ func registerQueryRoutes(cliCtx client.Context, r *mux.Router, queryRoute string
 	r.HandleFunc(fmt.Sprintf("/%s/collections/{%s}/supply", types.ModuleName, RestParamDenomID), querySupply(cliCtx, queryRoute)).Methods("GET")
 	// Get the collections of NFTs owned by an address
 	r.HandleFunc(fmt.Sprintf("/%s/owners/{%s}", types.ModuleName, RestParamOwner), queryOwner(cliCtx, queryRoute)).Methods("GET")
-	// Get all the NFT from a given collection
+	// Get all the NFTs from a given collection
 	r.HandleFunc(fmt.Sprintf("/%s/collections/{%s}", types.ModuleName, RestParamDenomID), queryCollection(cliCtx, queryRoute)).Methods("GET")
 	// Query all denoms
 	r.HandleFunc(fmt.Sprintf("/%s/denoms", types.ModuleName), queryDenoms(cliCtx, queryRoute)).Methods("GET")

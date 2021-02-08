@@ -6,7 +6,7 @@ import (
 	bank "github.com/cosmos/cosmos-sdk/x/bank/exported"
 )
 
-// BankKeeper defines the expected bank keeper for module accounts (noalias)
+// BankKeeper defines the expected bank keeper (noalias)
 type BankKeeper interface {
 	MintCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error
 	BurnCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error

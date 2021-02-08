@@ -13,7 +13,7 @@ import (
 	"github.com/irisnet/irismod/modules/nft/types"
 )
 
-// SetCollection save all NFT and return error if existed
+// SetCollection saves all NFTs and returns an error if there already exists
 func (k Keeper) SetCollection(ctx sdk.Context, collection types.Collection) error {
 	for _, nft := range collection.NFTs {
 		if err := k.MintNFT(
@@ -31,7 +31,7 @@ func (k Keeper) SetCollection(ctx sdk.Context, collection types.Collection) erro
 	return nil
 }
 
-// GetCollection returns the collection by the specified denomID
+// GetCollection returns the collection by the specified denom ID
 func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection, error) {
 	denom, err := k.GetDenom(ctx, denomID)
 	if err != nil {
@@ -42,7 +42,7 @@ func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection
 	return types.NewCollection(denom, nfts), nil
 }
 
-// GetPaginateCollection returns the collection by the specified denomID
+// GetPaginateCollection returns the collection by the specified denom ID
 func (k Keeper) GetPaginateCollection(ctx sdk.Context, request *types.QueryCollectionRequest, denomID string) (types.Collection, *query.PageResponse, error) {
 	denom, err := k.GetDenom(ctx, denomID)
 	if err != nil {
@@ -63,7 +63,7 @@ func (k Keeper) GetPaginateCollection(ctx sdk.Context, request *types.QueryColle
 	return types.NewCollection(denom, nfts), pageRes, nil
 }
 
-// GetCollections returns all the collection
+// GetCollections returns all the collections
 func (k Keeper) GetCollections(ctx sdk.Context) (cs []types.Collection) {
 	for _, denom := range k.GetDenoms(ctx) {
 		nfts := k.GetNFTs(ctx, denom.Id)
@@ -72,7 +72,7 @@ func (k Keeper) GetCollections(ctx sdk.Context) (cs []types.Collection) {
 	return cs
 }
 
-// GetTotalSupply returns the number of nft by the specified denomID
+// GetTotalSupply returns the number of NFTs by the specified denom ID
 func (k Keeper) GetTotalSupply(ctx sdk.Context, denomID string) uint64 {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.KeyCollection(denomID))
@@ -82,7 +82,7 @@ func (k Keeper) GetTotalSupply(ctx sdk.Context, denomID string) uint64 {
 	return types.MustUnMarshalSupply(k.cdc, bz)
 }
 
-// GetTotalSupplyOfOwner returns the amount of nft by the specified conditions
+// GetTotalSupplyOfOwner returns the amount of NFTs by the specified conditions
 func (k Keeper) GetTotalSupplyOfOwner(ctx sdk.Context, id string, owner sdk.AccAddress) (supply uint64) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.KeyOwner(owner, id, ""))

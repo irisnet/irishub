@@ -1,7 +1,7 @@
 package types
 
 const (
-	// QueryLiquidity liquidity query endpoint supported by the coinswap querier
+	// QueryLiquidity is the liquidity query endpoint supported by the coinswap querier
 	QueryLiquidity = "liquidity"
 )
 

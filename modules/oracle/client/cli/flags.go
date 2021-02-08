@@ -33,9 +33,9 @@ var (
 
 func init() {
 	FsCreateFeed.String(FlagFeedName, "", "The unique identifier of the feed")
-	FsCreateFeed.String(FlagAggregateFunc, "", "The name of predefined function for processing the service responses, e.g.avg、max、min etc")
-	FsCreateFeed.String(FlagValueJsonPath, "", "The field name or path of Service response result used to retrieve the value property of aggregate-func from response results")
-	FsCreateFeed.Uint64(FlagLatestHistory, 0, "The maximum Number of the latest history values to be saved for the Feed, range [1, 100]")
+	FsCreateFeed.String(FlagAggregateFunc, "", "The name of predefined function for processing the service responses, e.g., avg, max, min, etc.")
+	FsCreateFeed.String(FlagValueJsonPath, "", "The field name or path of service response result used to retrieve the value property of aggregate-func from response results")
+	FsCreateFeed.Uint64(FlagLatestHistory, 0, "The maximum number of the latest history values to be saved for the feed, range [1, 100]")
 	FsCreateFeed.String(FlagDescription, "", "The description of the feed.")
 	FsCreateFeed.String(FlagServiceName, "", "The name of the service to be invoked by the feed")
 	FsCreateFeed.StringSlice(FlagProviders, []string{}, "The list of service provider addresses")
@@ -50,9 +50,9 @@ func init() {
 	FsStartFeed.String(FlagCreator, "", "Address of the feed creator")
 
 	FsPauseFeed.String(FlagFeedName, "", "The unique identifier of the feed")
-	FsPauseFeed.String(FlagCreator, "", "Address of the Feed creator")
+	FsPauseFeed.String(FlagCreator, "", "Address of the feed creator")
 
-	FsEditFeed.Uint64(FlagLatestHistory, 0, "The maximum Number of the latest history values to be saved for the Feed, range [1, 100]")
+	FsEditFeed.Uint64(FlagLatestHistory, 0, "The maximum number of the latest history values to be saved for the feed, range [1, 100]")
 	FsEditFeed.StringSlice(FlagProviders, []string{}, "The list of service provider addresses")
 	FsEditFeed.String(FlagDescription, "", "The description of the feed.")
 	FsEditFeed.Int64(FlagTimeout, 0, "The maximum number of blocks to wait for a response since a request is sent, beyond which the request will be ignored")
@@ -61,5 +61,5 @@ func init() {
 	FsEditFeed.Uint32(FlagThreshold, 0, "The minimum number of responses needed for aggregation, range [1, Length(providers)]")
 	FsEditFeed.String(FlagCreator, "", "Address of the feed creator")
 
-	FsQueryFeeds.String(FlagFeedState, "", "The state of the feed,paused|running")
+	FsQueryFeeds.String(FlagFeedState, "", "The state of the feed, paused|running")
 }

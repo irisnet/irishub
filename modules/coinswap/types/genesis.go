@@ -17,7 +17,7 @@ func DefaultGenesisState() *GenesisState {
 	return NewGenesisState(DefaultParams(), StandardDenom)
 }
 
-// ValidateGenesis - placeholder function
+// ValidateGenesis validates the given genesis state
 func ValidateGenesis(data GenesisState) error {
 	if err := sdk.ValidateDenom(data.StandardDenom); err != nil {
 		return err

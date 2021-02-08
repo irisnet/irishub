@@ -8,7 +8,7 @@ import (
 	"github.com/irisnet/irismod/modules/nft/types"
 )
 
-// GetNFT gets the entire NFT tokenData struct
+// GetNFT gets the the specified NFT
 func (k Keeper) GetNFT(ctx sdk.Context, denomID, tokenID string) (nft exported.NFT, err error) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -23,7 +23,7 @@ func (k Keeper) GetNFT(ctx sdk.Context, denomID, tokenID string) (nft exported.N
 	return baseNFT, nil
 }
 
-// GetNFTs return the all NFT by the specified denomID
+// GetNFTs returns all NFTs by the specified denom ID
 func (k Keeper) GetNFTs(ctx sdk.Context, denom string) (nfts []exported.NFT) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -38,7 +38,8 @@ func (k Keeper) GetNFTs(ctx sdk.Context, denom string) (nfts []exported.NFT) {
 	return nfts
 }
 
-//Authorize check if the sender is the issuer of nft, if it returns nft, if not, return an error
+// Authorize checks if the sender is the owner of the given NFT
+// Return the NFT if true, an error otherwise
 func (k Keeper) Authorize(ctx sdk.Context, denomID, tokenID string, owner sdk.AccAddress) (types.BaseNFT, error) {
 	nft, err := k.GetNFT(ctx, denomID, tokenID)
 	if err != nil {
@@ -52,7 +53,7 @@ func (k Keeper) Authorize(ctx sdk.Context, denomID, tokenID string, owner sdk.Ac
 	return nft.(types.BaseNFT), nil
 }
 
-//HasNFT determine if nft exists
+// HasNFT checks if the specified NFT exists
 func (k Keeper) HasNFT(ctx sdk.Context, denomID, tokenID string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.KeyNFT(denomID, tokenID))

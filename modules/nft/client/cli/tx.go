@@ -37,7 +37,7 @@ func NewTxCmd() *cobra.Command {
 	return txCmd
 }
 
-// GetCmdMintNFT is the CLI command for a MintNFT transaction
+// GetCmdIssueDenom is the CLI command for an IssueDenom transaction
 func GetCmdIssueDenom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "issue [denom-id]",
@@ -164,7 +164,7 @@ func GetCmdMintNFT() *cobra.Command {
 func GetCmdEditNFT() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "edit [denom-id] [token-id]",
-		Long: "Edit the tokenData of an NFT.",
+		Long: "Edit the token data of an NFT.",
 		Example: fmt.Sprintf(
 			"$ %s tx nft edit <denom-id> <token-id> "+
 				"--uri=<uri> "+
@@ -216,7 +216,7 @@ func GetCmdEditNFT() *cobra.Command {
 func GetCmdTransferNFT() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "transfer [recipient] [denom-id] [token-id]",
-		Long: "Transfer a NFT to a recipient.",
+		Long: "Transfer an NFT to a recipient.",
 		Example: fmt.Sprintf(
 			"$ %s tx nft transfer <recipient> <denom-id> <token-id> "+
 				"--uri=<uri> "+

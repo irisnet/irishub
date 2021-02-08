@@ -20,7 +20,7 @@ var (
 	KeyStandardDenom = []byte("StandardDenom") // standard token denom key
 )
 
-// NewParams coinswap paramtypes constructor
+// NewParams is the coinswap params constructor
 func NewParams(fee sdk.Dec) Params {
 	return Params{
 		Fee: fee,

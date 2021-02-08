@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 )
 
-// RegisterHandlers register distribution REST routes.
+// RegisterHandlers registers the NFT REST routes.
 func RegisterHandlers(cliCtx client.Context, r *mux.Router, queryRoute string) {
 	registerQueryRoutes(cliCtx, r, queryRoute)
 	registerTxRoutes(cliCtx, r, queryRoute)

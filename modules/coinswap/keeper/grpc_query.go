@@ -13,7 +13,7 @@ import (
 
 var _ types.QueryServer = Keeper{}
 
-// Liquidity return the liquidity pool information of the denom
+// Liquidity returns the liquidity pool information of the denom
 func (k Keeper) Liquidity(c context.Context, req *types.QueryLiquidityRequest) (*types.QueryLiquidityResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")

@@ -30,7 +30,7 @@ func GetQueryCmd() *cobra.Command {
 	return txCmd
 }
 
-// GetCmdQueryFeed implements the query feed Content definition command
+// GetCmdQueryFeed implements the query feed definition command
 func GetCmdQueryFeed() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "feed [feed-name]",
@@ -58,11 +58,11 @@ func GetCmdQueryFeed() *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryFeed implements the query feed Content definition command
+// GetCmdQueryFeed implements the query feed definitions command
 func GetCmdQueryFeeds() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "feeds",
-		Short:   "Query a group of feed definition.",
+		Short:   "Query a group of feed definitions.",
 		Example: fmt.Sprintf("%s query oracle feeds", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)

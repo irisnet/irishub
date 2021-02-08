@@ -1,6 +1,6 @@
 package types
 
-// guardian module event types
+// oracle module event types
 const (
 	EventTypeCreateFeed   = "create_feed"
 	EventTypeStartFeed    = "start_feed"

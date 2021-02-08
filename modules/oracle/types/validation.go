@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	//MaxLatestHistory define the the maximum number of feed value saved
+	//MaxLatestHistory defines the the maximum number of feed values saved
 	MaxLatestHistory = 100
-	//MaxAggregateFuncNameLen define the the maximum length of the ggregate function name
+	//MaxAggregateFuncNameLen defines the the maximum length of the aggregation function name
 	MaxAggregateFuncNameLen = 10
-	//MaxDescriptionLen define the the maximum length of the description
+	//MaxDescriptionLen defines the the maximum length of the description
 	MaxDescriptionLen = 280
 )
 
@@ -23,7 +23,7 @@ var (
 	regexpFeedName = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9/_-]*$`)
 )
 
-// ValidateFeedName verify that the feedName is legal
+// ValidateFeedName verifies if the feed name is legal
 func ValidateFeedName(feedName string) error {
 	if !regexpFeedName.MatchString(feedName) {
 		return sdkerrors.Wrap(ErrInvalidFeedName, feedName)
@@ -31,7 +31,7 @@ func ValidateFeedName(feedName string) error {
 	return nil
 }
 
-// ValidateDescription verify that the desc is legal
+// ValidateDescription verifies if the description is legal
 func ValidateDescription(desc string) error {
 	if len(desc) > MaxDescriptionLen {
 		return sdkerrors.Wrap(ErrInvalidDescription, desc)
@@ -39,7 +39,7 @@ func ValidateDescription(desc string) error {
 	return nil
 }
 
-// ValidateAggregateFunc verify that the aggregateFunc is legal
+// ValidateAggregateFunc verifies if the aggregation function is legal
 func ValidateAggregateFunc(aggregateFunc string) error {
 	if len(aggregateFunc) == 0 || len(aggregateFunc) > MaxAggregateFuncNameLen {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "aggregate func must between [1, %d], got: %d", MaxAggregateFuncNameLen, len(aggregateFunc))
@@ -51,7 +51,7 @@ func ValidateAggregateFunc(aggregateFunc string) error {
 	return nil
 }
 
-// ValidateLatestHistory verify that the latestHistory is legal
+// ValidateLatestHistory verifies if the latest history is legal
 func ValidateLatestHistory(latestHistory uint64) error {
 	if latestHistory < 1 || latestHistory > MaxLatestHistory {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "latest history is invalid, should be between 1 and %d", MaxLatestHistory)
@@ -59,7 +59,7 @@ func ValidateLatestHistory(latestHistory uint64) error {
 	return nil
 }
 
-// ValidateCreator verify that the creator is legal
+// ValidateCreator verifies if the creator is legal
 func ValidateCreator(creator string) error {
 	if _, err := sdk.AccAddressFromBech32(creator); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator")
@@ -67,12 +67,12 @@ func ValidateCreator(creator string) error {
 	return nil
 }
 
-// ValidateServiceName verifies whether the  parameters are legal
+// ValidateServiceName verifies whether the service name is legal
 func ValidateServiceName(serviceName string) error {
 	return exported.ValidateServiceName(serviceName)
 }
 
-// ValidateResponseThreshold verifies whether the  parameters are legal
+// ValidateResponseThreshold verifies whether the given threshold is legal
 func ValidateResponseThreshold(responseThreshold uint32, maxCnt int) error {
 	if (maxCnt != 0 && int(responseThreshold) > maxCnt) || responseThreshold < 1 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "response threshold should be between 1 and %d", maxCnt)
@@ -80,7 +80,7 @@ func ValidateResponseThreshold(responseThreshold uint32, maxCnt int) error {
 	return nil
 }
 
-// ValidateTimeout verifies whether the  parameters are legal
+// ValidateTimeout verifies whether the given timeout and frequency are legal
 func ValidateTimeout(timeout int64, frequency uint64) error {
 	if frequency < uint64(timeout) {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "timeout [%d] should be no more than frequency [%d]", timeout, frequency)
@@ -88,7 +88,7 @@ func ValidateTimeout(timeout int64, frequency uint64) error {
 	return nil
 }
 
-// ValidateServiceFeeCap verifies whether the  parameters are legal
+// ValidateServiceFeeCap verifies whether the given service fee cap is legal
 func ValidateServiceFeeCap(serviceFeeCap sdk.Coins) error {
 	if !serviceFeeCap.IsValid() {
 		return sdkerrors.Wrapf(ErrInvalidServiceFeeCap, serviceFeeCap.String())
@@ -96,7 +96,8 @@ func ValidateServiceFeeCap(serviceFeeCap sdk.Coins) error {
 	return nil
 }
 
-// Modified return whether the  parameters are modified
+// Modified returns true if the given target string is modified
+// False otherwise
 func Modified(target string) bool {
 	return target != DoNotModify
 }

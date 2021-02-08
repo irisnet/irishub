@@ -31,7 +31,7 @@ func (k Keeper) swapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coi
 Calculate the amount of another token to be received based on the exact amount of tokens sold
 @param exactSoldCoin : sold coin
 @param soldTokenDenom : received token's denom
-@return : token amount that will to be received
+@return : amount of the token that will be received
 */
 func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin, boughtTokenDenom string) (sdk.Int, error) {
 	uniDenom, err := k.GetUniDenomFromDenoms(ctx, exactSoldCoin.Denom, boughtTokenDenom)
@@ -252,7 +252,7 @@ func (k Keeper) doubleTradeInputForExactOutput(ctx sdk.Context, input types.Inpu
 	return soldTokenAmt, nil
 }
 
-// getInputPrice returns the amount of coins bought (calculated) given the input amount being sold (exact)
+// GetInputPrice returns the amount of coins bought (calculated) given the input amount being sold (exact)
 // The fee is included in the input coins being bought
 // https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
 func GetInputPrice(inputAmt, inputReserve, outputReserve sdk.Int, fee sdk.Dec) sdk.Int {
@@ -263,7 +263,7 @@ func GetInputPrice(inputAmt, inputReserve, outputReserve sdk.Int, fee sdk.Dec) s
 	return numerator.Quo(denominator)
 }
 
-// getOutputPrice returns the amount of coins sold (calculated) given the output amount being bought (exact)
+// GetOutputPrice returns the amount of coins sold (calculated) given the output amount being bought (exact)
 // The fee is included in the output coins being bought
 func GetOutputPrice(outputAmt, inputReserve, outputReserve sdk.Int, fee sdk.Dec) sdk.Int {
 	deltaFee := sdk.OneDec().Sub(fee)

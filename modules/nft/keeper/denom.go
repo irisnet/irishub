@@ -7,19 +7,19 @@ import (
 	"github.com/irisnet/irismod/modules/nft/types"
 )
 
-// HasDenomID returns whether the specified denomID exists
+// HasDenomID returns whether the specified denom ID exists
 func (k Keeper) HasDenomID(ctx sdk.Context, id string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.KeyDenomID(id))
 }
 
-// HasDenomNm returns whether the specified denomNm exists
+// HasDenomNm returns whether the specified denom name exists
 func (k Keeper) HasDenomNm(ctx sdk.Context, name string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.KeyDenomName(name))
 }
 
-// SetDenom is responsible for saving the definition of denomID
+// SetDenom is responsible for saving the definition of denom
 func (k Keeper) SetDenom(ctx sdk.Context, denom types.Denom) error {
 	if k.HasDenomID(ctx, denom.Id) {
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "denomID %s has already exists", denom.Id)
@@ -36,7 +36,7 @@ func (k Keeper) SetDenom(ctx sdk.Context, denom types.Denom) error {
 	return nil
 }
 
-// GetDenom return the denom by id
+// GetDenom returns the denom by id
 func (k Keeper) GetDenom(ctx sdk.Context, id string) (denom types.Denom, err error) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -49,7 +49,7 @@ func (k Keeper) GetDenom(ctx sdk.Context, id string) (denom types.Denom, err err
 	return denom, nil
 }
 
-// GetDenoms return all the denoms
+// GetDenoms returns all the denoms
 func (k Keeper) GetDenoms(ctx sdk.Context) (denoms []types.Denom) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.KeyDenomID(""))

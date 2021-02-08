@@ -17,7 +17,7 @@ import (
 
 var _ types.QueryServer = Keeper{}
 
-// Feed queries a feed by feed name
+// Feed queries a feed by the feed name
 func (k Keeper) Feed(c context.Context, req *types.QueryFeedRequest) (*types.QueryFeedResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")

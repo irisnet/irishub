@@ -96,7 +96,7 @@ func initVars(suite *TestSuite) {
 func (suite *TestSuite) TestLiquidity() {
 	initVars(suite)
 
-	// test add liquidity (poor not exist)
+	// test add liquidity (pool does not exist)
 	uniDenom, _ := suite.app.CoinswapKeeper.GetUniDenomFromDenoms(suite.ctx, denomBTC, denomStandard)
 	suite.Equal(uniDenom, unidenomBTC)
 	poolAddr := types.GetReservePoolAddr(uniDenom)
@@ -117,7 +117,7 @@ func (suite *TestSuite) TestLiquidity() {
 	suite.Equal(fmt.Sprintf("100%s,10000000000000000000%s", denomBTC, denomStandard), reservePoolBalances.String())
 	suite.Equal(fmt.Sprintf("2999999900%s,20000000000000000000%s,10000000000000000000%s", denomBTC, denomStandard, unidenomBTC), sender1Blances.String())
 
-	// test add liquidity (poor exist)
+	// test add liquidity (pool exists)
 	uniDenom, _ = suite.app.CoinswapKeeper.GetUniDenomFromDenoms(suite.ctx, denomBTC, denomStandard)
 	suite.Equal(uniDenom, unidenomBTC)
 	poolAddr = types.GetReservePoolAddr(uniDenom)

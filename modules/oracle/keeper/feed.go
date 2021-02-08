@@ -14,7 +14,7 @@ import (
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
 )
 
-// GetFeed return the feed by feedName
+// GetFeed returns the feed by the feed name
 func (k Keeper) GetFeed(ctx sdk.Context, feedName string) (feed types.Feed, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.GetFeedKey(feedName))
@@ -25,7 +25,7 @@ func (k Keeper) GetFeed(ctx sdk.Context, feedName string) (feed types.Feed, foun
 	return feed, true
 }
 
-// GetFeedByReqCtxID return feed by requestContextID
+// GetFeedByReqCtxID returns the feed by the request context ID
 func (k Keeper) GetFeedByReqCtxID(ctx sdk.Context, requestContextID tmbytes.HexBytes) (feed types.Feed, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.GetReqCtxIDKey(requestContextID))
@@ -34,7 +34,7 @@ func (k Keeper) GetFeedByReqCtxID(ctx sdk.Context, requestContextID tmbytes.HexB
 	return k.GetFeed(ctx, feedName.Value)
 }
 
-// IteratorFeeds will foreach all feeds
+// IteratorFeeds iterates through all feeds
 func (k Keeper) IteratorFeeds(ctx sdk.Context, fn func(feed types.Feed)) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.GetFeedPrefixKey())
@@ -46,7 +46,7 @@ func (k Keeper) IteratorFeeds(ctx sdk.Context, fn func(feed types.Feed)) {
 	}
 }
 
-// IteratorFeedsByState will foreach all feeds by state
+// IteratorFeedsByState iterates through all feeds by state
 func (k Keeper) IteratorFeedsByState(
 	ctx sdk.Context,
 	state servicetypes.RequestContextState,
@@ -64,7 +64,7 @@ func (k Keeper) IteratorFeedsByState(
 	}
 }
 
-// SetFeed will save a feed to store
+// SetFeed saves a feed to store
 func (k Keeper) SetFeed(ctx sdk.Context, feed types.Feed) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryBare(&feed)
@@ -75,7 +75,7 @@ func (k Keeper) SetFeed(ctx sdk.Context, feed types.Feed) {
 	store.Set(types.GetReqCtxIDKey(requestContextID), bz)
 }
 
-// SetFeedValue will save a feed result to store
+// SetFeedValue saves a feed result to store
 func (k Keeper) SetFeedValue(
 	ctx sdk.Context,
 	feedName string,
@@ -91,7 +91,7 @@ func (k Keeper) SetFeedValue(
 	store.Set(types.GetFeedValueKey(feedName, batchCounter), bz)
 }
 
-// GetFeedValues return all feed values by feedName
+// GetFeedValues returns all feed values by the feed name
 func (k Keeper) GetFeedValues(ctx sdk.Context, feedName string) (result types.FeedValues) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStoreReversePrefixIterator(store, types.GetFeedValuePrefixKey(feedName))
@@ -104,20 +104,20 @@ func (k Keeper) GetFeedValues(ctx sdk.Context, feedName string) (result types.Fe
 	return
 }
 
-// Enqueue will put feedName to a 'state' queue
+// Enqueue puts the feed name to a 'state' queue
 func (k Keeper) Enqueue(ctx sdk.Context, feedName string, state servicetypes.RequestContextState) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.StringValue{Value: feedName})
 	store.Set(types.GetFeedStateKey(feedName, state), bz)
 }
 
-// Dequeue will remove from the 'state' queue
+// Dequeue removes the specified feed from the 'state' queue
 func (k Keeper) Dequeue(ctx sdk.Context, feedName string, state servicetypes.RequestContextState) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetFeedStateKey(feedName, state))
 }
 
-// dequeueAndEnqueue will move feedName  from the 'dequeueState' queue to a 'enqueueState' queue
+// dequeueAndEnqueue moves the specified feed from the 'dequeueState' queue to the 'enqueueState' queue
 func (k Keeper) dequeueAndEnqueue(
 	ctx sdk.Context,
 	feedName string,

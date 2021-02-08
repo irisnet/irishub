@@ -8,7 +8,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// ValidateInput verifies whether the  parameters are legal
+// ValidateInput verifies whether the given input is legal
 func ValidateInput(input Input) error {
 	if !(input.Coin.IsValid() && input.Coin.IsPositive()) {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid input (%s)", input.Coin.String())
@@ -24,7 +24,7 @@ func ValidateInput(input Input) error {
 	return nil
 }
 
-// ValidateOutput verifies whether the  parameters are legal
+// ValidateOutput verifies whether the given output is legal
 func ValidateOutput(output Output) error {
 	if !(output.Coin.IsValid() && output.Coin.IsPositive()) {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid output (%s)", output.Coin.String())
@@ -40,7 +40,7 @@ func ValidateOutput(output Output) error {
 	return nil
 }
 
-// ValidateDeadline verifies whether the  parameters are legal
+// ValidateDeadline verifies whether the given deadline is legal
 func ValidateDeadline(deadline int64) error {
 	if deadline <= 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("deadline %d must be greater than 0", deadline))
@@ -48,7 +48,7 @@ func ValidateDeadline(deadline int64) error {
 	return nil
 }
 
-// ValidateMaxToken verifies whether the  parameters are legal
+// ValidateMaxToken verifies whether the maximum token is legal
 func ValidateMaxToken(maxToken sdk.Coin) error {
 	if !(maxToken.IsValid() && maxToken.IsPositive()) {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid maxToken (%s)", maxToken.String())
@@ -64,7 +64,7 @@ func ValidateMaxToken(maxToken sdk.Coin) error {
 	return nil
 }
 
-// ValidateExactStandardAmt verifies whether the  parameters are legal
+// ValidateExactStandardAmt verifies whether the standard token amount is legal
 func ValidateExactStandardAmt(standardAmt sdk.Int) error {
 	if !standardAmt.IsPositive() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "standard token amount must be positive")
@@ -72,7 +72,7 @@ func ValidateExactStandardAmt(standardAmt sdk.Int) error {
 	return nil
 }
 
-// ValidateMinLiquidity verifies whether the  parameters are legal
+// ValidateMinLiquidity verifies whether the minimum liquidity is legal
 func ValidateMinLiquidity(minLiquidity sdk.Int) error {
 	if minLiquidity.IsNegative() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "minimum liquidity can not be negative")
@@ -80,7 +80,7 @@ func ValidateMinLiquidity(minLiquidity sdk.Int) error {
 	return nil
 }
 
-// ValidateMinToken verifies whether the  parameters are legal
+// ValidateMinToken verifies whether the minimum token amount is legal
 func ValidateMinToken(minToken sdk.Int) error {
 	if minToken.IsNegative() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "minimum token amount can not be negative")
@@ -88,7 +88,7 @@ func ValidateMinToken(minToken sdk.Int) error {
 	return nil
 }
 
-// ValidateWithdrawLiquidity verifies whether the  parameters are legal
+// ValidateWithdrawLiquidity verifies whether the given liquidity is legal
 func ValidateWithdrawLiquidity(liquidity sdk.Coin) error {
 	if !liquidity.IsValid() || !liquidity.IsPositive() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid withdrawLiquidity (%s)", liquidity.String())
@@ -100,7 +100,7 @@ func ValidateWithdrawLiquidity(liquidity sdk.Coin) error {
 	return nil
 }
 
-// ValidateMinStandardAmt verifies whether the  parameters are legal
+// ValidateMinStandardAmt verifies whether the minimum standard amount is legal
 func ValidateMinStandardAmt(minStandardAmt sdk.Int) error {
 	if minStandardAmt.IsNegative() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("minimum standard token amount %s can not be negative", minStandardAmt.String()))
