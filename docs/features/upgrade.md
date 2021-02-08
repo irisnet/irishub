@@ -107,3 +107,39 @@ The user replaces the software with the specified version and restarts the netwo
 The upgrade proposal can be cancelled. There is a proposal type of `Cancel Software Upgrade (CancelSoftwareUpgrade)`. When this type of proposal is voted through, the currently ongoing upgrade plan will be removed. Of course, this needs to be voted and executed before the upgrade plan is executed.
 
 If the current upgrade plan has been executed, but there are problems with the upgrade plan, then the proposal of `Cancel Software Upgrade` is invalid (because the network has stopped consensus). At this time, there is another solution to make up for this mistake, which is to use the `--unsafe-skip-upgrades` parameter to skip the specified upgrade height when restarting the network (not really skip the height, but jump via software upgrade `Handler`). Of course, this requires that 2/3 of the validators participating in the consensus perform the same operation, otherwise the network consensus cannot be reached.
+
+## Upgrade process
+
+### Submit an upgrade proposal
+
+The first step in the implementation of the software upgrade process is to initiate a software upgrade proposal by the governance module. The proposal details the upgrade time and upgrade content. For details, see the above [Concept](#Concepts). An example of a command line to initiate a proposal is as follows:
+
+```bash
+iris tx gov submit-proposal software-upgrade bifrost-rc2 \
+  --deposit 10000000uiris \
+  --upgrade-time 2021-02-09T13:00:00Z \
+  --title "mainnet software upgrade" \
+  --upgrade-info "Commit: 0ef5dd0b4d140a4788f05fc1a0bd409b3c6a0492. After the proposal is approved, please use the commit hash to build and restart your node." \
+  --description "Upgrade the mainnet software version from v1.0.0-rc0 to v1.0.0-rc2."
+  --from=node0 --chain-id=test 1000000uiris -b block -y
+```
+
+### Deposit and vote for the proposal
+
+The execution process of the software upgrade proposal is basically the same as that of other ordinary proposals. Both validators and delegators are required to comment on the proposal. For specific information, please refer to [governance module](./governance.md). An example of the command line to deposit the proposal is as follows:
+
+```bash
+iris tx gov deposit 1 1000000000uiris --from=node0 --chain-id=test --fees=1000000uiris -b block -y
+```
+
+Once the deposit amount reaches the minimum deposit amount, the proposal will enter the voting period, and the validator or delegator needs to vote on the proposal. An example of the command line to initiate a vote is as follows:
+
+```bash
+iris tx gov vote 1 yes  --from=node0 --chain-id=test 1000000uiris -b block -y
+```
+
+When the software upgrade proposal is passed, the upgrade module will create an upgrade plan to stop all nodes from the network consensus at a specified height or time, and wait for the new software to restart the network.
+
+### Restart the network
+
+When the upgrade proposal is passed, the node will stop producing blocks, and the user needs to download the source code and compile the new software according to the new version information specified in the first step [Submit Upgrade Proposal](#submit-an-upgrade-proposal), refer to [Install](../get-started/install.md). After the new software is installed, restart the node with the new version, and the node will execute the upgrade logic corresponding to the plan name. Once the voting power of the entire network exceeds 2/3 and restarts the network using the new version, the blockchain network will re-reach a new consensus and continue to produce new blocks.
