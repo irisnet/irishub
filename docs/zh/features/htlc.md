@@ -28,7 +28,7 @@
 
   当Bob在Bitcoin上成功claim之后，secret将被披露。通过这个secret，Alice将在IRIS Hub上完成相同的claim操作。这个操作也需要在Bob提供的过期时间之前完成。
 
-## IRIS Hub HTLC 规范
+## IRISHub HTLC 规范
 
 ### 创建HTLC消息
 

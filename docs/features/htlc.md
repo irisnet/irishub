@@ -28,7 +28,7 @@ Supposed that Alice swaps BTC for IRIS with Bob. The atomic swap process between
 
   The secret will be disclosed while the HTLC is claimed successfully by Bob on Bitcoin. Alice will perfom the same claim to the locked IRIS with the secret before the expiration time on IRIS Hub.
 
-## IRIS Hub HTLC Specification
+## IRISHub HTLC Specification
 
 ### Create HTLC message
 

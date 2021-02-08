@@ -42,10 +42,10 @@ When you initialize your Ledger, a 24-word mnemonic is generated and stored in t
 
 1. Install [Ledger Live](https://www.ledger.com/pages/ledger-live) on your machine.
 2. Using Ledger Live, [update your Ledger Nano S with the latest firmware](https://support.ledger.com/hc/en-us/articles/360002731113-Update-device-firmware).
-3. On the Ledger Live application, navigate to the `Manager` menu. 
+3. On the Ledger Live application, navigate to the `Manager` menu.
     ![manager](../pics/ledger-manager.png)
 4. Connect your Ledger Nano device and allow Ledger Manager from it.
-5. On the Ledger Live application, Search for `Cosmos`. 
+5. On the Ledger Live application, Search for `Cosmos`.
     ![search](../pics/ledger-search.png)
 6. Install the Cosmos application by clicking on `Install`.
 
@@ -69,19 +69,20 @@ You are now ready to start signing and sending transactions. The following is an
 iris tx bank send --help # to see all available options.
 ```
 
-::: tip 
+::: tip
 Be sure to unlock your device with the PIN and open the Cosmos app before trying to run these commands
 :::
 
 Use the keyName you set for your Ledger key and iris will connect with the Cosmos Ledger app to then sign your transaction.
 
-::: tip 
-The Cosmos app only support amino-json sign mode now, you must add the flag `--sign-mode amino-json` to use it 
+::: tip
+The Cosmos app only support amino-json sign mode now, you must add the flag `--sign-mode amino-json` to use it.
 :::
 
 ```bash
 iris tx send <keyName> <destinationAddress> <amount><denomination> --sign-mode amino-json
 ```
+
 When prompted with confirm transaction before signing, Answer Y.
 
 Next you will be prompted to review and approve the transaction on your Ledger device. Be sure to inspect the transaction JSON displayed on the screen. You can scroll through each field and each message.

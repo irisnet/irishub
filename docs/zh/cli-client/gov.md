@@ -15,7 +15,7 @@
 | [tally](#iris-query-gov-tally)                  | 汇总提案投票                                          |
 | [param](#iris-query-gov-param)                  | 查询参数                                              |
 | [params](#iris-query-gov-params)                | 查询治理流程的参数                                    |
-| [proposer](#iris-query-gov-proposer)            | 通过提议ID查询提案的发起人地址                                    |
+| [proposer](#iris-query-gov-proposer)            | 通过提议ID查询提案的发起人地址                        |
 | [submit-proposal](#iris-tx-gov-submit-proposal) | 提交提案                                              |
 | [deposit](#iris-tx-gov-deposit)                 | 为有效的提案抵押代币                                  |
 | [vote](#iris-tx-gov-vote)                       | 为活跃的提案投票:可选值： yes/no/no_with_veto/abstain |
@@ -156,6 +156,7 @@ iris query gov param [param-type] [flags]
 ```bash
 iris query gov params [flags]
 ```
+
 ## iris query gov proposer
 
 通过提议ID查询提案的发起人地址。
@@ -163,7 +164,6 @@ iris query gov params [flags]
 ```bash
 iris query gov proposer [proposal-id] [flags]
 ```
-
 
 ## iris tx gov submit-proposal
 
@@ -229,29 +229,30 @@ iris tx gov submit-proposal software-upgrade [name] (--upgrade-height [height] |
 
 **标识：**
 
-| 名称, 速记       | 类型   | 必须 | 默认 | 描述                                                 |
-| ---------------- | ------ | ---- | ---- | ------------------------------------------------ |
-| --deposit        | Coin   | Yes  |      | 提案抵押的代币                                     |
-| --title          | string | Yes  |      | 提案的标题                                         |
-| --description    | string | Yes  |      | 提案的描述                                         |
-| --upgrade-height | int64  |      |      | 升级必须发生的高度（不要与`--upgrade-time`一起使用）   |
-| --time           | string |      |      | 升级必须发生的时间（不要与`--upgrade-height`一起使用） |
-| --info           | string |      |      | 计划升级的可选信息，例如提交哈希等。                   |
-
-### iris tx gov submit-proposal cancel-software-upgrade 
-
-取消软件升级提案。
-
-```
-iris tx gov submit-proposal cancel-software-upgrade [flags]
-```
-**标识：**
-
 | 名称, 速记       | 类型   | 必须 | 默认 | 描述                                                   |
 | ---------------- | ------ | ---- | ---- | ------------------------------------------------------ |
 | --deposit        | Coin   | Yes  |      | 提案抵押的代币                                         |
 | --title          | string | Yes  |      | 提案的标题                                             |
 | --description    | string | Yes  |      | 提案的描述                                             |
+| --upgrade-height | int64  |      |      | 升级必须发生的高度（不要与`--upgrade-time`一起使用）   |
+| --time           | string |      |      | 升级必须发生的时间（不要与`--upgrade-height`一起使用） |
+| --info           | string |      |      | 计划升级的可选信息，例如提交哈希等。                   |
+
+### iris tx gov submit-proposal cancel-software-upgrade
+
+取消软件升级提案。
+
+```bash
+iris tx gov submit-proposal cancel-software-upgrade [flags]
+```
+
+**标识：**
+
+| 名称, 速记    | 类型   | 必须 | 默认 | 描述           |
+| ------------- | ------ | ---- | ---- | -------------- |
+| --deposit     | Coin   | Yes  |      | 提案抵押的代币 |
+| --title       | string | Yes  |      | 提案的标题     |
+| --description | string | Yes  |      | 提案的描述     |
 
 ## iris tx gov deposit
 

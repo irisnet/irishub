@@ -31,7 +31,7 @@ Service module allows you to define, bind, invoke services on the IRIS Hub. [Rea
 | [fees](#iris-query-service-fees)                        | Query the earned fees of a provider                                |
 | [withdraw-fees](#iris-tx-service-withdraw-fees)         | Withdraw the earned fees of a provider                             |
 | [schema](#iris-query-service-schema)                    | Query the system schema by the schema name                         |
-| [params](#iris-query-service-params)                    | Query values set as service parameters.                      |
+| [params](#iris-query-service-params)                    | Query values set as service parameters.                            |
 
 ## iris tx service define
 
@@ -358,11 +358,11 @@ iris query service request <request-id>
 You can retrieve the `request-id` in [Query request_id through rpc interface](#Query request_id through rpc interface) or [iris query service requests](#iris query service requests).
 :::
 
-##### Query request_id through rpc interface
+### Query request_id through rpc interface
 
 Query `block_results` according to `block height` through `rpc interface`, find `new_batch_request_provider` in `end_block_events`, decode the result with base64 to get `request_id`.
 
-```
+```bash
 curl -X POST -d '{"jsonrpc":"2.0","id":1,"method":"block_results","params":["10604"]}' http://localhost:26657
 ```
 

@@ -15,7 +15,7 @@ This module provides the basic functionalities for [Governance](../features/gove
 | [tally](#iris-query-gov-tally)                  | Get the tally of a proposal vote                                  |
 | [param](#iris-query-gov-param)                  | Query the parameters (voting                                      |
 | [params](#iris-query-gov-params)                | Query the parameters of the governance process                    |
-| [proposer](#iris-query-gov-proposer)            | Query which address proposed a proposal with a given ID.                                    |
+| [proposer](#iris-query-gov-proposer)            | Query which address proposed a proposal with a given ID.          |
 | [submit-proposal](#iris-tx-gov-submit-proposal) | Submit a proposal along with an initial deposit                   |
 | [deposit](#iris-tx-gov-deposit)                 | Deposit tokens for an active proposal                             |
 | [vote](#iris-tx-gov-vote)                       | Vote for an active proposal, options: yes/no/no_with_veto/abstain |
@@ -241,23 +241,21 @@ iris tx gov submit-proposal software-upgrade [name] (--upgrade-height [height] |
 | --time           | string |          |         | The time at which the upgrade must happen (not to be used together with --upgrade-height) |
 | --info           | string |          |         | Optional info for the planned upgrade such as commit hash, etc.                           |
 
-### iris tx gov submit-proposal cancel-software-upgrade 
+### iris tx gov submit-proposal cancel-software-upgrade
 
 Cancel a software upgrade along with an initial deposit.
 
-```
+```bash
 iris tx gov submit-proposal cancel-software-upgrade [flags]
 ```
 
 **Flags:**
 
-| Name, shorthand  | Type   | Required | Default | Description                                                  |
-| ---------------- | ------ | -------- | ------- | ------------------------------------------------------------ |
-| --deposit        | Coin   | Yes      |         | Deposit of the proposal                                      |
-| --title          | string | Yes      |         | Title of proposal                                            |
-| --description    | string | Yes      |         | Description of proposal                                      |
-
-
+| Name, shorthand | Type   | Required | Default | Description             |
+| --------------- | ------ | -------- | ------- | ----------------------- |
+| --deposit       | Coin   | Yes      |         | Deposit of the proposal |
+| --title         | string | Yes      |         | Title of proposal       |
+| --description   | string | Yes      |         | Description of proposal |
 
 ## iris tx gov deposit
 
