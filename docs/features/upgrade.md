@@ -116,12 +116,12 @@ The first step in the implementation of the software upgrade process is to initi
 
 ```bash
 iris tx gov submit-proposal software-upgrade bifrost-rc2 \
-  --deposit 10000000uiris \
+  --deposit 1000iris \
   --upgrade-time 2021-02-09T13:00:00Z \
   --title "mainnet software upgrade" \
   --upgrade-info "Commit: 0ef5dd0b4d140a4788f05fc1a0bd409b3c6a0492. After the proposal is approved, please use the commit hash to build and restart your node." \
   --description "Upgrade the mainnet software version from v1.0.0-rc0 to v1.0.0-rc2."
-  --from=node0 --chain-id=test 1000000uiris -b block -y
+  --from=node0 --chain-id=test --fees=1iris -b block -y
 ```
 
 ### Deposit and vote for the proposal
@@ -129,13 +129,13 @@ iris tx gov submit-proposal software-upgrade bifrost-rc2 \
 The execution process of the software upgrade proposal is basically the same as that of other ordinary proposals. Both validators and delegators are required to comment on the proposal. For specific information, please refer to [governance module](./governance.md). An example of the command line to deposit the proposal is as follows:
 
 ```bash
-iris tx gov deposit 1 1000000000uiris --from=node0 --chain-id=test --fees=1000000uiris -b block -y
+iris tx gov deposit 1 1000iris --from=node0 --chain-id=test --fees=1iris -b block -y
 ```
 
 Once the deposit amount reaches the minimum deposit amount, the proposal will enter the voting period, and the validator or delegator needs to vote on the proposal. An example of the command line to initiate a vote is as follows:
 
 ```bash
-iris tx gov vote 1 yes  --from=node0 --chain-id=test 1000000uiris -b block -y
+iris tx gov vote 1 yes  --from=node0 --chain-id=test --fees=1iris -b block -y
 ```
 
 When the software upgrade proposal is passed, the upgrade module will create an upgrade plan to stop all nodes from the network consensus at a specified height or time, and wait for the new software to restart the network.
