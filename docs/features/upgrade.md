@@ -112,7 +112,7 @@ If the current upgrade plan has been executed, but there are problems with the u
 
 ### Submit an upgrade proposal
 
-The first step in the implementation of the software upgrade process is to initiate a software upgrade proposal by the governance module. The proposal details the upgrade time and upgrade content. For details, see the above [Concept](#Concepts). An example of a command line to initiate a proposal is as follows:
+The first step in the implementation of the software upgrade process is to initiate a software upgrade proposal by the governance module. The proposal details the upgrade height or time. For details, see the above [Concept](#Concepts). An example of the command line to initiate a proposal is as follows:
 
 ```bash
 iris tx gov submit-proposal software-upgrade <plan-name> \
