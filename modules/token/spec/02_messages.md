@@ -4,7 +4,8 @@ order: 2
 
 # Messages
 
-In this section we describe the processing of the token messages and the corresponding updates to the state.
+In this section we describe the processing of the token messages and the
+corresponding updates to the state.
 
 ## MsgIssueToken
 
@@ -14,12 +15,12 @@ A token is created using the `MsgIssueToken` message.
 type MsgIssueToken struct {
   Symbol        string
   Name          string
-  Scale         uint8
+  Scale         uint32
   MinUnit       string
   InitialSupply uint64
   MaxSupply     uint64
   Mintable      bool
-  Owner         sdk.AccAddress
+  Owner         string
 }
 ```
 
@@ -43,17 +44,18 @@ This message is expected to fail if:
 - the `InitialSupply` is greater than `100000000000`
 - the `MaxSupply` > `1000000000000` or `MaxSupply` < `InitialSupply`
 
-This message creates and stores the `Token` object at appropriate indexes.
+This message creates and stores the `Token` object at appropriate
+indexes.
 
 ## MsgEditToken
 
 The `MaxSupply`, `Mintable` , `Name` of a token can be updated using the
-`MsgEditToken`.  
+`MsgEditToken`.
 
 ```go
 type MsgEditToken struct {
   Symbol    string
-  Owner     sdk.AccAddress
+  Owner     string
   MaxSupply uint64
   Mintable  Bool
   Name      string
@@ -79,8 +81,8 @@ The owner of the token can mint some tokens to the specified account
 ```go
 type MsgMintToken struct {
   Symbol string
-  Owner  sdk.AccAddress
-  To     sdk.AccAddress
+  Owner  string
+  To     string
   Amount uint64
 ```
 
@@ -89,7 +91,8 @@ This message is expected to fail if:
 - the `Symbol` is not existed
 - the `Mintable` of the token is false
 - the `Owner` is not the token owner
-- the `Amount` `Coin` has exceeded the number of additional issuances（**MaxSupply - Issued**）
+- the `Amount` `Coin` has exceeded the number of additional
+  issuances（**MaxSupply - Issued**）
 
 ## MsgBurnToken
 
@@ -98,7 +101,7 @@ The owner of the token can mint some tokens to the specified account
 ```go
 type MsgBurnToken struct {
   Symbol string
-  Sender sdk.AccAddress
+  Sender string
   Amount uint64
 ```
 
@@ -113,8 +116,8 @@ The ownership of the `token` can be transferred to others
 
 ```go
 type MsgTransferTokenOwner struct {
-  SrcOwner sdk.AccAddress
-  DstOwner sdk.AccAddress
+  SrcOwner string
+  DstOwner string
   Symbol   string
 }
 ```
@@ -123,3 +126,4 @@ This message is expected to fail if:
 
 - the token is not existed
 - the `Owner` is not the token owner
+

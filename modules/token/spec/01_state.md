@@ -14,19 +14,19 @@ Definition of data structure of FungibleToken
 type Token struct {
   Symbol        string
   Name          string
-  Scale         uint8
+  Scale         uint32
   MinUnit       string
   InitialSupply uint64
   MaxSupply     uint64
   Mintable      bool
-  Owner         sdk.AccAddress
+  Owner         string
 }
 ```
 
 ## Params
 
-Params is a module-wide configuration structure that stores system parameters
-and defines overall functioning of the token module.
+Params is a module-wide configuration structure that stores system
+parameters and defines overall functioning of the token module.
 
 - Params: `Paramsspace("token") -> amino(params)`
 
@@ -37,3 +37,4 @@ type Params struct {
   MintTokenFeeRatio sdk.Dec
 }
 ```
+
