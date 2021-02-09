@@ -1,4 +1,4 @@
-# Migrate IRISHub from v0.16 to v1.0.0
+# Migrate IRIShub from v0.16 to v1.0.0
 
 ## 1. Export genesis file
 

@@ -21,7 +21,7 @@ iris tx record create [digest] [digest-algo] [flags]
 
 | 名称，速记 | 类型   | 必须 | 默认 | 描述                       |
 | ---------- | ------ | ---- | ---- | -------------------------- |
-| --uri      | string |      |      | 记录的 uri, 比如 ipfs 链接 |
+| --uri      | string |      |      | 记录的 uri，比如 ipfs 链接 |
 | --meta     | string |      |      | 记录的元数据               |
 
 ## iris query record record

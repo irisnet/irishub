@@ -1,8 +1,6 @@
-# IRISHub 从 v0.16 迁移到 v1.0.0
+# IRIShub 从 v0.16 迁移到 v1.0.0
 
 ## 1. 导出 genesis 文件
-
-Stop irishub v0.16 daemon and use `irishub v0.16.4 (which fixed bugs in export)` to export mainnet state genesis with `--for-zero-height` at the upgrade block height
 
 停止 irishub v0.16 守护程序，并使用 `irishub v0.16.4（已修复导出中的错误）` 在升级高度导出主网状态并指定 `--for-zero-height`。
 

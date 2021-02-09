@@ -15,7 +15,7 @@ distribution模块用于管理自己的 [Staking 收益](../concepts/general-con
 | [fund-community-pool](#iris-tx-distribution-fund-community-pool)                        | 为社区基金池提供指定数额的资金                                                                 |
 | [set-withdraw-addr](#iris-tx-distribution-set-withdraw-addr)                            | 设置提现地址                                                                                   |
 | [withdraw-all-rewards](#iris-tx-distribution-withdraw-all-rewards)                      | 取回委托人所有收益                                                                             |
-| [withdraw-rewards](#iris-tx-distribution-withdraw-rewards)                              | 取回收益，有以下几种模式: 取回所有奖励、从指定的验证者取回委派奖励、验证人取回所有奖励以及佣金 |
+| [withdraw-rewards](#iris-tx-distribution-withdraw-rewards)                              | 取回收益，有以下几种模式：取回所有奖励、从指定的验证者取回委派奖励、验证人取回所有奖励以及佣金 |
 
 ## iris query distribution commission
 
@@ -91,7 +91,7 @@ iris tx distribution withdraw-all-rewards [flags]
 
 ## iris tx distribution withdraw-rewards
 
-取回收益，有以下几种模式: 取回所有奖励、从指定的验证者取回委派奖励、验证人取回所有奖励以及佣金。
+取回收益，有以下几种模式：取回所有奖励、从指定的验证者取回委派奖励、验证人取回所有奖励以及佣金。
 
 ```bash
 iris tx distribution withdraw-rewards [validator-addr] [flags]

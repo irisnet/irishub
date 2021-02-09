@@ -52,7 +52,7 @@
 * [\#2097](https://github.com/irisnet/irishub/issues/2097) Add scripts to migrate genesis data from v0.16.3
 * [\#2090](https://github.com/irisnet/irishub/issues/2090) Refactor guardian module
 * [\#2089](https://github.com/irisnet/irishub/issues/2089) Overwrite mint module
-* [\#2500](https://github.com/irisnet/irishub/issues/2500) Migrate IRISnet modules to irismod
+* [\#2500](https://github.com/irisnet/irishub/issues/2500) Migrate IRIShub modules to irismod
 * [\#2381](https://github.com/irisnet/irishub/pull/2381) Rebuild irishub v1.0 using cosmos-sdk v0.40
 
 ## 0.16.3
