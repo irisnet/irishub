@@ -167,8 +167,11 @@ func TestMsgBindServiceValidation(t *testing.T) {
 	invalidPromotionVolPricing := `{"price":"1stake","promotions_by_volume":[{"volume":0,"discount":"0.7"}]}`
 	invalidOptions := ""
 
+	validUpperDenomPricing := `{"price":"5ibc/9EBF7EBE6F8FFD34617809F3CF00E04A10D8B7226048F68866371FB9DAD8A25D"}`
+
 	testMsgs := []*MsgBindService{
 		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testQoS, testOptions, testOwner),                 // valid msg
+		NewMsgBindService(testServiceName, testProvider, testDeposit, validUpperDenomPricing, testQoS, testOptions, testOwner),      // Pricing denom accepts the upper characters
 		NewMsgBindService(testServiceName, emptyAddress, testDeposit, testPricing, testQoS, testOptions, testOwner),                 // missing provider address
 		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testQoS, testOptions, emptyAddress),              // missing owner address
 		NewMsgBindService(invalidName, testProvider, testDeposit, testPricing, testQoS, testOptions, testOwner),                     // service name contains illegal characters
@@ -189,18 +192,19 @@ func TestMsgBindServiceValidation(t *testing.T) {
 		errMsg  string
 	}{
 		{testMsgs[0], true, ""},
-		{testMsgs[1], false, "missing provider address"},
-		{testMsgs[2], false, "missing owner address"},
-		{testMsgs[3], false, "service name contains illegal characters"},
-		{testMsgs[4], false, "too long service name"},
-		{testMsgs[5], false, "invalid deposit"},
-		{testMsgs[6], false, "missing pricing"},
-		{testMsgs[7], false, "invalid Pricing JSON Schema instance"},
-		{testMsgs[8], false, "invalid pricing denom"},
-		{testMsgs[9], false, "invalid promotion time lack of time zone"},
-		{testMsgs[10], false, "invalid promotion volume"},
-		{testMsgs[11], false, "invalid qos"},
-		{testMsgs[12], false, "invalid options"},
+		{testMsgs[1], true, ""},
+		{testMsgs[2], false, "missing provider address"},
+		{testMsgs[3], false, "missing owner address"},
+		{testMsgs[4], false, "service name contains illegal characters"},
+		{testMsgs[5], false, "too long service name"},
+		{testMsgs[6], false, "invalid deposit"},
+		{testMsgs[7], false, "missing pricing"},
+		{testMsgs[8], false, "invalid Pricing JSON Schema instance"},
+		{testMsgs[9], false, "invalid pricing denom"},
+		{testMsgs[10], false, "invalid promotion time lack of time zone"},
+		{testMsgs[11], false, "invalid promotion volume"},
+		{testMsgs[12], false, "invalid qos"},
+		{testMsgs[13], false, "invalid options"},
 	}
 
 	for i, tc := range testCases {
@@ -253,8 +257,11 @@ func TestMsgUpdateServiceBindingValidation(t *testing.T) {
 	invalidPromotionVolPricing := `{"price":"1stake","promotions_by_volume":[{"volume":0,"discount":"0.7"}]}`
 	invalidOptions := ""
 
+	validUpperDenomPricing := `{"price":"5ibc/9EBF7EBE6F8FFD34617809F3CF00E04A10D8B7226048F68866371FB9DAD8A25D"}`
+
 	testMsgs := []*MsgUpdateServiceBinding{
 		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, testPricing, testQoS, testOptions, testOwner),                   // valid msg
+		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, validUpperDenomPricing, testQoS, testOptions, testOwner),        // Pricing denom accepts the upper characters
 		NewMsgUpdateServiceBinding(testServiceName, testProvider, emptyAddedDeposit, testPricing, testQoS, testOptions, testOwner),                  // empty deposit is allowed
 		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "", testQoS, testOptions, testOwner),                            // empty pricing is allowed
 		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, testPricing, 0, testOptions, testOwner),                         // 0 is allowed for qos
@@ -280,15 +287,16 @@ func TestMsgUpdateServiceBindingValidation(t *testing.T) {
 		{testMsgs[2], true, ""},
 		{testMsgs[3], true, ""},
 		{testMsgs[4], true, ""},
-		{testMsgs[5], false, "missing provider address"},
-		{testMsgs[6], false, "missing owner address"},
-		{testMsgs[7], false, "service name contains illegal characters"},
-		{testMsgs[8], false, "too long service name"},
-		{testMsgs[9], false, "invalid Pricing JSON Schema instance"},
-		{testMsgs[10], false, "invalid pricing denom"},
-		{testMsgs[11], false, "invalid promotion time lack of time zone"},
-		{testMsgs[12], false, "invalid promotion volume"},
-		{testMsgs[13], false, "invalid options"},
+		{testMsgs[5], true, ""},
+		{testMsgs[6], false, "missing provider address"},
+		{testMsgs[7], false, "missing owner address"},
+		{testMsgs[8], false, "service name contains illegal characters"},
+		{testMsgs[9], false, "too long service name"},
+		{testMsgs[10], false, "invalid Pricing JSON Schema instance"},
+		{testMsgs[11], false, "invalid pricing denom"},
+		{testMsgs[12], false, "invalid promotion time lack of time zone"},
+		{testMsgs[13], false, "invalid promotion volume"},
+		{testMsgs[14], false, "invalid options"},
 	}
 
 	for i, tc := range testCases {
