@@ -9,15 +9,17 @@ NFTs on application specific blockchains share some but not all features as thei
 ## Contents
 
 1. **[State](./01_state.md)**
-   - [NFT](./01_state.md#NFT)
+   - [NFT](./01_state.md#nft)
    - [Collections](./01_state.md#collections)
    - [Owners](./01_state.md#owners)
 2. **[Messages](./02_messages.md)**
-   - [Transfer NFT](./02_messages.md#MsgTransferNFT)
-   - [Edit NFT](./02_messages.md#MsgEditNFT)
-   - [Mint NFT](./02_messages.md#MsgMintNFT)
-   - [Burn NFT](./02_messages.md#MsgBurnNFT)
+   - [Issue Denom](./02_messages.md#msgissuedenom)
+   - [Transfer NFT](./02_messages.md#msgtransfernft)
+   - [Edit NFT](./02_messages.md#msgtransfernft)
+   - [Mint NFT](./02_messages.md#msgmintnft)
+   - [Burn NFT](./02_messages.md#msgburnnft)
 3. **[Events](./03_events.md)**
+   - [Handlers](03_events.md#handlers)
 4. **[Future Improvements](./04_future_improvements.md)**
 
 ## A Note on Metadata & IBC
