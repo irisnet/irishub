@@ -51,8 +51,6 @@ Submit cancellation of the currently ongoing software upgrade proposal through t
 iris tx gov submit-proposal cancel-software-upgrade [flags]
 ```
 
-**标识：**
-
 **Flags:**
 
 | Name, shorthand | Type   | Required | Default | Description             |

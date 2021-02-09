@@ -36,7 +36,7 @@ iris tx oracle create [flags]
 | --timeout         | int64    |          |         | The maximum number of blocks to wait for a response since a request is sent, beyond which the request will be ignored.         |
 | --frequency       | uint64   |          |         | The invocation frequency of sending repeated requests.                                                                         |
 | --threshold       | uint16   |          | 1       | The minimum number of responses needed for aggregation, range [1, Length(providers)].                                          |
-| --aggregate-func  | string   | Yes      |         | The name of predefined function for processing the service responses, e.g.avg、max、min etc.                                   |
+| --aggregate-func  | string   | Yes      |         | The name of predefined function for processing the service responses, e.g. avg, max, min etc.                                  |
 | --value-json-path | string   | Yes      |         | The field name or path of Service response result used to retrieve the value property of aggregate-func from response results. |
 
 ### Create a new feed
@@ -139,9 +139,9 @@ iris query oracle feeds [flags]
 
 **Flags:**
 
-| Name, shorthand | Type   | Required | Default | Description                                |
-| --------------- | ------ | -------- | ------- | ------------------------------------------ |
-| --state         | string |          |         | the state of the feed,e.g.paused、running. |
+| Name, shorthand | Type   | Required | Default | Description                                  |
+| --------------- | ------ | -------- | ------- | -------------------------------------------- |
+| --state         | string |          |         | the state of the feed, e.g. paused, running. |
 
 ### Query a group of feed
 

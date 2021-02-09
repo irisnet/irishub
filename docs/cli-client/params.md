@@ -6,7 +6,7 @@ Params module allows you to query the system parameters which can be governed (e
 iris query params subspace [subspace] [key] [flags]
 ```
 
-Subspace currently supports the following:`auth`、`bank`、`staking`、`mint`、`distribution`、`slashing`、`gov`、`crisis`、`token`、`record`、`htlc`、`coinswap`、`service`.
+Subspace currently supports the following:`auth`, `bank`, `staking`, `mint`, `distribution`, `slashing`, `gov`, `crisis`, `token`, `record`, `htlc`, `coinswap`, `service`.
 
 Among them, the parameters available for query for each subspace are as follows:
 

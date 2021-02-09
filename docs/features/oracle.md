@@ -3,7 +3,7 @@
 ## Introduction
 
 The module combines `service` to achieve decentralized injection from trusted Oracles such as `Chainlink` to IRIShub Oracle. Each data collection task is called a feed, and its underlying implementation depends on the `service` module. Feed life cycle
-It is basically the same as the `Service` RequestContext (paused, running), and is used to store off-chain data on the chain through Oracle nodes. In addition, you can only operate `Feed` through your Profiler account, and you cannot delete it. You can only pause the feed. Including the following operations：
+It is basically the same as the `Service` RequestContext (paused, running), and is used to store off-chain data on the chain through Oracle nodes. In addition, you can only operate `Feed` through your Profiler account, and you cannot delete it. You can only pause the feed. Including the following operations:
 
 - Create Feed
 - Start Feed

@@ -34,7 +34,7 @@ tmkms init -n irishub /path/to/kms/home
 
 ## Configuration
 
-To enable KMS, you need to edit the `priv_validator_laddr` in your `<iris-home>/config/config.toml` file first. E.g.:
+To enable KMS, you need to edit the `priv_validator_laddr` in your `<iris-home>/config/config.toml` file first. e.g.:
 
 ```toml
 # TCP or UNIX socket address for Tendermint to listen on for

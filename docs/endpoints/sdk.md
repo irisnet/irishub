@@ -10,7 +10,7 @@ Available in three languages:
 
 ## Design Goals and Concepts
 
-The SDK mainly implements the encapsulation of the functions of IRIShub modules, including: auth, bank, gov, htlc, keys, nft, oracle, random, record, service, staking, token。So that users can quickly realize the development of the following functions:
+The SDK mainly implements the encapsulation of the functions of IRIShub modules, including: auth, bank, gov, htlc, keys, nft, oracle, random, record, service, staking, token. So that users can quickly realize the development of the following functions:
 
 - Generating, Signing and Broadcasting Transactions
 - Private Key Management
