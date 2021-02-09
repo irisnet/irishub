@@ -25,7 +25,7 @@
 
 ## 长时间不参与网络共识
 
-在固定时间窗口`SignedBlocksWindow`内，验证人的缺席出块数目比重大于`MinSignedPerWindow`，则以`SlashFractionDowntime`比例惩罚验证人的绑定的token,并jail验证人。直到jail时间超过`DowntimeJailDuration`，才能通过unjail命令解除jail。
+在固定时间窗口`SignedBlocksWindow`内，验证人的缺席出块数目比重大于`MinSignedPerWindow`，则以`SlashFractionDowntime`比例惩罚验证人的绑定的token，并jail验证人。直到jail时间超过`DowntimeJailDuration`，才能通过unjail命令解除jail。
 
 **参数：**
 

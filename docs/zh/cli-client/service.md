@@ -397,8 +397,8 @@ iris tx service respond [flags]
 | 名称，速记   | 默认 | 描述                                                                                                    | 必须 |
 | ------------ | ---- | ------------------------------------------------------------------------------------------------------- | ---- |
 | --request-id |      | 欲响应请求的ID                                                                                          | 是   |
-| --result     |      | 响应结果的内容或文件路径, 是一个[Irishub Service Result JSON Schema](../features/service-result.md)实例 | 是   |
-| --data       |      | 响应输出的内容或文件路径, 是一个Output JSON Schema实例                                                  |      |
+| --result     |      | 响应结果的内容或文件路径，是一个[Irishub Service Result JSON Schema](../features/service-result.md)实例 | 是   |
+| --data       |      | 响应输出的内容或文件路径，是一个Output JSON Schema实例                                                  |      |
 
 ### 响应一个服务请求
 

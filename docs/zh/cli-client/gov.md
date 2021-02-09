@@ -44,7 +44,7 @@ iris query gov proposals [flags]
 
 **标识：**
 
-| 名称, 速记  | 类型    | 必须 | 默认 | 描述                                  |
+| 名称，速记  | 类型    | 必须 | 默认 | 描述                                  |
 | ----------- | ------- | ---- | ---- | ------------------------------------- |
 | --depositor | Address |      |      | 按抵押人地址过滤提案                  |
 | --limit     | uint    |      |      | 返回最新[数量]个提案。 默认为所有提案 |
@@ -210,9 +210,9 @@ iris tx gov submit-proposal param-change <path/to/proposal.json> --from=<key_or_
     "description": "Update max validators",
     "changes": [
         {
-        "subspace": "staking",
-        "key": "MaxValidators",
-        "value": 105
+            "subspace": "staking",
+            "key": "MaxValidators",
+            "value": 105
         }
     ],
     "deposit": "1000uiris"
@@ -229,7 +229,7 @@ iris tx gov submit-proposal software-upgrade [name] (--upgrade-height [height] |
 
 **标识：**
 
-| 名称, 速记       | 类型   | 必须 | 默认 | 描述                                                   |
+| 名称，速记       | 类型   | 必须 | 默认 | 描述                                                   |
 | ---------------- | ------ | ---- | ---- | ------------------------------------------------------ |
 | --deposit        | Coin   | Yes  |      | 提案抵押的代币                                         |
 | --title          | string | Yes  |      | 提案的标题                                             |
@@ -248,7 +248,7 @@ iris tx gov submit-proposal cancel-software-upgrade [flags]
 
 **标识：**
 
-| 名称, 速记    | 类型   | 必须 | 默认 | 描述           |
+| 名称，速记    | 类型   | 必须 | 默认 | 描述           |
 | ------------- | ------ | ---- | ---- | -------------- |
 | --deposit     | Coin   | Yes  |      | 提案抵押的代币 |
 | --title       | string | Yes  |      | 提案的标题     |

@@ -39,14 +39,14 @@
 | amount               | Coins    | 欲交换的资产数量                                                        |
 | hashLock             | string   | 由secret(和timestamp，如果提供)生成的sha256哈希值；32字节，十六进制表示 |
 | timestamp            | uint64   | 时间戳，如果提供则参与hash生成；精度为秒                                |
-| timeLock             | uint64   | 过期区块数；[50, 25480] (大于5分钟, 小于48小时)                         |
+| timeLock             | uint64   | 过期区块数；[50, 25480] （大于5分钟，小于48小时）                       |
 
 ### 认领HTLC消息
 
 | **字段** | **类型** | **描述**                                        |
 | -------- | -------- | ----------------------------------------------- |
 | hashLock | string   | 创建HTLC时提供的hash lock                       |
-| secret   | string   | 参与生成hash lock的随机数；32字节, 十六进制表示 |
+| secret   | string   | 参与生成hash lock的随机数；32字节，十六进制表示 |
 
 ### 退款HTLC消息
 
