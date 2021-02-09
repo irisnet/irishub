@@ -1,6 +1,6 @@
 # gRPC Gateway JSON REST
 
-在 IRIShub v1.0.0 中，节点继续提供 REST 服务。但是在 v0.16.3 和更早版本中存在的路由现在被标记为已弃用，并且已通过 gRPC-gateway 添加了新路由。
+在 irishub v1.0.0 中，节点继续提供 REST 服务。但是在 v0.16.3 和更早版本中存在的路由现在被标记为已弃用，并且已通过 gRPC-gateway 添加了新路由。
 
 ## API 激活方式和配置
 

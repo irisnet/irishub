@@ -1,6 +1,6 @@
 # Legacy Amino JSON REST
 
-The IRIShub versions v1.0.0 (depends on Cosmos-SDK v0.41) and earlier provided REST endpoints to query the state and broadcast transactions. These endpoints are kept in IRIShub v1.0, but they are marked as deprecated, and will be removed after a few versions therefore call these endpoints legacy REST endpoints.
+The irishub versions v1.0.0 (depends on Cosmos-SDK v0.41) and earlier provided REST endpoints to query the state and broadcast transactions. These endpoints are kept in irishub v1.0, but they are marked as deprecated, and will be removed after a few versions therefore call these endpoints legacy REST endpoints.
 
 Some important information concerning all legacy REST endpoints:
 

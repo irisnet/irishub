@@ -1,6 +1,6 @@
 # Legacy Amino JSON REST
 
-IRIShub v1.0.0（依赖Cosmos-SDK v0.41）和更早版本提供了 REST 端点来查询状态和广播交易。 这些端点在 IRIShub v1.0 中仍然保留，但已标记为已弃用，并计划在几个版本后删除。因此，我们将这些端点称为 Legacy REST 端点。
+irishub v1.0.0（依赖Cosmos-SDK v0.41）和更早版本提供了 REST 端点来查询状态和广播交易。 这些端点在 irishub v1.0 中仍然保留，但已标记为已弃用，并计划在几个版本后删除。因此，我们将这些端点称为 Legacy REST 端点。
 
 Legacy REST 端点相关的重要信息：
 
@@ -17,7 +17,7 @@ Legacy REST 端点相关的重要信息：
 
 ### Legacy REST API 路由
 
-IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](https://tools.ietf.org/id/draft-dalal-deprecation-header-01.html)标记为已弃用，它们仍然被维护以保持向后兼容，但是将在几个版本后删除。
+irishub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](https://tools.ietf.org/id/draft-dalal-deprecation-header-01.html)标记为已弃用，它们仍然被维护以保持向后兼容，但是将在几个版本后删除。
 
 对于应用程序开发人员而言，传统的 REST API 路由需要连接到 REST 服务器，这是通过在 ModuleManager 上调用 `RegisterRESTRoutes` 方法来完成的。
 
