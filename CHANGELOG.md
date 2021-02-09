@@ -8,7 +8,7 @@
 
 ### CLI
 
-* [\#2515](https://github.com/irisnet/irishub/pull/2515) Bump cosmos-sdk version to [v0.40.1](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.40.1)
+* [\#2541](https://github.com/irisnet/irishub/pull/2541) Bump cosmos-sdk version to [v0.41.0](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.41.0)
 * [\#2515](https://github.com/irisnet/irishub/pull/2515) Bump tendermint verion to [v0.34.3](https://github.com/tendermint/tendermint/releases/tag/v0.34.3)
 * [\#2567](https://github.com/irisnet/irishub/pull/2567) Bump irismod version to [v1.3.1](https://github.com/irisnet/irismod/releases/tag/v1.3.1)
 * [\#2505](https://github.com/irisnet/irishub/pull/2505) Remove duplicate cmd
@@ -16,7 +16,7 @@
 
 ### Application
 
-* [\#2515](https://github.com/irisnet/irishub/pull/2515) Bump cosmos-sdk version to [v0.40.1](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.40.1)
+* [\#2541](https://github.com/irisnet/irishub/pull/2541) Bump cosmos-sdk version to [v0.41.0](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.41.0)
 * [\#2515](https://github.com/irisnet/irishub/pull/2515) Bump tendermint verion to [v0.34.3](https://github.com/tendermint/tendermint/releases/tag/v0.34.3)
 * [\#2567](https://github.com/irisnet/irishub/pull/2567) Bump irismod version to [v1.3.1](https://github.com/irisnet/irismod/releases/tag/v1.3.1)
 * [\#2551](https://github.com/irisnet/irishub/pull/2551) Disable repeated service invocation
