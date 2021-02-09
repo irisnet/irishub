@@ -5,7 +5,7 @@ order: 2
 # 验证人问答
 
 :::tip
-IRISnet 基础概念请参考 [基础概念](general-concepts.md)
+IRIShub 基础概念请参考 [基础概念](general-concepts.md)
 :::
 
 ## 常见问题

@@ -10,10 +10,10 @@ Bech32是由Pieter Wuille和Greg Maxwel提出的新比特币地址格式。除�
 
 | HRP | Definition                              |
 | --- | :-------------------------------------- |
-| iaa | IRISnet Account Address                 |
-| iap | IRISnet Account Public Key              |
-| iva | IRISnet Validator's Operator Address    |
-| ivp | IRISnet Validator's Operator Public Key |
+| iaa | IRIShub Account Address                 |
+| iap | IRIShub Account Public Key              |
+| iva | IRIShub Validator's Operator Address    |
+| ivp | IRIShub Validator's Operator Public Key |
 | ica | Tendermint Consensus Address            |
 | icp | Tendermint Consensus Public Key         |
 
