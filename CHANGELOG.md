@@ -37,11 +37,21 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ## [Unreleased]
 
+## [v1.3.1] - 2021-02-09
+
+### Bug Fixes
+
+* (modules/service) [\#138](https://github.com/irisnet/irismod/pull/138) Modify price regex in the service pricing schema to adapt to the token denom.
+
+### Improvements
+
+* [\#136](https://github.com/irisnet/irismod/issues/136) Clean up the code and fix module specifications.
+
 ## [v1.3.0] - 2021-02-07
 
 ### Bug Fixes
 
-* (modules/token) [\#129](https://github.com/irisnet/irismod/pull/129) Fix incorrect calculation for minting token
+* (modules/token) [\#129](https://github.com/irisnet/irismod/pull/129) Fix incorrect calculation for minting token.
 * (modules/service) [\#123](https://github.com/irisnet/irismod/pull/123) Fix the key path for owner service fees.
 * (modules/service) [\#120](https://github.com/irisnet/irismod/pull/120) Fix DisableServiceBinding event type.
 * [\#116](https://github.com/irisnet/irismod/pull/116) Adjust ante check logic.
@@ -124,3 +134,4 @@ Ref: https://keepachangelog.com/en/1.0.0/
 [v1.2.0]: https://github.com/irisnet/irismod/releases/tag/v1.2.0
 [v1.2.1]: https://github.com/irisnet/irismod/releases/tag/v1.2.1
 [v1.3.0]: https://github.com/irisnet/irismod/releases/tag/v1.3.0
+[v1.3.1]: https://github.com/irisnet/irismod/releases/tag/v1.3.1
