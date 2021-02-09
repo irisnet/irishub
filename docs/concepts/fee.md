@@ -8,7 +8,7 @@ Certain types of transactions may consume more gas (e.g. creating validators), s
 
 ## Fee
 
-To secure their own validator node and maintain the availability of blockchain network, validators in IRISnet need a lot of equipments and resources. Thus, every transactions in IRISnet should pay some fee to validators. The parameter in commands is used to specify the maximum fee the user wants to pay for their transaction.
+To secure their own validator node and maintain the availability of blockchain network, validators in IRIShub need a lot of equipments and resources. Thus, every transactions in IRIShub should pay some fee to validators. The parameter in commands is used to specify the maximum fee the user wants to pay for their transaction.
 
 ## Gas
 

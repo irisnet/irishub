@@ -4,7 +4,7 @@ order: 4
 
 # Ledger Nano Support
 
-It is recommended to have a basic understanding of the [IRISnet Key](../concepts/key.md) before using the ledger.
+It is recommended to have a basic understanding of the [IRIShub Key](../concepts/key.md) before using the ledger.
 
 ## Ledger Support for account keys
 
@@ -16,7 +16,7 @@ At the core of a Ledger device, there is a mnemonic that is used to generate pri
 
 This mnemonic is compatible with IrisNet accounts. The tool used to generate addresses and transactions on the IrisNet network is called `iris`, which supports derivation of account keys from a Ledger seed. Note that the Ledger device acts as an enclave of the seed and private keys, and the process of signing transaction takes place within it. No private information ever leaves the Ledger device.
 
-To use `iris` with a Ledger device you will need the following(Since IRISnet is based on cosmos-sdk, the COSMOS app is available for IRISnet):
+To use `iris` with a Ledger device you will need the following(Since IRIShub is based on cosmos-sdk, the COSMOS app is available for IRIShub):
 
 - [A Ledger Nano with the `COSMOS` app installed and an account.](#using-a-ledger-device)
 - [A running `iris` instance connected to the network you wish to use.](../get-started/mainnet.md)
@@ -24,7 +24,7 @@ To use `iris` with a Ledger device you will need the following(Since IRISnet is 
 
 Now, you are all set to start sending transactions on the network.
 
-At the core of a ledger device, there is a mnemonic used to generate accounts on multiple blockchains (including the IRISnet). Usually, you will create a new mnemonic when you initialize your ledger device.
+At the core of a ledger device, there is a mnemonic used to generate accounts on multiple blockchains (including the IRIShub). Usually, you will create a new mnemonic when you initialize your ledger device.
 
 Next, learn how to generate an account.
 
@@ -38,7 +38,7 @@ To create an account, you just need to have `iris` installed. Before creating it
 Only use Ledger devices that you bought factory new or trust fully
 :::
 
-When you initialize your Ledger, a 24-word mnemonic is generated and stored in the device. This mnemonic is compatible with IRISnet and IRISnet accounts can be derived from it. Therefore, all you have to do is make your ledger compatible with `iris`. To do so, you need to go through the following steps:
+When you initialize your Ledger, a 24-word mnemonic is generated and stored in the device. This mnemonic is compatible with IRIShub and IRIShub accounts can be derived from it. Therefore, all you have to do is make your ledger compatible with `iris`. To do so, you need to go through the following steps:
 
 1. Install [Ledger Live](https://www.ledger.com/pages/ledger-live) on your machine.
 2. Using Ledger Live, [update your Ledger Nano S with the latest firmware](https://support.ledger.com/hc/en-us/articles/360002731113-Update-device-firmware).
@@ -55,7 +55,7 @@ Then, to create an account, use the following command:
 iris keys add <keyName> --ledger
 ```
 
-IRISnet uses [HD Wallets](../concepts/key.md). This means you can setup many accounts using the same Ledger seed. To create another account from your Ledger device, run (change the integer i to some value >= 0 to choose the account for HD derivation):
+IRIShub uses [HD Wallets](../concepts/key.md). This means you can setup many accounts using the same Ledger seed. To create another account from your Ledger device, run (change the integer i to some value >= 0 to choose the account for HD derivation):
 
 ```bash
 iris keys add <secondKeyName> --ledger --account <i>

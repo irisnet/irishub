@@ -1,6 +1,6 @@
 # gRPC Gateway JSON REST
 
-在 IRISHub v1.0.0 中，节点继续提供 REST 服务。但是在 v0.16.3 和更早版本中存在的路由现在被标记为已弃用，并且已通过 gRPC-gateway 添加了新路由。
+在 irishub v1.0.0 中，节点继续提供 REST 服务。但是在 v0.16.3 和更早版本中存在的路由现在被标记为已弃用，并且已通过 gRPC-gateway 添加了新路由。
 
 ## API 激活方式和配置
 
@@ -12,7 +12,7 @@
 
 ### gRPC-gateway REST 路由
 
-如果由于各种原因而不能使用 gRPC（例如，您正在构建 Web 应用，且浏览器不支持 gRPC 依赖的 HTTP2），则 IRISHub 会通过 gRPC-gateway 提供 REST 路由。
+如果由于各种原因而不能使用 gRPC（例如，您正在构建 Web 应用，且浏览器不支持 gRPC 依赖的 HTTP2），则 IRIShub 会通过 gRPC-gateway 提供 REST 路由。
 
 [gRPC-gateway](https://grpc-ecosystem.github.io/grpc-gateway/) 是将 gRPC 端点公开为 REST 端点的工具。对于 Protobuf 服务中定义的每个 RPC 端点，SDK提供了 REST 等效项。例如，可以通过 `/irismod.token.Query/Tokens` gRPC 端点，或者通过 gRPC-gateway `/irismod/token/tokens` REST 端点来查询 token 列表：两种方式返回的结果相同。对于 Protobuf 服务中定义的每个 RPC 方法，都定义了一个相应的 REST 端点作为可选项：
 
@@ -30,7 +30,7 @@
 
 ## API 端点
 
-**IRISHub API 端点**
+**IRIShub API 端点**
 
 | API Endpoints                                                                                                                               | Description                                              | Legacy REST Endpoint                                                              |
 | :------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------- | :-------------------------------------------------------------------------------- |

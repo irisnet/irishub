@@ -1,4 +1,4 @@
-# IRISHub
+# IRIShub
 
 ![Banner](https://raw.githubusercontent.com/irisnet/irishub/master/docs/pics/iris.jpg)
 

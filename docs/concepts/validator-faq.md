@@ -249,4 +249,4 @@ That means you have **Lost Your Validator Forever!** You can only create a new o
 ## Community Channels
 
 - Riot chat: <https://riot.im/app/#/room/#irisvalidators:matrix.org>
-- IRIShub Validator Working Group QQ Group：834063323
+- IRIShub Validator Working Group QQ Group: 834063323

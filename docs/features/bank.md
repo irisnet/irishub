@@ -22,11 +22,11 @@ This module is mainly used to transfer coins between accounts, query account bal
     iris tx bank send [A] [B] [10iris] --fees=0.3iris --chain-id=irishub
     ```
 
-    IRISnet supports multiple tokens in circulation, and in the future IRISnet will be able to include multiple tokens in one transaction.
+    IRIShub supports multiple tokens in circulation, and in the future IRIShub will be able to include multiple tokens in one transaction.
 
 3. Sign transactions generated offline
 
-    To improve account security, IRISnet supports offline signing of transactions to protect the account's private key. In any transaction, you can build an unsigned transaction using the flag --generate-only. Take transfer transaction as an example:
+    To improve account security, IRIShub supports offline signing of transactions to protect the account's private key. In any transaction, you can build an unsigned transaction using the flag --generate-only. Take transfer transaction as an example:
 
     ```bash
     iris tx bank send [from_key_or_address] [to_address] [amount]  --fees=0.3iris --generate-only
@@ -88,4 +88,4 @@ This module is mainly used to transfer coins between accounts, query account bal
     iris tx broadcast <file>
     ```
 
-    The transaction will be broadcast and executed in IRISnet.
+    The transaction will be broadcast and executed in IRIShub.
