@@ -199,12 +199,12 @@ irishub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 **端点名称：** QueryRedelegations
 
 - **端点路径：** `/staking/redelegations`
-- **更新内容：** 以下旧字段更改为新字段 `redelegation_entry` 的子字段:
+- **更新内容：** 以下旧字段更改为新字段 `redelegation_entry` 的子字段：
   - `completion_time`
   - `initial_balance`
   - `shares_dst`
 - `creation_height` 字段不再支持
-- 以下为新字段:
+- 以下为新字段：
   - `redelegation` 包含以下子字段
     - `delegator_address` (new)
     - `entries` (new)

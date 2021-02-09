@@ -41,13 +41,13 @@ iris tx distribution set-withdraw-addr [withdraw-addr] [flags]
 
 根据取回场景的不同，有2种方式可以取回收益：
 
-1.`withdraw-all-rewards` : 提取所有在外的委托收益）。
+1.`withdraw-all-rewards`：提取所有在外的委托收益
 
 ```bash
 iris tx distribution withdraw-all-rewards [flags] --from=<key-name> --fees=0.3iris --chain-id=irishub
 ```
 
-2.`withdraw-rewards` ：从指定验证人处提取委托收益。
+2.`withdraw-rewards` ：从指定验证人处提取委托收益
 
 ```bash
 iris tx distribution withdraw-rewards [validator-addr] [flags] --from=<key-name> --fees=0.3iris --chain-id=irishub

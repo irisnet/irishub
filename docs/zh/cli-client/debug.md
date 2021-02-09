@@ -29,7 +29,7 @@ Bech32 Val: iva1rulhmls7g9cjh239vnkjnw870t5urrut9cyrxl
 
 ### iris debug pubkey
 
-下面得到相同的结果:
+下面得到相同的结果：
 
 ```bash
 iris debug pubkey TZTQnfqOsi89SeoXVnIw+tnFJnr4X8qVC0U8AsEmFk4=

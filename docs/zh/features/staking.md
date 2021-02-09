@@ -53,7 +53,7 @@
 iris keys show <key-name>
 ```
 
- 示例输出:
+ 示例输出：
 
   ```bash
   - name: node0
@@ -71,7 +71,7 @@ iris keys show <key-name>
 iris q staking validator iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke
 ```
 
- 示例输出:
+ 示例输出：
 
 ```json
 {

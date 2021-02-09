@@ -220,7 +220,7 @@ Linux可以打开（每个进程）的默认文件数是 `1024`，而 `iris` 进
     WantedBy=multi-user.target
     ```
 
-- 在Ubuntu系统中修改全局ulimit示例:
+- 在Ubuntu系统中修改全局ulimit示例：
 
     ```bash
     # Edit limits.conf

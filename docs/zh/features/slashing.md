@@ -29,10 +29,10 @@
 
 **参数：**
 
-* `SignedBlocksWindow` 默认值: 20000
-* `MinSignedPerWindow` 默认值: 0.5
-* `DowntimeJailDuration` 默认值: 10分钟
-* `SlashFractionDowntime` 默认值: 0.01
+* `SignedBlocksWindow` 默认值：20000
+* `MinSignedPerWindow` 默认值：0.5
+* `DowntimeJailDuration` 默认值：10分钟
+* `SlashFractionDowntime` 默认值：0.01
 
 ## 恶意投票
 
@@ -40,7 +40,7 @@
 
 **参数：**
 
-* `DowntimeJailDuration` 默认值: 10分钟
-* `SlashFractionDoubleSign`默认值: 0.05
+* `DowntimeJailDuration` 默认值：10分钟
+* `SlashFractionDoubleSign`默认值：0.05
 
 `Slashing`模块的相关操作请参见[cli-slashing](../cli-client/slashing.md)

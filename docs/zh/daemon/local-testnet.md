@@ -8,7 +8,7 @@ order: 3
 
 ## 单节点测试网
 
-**需求:**
+**需求**
 
 - [安装iris](../get-started/install.md)
 
@@ -114,7 +114,7 @@ iris tendermint show-address
 
 ## 多节点测试网
 
-**前提:**
+**前提**
 
 - [安装 iris](../get-started/install.md)
 - [安装 jq](https://stedolan.github.io/jq/download/)

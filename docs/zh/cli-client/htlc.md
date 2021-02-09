@@ -1,22 +1,22 @@
 # HTLC
 
-[HTLC模块](../features/htlc.md)提供了与其他链进行原子交换的相关功能。
+[HTLC 模块](../features/htlc.md)提供了与其他链进行原子交换的相关功能。
 
-在HTLC生命周期中有下面的几种状态：
+在 HTLC 生命周期中有下面的几种状态：
 
-- open: HTLC是可申领的
-- completed: HTLC已经被申领
-- expired: HTLC过期并且可退还
-- refunded: HTLC已退还
+- open：HTLC是可申领的
+- completed：HTLC已经被申领
+- expired：HTLC过期并且可退还
+- refunded：HTLC已退还
 
 ## 可用命令
 
-| Name                           | Description                                      |
-| ------------------------------ | ------------------------------------------------ |
-| [create](#iris-tx-htlc-create) | 创建HTLC                                         |
-| [claim](#iris-tx-htlc-claim)   | 将一个OPEN状态的HTLC中锁定的资金发放到收款人地址 |
-| [refund](#iris-tx-htlc-refund) | 从过期的HTLC中取回退款                           |
-| [htlc](#iris-query-htlc-htlc)  | 查询一个HTLC的详细信息                           |
+| Name                           | Description                                          |
+| ------------------------------ | ---------------------------------------------------- |
+| [create](#iris-tx-htlc-create) | 创建 HTLC                                            |
+| [claim](#iris-tx-htlc-claim)   | 将一个 OPEN 状态的 HTLC 中锁定的资金发放到收款人地址 |
+| [refund](#iris-tx-htlc-refund) | 从过期的 HTLC 中取回退款                             |
+| [htlc](#iris-query-htlc-htlc)  | 查询一个 HTLC 的详细信息                             |
 
 ## iris tx htlc create
 
@@ -36,15 +36,15 @@ iris tx htlc create \
 
 **标识：**
 
-| 名称，速记                | 类型     | 必须 | 默认 | 描述                                                               |
-| ------------------------- | -------- | ---- | ---- | ------------------------------------------------------------------ |
-| --to                      | string   | 是   |      | Bech32编码的收款人地址                                             |
-| --receiver-on-other-chain | bytesHex |      |      | 另一条链上的HTLC认领接收地址                                       |
-| --amount                  | string   | 是   |      | 要发送的金额                                                       |
-| --secret                  | bytesHex |      |      | 用于生成Hash Lock的secret，缺省将随机生成                          |
-| --hash-lock               | bytesHex |      |      | 由secret和时间戳（如果提供）生成的sha256哈希，缺省将使用secret生成 |
-| --time-lock               | string   | 是   |      | 资金锁定的区块数                                                   |
-| --timestamp               | uint     |      |      | 参与生成hash lock的10位时间戳（可选）                              |
+| 名称，速记                | 类型     | 必须 | 默认 | 描述                                                                    |
+| ------------------------- | -------- | ---- | ---- | ----------------------------------------------------------------------- |
+| --to                      | string   | 是   |      | Bech32 编码的收款人地址                                                 |
+| --receiver-on-other-chain | bytesHex |      |      | 另一条链上的 HTLC 认领接收地址                                          |
+| --amount                  | string   | 是   |      | 要发送的金额                                                            |
+| --secret                  | bytesHex |      |      | 用于生成 hash lock 的 secret，缺省将随机生成                            |
+| --hash-lock               | bytesHex |      |      | 由 secret 和时间戳（如果提供）生成的 sha256 哈希，缺省将使用 secre 生成 |
+| --time-lock               | string   | 是   |      | 资金锁定的区块数                                                        |
+| --timestamp               | uint     |      |      | 参与生成 hash lock 的 10 位时间戳（可选）                               |
 
 ### 创建HTLC
 

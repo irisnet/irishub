@@ -23,7 +23,7 @@ Bech32是由Pieter Wuille和Greg Maxwel提出的新比特币地址格式。除�
 
 ## 账户密钥示例
 
-一旦创建一个新的账户，你将会看到以下信息:
+一旦创建一个新的账户，你将会看到以下信息：
 
 ```bash
 NAME:    TYPE:           ADDRESS:                                PUBKEY:
@@ -40,7 +40,7 @@ test1    local    iaa18ekc4dswwrh2a6lfyev4tr25h5y76jkpclyxkz    iap1addwnpepqgxa
 iris tendermint show-validator --home=<iris-home>
 ```
 
-示例输出:
+示例输出：
 
 ```bash
 icp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqsjeuxvx
