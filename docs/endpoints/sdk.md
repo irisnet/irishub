@@ -1,4 +1,4 @@
-# IRIShub SDKs
+# IRIShub Client SDKs
 
 IRIShub SDK is a software development kit based on the Endpoint provided by IRIShub, which provides great convenience for users to quickly develop applications based on the IRIShub chain.
 

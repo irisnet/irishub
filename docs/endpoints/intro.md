@@ -1,6 +1,6 @@
 # Introduction
 
-This document presents an overview of all the endpoints and IRIShub-SDK a node exposes.
+This document presents an overview of all the API endpoints a node exposes and the higher-level client SDKs.
 
 ## An Overview of All Endpoints and SDKs
 
