@@ -11,9 +11,9 @@ The record module emits the following events:
 ### MsgCreateRecord
 
 | Type          | Attribute Key | Attribute Value  |
-| ------------- | ------------- | ---------------- |
+|:--------------|:--------------|:-----------------|
 | create_record | creator       | {creatorAddress} |
 | create_record | record_id     | {recordId}       |
 | message       | module        | record           |
-| message       | action        | create_validator |
 | message       | sender        | {creatorAddress} |
+

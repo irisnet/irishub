@@ -13,8 +13,8 @@ The Record Module described here is meant to be used as a module for storing rec
 
 ## Contents
 1. **[State](01_state.md)**
-   - [Record](01_state.md#Record)
+   - [Record](01_state.md#record)
 2. **[Messages](02_messages.md)**
-   - [MsgCreateRecord](02_messages.md#MsgCreateRecord)
+   - [MsgCreateRecord](02_messages.md#msgcreaterecord)
 3. **[Events](03_events.md)**
    - [Handlers](03_events.md#handlers)

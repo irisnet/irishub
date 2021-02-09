@@ -4,7 +4,8 @@ order: 2
 
 # Messages
 
-In this section we describe the processing of the record messages and the corresponding updates to the state.
+In this section we describe the processing of the record messages and
+the corresponding updates to the state.
 
 ## MsgCreateRecord
 
@@ -21,5 +22,6 @@ This message is expected to fail if:
 - the length of contents is 0
 - the creator is empty
 - the parameters of each content are faulty, namely:
-    - the `Digest` is empty
-    - the `DigestAlgo` is empty
+  - the `Digest` is empty
+  - the `DigestAlgo` is empty
+
