@@ -301,7 +301,6 @@ iris tx service call [flags]
 | --service-fee-cap |       | 愿意为单个请求支付的最大服务费用                                   | 是   |
 | --data            |       | 请求输入的内容或文件路径，是一个Input JSON Schema实例              | 是   |
 | --timeout         |       | 请求超时                                                           | 是   |
-| --super-mode      | false | 签名者是否为超级用户                                               |      |
 | --repeated        | false | 请求是否为重复性的（irishub-v1.0.0中暂时禁用，将在后续版本中激活） |      |
 | --frequency       |       | 重复性请求的请求频率；默认为`timeout`值                            |      |
 | --total           |       | 重复性请求的请求总数，-1表示无限制                                 |      |

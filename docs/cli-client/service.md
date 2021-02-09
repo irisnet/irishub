@@ -303,7 +303,6 @@ iris tx service call [flags]
 | --service-fee-cap |         | Maximum service fee to pay for a single request                                                                        | Yes      |
 | --data            |         | Content or file path of the request input, which is an Input JSON Schema instance                                      | Yes      |
 | --timeout         |         | Request timeout                                                                                                        | Yes      |
-| --super-mode      | false   | Indicate if the signer is a super user                                                                                 |          |
 | --repeated        | false   | Indicate if the reqeust is repetitive (Temporarily disabled in irishub-v1.0.0, will be activated after a few versions) |          |
 | --frequency       |         | Request frequency when repeated, default to `timeout`                                                                  |          |
 | --total           |         | Request count when repeated, -1 means unlimited                                                                        |          |
