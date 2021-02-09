@@ -1,8 +1,9 @@
 package v2
 
 import (
+	"encoding/csv"
 	"encoding/json"
-
+	"fmt"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -20,7 +21,12 @@ import (
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"os"
+	"path/filepath"
 )
+
+const Atto  = "iris-atto"
+var DefaultNodeHome = os.ExpandEnv("$HOME/.iris")
 
 // export the state of iris for a genesis file
 func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (
@@ -40,6 +46,9 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 	}
 	p.accountMapper.IterateAccounts(ctx, appendAccount)
 	fileAccounts := []GenesisFileAccount{}
+	var csvData = [][]string{
+		{"Address", "Balance"},
+	}
 	for _, acc := range accounts {
 		if acc.Coins == nil {
 			continue
@@ -48,6 +57,7 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 		for _, coin := range acc.Coins {
 			coinsString = append(coinsString, coin.String())
 		}
+
 		fileAccounts = append(fileAccounts,
 			GenesisFileAccount{
 				Address:       acc.Address,
@@ -55,7 +65,156 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 				Sequence:      acc.Sequence,
 				AccountNumber: acc.AccountNumber,
 			})
+
+		csvData = append(csvData, []string{
+			acc.Address.String(),
+			acc.Coins.AmountOf(Atto).String(),
+		})
+
 	}
+
+	file := filepath.Join(DefaultNodeHome, "account.csv")
+	writeCSV(file, csvData)
+	fmt.Println("=========ExportAccounts End=========")
+
+	stakeState := stake.ExportGenesis(ctx, p.StakeKeeper)
+
+	csvData = [][]string{
+		{
+			"OperatorAddress",
+			"ConsensusPubkey",
+			"Status",
+			"Tokens",
+			"DelegatorShares",
+			"Moniker",
+			"Identity",
+			"Details",
+			"Website",
+			"UnbondingHeight",
+			"Rate",
+			"MaxRate",
+			"MaxChangeRate",
+		},
+	}
+	for _, val := range stakeState.Validators {
+		csvData = append(csvData, []string{
+			val.OperatorAddr.String(),
+			val.ConsPubKey.Address().String(),
+			string(val.Status),
+			val.Tokens.String(),
+			val.DelegatorShares.String(),
+			val.Description.Moniker,
+			val.Description.Identity,
+			val.Description.Details,
+			val.Description.Website,
+			fmt.Sprintf("%d", val.UnbondingHeight),
+			val.Commission.Rate.String(),
+			val.Commission.MaxRate.String(),
+			val.Commission.MaxChangeRate.String(),
+		})
+	}
+
+	file = filepath.Join(DefaultNodeHome, "validator.csv")
+	writeCSV(file, csvData)
+	fmt.Println("=========ExportValidators End=========")
+
+	csvData = [][]string{
+		{"DelegatorAddr", "ValidatorAddr", "UnbondHeight", "InitialBalance", "Balance", "EndTime"},
+	}
+	for _, ud := range stakeState.UnbondingDelegations {
+		csvData = append(csvData, []string{
+			ud.DelegatorAddr.String(),
+			ud.ValidatorAddr.String(),
+			string(ud.CreationHeight),
+			ud.InitialBalance.Amount.String(),
+			ud.Balance.Amount.String(),
+			ud.MinTime.String(),
+		})
+	}
+
+	file = filepath.Join(DefaultNodeHome, "unbonding.csv")
+	writeCSV(file, csvData)
+	fmt.Println("=========ExportUnbonding End=========")
+
+
+	csvData = [][]string{
+		{"DelegatorAddr", "ValidatorSrcAddr", "ValidatorDstAddr","UnbondHeight", "InitialBalance", "Balance", "EndTime"},
+	}
+	for _, rd := range stakeState.Redelegations {
+		csvData = append(csvData, []string{
+			rd.DelegatorAddr.String(),
+			rd.ValidatorSrcAddr.String(),
+			rd.ValidatorDstAddr.String(),
+			rd.InitialBalance.Amount.String(),
+			rd.Balance.Amount.String(),
+			rd.MinTime.String(),
+		})
+	}
+
+	file = filepath.Join(DefaultNodeHome, "redelegations.csv")
+	writeCSV(file, csvData)
+	fmt.Println("=========ExportRedelegations End=========")
+
+	csvData = [][]string{
+		{"DelegatorAddr", "ValidatorAddr", "Shares", "Height", "Amount"},
+	}
+	for _, del := range stakeState.Bonds {
+		val := p.StakeKeeper.Validator(ctx, del.ValidatorAddr)
+		csvData = append(csvData, []string{
+			del.DelegatorAddr.String(),
+			del.ValidatorAddr.String(),
+			del.Shares.String(),
+			string(del.Height),
+			val.GetTokens().Quo(val.GetDelegatorShares()).Mul(del.Shares).String(),
+		})
+	}
+
+	file = filepath.Join(DefaultNodeHome, "delegations.csv")
+	writeCSV(file, csvData)
+	fmt.Println("=========ExportDelegations End=========")
+
+	distrState := distr.ExportGenesis(ctx, p.distrKeeper)
+
+	csvData = [][]string{
+		{"DelegatorAddr", "ValidatorAddr", "Shares", "Height", "Amount"},
+	}
+	for _, dd := range distrState.DelegationDistInfos {
+		dr, err := p.distrKeeper.CurrentDelegationReward(ctx, dd.DelegatorAddr, dd.ValOperatorAddr)
+		if err != nil {
+			panic(err)
+		}
+
+		valInfo := p.distrKeeper.GetValidatorDistInfo(ctx, dd.ValOperatorAddr)
+
+		wc := p.distrKeeper.GetWithdrawContext(ctx, dd.ValOperatorAddr)
+		commission := valInfo.CurrentCommissionRewards(wc)
+		truncated, _ := commission.TruncateDecimal()
+
+		csvData = append(csvData, []string{
+			dd.DelegatorAddr.String(),
+			dd.ValOperatorAddr.String(),
+			dr.AmountOf(Atto).String(),
+			truncated.String(),
+		})
+	}
+
+	file = filepath.Join(DefaultNodeHome, "rewards.csv")
+	writeCSV(file, csvData)
+	fmt.Println("=========ExportRewards End=========")
+
+	csvData = [][]string{
+		{"DelegatorAddr", "WithdrawAddr"},
+	}
+	for _, dw := range distrState.DelegatorWithdrawInfos {
+		csvData = append(csvData, []string{
+			dw.DelegatorAddr.String(),
+			dw.WithdrawAddr.String(),
+		})
+	}
+
+	file = filepath.Join(DefaultNodeHome, "withdrawinfos.csv")
+	writeCSV(file, csvData)
+	fmt.Println("=========ExportDelegatorWithdrawInfos End=========")
 
 	genState := NewGenesisFileState(
 		fileAccounts,
@@ -191,4 +350,17 @@ func (p *ProtocolV2) prepForZeroHeightGenesis(ctx sdk.Context) {
 
 	/* Handle service state. */
 	service.PrepForZeroHeightGenesis(ctx, p.serviceKeeper)
+}
+
+func writeCSV(fileNm string, data [][]string) {
+	file, err := os.OpenFile(fileNm, os.O_CREATE|os.O_RDWR, 0644)
+	if err != nil {
+		fmt.Println("open file is failed, err: ", err)
+	}
+	defer file.Close()
+	// 写入UTF-8 BOM，防止中文乱码
+	file.WriteString("\xEF\xBB\xBF")
+	w := csv.NewWriter(file)
+	w.WriteAll(data)
+	w.Flush()
 }
