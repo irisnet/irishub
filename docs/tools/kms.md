@@ -26,7 +26,7 @@ cargo install tmkms --features=yubihsm --version=0.10.0-beta2
 
 ## Initialization
 
-Initialize configuration files for IRISHub
+Initialize configuration files for IRIShub
 
 ```bash
 tmkms init -n irishub /path/to/kms/home

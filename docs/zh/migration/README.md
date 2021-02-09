@@ -1,4 +1,4 @@
-# IRISHub 从 v0.16 迁移到 v1.0.0
+# IRIShub 从 v0.16 迁移到 v1.0.0
 
 ## 1. 导出 genesis 文件
 

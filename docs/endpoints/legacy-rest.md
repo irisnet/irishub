@@ -1,6 +1,6 @@
 # Legacy Amino JSON REST
 
-The IRISHub versions v1.0.0 (depends on Cosmos-SDK v0.41) and earlier provided REST endpoints to query the state and broadcast transactions. These endpoints are kept in IRISHub v1.0, but they are marked as deprecated, and will be removed after a few versions therefore call these endpoints legacy REST endpoints.
+The IRIShub versions v1.0.0 (depends on Cosmos-SDK v0.41) and earlier provided REST endpoints to query the state and broadcast transactions. These endpoints are kept in IRIShub v1.0, but they are marked as deprecated, and will be removed after a few versions therefore call these endpoints legacy REST endpoints.
 
 Some important information concerning all legacy REST endpoints:
 
@@ -35,11 +35,11 @@ For application developers, Legacy REST API routes needs to be wired up to the R
 | `GET` `/staking/*`                                                           | Staking query endpoints                     | All staking endpoints which return validators have two breaking changes. First, the validator's `consensus_pubkey` field returns an Amino-encoded struct representing an `Any` instead of a bech32-encoded string representing the pubkey. The `value` field of the `Any` is the pubkey's raw key as base64-encoded bytes. Second, the validator's `status` field now returns an int32 instead of string: `1=BOND_STATUS_UNBONDED`, `2=BOND_STATUS_UNBONDING`, `3=BOND_STATUS_BONDED`. |
 | `GET` `/staking/validators`                                                  | Get all validators                          | BondStatus is now a protobuf enum instead of an int32, and JSON serialized using its protobuf name, so expect query parameters like `?status=BOND_STATUS_{BONDED,UNBONDED,UNBONDING}` as opposed to `?status={bonded,unbonded,unbonding}`.                                                                                                                                                                                                                                             |
 
-<sup>1</sup>: Transactions that don't support Amino serialization are the ones that contain one or more `Msg`s that are not registered with the Amino codec. Currently in the IRISHub, only IBC `Msg`s fall into this case.
+<sup>1</sup>: Transactions that don't support Amino serialization are the ones that contain one or more `Msg`s that are not registered with the Amino codec. Currently in the IRIShub, only IBC `Msg`s fall into this case.
 
 ### Migrating to New REST Endpoints (from Cosmos-SDK v0.39)
 
-**IRISHub API Endpoints**
+**IRIShub API Endpoints**
 
 | Legacy REST Endpoint                                                              | Description                                                         | New gGPC-gateway REST Endpoint                                                                                |
 | --------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -340,7 +340,7 @@ The same code as integrating with irishub-v0.16.3 mainnet. The transaction struc
 }
 ```
 
-Where the IRISHub address prefix uses `iaa` instead, which affects the fields:
+Where the IRIShub address prefix uses `iaa` instead, which affects the fields:
 
 - value.msg.value.from_adress
 - value.msg.value.to_address

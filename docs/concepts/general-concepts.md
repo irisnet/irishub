@@ -63,7 +63,7 @@ The validator and its delegators can share the following rewards by proportion:
 
 - **Fee**
 
-  Each transaction needs a [fee](fee.md#fee) for compensating validators' work[Gas](fee.md#gas). These fees can be paid with IRIS and may later in any tokens which are whitelisted by the IRISHub's governance. Fees are distributed to validators in proportion to their stake. A minimum fee/gas ration is set in IRISnet.
+  Each transaction needs a [fee](fee.md#fee) for compensating validators' work[Gas](fee.md#gas). These fees can be paid with IRIS and may later in any tokens which are whitelisted by the IRIShub's governance. Fees are distributed to validators in proportion to their stake. A minimum fee/gas ration is set in IRISnet.
 
 Each validator receives revenue in proportion to its total stake. However, before this revenue is distributed to its delegators, the validator can apply a commission for providing staking services.
 

@@ -1,6 +1,6 @@
 # Legacy Amino JSON REST
 
-IRISHub v1.0.0（依赖Cosmos-SDK v0.41）和更早版本提供了 REST 端点来查询状态和广播交易。 这些端点在 IRISHub v1.0 中仍然保留，但已标记为已弃用，并计划在几个版本后删除。因此，我们将这些端点称为 Legacy REST 端点。
+IRIShub v1.0.0（依赖Cosmos-SDK v0.41）和更早版本提供了 REST 端点来查询状态和广播交易。 这些端点在 IRIShub v1.0 中仍然保留，但已标记为已弃用，并计划在几个版本后删除。因此，我们将这些端点称为 Legacy REST 端点。
 
 Legacy REST 端点相关的重要信息：
 
@@ -39,7 +39,7 @@ IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 
 ### 迁移到新的 REST 端点 (从 Cosmos-SDK v0.39)
 
-**IRISHub API 端点**
+**IRIShub API 端点**
 
 | Legacy REST 端点                                                                  | 描述                                 | 新的 gGPC-gateway REST 端点                                                                                   |
 | --------------------------------------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
@@ -340,7 +340,7 @@ IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 }
 ```
 
-IRISHub 地址前缀使用 `iaa` 代替，这会影响以下字段：
+IRIShub 地址前缀使用 `iaa` 代替，这会影响以下字段：
 
 - value.msg.value.from_adress
 - value.msg.value.to_address

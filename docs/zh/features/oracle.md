@@ -2,7 +2,7 @@
 
 ## 简介
 
-该模块结合 `service` 实现从 `Chainlink` 等可信 Oracle 向 IRISHub Oracle 的去中心化注入。每项数据的收集任务称之为 Feed，它的底层实现依赖于 `service` 模块。Feed 的生命周期
+该模块结合 `service` 实现从 `Chainlink` 等可信 Oracle 向 IRIShub Oracle 的去中心化注入。每项数据的收集任务称之为 Feed，它的底层实现依赖于 `service` 模块。Feed 的生命周期
 同 `service` 的 RequestContext 基本一致（暂停、运行），用于通过 Oracle 节点将链下数据存储在链上。另外，只能通过 Profiler 账户操作 `Feed`，并且不能删除，只能暂停 Feed。主要包括以下几种操作：
 
 - 创建 Feed
