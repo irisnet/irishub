@@ -184,7 +184,7 @@ func GetActiveRequestSubspaceByReqCtx(requestContextID []byte, batchCounter uint
 
 // GetRequestVolumeKey returns the key for the request volume for the specified consumer and binding
 func GetRequestVolumeKey(consumer sdk.AccAddress, serviceName string, provider sdk.AccAddress) []byte {
-	return append(append(RequestVolumeKey, getStringsKey([]string{consumer.String(), serviceName, provider.String()})...), Delimiter...)
+	return append(RequestVolumeKey, getStringsKey([]string{consumer.String(), serviceName, provider.String()})...)
 }
 
 // GetResponseKey returns the key for the response for the given request ID
@@ -212,7 +212,7 @@ func GetOwnerEarnedFeesKey(owner sdk.AccAddress, denom string) []byte {
 	return append(append(OwnerEarnedFeesKey, owner.Bytes()...), []byte(denom)...)
 }
 
-// GetOwnerEarnedFeesSubspace gets the subspace for the earned fees of the specified provider
+// GetOwnerEarnedFeesSubspace gets the subspace for the earned fees of the specified owner
 func GetOwnerEarnedFeesSubspace(owner sdk.AccAddress) []byte {
 	return append(OwnerEarnedFeesKey, owner.Bytes()...)
 }

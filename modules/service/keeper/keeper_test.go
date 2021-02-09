@@ -390,7 +390,24 @@ func (suite *KeeperTestSuite) TestKeeperRequestService() {
 	suite.Equal(len(newProviders), int(requestContext.BatchRequestCount))
 	suite.Equal(types.BATCHRUNNING, requestContext.BatchState)
 
-	iterator := suite.keeper.ActiveRequestsIteratorByReqCtx(ctx, requestContextID, requestContext.BatchCounter)
+	iterator := suite.keeper.ActiveRequestsIterator(ctx, testServiceName, testProvider)
+	defer iterator.Close()
+
+	suite.True(iterator.Valid())
+
+	for ; iterator.Valid(); iterator.Next() {
+		var requestID gogotypes.BytesValue
+		suite.cdc.MustUnmarshalBinaryBare(iterator.Value(), &requestID)
+
+		request, found := suite.keeper.GetRequest(ctx, requestID.Value)
+		suite.True(found)
+
+		suite.Equal(testServiceName, request.ServiceName)
+		suite.Equal(consumer.String(), request.Consumer)
+		suite.Equal(testProvider.String(), request.Provider)
+	}
+
+	iterator = suite.keeper.ActiveRequestsIteratorByReqCtx(ctx, requestContextID, requestContext.BatchCounter)
 	defer iterator.Close()
 
 	suite.True(iterator.Valid())
