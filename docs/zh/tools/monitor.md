@@ -8,7 +8,7 @@ order: 1
 
 IRIShub 软件可以提供Prometheus监控指标，Prometheus可以收集这些指标。
 
-默认情况下此功能是被禁用的，要启用Prometheus监控指标，请在配置文件(config.toml)中设置`prometheus = true`。默认情况下，Metrics将在26660端口下的/metrics提供，可以在配置文件中修改服务地址`prometheus_listen_addr = ":26660"`。
+默认情况下此功能是被禁用的，要启用Prometheus监控指标，请在配置文件（config.toml）中设置`prometheus = true`。默认情况下，Metrics将在26660端口下的/metrics提供，可以在配置文件中修改服务地址`prometheus_listen_addr = ":26660"`。
 
 ## 监控指标
 

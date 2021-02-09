@@ -37,8 +37,6 @@ genesis.json定义了创世块数据，该数据定义了系统参数，例如ch
 
 ### node_key.json
 
-node_key.json is used to store the node's key. The node-id queried by `iris tendermint show-node-id` is derived by the key, which is used to indicate the unique identity of the node. It is used in p2p connection.
-
 node_key.json用于存储节点的密钥。`iris tendermint show-node-id`查询的节点ID由该密钥派生，该ID是节点的唯一标识。它用于p2p连接。
 
 ### priv_validator.json
@@ -47,8 +45,8 @@ pri_validator.json是[Tendermint Key](../concepts/validator-faq.md#tendermint-�
 
 ### config.toml
 
-config.toml是节点的非共识配置。不同的节点可以根据自己的情况进行配置。常见的修改是`persistent_peers` /`moniker` /`laddr`
+config.toml是节点的非共识配置。不同的节点可以根据自己的情况进行配置。常见的修改是`persistent_peers`、`moniker`、`laddr`
 
 ### iris.toml
 
-iris.toml为IRIShub提供了一些特殊的配置，例如`check invariant`，`track coin flow`。
+iris.toml为IRIShub提供了一些特殊的配置，例如`check invariant`、`track coin flow`。

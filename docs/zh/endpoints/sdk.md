@@ -22,4 +22,4 @@ IRIShub SDK 的文档连接如下：
 
 - [Go SDK docs](https://github.com/irisnet/irishub-sdk-go/blob/master/README.md)
 - [JavaScript SDK docs](https://github.com/irisnet/irishub-sdk-js/blob/master/README.md)
-- Java SDK docs (敬请期待)
+- Java SDK docs（敬请期待）
