@@ -27,7 +27,7 @@ iris可执行程序是运行IRIShub节点的入口，包括验证人节点和其
 
 `iris init`命令负责初始化指定的`--home`目录并创建默认配置文件。除`iris init`命令外，任何其他`iris`子命令使用的主目录必须初始化，否则将报错。
 
-Iris节点的数据存储在主目录的“ data”目录中，包括区块链数据，应用程序层数据和索引数据。
+IRIShub节点的数据存储在主目录的“data”目录中，包括区块链数据，应用程序层数据和索引数据。
 
 所有配置文件都存储在`<home-dir>/config`目录中：
 
@@ -47,6 +47,6 @@ pri_validator.json是[Tendermint Key](../concepts/validator-faq.md#tendermint-�
 
 config.toml是节点的非共识配置。不同的节点可以根据自己的情况进行配置。常见的修改是`persistent_peers`、`moniker`、`laddr`
 
-### iris.toml
+### app.toml
 
-iris.toml为IRIShub提供了一些特殊的配置，例如`check invariant`、`track coin flow`。
+app.toml为IRIShub提供了基础配置、监控配置、API配置、同步状态配置和gRPC配置。
