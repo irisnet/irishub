@@ -100,7 +100,7 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 		csvData = append(csvData, []string{
 			val.OperatorAddr.String(),
 			val.ConsPubKey.Address().String(),
-			string(val.Status),
+			sdk.BondStatusToString(val.Status),
 			val.Tokens.String(),
 			val.DelegatorShares.String(),
 			val.Description.Moniker,
