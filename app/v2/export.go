@@ -119,13 +119,13 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 	fmt.Println("=========ExportValidators End=========")
 
 	csvData = [][]string{
-		{"DelegatorAddr", "ValidatorAddr", "UnbondHeight", "InitialBalance", "Balance", "EndTime"},
+		{"DelegatorAddr", "ValidatorAddr", "CreationHeight", "InitialBalance", "Balance", "EndTime"},
 	}
 	for _, ud := range stakeState.UnbondingDelegations {
 		csvData = append(csvData, []string{
 			ud.DelegatorAddr.String(),
 			ud.ValidatorAddr.String(),
-			string(ud.CreationHeight),
+			fmt.Sprintf("%d", ud.CreationHeight),
 			ud.InitialBalance.Amount.String(),
 			ud.Balance.Amount.String(),
 			ud.MinTime.String(),
@@ -138,7 +138,7 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 
 
 	csvData = [][]string{
-		{"DelegatorAddr", "ValidatorSrcAddr", "ValidatorDstAddr","UnbondHeight", "InitialBalance", "Balance", "EndTime"},
+		{"DelegatorAddr", "ValidatorSrcAddr", "ValidatorDstAddr","InitialBalance", "Balance", "EndTime"},
 	}
 	for _, rd := range stakeState.Redelegations {
 		csvData = append(csvData, []string{
@@ -156,15 +156,15 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 	fmt.Println("=========ExportRedelegations End=========")
 
 	csvData = [][]string{
-		{"DelegatorAddr", "ValidatorAddr", "Shares", "Height", "Amount"},
+		{"DelegatorAddr", "ValidatorAddr", "BondUpdateHeight", "Shares", "Amount"},
 	}
 	for _, del := range stakeState.Bonds {
 		val := p.StakeKeeper.Validator(ctx, del.ValidatorAddr)
 		csvData = append(csvData, []string{
 			del.DelegatorAddr.String(),
 			del.ValidatorAddr.String(),
+			fmt.Sprintf("%d", del.Height),
 			del.Shares.String(),
-			string(del.Height),
 			val.GetTokens().Quo(val.GetDelegatorShares()).Mul(del.Shares).String(),
 		})
 	}
@@ -176,7 +176,7 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 	distrState := distr.ExportGenesis(ctx, p.distrKeeper)
 
 	csvData = [][]string{
-		{"DelegatorAddr", "ValidatorAddr", "Shares", "Height", "Amount"},
+		{"DelegatorAddr", "ValidatorAddr", "DelegationReward", "CommissionReward"},
 	}
 	for _, dd := range distrState.DelegationDistInfos {
 		dr, err := p.distrKeeper.CurrentDelegationReward(ctx, dd.DelegatorAddr, dd.ValOperatorAddr)
@@ -194,7 +194,7 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 			dd.DelegatorAddr.String(),
 			dd.ValOperatorAddr.String(),
 			dr.AmountOf(Atto).String(),
-			truncated.String(),
+			truncated.AmountOf(Atto).String(),
 		})
 	}
 
