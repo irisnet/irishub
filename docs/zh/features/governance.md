@@ -70,19 +70,9 @@ _参与者_ 是对提议有投票权利的用户。在 Iris Hub 上，参与者�
 
 #### 选项集
 
-The option set of a proposal refers to the set of choices a participant can
-choose from when casting its vote.
-
 一个提议的选项集指的是，当一个参与者进行投票时可以从中选择的选项集合。
 
 初始选项集包括下列的选项：
-
-- `Yes`
-- `No`
-- `NoWithVeto`
-- `Abstain`
-
-The initial option set includes the following options:
 
 - `Yes`：赞成
 - `No`：反对
@@ -95,21 +85,13 @@ _注意: 在 UI 端，我们可以为一些紧急的提议增加一个 `Not Urge
 
 #### 法定人数
 
-Quorum is defined as the minimum percentage of voting power that needs to be
-casted on a proposal for the result to be valid.
-
 法定人数被定义为，为使一个提议的投票结果有效，所需要进行投票的投票权的最小百分比。
 
 #### 阈值
 
-Threshold is defined as the minimum proportion of `Yes` votes (excluding `Abstain` votes) for the proposal to be accepted.
-
 阈值被定义为，为使提议被接受而所需要的 `赞成` 票的最小比例。
 
 阈值初始被设置为 50%，如果超过 1/3 的投票（排除 `弃权` 投票）是 `否决` 票，有一定的否决概率。这意味着在投票期结束时，如果 `赞成` 投票（排除 `弃权` 投票）的比例大于 50%，并且 `否决` 投票（排除 `弃权` 投票）的比例小于 1/3，则提议将被接受。
-
-Proposals can be accepted before the end of the voting period if they meet a special condition. Namely, if the ratio of `Yes` votes to `InitTotalVotingPower`exceeds 2:3, the proposal will be immediately accepted, even if the `Voting period` is not finished. `InitTotalVotingPower` is the total voting power of all bonded Iris holders at the moment when the vote opens.
-This condition exists so that the network can react quickly in case of urgency.
 
 在投票期结束之前，如果满足一个特殊条件，提议可以被接受。即，如果 `赞成` 投票与 `InitTotalVotingPower`（`初始总投票权`）的比例超过 2:3，提议将立即被接受，即使 `投票期` 还没结束。`初始总投票权` 是投票开启时所有质押的 Iris 持有人的总投票权。这个条件存在以至于在紧急情况下网络可以快速做出反应。
 

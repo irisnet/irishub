@@ -1,6 +1,6 @@
 # Legacy Amino JSON REST
 
-IRISHub v1.0.0（依赖Cosmos-SDK v0.41）和更早版本提供了 REST 端点来查询状态和广播交易。 这些端点在 IRISHub v1.0 中仍然保留，但已标记为已弃用，并计划在几个版本后删除。因此，我们将这些端点称为 Legacy REST 端点。
+irishub v1.0.0（依赖Cosmos-SDK v0.41）和更早版本提供了 REST 端点来查询状态和广播交易。 这些端点在 irishub v1.0 中仍然保留，但已标记为已弃用，并计划在几个版本后删除。因此，我们将这些端点称为 Legacy REST 端点。
 
 Legacy REST 端点相关的重要信息：
 
@@ -17,13 +17,13 @@ Legacy REST 端点相关的重要信息：
 
 ### Legacy REST API 路由
 
-IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](https://tools.ietf.org/id/draft-dalal-deprecation-header-01.html)标记为已弃用，它们仍然被维护以保持向后兼容，但是将在几个版本后删除。
+irishub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](https://tools.ietf.org/id/draft-dalal-deprecation-header-01.html)标记为已弃用，它们仍然被维护以保持向后兼容，但是将在几个版本后删除。
 
 对于应用程序开发人员而言，传统的 REST API 路由需要连接到 REST 服务器，这是通过在 ModuleManager 上调用 `RegisterRESTRoutes` 方法来完成的。
 
 ## Legacy REST 端点
 
-### Legacy REST 端点的中不兼容更新 (对比 Cosmos-SDK v0.39 及更早的版本)
+### Legacy REST 端点的中不兼容更新 （对比 Cosmos-SDK v0.39 及更早的版本）
 
 | Legacy REST 端点                                                             | 描述                                         | 不兼容更新                                                                                                                                                                                                                                                                                                                                                   |
 | ---------------------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -37,9 +37,9 @@ IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 
 <sup>1</sup>： 不支持 Amino 序列化的交易是那些包含一个或多个未在 Amino 编解码器中注册的 `Msg` 的交易。 当前在 IRIShub 中，只有 IBC `Msg`s 属于这种情况。
 
-### 迁移到新的 REST 端点 (从 Cosmos-SDK v0.39)
+### 迁移到新的 REST 端点 （从 Cosmos-SDK v0.39）
 
-**IRISHub API 端点**
+**IRIShub API 端点**
 
 | Legacy REST 端点                                                                  | 描述                                 | 新的 gGPC-gateway REST 端点                                                                                   |
 | --------------------------------------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
@@ -199,15 +199,15 @@ IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 **端点名称：** QueryRedelegations
 
 - **端点路径：** `/staking/redelegations`
-- **更新内容：** 以下旧字段更改为新字段 `redelegation_entry` 的子字段:
+- **更新内容：** 以下旧字段更改为新字段 `redelegation_entry` 的子字段：
   - `completion_time`
   - `initial_balance`
   - `shares_dst`
 - `creation_height` 字段不再支持
-- 以下为新字段:
+- 以下为新字段：
   - `redelegation` 包含以下子字段
-    - `delegator_address` (new)
-    - `entries` (new)
+    - `delegator_address` （新增）
+    - `entries` （新增）
     - `valdiator_dst_address`
     - `validator_src_address`
 - **JSON 示例：**
@@ -340,12 +340,12 @@ IRIShub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 }
 ```
 
-IRISHub 地址前缀使用 `iaa` 代替，这会影响以下字段：
+IRIShub 地址前缀使用 `iaa` 代替，这会影响以下字段：
 
 - value.msg.value.from_adress
 - value.msg.value.to_address
 
-Denom 替换为 `uiris` (1iris = 10<sup>6</sup>uiris)，这会影响到以下字段：
+Denom 替换为 `uiris` （1iris = 10<sup>6</sup>uiris），这会影响到以下字段：
 
 - value.msg.value.amount.denom
 - value.fee.amount.denom

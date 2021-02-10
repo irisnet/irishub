@@ -26,7 +26,7 @@ cargo install tmkms --features=yubihsm --version=0.10.0-beta2
 
 ## Initialization
 
-Initialize configuration files for IRISHub
+Initialize configuration files for IRIShub
 
 ```bash
 tmkms init -n irishub /path/to/kms/home
@@ -34,7 +34,7 @@ tmkms init -n irishub /path/to/kms/home
 
 ## Configuration
 
-To enable KMS, you need to edit the `priv_validator_laddr` in your `<iris-home>/config/config.toml` file first. E.g.:
+To enable KMS, you need to edit the `priv_validator_laddr` in your `<iris-home>/config/config.toml` file first. e.g.:
 
 ```toml
 # TCP or UNIX socket address for Tendermint to listen on for
@@ -59,12 +59,13 @@ Then start tmkms:
 ```bash
 tmkms start -c /path/to/kms/home/tmkms.toml
 ```
-### Using a YubiHSM	
+
+### Using a YubiHSM
 
 Detailed information on how to setup a KMS with YubiHSM2 can be found [here](https://github.com/iqlusioninc/tmkms/blob/master/README.yubihsm.md).
 
 If you want to import an existing IRIShub private_key:
 
-```bash	
+```bash
 tmkms yubihsm keys import <iris_home>/config/priv_validator.json -i <id> -t json -c /path/to/kms/home/tmkms.toml
 ```

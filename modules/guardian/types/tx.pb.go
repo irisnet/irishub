@@ -27,7 +27,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// AddSuper defines the properties of add super account message
+// MsgAddSuper defines the properties of add super account message
 type MsgAddSuper struct {
 	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
 	Address     string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
@@ -125,7 +125,7 @@ func (m *MsgAddSuperResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgAddSuperResponse proto.InternalMessageInfo
 
-// DeleteSuper defines the properties of delete super account message
+// MsgDeleteSuper defines the properties of delete super account message
 type MsgDeleteSuper struct {
 	Address   string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
 	DeletedBy string `protobuf:"bytes,3,opt,name=deleted_by,json=deletedBy,proto3" json:"deleted_by,omitempty"`

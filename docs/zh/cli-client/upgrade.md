@@ -21,7 +21,7 @@ iris tx gov submit-proposal software-upgrade <plan-name> [flags]
 
 **标识：**
 
-| 名称, 速记       | 类型   | 必须 | 默认 | 描述                                             |
+| 名称，速记       | 类型   | 必须 | 默认 | 描述                                             |
 | ---------------- | ------ | ---- | ---- | ------------------------------------------------ |
 | --deposit        | Coins  |      |      | 为提案抵押的代币数量                             |
 | --title          | string |      |      | 提案标题                                         |
@@ -35,9 +35,9 @@ iris tx gov submit-proposal software-upgrade <plan-name> [flags]
 
 ```json
 {
-  "binaries": {
-    "linux/amd64":"https://example.com/irishub.zip?checksum=sha256:aec070645fe53ee3b3763059376134f058cc337247c978add178b6ccdfb0019f"
-  }
+    "binaries": {
+        "linux/amd64":"https://example.com/irishub.zip?checksum=sha256:aec070645fe53ee3b3763059376134f058cc337247c978add178b6ccdfb0019f"
+    }
 }
 ```
 
@@ -53,7 +53,7 @@ iris tx gov submit-proposal cancel-software-upgrade [flags]
 
 **标识：**
 
-| 名称, 速记    | 类型   | 必须 | 默认 | 描述                 |
+| 名称，速记    | 类型   | 必须 | 默认 | 描述                 |
 | ------------- | ------ | ---- | ---- | -------------------- |
 | --deposit     | Coins  |      |      | 为提案抵押的代币数量 |
 | --title       | string |      |      | 提案标题             |

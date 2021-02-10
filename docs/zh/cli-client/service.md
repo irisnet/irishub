@@ -294,17 +294,16 @@ iris tx service call [flags]
 
 **标志：**
 
-| 名称，速记        | 默认  | 描述                                                  | 必须 |
-| ----------------- | ----- | ----------------------------------------------------- | ---- |
-| --service-name    |       | 服务名称                                              | 是   |
-| --providers       |       | 服务提供者列表                                        | 是   |
-| --service-fee-cap |       | 愿意为单个请求支付的最大服务费用                      | 是   |
-| --data            |       | 请求输入的内容或文件路径，是一个Input JSON Schema实例 | 是   |
-| --timeout         |       | 请求超时                                              | 是   |
-| --super-mode      | false | 签名者是否为超级用户                                  |      |
-| --repeated        | false | 请求是否为重复性的                                    |      |
-| --frequency       |       | 重复性请求的请求频率；默认为`timeout`值               |      |
-| --total           |       | 重复性请求的请求总数，-1表示无限制                    |      |
+| 名称，速记        | 默认  | 描述                                                               | 必须 |
+| ----------------- | ----- | ------------------------------------------------------------------ | ---- |
+| --service-name    |       | 服务名称                                                           | 是   |
+| --providers       |       | 服务提供者列表                                                     | 是   |
+| --service-fee-cap |       | 愿意为单个请求支付的最大服务费用                                   | 是   |
+| --data            |       | 请求输入的内容或文件路径，是一个Input JSON Schema实例              | 是   |
+| --timeout         |       | 请求超时                                                           | 是   |
+| --repeated        | false | 请求是否为重复性的（irishub-v1.0.0中暂时禁用，将在后续版本中激活） |      |
+| --frequency       |       | 重复性请求的请求频率；默认为`timeout`值                            |      |
+| --total           |       | 重复性请求的请求总数，-1表示无限制                                 |      |
 
 ### 发起一个服务调用请求
 
@@ -356,11 +355,11 @@ iris query service request <request-id>
 你可以通过两种方式获取`request-id`：[通过rpc接口查询request_id](#通过rpc接口查询request_id) 和 [iris query service requests](#iris query service requests)。
 :::
 
-##### 通过rpc接口查询request_id
+### 通过rpc接口查询request_id
 
 通过`rpc接口`按`区块高度`查询`block_results`，在`end_block_events`找到`new_batch_request_provider`，将结果进行base64解码，获取`request_id`。
 
-```
+```bash
 curl -X POST -d '{"jsonrpc":"2.0","id":1,"method":"block_results","params":["10604"]}' http://localhost:26657
 ```
 
@@ -397,8 +396,8 @@ iris tx service respond [flags]
 | 名称，速记   | 默认 | 描述                                                                                                    | 必须 |
 | ------------ | ---- | ------------------------------------------------------------------------------------------------------- | ---- |
 | --request-id |      | 欲响应请求的ID                                                                                          | 是   |
-| --result     |      | 响应结果的内容或文件路径, 是一个[Irishub Service Result JSON Schema](../features/service-result.md)实例 | 是   |
-| --data       |      | 响应输出的内容或文件路径, 是一个Output JSON Schema实例                                                  |      |
+| --result     |      | 响应结果的内容或文件路径，是一个[Irishub Service Result JSON Schema](../features/service-result.md)实例 | 是   |
+| --data       |      | 响应输出的内容或文件路径，是一个Output JSON Schema实例                                                  |      |
 
 ### 响应一个服务请求
 

@@ -24,7 +24,7 @@ iris query bank balances [address] [flags]
 | --------------- | ------ | -------- | ------- | ---------------------------------------------------------- |
 | -h, --help      |        |          |         | Help for coin-type                                         |
 | --denom         | string |          |         | The specific balance denomination to query for             |
-| --count-total   |        |          |         | count total number of records in all balances to query for |
+| --count-total   |        |          |         | Count total number of records in all balances to query for |
 
 ### iris query bank total
 
@@ -51,6 +51,6 @@ iris tx bank send [from_key_or_address] [to_address] [amount] [flags]
 
 **Flags:**
 
-| Name, shorthand | Type   | Required | Default | Description                                                  |
-| --------------- | ------ | -------- | ------- | ------------------------------------------------------------ |
-| -h, --help      |        |          |         | Help for balances                                            |
+| Name, shorthand | Type | Required | Default | Description       |
+| --------------- | ---- | -------- | ------- | ----------------- |
+| -h, --help      |      |          |         | Help for balances |

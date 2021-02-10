@@ -30,7 +30,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// QueryParametersRequest is request type for the Query/Parameters RPC method
+// QueryParamsRequest is request type for the Query/Parameters RPC method
 type QueryParamsRequest struct {
 }
 
@@ -67,7 +67,7 @@ func (m *QueryParamsRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryParamsRequest proto.InternalMessageInfo
 
-// QueryParametersResponse is response type for the Query/Parameters RPC method
+// QueryParamsResponse is response type for the Query/Parameters RPC method
 type QueryParamsResponse struct {
 	Params Params              `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
 	Res    *query.PageResponse `protobuf:"bytes,2,opt,name=res,proto3" json:"res,omitempty"`
@@ -164,7 +164,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
-	// Parameters queries the mint parameters
+	// Params queries the mint parameters
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 }
 
@@ -187,7 +187,7 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
-	// Parameters queries the mint parameters
+	// Params queries the mint parameters
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 }
 

@@ -4,7 +4,7 @@ order: 4
 
 # Ledger Nano支持
 
-建议在使用ledger之前对[IRISnet Key](../concepts/key.md)进行一个基本的了解。
+建议在使用ledger之前对[IRIShub Key](../concepts/key.md)进行一个基本的了解。
 
 ## Ledger支持账户密钥
 
@@ -45,7 +45,7 @@ order: 4
 3. 在Ledger Live应用中，导航到`Manager`菜单。
    ![manager](../pics/ledger-manager.png)
 4. 连接你的Ledger Nano设备并允许Ledger Manager接入。
-5. 在Ledger Live应用中，搜索`Cosmos`. 
+5. 在Ledger Live应用中，搜索`Cosmos`.
     ![search](../pics/ledger-search.png)
 6. 点击`Install`安装Cosmos应用程序.
 
@@ -69,13 +69,13 @@ iris keys add <secondKeyName> --ledger --account <i>
 iris tx bank send --help # to see all available options.
 ```
 
-::: tip 
+::: tip
 在尝试运行以下命令之前，请确保使用PIN解锁你的设备并打开Cosmos应用程序
 :::
 
 使用你为Ledger密钥设置的keyName，iris将与Cosmos Ledger应用程序连接以签名交易。
 
-::: tip 
+::: tip
 Cosmos应用程序现在仅支持amino-json签名模式，你必须添加标志`--sign-mode amino-json`才能使用
 :::
 

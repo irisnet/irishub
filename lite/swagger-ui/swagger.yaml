@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  title: IRISHub - Legacy REST and gRPC Gateway docs
+  title: IRIShub - Legacy REST and gRPC Gateway docs
   description: 'A REST interface for state queries, legacy transactions'
   version: 1.0.0
 paths:
@@ -9,7 +9,7 @@ paths:
       description: Information about the connected node
       summary: The properties of the connected node
       tags:
-        - IRISHub REST
+        - IRIShub REST
       produces:
         - application/json
       responses:
@@ -28921,7 +28921,7 @@ paths:
                       signatures required by gogoproto.
                   mint_token_fee_ratio:
                     type: string
-                title: token parameters
+                title: Params defines token module's parameters
               res:
                 type: object
                 properties:
@@ -30221,7 +30221,7 @@ paths:
         - Query
   /irismod/token/total_burn:
     get:
-      summary: Params queries the token parameters
+      summary: TotalBurn queries all the burnt coins
       operationId: TotalBurn
       responses:
         '200':
@@ -30497,8 +30497,8 @@ paths:
                        - HTLC_STATE_COMPLETED: HTLC_STATE_COMPLETED defines a completed state.
                        - HTLC_STATE_EXPIRED: HTLC_STATE_EXPIRED defines an expired state.
                        - HTLC_STATE_REFUNDED: HTLC_STATE_REFUNDED defines a refunded state.
-                    title: HTLCState defines a state for an HTLC
-                title: HTLC defines a struct for an HTLC
+                    title: HTLCState defines the state of an HTLC
+                title: HTLC defines the struct of an HTLC
             title: >-
               QueryBalanceResponse is the response type for the Query/HTLC RPC
               method
@@ -30534,7 +30534,7 @@ paths:
         - Query
   '/irismod/coinswap/liquidities/{denom}':
     get:
-      summary: |-
+      summary: >-
         Liquidity returns the total liquidity available for the provided
         denomination
       operationId: Liquidity
@@ -30647,7 +30647,7 @@ paths:
                         type: string
                       creator:
                         type: string
-                    description: Denom defines a type of NFT.
+                    title: Denom defines a type of NFT
                   nfts:
                     type: array
                     items:
@@ -30663,7 +30663,8 @@ paths:
                           type: string
                         owner:
                           type: string
-                      description: BaseNFT defines a non fungible token.
+                      title: BaseNFT defines a non-fungible token
+                title: Collection defines a type of collection
               pagination:
                 type: object
                 properties:
@@ -30841,7 +30842,7 @@ paths:
                       type: string
                     creator:
                       type: string
-                  description: Denom defines a type of NFT.
+                  title: Denom defines a type of NFT
               pagination:
                 type: object
                 properties:
@@ -30964,7 +30965,7 @@ paths:
                     type: string
                   creator:
                     type: string
-                description: Denom defines a type of NFT.
+                title: Denom defines a type of NFT
             title: >-
               QueryDenomResponse is the response type for the Query/Denom RPC
               method
@@ -31023,6 +31024,10 @@ paths:
                           type: array
                           items:
                             type: string
+                      title: >-
+                        IDCollection defines a type of collection with specified
+                        ID
+                title: Owner defines a type of owner
               pagination:
                 type: object
                 properties:
@@ -31155,7 +31160,7 @@ paths:
                     type: string
                   owner:
                     type: string
-                description: BaseNFT defines a non fungible token.
+                title: BaseNFT defines a non-fungible token
             title: QueryNFTResponse is the response type for the Query/NFT RPC method
         default:
           description: An unexpected error response.
@@ -31241,7 +31246,7 @@ paths:
                       format: date-time
                     owner:
                       type: string
-                  description: ServiceBinding defines a standard for service binding.
+                  title: ServiceBinding defines a standard for service binding
               pagination:
                 type: object
                 properties:
@@ -31399,7 +31404,7 @@ paths:
                     format: date-time
                   owner:
                     type: string
-                description: ServiceBinding defines a standard for service binding.
+                title: ServiceBinding defines a standard for service binding
             title: >-
               QueryDefinitionResponse is response type for the Query/Binding RPC
               method
@@ -31526,13 +31531,13 @@ paths:
                     default: RUNNING
                     description: >-
                       - RUNNING: RUNNING defines the running request context
-                      status.
-                       - PAUSED: PAUSED defines the paused request context status.
-                       - COMPLETED: COMPLETED defines the completed request context status.
+                      status
+                       - PAUSED: PAUSED defines the paused request context status
+                       - COMPLETED: COMPLETED defines the completed request context status
                     title: >-
                       RequestContextState is a type alias that represents a
                       request status as a byte
-                description: RequestContext defines a standard for request context.
+                title: RequestContext defines a standard for request context
             title: >-
               QueryRequestContextResponse is response type for the
               Query/RequestContext RPC method
@@ -31592,7 +31597,7 @@ paths:
                     type: string
                   schemas:
                     type: string
-                description: ServiceDefinition defines a standard for service definition.
+                title: ServiceDefinition defines a standard for service definition
             title: >-
               QueryDefinitionResponse is response type for the Query/Definition
               RPC method
@@ -31777,7 +31782,7 @@ paths:
                     format: uint64
                   base_denom:
                     type: string
-                title: service parameters
+                title: Params defines service module's parameters
               res:
                 type: object
                 properties:
@@ -31886,7 +31891,7 @@ paths:
                     request_context_batch_counter:
                       type: string
                       format: uint64
-                  description: Request defines a standard for request.
+                  title: Request defines a standard for request
               pagination:
                 type: object
                 properties:
@@ -32048,7 +32053,7 @@ paths:
                   request_context_batch_counter:
                     type: string
                     format: uint64
-                description: Request defines a standard for request.
+                title: Request defines a standard for request
             title: >-
               QueryRequestResponse is response type for the Query/Request RPC
               method
@@ -32135,7 +32140,7 @@ paths:
                     request_context_batch_counter:
                       type: string
                       format: uint64
-                  description: Request defines a standard for request.
+                  title: Request defines a standard for request
               pagination:
                 type: object
                 properties:
@@ -32273,7 +32278,7 @@ paths:
                     request_context_batch_counter:
                       type: string
                       format: uint64
-                  description: Response defines a standard for response.
+                  title: Response defines a standard for response
               pagination:
                 type: object
                 properties:
@@ -32410,7 +32415,7 @@ paths:
                   request_context_batch_counter:
                     type: string
                     format: uint64
-                description: Response defines a standard for response.
+                title: Response defines a standard for response
             title: >-
               QueryResponseResponse is response type for the Query/Response RPC
               method
@@ -32489,7 +32494,7 @@ paths:
         - Query
   /irismod/oracle/feeds:
     get:
-      summary: QueryFeedsRequest queries the feed list
+      summary: Feeds queries the feed list
       operationId: Feeds
       responses:
         '200':
@@ -32565,14 +32570,15 @@ paths:
                       default: RUNNING
                       description: >-
                         - RUNNING: RUNNING defines the running request context
-                        status.
-                         - PAUSED: PAUSED defines the paused request context status.
-                         - COMPLETED: COMPLETED defines the completed request context status.
+                        status
+                         - PAUSED: PAUSED defines the paused request context status
+                         - COMPLETED: COMPLETED defines the completed request context status
                       title: >-
                         RequestContextState is a type alias that represents a
                         request status as a byte
                   title: FeedContext defines the feed context struct
               pagination:
+                title: pagination defines an optional pagination for the request
                 type: object
                 properties:
                   next_key:
@@ -32750,9 +32756,9 @@ paths:
                     default: RUNNING
                     description: >-
                       - RUNNING: RUNNING defines the running request context
-                      status.
-                       - PAUSED: PAUSED defines the paused request context status.
-                       - COMPLETED: COMPLETED defines the completed request context status.
+                      status
+                       - PAUSED: PAUSED defines the paused request context status
+                       - COMPLETED: COMPLETED defines the completed request context status
                     title: >-
                       RequestContextState is a type alias that represents a
                       request status as a byte
@@ -32999,9 +33005,10 @@ paths:
                           type: string
                         meta:
                           type: string
-                      description: Content defines the detailed information for a record.
+                      title: Content defines the detailed information for a record
                   creator:
                     type: string
+                title: Record defines the record standard
             title: >-
               QueryRecordResponse is the response type for the Query/Record RPC
               method
@@ -33036,7 +33043,7 @@ paths:
         - Query
   /irishub/mint/params:
     get:
-      summary: Parameters queries the mint parameters
+      summary: Params queries the mint parameters
       operationId: MintParams
       responses:
         '200':
@@ -33053,7 +33060,7 @@ paths:
                   inflation:
                     type: string
                     title: inflation rate
-                title: mint parameters
+                title: Params defines mint module's parameters
               res:
                 type: object
                 properties:
@@ -33082,8 +33089,8 @@ paths:
                            PageResponse page = 2;
                    }
             title: >-
-              QueryParametersResponse is response type for the Query/Parameters
-              RPC method
+              QueryParamsResponse is response type for the Query/Parameters RPC
+              method
         default:
           description: An unexpected error response.
           schema:
@@ -51878,7 +51885,7 @@ definitions:
           signatures required by gogoproto.
       mint_token_fee_ratio:
         type: string
-    title: token parameters
+    title: Params defines token module's parameters
   irismod.token.QueryFeesResponse:
     type: object
     properties:
@@ -51934,7 +51941,7 @@ definitions:
               signatures required by gogoproto.
           mint_token_fee_ratio:
             type: string
-        title: token parameters
+        title: Params defines token module's parameters
       res:
         type: object
         properties:
@@ -52381,8 +52388,8 @@ definitions:
            - HTLC_STATE_COMPLETED: HTLC_STATE_COMPLETED defines a completed state.
            - HTLC_STATE_EXPIRED: HTLC_STATE_EXPIRED defines an expired state.
            - HTLC_STATE_REFUNDED: HTLC_STATE_REFUNDED defines a refunded state.
-        title: HTLCState defines a state for an HTLC
-    title: HTLC defines a struct for an HTLC
+        title: HTLCState defines the state of an HTLC
+    title: HTLC defines the struct of an HTLC
   irismod.htlc.HTLCState:
     type: string
     enum:
@@ -52396,7 +52403,7 @@ definitions:
        - HTLC_STATE_COMPLETED: HTLC_STATE_COMPLETED defines a completed state.
        - HTLC_STATE_EXPIRED: HTLC_STATE_EXPIRED defines an expired state.
        - HTLC_STATE_REFUNDED: HTLC_STATE_REFUNDED defines a refunded state.
-    title: HTLCState defines a state for an HTLC
+    title: HTLCState defines the state of an HTLC
   irismod.htlc.QueryHTLCResponse:
     type: object
     properties:
@@ -52447,8 +52454,8 @@ definitions:
                - HTLC_STATE_COMPLETED: HTLC_STATE_COMPLETED defines a completed state.
                - HTLC_STATE_EXPIRED: HTLC_STATE_EXPIRED defines an expired state.
                - HTLC_STATE_REFUNDED: HTLC_STATE_REFUNDED defines a refunded state.
-            title: HTLCState defines a state for an HTLC
-        title: HTLC defines a struct for an HTLC
+            title: HTLCState defines the state of an HTLC
+        title: HTLC defines the struct of an HTLC
     title: QueryBalanceResponse is the response type for the Query/HTLC RPC method
   irismod.coinswap.QueryLiquidityResponse:
     type: object
@@ -52505,7 +52512,7 @@ definitions:
         type: string
       owner:
         type: string
-    description: BaseNFT defines a non fungible token.
+    title: BaseNFT defines a non-fungible token
   irismod.nft.Collection:
     type: object
     properties:
@@ -52520,7 +52527,7 @@ definitions:
             type: string
           creator:
             type: string
-        description: Denom defines a type of NFT.
+        title: Denom defines a type of NFT
       nfts:
         type: array
         items:
@@ -52536,7 +52543,8 @@ definitions:
               type: string
             owner:
               type: string
-          description: BaseNFT defines a non fungible token.
+          title: BaseNFT defines a non-fungible token
+    title: Collection defines a type of collection
   irismod.nft.Denom:
     type: object
     properties:
@@ -52548,7 +52556,7 @@ definitions:
         type: string
       creator:
         type: string
-    description: Denom defines a type of NFT.
+    title: Denom defines a type of NFT
   irismod.nft.IDCollection:
     type: object
     properties:
@@ -52558,6 +52566,7 @@ definitions:
         type: array
         items:
           type: string
+    title: IDCollection defines a type of collection with specified ID
   irismod.nft.Owner:
     type: object
     properties:
@@ -52574,6 +52583,8 @@ definitions:
               type: array
               items:
                 type: string
+          title: IDCollection defines a type of collection with specified ID
+    title: Owner defines a type of owner
   irismod.nft.QueryCollectionResponse:
     type: object
     properties:
@@ -52591,7 +52602,7 @@ definitions:
                 type: string
               creator:
                 type: string
-            description: Denom defines a type of NFT.
+            title: Denom defines a type of NFT
           nfts:
             type: array
             items:
@@ -52607,7 +52618,8 @@ definitions:
                   type: string
                 owner:
                   type: string
-              description: BaseNFT defines a non fungible token.
+              title: BaseNFT defines a non-fungible token
+        title: Collection defines a type of collection
       pagination:
         type: object
         properties:
@@ -52650,7 +52662,7 @@ definitions:
             type: string
           creator:
             type: string
-        description: Denom defines a type of NFT.
+        title: Denom defines a type of NFT
     title: QueryDenomResponse is the response type for the Query/Denom RPC method
   irismod.nft.QueryDenomsResponse:
     type: object
@@ -52668,7 +52680,7 @@ definitions:
               type: string
             creator:
               type: string
-          description: Denom defines a type of NFT.
+          title: Denom defines a type of NFT
       pagination:
         type: object
         properties:
@@ -52711,7 +52723,7 @@ definitions:
             type: string
           owner:
             type: string
-        description: BaseNFT defines a non fungible token.
+        title: BaseNFT defines a non-fungible token
     title: QueryNFTResponse is the response type for the Query/NFT RPC method
   irismod.nft.QueryOwnerResponse:
     type: object
@@ -52732,6 +52744,8 @@ definitions:
                   type: array
                   items:
                     type: string
+              title: IDCollection defines a type of collection with specified ID
+        title: Owner defines a type of owner
       pagination:
         type: object
         properties:
@@ -52801,7 +52815,7 @@ definitions:
         format: uint64
       base_denom:
         type: string
-    title: service parameters
+    title: Params defines service module's parameters
   irismod.service.QueryBindingResponse:
     type: object
     properties:
@@ -52843,7 +52857,7 @@ definitions:
             format: date-time
           owner:
             type: string
-        description: ServiceBinding defines a standard for service binding.
+        title: ServiceBinding defines a standard for service binding
     title: QueryDefinitionResponse is response type for the Query/Binding RPC method
   irismod.service.QueryBindingsResponse:
     type: object
@@ -52888,7 +52902,7 @@ definitions:
               format: date-time
             owner:
               type: string
-          description: ServiceBinding defines a standard for service binding.
+          title: ServiceBinding defines a standard for service binding
       pagination:
         type: object
         properties:
@@ -52937,7 +52951,7 @@ definitions:
             type: string
           schemas:
             type: string
-        description: ServiceDefinition defines a standard for service definition.
+        title: ServiceDefinition defines a standard for service definition
     title: >-
       QueryDefinitionResponse is response type for the Query/Definition RPC
       method
@@ -53003,7 +53017,7 @@ definitions:
             format: uint64
           base_denom:
             type: string
-        title: service parameters
+        title: Params defines service module's parameters
       res:
         type: object
         properties:
@@ -53113,13 +53127,13 @@ definitions:
               - COMPLETED
             default: RUNNING
             description: |-
-              - RUNNING: RUNNING defines the running request context status.
-               - PAUSED: PAUSED defines the paused request context status.
-               - COMPLETED: COMPLETED defines the completed request context status.
+              - RUNNING: RUNNING defines the running request context status
+               - PAUSED: PAUSED defines the paused request context status
+               - COMPLETED: COMPLETED defines the completed request context status
             title: >-
               RequestContextState is a type alias that represents a request
               status as a byte
-        description: RequestContext defines a standard for request context.
+        title: RequestContext defines a standard for request context
     title: >-
       QueryRequestContextResponse is response type for the Query/RequestContext
       RPC method
@@ -53167,7 +53181,7 @@ definitions:
           request_context_batch_counter:
             type: string
             format: uint64
-        description: Request defines a standard for request.
+        title: Request defines a standard for request
     title: QueryRequestResponse is response type for the Query/Request RPC method
   irismod.service.QueryRequestsByReqCtxResponse:
     type: object
@@ -53215,7 +53229,7 @@ definitions:
             request_context_batch_counter:
               type: string
               format: uint64
-          description: Request defines a standard for request.
+          title: Request defines a standard for request
       pagination:
         type: object
         properties:
@@ -53290,7 +53304,7 @@ definitions:
             request_context_batch_counter:
               type: string
               format: uint64
-          description: Request defines a standard for request.
+          title: Request defines a standard for request
       pagination:
         type: object
         properties:
@@ -53336,7 +53350,7 @@ definitions:
           request_context_batch_counter:
             type: string
             format: uint64
-        description: Response defines a standard for response.
+        title: Response defines a standard for response
     title: QueryResponseResponse is response type for the Query/Response RPC method
   irismod.service.QueryResponsesResponse:
     type: object
@@ -53359,7 +53373,7 @@ definitions:
             request_context_batch_counter:
               type: string
               format: uint64
-          description: Response defines a standard for response.
+          title: Response defines a standard for response
       pagination:
         type: object
         properties:
@@ -53438,7 +53452,7 @@ definitions:
       request_context_batch_counter:
         type: string
         format: uint64
-    description: Request defines a standard for request.
+    title: Request defines a standard for request
   irismod.service.RequestContext:
     type: object
     properties:
@@ -53514,13 +53528,13 @@ definitions:
           - COMPLETED
         default: RUNNING
         description: |-
-          - RUNNING: RUNNING defines the running request context status.
-           - PAUSED: PAUSED defines the paused request context status.
-           - COMPLETED: COMPLETED defines the completed request context status.
+          - RUNNING: RUNNING defines the running request context status
+           - PAUSED: PAUSED defines the paused request context status
+           - COMPLETED: COMPLETED defines the completed request context status
         title: >-
           RequestContextState is a type alias that represents a request status
           as a byte
-    description: RequestContext defines a standard for request context.
+    title: RequestContext defines a standard for request context
   irismod.service.RequestContextBatchState:
     type: string
     enum:
@@ -53541,9 +53555,9 @@ definitions:
       - COMPLETED
     default: RUNNING
     description: |-
-      - RUNNING: RUNNING defines the running request context status.
-       - PAUSED: PAUSED defines the paused request context status.
-       - COMPLETED: COMPLETED defines the completed request context status.
+      - RUNNING: RUNNING defines the running request context status
+       - PAUSED: PAUSED defines the paused request context status
+       - COMPLETED: COMPLETED defines the completed request context status
     title: >-
       RequestContextState is a type alias that represents a request status as a
       byte
@@ -53563,7 +53577,7 @@ definitions:
       request_context_batch_counter:
         type: string
         format: uint64
-    description: Response defines a standard for response.
+    title: Response defines a standard for response
   irismod.service.ServiceBinding:
     type: object
     properties:
@@ -53599,7 +53613,7 @@ definitions:
         format: date-time
       owner:
         type: string
-    description: ServiceBinding defines a standard for service binding.
+    title: ServiceBinding defines a standard for service binding
   irismod.service.ServiceDefinition:
     type: object
     properties:
@@ -53617,7 +53631,7 @@ definitions:
         type: string
       schemas:
         type: string
-    description: ServiceDefinition defines a standard for service definition.
+    title: ServiceDefinition defines a standard for service definition
   irismod.oracle.Feed:
     type: object
     properties:
@@ -53698,9 +53712,9 @@ definitions:
           - COMPLETED
         default: RUNNING
         description: |-
-          - RUNNING: RUNNING defines the running request context status.
-           - PAUSED: PAUSED defines the paused request context status.
-           - COMPLETED: COMPLETED defines the completed request context status.
+          - RUNNING: RUNNING defines the running request context status
+           - PAUSED: PAUSED defines the paused request context status
+           - COMPLETED: COMPLETED defines the completed request context status
         title: >-
           RequestContextState is a type alias that represents a request status
           as a byte
@@ -53781,9 +53795,9 @@ definitions:
               - COMPLETED
             default: RUNNING
             description: |-
-              - RUNNING: RUNNING defines the running request context status.
-               - PAUSED: PAUSED defines the paused request context status.
-               - COMPLETED: COMPLETED defines the completed request context status.
+              - RUNNING: RUNNING defines the running request context status
+               - PAUSED: PAUSED defines the paused request context status
+               - COMPLETED: COMPLETED defines the completed request context status
             title: >-
               RequestContextState is a type alias that represents a request
               status as a byte
@@ -53873,14 +53887,15 @@ definitions:
                 - COMPLETED
               default: RUNNING
               description: |-
-                - RUNNING: RUNNING defines the running request context status.
-                 - PAUSED: PAUSED defines the paused request context status.
-                 - COMPLETED: COMPLETED defines the completed request context status.
+                - RUNNING: RUNNING defines the running request context status
+                 - PAUSED: PAUSED defines the paused request context status
+                 - COMPLETED: COMPLETED defines the completed request context status
               title: >-
                 RequestContextState is a type alias that represents a request
                 status as a byte
           title: FeedContext defines the feed context struct
       pagination:
+        title: pagination defines an optional pagination for the request
         type: object
         properties:
           next_key:
@@ -54012,7 +54027,7 @@ definitions:
         type: string
       meta:
         type: string
-    description: Content defines the detailed information for a record.
+    title: Content defines the detailed information for a record
   irismod.record.QueryRecordResponse:
     type: object
     properties:
@@ -54034,9 +54049,10 @@ definitions:
                   type: string
                 meta:
                   type: string
-              description: Content defines the detailed information for a record.
+              title: Content defines the detailed information for a record
           creator:
             type: string
+        title: Record defines the record standard
     title: QueryRecordResponse is the response type for the Query/Record RPC method
   irismod.record.Record:
     type: object
@@ -54056,9 +54072,10 @@ definitions:
               type: string
             meta:
               type: string
-          description: Content defines the detailed information for a record.
+          title: Content defines the detailed information for a record
       creator:
         type: string
+    title: Record defines the record standard
   irishub.mint.Params:
     type: object
     properties:
@@ -54068,7 +54085,7 @@ definitions:
       inflation:
         type: string
         title: inflation rate
-    title: mint parameters
+    title: Params defines mint module's parameters
   irishub.mint.QueryParamsResponse:
     type: object
     properties:
@@ -54081,7 +54098,7 @@ definitions:
           inflation:
             type: string
             title: inflation rate
-        title: mint parameters
+        title: Params defines mint module's parameters
       res:
         type: object
         properties:
@@ -54107,9 +54124,7 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-    title: >-
-      QueryParametersResponse is response type for the Query/Parameters RPC
-      method
+    title: QueryParamsResponse is response type for the Query/Parameters RPC method
   irishub.guardian.AccountType:
     type: string
     enum:

@@ -81,16 +81,16 @@ Example Output:
     "tokens": "100000000",
     "delegator_shares": "100000000.000000000000000000",
     "description": {
-    "moniker": "node0"
+        "moniker": "node0"
     },
     "unbonding_time": "1970-01-01T00:00:00Z",
     "commission": {
-    "commission_rates": {
-        "rate": "1.000000000000000000",
-        "max_rate": "1.000000000000000000",
-        "max_change_rate": "1.000000000000000000"
-    },
-    "update_time": "2020-08-26T06:43:07.065305Z"
+        "commission_rates": {
+            "rate": "1.000000000000000000",
+            "max_rate": "1.000000000000000000",
+            "max_change_rate": "1.000000000000000000"
+        },
+        "update_time": "2020-08-26T06:43:07.065305Z"
     },
     "min_self_delegation": "1"
 }

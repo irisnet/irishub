@@ -241,23 +241,21 @@ iris tx gov submit-proposal software-upgrade [name] (--upgrade-height [height] |
 | --time           | string |          |         | The time at which the upgrade must happen (not to be used together with --upgrade-height) |
 | --info           | string |          |         | Optional info for the planned upgrade such as commit hash, etc.                           |
 
-### iris tx gov submit-proposal cancel-software-upgrade 
+### iris tx gov submit-proposal cancel-software-upgrade
 
 Cancel a software upgrade along with an initial deposit.
 
-```
+```bash
 iris tx gov submit-proposal cancel-software-upgrade [flags]
 ```
 
 **Flags:**
 
-| Name, shorthand  | Type   | Required | Default | Description                                                  |
-| ---------------- | ------ | -------- | ------- | ------------------------------------------------------------ |
-| --deposit        | Coin   | Yes      |         | Deposit of the proposal                                      |
-| --title          | string | Yes      |         | Title of proposal                                            |
-| --description    | string | Yes      |         | Description of proposal                                      |
-
-
+| Name, shorthand | Type   | Required | Default | Description             |
+| --------------- | ------ | -------- | ------- | ----------------------- |
+| --deposit       | Coin   | Yes      |         | Deposit of the proposal |
+| --title         | string | Yes      |         | Title of proposal       |
+| --description   | string | Yes      |         | Description of proposal |
 
 ## iris tx gov deposit
 

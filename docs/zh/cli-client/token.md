@@ -29,7 +29,7 @@ iris tx token issue [flags]
 
 | 名称，速记       | 类型    | 必须 | 默认          | 描述                                                               |
 | ---------------- | ------- | ---- | ------------- | ------------------------------------------------------------------ |
-| --name           | string  | 是   |               | 通证的名称，限制为32个unicode字符，例如"IRIS Network"              |
+| --name           | string  | 是   |               | 通证的名称，限制为32个unicode字符，例如“IRIS Network”              |
 | --symbol         | string  | 是   |               | 通证的符号，长度在3到8之间，字母数字字符，以字符开始，不区分大小写 |
 | --initial-supply | uint64  | 是   |               | 此通证的初始供应。 增发前的数量不应超过1000亿。                    |
 | --max-supply     | uint64  |      | 1000000000000 | 通证上限，总供应不能超过最大供应。 增发前的数量不应超过1万亿       |
@@ -41,16 +41,16 @@ iris tx token issue [flags]
 
 ```bash
 iris tx token issue \
-	--name="Kitty Token" \
-	--symbol="kitty" \
-	--min-unit="kitty" \
-	--scale=0 \
-	--initial-supply=100000000000 \
-	--max-supply=1000000000000 \
-	--mintable=true \
-	--from=<key-name> \
-	--chain-id=<chain-id> \
-	--fees=<fee>
+    --name="Kitty Token" \
+    --symbol="kitty" \
+    --min-unit="kitty" \
+    --scale=0 \
+    --initial-supply=100000000000 \
+    --max-supply=1000000000000 \
+    --mintable=true \
+    --from=<key-name> \
+    --chain-id=<chain-id> \
+    --fees=<fee>
 ```
 
 ### 发送通证

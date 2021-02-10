@@ -28,7 +28,7 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// Minter represents the minting state.
+// Minter represents the minting state
 type Minter struct {
 	// time which the last update was made to the minter
 	LastUpdate time.Time `protobuf:"bytes,1,opt,name=last_update,json=lastUpdate,proto3,stdtime" json:"last_update" yaml:"last_update"`
@@ -76,7 +76,7 @@ func (m *Minter) GetLastUpdate() time.Time {
 	return time.Time{}
 }
 
-// mint parameters
+// Params defines mint module's parameters
 type Params struct {
 	// type of coin to mint
 	MintDenom string `protobuf:"bytes,1,opt,name=mint_denom,json=mintDenom,proto3" json:"mint_denom,omitempty"`

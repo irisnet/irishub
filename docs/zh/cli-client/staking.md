@@ -56,7 +56,7 @@ iris query staking delegation [delegator-addr] [validator-addr]
 iris query staking delegation <iaa...> <iva...>
 ```
 
-示例输出:
+示例输出：
 
 ```bash
 Delegation:
@@ -94,7 +94,7 @@ iris query staking delegations-to [validator-address] [flags]
 iris query staking delegations-to <iva...>
 ```
 
-示例输出:
+示例输出：
 
 ```bash
 Delegation:
@@ -183,7 +183,7 @@ iris query staking redelegations <iaa...>
 iris query staking pool
 ```
 
-示例输出:
+示例输出：
 
 ```bash
 Pool:

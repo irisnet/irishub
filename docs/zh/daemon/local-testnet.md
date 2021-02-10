@@ -8,7 +8,7 @@ order: 3
 
 ## 单节点测试网
 
-**需求:**
+**需求**
 
 - [安装iris](../get-started/install.md)
 
@@ -37,7 +37,7 @@ iris keys add MyValidator
 将该钱包地址添加到 genesis 文件中的 genesis.app_state.accounts 数组中
 
 :::tip
-此命令使您可以设置通证数量。确保此帐户有 uiris，这是 IRISnet 上唯一的质押通证
+此命令使您可以设置通证数量。确保此帐户有 uiris，这是 IRIShub 上唯一的质押通证
 :::
 
 ```bash
@@ -114,7 +114,7 @@ iris tendermint show-address
 
 ## 多节点测试网
 
-**前提:**
+**前提**
 
 - [安装 iris](../get-started/install.md)
 - [安装 jq](https://stedolan.github.io/jq/download/)

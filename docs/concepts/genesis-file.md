@@ -80,12 +80,10 @@ Each genesis state starts with a list of account balances. Social consensus on t
 
 * **vesting** Params related to vesting
 
-
-
 Parameters that can be governed: [Gov Parameters](gov-params.md)
 
 ## Gentxs
 
 Gentxs contains the transaction set of creating validators in genesis block.
-The IRISnet provides robust tools for bootstrapping the identities that will start chain via the `gen-tx` process. `gen-tx` or a Genesis Transaction is cryptographically signed transactions that are executed during chain initialization that generate a starting set of validators.
+The IRIShub provides robust tools for bootstrapping the identities that will start chain via the `gen-tx` process. `gen-tx` or a Genesis Transaction is cryptographically signed transactions that are executed during chain initialization that generate a starting set of validators.
 The gen-txs are artifacts that prove that the holders of accounts consent in launching the network and that they put capital at risk in the process.

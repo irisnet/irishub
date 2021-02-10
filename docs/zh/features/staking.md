@@ -53,7 +53,7 @@
 iris keys show <key-name>
 ```
 
- 示例输出:
+ 示例输出：
 
   ```bash
   - name: node0
@@ -71,29 +71,29 @@ iris keys show <key-name>
 iris q staking validator iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke
 ```
 
- 示例输出:
+ 示例输出：
 
 ```json
-  {
-      "operator_address": "iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke",
-      "consensus_pubkey": "icp1zcjduepq9meszzqu54gpxvs4vzvuv85qvv5ef0egz3sde0ps4dvktcv77uds0kkhgf",
-      "status": 3,
-      "tokens": "100000000",
-      "delegator_shares": "100000000.000000000000000000",
-      "description": {
+{
+    "operator_address": "iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke",
+    "consensus_pubkey": "icp1zcjduepq9meszzqu54gpxvs4vzvuv85qvv5ef0egz3sde0ps4dvktcv77uds0kkhgf",
+    "status": 3,
+    "tokens": "100000000",
+    "delegator_shares": "100000000.000000000000000000",
+    "description": {
         "moniker": "node0"
-      },
-      "unbonding_time": "1970-01-01T00:00:00Z",
-      "commission": {
+    },
+    "unbonding_time": "1970-01-01T00:00:00Z",
+    "commission": {
         "commission_rates": {
-          "rate": "1.000000000000000000",
-          "max_rate": "1.000000000000000000",
-          "max_change_rate": "1.000000000000000000"
+            "rate": "1.000000000000000000",
+            "max_rate": "1.000000000000000000",
+            "max_change_rate": "1.000000000000000000"
         },
         "update_time": "2020-08-26T06:43:07.065305Z"
-      },
-      "min_self_delegation": "1"
-    }
+    },
+    "min_self_delegation": "1"
+}
 ```
 
 - 修改验证人信息

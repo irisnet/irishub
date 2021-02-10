@@ -43,7 +43,7 @@ iris tx nft mint [denomID] [tokenID] [flags]
 
 **标志：**
 
-| 名称, 速记  | 默认 | 描述               | 必须 |
+| 名称，速记  | 默认 | 描述               | 必须 |
 | ----------- | ---- | ------------------ | ---- |
 | --uri       |      | 链下token数据的URI |      |
 | --recipient |      | nft接受者          |      |
@@ -59,7 +59,7 @@ iris tx nft edit [denomID] [tokenID] [flags]
 
 **标志：**
 
-| 名称, 速记 | 默认 | 描述               | 必须 |
+| 名称，速记 | 默认 | 描述               | 必须 |
 | ---------- | ---- | ------------------ | ---- |
 | --uri      |      | 链下token数据的URI |      |
 | --name     |      | nft名字            |      |
@@ -74,7 +74,7 @@ iris tx nft transfer [recipient] [denomID] [tokenID] [flags]
 
 **标志：**
 
-| 名称, 速记 | 默认 | 描述               | 必须 |
+| 名称，速记 | 默认 | 描述               | 必须 |
 | ---------- | ---- | ------------------ | ---- |
 | --uri      |      | 链下token数据的URI |      |
 | --name     |      | nft名字            |      |

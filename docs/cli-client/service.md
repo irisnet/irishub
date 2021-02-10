@@ -296,17 +296,16 @@ iris tx service call [flags]
 
 **Flags:**
 
-| Name, shorthand   | Default | Description                                                                       | Required |
-| ----------------- | ------- | --------------------------------------------------------------------------------- | -------- |
-| --service-name    |         | Service name                                                                      | Yes      |
-| --providers       |         | Provider list to request                                                          | Yes      |
-| --service-fee-cap |         | Maximum service fee to pay for a single request                                   | Yes      |
-| --data            |         | Content or file path of the request input, which is an Input JSON Schema instance | Yes      |
-| --timeout         |         | Request timeout                                                                   | Yes      |
-| --super-mode      | false   | Indicate if the signer is a super user                                            |          |
-| --repeated        | false   | Indicate if the reqeust is repetitive                                             |          |
-| --frequency       |         | Request frequency when repeated, default to `timeout`                             |          |
-| --total           |         | Request count when repeated, -1 means unlimited                                   |          |
+| Name, shorthand   | Default | Description                                                                                                            | Required |
+| ----------------- | ------- | ---------------------------------------------------------------------------------------------------------------------- | -------- |
+| --service-name    |         | Service name                                                                                                           | Yes      |
+| --providers       |         | Provider list to request                                                                                               | Yes      |
+| --service-fee-cap |         | Maximum service fee to pay for a single request                                                                        | Yes      |
+| --data            |         | Content or file path of the request input, which is an Input JSON Schema instance                                      | Yes      |
+| --timeout         |         | Request timeout                                                                                                        | Yes      |
+| --repeated        | false   | Indicate if the reqeust is repetitive (Temporarily disabled in irishub-v1.0.0, will be activated after a few versions) |          |
+| --frequency       |         | Request frequency when repeated, default to `timeout`                                                                  |          |
+| --total           |         | Request count when repeated, -1 means unlimited                                                                        |          |
 
 ### Initiate a service invocation request
 
@@ -358,11 +357,11 @@ iris query service request <request-id>
 You can retrieve the `request-id` in [Query request_id through rpc interface](#Query request_id through rpc interface) or [iris query service requests](#iris query service requests).
 :::
 
-##### Query request_id through rpc interface
+### Query request_id through rpc interface
 
 Query `block_results` according to `block height` through `rpc interface`, find `new_batch_request_provider` in `end_block_events`, decode the result with base64 to get `request_id`.
 
-```
+```bash
 curl -X POST -d '{"jsonrpc":"2.0","id":1,"method":"block_results","params":["10604"]}' http://localhost:26657
 ```
 

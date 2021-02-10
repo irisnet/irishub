@@ -9,8 +9,8 @@
 
 ### 收益的来源
 
-1. 交易所产生的交易费 `fee` (由交易的第一个签名者支付`fee`)
-2. 通胀的代币 `inflation`   (目前IRISnet系统设置的通胀为4%每年，通证总量为`20亿`)
+1. 交易所产生的交易费 `fee`（由交易的第一个签名者支付`fee`）
+2. 通胀的代币 `inflation`（目前IRISnet系统设置的通胀为4%每年，通证总量为`20亿`）
 
 ### 收益的去向
 
@@ -29,7 +29,7 @@
 
 默认情况下，收益将支付给发送委托交易的钱包。
 
-委托人可以更改自己收益取回钱包的地址。将委托地址对应的钱包(标记为`A`)，希望收益取回钱包地址(标记为`B`)。
+委托人可以更改自己收益取回钱包的地址。将委托地址对应的钱包（标记为`A`），希望收益取回钱包地址（标记为`B`）。
 
 设置钱包B为取回收益的钱包：
 
@@ -41,13 +41,13 @@ iris tx distribution set-withdraw-addr [withdraw-addr] [flags]
 
 根据取回场景的不同，有2种方式可以取回收益：
 
-1.`withdraw-all-rewards` : 提取所有在外的委托收益）。
+1.`withdraw-all-rewards`：提取所有在外的委托收益
 
 ```bash
 iris tx distribution withdraw-all-rewards [flags] --from=<key-name> --fees=0.3iris --chain-id=irishub
 ```
 
-2.`withdraw-rewards` ：从指定验证人处提取委托收益。
+2.`withdraw-rewards` ：从指定验证人处提取委托收益
 
 ```bash
 iris tx distribution withdraw-rewards [validator-addr] [flags] --from=<key-name> --fees=0.3iris --chain-id=irishub

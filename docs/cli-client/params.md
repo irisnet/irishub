@@ -6,19 +6,19 @@ Params module allows you to query the system parameters which can be governed (e
 iris query params subspace [subspace] [key] [flags]
 ```
 
-Subspace currently supports the following:`auth`、`bank`、`staking`、`mint`、`distribution`、`slashing`、`gov`、`crisis`、`token`、`record`、`htlc`、`coinswap`、`service`.
+Subspace currently supports the following:`auth`, `bank`, `staking`, `mint`, `distribution`, `slashing`, `gov`, `crisis`, `token`, `record`, `htlc`, `coinswap`, `service`.
 
 Among them, the parameters available for query for each subspace are as follows:
 
 ## auth
 
-| key                      | description                                                  | default |
-| ------------------------ | ------------------------------------------------------------ | ------- |
+| key                      | description                                                     | default |
+| ------------------------ | --------------------------------------------------------------- | ------- |
 | `MaxMemoCharacters`      | Maximum number of characters in the memo field in a transaction | 256     |
-| `TxSigLimit`             | Maximum number of signatures per transaction                 | 7       |
-| `TxSizeCostPerByte`      | The amount of gas consumed per byte of the transaction       | 10      |
-| `SigVerifyCostED25519`   | Gas spent on edd2519 algorithm signature verification        | 590     |
-| `SigVerifyCostSecp256k1` | Gas spent on secp256k1 algorithm signature verification      | 1000    |
+| `TxSigLimit`             | Maximum number of signatures per transaction                    | 7       |
+| `TxSizeCostPerByte`      | The amount of gas consumed per byte of the transaction          | 10      |
+| `SigVerifyCostED25519`   | Gas spent on edd2519 algorithm signature verification           | 590     |
+| `SigVerifyCostSecp256k1` | Gas spent on secp256k1 algorithm signature verification         | 1000    |
 
 ## bank
 
@@ -65,11 +65,11 @@ Among them, the parameters available for query for each subspace are as follows:
 
 ## gov
 
-| key             | description                                      | default                                                      |
-| --------------- | ------------------------------------------------ | ------------------------------------------------------------ |
+| key             | description                                      | default                                                         |
+| --------------- | ------------------------------------------------ | --------------------------------------------------------------- |
 | `depositparams` | Related parameters of the deposit mortgage phase | `min_deposit`:    10000000uiris; `max_deposit_period`: 2d(days) |
-| `votingparams`  | Related parameters of the voting mortgage phase  | `voting_period`: 2d(days)                                    |
-| `tallyparams`   | Related parameters of the voting tally phase     | `quorum`: 0.334; `threshold`: 0.5; `veto_threshold`: 0.334   |
+| `votingparams`  | Related parameters of the voting mortgage phase  | `voting_period`: 2d(days)                                       |
+| `tallyparams`   | Related parameters of the voting tally phase     | `quorum`: 0.334; `threshold`: 0.5; `veto_threshold`: 0.334      |
 
 ## crisis
 

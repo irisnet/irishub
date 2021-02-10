@@ -48,24 +48,24 @@ priv_validator_laddr = "localhost:26658"
 
 - 配置`state_file`为上一步完成的`priv_validator_state.json`。
 - 将你的Yubihsm密码写入文件`yubihsm-password.txt`并将`password_file`设置为它。
-- 编辑`addr`指向你的`iris`实例（注意: 无需指定连接ID，仅让它保持格式如：tcp://localhost:26658）。
+- 编辑`addr`指向你的`iris`实例（注意：无需指定连接ID，仅让它保持格式如：tcp://localhost:26658）。
 - 调整`chain_id` 以匹配你的`<iris-home>/config/genesis.json`中的设置。
 - 编辑`auth`以授权访问你的Yubihsm。
 - 编辑`keys`确定你将使用的pubkey。
 - 编辑`protocol_version`为v0.34。
 
-然后启动tmkms:
+然后启动 tmkms
 
 ```bash
 tmkms start -c /path/to/kms/home/tmkms.toml
 ```
 
-### 使用YubiHSM	
+### 使用YubiHSM
 
 有关如何使用YubiHSM2设置KMS的更多信息，请参阅[这里](https://github.com/iqlusioninc/tmkms/blob/master/README.yubihsm.md)。
 
 如果要导入已存在的IRIShub private_key，可以：
 
-```bash	
+```bash
 tmkms yubihsm keys import <iris_home>/config/priv_validator.json -i <id> -t json -c /path/to/kms/home/tmkms.toml
 ```
