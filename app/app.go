@@ -193,9 +193,10 @@ type IrisApp struct {
 	invCheckPeriod uint
 
 	// keys to access the substores
-	keys    map[string]*sdk.KVStoreKey
-	tkeys   map[string]*sdk.TransientStoreKey
-	memKeys map[string]*sdk.MemoryStoreKey
+	keys     map[string]*sdk.KVStoreKey
+	tkeys    map[string]*sdk.TransientStoreKey
+	memKeys  map[string]*sdk.MemoryStoreKey
+	homePath string
 
 	// keepers
 	accountKeeper    authkeeper.AccountKeeper
@@ -309,6 +310,7 @@ func NewIrisApp(
 		keys:              keys,
 		tkeys:             tkeys,
 		memKeys:           memKeys,
+		homePath:          homePath,
 	}
 
 	app.paramsKeeper = initParamsKeeper(appCodec, cdc, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
@@ -593,7 +595,9 @@ func (app *IrisApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	serviceGenState.Definitions = append(serviceGenState.Definitions, randomtypes.GetSvcDefinition())
 	genesisState[servicetypes.ModuleName] = app.appCodec.MustMarshalJSON(&serviceGenState)
 
-	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
+	resp := app.mm.InitGenesis(ctx, app.appCodec, genesisState)
+	app.ExportStateToCSV(ctx)
+	return resp
 }
 
 // LoadHeight loads a particular height
