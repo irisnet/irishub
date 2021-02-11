@@ -2,6 +2,7 @@ package v2
 
 import (
 	"encoding/csv"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/irisnet/irishub/app/protocol"
@@ -94,9 +95,23 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 			"Rate",
 			"MaxRate",
 			"MaxChangeRate",
+			"OwnerAddr",
+			"CommissionReward",
 		},
 	}
 	for _, val := range stakeState.Validators {
+		owner, err := sdk.AccAddressFromHex(hex.EncodeToString(val.OperatorAddr.Bytes()))
+		if err != nil {
+			panic(err)
+		}
+
+
+		valInfo := p.distrKeeper.GetValidatorDistInfo(ctx, val.OperatorAddr)
+
+		wc := p.distrKeeper.GetWithdrawContext(ctx, val.OperatorAddr)
+		commission := valInfo.CurrentCommissionRewards(wc)
+		truncated, _ := commission.TruncateDecimal()
+
 		csvData = append(csvData, []string{
 			val.OperatorAddr.String(),
 			val.ConsPubKey.Address().String(),
@@ -111,6 +126,8 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 			val.Commission.Rate.String(),
 			val.Commission.MaxRate.String(),
 			val.Commission.MaxChangeRate.String(),
+			owner.String(),
+			truncated.AmountOf(Atto).String(),
 		})
 	}
 
@@ -176,7 +193,7 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 	distrState := distr.ExportGenesis(ctx, p.distrKeeper)
 
 	csvData = [][]string{
-		{"DelegatorAddr", "ValidatorAddr", "DelegationReward", "CommissionReward"},
+		{"DelegatorAddr", "ValidatorAddr", "DelegationReward"},
 	}
 	for _, dd := range distrState.DelegationDistInfos {
 		dr, err := p.distrKeeper.CurrentDelegationReward(ctx, dd.DelegatorAddr, dd.ValOperatorAddr)
@@ -184,17 +201,10 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 			panic(err)
 		}
 
-		valInfo := p.distrKeeper.GetValidatorDistInfo(ctx, dd.ValOperatorAddr)
-
-		wc := p.distrKeeper.GetWithdrawContext(ctx, dd.ValOperatorAddr)
-		commission := valInfo.CurrentCommissionRewards(wc)
-		truncated, _ := commission.TruncateDecimal()
-
 		csvData = append(csvData, []string{
 			dd.DelegatorAddr.String(),
 			dd.ValOperatorAddr.String(),
 			dr.AmountOf(Atto).String(),
-			truncated.AmountOf(Atto).String(),
 		})
 	}
 
