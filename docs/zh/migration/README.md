@@ -43,7 +43,7 @@ iris init [moniker] --home [v1.0.0_node_home]
   - 修改文件名称
   
     ```bash
-    mv [v0.16_node_home]/config/priv_validator.json [v1.0.0_node_home]/config/priv_validator_key.json
+    cp [v0.16_node_home]/config/priv_validator.json [v1.0.0_node_home]/config/priv_validator_key.json
     ```
 
   - 使用脚本

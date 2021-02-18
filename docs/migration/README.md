@@ -43,7 +43,7 @@ If you do not use kms to deploy nodes, and the node configuration file exists, y
   - Rename file
   
     ```bash
-    mv [v0.16_node_home]/config/priv_validator.json [v1.0.0_node_home]/config/priv_validator_key.json
+    cp [v0.16_node_home]/config/priv_validator.json [v1.0.0_node_home]/config/priv_validator_key.json
     ```
 
   - Use script
