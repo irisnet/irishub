@@ -3,7 +3,7 @@ module github.com/irisnet/irishub
 go 1.15
 
 require (
-	github.com/cosmos/cosmos-sdk v0.41.2
+	github.com/cosmos/cosmos-sdk v0.41.3
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.4.3
 	github.com/gorilla/mux v1.8.0
