@@ -3,11 +3,6 @@
 #
 FROM golang:1.15.5-alpine3.12 as builder
 
-# this comes from standard alpine nightly file
-#  https://github.com/rust-lang/docker-rust-nightly/blob/master/alpine3.12/Dockerfile
-# with some changes to support our toolchain, etc
-RUN set -eux; apk add --no-cache ca-certificates build-base;
-
 # Set up dependencies
 ENV PACKAGES make gcc git libc-dev bash linux-headers eudev-dev
 
@@ -19,7 +14,7 @@ COPY . .
 # Install minimum necessary dependencies
 RUN apk add --no-cache $PACKAGES
 
-RUN BUILD_TAGS=muslc make build
+RUN make build
 
 # ----------------------------
 

@@ -1,4 +1,4 @@
-# IRIShub 从 v0.16 迁移到 v1.0.0
+# IRIShub 从 v0.16 迁移到 v1.0.1
 
 ## 1. 导出 genesis 文件
 
@@ -10,53 +10,53 @@ iris export --home [v0.16_node_home] --height [upgrade-height] --for-zero-height
 
 ## 2. 迁移 genesis 文件
 
-使用 `irishub v1.0.0` 迁移导出的 genesis.json 文件
+使用 `irishub v1.0.1` 迁移导出的 genesis.json 文件
 
 ```bash
-iris migrate genesis.json --chain-id irishub-1 > genesis_v1.0.0.json
+iris migrate genesis.json --chain-id irishub-1 > genesis_v1.0.1.json
 ```
 
 校验 sha256sum 哈希值是否正确
 
 ```bash
-sha256sum genesis_v1.0.0.json
+sha256sum genesis_v1.0.1.json
 ```
 
 ## 3. 初始化新节点
 
-使用 `irishub v1.0.0` 初始化新的节点
+使用 `irishub v1.0.1` 初始化新的节点
 
 ```bash
-iris init [moniker] --home [v1.0.0_node_home]
+iris init [moniker] --home [v1.0.1_node_home]
 ```
 
 ## 4. 迁移私钥文件
 
-使用 `irishub v1.0.0` 迁移私钥文件
+使用 `irishub v1.0.1` 迁移私钥文件
 
 ```bash
-go run migrate/scripts/privValUpgrade.go [v0.16_node_home]/config/priv_validator.json [v1.0.0_node_home]/config/priv_validator_key.json [v1.0.0_node_home]/data/priv_validator_state.json
+go run migrate/scripts/privValUpgrade.go [v0.16_node_home]/config/priv_validator.json [v1.0.1_node_home]/config/priv_validator_key.json [v1.0.1_node_home]/data/priv_validator_state.json
 ```
 
 ## 5. 迁移节点密钥文件
 
-使用 `irishub v1.0.0` 迁移节点密钥文件
+使用 `irishub v1.0.1` 迁移节点密钥文件
 
 ```bash
-cp [v0.16_node_home]/config/node_key.json [v1.0.0_node_home]/config/node_key.json
+cp [v0.16_node_home]/config/node_key.json [v1.0.1_node_home]/config/node_key.json
 ```
 
 ## 6. 复制迁移过的 genensis 文件到新的节点目录
 
-复制 genesis_v1.0.0.json 到新节点的配置文件目录
+复制 genesis_v1.0.1.json 到新节点的配置文件目录
 
 ```bash
-cp genesis_v1.0.0.json [v1.0.0_node_home]/config/genesis.json
+cp genesis_v1.0.1.json [v1.0.1_node_home]/config/genesis.json
 ```
 
 ## 7. 配置新的节点
 
-在 `[v1.0.0_node_home]/config/app.toml` 中配置 `minimum-gas-prices`
+在 `[v1.0.1_node_home]/config/app.toml` 中配置 `minimum-gas-prices`
 
 ```toml
 
@@ -67,7 +67,7 @@ minimum-gas-prices = "0.2uiris"
 
 ```
 
-复制 `[v0.16_node_home]/config/config.toml` 中的 `persistent_peers` 到 `[v1.0.0_node_home]/config/config.toml` 中
+复制 `[v0.16_node_home]/config/config.toml` 中的 `persistent_peers` 到 `[v1.0.1_node_home]/config/config.toml` 中
 
 ```toml
 
@@ -80,9 +80,9 @@ persistent_peers = ""
 
 ## 8. 启动新的节点
 
-使用 irishub v1.0.0 启动新的节点
+使用 irishub v1.0.1 启动新的节点
 
 ```bash
-iris unsafe-reset-all --home [v1.0.0_node_home]
-iris start --home [v1.0.0_node_home]
+iris unsafe-reset-all --home [v1.0.1_node_home]
+iris start --home [v1.0.1_node_home]
 ```
