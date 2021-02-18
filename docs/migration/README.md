@@ -32,21 +32,25 @@ iris init [moniker] --home [v1.0.0_node_home]
 
 ## 4. Migrate privkey file
 
-Migrate privkey file with irishub v1.0.0,There are two ways:
+Migrate privkey file with irishub v1.0.0.
 
-- Rename file
+- KMS user
+If you are using kms deployment node, please upgrade `tmkms` first, and then modify the relevant configuration, please refer to the [kms](../tools/kms.md) for details
 
+- Not KMS user
+If you do not use kms to deploy nodes, and the node configuration file exists, you can use the following two ways:
+
+  - Rename file
+  
     ```bash
     mv [v0.16_node_home]/config/priv_validator.json [v1.0.0_node_home]/config/priv_validator_key.json
     ```
 
-- Use script
+  - Use script
 
     ```bash
     go run migrate/scripts/privValUpgrade.go [v0.16_node_home]/config/priv_validator.json [v1.0.0_node_home]/config/priv_validator_key.json [v1.0.0_node_home]/data/priv_validator_state.json
     ```
-
-**If you are using kms deployment node, please upgrade kms first, and then modify the relevant configuration, please refer to the [document](../tools/kms.md) for details**
 
 ## 5. Migrate node key file
 

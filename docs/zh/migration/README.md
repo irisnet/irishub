@@ -32,21 +32,25 @@ iris init [moniker] --home [v1.0.0_node_home]
 
 ## 4. 迁移私钥文件
 
-使用 `irishub v1.0.0` 迁移私钥文件，有两种方式：
+使用 `irishub v1.0.0` 迁移私钥文件。
 
-- 修改文件名称
+- `KMS`用户
+如果你使用的是kms部署节点，请先升级`tmkms`，然后修改相关配置，详细内容请参考[kms](../tools/kms.md)
 
+- 非`KMS`用户
+如果你没有使用的是kms部署节点，节点配置文件存在的情况下，可以使用以下两种方式迁移配置文件：
+
+  - 修改文件名称
+  
     ```bash
     mv [v0.16_node_home]/config/priv_validator.json [v1.0.0_node_home]/config/priv_validator_key.json
     ```
 
-- 使用脚本
+  - 使用脚本
 
     ```bash
     go run migrate/scripts/privValUpgrade.go [v0.16_node_home]/config/priv_validator.json [v1.0.0_node_home]/config/priv_validator_key.json [v1.0.0_node_home]/data/priv_validator_state.json
     ```
-
-**如果你使用的是kms部署节点，请先升级kms，然后修改相关配置，详细内容请参考[文档](../tools/kms.md)**
 
 ## 5. 迁移节点密钥文件
 
