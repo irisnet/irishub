@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 1.0.1
+
+*February 18th, 2021*
+
+This release fixes a downstream security issue which impacts Cosmos SDK users. 
+See the [Tendermint v0.34.7 SDK changelog](https://github.com/tendermint/tendermint/blob/v0.34.x/CHANGELOG.md#v0347) for details.
+
+* [\#2571](https://github.com/irisnet/irishub/pull/2571) Bump cosmos-sdk version to [v0.41.2](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.41.0)
+* [\#2571](https://github.com/irisnet/irishub/pull/2571) Bump tendermint verion to [v0.34.7](https://github.com/tendermint/tendermint/releases/tag/v0.34.3)
+
+
 ## 1.0.0
 
 *February 9th, 2021*
