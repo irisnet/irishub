@@ -68,6 +68,13 @@ func (k Keeper) BaseDenom(ctx sdk.Context) (res string) {
 	return
 }
 
+// RestrictedServiceFeeDenom returns the boolean value which
+// indicates if the service fee only accepts the base denom
+func (k Keeper) RestrictedServiceFeeDenom(ctx sdk.Context) (res bool) {
+	k.paramSpace.Get(ctx, types.KeyRestrictedServiceFeeDenom, &res)
+	return
+}
+
 // GetParams gets all parameteras as types.Params
 func (k Keeper) GetParams(ctx sdk.Context) types.Params {
 	return types.NewParams(
@@ -80,6 +87,7 @@ func (k Keeper) GetParams(ctx sdk.Context) types.Params {
 		k.ArbitrationTimeLimit(ctx),
 		k.TxSizeLimit(ctx),
 		k.BaseDenom(ctx),
+		k.RestrictedServiceFeeDenom(ctx),
 	)
 }
 

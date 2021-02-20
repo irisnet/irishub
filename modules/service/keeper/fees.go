@@ -24,7 +24,7 @@ func (k Keeper) AddEarnedFee(ctx sdk.Context, provider sdk.AccAddress, fee sdk.C
 		taxCoins = taxCoins.Add(sdk.NewCoin(coin.Denom, taxAmount))
 	}
 
-	if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, types.RequestAccName, k.taxAccName, taxCoins); err != nil {
+	if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, types.RequestAccName, k.feeCollectorName, taxCoins); err != nil {
 		return err
 	}
 

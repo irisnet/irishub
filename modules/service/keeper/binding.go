@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"bytes"
-	"encoding/json"
 	"time"
 
 	gogotypes "github.com/gogo/protobuf/types"
@@ -59,16 +58,6 @@ func (k Keeper) AddServiceBinding(
 		return err
 	}
 
-	if err := types.ValidatePricing(parsedPricing); err != nil {
-		return err
-	}
-
-	for i, token := range parsedPricing.Price {
-		if total := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(token.Denom); !total.IsPositive() {
-			return sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid denom: %s", parsedPricing.Price[i].Denom)
-		}
-	}
-
 	minDeposit, err := k.GetMinDeposit(ctx, parsedPricing)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrInvalidMinDeposit, "%s", err)
@@ -118,15 +107,15 @@ func (k Keeper) SetServiceBindingForGenesis(
 		return err
 	}
 
+	pricing, err := types.ParsePricing(svcBinding.Pricing)
+	if err != nil {
+		return err
+	}
+
 	k.SetServiceBinding(ctx, svcBinding)
 	k.SetOwnerServiceBinding(ctx, svcBinding)
 	k.SetOwner(ctx, provider, owner)
 	k.SetOwnerProvider(ctx, owner, provider)
-
-	pricing, err := k.ParsePricing(ctx, svcBinding.Pricing)
-	if err != nil {
-		return err
-	}
 
 	k.SetPricing(ctx, svcBinding.ServiceName, provider, pricing)
 
@@ -191,16 +180,6 @@ func (k Keeper) UpdateServiceBinding(
 		parsedPricing, err := k.ParsePricing(ctx, pricing)
 		if err != nil {
 			return err
-		}
-
-		if err := types.ValidatePricing(parsedPricing); err != nil {
-			return err
-		}
-
-		for i, token := range parsedPricing.Price {
-			if total := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(token.Denom); !total.IsPositive() {
-				return sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid denom: %s", parsedPricing.Price[i].Denom)
-			}
 		}
 
 		binding.Pricing = pricing
@@ -505,25 +484,6 @@ func (k Keeper) OwnerProvidersIterator(ctx sdk.Context, owner sdk.AccAddress) sd
 	return sdk.KVStorePrefixIterator(store, types.GetOwnerProvidersSubspace(owner))
 }
 
-// ParsePricing parses the given string to Pricing
-func (k Keeper) ParsePricing(ctx sdk.Context, pricing string) (p types.Pricing, err error) {
-	var rawPricing types.RawPricing
-	if err := json.Unmarshal([]byte(pricing), &rawPricing); err != nil {
-		return p, sdkerrors.Wrapf(types.ErrInvalidPricing, "failed to unmarshal the pricing: %s", err.Error())
-	}
-
-	tokenPrice, err := sdk.ParseCoinNormalized(rawPricing.Price)
-	if err != nil {
-		return p, sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid price: %s", err.Error())
-	}
-
-	p.Price = sdk.Coins{tokenPrice}
-	p.PromotionsByTime = rawPricing.PromotionsByTime
-	p.PromotionsByVolume = rawPricing.PromotionsByVolume
-
-	return p, nil
-}
-
 // SetPricing sets the pricing for the specified service binding
 func (k Keeper) SetPricing(
 	ctx sdk.Context,
@@ -651,12 +611,49 @@ func (k Keeper) GetMinDeposit(ctx sdk.Context, pricing types.Pricing) (sdk.Coins
 	return minDeposit, nil
 }
 
+// ParsePricing parses the given pricing
+func (k Keeper) ParsePricing(ctx sdk.Context, pricing string) (p types.Pricing, err error) {
+	p, err = types.ParsePricing(pricing)
+	if err != nil {
+		return p, err
+	}
+
+	if err := types.CheckPricing(p); err != nil {
+		return p, err
+	}
+
+	if err := k.validatePricing(ctx, p); err != nil {
+		return p, err
+	}
+
+	return p, nil
+}
+
 // validateDeposit validates the given deposit
 func (k Keeper) validateDeposit(ctx sdk.Context, deposit sdk.Coins) error {
 	baseDenom := k.BaseDenom(ctx)
 
 	if len(deposit) != 1 || deposit[0].Denom != baseDenom {
 		return sdkerrors.Wrapf(types.ErrInvalidDeposit, "deposit only accepts %s", baseDenom)
+	}
+
+	return nil
+}
+
+// validatePricing validates the given pricing
+func (k Keeper) validatePricing(ctx sdk.Context, pricing types.Pricing) error {
+	priceDenom := pricing.Price.GetDenomByIndex(0)
+
+	if k.RestrictedServiceFeeDenom(ctx) {
+		baseDenom := k.BaseDenom(ctx)
+
+		if priceDenom != baseDenom {
+			return sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid denom: %s, service fee only accepts %s", priceDenom, baseDenom)
+		}
+	}
+
+	if supply := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(priceDenom); !supply.IsPositive() {
+		return sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid denom: %s", priceDenom)
 	}
 
 	return nil

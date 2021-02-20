@@ -378,8 +378,8 @@ func (s *IntegrationTestSuite) TestService() {
 	withdrawalFees := respType.(*banktypes.QueryAllBalancesResponse).Balances
 	s.Require().Equal(expectedEarnedFees, withdrawalFees.String())
 
-	//------check service tax account-------------
-	bz, err = banktestutil.QueryBalancesExec(val.ClientCtx, authtypes.NewModuleAddress(servicetypes.TaxAccName))
+	//------check service tax-------------
+	bz, err = banktestutil.QueryBalancesExec(val.ClientCtx, authtypes.NewModuleAddress(servicetypes.FeeCollectorName))
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	taxFees := respType.(*banktypes.QueryAllBalancesResponse).Balances

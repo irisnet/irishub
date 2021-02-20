@@ -1076,7 +1076,7 @@ func (k Keeper) Slash(ctx sdk.Context, requestID tmbytes.HexBytes) error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "%s is less than %s", binding.Deposit.String(), slashedCoins.String())
 	}
 
-	if err := k.bankKeeper.BurnCoins(ctx, types.DepositAccName, slashedCoins); err != nil {
+	if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, types.DepositAccName, k.feeCollectorName, slashedCoins); err != nil {
 		return err
 	}
 

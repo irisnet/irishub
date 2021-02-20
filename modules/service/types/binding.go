@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -72,8 +73,27 @@ func GetDiscountByVolume(pricing Pricing, volume uint64) sdk.Dec {
 	return sdk.OneDec()
 }
 
-// ValidatePricing validates the given pricing
-func ValidatePricing(pricing Pricing) error {
+// ParsePricing parses the given string to Pricing
+func ParsePricing(pricing string) (p Pricing, err error) {
+	var rawPricing RawPricing
+	if err := json.Unmarshal([]byte(pricing), &rawPricing); err != nil {
+		return p, sdkerrors.Wrapf(ErrInvalidPricing, "failed to unmarshal the pricing: %s", err.Error())
+	}
+
+	priceCoin, err := sdk.ParseCoinNormalized(rawPricing.Price)
+	if err != nil {
+		return p, sdkerrors.Wrapf(ErrInvalidPricing, "invalid price: %s", err.Error())
+	}
+
+	p.Price = sdk.Coins{priceCoin}
+	p.PromotionsByTime = rawPricing.PromotionsByTime
+	p.PromotionsByVolume = rawPricing.PromotionsByVolume
+
+	return p, nil
+}
+
+// CheckPricing checks if the given pricing complies with the specific rules
+func CheckPricing(pricing Pricing) error {
 	// CONTRACT:
 	// p.EndTime > p.StartTime
 	// p[i].StartTime >= p[i-1].EndTime

@@ -104,6 +104,19 @@ func ValidateServiceDeposit(deposit sdk.Coins) error {
 	return nil
 }
 
+func ValidatePricing(pricing string) error {
+	if err := ValidateBindingPricing(pricing); err != nil {
+		return err
+	}
+
+	parsedPricing, err := ParsePricing(pricing)
+	if err != nil {
+		return err
+	}
+
+	return CheckPricing(parsedPricing)
+}
+
 // ValidateQoS verifies whether the  parameters are legal
 func ValidateQoS(qos uint64) error {
 	if qos == 0 {

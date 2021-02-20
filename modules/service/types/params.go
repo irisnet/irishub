@@ -12,32 +12,32 @@ import (
 
 // Service params default values
 var (
-	DefaultMaxRequestTimeout    = int64(100)
-	DefaultMinDepositMultiple   = int64(1000)
-	DefaultMinDeposit           = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000))) // 5000stake
-	DefaultServiceFeeTax        = sdk.NewDecWithPrec(5, 2)                                          // 5%
-	DefaultSlashFraction        = sdk.NewDecWithPrec(1, 3)                                          // 0.1%
-	DefaultComplaintRetrospect  = 15 * 24 * time.Hour                                               // 15 days
-	DefaultArbitrationTimeLimit = 5 * 24 * time.Hour                                                // 5 days
-	DefaultTxSizeLimit          = uint64(4000)
-	DefaultBaseDenom            = sdk.DefaultBondDenom
+	DefaultMaxRequestTimeout         = int64(100)
+	DefaultMinDepositMultiple        = int64(1000)
+	DefaultMinDeposit                = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000))) // 5000stake
+	DefaultServiceFeeTax             = sdk.NewDecWithPrec(5, 2)                                          // 5%
+	DefaultSlashFraction             = sdk.NewDecWithPrec(1, 3)                                          // 0.1%
+	DefaultComplaintRetrospect       = 15 * 24 * time.Hour                                               // 15 days
+	DefaultArbitrationTimeLimit      = 5 * 24 * time.Hour                                                // 5 days
+	DefaultTxSizeLimit               = uint64(4000)
+	DefaultBaseDenom                 = sdk.DefaultBondDenom
+	DefaultRestrictedServiceFeeDenom = false
 )
 
 // Keys for parameter access
 // nolint
 var (
-	KeyMaxRequestTimeout    = []byte("MaxRequestTimeout")
-	KeyMinDepositMultiple   = []byte("MinDepositMultiple")
-	KeyMinDeposit           = []byte("MinDeposit")
-	KeyServiceFeeTax        = []byte("ServiceFeeTax")
-	KeySlashFraction        = []byte("SlashFraction")
-	KeyComplaintRetrospect  = []byte("ComplaintRetrospect")
-	KeyArbitrationTimeLimit = []byte("ArbitrationTimeLimit")
-	KeyTxSizeLimit          = []byte("TxSizeLimit")
-	KeyBaseDenom            = []byte("BaseDenom")
+	KeyMaxRequestTimeout         = []byte("MaxRequestTimeout")
+	KeyMinDepositMultiple        = []byte("MinDepositMultiple")
+	KeyMinDeposit                = []byte("MinDeposit")
+	KeyServiceFeeTax             = []byte("ServiceFeeTax")
+	KeySlashFraction             = []byte("SlashFraction")
+	KeyComplaintRetrospect       = []byte("ComplaintRetrospect")
+	KeyArbitrationTimeLimit      = []byte("ArbitrationTimeLimit")
+	KeyTxSizeLimit               = []byte("TxSizeLimit")
+	KeyBaseDenom                 = []byte("BaseDenom")
+	KeyRestrictedServiceFeeDenom = []byte("RestrictedServiceFeeDenom")
 )
-
-var _ paramstypes.ParamSet = (*Params)(nil)
 
 // NewParams creates a new Params instance
 func NewParams(
@@ -50,17 +50,19 @@ func NewParams(
 	arbitrationTimeLimit time.Duration,
 	txSizeLimit uint64,
 	baseDenom string,
+	restrictedServiceFeeDenom bool,
 ) Params {
 	return Params{
-		MaxRequestTimeout:    maxRequestTimeout,
-		MinDepositMultiple:   minDepositMultiple,
-		MinDeposit:           minDeposit,
-		ServiceFeeTax:        serviceFeeTax,
-		SlashFraction:        slashFraction,
-		ComplaintRetrospect:  complaintRetrospect,
-		ArbitrationTimeLimit: arbitrationTimeLimit,
-		TxSizeLimit:          txSizeLimit,
-		BaseDenom:            baseDenom,
+		MaxRequestTimeout:         maxRequestTimeout,
+		MinDepositMultiple:        minDepositMultiple,
+		MinDeposit:                minDeposit,
+		ServiceFeeTax:             serviceFeeTax,
+		SlashFraction:             slashFraction,
+		ComplaintRetrospect:       complaintRetrospect,
+		ArbitrationTimeLimit:      arbitrationTimeLimit,
+		TxSizeLimit:               txSizeLimit,
+		BaseDenom:                 baseDenom,
+		RestrictedServiceFeeDenom: restrictedServiceFeeDenom,
 	}
 }
 
@@ -75,7 +77,8 @@ func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 		paramstypes.NewParamSetPair(KeyComplaintRetrospect, &p.ComplaintRetrospect, validateComplaintRetrospect),
 		paramstypes.NewParamSetPair(KeyArbitrationTimeLimit, &p.ArbitrationTimeLimit, validateArbitrationTimeLimit),
 		paramstypes.NewParamSetPair(KeyTxSizeLimit, &p.TxSizeLimit, validateTxSizeLimit),
-		paramstypes.NewParamSetPair(KeyBaseDenom, &p.BaseDenom, validateTxBaseDenom),
+		paramstypes.NewParamSetPair(KeyBaseDenom, &p.BaseDenom, validateBaseDenom),
+		paramstypes.NewParamSetPair(KeyRestrictedServiceFeeDenom, &p.RestrictedServiceFeeDenom, validateRestrictedServiceFeeDenom),
 	}
 }
 
@@ -91,6 +94,7 @@ func DefaultParams() Params {
 		DefaultArbitrationTimeLimit,
 		DefaultTxSizeLimit,
 		DefaultBaseDenom,
+		DefaultRestrictedServiceFeeDenom,
 	)
 }
 
@@ -123,11 +127,14 @@ func (p Params) Validate() error {
 	if err := validateArbitrationTimeLimit(p.ArbitrationTimeLimit); err != nil {
 		return err
 	}
+	if err := validateTxSizeLimit(p.TxSizeLimit); err != nil {
+		return err
+	}
 	if err := sdk.ValidateDenom(p.BaseDenom); err != nil {
 		return err
 	}
 
-	return validateTxSizeLimit(p.TxSizeLimit)
+	return validateRestrictedServiceFeeDenom(p.RestrictedServiceFeeDenom)
 }
 
 func validateMaxRequestTimeout(i interface{}) error {
@@ -234,11 +241,20 @@ func validateTxSizeLimit(i interface{}) error {
 	return nil
 }
 
-func validateTxBaseDenom(i interface{}) error {
+func validateBaseDenom(i interface{}) error {
 	v, ok := i.(string)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
 	return sdk.ValidateDenom(v)
+}
+
+func validateRestrictedServiceFeeDenom(i interface{}) error {
+	_, ok := i.(bool)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	return nil
 }

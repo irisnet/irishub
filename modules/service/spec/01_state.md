@@ -11,15 +11,16 @@ guarantee the interaction between the consumer and provider.
 
 ```go
 type Params struct {
-    MaxRequestTimeout    int64         // maximum request timeout
-    MinDepositMultiple   int64         // minimum deposit multiple
-    MinDeposit           sdk.Coins     // minimum deposit
-    ServiceFeeTax        sdk.Dec       // service fee tax ratio
-    SlashFraction        sdk.Dec       // fraction for stashing
-    ComplaintRetrospect  time.Duration // duration for complaint retrospect
-    ArbitrationTimeLimit time.Duration // duration for arbitration
-    TxSizeLimit          uint64        // transaction size limitation for service
-    BaseDenom            string        // base denom for deposit
+    MaxRequestTimeout         int64         // maximum request timeout
+    MinDepositMultiple        int64         // minimum deposit multiple
+    MinDeposit                sdk.Coins     // minimum deposit
+    ServiceFeeTax             sdk.Dec       // service fee tax ratio
+    SlashFraction             sdk.Dec       // fraction for stashing
+    ComplaintRetrospect       time.Duration // duration for complaint retrospect
+    ArbitrationTimeLimit      time.Duration // duration for arbitration
+    TxSizeLimit               uint64        // transaction size limitation for service
+    BaseDenom                 string        // base denom for deposit
+    RestrictedServiceFeeDenom bool          // indicates if the service fee only accepts the base denom
 }
 ```
 

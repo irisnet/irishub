@@ -22,8 +22,8 @@ type Keeper struct {
 	bankKeeper    types.BankKeeper
 	paramSpace    paramstypes.Subspace
 
-	// name of the service fee tax ModuleAccount
-	taxAccName string
+	// name of the fee collector
+	feeCollectorName string
 
 	// used to map the module name to response callback
 	respCallbacks map[string]types.ResponseCallback
@@ -42,7 +42,7 @@ func NewKeeper(
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	paramSpace paramstypes.Subspace,
-	taxAccName string,
+	feeCollectorName string,
 ) Keeper {
 	// ensure service module accounts are set
 	if addr := accountKeeper.GetModuleAddress(types.DepositAccName); addr == nil {
@@ -59,12 +59,12 @@ func NewKeeper(
 	}
 
 	keeper := Keeper{
-		storeKey:      key,
-		cdc:           cdc,
-		accountKeeper: accountKeeper,
-		bankKeeper:    bankKeeper,
-		taxAccName:    taxAccName,
-		paramSpace:    paramSpace,
+		storeKey:         key,
+		cdc:              cdc,
+		accountKeeper:    accountKeeper,
+		bankKeeper:       bankKeeper,
+		feeCollectorName: feeCollectorName,
+		paramSpace:       paramSpace,
 	}
 
 	keeper.respCallbacks = make(map[string]types.ResponseCallback)
