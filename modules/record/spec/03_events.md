@@ -6,14 +6,13 @@ order: 3
 
 The record module emits the following events:
 
-## handlers
+## Handlers
 
 ### MsgCreateRecord
 
 | Type          | Attribute Key | Attribute Value  |
-|:--------------|:--------------|:-----------------|
+| :------------ | :------------ | :--------------- |
 | create_record | creator       | {creatorAddress} |
 | create_record | record_id     | {recordId}       |
 | message       | module        | record           |
 | message       | sender        | {creatorAddress} |
-
