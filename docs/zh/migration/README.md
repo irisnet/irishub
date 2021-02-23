@@ -16,6 +16,13 @@ iris export --home [v0.16_node_home] --height [upgrade-height] --for-zero-height
 iris migrate genesis.json --chain-id irishub-1 > genesis_v1.0.1.json
 ```
 
+将升级高度+1指定为irishub v1.0.1的初始高度
+
+```bash
+export initial_height=$[${upgrade block height} + 1]
+jq --arg v "$initial_height" '.initial_height=$v' genesis_v1.0.1.json | sponge genesis_v1.0.1.json
+```
+
 校验 sha256sum 哈希值是否正确
 
 ```bash

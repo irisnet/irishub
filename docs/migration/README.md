@@ -16,6 +16,13 @@ Migrate the exported genesis.json with irishub v1.0.1
 iris migrate genesis.json --chain-id irishub-1 > genesis_v1.0.1.json
 ```
 
+Specify the upgrade height + 1 as the initial height of irishub v1.0.1
+
+```bash
+export initial_height=$[${upgrade block height} + 1]
+jq --arg v "$initial_height" '.initial_height=$v' genesis_v1.0.1.json | sponge genesis_v1.0.1.json
+```
+
 Check if sha256sum is correct
 
 ```bash
