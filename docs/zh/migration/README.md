@@ -5,7 +5,7 @@
 停止 irishub v0.16 守护程序，并使用 `irishub v0.16.4（已修复导出中的错误）` 在升级高度导出主网状态并指定 `--for-zero-height`。
 
 ```bash
-iris export --home [v0.16_node_home] --height [upgrade-height] --for-zero-height
+iris export --home [v0.16_node_home] --height 9146455 --for-zero-height
 ```
 
 ## 2. 迁移 genesis 文件
@@ -19,7 +19,8 @@ iris migrate genesis.json --chain-id irishub-1 > genesis_v1.0.1.json
 将升级高度+1指定为irishub v1.0.1的初始高度
 
 ```bash
-export initial_height=$[${upgrade block height} + 1]
+# export initial_height=$[${upgrade block height} + 1]
+export initial_height=9146456
 jq --arg v "$initial_height" '.initial_height=$v' genesis_v1.0.1.json | sponge genesis_v1.0.1.json
 ```
 
