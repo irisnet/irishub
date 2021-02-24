@@ -5,7 +5,7 @@
 Stop irishub v0.16 daemon and use `irishub v0.16.4 (which fixed bugs in export)` to export mainnet state genesis with `--for-zero-height` at the upgrade block height
 
 ```bash
-iris export --home [v0.16_node_home] --height [upgrade-height] --for-zero-height
+iris export --home [v0.16_node_home] --height 9146455 --for-zero-height
 ```
 
 ## 2. Migrate genesis file
@@ -14,6 +14,14 @@ Migrate the exported genesis.json with irishub v1.0.1
 
 ```bash
 iris migrate genesis.json --chain-id irishub-1 > genesis_v1.0.1.json
+```
+
+Specify the upgrade height + 1 as the initial height of irishub v1.0.1
+
+```bash
+# export initial_height=$[${upgrade block height} + 1]
+export initial_height=9146456
+jq --arg v "$initial_height" '.initial_height=$v' genesis_v1.0.1.json | sponge genesis_v1.0.1.json
 ```
 
 Check if sha256sum is correct
