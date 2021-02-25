@@ -12,7 +12,7 @@ order: 3
 
 ```bash
 # 初始化节点
-iris init <moniker> --chain-id=irishub
+iris init <moniker> --chain-id=irishub-1
 
 # 下载主网公开的 config.toml 和 genesis.json
 curl -o ~/.iris/config/config.toml https://raw.githubusercontent.com/irisnet/mainnet/master/config/config.toml
@@ -26,10 +26,6 @@ iris start
 您可能会看到一些连接错误，这没关系，P2P网络正在尝试查找可用的连接
 
 可以添加几个[社区公开节点](https://github.com/irisnet/mainnet/blob/master/config/community-peers.md) 到`config.toml`中的`persistent_peers`。
-:::
-
-:::tip
-从零开始追赶区块需要很长时间，您也可以下载[主网数据快照](#TODO)以减少同步时间
 :::
 
 ## 升级为验证人节点
@@ -66,10 +62,13 @@ iris tx staking create-validator \
     --pubkey=$(iris tendermint show-validator) \
     --moniker=<your-validator-name> \
     --amount=<amount-to-be-delegated, e.g. 10000iris> \
+    --min-self-delegation=1 \
+    --commission-max-change-rate=0.1 \
+    --commission-max-rate=0.1 \
     --commission-rate=0.1 \
     --gas=100000 \
     --fees=0.6iris \
-    --chain-id=irishub \
+    --chain-id=irishub-1 \
     --from=<key-name>
 ```
 

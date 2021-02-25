@@ -18,7 +18,7 @@
 | [proposer](#iris-query-gov-proposer)            | 通过提议ID查询提案的发起人地址                         |
 | [submit-proposal](#iris-tx-gov-submit-proposal) | 提交提案                                               |
 | [deposit](#iris-tx-gov-deposit)                 | 为有效的提案抵押代币                                   |
-| [vote](#iris-tx-gov-vote)                       | 为活跃的提案投票：可选值： yes/no/no_with_veto/abstain |
+| [vote](#iris-tx-gov-vote)                       | 为活跃的提案投票，可选值： yes/no/no_with_veto/abstain |
 
 ## iris query gov proposal
 
