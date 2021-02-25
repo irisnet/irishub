@@ -28,10 +28,6 @@ iris start
 可以添加几个[社区公开节点](https://github.com/irisnet/mainnet/blob/master/config/community-peers.md) 到`config.toml`中的`persistent_peers`。
 :::
 
-:::tip
-从零开始追赶区块需要很长时间，您也可以下载[主网数据快照](#TODO)以减少同步时间
-:::
-
 ## 升级为验证人节点
 
 ### 创建钱包
