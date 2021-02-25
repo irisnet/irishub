@@ -38,7 +38,7 @@ bc77e49df0de4d70ab6f97f1e3a17bfb51a1ea7a@34.80.202.172:26656
 
 ### 水龙头
 
-欢迎加入我们的【[社区](https://discord.gg/9cSt7MX2fn)】申请测试通证
+欢迎加入我们的【[Discord 社区](https://discord.gg/9cSt7MX2fn)】申请测试通证
 
 ## 浏览器
 
