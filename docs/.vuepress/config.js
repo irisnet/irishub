@@ -72,7 +72,7 @@ module.exports = {
                     ["Features", "features"],
                     ["Daemon", "daemon"],
                     ["CLI Client", "cli-client"],
-                    ["API Server", "light-client"],
+                    ["Endpoints", "endpoints"],
                     ["Tools", "tools"],
                     ["Resources", "resources"]
                 ])
@@ -91,7 +91,7 @@ module.exports = {
                     ["功能模块", "/zh/features"],
                     ["守护进程", "/zh/daemon"],
                     ["命令行客户端", "/zh/cli-client"],
-                    ["API 服务", "/zh/light-client"],
+                    ["服务端点", "/zh/endpoints"],
                     ["工具", "/zh/tools"],
                     ["资源", "/zh/resources"]
                 ])
