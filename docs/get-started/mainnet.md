@@ -28,10 +28,6 @@ You may see some connection errors, it does not matter, the P2P network is tryin
 Try to add some of the [Community Peers](https://github.com/irisnet/mainnet/blob/master/config/community-peers.md) to `persistent_peers` in the config.toml
 :::
 
-:::tip
-It will take a long time to sync from scratch, you can also download the [mainnet data snapshot](#TODO) to reduce the time spent on synchronization
-:::
-
 ## Upgrade to Validator Node
 
 ### Create a Wallet
