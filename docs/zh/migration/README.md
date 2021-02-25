@@ -28,6 +28,7 @@ jq --arg v "$initial_height" '.initial_height=$v' genesis_v1.0.1.json | sponge g
 
 ```bash
 sha256sum genesis_v1.0.1.json
+62ef600a3cd7c6a94a47e1af66e9d6a6a0c9b224171e3e70e8ecf6497f47716b  genesis_v1.0.1.json
 ```
 
 ## 3. 初始化新节点
@@ -42,23 +43,25 @@ iris init [moniker] --home [v1.0.1_node_home]
 
 使用 `irishub v1.0.1` 迁移私钥文件。
 
-- `KMS`用户
+### `KMS`用户
+
 如果你使用的是KMS部署节点，请先升级`tmkms`，然后修改相关配置，详细内容请参考[kms](../tools/kms.md)
 
-- 非`KMS`用户
+### 非`KMS`用户
+
 如果你没有使用的是KMS部署节点，节点配置文件存在的情况下，可以使用以下两种方式中的一种迁移配置文件：
 
-  - 修改文件名称
-  
-    ```bash
-    cp [v0.16_node_home]/config/priv_validator.json [v1.0.1_node_home]/config/priv_validator_key.json
-    ```
+- 修改文件名称
 
-  - 使用脚本
+```bash
+cp [v0.16_node_home]/config/priv_validator.json [v1.0.1_node_home]/config/priv_validator_key.json
+```
 
-    ```bash
-    go run migrate/scripts/privValUpgrade.go [v0.16_node_home]/config/priv_validator.json [v1.0.1_node_home]/config/priv_validator_key.json [v1.0.1_node_home]/data/priv_validator_state.json
-    ```
+- 使用脚本
+
+```bash
+go run migrate/scripts/privValUpgrade.go [v0.16_node_home]/config/priv_validator.json [v1.0.1_node_home]/config/priv_validator_key.json [v1.0.1_node_home]/data/priv_validator_state.json
+```
 
 ## 5. 迁移节点密钥文件
 
