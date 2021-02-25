@@ -5,7 +5,7 @@
 Stop irishub v0.16 daemon and use `irishub v0.16.4 (which fixed bugs in export)` to export mainnet state genesis with `--for-zero-height` at the upgrade block height
 
 ```bash
-iris export --home [v0.16_node_home] --height [upgrade-height] --for-zero-height
+iris export --home [v0.16_node_home] --height 9146455 --for-zero-height
 ```
 
 ## 2. Migrate genesis file
@@ -14,6 +14,14 @@ Migrate the exported genesis.json with irishub v1.0.1
 
 ```bash
 iris migrate genesis.json --chain-id irishub-1 > genesis_v1.0.1.json
+```
+
+Specify the upgrade height + 1 as the initial height of irishub v1.0.1
+
+```bash
+# export initial_height=$[${upgrade block height} + 1]
+export initial_height=9146456
+jq --arg v "$initial_height" '.initial_height=$v' genesis_v1.0.1.json | sponge genesis_v1.0.1.json
 ```
 
 Check if sha256sum is correct
@@ -34,23 +42,25 @@ iris init [moniker] --home [v1.0.1_node_home]
 
 Migrate privkey file with irishub v1.0.1.
 
-- KMS user
+### KMS user
+
 If you are using KMS to deploy node, please upgrade `tmkms` first, and then modify the relevant configuration. Please refer to the [kms](../tools/kms.md) for details
 
-- Not KMS user
+### Not KMS user
+
 If you are not using KMS to deploy node, and the node configuration file exists, you can use either one of the following two ways:
 
-  - Rename file
+- Rename file
   
-    ```bash
-    cp [v0.16_node_home]/config/priv_validator.json [v1.0.1_node_home]/config/priv_validator_key.json
-    ```
+```bash
+cp [v0.16_node_home]/config/priv_validator.json [v1.0.1_node_home]/config/priv_validator_key.json
+```
 
-  - Use script
+- Use script
 
-    ```bash
-    go run migrate/scripts/privValUpgrade.go [v0.16_node_home]/config/priv_validator.json [v1.0.1_node_home]/config/priv_validator_key.json [v1.0.1_node_home]/data/priv_validator_state.json
-    ```
+```bash
+go run migrate/scripts/privValUpgrade.go [v0.16_node_home]/config/priv_validator.json [v1.0.1_node_home]/config/priv_validator_key.json [v1.0.1_node_home]/data/priv_validator_state.json
+```
 
 ## 5. Migrate node key file
 
