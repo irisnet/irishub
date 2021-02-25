@@ -1,8 +1,7 @@
 #
-# Build mainnet image: docker build -t irisnet/irishub .
-# Build testnet image: docker build -t irisnet/irishub --build-arg NetworkType=testnet .
+# Build image: docker build -t irisnet/irishub .
 #
-FROM golang:1.12.5-alpine3.9 as builder
+FROM golang:1.15.5-alpine3.12 as builder
 
 # Set up dependencies
 ENV PACKAGES make gcc git libc-dev bash linux-headers eudev-dev
@@ -12,17 +11,14 @@ WORKDIR /irishub
 # Add source files
 COPY . .
 
-# Install minimum necessary dependencies, run unit tests
-RUN apk add --no-cache $PACKAGES && make get_tools && make test_unit
+# Install minimum necessary dependencies
+RUN apk add --no-cache $PACKAGES
 
-# Initialize network type, could be override via docker build argument `--build-arg NetworkType=testnet`
-ARG NetworkType=mainnet
-
-RUN make build_cur
+RUN make build
 
 # ----------------------------
 
-FROM alpine:3.9
+FROM alpine:3.12
 
 # p2p port
 EXPOSE 26656

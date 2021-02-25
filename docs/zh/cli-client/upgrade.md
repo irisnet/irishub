@@ -1,79 +1,76 @@
-# iriscli upgrade
+# Upgrade
 
-此命令用于查询软件升级状态
+此模块提供软件版本升级的基本功能。
 
 ## 可用命令
 
-| 名称                                            | 描述               |
-| ----------------------------------------------- | ------------------ |
-| [info](#iriscli-upgrade-info)                   | 查询升级模块的信息 |
-| [query-signals](#iriscli-upgrade-query-signals) | 查询signals的信息  |
+| 名称                                                                            | 描述                           |
+| ------------------------------------------------------------------------------- | ------------------------------ |
+| [software-upgrade](#iris-tx-gov-submit-proposal-software-upgrade)               | 发起软件升级提案               |
+| [cancel-software-upgrade](#iris-tx-gov-submit-proposal-cancel-software-upgrade) | 取消当前升级提案               |
+| [plan](#iris-query-upgrade-plan)                                                | 查询当前正在进行的软件升级提案 |
+| [applied](#iris-query-upgrade-applied)                                          | 查询已经执行的软件升级提案     |
 
-## iriscli upgrade info
+## iris tx gov submit-proposal software-upgrade
 
-### 查询链上正在使用的版本
+通过治理模块发起一个软件升级提案。
 
 ```bash
-iriscli upgrade info
+iris tx gov submit-proposal software-upgrade <plan-name> [flags]
 ```
 
-这将显示当前的协议信息以及准备升级的协议信息，例如
+**标识：**
+
+| 名称，速记       | 类型   | 必须 | 默认 | 描述                                             |
+| ---------------- | ------ | ---- | ---- | ------------------------------------------------ |
+| --deposit        | Coins  |      |      | 为提案抵押的代币数量                             |
+| --title          | string |      |      | 提案标题                                         |
+| --description    | string |      |      | 提案描述信息                                     |
+| --upgrade-height | uint64 |      |      | 执行软件升级的高度（和`--upgrade-time`二选一）   |
+| --upgrade-time   | Time   |      |      | 执行软件升级的时间（例如：2006-01-02T15:04:05Z） |
+| --upgrade-info   | string |      |      | 软件升级信息                                     |
+
+:::tip
+如果需要支持[cosmovisor](#https://github.com/cosmos/cosmos-sdk/tree/master/cosmovisor)自动执行软件升级，`--upgrade-info`需要使用固定的格式，例如：
 
 ```json
 {
-  "version": {
-    "ProposalID": "1",
-    "Success": true,
-    "Protocol": {
-      "version": "0",
-      "software": "https://github.com/irisnet/irishub/tree/v0.10.0",
-      "height": "1"
+    "binaries": {
+        "linux/amd64":"https://example.com/irishub.zip?checksum=sha256:aec070645fe53ee3b3763059376134f058cc337247c978add178b6ccdfb0019f"
     }
-  },
-  "upgrade_config": {
-    "ProposalID": "3",
-    "Definition": {
-      "version": "1",
-      "software": "https://github.com/irisnet/irishub/tree/v0.10.1",
-      "height": "8000"
-    }
-  }
 }
 ```
 
-## iriscli upgrade query-signals
+:::
 
-查询当前的signals信息
+## iris tx gov submit-proposal cancel-software-upgrade
 
-**标志：**
-
-| 名称，速记 | 默认 | 描述        | 必须 |
-| --------------- | ------- | ------------------ | -------- |
-| --detail        | false   | signals详情 |          |
-
-### 查询已升级的voting power统计信息
+通过治理模块发起取消当前正在进行的软件升级提案。
 
 ```bash
-iriscli upgrade query-signals
+iris tx gov submit-proposal cancel-software-upgrade [flags]
 ```
 
-示例输出：
+**标识：**
+
+| 名称，速记    | 类型   | 必须 | 默认 | 描述                 |
+| ------------- | ------ | ---- | ---- | -------------------- |
+| --deposit     | Coins  |      |      | 为提案抵押的代币数量 |
+| --title       | string |      |      | 提案标题             |
+| --description | string |      |      | 提案描述信息         |
+
+## iris query upgrade plan
+
+查询当前正在进行的软件升级计划。
 
 ```bash
-signalsVotingPower/totalVotingPower = 0.5000000000
+iris query upgrade plan [flags]
 ```
 
-### 查询升级signals详情
+## iris query upgrade applied
+
+查询已近执行的软件升级计划
 
 ```bash
-iriscli upgrade query-signals --detail
-```
-
-示例输出：
-
-```bash
-iva15cv33a67cfey5eze7238hck6yngw36949evplx   100.0000000000
-iva15cv33a67cfey5eze7238hck6yngw36949evplx   100.0000000000
-iva15cv33a67cfey5eze7238hck6yngw36949evplx   100.0000000000
-siganalsVotingPower/totalVotingPower = 0.5000000000
+iris query upgrade applied <upgrade-name>
 ```

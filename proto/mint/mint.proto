@@ -1,0 +1,25 @@
+syntax = "proto3";
+package irishub.mint;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/irisnet/irishub/modules/mint/types";
+
+// Minter represents the minting state
+message Minter {
+    // time which the last update was made to the minter
+    google.protobuf.Timestamp last_update = 1 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"last_update\"" ];
+    // base inflation
+    string inflation_base = 2 [ (gogoproto.moretags) = "yaml:\"inflation_base\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false ];
+}
+
+// Params defines mint module's parameters
+message Params {
+    option (gogoproto.goproto_stringer) = false;
+
+    // type of coin to mint
+    string mint_denom = 1;
+    // inflation rate
+    string inflation = 2 [ (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false ];
+}

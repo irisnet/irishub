@@ -12,7 +12,7 @@ order: 3
 
 ```bash
 # initialize node configurations
-iris init --moniker=<your-custom-name> --chain-id=irishub
+iris init <moniker> --chain-id=irishub-1
 
 # download mainnet public config.toml and genesis.json
 curl -o ~/.iris/config/config.toml https://raw.githubusercontent.com/irisnet/mainnet/master/config/config.toml
@@ -28,10 +28,6 @@ You may see some connection errors, it does not matter, the P2P network is tryin
 Try to add some of the [Community Peers](https://github.com/irisnet/mainnet/blob/master/config/community-peers.md) to `persistent_peers` in the config.toml
 :::
 
-:::tip
-It will take a long time to sync from scratch, you can also download the [mainnet data snapshot](#TODO) to reduce the time spent on synchronization
-:::
-
 ## Upgrade to Validator Node
 
 ### Create a Wallet
@@ -40,7 +36,7 @@ You can [create a new wallet](../cli-client/keys.md#create-a-new-key) or [import
 
 ```bash
 # create a new wallet
-iriscli keys add <key-name>
+iris keys add <key-name>
 ```
 
 :::warning
@@ -56,7 +52,7 @@ write the seed phrase in a safe place! It is the only way to recover your accoun
 # apt-get update && apt-get install -y jq
 
 # if the output is false, means your node has caught-up
-iriscli status | jq .sync_info.catching_up
+iris status | jq .sync_info.catching_up
 ```
 
 ### Create Validator
@@ -64,16 +60,18 @@ iriscli status | jq .sync_info.catching_up
 Only if your node has caught-up, you can run the following command to upgrade your node to be a validator.
 
 ```bash
-iriscli stake create-validator \
+iris tx staking create-validator \
     --pubkey=$(iris tendermint show-validator) \
     --moniker=<your-validator-name> \
     --amount=<amount-to-be-delegated, e.g. 10000iris> \
+    --min-self-delegation=1 \
+    --commission-max-change-rate=0.1 \
+    --commission-max-rate=0.1 \
     --commission-rate=0.1 \
     --gas=100000 \
-    --fee=0.6iris \
-    --chain-id=irishub \
-    --from=<key-name> \
-    --commit
+    --fees=0.6iris \
+    --chain-id=irishub-1 \
+    --from=<key-name>
 ```
 
 :::warning

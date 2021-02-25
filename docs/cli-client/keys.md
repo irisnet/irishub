@@ -1,48 +1,52 @@
-# iriscli keys
+# Keys
 
 Keys allows you to manage your local tendermint keystore (wallets) for iris.
 
 ## Available Commands
 
-| Name                               | Description                                                                                  |
-| ---------------------------------- | -------------------------------------------------------------------------------------------- |
-| [add](#iriscli-keys-add)           | Create a new key, or import from seed , or import from a keystore file                       |
-| [list](#iriscli-keys-list)         | List all keys                                                                                |
-| [show](#iriscli-keys-show)         | Show key info for the given name                                                             |
-| [export](#iriscli-keys-export)     | Export keystore to a json file                                                               |
-| [delete](#iriscli-keys-delete)     | Delete the given key                                                                         |
-| [update](#iriscli-keys-update)     | Change the password used to protect private key                                              |
-| [mnemonic](#iriscli-keys-mnemonic) | Create a bip39 mnemonic, sometimes called a seed phrase, by reading from the system entropy. |
-| [new](#iriscli-keys-new)           | Derive a new private key using an interactive command that will prompt you for each input.   |
+| Name                            | Description                                                                                      |
+| ------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [add](#iris-keys-add)           | Add an encrypted private key (either newly generated or recovered), encrypt it, and save to disk |
+| [delete](#iris-keys-delete)     | Delete the given key                                                                             |
+| [export](#iris-keys-export)     | Export private keys                                                                              |
+| [import](#iris-keys-import)     | Import private keys into the local keybase                                                       |
+| [list](#iris-keys-list)         | List all keys                                                                                    |
+| [migrate](#iris-keys-migrate)   | Migrate keys from the legacy (db-based) Keybase                                                  |
+| [mnemonic](#iris-keys-mnemonic) | Compute the bip39 mnemonic for some input entropy                                                |
+| [parse](#iris-keys-parse)       | Parse address from hex to bech32 and vice versa                                                  |
+| [show](#iris-keys-show)         | Retrieve key information by name or address                                                      |
 
-## iriscli keys add
+## iris keys add
 
-Create a new key (wallet), or recover from mnemonic/keystore.
+Derive a new private key and encrypt to disk.
 
 ```bash
-iriscli keys add <key-name> <flags>
+iris keys add <key-name> [flags]
 ```
 
 **Flags:**
 
-| Name, shorthand      | Default   | Description                                                       | Required |
-| -------------------- | --------- | ----------------------------------------------------------------- | -------- |
-| --account            |           | Account number for HD derivation                                  |          |
-| --dry-run            |           | Perform action, but don't add key to local keystore               |          |
-| --help, -h           |           | Help for add                                                      |          |
-| --index              |           | Index number for HD derivation                                    |          |
-| --ledger             |           | Store a local reference to a private key on a Ledger device       |          |
-| --no-backup          |           | Don't print out seed phrase (if others are watching the terminal) |          |
-| --recover            |           | Provide seed phrase to recover existing key instead of creating   |          |
-| --keystore           |           | Recover a key from keystore                                       |          |
-| --multisig           |           | Create multisig key                                               |          |
-| --multisig-threshold |           | Specify the minimum number of signatures for multisig key         |          |
-| --type, -t           | secp256k1 | Type of private key (secp256k\ed25519)                            |          |
+| Name, shorthand      | Default  | Description                                                       | Required |
+| -------------------- | -------- | ----------------------------------------------------------------- | -------- |
+| --multisig           |          | Construct and store a multisig public key                         |          |
+| --multisig-threshold | 1        | K out of N required signatures                                    |          |
+| --nosort             | false    | Keys passed to --multisig are taken in the order they're supplied |          |
+| --pubkey             |          | Parse a public key in bech32 format and save it to disk           |          |
+| --interactive        | false    | Interactively prompt user for BIP39 passphrase and mnemonic       |          |
+| --ledger             | false    | Store a local reference to a private key on a Ledger device       |          |
+| --recover            | false    | Provide seed phrase to recover existing key instead of creating   |          |
+| --no-backup          | false    | Don't print out seed phrase (if others are watching the terminal) |          |
+| --dry-run            | false    | Perform action, but don't add key to local keystore               |          |
+| --hd-path            |          | Manual HD Path derivation (overrides BIP44 config)                |          |
+| --coin-type          | 118      | coin type number for HD derivation                                |          |
+| --account            | 0        | Account number for HD derivation                                  |          |
+| --index              | 0        | Address index number for HD derivation                            |          |
+| --algo               | secp256k | Key signing algorithm to generate keys for                        |          |
 
 ### Create a new key
 
 ```bash
-iriscli keys add MyKey
+iris keys add MyKey
 ```
 
 Enter and repeat the password, at least 8 characters, then you will get a new key.
@@ -58,7 +62,7 @@ write the seed phrase in a safe place! It is the only way to recover your accoun
 If you forget your password or lose your key, or you wanna use your key in another place, you can recover your key by your seed phrase.
 
 ```bash
-iriscli keys add MyKey --recover
+iris keys add MyKey --recover
 ```
 
 You'll be asked to enter and repeat the new password for your key, and enter the seed phrase. Then you get your key back.
@@ -69,18 +73,12 @@ Repeat the passphrase:
 Enter your recovery seed phrase:
 ```
 
-### Import an existing key from keystore
-
-```bash
-iriscli keys add Mykey --recover --keystore=<path-to-keystore>
-```
-
 ### Create a multisig key
 
 The following example creates a multisig key with 3 sub-keys, and specify the minimum number of signatures as 2. The tx could be broadcast only when the number of signatures is greater than or equal to 2.
 
 ```bash
-iriscli keys add <multisig-keyname> --multisig-threshold=2 --multisig=<signer-keyname-1>,<signer-keyname-2>,<signer-keyname-3>
+iris keys add <multisig-keyname> --multisig-threshold=2 --multisig=<signer-keyname-1>,<signer-keyname-2>,<signer-keyname-3>
 ```
 
 :::tip
@@ -88,93 +86,17 @@ iriscli keys add <multisig-keyname> --multisig-threshold=2 --multisig=<signer-ke
 
 If you don't have all the permission of sub-keys, you can ask for the pubkeys to create the offline keys first, then you will be able to create the multisig key.
 
-Offline key can be created by "iriscli keys add --pubkey".
+Offline key can be created by "iris keys add --pubkey".
 :::
 
-How to use multisig key to sign and broadcast a transaction,  please refer to [multisign](tx.md#iriscli-tx-multisign)
+How to use multisig key to sign and broadcast a transaction,  please refer to [multisign](tx.md#iris-tx-multisign)
 
-## iriscli keys list
-
-List all the keys stored by this key manager along with their associated name, type, address and pubkey.
-
-### List all keys
-
-```bash
-iriscli keys list
-```
-
-## iriscli keys show
-
-Get details of a local key.
-
-```bash
-iriscli keys show <key-name> <flags>
-```
-
-**Flags:**
-
-| Name, shorthand      | Default | Description                                         | Required |
-| -------------------- | ------- | --------------------------------------------------- | -------- |
-| --address            |         | Output the address only (overrides --output)        |          |
-| --bech               | acc     | The Bech32 prefix encoding for a key (acc/val/cons) |          |
-| --help, -h           |         | help for show                                       |          |
-| --multisig-threshold | 1       | K out of N required signatures                      |          |
-| --pubkey             |         | Output the public key only (overrides --output)     |          |
-
-### Get details of a local key
-
-```bash
-iriscli keys show MyKey
-```
-
-The following infos will be shown:
-
-```bash
-NAME:    TYPE:    ADDRESS:                                      PUBKEY:
-MyKey    local    iaa1kkm4w5pvmcw0e3vjcxqtfxwqpm3k0zak83e7nf    iap1addwnpepq0gsl90v9dgac3r9hzgz53ul5ml5ynq89ax9x8qs5jgv5z5vyssskzc7exa
-```
-
-### Get validator operator address
-
-If an address has been bonded to be a validator operator (which the address you used to create a validator), then you can use `--bech val` to get the operator's address prefixed by `iva` and the pubkey prefixed by `ivp`:
-
-```bash
-iriscli keys show MyKey --bech val
-```
-
-Example Output:
-
-```bash
-NAME:    TYPE:    ADDRESS:                                      PUBKEY:
-MyKey    local    iva12nda6xwpmp000jghyneazh4kkgl2tnzyx7trze    ivp1addwnpepqfw52vyzt9xgshxmw7vgpfqrey30668g36f9z837kj9dy68kn2wxqm8gtmk
-```
-
-## iriscli keys export
-
-Export the keystore of a key to a json file
-
-```bash
-iriscli keys export <key-name> <flags>
-```
-
-**Flags:**
-
-| Name, shorthand | Default | Description          | Required |
-| --------------- | ------- | -------------------- | -------- |
-| --output-file   |         | The path of keystore |          |
-
-### Export keystore
-
-```bash
-iriscli keys export Mykey --output-file=<path-to-keystore>
-```
-
-## iriscli keys delete
+## iris keys delete
 
 Delete a local key by the given name.
 
 ```bash
-iriscli keys delete <key-name> <flags>
+iris keys delete <key-name> [flags]
 ```
 
 **Flags:**
@@ -187,25 +109,71 @@ iriscli keys delete <key-name> <flags>
 ### Delete a local key
 
 ```bash
-iriscli keys delete MyKey
+iris keys delete MyKey
 ```
 
-## iriscli keys update
+## iris keys export
 
-Change the password of a key, used to protect the private key.
-
-### Change the password of a local key
+Export the keystore of a key to a json file
 
 ```bash
-iriscli keys update MyKey
+iris keys export <key-name> [flags]
 ```
 
-## iriscli keys mnemonic
+### Export keystore
+
+```bash
+iris keys export Mykey --output-file=<path-to-keystore>
+```
+
+## iris keys import
+
+Import a ASCII armored private key into the local keybase.
+
+### Import a ASCII armored private key
+
+```bash
+iris keys import <name> <keyfile> [flags]
+```
+
+## iris keys list
+
+List all the keys stored by this key manager along with their associated name, type, address and pubkey.
+
+**Flags:**
+
+| Name, shorthand | Default | Description     | Required |
+| --------------- | ------- | --------------- | -------- |
+| --list-name     |         | List names only |          |
+
+### List all keys
+
+```bash
+iris keys list
+```
+
+## iris keys migrate
+
+Migrate key information from the legacy (db-based) Keybase to the new keyring-based Keybase.
+
+**Flags:**
+
+| Name, shorthand | Default | Description                                                              | Required |
+| --------------- | ------- | ------------------------------------------------------------------------ | -------- |
+| --dry-run       |         | Run migration without actually persisting any changes to the new Keybase |          |
+
+### Migrate key information
+
+```bash
+iris keys migrate [flags]
+```
+
+## iris keys mnemonic
 
 Create a bip39 mnemonic, sometimes called a seed phrase, by reading from the system entropy. To pass your own entropy, use `unsafe-entropy` mode.
 
 ```bash
-iriscli keys mnemonic <flags>
+iris keys mnemonic [flags]
 ```
 
 **Flags:**
@@ -217,71 +185,77 @@ iriscli keys mnemonic <flags>
 ### Create a bip39 mnemonic
 
 ```bash
-iriscli keys mnemonic
+iris keys mnemonic
 ```
 
 You'll get a bip39 mnemonic with 24 words, e.g.:
 
 ```bash
-police possible oval milk network indicate usual blossom spring wasp taste canal announce purpose rib mind river pet brown web response sting remain airport
+beauty entire blue tape ordinary fix rotate learn smart tiger dolphin cycle cigar dish alcohol slab bachelor vital design consider paper panther mad eternal
 ```
 
-## iriscli keys new
+## iris keys parse
 
-:::warning
-**Deprecated**
-:::
+Convert and print to stdout key addresses and fingerprints from hexadecimal into bech32 cosmos prefixed format and vice versa.
 
-Derive a new private key using an interactive command that will prompt you for each input.
-
-Optionally specify a bip39 mnemonic, a bip39 passphrase to further secure the mnemonic, and a bip32 HD path to derive a specific account. The key will be stored under the given name and encrypted with the given password. The only input that is required is the encryption password.
+### Convert and print to stdout key addresses and fingerprints
 
 ```bash
-iriscli keys new <key-name> <flags>
+iris keys parse <hex-or-bech32-address> [flags]
+```
+
+## iris keys show
+
+Get details of a local key.
+
+```bash
+iris keys show <key-name> [flags]
 ```
 
 **Flags:**
 
-| Name, shorthand | Default         | Description                                                     | Required |
-| --------------- | --------------- | --------------------------------------------------------------- | -------- |
-| --bip44-path    | 44'/118'/0'/0/0 | BIP44 path from which to derive a private key                   |          |
-| --default       |                 | Skip the prompts and just use the default values for everything |          |
-| --help, -h      |                 | Help for new                                                    |          |
-| --ledger        |                 | Store a local reference to a private key on a Ledger device     |          |
+| Name, shorthand      | Default | Description                                         | Required |
+| -------------------- | ------- | --------------------------------------------------- | -------- |
+| --address            | false   | Output the address only (overrides --output)        |          |
+| --bech               | acc     | The Bech32 prefix encoding for a key (acc/val/cons) |          |
+| --device             | false   | Output the address in a ledger device               |          |
+| --multisig-threshold | 1       | K out of N required signatures                      |          |
+| --pubkey             | false   | Output the public key only (overrides --output)     |          |
 
-### Create a new key by the specified method
-
-```bash
-iriscli keys new MyKey
-```
-
-You'll be asked to enter your bip44 path, default is 44'/118'/0'/0/0.
+### Get details of a local key
 
 ```bash
-> -------------------------------------
-> Enter your bip44 path. Default is 44'/118'/0'/0/0
+iris keys show MyKey
 ```
 
-Then you'll be asked to enter your bip39 mnemonic, or hit enter to generate one.
+The following infos will be shown:
 
 ```bash
-> Enter your bip39 mnemonic, or hit enter to generate one.
+- name: Mykey
+  type: local
+  address: iaa1tulwx2hwz4dv8te6cflhda64dn0984harlzegw
+  pubkey: iap1addwnpepq24rufap6u0sysqcpgsfzqhw3x8nfkhqhtmpgqt0369rlyqcg0vkgwzc4k0
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
 ```
 
-You can hit enter to generate bip39 mnemonic, then a new hint will be show to ask you to enter bip39 passphrase.
+### Get validator operator address
+
+If an address has been bonded to be a validator operator (which the address you used to create a validator), then you can use `--bech val` to get the operator's address prefixed by `iva` and the pubkey prefixed by `ivp`:
 
 ```bash
-> -------------------------------------
-> Enter your bip39 passphrase. This is combined with the mnemonic to derive the seed
-> Most users should just hit enter to use the default, ""
+iris keys show MyKey --bech val
 ```
 
-Also you can hit enter to skip it, then you'll receive a hint to enter a password.
+Example Output:
 
 ```bash
-> -------------------------------------
-> Enter a passphrase to encrypt your key to disk:
-> Repeat the passphrase:
+- name: Mykey
+  type: local
+  address: iva1tulwx2hwz4dv8te6cflhda64dn0984hakwgk4f
+  pubkey: ivp1addwnpepq24rufap6u0sysqcpgsfzqhw3x8nfkhqhtmpgqt0369rlyqcg0vkgd8e6zy
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
 ```
-
-After that, you're done with creating a new key.

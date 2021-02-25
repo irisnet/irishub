@@ -1,61 +1,49 @@
 package guardian
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	"fmt"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/guardian/keeper"
+	"github.com/irisnet/irishub/modules/guardian/types"
 )
 
-// GenesisState - all guardian state that must be provided at genesis
-type GenesisState struct {
-	Profilers []Guardian `json:"profilers"`
-	Trustees  []Guardian `json:"trustees"`
-}
-
-func NewGenesisState(profilers, trustees []Guardian) GenesisState {
-	return GenesisState{
-		Profilers: profilers,
-		Trustees:  trustees,
+// InitGenesis stores genesis data
+func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data types.GenesisState) {
+	if err := ValidateGenesis(data); err != nil {
+		panic(fmt.Errorf("failed to initialize guardian genesis state: %s", err.Error()))
+	}
+	// Add supers
+	for _, super := range data.Supers {
+		keeper.AddSuper(ctx, super)
 	}
 }
 
-func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
-	// Add profilers
-	for _, profiler := range data.Profilers {
-		keeper.AddProfiler(ctx, profiler)
-	}
-	// Add trustees
-	for _, trustee := range data.Trustees {
-		keeper.AddTrustee(ctx, trustee)
-	}
+// ExportGenesis outputs genesis data
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
+	var supers []types.Super
+	k.IterateSupers(
+		ctx,
+		func(super types.Super) bool {
+			supers = append(supers, super)
+			return false
+		},
+	)
+
+	return types.NewGenesisState(supers)
 }
 
-func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	profilersIterator := k.ProfilersIterator(ctx)
-	defer profilersIterator.Close()
-	var profilers []Guardian
-	for ; profilersIterator.Valid(); profilersIterator.Next() {
-		var profiler Guardian
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(profilersIterator.Value(), &profiler)
-		profilers = append(profilers, profiler)
+// ValidateGenesis performs basic validation of supply genesis data returning an
+// error for any failed validation criteria.
+func ValidateGenesis(data types.GenesisState) error {
+	for _, super := range data.Supers {
+		if _, err := sdk.AccAddressFromBech32(super.Address); err != nil {
+			return err
+		}
+		if _, err := sdk.AccAddressFromBech32(super.AddedBy); err != nil {
+			return err
+		}
 	}
-
-	trusteesIterator := k.TrusteesIterator(ctx)
-	defer trusteesIterator.Close()
-	var trustees []Guardian
-	for ; trusteesIterator.Valid(); trusteesIterator.Next() {
-		var trustee Guardian
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(trusteesIterator.Value(), &trustee)
-		trustees = append(trustees, trustee)
-	}
-	return NewGenesisState(profilers, trustees)
-}
-
-// get raw genesis raw message for testing
-func DefaultGenesisState() GenesisState {
-	guardian := Guardian{Description: "genesis", AccountType: Genesis}
-	return NewGenesisState([]Guardian{guardian}, []Guardian{guardian})
-}
-
-// get raw genesis raw message for testing
-func DefaultGenesisStateForTest() GenesisState {
-	return DefaultGenesisState()
+	return nil
 }

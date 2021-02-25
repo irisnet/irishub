@@ -1,59 +1,36 @@
 package mint
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	"errors"
+	"fmt"
+
+	"github.com/irisnet/irishub/modules/mint/keeper"
+	"github.com/irisnet/irishub/modules/mint/types"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// GenesisState - all distribution state that must be provided at genesis
-type GenesisState struct {
-	Minter Minter `json:"minter"` // minter object
-	Params Params `json:"params"` // inflation params
-}
-
-func NewGenesisState(minter Minter, params Params) GenesisState {
-	return GenesisState{
-		Minter: minter,
-		Params: params,
-	}
-}
-
-// get raw genesis raw message for testing
-func DefaultGenesisState() GenesisState {
-	return GenesisState{
-		Minter: InitialMinter(),
-		Params: DefaultParams(),
-	}
-}
-
-// new mint genesis
-func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
+// InitGenesis new mint genesis
+func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data types.GenesisState) {
 	if err := ValidateGenesis(data); err != nil {
-		panic(err.Error())
+		panic(fmt.Errorf("failed to initialize mint genesis state: %s", err.Error()))
 	}
-
 	keeper.SetMinter(ctx, data.Minter)
 	keeper.SetParamSet(ctx, data.Params)
 }
 
-// ExportGenesis returns a GenesisState for a given context and keeper. The
-// GenesisState will contain the pool, and validator/delegator distribution info's
-func ExportGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
-
+// ExportGenesis returns a GenesisState for a given context and keeper.
+func ExportGenesis(ctx sdk.Context, keeper keeper.Keeper) *types.GenesisState {
 	minter := keeper.GetMinter(ctx)
 	params := keeper.GetParamSet(ctx)
-	return NewGenesisState(minter, params)
+	return types.NewGenesisState(minter, params)
 }
 
-// ValidateGenesis validates the provided staking genesis state to ensure the
-// expected invariants holds. (i.e. params in correct bounds, no duplicate validators)
-func ValidateGenesis(data GenesisState) error {
-	err := validateParams(data.Params)
-	if err != nil {
-		return err
+// ValidateGenesis performs basic validation of supply genesis data returning an
+// error for any failed validation criteria.
+func ValidateGenesis(data types.GenesisState) error {
+	if !data.Minter.InflationBase.IsPositive() {
+		return errors.New("base inflation must be positive")
 	}
-	err = validateMinter(data.Minter)
-	if err != nil {
-		return err
-	}
-	return nil
+	return data.Params.Validate()
 }

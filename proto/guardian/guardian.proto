@@ -1,0 +1,24 @@
+syntax = "proto3";
+package irishub.guardian;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/irisnet/irishub/modules/guardian/types";
+
+// Super defines the super standard
+message Super {
+    string description = 1;
+    AccountType account_type = 2 [ (gogoproto.moretags) = "yaml:\"account_type\"" ];
+    string address = 3;
+    string added_by = 4;
+}
+
+// AccountType defines the super account type
+enum AccountType {
+    option (gogoproto.goproto_enum_prefix) = false;
+
+    // GENESIS defines a genesis account type
+    GENESIS = 0 [ (gogoproto.enumvalue_customname) = "Genesis" ];
+    // ORDINARY defines a ordinary account type
+    ORDINARY = 1 [ (gogoproto.enumvalue_customname) = "Ordinary" ];
+}

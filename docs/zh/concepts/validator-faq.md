@@ -5,7 +5,7 @@ order: 2
 # 验证人问答
 
 :::tip
-IRISnet 基础概念请参考 [基础概念](general-concepts.md)
+IRIShub 基础概念请参考 [基础概念](general-concepts.md)
 :::
 
 ## 常见问题
@@ -62,14 +62,14 @@ IRISnet 基础概念请参考 [基础概念](general-concepts.md)
 - 查询对应的节点Hex地址
 
   ```bash
-  iriscli status | jq .validator_info.address
+  iris status | jq .validator_info.address
   ```
   
   它也存储在`config/priv_validator.json`中。
 
 #### 应用程序密钥
 
-该密钥可以通过`iriscli`创建，用于签名交易。应用程序密钥与以`iap`为前缀的公钥和以`iaa`为前缀的地址相关联。两者都是由`iriscli keys add`生成的帐户密钥派生出来的。
+该密钥可以通过`iris`创建，用于签名交易。应用程序密钥与以`iap`为前缀的公钥和以`iaa`为前缀的地址相关联。两者都是由`iris keys add`生成的帐户密钥派生出来的。
 
 注意：验证人操作员的密钥直接与应用程序密钥绑定，地址和公钥分别使用保留的前缀：iva和ivp。
 
@@ -138,7 +138,7 @@ IRISnet 基础概念请参考 [基础概念](general-concepts.md)
   查询验证人的操作员地址（iva ...）和pubkey（ivp ...）：
 
   ```bash
-  iriscli keys show MyKey --bech=val
+  iris keys show MyKey --bech=val
   ```
 
 - 验证人节点地址，即[Tendermint密钥](#Tendermint-密钥)
@@ -153,7 +153,7 @@ IRISnet 基础概念请参考 [基础概念](general-concepts.md)
 
 3. 点击`Add a PGP key`，创建一个PGP私钥，完成后您将获得一个16位的字符串
 
-4. [编辑验证人](../cli-client/stake.md#iriscli-stake-edit-validator)信息并指定`--identity=<16位的PGP字符串>`
+4. [编辑验证人](../cli-client/staking.md#iris-tx-staking-edit-validator)信息并指定`--identity=<16位的PGP字符串>`
 
 ## 常见错误
 
@@ -176,15 +176,15 @@ IRISnet 基础概念请参考 [基础概念](general-concepts.md)
   iris tendermint show-validator --home=<iris-home>
 
   # 使用共识公钥查询节点状态
-  iriscli stake signing-info <validator-consensus-public-key>
+  iris query slashing signing-info [validator-conspub]
   ```
 
   您将可以看到 `Jailed Until` 的时间，只有在该时间之后，您才可以执行接下来的步骤。
 
-- 如果当前时间已经超过了 `Jailed Until`，即可执行[解禁](../cli-client/stake.md#iriscli-stake-unjail)操作：
+- 如果当前时间已经超过了 `Jailed Until`，即可执行[解禁](../cli-client/slashing.md#iris-tx-slashing-unjail)操作：
   
   ```bash
-  iriscli stake unjail --from=<key-name> --fee=0.3iris --chain-id=irishub
+  iris tx stake unjail --from=<key-name> --fees=0.3iris --chain-id=irishub
   ```
 
 - 再次检查您的验证人，看看您的投票权是否恢复。
@@ -220,7 +220,7 @@ Linux可以打开（每个进程）的默认文件数是 `1024`，而 `iris` 进
     WantedBy=multi-user.target
     ```
 
-- 在Ubuntu系统中修改全局ulimit示例:
+- 在Ubuntu系统中修改全局ulimit示例：
 
     ```bash
     # Edit limits.conf
@@ -257,13 +257,14 @@ Linux可以打开（每个进程）的默认文件数是 `1024`，而 `iris` 进
 - 用您的备份替换当前的 `<iris-home>/config/priv_validator.json`
 - 通过`iris tendermint show-validator --home=<iris-home>` 确认 `Consensus Pubkey` 是正确的
 - 启动节点
-- 完成同步后，检查`voting_power`现在应该大于0：`iriscli status`
+- 完成同步后，检查`voting_power`现在应该大于0：`iris status`
 
 #### 如果我丢失了Tendermint密钥怎么办
 
-这意味着您 **永远失去了您的验证人！**您只能创建一个新的验证人，并将所有通证[转委托](../cli-client/stake.md#iriscli-stake-redelegate)给新的验证人。
+这意味着您 **永远失去了您的验证人！**您只能创建一个新的验证人，并将所有通证[转委托](../cli-client/staking.md#iris-tx-staking-redelegate)给新的验证人。
 
 ## 加入社区
 
-- 英文 Riot：<https://riot.im/app/#/room/#irisvalidators:matrix.org>
-- 中文 QQ： 834063323
+- Discord：<https://discord.gg/yPsTf4cgPh>
+- Riot：<https://riot.im/app/#/room/#irisvalidators:matrix.org>
+- QQ：834063323

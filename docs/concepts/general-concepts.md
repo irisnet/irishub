@@ -52,9 +52,9 @@ The validator and its delegators can share the following rewards by proportion:
 
 - **Block Inflation**
 
-  Block Inflation exists to incentivize IRIS holders to stake. The more staked IRIS tokens are, more secure the network become(Read more about [Staking](../features/stake.md)).
+  Block Inflation exists to incentivize IRIS holders to stake. The more staked IRIS tokens are, more secure the network become(Read more about [Staking](../features/staking.md)).
 
-  Block Inflation will be [distributed every block](../features/mint.md). [Inflation rate](../features/mint.md) in IRISnet for the first year will be 4%.  **This ration could be adjusted by `parameter-change` proposals**.
+  Block Inflation will be [distributed every block](../features/mint.md). [Inflation rate](../features/mint.md) in IRIShub for the first year will be 4%.  **This ration could be adjusted by `parameter-change` proposals**.
   In this way, loose IRIS will devalue year by year.
 
 - **Block Proposer Reward**
@@ -63,7 +63,7 @@ The validator and its delegators can share the following rewards by proportion:
 
 - **Fee**
 
-  Each transaction needs a [fee](fee.md#fee) for compensating validators' work[Gas](fee.md#gas). These fees can be paid with IRIS and may later in any tokens which are whitelisted by the IRISHub's governance. Fees are distributed to validators in proportion to their stake. A minimum fee/gas ration is set in IRISnet.
+  Each transaction needs a [fee](fee.md#fee) for compensating validators' work[Gas](fee.md#gas). These fees can be paid with IRIS and may later in any tokens which are whitelisted by the IRIShub's governance. Fees are distributed to validators in proportion to their stake. A minimum fee/gas ration is set in IRIShub.
 
 Each validator receives revenue in proportion to its total stake. However, before this revenue is distributed to its delegators, the validator can apply a commission for providing staking services.
 
@@ -100,7 +100,7 @@ Additionally, validators are expected to be active members of the community. The
 
 ## Validator Risks
 
-- **Unavailability**: Validators are expected to keep signing votes for making new blocks. If a validator's signature has not been included in more than 30% of the last 34,560 blocks (which amounts to approximately 48 hours, assuming an average block-generating time of 5 seconds), this validator will get jailed and removed from current validatorset for 1.5 day, and their bonded tokens will get slashed by 0.03%.
+- **Unavailability**: Validators are expected to keep signing votes for making new blocks. If a validator's signature has not been included in more than 30% of the last 34,560 blocks (which amounts to approximately 48 hours, assuming an average block-generating time of 5 seconds), this validator will get jailed and removed from current validatorset for 10 minutes, and their bonded tokens will get slashed by 0.03%.
 - **Double Sign**: If the protocol detects that a validator voted multiple different opinions about the same block (same height/round), or voted for different blocks at the same height/round, this validator will get jailed and removed from current validatorset for 2 days. Their bonded tokens will get slashed by 1%.
 - **Censorship**: If the protocol detects that a proposer included invalid transactions in a block, this validator will get jailed and removed from current validatorset for 2 days.
 

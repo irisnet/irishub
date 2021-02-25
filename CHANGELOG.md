@@ -1,5 +1,53 @@
 # Changelog
 
+## Unreleased
+
+## 1.0.1
+
+*February 18th, 2021*
+
+This release fixes a downstream security issue which impacts Cosmos SDK users. 
+See the [Tendermint v0.34.7 SDK changelog](https://github.com/tendermint/tendermint/blob/v0.34.x/CHANGELOG.md#v0347) for details.
+
+* [\#2573](https://github.com/irisnet/irishub/pull/2573) Bump cosmos-sdk version to [v0.41.3](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.41.3)
+* [\#2571](https://github.com/irisnet/irishub/pull/2571) Bump tendermint verion to [v0.34.7](https://github.com/tendermint/tendermint/releases/tag/v0.34.7)
+
+
+## 1.0.0
+
+*February 9th, 2021*
+
+### CLI
+
+* [\#2541](https://github.com/irisnet/irishub/pull/2541) Bump cosmos-sdk version to [v0.41.0](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.41.0)
+* [\#2515](https://github.com/irisnet/irishub/pull/2515) Bump tendermint verion to [v0.34.3](https://github.com/tendermint/tendermint/releases/tag/v0.34.3)
+* [\#2567](https://github.com/irisnet/irishub/pull/2567) Bump irismod version to [v1.3.1](https://github.com/irisnet/irismod/releases/tag/v1.3.1)
+* [\#2505](https://github.com/irisnet/irishub/pull/2505) Remove duplicate cmd
+* [\#2154](https://github.com/irisnet/irishub/issues/2154) Support native token unit conversion in command
+
+### Application
+
+* [\#2541](https://github.com/irisnet/irishub/pull/2541) Bump cosmos-sdk version to [v0.41.0](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.41.0)
+* [\#2515](https://github.com/irisnet/irishub/pull/2515) Bump tendermint verion to [v0.34.3](https://github.com/tendermint/tendermint/releases/tag/v0.34.3)
+* [\#2567](https://github.com/irisnet/irishub/pull/2567) Bump irismod version to [v1.3.1](https://github.com/irisnet/irismod/releases/tag/v1.3.1)
+* [\#2551](https://github.com/irisnet/irishub/pull/2551) Disable repeated service invocation
+* [\#2542](https://github.com/irisnet/irishub/pull/2542) Migrate withdraw infos
+* [\#2524](https://github.com/irisnet/irishub/pull/2524) Fix proto package and path
+* [\#2518](https://github.com/irisnet/irishub/pull/2518) Move abandoned tokens to communityTax
+* [\#2512](https://github.com/irisnet/irishub/pull/2512) Normalize msg and genesis validation
+* [\#2484](https://github.com/irisnet/irishub/pull/2484) Bump cosmos-sdk version to [v0.40.0](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.40.0)
+* [\#2484](https://github.com/irisnet/irishub/pull/2484) Bump tendermint verion to [v0.34.1](https://github.com/tendermint/tendermint/releases/tag/v0.34.1)
+* [\#2502](https://github.com/irisnet/irishub/pull/2502) Bump irismod version to [v1.2.0](https://github.com/irisnet/irismod/releases/tag/v1.2.0)
+* [\#2501](https://github.com/irisnet/irishub/issues/2501) Merge the swagger docs of cosmos-sdk and irismod
+* [\#2485](https://github.com/irisnet/irishub/pull/2485) Support key import 0.16.3 and earlier version keystore file
+* [\#2488](https://github.com/irisnet/irishub/pull/2488) Restrict the use of certain token for specified Msg
+* [\#2098](https://github.com/irisnet/irishub/issues/2098) Migrate iriscli test
+* [\#2097](https://github.com/irisnet/irishub/issues/2097) Add scripts to migrate genesis data from v0.16.3
+* [\#2090](https://github.com/irisnet/irishub/issues/2090) Refactor guardian module
+* [\#2089](https://github.com/irisnet/irishub/issues/2089) Overwrite mint module
+* [\#2500](https://github.com/irisnet/irishub/issues/2500) Migrate IRIShub modules to irismod
+* [\#2381](https://github.com/irisnet/irishub/pull/2381) Rebuild irishub v1.0 using cosmos-sdk v0.40
+
 ## 0.16.3
 
 *Aug 25th, 2020*

@@ -13,42 +13,77 @@ Each genesis state starts with a list of account balances. Social consensus on t
 
 * **genesis_time** The time to launch
 * **chain_id**     Blockchain’s ID
+* **initial_height** The height to init
 
 ## Consensus Params
 
-* **block_size**
-  * `max_bytes` The max size of a block
+* **block**
+  * `max_bytes` The max size of a block.
   * `max_gas`  The maximum gas quantity of a block. Its default value is -1 which means no gas limit. If the accumulation of gas consumption exceeds the block gas limit, the transaction and all subsequent transactions in the same block will fail to deliver.
+  * `time_iota_ms` Minimum time increment between consecutive blocks (in milliseconds).
 * **evidence**   The lifecycle of deception evidence in the block
+  * `max_age_num_blocks` Max age of evidence, in blocks.
+  * `max_age_duration`  Max age of evidence, in time.
+  * `max_bytes` The maximum size of total evidence in bytes that can be committed in a single block.
+* **validator**  The information of validator
+  * `pub_key_types` The public key types validators can use.
 
 ## App State
 
-* **accounts** Initial account info
-
 * **auth** Params related to the system
 
-* **stake** Params related to the staking consensus
-  
-* **mint**  Params related to inflation
-  
+* **bank** Params related to bank
+
+* **capability** Params related to capability
+
+* **coinswap** Params related to coinswap
+
+* **crisis** Params related to crisis
+
 * **distribution** Params related to distribution & commission
-  
+
+* **evidence** Params related to evidence
+
+* **genutil** Params related to genutil
+
 * **gov**  Params related to on-chain governance
 
-* **upgrade** Params related to upgrade
+* **guardian** Params related to guardian
 
-* **slashing** Params related to slashing validators
+* **htlc** Params related to  htlc
 
-* **asset**  Params related to asset
+* **ibc** Params related to  ibc
+
+* **nft** Params related to  nft
+
+* **mint**  Params related to inflation
+
+* **oracle**  Params related to oracle
+
+* **params**  Params related to params
+
+* **random**  Params related to random
+
+* **record**  Params related to record
 
 * **service**  Params related to service
 
-* **guardian** Params related to guardian
+* **slashing**  Params related to slashing validators
+
+* **staking**  Params related to staking
+
+* **token**  Params related to token
+
+* **transfer**  Params related to transfer
+
+* **upgrade** Params related to upgrade
+
+* **vesting** Params related to vesting
 
 Parameters that can be governed: [Gov Parameters](gov-params.md)
 
 ## Gentxs
 
 Gentxs contains the transaction set of creating validators in genesis block.
-The IRISnet provides robust tools for bootstrapping the identities that will start chain via the `gen-tx` process. `gen-tx` or a Genesis Transaction is cryptographically signed transactions that are executed during chain initialization that generate a starting set of validators.
+The IRIShub provides robust tools for bootstrapping the identities that will start chain via the `gen-tx` process. `gen-tx` or a Genesis Transaction is cryptographically signed transactions that are executed during chain initialization that generate a starting set of validators.
 The gen-txs are artifacts that prove that the holders of accounts consent in launching the network and that they put capital at risk in the process.

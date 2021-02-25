@@ -1,79 +1,76 @@
-# iriscli upgrade
+# Upgrade
 
-This module is used to query the software upgrade status.
+This module provides the basic functions of software version upgrade.
 
 ## Available Commands
 
-| Name                                            | Description                             |
-| ----------------------------------------------- | --------------------------------------- |
-| [info](#iriscli-upgrade-info)                   | Query the information of upgrade module |
-| [query-signals](#iriscli-upgrade-query-signals) | Query the information of signals        |
+| Name                                                                            | Description                                           |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| [software-upgrade](#iris-tx-gov-submit-proposal-software-upgrade)               | Submit a software upgrade proposal                    |
+| [cancel-software-upgrade](#iris-tx-gov-submit-proposal-cancel-software-upgrade) | Cancel the current upgrade proposal                   |
+| [plan](#iris-query-upgrade-plan)                                                | Query the software upgrade plan currently in progress |
+| [applied](#iris-query-upgrade-applied)                                          | Query the executed software upgrade plan              |
 
-## iriscli upgrade info
+## iris tx gov submit-proposal software-upgrade
 
-### Query the version the chain is running
+Initiate a software upgrade proposal through the `Gov` module.
 
 ```bash
-iriscli upgrade info
+iris tx gov submit-proposal software-upgrade <plan-name> [flags]
 ```
-
-Then it will show the current protocol information and the protocol information is currently being prepared for upgrade, e.g.
-
-```json
-{
-  "version": {
-    "ProposalID": "1",
-    "Success": true,
-    "Protocol": {
-      "version": "0",
-      "software": "https://github.com/irisnet/irishub/tree/v0.10.0",
-      "height": "1"
-    }
-  },
-  "upgrade_config": {
-    "ProposalID": "3",
-    "Definition": {
-      "version": "1",
-      "software": "https://github.com/irisnet/irishub/tree/v0.10.1",
-      "height": "8000"
-    }
-  }
-}
-```
-
-## iriscli upgrade query-signals
-
-Query the current information of upgrade signals.
 
 **Flags:**
 
-| Name, shorthand | Default | Description        | Required |
-| --------------- | ------- | ------------------ | -------- |
-| --detail        | false   | Details of signals |          |
+| Name, shorthand  | Type   | Required | Default | Description                                                                                                            |
+| ---------------- | ------ | -------- | ------- | ---------------------------------------------------------------------------------------------------------------------- |
+| --deposit        | Coins  |          |         | deposit of proposal                                                                                                    |
+| --title          | string |          |         | title of proposal                                                                                                      |
+| --description    | string |          |         | description of proposal                                                                                                |
+| --upgrade-height | uint64 |          |         | The height at which the upgrade must happen (not to be used together with `--upgrade-time`)                            |
+| --upgrade-time   | Time   |          |         | The time at which the upgrade must happen (ex. 2006-01-02T15:04:05Z) (not to be used together with `--upgrade-height`) |
+| --upgrade-info   | string |          |         | Optional info for the planned upgrade such as commit hash, etc.                                                        |
 
-### Query the tally of upgraded voting power
+:::tip
+If you need to support [cosmovisor](#https://github.com/cosmos/cosmos-sdk/tree/master/cosmovisor) to automatically perform software upgrades, `--upgrade-info` needs to use a fixed format, such as:
 
-```bash
-iriscli upgrade query-signals
+```json
+{
+    "binaries": {
+        "linux/amd64":"https://example.com/irishub.zip?checksum=sha256:aec070645fe53ee3b3763059376134f058cc337247c978add178b6ccdfb0019f"
+    }
+}
 ```
 
-Example Output:
+:::
+
+## iris tx gov submit-proposal cancel-software-upgrade
+
+Submit cancellation of the currently ongoing software upgrade proposal through the `Gov` module.
 
 ```bash
-signalsVotingPower/totalVotingPower = 0.5000000000
+iris tx gov submit-proposal cancel-software-upgrade [flags]
 ```
 
-### Query the detail of upgrade signals
+**Flags:**
+
+| Name, shorthand | Type   | Required | Default | Description             |
+| --------------- | ------ | -------- | ------- | ----------------------- |
+| --deposit       | Coins  |          |         | deposit of proposal     |
+| --title         | string |          |         | title of proposal       |
+| --description   | string |          |         | description of proposal |
+
+## iris query upgrade plan
+
+Query the currently ongoing software upgrade plan.
 
 ```bash
-iriscli upgrade query-signals --detail
+iris query upgrade plan [flags]
 ```
 
-Example Output:
+## iris query upgrade applied
+
+Query the software upgrade plan that has been executed recently.
 
 ```bash
-iva15cv33a67cfey5eze7238hck6yngw36949evplx   100.0000000000
-iva15cv33a67cfey5eze7238hck6yngw36949evplx   100.0000000000
-iva15cv33a67cfey5eze7238hck6yngw36949evplx   100.0000000000
-siganalsVotingPower/totalVotingPower = 0.5000000000
+iris query upgrade applied <upgrade-name>
 ```

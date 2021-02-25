@@ -25,34 +25,22 @@
 
 ## 长时间不参与网络共识
 
-在固定时间窗口`SignedBlocksWindow`内，验证人的缺席出块数目比重大于`MinSignedPerWindow`，则以`SlashFractionDowntime`比例惩罚验证人的绑定的token,并jail验证人。直到jail时间超过`DowntimeJailDuration`，才能通过unjail命令解除jail。
+在固定时间窗口`SignedBlocksWindow`内，验证人的缺席出块数目比重大于`MinSignedPerWindow`，则以`SlashFractionDowntime`比例惩罚验证人的绑定的token，并jail验证人。直到jail时间超过`DowntimeJailDuration`，才能通过unjail命令解除jail。
 
 **参数：**
 
-* `SignedBlocksWindow` 默认值: 20000
-* `MinSignedPerWindow` 默认值: 0.5
-* `DowntimeJailDuration` 默认值: 2天
-* `SlashFractionDowntime` 默认值: 0.005
+* `SignedBlocksWindow` 默认值：20000
+* `MinSignedPerWindow` 默认值：0.5
+* `DowntimeJailDuration` 默认值：10分钟
+* `SlashFractionDowntime` 默认值：0.01
 
 ## 恶意投票
 
-执行区块时, 收到某验证人对同一高度同一Round区块进行不同签名的作恶证据（称为Double Sign），如果作恶的时间距当前区块时间小于`MaxEvidenceAge`，则以`SlashFractionDoubleSign`比例惩罚验证人的绑定的token,并jail验证人。直到jail时间超过`DoubleSignJailDuration`，才能通过unjail命令解除jail。
+执行区块时，收到某验证人对同一高度同一Round区块进行不同签名的作恶证据（称为Double Sign），则以`SlashFractionDoubleSign`比例惩罚验证人的绑定的token，并jail验证人。直到jail时间超过`DoubleSignJailDuration`，才能通过unjail命令解除jail。
 
 **参数：**
 
-* `MaxEvidenceAge` 默认值: 1天
-* `DoubleSignJailDuration` 默认值: 5天
-* `SlashFractionDoubleSign`默认值: 0.01
+* `DowntimeJailDuration` 默认值：10分钟
+* `SlashFractionDoubleSign`默认值：0.05
 
-## 打包不合法的交易
-
-如果节点在执行区块过程中，检测到其中交易只要没有通过`txDecoder`, `validateTx`, `validateBasicTxMsgs`, 则以`SlashFractionCensorship`比例惩罚验证人的绑定的token, 并jail验证人。直到jail时间超过`CensorshipJailDuration`，才能通过unjail命令解除jail。
-
-* `txDecode` 对Tx的反序列化
-* `validateTx` 对Tx的大小限制
-* `validateBasicTxMsgs` 对tx中msg的基本检查
-
-**参数：**
-
-* `CensorshipJailDuration` 默认值: 7天
-* `SlashFractionCensorship` 默认值: 0.02
+`Slashing`模块的相关操作请参见[cli-slashing](../cli-client/slashing.md)

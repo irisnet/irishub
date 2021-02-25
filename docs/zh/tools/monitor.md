@@ -8,28 +8,28 @@ order: 1
 
 IRIShub 软件可以提供Prometheus监控指标，Prometheus可以收集这些指标。
 
-默认情况下此功能是被禁用的，要启用Prometheus监控指标，请在配置文件(config.toml)中设置`prometheus = true`。默认情况下，Metrics将在26660端口下的/metrics提供，可以在配置文件中修改服务地址`prometheus_listen_addr = ":26660"`。
+默认情况下此功能是被禁用的，要启用Prometheus监控指标，请在配置文件（config.toml）中设置`prometheus = true`。默认情况下，Metrics将在26660端口下的/metrics提供，可以在配置文件中修改服务地址`prometheus_listen_addr = ":26660"`。
 
 ## 监控指标
 
-应用层监控参数如下，命名空间: `iris`
+应用层监控参数如下，命名空间：`iris`
 
-| Name                              | Type    | Tags                           | Description                                      |
-| --------------------------------- | ------- | ------------------------------ | ------------------------------------------------ |
-| module_stake_bonded_token         | Gauge   | validator_address              | 验证人被绑定的token总数                          |
-| module_stake_loosen_token         | Gauge   |                                | 未被绑定的token总数                              |
-| module_stake_burned_token         | Gauge   |                                | 销毁的token总数                                  |
-| module_stake_slashed_token        | Counter | validator_address              | 验证人被惩罚的token总数                          |
-| module_stake_jailed               | Gauge   | validator_address              | 验证人监禁状态，0（未监禁）或1（被监禁）         |
-| module_stake_power                | Gauge   | validator_address              | 验证人投票权                                     |
-| module_upgrade_upgrade            | Gauge   |                                | 是否需要安装新软件，0（否）或1（是）             |
-| module_upgrade_signal             | Gauge   | validator_address, version     | 验证人是否运行了新版本软件，0（否）或1（是）     |
-| module_service_active_requests    | Gauge   |                                | 活跃的请求数                                     |
-| module_gov_parameter              | Gauge   | parameter_key                  | 治理参数                                         |
-| module_gov_proposal_status        | Gauge   | proposal_id                    | 提议状态，0:抵押期 1:投票期 2:通过 3:拒绝 4:其他 |
-| module_gov_vote                   | Gauge   | proposal_id, validator_address | 验证人投票结果，0:同意 1:反对 2:强烈反对 3:弃权  |
-| module_distribution_community_tax | Gauge   | height                         | 社区基金累计值                                   |
-| v0_invariant_failure              | Counter | error                          | Invariant检查错误事件                            |
+| Name                              | Type    | Tags                           | Description                                           |
+| --------------------------------- | ------- | ------------------------------ | ----------------------------------------------------- |
+| module_stake_bonded_token         | Gauge   | validator_address              | 验证人被绑定的token总数                               |
+| module_stake_loosen_token         | Gauge   |                                | 未被绑定的token总数                                   |
+| module_stake_burned_token         | Gauge   |                                | 销毁的token总数                                       |
+| module_stake_slashed_token        | Counter | validator_address              | 验证人被惩罚的token总数                               |
+| module_stake_jailed               | Gauge   | validator_address              | 验证人监禁状态，0（未监禁）或1（被监禁）              |
+| module_stake_power                | Gauge   | validator_address              | 验证人投票权                                          |
+| module_upgrade_upgrade            | Gauge   |                                | 是否需要安装新软件，0（否）或1（是）                  |
+| module_upgrade_signal             | Gauge   | validator_address, version     | 验证人是否运行了新版本软件，0（否）或1（是）          |
+| module_service_active_requests    | Gauge   |                                | 活跃的请求数                                          |
+| module_gov_parameter              | Gauge   | parameter_key                  | 治理参数                                              |
+| module_gov_proposal_status        | Gauge   | proposal_id                    | 提议状态，0：抵押期 1：投票期 2：通过 3：拒绝 4：其他 |
+| module_gov_vote                   | Gauge   | proposal_id, validator_address | 验证人投票结果，0：同意 1：反对 2：强烈反对 3：弃权   |
+| module_distribution_community_tax | Gauge   | height                         | 社区基金累计值                                        |
+| v0_invariant_failure              | Counter | error                          | Invariant检查错误事件                                 |
 
 共识层监控参数如下，名字空间：`tendermint`
 
@@ -105,5 +105,5 @@ docker run -d --name=grafana -p 3000:3000 grafana/grafana
 :::tip
 默认的用户名和密码均为admin。强烈建议在登录后立即更改你的用户名和密码。
 
-兼容所有基于 cosmos-sdk 和 tendermint 的区块链的 Grafana 仪表盘: [cosmos-dashboard](https://github.com/zhangyelong/cosmos-dashboard)
+兼容所有基于 cosmos-sdk 和 tendermint 的区块链的 Grafana 仪表盘：[cosmos-dashboard](https://github.com/zhangyelong/cosmos-dashboard)
 :::

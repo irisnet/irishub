@@ -23,58 +23,37 @@ The inflation rate is assigned to 4% per year in genesis file. This value can be
 This is the calculation equation:
 
 ```bash
- blockCostTime  = (current block BFT time) - (last block BFT time)
- AnnualInflationAmount = inflationBasement * inflationRate
- blockInflationAmount = AnnualInflationAmount * blockCostTime / (year)
+blockCostTime  = (current block BFT time) - (last block BFT time)
+AnnualInflationAmount = inflationBasement * inflationRate
+blockInflationAmount = AnnualInflationAmount * blockCostTime / (year)
 ```
 
-The value of `inflationBasement` is specified in genesis file. By default its value `2000000000iris`(2 billion iris, `1 iris` equals `1*10^18 iris-atto`), and its value will never be changed.
-Suppose `blockCostTime` is 5000 millisecond, and `inflationRate` is `4%`, then the inflation amount will be `12675235125611580094iris-atto` (`12.675235125611580094iris`)
+The value of `inflationBasement` is specified in genesis file. By default its value `2000000000iris`(2 billion iris, `1 iris` equals `1*10^18 uiris`), and its value will never be changed.
+Suppose `blockCostTime` is 5000 millisecond, and `inflationRate` is `4%`, then the inflation amount will be `12675235125611580094uiris` (`12.675235125611580094iris`)
 
 ## Impact to users
 
 The inflation calculation is automatically triggered by each block. So once a new block is produced, new tokens will be created and the loose tokens will increase accordingly. Users have no directly interface to affect this process.
 
-There are two command line interfaces and two LCD restful APIs which can query total loose tokens amount.
+There is a command line interface and one LCD restful APIs which can query total loose tokens amount.
 
-1. `iriscli stake pool`
+`iris q staking pool`
 
-    This is much faster, but it cannot get merkle proof and verify proof. So if you doesn't trust the connected full node, please don't use this interface.
+This is much faster, but it cannot get merkle proof and verify proof. So if you doesn't trust the connected full node, please don't use this interface.
 
-    ```bash
-    iriscli stake pool --node=<iris-node-url>
-    ```
+```bash
+iris q staking pool --node=<iris-node-url>
+```
 
-    Example Output:
+Example Output:
 
-    ```bash
-    Pool
-    Loose Tokens: 1846663.900384156921391687
-    Bonded Tokens: 425182.329615843078608313
-    Token Supply: 2271846.230000000000000000
-    Bonded Ratio: 0.187152776500000000
-    ```
+```bash
+bonded_tokens: "100000000000000000000"
+not_bonded_tokens: "0"
+```
 
-2. `iriscli bank token-stats`
+`/staking/pool`
 
-    You can use `--trust-node` flag to indicate whether the connected full node is trustable or not. If you can't access to a trustable node, this command line is very helpful.
+Please refer to LCD swagger document.
 
-    ```bash
-    iriscli bank token-stats --trust-node=false --chain-id=<chain-id> --node=<iris-node-url>
-    ```
-
-    Example Output:
-
-    ```bash
-    TokenStats:
-      Loose Tokens:  1864477.596384156921391687iris
-      Burned Tokens:  null
-      Bonded Tokens:  425182.329615843078608313iris
-
-    ```
-
-3. `/stake/pool` and `/bank/token-stats`
-
-    Please refer to LCD swagger document.
-
-    As for how to run a LCD node please refer to [LCD document](../light-client/intro.md).
+As for how to run a LCD node please refer to [LCD document](../light-client/intro.md).
