@@ -28,6 +28,7 @@ Check if sha256sum is correct
 
 ```bash
 sha256sum genesis_v1.0.1.json
+62ef600a3cd7c6a94a47e1af66e9d6a6a0c9b224171e3e70e8ecf6497f47716b  genesis_v1.0.1.json
 ```
 
 ## 3. Initialize new node
