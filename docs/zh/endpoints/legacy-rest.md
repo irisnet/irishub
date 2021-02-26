@@ -1,3 +1,7 @@
+---
+order: 2
+---
+
 # Legacy Amino JSON REST
 
 irishub v1.0.0（依赖Cosmos-SDK v0.41）和更早版本提供了 REST 端点来查询状态和广播交易。 这些端点在 irishub v1.0 中仍然保留，但已标记为已弃用，并计划在几个版本后删除。因此，我们将这些端点称为 Legacy REST 端点。
@@ -41,7 +45,7 @@ irishub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 
 **IRIShub API 端点**
 
-| Legacy REST 端点                                                                  | 描述                                 | 新的 gGPC-gateway REST 端点                                                                                   |
+| Legacy REST 端点                                                                  | 描述                                 | 新的 gRPC-gateway REST 端点                                                                                   |
 | --------------------------------------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
 | `GET` `/bank/balances/{address}`                                                  | 查询一个地址的余额                   | `GET` `/cosmos/bank/v1beta1/balances/{address}`                                                               |
 | `POST` `/bank/accounts/{address}/transfers`                                       | 从一个账户向另一个账户转账           | N/A，直接使用 Protobuf                                                                                        |
@@ -90,14 +94,14 @@ irishub v0.16 和更早版本中存在的 REST 路由通过 [HTTP 弃用标头](
 | `POST` `/distribution/delegators/{delegatorAddr}/withdraw_address`                | 重设奖励提取地址                     | N/A，直接使用 Protobuf                                                                                        |
 | `GET` `/distribution/validators/{validatorAddr}`                                  | 获取一个验证人奖励分配信息           | N/A，直接使用 Protobuf                                                                                        |
 | `GET` `/distribution/validators/{validatorAddr}/outstanding_rewards`              | 获取一个验证人所有未偿付的奖励       | `GET` `/cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards`                       |
-| `GET` `/distribution/validators/{validatorAddr}/rewards`                          | 获取一个验证人的佣金和自委托奖励     | N/A，直接使用 Protobuf                                                                                        |
+| `GET` `/distribution/validators/{validatorAddr}/rewards`                          | 获取一个验证人的佣金和自委托奖励     | `GET` `/cosmos/distribution/v1beta1/validators/{validator_address}/commission` <br> `GET` `/cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards`   |
 | `POST` `/distribution/validators/{validatorAddr}/rewards`                         | 取出验证人的奖励                     | N/A，直接使用 Protobuf                                                                                        |
 | `GET` `/distribution/community_pool`                                              | 获取社区池中持有的金额               | `GET` `/cosmos/distribution/v1beta1/community_pool`                                                           |
 | `GET` `/distribution/parameters`                                                  | 获取 distribution 模块参数值         | `GET` `/cosmos/distribution/v1beta1/params`                                                                   |
 
 **Tendermint API 端点**
 
-| Legacy REST 端点                | 描述                                            | 新的 gGPC-gateway REST 端点                                    |
+| Legacy REST 端点                | 描述                                            | 新的 gRPC-gateway REST 端点                                    |
 | ------------------------------- | ----------------------------------------------- | -------------------------------------------------------------- |
 | `GET` `/node_info`              | 获取连接的节点的属性值                          | `GET` `/cosmos/base/tendermint/v1beta1/node_info`              |
 | `GET` `/syncing`                | 获取节点的同步状态                              | `GET` `/cosmos/base/tendermint/v1beta1/syncing`                |

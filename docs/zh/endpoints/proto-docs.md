@@ -1,5 +1,8 @@
-<!-- This file is auto-generated. Please do not modify it yourself. -->
+---
+order: 6
+---
 # Protobuf Documentation
+<!-- This file is auto-generated. Please do not modify it yourself. -->
 <a name="top"></a>
 
 ## Table of Contents

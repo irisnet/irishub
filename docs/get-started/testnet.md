@@ -9,8 +9,8 @@ After IRIS Hub 1.0 upgrade of mainnet, **Nyancat Testnet** starts to operate as 
 ## Public Endpoints
 
 - GRPC: 34.80.202.172:9090
-- RPC: http://34.80.202.172:26657
-- REST: http://34.80.202.172:1317/swagger/
+- RPC: <http://34.80.202.172:26657>
+- REST: <http://34.80.202.172:1317/swagger/>
 
 ## Running a Node
 
