@@ -9,12 +9,12 @@ order: 4
 ## 公共端点
 
 - GRPC：34.80.202.172:9090
-- RPC：http://34.80.202.172:26657
-- REST：http://34.80.202.172:1317/swagger/
+- RPC：<http://34.80.202.172:26657>
+- REST：<http://34.80.202.172:1317/swagger/>
 
 ## 运行节点
 
-如果您想自行配置测试网节点而不是使用公共端点，可以参考加入[IRIS Hub 主网]（https://www.irisnet.org/docs/get-started/mainnet.html）步骤，除了：
+如果您想自行配置测试网节点而不是使用公共端点，可以参考 [加入 IRIS Hub 主网](https://www.irisnet.org/docs/get-started/mainnet.html) 步骤，除了：
 
 ### 创世文件
 
