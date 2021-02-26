@@ -1,3 +1,7 @@
+---
+order: 3
+---
+
 # gRPC Gateway JSON REST
 
 In irishub v1.0.0, the node continues to serve a REST server. However, the existing routes present in version v0.16.3 and earlier are now marked as deprecated, and new routes have been added via gRPC-gateway.
