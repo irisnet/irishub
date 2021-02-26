@@ -74,6 +74,7 @@ module.exports = {
                     ["CLI Client", "cli-client"],
                     ["Endpoints", "endpoints"],
                     ["Tools", "tools"],
+                    ["Migration", "migration"],
                     ["Resources", "resources"]
                 ])
             },
@@ -93,6 +94,7 @@ module.exports = {
                     ["命令行客户端", "/zh/cli-client"],
                     ["服务端点", "/zh/endpoints"],
                     ["工具", "/zh/tools"],
+                    ["迁移", "/zh/migration"],
                     ["资源", "/zh/resources"]
                 ])
             }

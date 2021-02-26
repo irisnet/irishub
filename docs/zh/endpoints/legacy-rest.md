@@ -1,3 +1,7 @@
+---
+order: 2
+---
+
 # Legacy Amino JSON REST
 
 irishub v1.0.0（依赖Cosmos-SDK v0.41）和更早版本提供了 REST 端点来查询状态和广播交易。 这些端点在 irishub v1.0 中仍然保留，但已标记为已弃用，并计划在几个版本后删除。因此，我们将这些端点称为 Legacy REST 端点。
