@@ -41,7 +41,7 @@ For application developers, Legacy REST API routes needs to be wired up to the R
 
 **IRIShub API Endpoints**
 
-| Legacy REST Endpoint                                                              | Description                                                         | New gGPC-gateway REST Endpoint                                                                                |
+| Legacy REST Endpoint                                                              | Description                                                         | New gRPC-gateway REST Endpoint                                                                                |
 | --------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `GET` `/bank/balances/{address}`                                                  | Get the balance of an address                                       | `GET` `/cosmos/bank/v1beta1/balances/{address}`                                                               |
 | `POST` `/bank/accounts/{address}/transfers`                                       | Send coins from one account to another                              | N/A, use Protobuf directly                                                                                    |
@@ -90,14 +90,14 @@ For application developers, Legacy REST API routes needs to be wired up to the R
 | `POST` `/distribution/delegators/{delegatorAddr}/withdraw_address`                | Replace the rewards withdrawal address                              | N/A, use Protobuf directly                                                                                    |
 | `GET` `/distribution/validators/{validatorAddr}`                                  | Validator distribution information                                  | N/A, use Protobuf directly                                                                                    |
 | `GET` `/distribution/validators/{validatorAddr}/outstanding_rewards`              | Outstanding rewards of a single validator                           | `GET` `/cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards`                       |
-| `GET` `/distribution/validators/{validatorAddr}/rewards`                          | Commission and self-delegation rewards of a single a validator      | N/A, use Protobuf directly                                                                                    |
+| `GET` `/distribution/validators/{validatorAddr}/rewards`                          | Commission and self-delegation rewards of a single a validator      | `GET` `/cosmos/distribution/v1beta1/validators/{validator_address}/commission` <br> `GET` `/cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards`  |
 | `POST` `/distribution/validators/{validatorAddr}/rewards`                         | Withdraw the validator's rewards                                    | N/A, use Protobuf directly                                                                                    |
 | `GET` `/distribution/community_pool`                                              | Get the amount held in the community pool                           | `GET` `/cosmos/distribution/v1beta1/community_pool`                                                           |
 | `GET` `/distribution/parameters`                                                  | Get the current distribution parameter values                       | `GET` `/cosmos/distribution/v1beta1/params`                                                                   |
 
 **Tendermint API Endpoints**
 
-| Legacy REST Endpoint            | Description                                      | New gGPC-gateway REST Endpoint                                 |
+| Legacy REST Endpoint            | Description                                      | New gRPC-gateway REST Endpoint                                 |
 | ------------------------------- | ------------------------------------------------ | -------------------------------------------------------------- |
 | `GET` `/node_info`              | Get the properties of the connected node         | `GET` `/cosmos/base/tendermint/v1beta1/node_info`              |
 | `GET` `/syncing`                | Get syncing state of node                        | `GET` `/cosmos/base/tendermint/v1beta1/syncing`                |
