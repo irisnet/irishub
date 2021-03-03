@@ -58,6 +58,8 @@ var (
 	testInput         = `{"header":{},"body":{}}`
 	testResult        = `{"code":200,"message":""}`
 	testOutput        = `{"header":{},"body":{}}`
+	testErrorResult   = `{"code":400,"message":""}`
+	testEmptyOutput   = ""
 	testServiceFee    = sdk.NewCoins(testCoin3)
 	testServiceFee2   = sdk.NewCoins(testCoin4)
 	testServiceFeeCap = sdk.NewCoins(testCoin3)
@@ -472,7 +474,8 @@ func (suite *KeeperTestSuite) TestKeeperRespondService() {
 	suite.addCoins(consumer, testServiceFee2)
 
 	requestID1 := suite.setRequest(ctx, consumer, provider, requestContextID, testServiceFee)
-	requestID2 := suite.setRequest(ctx, consumer, provider, requestContextID, testServiceFee2)
+	requestID2 := suite.setRequest(ctx, consumer, provider, requestContextID, testServiceFee)
+	requestID3 := suite.setRequest(ctx, consumer, provider, requestContextID, testServiceFee2)
 
 	// respond request 1
 	_, _, err := suite.keeper.AddResponse(ctx, requestID1, provider, testResult, testOutput)
@@ -494,23 +497,42 @@ func (suite *KeeperTestSuite) TestKeeperRespondService() {
 	suite.Equal(uint64(1), volume)
 
 	// respond request 2
-	_, _, err = suite.keeper.AddResponse(ctx, requestID2, provider, testResult, testOutput)
+	_, _, err = suite.keeper.AddResponse(ctx, requestID2, provider, testErrorResult, testEmptyOutput)
 	suite.NoError(err)
 
 	requestContext, _ = suite.keeper.GetRequestContext(ctx, requestContextID)
 	suite.Equal(uint32(2), requestContext.BatchResponseCount)
-	suite.Equal(types.BATCHCOMPLETED, requestContext.BatchState)
+	suite.Equal(types.BATCHRUNNING, requestContext.BatchState)
 
-	_, found = suite.keeper.GetResponse(ctx, requestID2)
+	response, found = suite.keeper.GetResponse(ctx, requestID2)
 	suite.True(found)
+
+	suite.Equal(provider.String(), response.Provider)
+	suite.Equal(consumer.String(), response.Consumer)
+	suite.Equal(requestContextID.String(), response.RequestContextId)
+	suite.Equal(requestContext.BatchCounter, response.RequestContextBatchCounter)
 
 	volume = suite.keeper.GetRequestVolume(ctx, consumer, requestContext.ServiceName, provider)
 	suite.Equal(uint64(2), volume)
 
+	// respond request 3
+	_, _, err = suite.keeper.AddResponse(ctx, requestID3, provider, testResult, testOutput)
+	suite.NoError(err)
+
+	requestContext, _ = suite.keeper.GetRequestContext(ctx, requestContextID)
+	suite.Equal(uint32(3), requestContext.BatchResponseCount)
+	suite.Equal(types.BATCHCOMPLETED, requestContext.BatchState)
+
+	_, found = suite.keeper.GetResponse(ctx, requestID3)
+	suite.True(found)
+
+	volume = suite.keeper.GetRequestVolume(ctx, consumer, requestContext.ServiceName, provider)
+	suite.Equal(uint64(3), volume)
+
 	earnedFees, found := suite.keeper.GetEarnedFees(ctx, provider)
 	suite.True(found)
 	suite.False(earnedFees.Empty())
-	suite.Equal(uint64(2), earnedFees.AmountOf(sdk.DefaultBondDenom).Uint64())
+	suite.Equal(uint64(4), earnedFees.AmountOf(sdk.DefaultBondDenom).Uint64())
 	suite.Equal(uint64(10), earnedFees.AmountOf(testDenom4).Uint64())
 
 	ownerEarnedFees, found := suite.keeper.GetOwnerEarnedFees(ctx, testOwner)
@@ -519,6 +541,7 @@ func (suite *KeeperTestSuite) TestKeeperRespondService() {
 
 	suite.False(suite.keeper.IsRequestActive(ctx, requestID1))
 	suite.False(suite.keeper.IsRequestActive(ctx, requestID2))
+	suite.False(suite.keeper.IsRequestActive(ctx, requestID3))
 }
 
 func (suite *KeeperTestSuite) TestRequestServiceFromModule() {

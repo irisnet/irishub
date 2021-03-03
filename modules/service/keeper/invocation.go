@@ -889,8 +889,10 @@ func (k Keeper) AddResponse(
 		return request, response, sdkerrors.Wrap(types.ErrInvalidResponse, "request is not active")
 	}
 
-	if err := types.ValidateResponseOutput(output); err != nil {
-		return request, response, sdkerrors.Wrap(types.ErrInvalidResponseOutput, err.Error())
+	if len(output) > 0 {
+		if err := types.ValidateResponseOutput(output); err != nil {
+			return request, response, sdkerrors.Wrap(types.ErrInvalidResponseOutput, err.Error())
+		}
 	}
 
 	if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
