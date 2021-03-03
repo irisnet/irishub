@@ -12,7 +12,7 @@
   "devDependencies": {
     "@vuepress/plugin-search": "^1.0.0-rc.1",
     "lodash": "^4.17.19",
-    "markdown-it": "^8.4.2",
+    "markdown-it": "^12.0.4",
     "markdown-it-meta": "0.0.1",
     "vuepress": "^1.8.2"
   },
