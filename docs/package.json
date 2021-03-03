@@ -10,7 +10,7 @@
   "author": "IRISnet Dev Team",
   "license": "ISC",
   "devDependencies": {
-    "@vuepress/plugin-search": "^1.0.0-rc.1",
+    "@vuepress/plugin-search": "^1.8.2",
     "lodash": "^4.17.19",
     "markdown-it": "^8.4.2",
     "markdown-it-meta": "0.0.1",
