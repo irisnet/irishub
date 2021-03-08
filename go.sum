@@ -304,8 +304,8 @@ github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANyt
 github.com/influxdata/influxdb1-client v0.0.0-20191209144304-8bf82d3c094d/go.mod h1:qj24IKcXYK6Iy9ceXlo3Tc+vtHo9lIhSX5JddghvEPo=
 github.com/irisnet/cosmos-sdk v0.34.4-0.20210304082514-9a60267940b8 h1:KTCFlQ3/T4xgtWjc5R3/6htVYQzVIK15cGFrEIcCJWU=
 github.com/irisnet/cosmos-sdk v0.34.4-0.20210304082514-9a60267940b8/go.mod h1:xiLp1G8mumj82S5KLJGCAyeAlD+7VNomg/aRSJV12yk=
-github.com/irisnet/irismod v1.3.1 h1:KeHCHxb8pc3Jk3bVi9eK4MP+jPQDneChloGFVuglDwE=
-github.com/irisnet/irismod v1.3.1/go.mod h1:5Ye17WorhxHwrGDZvSkmrfiFq5PXi3roINw1JcB4IB0=
+github.com/irisnet/irismod v1.3.2-0.20210308021302-c22d58f6e250 h1:SDYSZtSveO0JY6bWjlHb6f9Iw4AOt7UirgsdG4Btm2Q=
+github.com/irisnet/irismod v1.3.2-0.20210308021302-c22d58f6e250/go.mod h1:JfAAdwp0kXzwU8VBPJ4gdZgbWImpaqp2DWpQDiLXIso=
 github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=
@@ -571,7 +571,6 @@ github.com/tendermint/go-amino v0.16.0/go.mod h1:TQU0M1i/ImAo+tYpZi73AU3V/dKeCoM
 github.com/tendermint/tendermint v0.34.0-rc4/go.mod h1:yotsojf2C1QBOw4dZrTcxbyxmPUrT4hNuOQWX9XUwB4=
 github.com/tendermint/tendermint v0.34.0-rc6/go.mod h1:ugzyZO5foutZImv0Iyx/gOFCX6mjJTgbLHTwi17VDVg=
 github.com/tendermint/tendermint v0.34.0/go.mod h1:Aj3PIipBFSNO21r+Lq3TtzQ+uKESxkbA3yo/INM4QwQ=
-github.com/tendermint/tendermint v0.34.3/go.mod h1:h57vnXeOlrdvvNFCqPBSaOrpOivl+2swWEtlUAqStYE=
 github.com/tendermint/tendermint v0.34.8 h1:PMWgUx47FrNTsfhxCWzoiIlVAC1SE9+WBlnsF9oQW0I=
 github.com/tendermint/tendermint v0.34.8/go.mod h1:JVuu3V1ZexOaZG8VJMRl8lnfrGw6hEB2TVnoUwKRbss=
 github.com/tendermint/tm-db v0.6.2/go.mod h1:GYtQ67SUvATOcoY8/+x6ylk8Qo02BQyLrAs+yAcLvGI=

@@ -167,7 +167,7 @@ var (
 		coinswaptypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
 		servicetypes.DepositAccName:    {authtypes.Burner},
 		servicetypes.RequestAccName:    nil,
-		servicetypes.TaxAccName:        {authtypes.Burner},
+		servicetypes.FeeCollectorName:  {authtypes.Burner},
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -407,7 +407,7 @@ func NewIrisApp(
 
 	app.serviceKeeper = servicekeeper.NewKeeper(
 		appCodec, keys[servicetypes.StoreKey], app.accountKeeper, app.bankKeeper,
-		app.GetSubspace(servicetypes.ModuleName), servicetypes.TaxAccName,
+		app.GetSubspace(servicetypes.ModuleName), servicetypes.FeeCollectorName,
 	)
 
 	app.oracleKeeper = oraclekeeper.NewKeeper(
