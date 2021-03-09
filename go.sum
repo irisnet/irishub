@@ -102,9 +102,6 @@ github.com/coreos/go-systemd v0.0.0-20180511133405-39ca1b05acc7/go.mod h1:F5haX7
 github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/coreos/pkg v0.0.0-20160727233714-3ac0863d7acf/go.mod h1:E3G3o1h8I7cfcXa63jLwjI0eiQQMgzzUDFVpN/nH/eA=
 github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfcXa63jLwjI0eiQQMgzzUDFVpN/nH/eA=
-github.com/cosmos/cosmos-sdk v0.41.0/go.mod h1:vlgqdPpUGSxgqSbZea6fjszoLkPKwCuiqSBySLlv4ro=
-github.com/cosmos/cosmos-sdk v0.41.3 h1:FQusz1vO0iyri5RBke2aMdx7aqj5Ma2/5c/4W9+u7ko=
-github.com/cosmos/cosmos-sdk v0.41.3/go.mod h1:yKN705My5fGGT93DrdoeZ96GPFLCVZrzDBciGf8/Ldo=
 github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d/go.mod h1:tSxLoYXyBmiFeKpvmq4dzayMdCjCnu8uqmCysIGBT2Y=
 github.com/cosmos/go-bip39 v1.0.0 h1:pcomnQdrdH22njcAatO0yWojsUnCO3y2tNoV1cb6hHY=
 github.com/cosmos/go-bip39 v1.0.0/go.mod h1:RNJv0H/pOIVgxw6KS7QeX2a0Uo0aKUlfhZ4xuwvCdJw=
@@ -171,7 +168,6 @@ github.com/franela/goreq v0.0.0-20171204163338-bcd34c9993f8/go.mod h1:ZhphrRTfi2
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWoS4=
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
-github.com/ghodss/yaml v1.0.0 h1:wQHKEahhL6wmXdzwWG11gIVCkOv05bNOh+Rxn0yngAk=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
@@ -191,7 +187,6 @@ github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2/go.mod h1:bBOAhwG1umN6
 github.com/gogo/gateway v1.1.0 h1:u0SuhL9+Il+UbjM9VIE3ntfRujKbvVpFvNB4HbjeVQ0=
 github.com/gogo/gateway v1.1.0/go.mod h1:S7rR8FRQyG3QFESeSv4l2WnsyzlCLG0CzBbUUo/mbic=
 github.com/gogo/googleapis v1.1.0/go.mod h1:gf4bu3Q80BeJ6H1S1vYPm8/ELATdvryBaNFGgqEef3s=
-github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b h1:VKtxabqXZkF25pY9ekfRL6a582T4P37/31XEstQ5p58=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
 github.com/golang/groupcache v0.0.0-20160516000752-02826c3e7903/go.mod h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=
 github.com/golang/groupcache v0.0.0-20190129154638-5b532d6fd5ef/go.mod h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=
@@ -237,7 +232,6 @@ github.com/google/pprof v0.0.0-20181206194817-3ea8567a2e57/go.mod h1:zfwlbNMJ+OI
 github.com/google/pprof v0.0.0-20190515194954-54271f7e092f/go.mod h1:zfwlbNMJ+OItoe0UupaVj+oy1omPYYDuagoSzA8v9mc=
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
 github.com/google/uuid v1.0.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/google/uuid v1.1.2 h1:EVhdT+1Kseyi1/pUmXKaFxYsDNy9RQYkMWRH68J/W7Y=
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
@@ -308,8 +302,10 @@ github.com/hudl/fargo v1.3.0/go.mod h1:y3CKSmjA+wD2gak7sUSXTAoopbhU08POFhmITJgmK
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/influxdata/influxdb1-client v0.0.0-20191209144304-8bf82d3c094d/go.mod h1:qj24IKcXYK6Iy9ceXlo3Tc+vtHo9lIhSX5JddghvEPo=
-github.com/irisnet/irismod v1.3.1 h1:KeHCHxb8pc3Jk3bVi9eK4MP+jPQDneChloGFVuglDwE=
-github.com/irisnet/irismod v1.3.1/go.mod h1:5Ye17WorhxHwrGDZvSkmrfiFq5PXi3roINw1JcB4IB0=
+github.com/irisnet/cosmos-sdk v0.34.4-0.20210304082514-9a60267940b8 h1:KTCFlQ3/T4xgtWjc5R3/6htVYQzVIK15cGFrEIcCJWU=
+github.com/irisnet/cosmos-sdk v0.34.4-0.20210304082514-9a60267940b8/go.mod h1:xiLp1G8mumj82S5KLJGCAyeAlD+7VNomg/aRSJV12yk=
+github.com/irisnet/irismod v1.3.2-0.20210308021302-c22d58f6e250 h1:SDYSZtSveO0JY6bWjlHb6f9Iw4AOt7UirgsdG4Btm2Q=
+github.com/irisnet/irismod v1.3.2-0.20210308021302-c22d58f6e250/go.mod h1:JfAAdwp0kXzwU8VBPJ4gdZgbWImpaqp2DWpQDiLXIso=
 github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=
@@ -504,7 +500,6 @@ github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb6uqfes/u+d4ooFouqFdy9/2g9QGwK3SQygK0Ts=
 github.com/samuel/go-zookeeper v0.0.0-20190923202752-2cc03de413da/go.mod h1:gi+0XIa01GRL2eRQVjQkKGqKF3SF9vZR/HnPullcV2E=
-github.com/sasha-s/go-deadlock v0.2.0 h1:lMqc+fUb7RrFS3gQLtoQsJ7/6TV/pAIFvBsqX73DK8Y=
 github.com/sasha-s/go-deadlock v0.2.0/go.mod h1:StQn567HiB1fF2yJ44N9au7wOhrPS3iZqiDbRupzT10=
 github.com/sasha-s/go-deadlock v0.2.1-0.20190427202633-1595213edefa h1:0U2s5loxrTy6/VgfVoLuVLFJcURKLH49ie0zSch7gh4=
 github.com/sasha-s/go-deadlock v0.2.1-0.20190427202633-1595213edefa/go.mod h1:F73l+cr82YSh10GxyRI6qZiCgK64VaZjwesgfQ1/iLM=
@@ -576,12 +571,9 @@ github.com/tendermint/go-amino v0.16.0/go.mod h1:TQU0M1i/ImAo+tYpZi73AU3V/dKeCoM
 github.com/tendermint/tendermint v0.34.0-rc4/go.mod h1:yotsojf2C1QBOw4dZrTcxbyxmPUrT4hNuOQWX9XUwB4=
 github.com/tendermint/tendermint v0.34.0-rc6/go.mod h1:ugzyZO5foutZImv0Iyx/gOFCX6mjJTgbLHTwi17VDVg=
 github.com/tendermint/tendermint v0.34.0/go.mod h1:Aj3PIipBFSNO21r+Lq3TtzQ+uKESxkbA3yo/INM4QwQ=
-github.com/tendermint/tendermint v0.34.3 h1:9yEsf3WO5VAwPVwrmM+RffDMiijmNfWaBwNttHm0q5w=
-github.com/tendermint/tendermint v0.34.3/go.mod h1:h57vnXeOlrdvvNFCqPBSaOrpOivl+2swWEtlUAqStYE=
-github.com/tendermint/tendermint v0.34.7 h1:lvBJFNqpDuEzKfLZKtUXOL5dMOpqHonHlO6LCujyl6E=
-github.com/tendermint/tendermint v0.34.7/go.mod h1:JVuu3V1ZexOaZG8VJMRl8lnfrGw6hEB2TVnoUwKRbss=
+github.com/tendermint/tendermint v0.34.8 h1:PMWgUx47FrNTsfhxCWzoiIlVAC1SE9+WBlnsF9oQW0I=
+github.com/tendermint/tendermint v0.34.8/go.mod h1:JVuu3V1ZexOaZG8VJMRl8lnfrGw6hEB2TVnoUwKRbss=
 github.com/tendermint/tm-db v0.6.2/go.mod h1:GYtQ67SUvATOcoY8/+x6ylk8Qo02BQyLrAs+yAcLvGI=
-github.com/tendermint/tm-db v0.6.3 h1:ZkhQcKnB8/2jr5EaZwGndN4owkPsGezW2fSisS9zGbg=
 github.com/tendermint/tm-db v0.6.3/go.mod h1:lfA1dL9/Y/Y8wwyPp2NMLyn5P5Ptr/gvDFNWtrCWSf8=
 github.com/tendermint/tm-db v0.6.4 h1:3N2jlnYQkXNQclQwd/eKV/NzlqPlfK21cpRRIx80XXQ=
 github.com/tendermint/tm-db v0.6.4/go.mod h1:dptYhIpJ2M5kUuenLr+Yyf3zQOv1SgBZcl8/BmWlMBw=
@@ -829,7 +821,6 @@ google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013/go.mod h1:NbSheEEY
 google.golang.org/genproto v0.0.0-20200825200019-8632dd797987/go.mod h1:FWY/as6DDZQgahTzZj3fqbO1CbirC29ZNUFHwi0/+no=
 google.golang.org/genproto v0.0.0-20201111145450-ac7456db90a6/go.mod h1:FWY/as6DDZQgahTzZj3fqbO1CbirC29ZNUFHwi0/+no=
 google.golang.org/genproto v0.0.0-20201119123407-9b1e624d6bc4/go.mod h1:FWY/as6DDZQgahTzZj3fqbO1CbirC29ZNUFHwi0/+no=
-google.golang.org/genproto v0.0.0-20210114201628-6edceaf6022f h1:izedQ6yVIc5mZsRuXzmSreCOlzI0lCU1HpG8yEdMiKw=
 google.golang.org/genproto v0.0.0-20210114201628-6edceaf6022f/go.mod h1:FWY/as6DDZQgahTzZj3fqbO1CbirC29ZNUFHwi0/+no=
 google.golang.org/genproto v0.0.0-20210204154452-deb828366460 h1:pvsg2TgyP8bWrYqyL10tbNHu5KypD5DWJPrCjaTkwZA=
 google.golang.org/genproto v0.0.0-20210204154452-deb828366460/go.mod h1:FWY/as6DDZQgahTzZj3fqbO1CbirC29ZNUFHwi0/+no=
