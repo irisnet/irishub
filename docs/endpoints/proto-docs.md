@@ -11590,6 +11590,7 @@ Params defines service module's parameters
 | `arbitration_time_limit` | [google.protobuf.Duration](#google.protobuf.Duration) |  |  |
 | `tx_size_limit` | [uint64](#uint64) |  |  |
 | `base_denom` | [string](#string) |  |  |
+| `restricted_service_fee_denom` | [bool](#bool) |  |  |
 
 
 
