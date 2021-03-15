@@ -53,13 +53,21 @@ var DefaultConsensusParams = &abci.ConsensusParams{
 	},
 }
 
+func setup(withGenesis bool, invCheckPeriod uint) (*SimApp, GenesisState) {
+	db := dbm.NewMemDB()
+	encCdc := MakeTestEncodingConfig()
+	app := NewSimApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, invCheckPeriod, encCdc, EmptyAppOptions{})
+	if withGenesis {
+		return app, NewDefaultGenesisState(encCdc.Marshaler)
+	}
+	return app, GenesisState{}
+}
+
 // Setup initializes a new SimApp. A Nop logger is set in SimApp.
 func Setup(isCheckTx bool) *SimApp {
-	db := dbm.NewMemDB()
-	app := NewSimApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, MakeEncodingConfig(), EmptyAppOptions{})
+	app, genesisState := setup(!isCheckTx, 5)
 	if !isCheckTx {
 		// init chain must be called to stop deliverState from being nil
-		genesisState := NewDefaultGenesisState()
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 		if err != nil {
 			panic(err)
@@ -80,20 +88,20 @@ func Setup(isCheckTx bool) *SimApp {
 
 func NewConfig() network.Config {
 	cfg := network.DefaultConfig()
-	encCfg := MakeEncodingConfig()
+	encCfg := MakeTestEncodingConfig()
 	cfg.Codec = encCfg.Marshaler
 	cfg.TxConfig = encCfg.TxConfig
 	cfg.LegacyAmino = encCfg.Amino
 	cfg.InterfaceRegistry = encCfg.InterfaceRegistry
 	cfg.AppConstructor = SimAppConstructor
-	cfg.GenesisState = NewDefaultGenesisState()
+	cfg.GenesisState = NewDefaultGenesisState(cfg.Codec)
 	return cfg
 }
 
 func SimAppConstructor(val network.Validator) servertypes.Application {
 	return NewSimApp(
-		val.Ctx.Logger, dbm.NewMemDB(), nil, true, make(map[int64]bool), val.Ctx.Config.RootDir, 0, MakeEncodingConfig(),
-		EmptyAppOptions{},
+		val.Ctx.Logger, dbm.NewMemDB(), nil, true, make(map[int64]bool),
+		val.Ctx.Config.RootDir, 0, MakeTestEncodingConfig(), EmptyAppOptions{},
 		bam.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
 		bam.SetMinGasPrices(val.AppConfig.MinGasPrices),
 	)
@@ -104,11 +112,7 @@ func SimAppConstructor(val network.Validator) servertypes.Application {
 // of one consensus engine unit (10^6) in the default token of the simapp from first genesis
 // account. A Nop logger is set in SimApp.
 func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) *SimApp {
-	db := dbm.NewMemDB()
-	app := NewSimApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, MakeEncodingConfig(), EmptyAppOptions{})
-
-	genesisState := NewDefaultGenesisState()
-
+	app, genesisState := setup(true, 5)
 	// set genesis accounts
 	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
 	genesisState[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(authGenesis)
@@ -119,9 +123,6 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 	bondAmt := sdk.NewInt(1000000)
 
 	for _, val := range valSet.Validators {
-		// Currently validator requires tmcrypto.ed25519 keys, which don't support
-		// our Marshaling interfaces, so we need to pack them into our version of ed25519.
-		// There is ongoing work to add secp256k1 keys (https://github.com/cosmos/cosmos-sdk/pull/7604).
 		pk, err := cryptocodec.FromTmPubKeyInterface(val.PubKey)
 		require.NoError(t, err)
 		pkAny, err := codectypes.NewAnyWithValue(pk)
@@ -185,12 +186,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 // SetupWithGenesisAccounts initializes a new SimApp with the provided genesis
 // accounts and possible balances.
 func SetupWithGenesisAccounts(genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) *SimApp {
-	db := dbm.NewMemDB()
-	app := NewSimApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, MakeEncodingConfig(), EmptyAppOptions{})
-
-	// initialize the chain with the passed in genesis accounts
-	genesisState := NewDefaultGenesisState()
-
+	app, genesisState := setup(true, 0)
 	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
 	genesisState[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(authGenesis)
 
