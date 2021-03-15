@@ -18,7 +18,7 @@ This specification describes the htlc module.
 1. **[Messages](./02_messages.md)**
    - [Create HTLC](./02_messages.md#msgcreatehtlc)
    - [Claim HTLC](./02_messages.md#msgclaimhtlc)
-   - [Refund HTLC](./02_messages.md#msgrefundhtlc)
 1. **[Events](./03_events.md)**
    - [BeginBlocker](03_events.md#beginblocker)
    - [Handlers](03_events.md#handlers)
+1. **[Parameters](04_params.md)**

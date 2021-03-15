@@ -10,14 +10,20 @@ order: 1
 
 ```go
 type HTLC struct {
+    Id                   string
     Sender               string
     To                   string
     ReceiverOnOtherChain string
-    Amount               sdk.Coins
+    SenderOnOtherChain   string
+    Amount               skd.Coins
+    HashLock             string
     Secret               string
     Timestamp            uint64
     ExpirationHeight     uint64
     State                HTLCState
+    ClosedBlock          uint64
+    Transfer             bool
+    Direction            SwapDirection
 }
 ```
 
@@ -25,7 +31,6 @@ type HTLC struct {
 
 - `HTLC_STATE_OPEN` defines an open state
 - `HTLC_STATE_COMPLETED` defines a completed state
-- `HTLC_STATE_EXPIRED` defines an expired state
 - `HTLC_STATE_REFUNDED` defines a refunded state
 
 ```go
@@ -36,23 +41,64 @@ const (
     Open HTLCState = 0
     // HTLC_STATE_COMPLETED defines a completed state.
     Completed HTLCState = 1
-    // HTLC_STATE_EXPIRED defines an expired state.
-    Expired HTLCState = 2
     // HTLC_STATE_REFUNDED defines a refunded state.
-    Refunded HTLCState = 3
+    Refunded HTLCState = 2
 )
 
 var HTLCState_name = map[int32]string{
     0: "HTLC_STATE_OPEN",
     1: "HTLC_STATE_COMPLETED",
-    2: "HTLC_STATE_EXPIRED",
-    3: "HTLC_STATE_REFUNDED",
+    2: "HTLC_STATE_REFUNDED",
 }
 
 var HTLCState_value = map[string]int32{
     "HTLC_STATE_OPEN":      0,
     "HTLC_STATE_COMPLETED": 1,
-    "HTLC_STATE_EXPIRED":   2,
-    "HTLC_STATE_REFUNDED":  3,
+    "HTLC_STATE_REFUNDED":  2,
+}
+```
+
+`SwapDirection` defines the direction of an HTLT
+
+- `INVALID` defines an htlt invalid direction
+- `INCOMING` defines an htlt incoming direction
+- `OUTGOING` defines an htlt outgoing direction
+
+```go
+type SwapDirection int32
+
+const (
+    // INVALID defines an htlt invalid direction.
+    Invalid SwapDirection = 0
+    // INCOMING defines an htlt incoming direction.
+    Incoming SwapDirection = 1
+    // OUTGOING defines an htlt outgoing direction.
+    Outgoing SwapDirection = 2
+)
+
+var SwapDirection_name = map[int32]string{
+    0: "INVALID",
+    1: "INCOMING",
+    2: "OUTGOING",
+}
+
+var SwapDirection_value = map[string]int32{
+    "INVALID":  0,
+    "INCOMING": 1,
+    "OUTGOING": 2,
+}
+```
+
+## AssetSupply
+
+AssetSupply contains information about an asset's supply
+
+```go
+type AssetSupply struct {
+    IncomingSupply           sdk.Coin
+    OutgoingSupply           sdk.Coin
+    CurrentSupply            sdk.Coin
+    TimeLimitedCurrentSupply sdk.Coin
+    TimeElapsed              time.Duration
 }
 ```
