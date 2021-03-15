@@ -54,7 +54,7 @@ func (suite *TestSuite) TestNewQuerier() {
 	suite.NoError(err)
 
 	var redelRes types.QueryLiquidityResponse
-	errRes = suite.cdc.UnmarshalJSON(res, &redelRes)
+	errRes = suite.app.LegacyAmino().UnmarshalJSON(res, &redelRes)
 	suite.NoError(errRes)
 	standard := sdk.NewCoin(denomStandard, standardAmt)
 	token := sdk.NewCoin(denomBTC, btcAmt)

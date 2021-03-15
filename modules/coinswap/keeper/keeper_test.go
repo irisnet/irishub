@@ -10,7 +10,7 @@ import (
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irismod/modules/coinswap/types"
@@ -34,18 +34,22 @@ var (
 type TestSuite struct {
 	suite.Suite
 
-	cdc codec.JSONMarshaler
-	ctx sdk.Context
-	app *simapp.SimApp
+	ctx         sdk.Context
+	app         *simapp.SimApp
+	queryClient types.QueryClient
 }
 
 func (suite *TestSuite) SetupTest() {
-	isCheckTx := false
-	app := simapp.Setup(isCheckTx)
+	app := simapp.Setup(false)
+	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
-	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
-	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
+	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
+	types.RegisterQueryServer(queryHelper, app.CoinswapKeeper)
+	queryClient := types.NewQueryClient(queryHelper)
+
 	suite.app = app
+	suite.ctx = ctx
+	suite.queryClient = queryClient
 }
 
 func TestKeeperTestSuite(t *testing.T) {
