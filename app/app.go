@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -168,7 +169,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		tokentypes.ModuleName:          {authtypes.Minter, authtypes.Burner},
-		htlctypes.ModuleName:           nil,
+		htlctypes.ModuleName:           {authtypes.Minter, authtypes.Burner},
 		coinswaptypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
 		servicetypes.DepositAccName:    {authtypes.Burner},
 		servicetypes.RequestAccName:    nil,
@@ -400,7 +401,13 @@ func NewIrisApp(
 	app.recordKeeper = recordkeeper.NewKeeper(appCodec, keys[recordtypes.StoreKey])
 	app.nftKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey])
 
-	app.htlcKeeper = htlckeeper.NewKeeper(appCodec, keys[htlctypes.StoreKey], app.accountKeeper, app.bankKeeper)
+	app.htlcKeeper = htlckeeper.NewKeeper(
+		appCodec, keys[htlctypes.StoreKey],
+		app.GetSubspace(htlctypes.ModuleName),
+		app.accountKeeper,
+		app.bankKeeper,
+		app.ModuleAccountAddrs(),
+	)
 
 	app.coinswapKeeper = coinswapkeeper.NewKeeper(
 		appCodec, keys[coinswaptypes.StoreKey], app.GetSubspace(coinswaptypes.ModuleName),
@@ -597,7 +604,52 @@ func (app *IrisApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	serviceGenState.Definitions = append(serviceGenState.Definitions, randomtypes.GetSvcDefinition())
 	genesisState[servicetypes.ModuleName] = app.appCodec.MustMarshalJSON(&serviceGenState)
 
+	// add htlt params at InitChainer, overwrite if it exists
+	var htlcGenState htlctypes.GenesisState
+	app.appCodec.MustUnmarshalJSON(genesisState[htlctypes.ModuleName], &htlcGenState)
+	htlcGenState.Params = PresetHTLTParams()
+	genesisState[htlctypes.ModuleName] = app.appCodec.MustMarshalJSON(&htlcGenState)
+
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
+}
+
+func PresetHTLTParams() htlctypes.Params {
+	return htlctypes.Params{
+		AssetParams: []htlctypes.AssetParam{
+			{
+				Denom: "htltbcbnb",
+				SupplyLimit: htlctypes.SupplyLimit{
+					Limit:          sdk.NewInt(350000000000000),
+					TimeLimited:    false,
+					TimeBasedLimit: sdk.ZeroInt(),
+					TimePeriod:     time.Hour,
+				},
+				Active:        true,
+				DeputyAddress: "iaa1kznrznww4pd6gx0zwrpthjk68fdmqypj55j94s",
+				FixedFee:      sdk.NewInt(1000),
+				MinSwapAmount: sdk.OneInt(),
+				MaxSwapAmount: sdk.NewInt(1000000000000),
+				MinBlockLock:  htlctypes.DefaultMinBlockLock,
+				MaxBlockLock:  htlctypes.DefaultMaxBlockLock,
+			},
+			{
+				Denom: "htltbcbusd",
+				SupplyLimit: htlctypes.SupplyLimit{
+					Limit:          sdk.NewInt(100000000000000),
+					TimeLimited:    true,
+					TimeBasedLimit: sdk.NewInt(50000000000),
+					TimePeriod:     time.Hour,
+				},
+				Active:        true,
+				DeputyAddress: "iaa1kznrznww4pd6gx0zwrpthjk68fdmqypj55j94s",
+				FixedFee:      sdk.NewInt(1000),
+				MinSwapAmount: sdk.OneInt(),
+				MaxSwapAmount: sdk.NewInt(1000000000000),
+				MinBlockLock:  htlctypes.DefaultMinBlockLock,
+				MaxBlockLock:  htlctypes.DefaultMaxBlockLock,
+			},
+		},
+	}
 }
 
 // LoadHeight loads a particular height

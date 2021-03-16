@@ -32,7 +32,6 @@ import (
 
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/params"
-	"github.com/irisnet/irishub/migrate"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
@@ -75,7 +74,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
 		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-		migrate.MigrateGenesisCmd(),
 		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
 		AddGenesisAccountCmd(app.DefaultNodeHome),
