@@ -39,6 +39,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ### Bug Fixes
 
+* (modules/coinswap) [\#155](https://github.com/irisnet/irismod/pull/155) Fix min liquidity check in add liquidity.
 * (modules/coinswap)[\#153](https://github.com/irisnet/irismod/pull/151) Fix query not-existent reserve pool.
 * (modules/service) [\#152](https://github.com/irisnet/irismod/pull/152) Fix update service binding.
 
@@ -110,7 +111,6 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ### Improvements
 
-
 * [\#66](https://github.com/irisnet/irismod/pull/66) Bump cosmos-sdk version to [v0.40.0](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.40.0).
 * [\#66](https://github.com/irisnet/irismod/pull/66) Bump tendermint verion to [v0.34.1](https://github.com/tendermint/tendermint/releases/tag/v0.34.1).
 * (modules/coinswap)[\#68](https://github.com/irisnet/irismod/pull/68) Remove standard denom from params and replace prefix `uni:` with `swap/`
@@ -121,7 +121,6 @@ Ref: https://keepachangelog.com/en/1.0.0/
 * (modules/service) [\#38](https://github.com/irisnet/irismod/pull/38) Replace msg_index by internal_index to generate request_context_id.
 * [\#37](https://github.com/irisnet/irismod/issues/37) Refactor gRPC gateway REST endpiont.
 * [\#22](https://github.com/irisnet/irismod/issues/22) Refactor viper.GetXXX() to cmd.Flags().GetXXX() in CLI.
-
 
 ## [v1.1.1] - 2020-10-20
 
