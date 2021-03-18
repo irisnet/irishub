@@ -97,9 +97,6 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.C
 		return sdk.Coin{}, err
 	}
 
-	reservePool := k.GetReservePool(ctx, uniDenom)
-	standardReserveAmt := reservePool.AmountOf(standardDenom)
-	tokenReserveAmt := reservePool.AmountOf(msg.MaxToken.Denom)
 	liquidity := k.bk.GetSupply(ctx).GetTotal().AmountOf(uniDenom)
 
 	var mintLiquidityAmt sdk.Int
@@ -112,6 +109,14 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.C
 		mintLiquidityAmt = msg.ExactStandardAmt
 		depositToken = sdk.NewCoin(msg.MaxToken.Denom, msg.MaxToken.Amount)
 	} else {
+		reservePool, err := k.GetReservePool(ctx, uniDenom)
+		if err != nil {
+			return sdk.Coin{}, err
+		}
+
+		standardReserveAmt := reservePool.AmountOf(standardDenom)
+		tokenReserveAmt := reservePool.AmountOf(msg.MaxToken.Denom)
+
 		mintLiquidityAmt = (liquidity.Mul(msg.ExactStandardAmt)).Quo(standardReserveAmt)
 		if mintLiquidityAmt.LT(msg.MinLiquidity) {
 			return sdk.Coin{}, sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("liquidity amount not met, user expected: no less than %s, actual: %s", msg.MinLiquidity.String(), mintLiquidityAmt.String()))
@@ -171,9 +176,9 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) 
 	}
 
 	// check if reserve pool exists
-	reservePool := k.GetReservePool(ctx, uniDenom)
-	if reservePool == nil {
-		return nil, sdkerrors.Wrap(types.ErrReservePoolNotExists, uniDenom)
+	reservePool, err := k.GetReservePool(ctx, uniDenom)
+	if err != nil {
+		return nil, err
 	}
 
 	standardReserveAmt := reservePool.AmountOf(standardDenom)
@@ -240,15 +245,14 @@ func (k Keeper) removeLiquidity(ctx sdk.Context, poolAddr, sender sdk.AccAddress
 	return coins, k.bk.SendCoins(ctx, poolAddr, sender, coins)
 }
 
-// GetReservePool returns the total balance of the reserve pool at the
-// provided denomination.
-func (k Keeper) GetReservePool(ctx sdk.Context, uniDenom string) (coins sdk.Coins) {
+// GetReservePool returns the total balance of the reserve pool at the provided denomination.
+func (k Keeper) GetReservePool(ctx sdk.Context, uniDenom string) (coins sdk.Coins, err error) {
 	swapPoolAccAddr := types.GetReservePoolAddr(uniDenom)
 	acc := k.ak.GetAccount(ctx, swapPoolAccAddr)
 	if acc == nil {
-		return nil
+		return nil, sdkerrors.Wrap(types.ErrReservePoolNotExists, uniDenom)
 	}
-	return k.bk.GetAllBalances(ctx, acc.GetAddress())
+	return k.bk.GetAllBalances(ctx, acc.GetAddress()), nil
 }
 
 // GetParams gets the parameters for the coinswap module.

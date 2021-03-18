@@ -38,9 +38,9 @@ func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin,
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	reservePool := k.GetReservePool(ctx, uniDenom)
-	if reservePool == nil {
-		return sdk.ZeroInt(), sdkerrors.Wrap(types.ErrReservePoolNotExists, uniDenom)
+	reservePool, err := k.GetReservePool(ctx, uniDenom)
+	if err != nil {
+		return sdk.ZeroInt(), err
 	}
 	inputReserve := reservePool.AmountOf(exactSoldCoin.Denom)
 	outputReserve := reservePool.AmountOf(boughtTokenDenom)
@@ -149,9 +149,9 @@ func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Co
 	if err != nil {
 		return sdk.ZeroInt(), sdkerrors.Wrap(types.ErrReservePoolNotExists, uniDenom)
 	}
-	reservePool := k.GetReservePool(ctx, uniDenom)
-	if reservePool == nil {
-		return sdk.ZeroInt(), sdkerrors.Wrap(types.ErrReservePoolNotExists, uniDenom)
+	reservePool, err := k.GetReservePool(ctx, uniDenom)
+	if err != nil {
+		return sdk.ZeroInt(), err
 	}
 	outputReserve := reservePool.AmountOf(exactBoughtCoin.Denom)
 	inputReserve := reservePool.AmountOf(soldTokenDenom)

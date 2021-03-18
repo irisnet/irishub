@@ -26,7 +26,10 @@ func (k Keeper) Liquidity(c context.Context, req *types.QueryLiquidityRequest) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	reservePool := k.GetReservePool(ctx, uniDenom)
+	reservePool, err := k.GetReservePool(ctx, uniDenom)
+	if err != nil {
+		return nil, err
+	}
 
 	standardDenom := k.GetStandardDenom(ctx)
 	standard := sdk.NewCoin(standardDenom, reservePool.AmountOf(standardDenom))
