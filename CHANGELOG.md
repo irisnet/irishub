@@ -43,7 +43,8 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ### Improvements
 
-* (modules/coinswap)[\#151](https://github.com/irisnet/irismod/pull/151) Replace prefix `swap/` with `swap`
+* (modules/token)[\#154](https://github.com/irisnet/irismod/pull/154) Add reserved token prefix.
+* (modules/coinswap)[\#151](https://github.com/irisnet/irismod/pull/151) Replace prefix `swap/` with `swap`.
 * (modules/htlc)[\#146](https://github.com/irisnet/irismod/pull/146) Refactor HTLC module to support HTLT.
 
 ## [v1.3.1] - 2021-02-09

@@ -29,10 +29,15 @@ const (
 	MaximumMinUnitLen = 64
 )
 
+const (
+	ReservedPeg  = "peg"
+	ReservedIBC  = "ibc"
+	ReservedSwap = "swap"
+	ReservedHTLT = "htlt"
+)
+
 var (
-	keywords = strings.Join([]string{
-		"peg", "ibc", "swap",
-	}, "|")
+	keywords          = strings.Join([]string{ReservedPeg, ReservedIBC, ReservedSwap, ReservedHTLT}, "|")
 	regexpKeywordsFmt = fmt.Sprintf("^(%s).*", keywords)
 	regexpKeyword     = regexp.MustCompile(regexpKeywordsFmt).MatchString
 
@@ -50,23 +55,18 @@ func ValidateToken(token Token) error {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 		}
 	}
-
 	if err := ValidateName(token.Name); err != nil {
 		return err
 	}
-
 	if err := ValidateSymbol(token.Symbol); err != nil {
 		return err
 	}
-
 	if err := ValidateMinUnit(token.MinUnit); err != nil {
 		return err
 	}
-
 	if err := ValidateInitialSupply(token.InitialSupply); err != nil {
 		return err
 	}
-
 	if token.MaxSupply < token.InitialSupply {
 		return sdkerrors.Wrapf(ErrInvalidMaxSupply, "invalid token max supply %d, only accepts value [%d, %d]", token.MaxSupply, token.InitialSupply, uint64(MaximumMaxSupply))
 	}
