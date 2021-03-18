@@ -37,6 +37,10 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ## [Unreleased]
 
+### Bug Fixes
+
+* (modules/service) [\#152](https://github.com/irisnet/irismod/pull/152) Fix update service binding.
+
 ### Improvements
 
 * (modules/coinswap)[\#151](https://github.com/irisnet/irismod/pull/151) Replace prefix `swap/` with `swap`
