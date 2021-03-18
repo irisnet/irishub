@@ -19,7 +19,6 @@ const (
 var (
 	_ sdk.Msg = &MsgCreateHTLC{}
 	_ sdk.Msg = &MsgClaimHTLC{}
-	_ sdk.Msg = &MsgRefundHTLC{}
 )
 
 // NewMsgCreateHTLC creates a new MsgCreateHTLC instance
@@ -27,19 +26,23 @@ func NewMsgCreateHTLC(
 	sender string,
 	to string,
 	receiverOnOtherChain string,
+	senderOnOtherChain string,
 	amount sdk.Coins,
 	hashLock string,
 	timestamp uint64,
 	timeLock uint64,
+	transfer bool,
 ) MsgCreateHTLC {
 	return MsgCreateHTLC{
 		Sender:               sender,
 		To:                   to,
 		ReceiverOnOtherChain: receiverOnOtherChain,
+		SenderOnOtherChain:   senderOnOtherChain,
 		Amount:               amount,
 		HashLock:             hashLock,
 		Timestamp:            timestamp,
 		TimeLock:             timeLock,
+		Transfer:             transfer,
 	}
 }
 
@@ -63,18 +66,19 @@ func (msg MsgCreateHTLC) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateAmount(msg.Amount); err != nil {
+	if err := ValidateSenderOnOtherChain(msg.SenderOnOtherChain); err != nil {
 		return err
 	}
 
-	if err := ValidateHashLock(msg.HashLock); err != nil {
+	if err := ValidateAmount(msg.Transfer, msg.Amount); err != nil {
 		return err
 	}
 
-	if err := ValidateTimeLock(msg.TimeLock); err != nil {
+	if err := ValidateID(msg.HashLock); err != nil {
 		return err
 	}
-	return nil
+
+	return ValidateTimeLock(msg.TimeLock)
 }
 
 // GetSignBytes implements Msg
@@ -97,13 +101,13 @@ func (msg MsgCreateHTLC) GetSigners() []sdk.AccAddress {
 // NewMsgClaimHTLC constructs a new MsgClaimHTLC instance
 func NewMsgClaimHTLC(
 	sender string,
-	hashLock string,
+	id string,
 	secret string,
 ) MsgClaimHTLC {
 	return MsgClaimHTLC{
-		Sender:   sender,
-		HashLock: hashLock,
-		Secret:   secret,
+		Sender: sender,
+		Id:     id,
+		Secret: secret,
 	}
 }
 
@@ -119,7 +123,7 @@ func (msg MsgClaimHTLC) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
-	if err := ValidateHashLock(msg.HashLock); err != nil {
+	if err := ValidateID(msg.Id); err != nil {
 		return err
 	}
 
@@ -137,52 +141,6 @@ func (msg MsgClaimHTLC) GetSignBytes() []byte {
 
 // GetSigners implements Msg
 func (msg MsgClaimHTLC) GetSigners() []sdk.AccAddress {
-	from, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{from}
-}
-
-// -----------------------------------------------------------------------------
-
-// NewMsgRefundHTLC constructs a new MsgRefundHTLC instance
-func NewMsgRefundHTLC(
-	sender string,
-	hashLock string,
-) MsgRefundHTLC {
-	return MsgRefundHTLC{
-		Sender:   sender,
-		HashLock: hashLock,
-	}
-}
-
-// Route implements Msg
-func (msg MsgRefundHTLC) Route() string { return RouterKey }
-
-// Type implements Msg
-func (msg MsgRefundHTLC) Type() string { return TypeMsgRefundHTLC }
-
-// ValidateBasic implements Msg
-func (msg MsgRefundHTLC) ValidateBasic() error {
-	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
-	}
-
-	if err := ValidateHashLock(msg.HashLock); err != nil {
-		return err
-	}
-	return nil
-}
-
-// GetSignBytes implements Msg
-func (msg MsgRefundHTLC) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
-}
-
-// GetSigners implements Msg
-func (msg MsgRefundHTLC) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		panic(err)

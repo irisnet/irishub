@@ -3,6 +3,7 @@ package irismod.htlc;
 
 import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/htlc/types";
 option (gogoproto.goproto_getters_all) = false;
@@ -11,14 +12,20 @@ option (gogoproto.goproto_getters_all) = false;
 message HTLC {
     option (gogoproto.equal) = true;
 
-    string sender = 1;
-    string to = 2;
-    string receiver_on_other_chain = 3 [ (gogoproto.moretags) = "yaml:\"receiver_on_other_chain\"" ];
-    repeated cosmos.base.v1beta1.Coin amount = 4 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins" ];
-    string secret = 5;
-    uint64 timestamp = 6;
-    uint64 expiration_height = 7 [ (gogoproto.moretags) = "yaml:\"expiration_height\"" ];
-    HTLCState state = 8;
+    string id = 1;
+    string sender = 2;
+    string to = 3;
+    string receiver_on_other_chain = 4 [ (gogoproto.moretags) = "yaml:\"receiver_on_other_chain\"" ];
+    string sender_on_other_chain = 5 [ (gogoproto.moretags) = "yaml:\"sender_on_other_chain\"" ];
+    repeated cosmos.base.v1beta1.Coin amount = 6 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins" ];
+    string hash_lock = 7 [ (gogoproto.moretags) = "yaml:\"hash_lock\"" ];
+    string secret = 8;
+    uint64 timestamp = 9;
+    uint64 expiration_height = 10 [ (gogoproto.moretags) = "yaml:\"expiration_height\"" ];
+    HTLCState state = 11;
+    uint64 closed_block = 12 [ (gogoproto.moretags) = "yaml:\"closed_block\"" ];
+    bool transfer = 13;
+    SwapDirection direction = 14;
 }
 
 // HTLCState defines the state of an HTLC
@@ -29,8 +36,59 @@ enum HTLCState {
     HTLC_STATE_OPEN = 0 [ (gogoproto.enumvalue_customname) = "Open" ];
     // HTLC_STATE_COMPLETED defines a completed state.
     HTLC_STATE_COMPLETED = 1 [ (gogoproto.enumvalue_customname) = "Completed" ];
-    // HTLC_STATE_EXPIRED defines an expired state.
-    HTLC_STATE_EXPIRED = 2 [ (gogoproto.enumvalue_customname) = "Expired" ];
     // HTLC_STATE_REFUNDED defines a refunded state.
-    HTLC_STATE_REFUNDED = 3 [ (gogoproto.enumvalue_customname) = "Refunded" ];
+    HTLC_STATE_REFUNDED = 2 [ (gogoproto.enumvalue_customname) = "Refunded" ];
+}
+
+// SwapDirection defines the direction of an HTLT
+enum SwapDirection {
+    option (gogoproto.goproto_enum_prefix) = false;
+
+    // INVALID defines an htlt invalid direction.
+    INVALID = 0 [ (gogoproto.enumvalue_customname) = "Invalid" ];
+    // INCOMING defines an htlt incoming direction.
+    INCOMING = 1 [ (gogoproto.enumvalue_customname) = "Incoming" ];
+    // OUTGOING defines an htlt outgoing direction.
+    OUTGOING = 2 [ (gogoproto.enumvalue_customname) = "Outgoing" ];
+}
+
+message AssetSupply {
+    cosmos.base.v1beta1.Coin incoming_supply = 1 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"incoming_supply\"" ];
+    cosmos.base.v1beta1.Coin outgoing_supply = 2 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"assetoutgoing_supply_params\"" ];
+    cosmos.base.v1beta1.Coin current_supply = 3 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"current_supply\"" ];
+    cosmos.base.v1beta1.Coin time_limited_current_supply = 4 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"time_limited_current_supply\"" ];
+    google.protobuf.Duration time_elapsed = 5 [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true, (gogoproto.moretags) = "yaml:\"time_elapsed\"" ];
+}
+
+// Params defines token module's parameters
+message Params {
+    option (gogoproto.equal) = true;
+    option (gogoproto.goproto_stringer) = false;
+
+    repeated AssetParam asset_params = 1 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"asset_params\"" ];
+}
+
+message AssetParam {
+    option (gogoproto.equal) = true;
+    option (gogoproto.goproto_stringer) = false;
+
+    string denom = 1;                                                                                                               // name of the asset
+    SupplyLimit supply_limit = 2 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"supply_limit\"" ];                  // asset supply limit
+    bool active = 3;                                                                                                                // denotes if asset is available or paused
+    string deputy_address = 4 [ (gogoproto.moretags) = "yaml:\"deputy_address\"" ];                                                 // the address of the relayer process
+    string fixed_fee = 5 [ (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false ];       // the fixed fee charged by the relayer process for outgoing swaps
+    string min_swap_amount = 6 [ (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false ]; // Minimum swap amount
+    string max_swap_amount = 7 [ (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false ]; // Maximum swap amount
+    uint64 min_block_lock = 8 [ (gogoproto.moretags) = "yaml:\"min_block_lock\"" ];                                                 // Minimum swap block lock
+    uint64 max_block_lock = 9 [ (gogoproto.moretags) = "yaml:\"max_block_lock\"" ];                                                 // Maximum swap block lock
+}
+
+message SupplyLimit {
+    option (gogoproto.equal) = true;
+    option (gogoproto.goproto_stringer) = false;
+
+    string limit = 1 [ (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false ];                                     // the absolute supply limit for an asset
+    bool time_limited = 2 [ (gogoproto.moretags) = "yaml:\"time_limited\"" ];                                                                                 // boolean for if the supply is also limited by time
+    google.protobuf.Duration time_period = 3 [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true, (gogoproto.moretags) = "yaml:\"time_period\"" ]; // the duration for which the supply time limit applies
+    string time_based_limit = 4 [ (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false ];                          // the supply limit for an asset for each time period
 }

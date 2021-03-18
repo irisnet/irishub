@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -29,7 +30,6 @@ func NewTxCmd() *cobra.Command {
 	htlcTxCmd.AddCommand(
 		GetCmdCreateHTLC(),
 		GetCmdClaimHTLC(),
-		GetCmdRefundHTLC(),
 	)
 
 	return htlcTxCmd
@@ -45,10 +45,12 @@ func GetCmdCreateHTLC() *cobra.Command {
 			"$ %s tx htlc create "+
 				"--to=<recipient> "+
 				"--receiver-on-other-chain=<receiver-on-other-chain> "+
+				"--sender-on-other-chain=<sender-on-other-chain> "+
 				"--amount=<amount> "+
 				"--hash-lock=<hash-lock> "+
 				"--timestamp=<timestamp> "+
 				"--time-lock=<time-lock> "+
+				"--transfer=false "+
 				"--from=mykey",
 			version.AppName,
 		),
@@ -74,6 +76,12 @@ func GetCmdCreateHTLC() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			senderOnOtherChain, err := cmd.Flags().GetString(FlagSenderOnOtherChain)
+			if err != nil {
+				return err
+			}
+
 			amountStr, err := cmd.Flags().GetString(FlagAmount)
 			if err != nil {
 				return err
@@ -90,6 +98,11 @@ func GetCmdCreateHTLC() *cobra.Command {
 			}
 
 			timeLock, err := cmd.Flags().GetUint64(FlagTimeLock)
+			if err != nil {
+				return err
+			}
+
+			transfer, err := cmd.Flags().GetBool(FlagTransfer)
 			if err != nil {
 				return err
 			}
@@ -116,8 +129,9 @@ func GetCmdCreateHTLC() *cobra.Command {
 			}
 
 			msg := types.NewMsgCreateHTLC(
-				sender.String(), toAddr, receiverOnOtherChain, amount,
-				hex.EncodeToString(hashLock), timestamp, timeLock,
+				sender.String(), toAddr, receiverOnOtherChain,
+				senderOnOtherChain, amount, hex.EncodeToString(hashLock),
+				timestamp, timeLock, transfer,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -128,10 +142,9 @@ func GetCmdCreateHTLC() *cobra.Command {
 				fmt.Println("It is the only way to claim or refund the locked coins from an HTLC")
 				fmt.Println()
 				fmt.Printf("Secret:      %s\nHashLock:    %s\n",
-					hex.EncodeToString(secret), hex.EncodeToString(hashLock),
+					strings.ToUpper(hex.EncodeToString(secret)), strings.ToUpper(hex.EncodeToString(hashLock)),
 				)
 			}
-
 			return err
 		},
 	}
@@ -148,10 +161,10 @@ func GetCmdCreateHTLC() *cobra.Command {
 // GetCmdClaimHTLC implements claiming an HTLC command
 func GetCmdClaimHTLC() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "claim [hash-lock] [secret]",
+		Use:     "claim [id] [secret]",
 		Short:   "Claim an HTLC",
 		Long:    "Claim an open HTLC with a secret.",
-		Example: fmt.Sprintf("$ %s tx htlc claim <hash-lock> <secret> --from mykey", version.AppName),
+		Example: fmt.Sprintf("$ %s tx htlc claim <id> <secret> --from mykey", version.AppName),
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -170,39 +183,6 @@ func GetCmdClaimHTLC() *cobra.Command {
 			}
 
 			msg := types.NewMsgClaimHTLC(sender, args[0], args[1])
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
-		},
-	}
-	flags.AddTxFlagsToCmd(cmd)
-
-	return cmd
-}
-
-// GetCmdRefundHTLC implements refunding an HTLC command
-func GetCmdRefundHTLC() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "refund [hash-lock]",
-		Short:   "Refund an HTLC",
-		Long:    "Refund from an expired HTLC.",
-		Example: fmt.Sprintf("$ %s tx htlc refund <hash-lock> --from mykey", version.AppName),
-		Args:    cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			sender := clientCtx.GetFromAddress().String()
-
-			if _, err := hex.DecodeString(args[0]); err != nil {
-				return err
-			}
-
-			msg := types.NewMsgRefundHTLC(sender, args[0])
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

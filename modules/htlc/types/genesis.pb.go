@@ -7,15 +7,19 @@ import (
 	fmt "fmt"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	_ "github.com/golang/protobuf/ptypes/timestamp"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -25,7 +29,10 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // GenesisState defines the HTLC module's genesis state
 type GenesisState struct {
-	PendingHtlcs map[string]HTLC `protobuf:"bytes,1,rep,name=pending_htlcs,json=pendingHtlcs,proto3" json:"pending_htlcs" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Params            Params        `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
+	PendingHtlcs      []HTLC        `protobuf:"bytes,2,rep,name=pending_htlcs,json=pendingHtlcs,proto3" json:"pending_htlcs" yaml:"pending_htlcs"`
+	Supplies          []AssetSupply `protobuf:"bytes,3,rep,name=supplies,proto3" json:"supplies"`
+	PreviousBlockTime time.Time     `protobuf:"bytes,4,opt,name=previous_block_time,json=previousBlockTime,proto3,stdtime" json:"previous_block_time" yaml:"previous_block_time"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }
@@ -61,39 +68,65 @@ func (m *GenesisState) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GenesisState proto.InternalMessageInfo
 
-func (m *GenesisState) GetPendingHtlcs() map[string]HTLC {
+func (m *GenesisState) GetParams() Params {
+	if m != nil {
+		return m.Params
+	}
+	return Params{}
+}
+
+func (m *GenesisState) GetPendingHtlcs() []HTLC {
 	if m != nil {
 		return m.PendingHtlcs
 	}
 	return nil
 }
 
+func (m *GenesisState) GetSupplies() []AssetSupply {
+	if m != nil {
+		return m.Supplies
+	}
+	return nil
+}
+
+func (m *GenesisState) GetPreviousBlockTime() time.Time {
+	if m != nil {
+		return m.PreviousBlockTime
+	}
+	return time.Time{}
+}
+
 func init() {
 	proto.RegisterType((*GenesisState)(nil), "irismod.htlc.GenesisState")
-	proto.RegisterMapType((map[string]HTLC)(nil), "irismod.htlc.GenesisState.PendingHtlcsEntry")
 }
 
 func init() { proto.RegisterFile("htlc/genesis.proto", fileDescriptor_0ebc20432ba713fe) }
 
 var fileDescriptor_0ebc20432ba713fe = []byte{
-	// 265 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0xca, 0x28, 0xc9, 0x49,
-	0xd6, 0x4f, 0x4f, 0xcd, 0x4b, 0x2d, 0xce, 0x2c, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2,
-	0xc9, 0x2c, 0xca, 0x2c, 0xce, 0xcd, 0x4f, 0xd1, 0x03, 0xc9, 0x49, 0x89, 0xa4, 0xe7, 0xa7, 0xe7,
-	0x83, 0x25, 0xf4, 0x41, 0x2c, 0x88, 0x1a, 0x29, 0x7e, 0xb0, 0x3e, 0x10, 0x01, 0x11, 0x50, 0xda,
-	0xc3, 0xc8, 0xc5, 0xe3, 0x0e, 0x31, 0x26, 0xb8, 0x24, 0xb1, 0x24, 0x55, 0x28, 0x9c, 0x8b, 0xb7,
-	0x20, 0x35, 0x2f, 0x25, 0x33, 0x2f, 0x3d, 0x1e, 0xa4, 0xac, 0x58, 0x82, 0x51, 0x81, 0x59, 0x83,
-	0xdb, 0x48, 0x47, 0x0f, 0xd9, 0x74, 0x3d, 0x64, 0x2d, 0x7a, 0x01, 0x10, 0xf5, 0x1e, 0x20, 0xe5,
-	0xae, 0x79, 0x25, 0x45, 0x95, 0x4e, 0x2c, 0x27, 0xee, 0xc9, 0x33, 0x04, 0xf1, 0x14, 0x20, 0x49,
-	0x48, 0x05, 0x73, 0x09, 0x62, 0x28, 0x14, 0x12, 0xe0, 0x62, 0xce, 0x4e, 0xad, 0x94, 0x60, 0x54,
-	0x60, 0xd4, 0xe0, 0x0c, 0x02, 0x31, 0x85, 0x34, 0xb8, 0x58, 0xcb, 0x12, 0x73, 0x4a, 0x53, 0x25,
-	0x98, 0x14, 0x18, 0x35, 0xb8, 0x8d, 0x84, 0x50, 0xed, 0xf5, 0x08, 0xf1, 0x71, 0x0e, 0x82, 0x28,
-	0xb0, 0x62, 0xb2, 0x60, 0x74, 0x72, 0x3f, 0xf1, 0x48, 0x8e, 0xf1, 0xc2, 0x23, 0x39, 0xc6, 0x07,
-	0x8f, 0xe4, 0x18, 0x27, 0x3c, 0x96, 0x63, 0xb8, 0xf0, 0x58, 0x8e, 0xe1, 0xc6, 0x63, 0x39, 0x86,
-	0x28, 0xdd, 0xf4, 0xcc, 0x92, 0x8c, 0xd2, 0x24, 0xbd, 0xe4, 0xfc, 0x5c, 0x7d, 0x90, 0x11, 0x79,
-	0xa9, 0x25, 0xfa, 0x50, 0xa3, 0xf4, 0x73, 0xf3, 0x53, 0x4a, 0x73, 0x52, 0x8b, 0xc1, 0xe1, 0xa0,
-	0x5f, 0x52, 0x59, 0x90, 0x5a, 0x9c, 0xc4, 0x06, 0x0e, 0x0e, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff,
-	0xff, 0xa5, 0x09, 0xa1, 0x91, 0x59, 0x01, 0x00, 0x00,
+	// 358 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x51, 0xb1, 0x6e, 0xea, 0x30,
+	0x14, 0x4d, 0x00, 0xa1, 0xa7, 0xc0, 0xd3, 0xd3, 0x4b, 0x19, 0xd2, 0xa8, 0x4a, 0x50, 0x86, 0x8a,
+	0xa5, 0xb6, 0x44, 0xb7, 0x76, 0x6a, 0x3a, 0xc0, 0xd0, 0xa1, 0x02, 0xba, 0x74, 0x41, 0x09, 0xb8,
+	0xc6, 0x6a, 0x1c, 0x5b, 0xb1, 0x53, 0x89, 0xbf, 0xe0, 0xb3, 0x50, 0x27, 0xc6, 0x4e, 0xb4, 0x82,
+	0x3f, 0xe8, 0x17, 0x54, 0x76, 0x4c, 0x55, 0xd4, 0xc5, 0xf2, 0xf5, 0x39, 0xe7, 0xde, 0x73, 0xae,
+	0x1d, 0x77, 0x21, 0xb3, 0x19, 0xc4, 0x28, 0x47, 0x82, 0x08, 0xc0, 0x0b, 0x26, 0x99, 0xdb, 0x26,
+	0x05, 0x11, 0x94, 0xcd, 0x81, 0xc2, 0xfc, 0x0e, 0x66, 0x98, 0x69, 0x00, 0xaa, 0x5b, 0xc5, 0xf1,
+	0xff, 0x69, 0x9d, 0x3a, 0xcc, 0x43, 0x88, 0x19, 0xc3, 0x19, 0x82, 0xba, 0x4a, 0xcb, 0x27, 0x28,
+	0x09, 0x45, 0x42, 0x26, 0x94, 0x57, 0x84, 0xe8, 0xb5, 0xe6, 0xb4, 0x07, 0xd5, 0x9c, 0xb1, 0x4c,
+	0x24, 0x72, 0xfb, 0x4e, 0x93, 0x27, 0x45, 0x42, 0x85, 0x67, 0x77, 0xed, 0x5e, 0xab, 0xdf, 0x01,
+	0x3f, 0xe7, 0x82, 0x7b, 0x8d, 0xc5, 0x8d, 0xf5, 0x36, 0xb4, 0x46, 0x86, 0xe9, 0x3e, 0x38, 0x7f,
+	0x39, 0xca, 0xe7, 0x24, 0xc7, 0x53, 0x45, 0x12, 0x5e, 0xad, 0x5b, 0xef, 0xb5, 0xfa, 0xee, 0xb1,
+	0x74, 0x38, 0xb9, 0xbb, 0x8d, 0xcf, 0x94, 0xf0, 0x73, 0x1b, 0x76, 0x96, 0x09, 0xcd, 0xae, 0xa2,
+	0x23, 0x59, 0x34, 0x6a, 0x9b, 0x7a, 0xa8, 0x4a, 0xf7, 0xda, 0xf9, 0x23, 0x4a, 0xce, 0x33, 0x82,
+	0x84, 0x57, 0xd7, 0x1d, 0x4f, 0x8f, 0x3b, 0xde, 0x08, 0x81, 0xe4, 0x58, 0x51, 0x96, 0xc6, 0xd1,
+	0xb7, 0xc0, 0x2d, 0x9c, 0x13, 0x5e, 0xa0, 0x17, 0xc2, 0x4a, 0x31, 0x4d, 0x33, 0x36, 0x7b, 0x9e,
+	0xaa, 0xe8, 0x5e, 0x43, 0x87, 0xf2, 0x41, 0xb5, 0x17, 0x70, 0xd8, 0x0b, 0x98, 0x1c, 0xf6, 0x12,
+	0x9f, 0x1b, 0x87, 0xbe, 0x71, 0xf8, 0xbb, 0x49, 0xb4, 0x7a, 0x0f, 0xed, 0xd1, 0xff, 0x03, 0x12,
+	0x2b, 0x40, 0xe9, 0xe3, 0xc1, 0x7a, 0x17, 0xd8, 0x9b, 0x5d, 0x60, 0x7f, 0xec, 0x02, 0x7b, 0xb5,
+	0x0f, 0xac, 0xcd, 0x3e, 0xb0, 0xde, 0xf6, 0x81, 0xf5, 0x78, 0x81, 0x89, 0x5c, 0x94, 0x29, 0x98,
+	0x31, 0x0a, 0x55, 0x84, 0x1c, 0x49, 0x68, 0xa2, 0x40, 0xca, 0xe6, 0x65, 0x86, 0x84, 0xfe, 0x36,
+	0x28, 0x97, 0x1c, 0x89, 0xb4, 0xa9, 0x7d, 0x5d, 0x7e, 0x05, 0x00, 0x00, 0xff, 0xff, 0x14, 0xc0,
+	0x55, 0xa7, 0x08, 0x02, 0x00, 0x00,
 }
 
 func (m *GenesisState) Marshal() (dAtA []byte, err error) {
@@ -116,12 +149,32 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.PendingHtlcs) > 0 {
-		for k := range m.PendingHtlcs {
-			v := m.PendingHtlcs[k]
-			baseI := i
+	n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.PreviousBlockTime, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.PreviousBlockTime):])
+	if err1 != nil {
+		return 0, err1
+	}
+	i -= n1
+	i = encodeVarintGenesis(dAtA, i, uint64(n1))
+	i--
+	dAtA[i] = 0x22
+	if len(m.Supplies) > 0 {
+		for iNdEx := len(m.Supplies) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := (&v).MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.Supplies[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenesis(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.PendingHtlcs) > 0 {
+		for iNdEx := len(m.PendingHtlcs) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.PendingHtlcs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -130,16 +183,18 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			}
 			i--
 			dAtA[i] = 0x12
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintGenesis(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintGenesis(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0xa
 		}
 	}
+	{
+		size, err := m.Params.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGenesis(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -160,15 +215,22 @@ func (m *GenesisState) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = m.Params.Size()
+	n += 1 + l + sovGenesis(uint64(l))
 	if len(m.PendingHtlcs) > 0 {
-		for k, v := range m.PendingHtlcs {
-			_ = k
-			_ = v
-			l = v.Size()
-			mapEntrySize := 1 + len(k) + sovGenesis(uint64(len(k))) + 1 + l + sovGenesis(uint64(l))
-			n += mapEntrySize + 1 + sovGenesis(uint64(mapEntrySize))
+		for _, e := range m.PendingHtlcs {
+			l = e.Size()
+			n += 1 + l + sovGenesis(uint64(l))
 		}
 	}
+	if len(m.Supplies) > 0 {
+		for _, e := range m.Supplies {
+			l = e.Size()
+			n += 1 + l + sovGenesis(uint64(l))
+		}
+	}
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.PreviousBlockTime)
+	n += 1 + l + sovGenesis(uint64(l))
 	return n
 }
 
@@ -209,6 +271,39 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Params", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Params.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PendingHtlcs", wireType)
 			}
 			var msglen int
@@ -236,105 +331,77 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.PendingHtlcs == nil {
-				m.PendingHtlcs = make(map[string]HTLC)
+			m.PendingHtlcs = append(m.PendingHtlcs, HTLC{})
+			if err := m.PendingHtlcs[len(m.PendingHtlcs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
-			var mapkey string
-			mapvalue := &HTLC{}
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowGenesis
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Supplies", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
 				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowGenesis
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var mapmsglen int
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowGenesis
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						mapmsglen |= int(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					if mapmsglen < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					postmsgIndex := iNdEx + mapmsglen
-					if postmsgIndex < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					if postmsgIndex > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = &HTLC{}
-					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
-						return err
-					}
-					iNdEx = postmsgIndex
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipGenesis(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
 				}
 			}
-			m.PendingHtlcs[mapkey] = *mapvalue
+			if msglen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Supplies = append(m.Supplies, AssetSupply{})
+			if err := m.Supplies[len(m.Supplies)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PreviousBlockTime", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.PreviousBlockTime, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

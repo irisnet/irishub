@@ -11,7 +11,8 @@ import (
 // Rest variable names
 // nolint
 const (
-	RestHashLock = "hash-lock"
+	RestID    = "id"
+	RestDenom = "denom"
 )
 
 // RegisterHandlers defines routes that get registered by the main application
@@ -26,10 +27,12 @@ type CreateHTLCReq struct {
 	Sender               string       `json:"sender" yaml:"sender"`
 	To                   string       `json:"to" yaml:"to"`
 	ReceiverOnOtherChain string       `json:"receiver_on_other_chain" yaml:"receiver_on_other_chain"`
+	SenderOnOtherChain   string       `json:"sender_on_other_chain" yaml:"sender_on_other_chain"`
 	Amount               sdk.Coins    `json:"amount" yaml:"amount"`
 	HashLock             string       `json:"hash_lock" yaml:"hash_lock"`
 	TimeLock             uint64       `json:"time_lock" yaml:"time_lock"`
 	Timestamp            uint64       `json:"timestamp" yaml:"timestamp"`
+	Transfer             bool         `json:"transfer" yaml:"transfer"`
 }
 
 // ClaimHTLCReq defines the properties of an HTLC claim request's body.
@@ -37,10 +40,4 @@ type ClaimHTLCReq struct {
 	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"`
 	Sender  string       `json:"sender" yaml:"sender"`
 	Secret  string       `json:"secret" yaml:"secret"`
-}
-
-// RefundHTLCReq defines the properties of an HTLC refund request's body.
-type RefundHTLCReq struct {
-	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"`
-	Sender  string       `json:"sender" yaml:"sender"`
 }

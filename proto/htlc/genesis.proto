@@ -3,10 +3,14 @@ package irismod.htlc;
 
 import "gogoproto/gogo.proto";
 import "htlc/htlc.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/htlc/types";
 
 // GenesisState defines the HTLC module's genesis state
 message GenesisState {
-    map<string, HTLC> pending_htlcs = 1 [ (gogoproto.nullable) = false ];
+    Params params = 1 [ (gogoproto.nullable) = false ];
+    repeated HTLC pending_htlcs = 2 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"pending_htlcs\"" ];
+    repeated AssetSupply supplies = 3 [ (gogoproto.nullable) = false ];
+    google.protobuf.Timestamp previous_block_time = 4 [ (gogoproto.nullable) = false, (gogoproto.stdtime) = true, (gogoproto.moretags) = "yaml:\"previous_block_time\"" ];
 }

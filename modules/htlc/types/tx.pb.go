@@ -35,10 +35,12 @@ type MsgCreateHTLC struct {
 	Sender               string                                   `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
 	To                   string                                   `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`
 	ReceiverOnOtherChain string                                   `protobuf:"bytes,3,opt,name=receiver_on_other_chain,json=receiverOnOtherChain,proto3" json:"receiver_on_other_chain,omitempty" yaml:"receiver_on_other_chain"`
-	Amount               github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,4,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
-	HashLock             string                                   `protobuf:"bytes,5,opt,name=hash_lock,json=hashLock,proto3" json:"hash_lock,omitempty" yaml:"hash_lock"`
-	Timestamp            uint64                                   `protobuf:"varint,6,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	TimeLock             uint64                                   `protobuf:"varint,7,opt,name=time_lock,json=timeLock,proto3" json:"time_lock,omitempty" yaml:"time_lock"`
+	SenderOnOtherChain   string                                   `protobuf:"bytes,4,opt,name=sender_on_other_chain,json=senderOnOtherChain,proto3" json:"sender_on_other_chain,omitempty" yaml:"sender_on_other_chain"`
+	Amount               github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,5,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
+	HashLock             string                                   `protobuf:"bytes,6,opt,name=hash_lock,json=hashLock,proto3" json:"hash_lock,omitempty" yaml:"hash_lock"`
+	Timestamp            uint64                                   `protobuf:"varint,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	TimeLock             uint64                                   `protobuf:"varint,8,opt,name=time_lock,json=timeLock,proto3" json:"time_lock,omitempty" yaml:"time_lock"`
+	Transfer             bool                                     `protobuf:"varint,9,opt,name=transfer,proto3" json:"transfer,omitempty"`
 }
 
 func (m *MsgCreateHTLC) Reset()         { *m = MsgCreateHTLC{} }
@@ -113,9 +115,9 @@ var xxx_messageInfo_MsgCreateHTLCResponse proto.InternalMessageInfo
 
 // MsgClaimHTLC defines a message to claim an HTLC
 type MsgClaimHTLC struct {
-	Sender   string `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
-	HashLock string `protobuf:"bytes,2,opt,name=hash_lock,json=hashLock,proto3" json:"hash_lock,omitempty" yaml:"hash_lock"`
-	Secret   string `protobuf:"bytes,3,opt,name=secret,proto3" json:"secret,omitempty"`
+	Sender string `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
+	Id     string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty" yaml:"id"`
+	Secret string `protobuf:"bytes,3,opt,name=secret,proto3" json:"secret,omitempty"`
 }
 
 func (m *MsgClaimHTLC) Reset()         { *m = MsgClaimHTLC{} }
@@ -188,129 +190,52 @@ func (m *MsgClaimHTLCResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgClaimHTLCResponse proto.InternalMessageInfo
 
-// MsgRefundHTLC defines a message to refund an HTLC
-type MsgRefundHTLC struct {
-	Sender   string `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
-	HashLock string `protobuf:"bytes,2,opt,name=hash_lock,json=hashLock,proto3" json:"hash_lock,omitempty" yaml:"hash_lock"`
-}
-
-func (m *MsgRefundHTLC) Reset()         { *m = MsgRefundHTLC{} }
-func (m *MsgRefundHTLC) String() string { return proto.CompactTextString(m) }
-func (*MsgRefundHTLC) ProtoMessage()    {}
-func (*MsgRefundHTLC) Descriptor() ([]byte, []int) {
-	return fileDescriptor_07729a8273c903af, []int{4}
-}
-func (m *MsgRefundHTLC) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgRefundHTLC) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgRefundHTLC.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgRefundHTLC) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRefundHTLC.Merge(m, src)
-}
-func (m *MsgRefundHTLC) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgRefundHTLC) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRefundHTLC.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgRefundHTLC proto.InternalMessageInfo
-
-// MsgRefundHTLCResponse defines the Msg/RefundHTLC response type
-type MsgRefundHTLCResponse struct {
-}
-
-func (m *MsgRefundHTLCResponse) Reset()         { *m = MsgRefundHTLCResponse{} }
-func (m *MsgRefundHTLCResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgRefundHTLCResponse) ProtoMessage()    {}
-func (*MsgRefundHTLCResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_07729a8273c903af, []int{5}
-}
-func (m *MsgRefundHTLCResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgRefundHTLCResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgRefundHTLCResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgRefundHTLCResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRefundHTLCResponse.Merge(m, src)
-}
-func (m *MsgRefundHTLCResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgRefundHTLCResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRefundHTLCResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgRefundHTLCResponse proto.InternalMessageInfo
-
 func init() {
 	proto.RegisterType((*MsgCreateHTLC)(nil), "irismod.htlc.MsgCreateHTLC")
 	proto.RegisterType((*MsgCreateHTLCResponse)(nil), "irismod.htlc.MsgCreateHTLCResponse")
 	proto.RegisterType((*MsgClaimHTLC)(nil), "irismod.htlc.MsgClaimHTLC")
 	proto.RegisterType((*MsgClaimHTLCResponse)(nil), "irismod.htlc.MsgClaimHTLCResponse")
-	proto.RegisterType((*MsgRefundHTLC)(nil), "irismod.htlc.MsgRefundHTLC")
-	proto.RegisterType((*MsgRefundHTLCResponse)(nil), "irismod.htlc.MsgRefundHTLCResponse")
 }
 
 func init() { proto.RegisterFile("htlc/tx.proto", fileDescriptor_07729a8273c903af) }
 
 var fileDescriptor_07729a8273c903af = []byte{
-	// 531 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0xbd, 0x8e, 0xd3, 0x40,
-	0x10, 0xb6, 0x93, 0x10, 0x2e, 0xcb, 0x1d, 0x42, 0x56, 0xb8, 0x33, 0x06, 0xd9, 0x91, 0x69, 0xd2,
-	0x9c, 0x97, 0x1c, 0xdd, 0x95, 0x49, 0x83, 0x74, 0x7f, 0x92, 0x45, 0x03, 0x4d, 0x70, 0xd6, 0x8b,
-	0x6d, 0xc5, 0xde, 0x89, 0xbc, 0x9b, 0x83, 0x2b, 0x79, 0x03, 0x1e, 0x81, 0x9a, 0x27, 0x49, 0x79,
-	0x25, 0x55, 0x80, 0xa4, 0xa1, 0xce, 0x13, 0xa0, 0xb5, 0x9d, 0xc4, 0x51, 0xb8, 0x88, 0xe2, 0x2a,
-	0xcf, 0xce, 0xb7, 0xfb, 0xed, 0xf7, 0xcd, 0xcc, 0x1a, 0x1d, 0x84, 0x22, 0x26, 0x58, 0x7c, 0x76,
-	0x46, 0x29, 0x08, 0xd0, 0xf6, 0xa3, 0x34, 0xe2, 0x09, 0xf8, 0x8e, 0x4c, 0x1b, 0x26, 0x01, 0x9e,
-	0x00, 0xc7, 0x03, 0x8f, 0x53, 0x7c, 0xdd, 0x19, 0x50, 0xe1, 0x75, 0x30, 0x81, 0x88, 0xe5, 0xbb,
-	0x8d, 0x66, 0x00, 0x01, 0x64, 0x21, 0x96, 0x51, 0x9e, 0xb5, 0xbf, 0x54, 0xd1, 0xc1, 0x05, 0x0f,
-	0x7a, 0x29, 0xf5, 0x04, 0x7d, 0xf3, 0xf6, 0xbc, 0xa7, 0x1d, 0xa2, 0x3a, 0xa7, 0xcc, 0xa7, 0xa9,
-	0xae, 0xb6, 0xd4, 0x76, 0xc3, 0x2d, 0x56, 0xda, 0x63, 0x54, 0x11, 0xa0, 0x57, 0xb2, 0x5c, 0x45,
-	0x80, 0xf6, 0x0e, 0x1d, 0xa5, 0x94, 0xd0, 0xe8, 0x9a, 0xa6, 0x7d, 0x60, 0x7d, 0x10, 0x21, 0x4d,
-	0xfb, 0x24, 0xf4, 0x22, 0xa6, 0x57, 0xe5, 0xa6, 0xae, 0xbd, 0x98, 0x5a, 0xe6, 0x8d, 0x97, 0xc4,
-	0xa7, 0xf6, 0x1d, 0x1b, 0x6d, 0xb7, 0xb9, 0x44, 0xae, 0xd8, 0x95, 0xcc, 0xf7, 0x64, 0x5a, 0x23,
-	0xa8, 0xee, 0x25, 0x30, 0x66, 0x42, 0xaf, 0xb5, 0xaa, 0xed, 0x47, 0x27, 0xcf, 0x9c, 0xdc, 0x9b,
-	0x23, 0xbd, 0x39, 0x85, 0x37, 0xa7, 0x07, 0x11, 0xeb, 0xbe, 0x9a, 0x4c, 0x2d, 0xe5, 0xfb, 0x4f,
-	0xab, 0x1d, 0x44, 0x22, 0x1c, 0x0f, 0x1c, 0x02, 0x09, 0x2e, 0x0a, 0x91, 0x7f, 0x8e, 0xb9, 0x3f,
-	0xc4, 0xe2, 0x66, 0x44, 0x79, 0x76, 0x80, 0xbb, 0x05, 0xb5, 0xd6, 0x41, 0x8d, 0xd0, 0xe3, 0x61,
-	0x3f, 0x06, 0x32, 0xd4, 0x1f, 0x64, 0x8a, 0x9b, 0x8b, 0xa9, 0xf5, 0x24, 0x57, 0xbc, 0x82, 0x6c,
-	0x77, 0x4f, 0xc6, 0xe7, 0x40, 0x86, 0xda, 0x0b, 0xd4, 0x10, 0x51, 0x42, 0xb9, 0xf0, 0x92, 0x91,
-	0x5e, 0x6f, 0xa9, 0xed, 0x9a, 0xbb, 0x4e, 0x48, 0x42, 0xb9, 0xc8, 0x09, 0x1f, 0x4a, 0xb4, 0x4c,
-	0xb8, 0x82, 0x6c, 0x77, 0x4f, 0xc6, 0x92, 0xf0, 0xb4, 0xf6, 0xe7, 0x9b, 0xa5, 0xda, 0x47, 0xe8,
-	0xe9, 0x46, 0x0b, 0x5c, 0xca, 0x47, 0xc0, 0x38, 0xb5, 0x3f, 0xa1, 0x7d, 0x09, 0xc4, 0x5e, 0x94,
-	0xec, 0x6c, 0xcd, 0x86, 0x95, 0xca, 0x7f, 0x59, 0xc9, 0xa8, 0x48, 0x4a, 0x45, 0xde, 0x2c, 0xb7,
-	0x58, 0x15, 0x8a, 0x0e, 0x51, 0xb3, 0x7c, 0xf1, 0x4a, 0xd0, 0x87, 0x6c, 0x58, 0x5c, 0xfa, 0x71,
-	0xcc, 0xfc, 0x7b, 0x56, 0xb4, 0x51, 0x8b, 0xf5, 0x0d, 0xcb, 0xab, 0x4f, 0x16, 0x2a, 0xaa, 0x5e,
-	0xf0, 0x40, 0xbb, 0x44, 0xa8, 0x34, 0xac, 0xcf, 0x9d, 0xf2, 0x1b, 0x70, 0x36, 0xca, 0x68, 0xbc,
-	0xdc, 0x01, 0x2e, 0x79, 0xb5, 0x33, 0xd4, 0x58, 0x17, 0xd8, 0xd8, 0x3e, 0xb1, 0xc4, 0x0c, 0xfb,
-	0x6e, 0x6c, 0x45, 0x76, 0x89, 0x50, 0xa9, 0x38, 0xdb, 0xe2, 0xd6, 0xe0, 0x3f, 0xc4, 0x6d, 0x9b,
-	0xee, 0x9e, 0x4d, 0x7e, 0x9b, 0xca, 0x64, 0x66, 0xaa, 0xb7, 0x33, 0x53, 0xfd, 0x35, 0x33, 0xd5,
-	0xaf, 0x73, 0x53, 0xb9, 0x9d, 0x9b, 0xca, 0x8f, 0xb9, 0xa9, 0xbc, 0x3f, 0x2e, 0xcd, 0xbc, 0x24,
-	0x63, 0x54, 0xe0, 0x82, 0x14, 0x27, 0xe0, 0x8f, 0x63, 0xca, 0x71, 0xfe, 0xc7, 0x90, 0xe3, 0x3f,
-	0xa8, 0x67, 0x2f, 0xfe, 0xf5, 0xdf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x9f, 0xff, 0xa5, 0x5e, 0x46,
-	0x04, 0x00, 0x00,
+	// 547 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x53, 0x41, 0x73, 0xd2, 0x40,
+	0x14, 0x26, 0x80, 0x48, 0xd6, 0xe2, 0x38, 0x19, 0xda, 0xc6, 0x58, 0x13, 0x66, 0xbd, 0x70, 0x69,
+	0x22, 0xf5, 0xd6, 0x23, 0x5c, 0x9c, 0x69, 0x6b, 0x67, 0x56, 0x2f, 0x7a, 0x61, 0xc2, 0x66, 0x25,
+	0x3b, 0x90, 0x5d, 0x66, 0x77, 0xe9, 0xd8, 0x7f, 0xe1, 0x4f, 0x70, 0x3c, 0xfa, 0x4b, 0x38, 0xf6,
+	0xe8, 0x09, 0x15, 0x2e, 0x9e, 0xf9, 0x05, 0xce, 0x66, 0x03, 0x05, 0xb5, 0x3d, 0xf1, 0xde, 0xf7,
+	0xbd, 0xf7, 0xbd, 0xc7, 0xcb, 0xb7, 0xa0, 0x91, 0xaa, 0x31, 0x8e, 0xd4, 0xa7, 0x70, 0x22, 0xb8,
+	0xe2, 0xce, 0x1e, 0x15, 0x54, 0x66, 0x3c, 0x09, 0x35, 0xec, 0xf9, 0x98, 0xcb, 0x8c, 0xcb, 0x68,
+	0x10, 0x4b, 0x12, 0x5d, 0x75, 0x06, 0x44, 0xc5, 0x9d, 0x08, 0x73, 0xca, 0x4c, 0xb5, 0xd7, 0x1c,
+	0xf2, 0x21, 0xcf, 0xc3, 0x48, 0x47, 0x06, 0x85, 0xab, 0x0a, 0x68, 0x5c, 0xc8, 0x61, 0x4f, 0x90,
+	0x58, 0x91, 0xd7, 0xef, 0xce, 0x7b, 0xce, 0x01, 0xa8, 0x49, 0xc2, 0x12, 0x22, 0x5c, 0xab, 0x65,
+	0xb5, 0x6d, 0x54, 0x64, 0xce, 0x63, 0x50, 0x56, 0xdc, 0x2d, 0xe7, 0x58, 0x59, 0x71, 0xe7, 0x3d,
+	0x38, 0x14, 0x04, 0x13, 0x7a, 0x45, 0x44, 0x9f, 0xb3, 0x3e, 0x57, 0x29, 0x11, 0x7d, 0x9c, 0xc6,
+	0x94, 0xb9, 0x15, 0x5d, 0xd4, 0x85, 0xab, 0x79, 0xe0, 0x5f, 0xc7, 0xd9, 0xf8, 0x14, 0xde, 0x51,
+	0x08, 0x51, 0x73, 0xcd, 0x5c, 0xb2, 0x4b, 0x8d, 0xf7, 0x34, 0xec, 0xbc, 0x05, 0xfb, 0x66, 0xe8,
+	0xdf, 0xc2, 0xd5, 0x5c, 0xb8, 0xb5, 0x9a, 0x07, 0x47, 0x46, 0xf8, 0xbf, 0x65, 0x10, 0x39, 0x06,
+	0xdf, 0x11, 0xc5, 0xa0, 0x16, 0x67, 0x7c, 0xca, 0x94, 0xfb, 0xa0, 0x55, 0x69, 0x3f, 0x3a, 0x79,
+	0x1a, 0x9a, 0x83, 0x85, 0xfa, 0x60, 0x61, 0x71, 0xb0, 0xb0, 0xc7, 0x29, 0xeb, 0xbe, 0x9c, 0xcd,
+	0x83, 0xd2, 0xb7, 0x1f, 0x41, 0x7b, 0x48, 0x55, 0x3a, 0x1d, 0x84, 0x98, 0x67, 0x51, 0x71, 0x5d,
+	0xf3, 0x73, 0x2c, 0x93, 0x51, 0xa4, 0xae, 0x27, 0x44, 0xe6, 0x0d, 0x12, 0x15, 0xd2, 0x4e, 0x07,
+	0xd8, 0x69, 0x2c, 0xd3, 0xfe, 0x98, 0xe3, 0x91, 0x5b, 0xcb, 0xb7, 0x6d, 0xae, 0xe6, 0xc1, 0x13,
+	0xb3, 0xed, 0x86, 0x82, 0xa8, 0xae, 0xe3, 0x73, 0x8e, 0x47, 0xce, 0x11, 0xb0, 0x15, 0xcd, 0x88,
+	0x54, 0x71, 0x36, 0x71, 0x1f, 0xb6, 0xac, 0x76, 0x15, 0xdd, 0x02, 0x5a, 0x50, 0x27, 0x46, 0xb0,
+	0xae, 0xd9, 0x6d, 0xc1, 0x0d, 0x05, 0x51, 0x5d, 0xc7, 0xb9, 0xa0, 0x07, 0xea, 0x4a, 0xc4, 0x4c,
+	0x7e, 0x24, 0xc2, 0xb5, 0x5b, 0x56, 0xbb, 0x8e, 0x36, 0xf9, 0x69, 0xf5, 0xf7, 0x97, 0xc0, 0x82,
+	0x87, 0x60, 0x7f, 0xe7, 0x9b, 0x23, 0x22, 0x27, 0x9c, 0x49, 0x02, 0x31, 0xd8, 0xd3, 0xc4, 0x38,
+	0xa6, 0xd9, 0xbd, 0x5e, 0x78, 0x0e, 0xca, 0x34, 0x31, 0x5e, 0xe8, 0x36, 0x56, 0xf3, 0xc0, 0x36,
+	0xeb, 0xd0, 0x04, 0xa2, 0x32, 0x4d, 0x4c, 0x1b, 0x16, 0x44, 0x19, 0x27, 0xa0, 0x22, 0x2b, 0xa6,
+	0x1f, 0x80, 0xe6, 0xf6, 0x90, 0xf5, 0xf0, 0x93, 0xaf, 0x16, 0xa8, 0x5c, 0xc8, 0xa1, 0xf3, 0x06,
+	0x80, 0x2d, 0x3b, 0x3e, 0x0b, 0xb7, 0x5d, 0x1e, 0xee, 0xec, 0xed, 0xbd, 0xb8, 0x87, 0x5c, 0xeb,
+	0x3a, 0x67, 0xc0, 0xbe, 0xfd, 0x47, 0xde, 0xbf, 0x1d, 0x6b, 0xce, 0x83, 0x77, 0x73, 0x6b, 0xb1,
+	0xee, 0xd9, 0xec, 0x97, 0x5f, 0x9a, 0x2d, 0x7c, 0xeb, 0x66, 0xe1, 0x5b, 0x3f, 0x17, 0xbe, 0xf5,
+	0x79, 0xe9, 0x97, 0x6e, 0x96, 0x7e, 0xe9, 0xfb, 0xd2, 0x2f, 0x7d, 0x38, 0xde, 0x32, 0x8c, 0xd6,
+	0x62, 0x44, 0x45, 0x85, 0x66, 0x94, 0xf1, 0x64, 0x3a, 0x26, 0x32, 0x32, 0x6f, 0x58, 0x7b, 0x67,
+	0x50, 0xcb, 0xdf, 0xe0, 0xab, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x15, 0xf7, 0xf1, 0xb9, 0xd8,
+	0x03, 0x00, 0x00,
 }
 
 func (this *MsgCreateHTLC) Equal(that interface{}) bool {
@@ -341,6 +266,9 @@ func (this *MsgCreateHTLC) Equal(that interface{}) bool {
 	if this.ReceiverOnOtherChain != that1.ReceiverOnOtherChain {
 		return false
 	}
+	if this.SenderOnOtherChain != that1.SenderOnOtherChain {
+		return false
+	}
 	if len(this.Amount) != len(that1.Amount) {
 		return false
 	}
@@ -356,6 +284,9 @@ func (this *MsgCreateHTLC) Equal(that interface{}) bool {
 		return false
 	}
 	if this.TimeLock != that1.TimeLock {
+		return false
+	}
+	if this.Transfer != that1.Transfer {
 		return false
 	}
 	return true
@@ -382,37 +313,10 @@ func (this *MsgClaimHTLC) Equal(that interface{}) bool {
 	if this.Sender != that1.Sender {
 		return false
 	}
-	if this.HashLock != that1.HashLock {
+	if this.Id != that1.Id {
 		return false
 	}
 	if this.Secret != that1.Secret {
-		return false
-	}
-	return true
-}
-func (this *MsgRefundHTLC) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*MsgRefundHTLC)
-	if !ok {
-		that2, ok := that.(MsgRefundHTLC)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if this.Sender != that1.Sender {
-		return false
-	}
-	if this.HashLock != that1.HashLock {
 		return false
 	}
 	return true
@@ -430,12 +334,10 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
-	// CreateHTLC defines a method for creating a HTLC.
+	// CreateHTLC defines a method for creating a HTLC
 	CreateHTLC(ctx context.Context, in *MsgCreateHTLC, opts ...grpc.CallOption) (*MsgCreateHTLCResponse, error)
 	// ClaimHTLC defines a method for claiming a HTLC
 	ClaimHTLC(ctx context.Context, in *MsgClaimHTLC, opts ...grpc.CallOption) (*MsgClaimHTLCResponse, error)
-	// RefundHTLC defines a method for refunding a HTLC.
-	RefundHTLC(ctx context.Context, in *MsgRefundHTLC, opts ...grpc.CallOption) (*MsgRefundHTLCResponse, error)
 }
 
 type msgClient struct {
@@ -464,23 +366,12 @@ func (c *msgClient) ClaimHTLC(ctx context.Context, in *MsgClaimHTLC, opts ...grp
 	return out, nil
 }
 
-func (c *msgClient) RefundHTLC(ctx context.Context, in *MsgRefundHTLC, opts ...grpc.CallOption) (*MsgRefundHTLCResponse, error) {
-	out := new(MsgRefundHTLCResponse)
-	err := c.cc.Invoke(ctx, "/irismod.htlc.Msg/RefundHTLC", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
-	// CreateHTLC defines a method for creating a HTLC.
+	// CreateHTLC defines a method for creating a HTLC
 	CreateHTLC(context.Context, *MsgCreateHTLC) (*MsgCreateHTLCResponse, error)
 	// ClaimHTLC defines a method for claiming a HTLC
 	ClaimHTLC(context.Context, *MsgClaimHTLC) (*MsgClaimHTLCResponse, error)
-	// RefundHTLC defines a method for refunding a HTLC.
-	RefundHTLC(context.Context, *MsgRefundHTLC) (*MsgRefundHTLCResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -492,9 +383,6 @@ func (*UnimplementedMsgServer) CreateHTLC(ctx context.Context, req *MsgCreateHTL
 }
 func (*UnimplementedMsgServer) ClaimHTLC(ctx context.Context, req *MsgClaimHTLC) (*MsgClaimHTLCResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ClaimHTLC not implemented")
-}
-func (*UnimplementedMsgServer) RefundHTLC(ctx context.Context, req *MsgRefundHTLC) (*MsgRefundHTLCResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RefundHTLC not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -537,24 +425,6 @@ func _Msg_ClaimHTLC_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_RefundHTLC_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgRefundHTLC)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).RefundHTLC(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/irismod.htlc.Msg/RefundHTLC",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).RefundHTLC(ctx, req.(*MsgRefundHTLC))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "irismod.htlc.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -566,10 +436,6 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ClaimHTLC",
 			Handler:    _Msg_ClaimHTLC_Handler,
-		},
-		{
-			MethodName: "RefundHTLC",
-			Handler:    _Msg_RefundHTLC_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -596,22 +462,32 @@ func (m *MsgCreateHTLC) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.Transfer {
+		i--
+		if m.Transfer {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x48
+	}
 	if m.TimeLock != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.TimeLock))
 		i--
-		dAtA[i] = 0x38
+		dAtA[i] = 0x40
 	}
 	if m.Timestamp != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.Timestamp))
 		i--
-		dAtA[i] = 0x30
+		dAtA[i] = 0x38
 	}
 	if len(m.HashLock) > 0 {
 		i -= len(m.HashLock)
 		copy(dAtA[i:], m.HashLock)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.HashLock)))
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x32
 	}
 	if len(m.Amount) > 0 {
 		for iNdEx := len(m.Amount) - 1; iNdEx >= 0; iNdEx-- {
@@ -624,8 +500,15 @@ func (m *MsgCreateHTLC) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x22
+			dAtA[i] = 0x2a
 		}
+	}
+	if len(m.SenderOnOtherChain) > 0 {
+		i -= len(m.SenderOnOtherChain)
+		copy(dAtA[i:], m.SenderOnOtherChain)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.SenderOnOtherChain)))
+		i--
+		dAtA[i] = 0x22
 	}
 	if len(m.ReceiverOnOtherChain) > 0 {
 		i -= len(m.ReceiverOnOtherChain)
@@ -701,10 +584,10 @@ func (m *MsgClaimHTLC) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.HashLock) > 0 {
-		i -= len(m.HashLock)
-		copy(dAtA[i:], m.HashLock)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.HashLock)))
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Id)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -741,66 +624,6 @@ func (m *MsgClaimHTLCResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgRefundHTLC) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgRefundHTLC) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgRefundHTLC) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.HashLock) > 0 {
-		i -= len(m.HashLock)
-		copy(dAtA[i:], m.HashLock)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.HashLock)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Sender) > 0 {
-		i -= len(m.Sender)
-		copy(dAtA[i:], m.Sender)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Sender)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgRefundHTLCResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgRefundHTLCResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgRefundHTLCResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -830,6 +653,10 @@ func (m *MsgCreateHTLC) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
+	l = len(m.SenderOnOtherChain)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	if len(m.Amount) > 0 {
 		for _, e := range m.Amount {
 			l = e.Size()
@@ -845,6 +672,9 @@ func (m *MsgCreateHTLC) Size() (n int) {
 	}
 	if m.TimeLock != 0 {
 		n += 1 + sovTx(uint64(m.TimeLock))
+	}
+	if m.Transfer {
+		n += 2
 	}
 	return n
 }
@@ -868,7 +698,7 @@ func (m *MsgClaimHTLC) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.HashLock)
+	l = len(m.Id)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -880,32 +710,6 @@ func (m *MsgClaimHTLC) Size() (n int) {
 }
 
 func (m *MsgClaimHTLCResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *MsgRefundHTLC) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Sender)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.HashLock)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	return n
-}
-
-func (m *MsgRefundHTLCResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1047,6 +851,38 @@ func (m *MsgCreateHTLC) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SenderOnOtherChain", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SenderOnOtherChain = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
 			}
 			var msglen int
@@ -1079,7 +915,7 @@ func (m *MsgCreateHTLC) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field HashLock", wireType)
 			}
@@ -1111,7 +947,7 @@ func (m *MsgCreateHTLC) Unmarshal(dAtA []byte) error {
 			}
 			m.HashLock = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 6:
+		case 7:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
 			}
@@ -1130,7 +966,7 @@ func (m *MsgCreateHTLC) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 7:
+		case 8:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TimeLock", wireType)
 			}
@@ -1149,6 +985,26 @@ func (m *MsgCreateHTLC) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Transfer", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Transfer = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -1283,7 +1139,7 @@ func (m *MsgClaimHTLC) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HashLock", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1311,7 +1167,7 @@ func (m *MsgClaimHTLC) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.HashLock = string(dAtA[iNdEx:postIndex])
+			m.Id = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -1393,170 +1249,6 @@ func (m *MsgClaimHTLCResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgClaimHTLCResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgRefundHTLC) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRefundHTLC: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRefundHTLC: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Sender = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HashLock", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.HashLock = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgRefundHTLCResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRefundHTLCResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRefundHTLCResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

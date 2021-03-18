@@ -73,16 +73,3 @@ func validateFee(i interface{}) error {
 
 	return nil
 }
-
-func validateStandardDenom(i interface{}) error {
-	v, ok := i.(string)
-	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", i)
-	}
-
-	if err := sdk.ValidateDenom(v); err != nil {
-		return err
-	}
-
-	return nil
-}

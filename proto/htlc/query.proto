@@ -2,6 +2,7 @@ syntax = "proto3";
 package irismod.htlc;
 
 import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
 import "htlc/htlc.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/htlc/types";
@@ -10,17 +11,59 @@ option go_package = "github.com/irisnet/irismod/modules/htlc/types";
 service Query {
     // HTLC queries the HTLC by the specified hash lock
     rpc HTLC(QueryHTLCRequest) returns (QueryHTLCResponse) {
-        option (google.api.http).get = "/irismod/htlc/htlcs/{hash_lock}";
+        option (google.api.http).get = "/irismod/htlc/htlcs/{id}";
+    }
+
+    // AssetSupply queries the supply of an asset
+    rpc AssetSupply(QueryAssetSupplyRequest) returns (QueryAssetSupplyResponse) {
+        option (google.api.http).get = "/irismod/htlc/supplies/{denom}";
+    }
+
+    // AssetSupplies queries the supplies of all assets
+    rpc AssetSupplies(QueryAssetSuppliesRequest) returns (QueryAssetSuppliesResponse) {
+        option (google.api.http).get = "/irismod/htlc/supplies";
+    }
+
+    // Params queries the htlc parameters
+    rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+        option (google.api.http).get = "/irismod/htlc/params";
     }
 }
 
 // QueryHTLCRequest is the request type for the Query/HTLC RPC method
 message QueryHTLCRequest {
-    // address is the address to query balances for
-    string hash_lock = 1;
+    string id = 1;
 }
 
 // QueryBalanceResponse is the response type for the Query/HTLC RPC method
 message QueryHTLCResponse {
     HTLC htlc = 1;
+}
+
+// QueryAssetSupplyRequest is request type for the Query/AssetSupply RPC method
+message QueryAssetSupplyRequest {
+    string denom = 1;
+}
+
+// QueryAssetSupplyResponse is response type for the Query/AssetSupply RPC method
+message QueryAssetSupplyResponse {
+    AssetSupply asset_supply = 1 [ (gogoproto.moretags) = "yaml:\"asset_supply\"" ];
+}
+
+// QueryAssetSuppliesRequest is request type for the Query/AssetSupplies RPC method
+message QueryAssetSuppliesRequest {
+}
+
+// QueryAssetSuppliesResponse is response type for the Query/AssetSupplies RPC method
+message QueryAssetSuppliesResponse {
+    repeated AssetSupply asset_supplies = 1 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"asset_supplies\"" ];
+}
+
+// QueryParamsRequest is request type for the Query/Parameters RPC method
+message QueryParamsRequest {
+}
+
+// QueryParamsResponse is response type for the Query/Parameters RPC method
+message QueryParamsResponse {
+    Params params = 1 [ (gogoproto.nullable) = false ];
 }

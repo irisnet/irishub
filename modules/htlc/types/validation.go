@@ -10,6 +10,8 @@ import (
 const (
 	// SecretLength is the length for the secret in hex string
 	SecretLength = 64
+	// HTLCIDLength is the length for the hash lock in hex string
+	HTLCIDLength = 64
 	// HashLockLength is the length for the hash lock in hex string
 	HashLockLength = 64
 	// MaxLengthForAddressOnOtherChain is the maximum length for the address on other chains
@@ -28,10 +30,33 @@ func ValidateReceiverOnOtherChain(receiverOnOtherChain string) error {
 	return nil
 }
 
+// ValidateSenderOnOtherChain verifies if the receiver on the other chain is legal
+func ValidateSenderOnOtherChain(senderOnOtherChain string) error {
+	if len(senderOnOtherChain) > MaxLengthForAddressOnOtherChain {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "length of the sender on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain)
+	}
+	return nil
+}
+
 // ValidateAmount verifies whether the given amount is legal
-func ValidateAmount(amount sdk.Coins) error {
+func ValidateAmount(transfer bool, amount sdk.Coins) error {
+	if transfer && len(amount) != 1 {
+		return sdkerrors.Wrapf(ErrInvalidAmount, amount.String())
+	}
 	if !(amount.IsValid() && amount.IsAllPositive()) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "the transferred amount must be valid")
+	}
+	return nil
+}
+
+// ValidateID verifies whether the given ID lock is legal
+func ValidateID(id string) error {
+	if len(id) != HTLCIDLength {
+		return sdkerrors.Wrapf(ErrInvalidID, "length of the htlc id must be %d", HTLCIDLength)
+	}
+
+	if _, err := hex.DecodeString(id); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidID, "id must be a hex encoded string")
 	}
 	return nil
 }

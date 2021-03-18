@@ -34,16 +34,6 @@ func ClaimHTLCExec(clientCtx client.Context, from string, hashLock string, secre
 	return clitestutil.ExecTestCLICmd(clientCtx, htlccli.GetCmdClaimHTLC(), args)
 }
 
-func RefundHTLCExec(clientCtx client.Context, from string, hashLock string, extraArgs ...string) (testutil.BufferWriter, error) {
-	args := []string{
-		hashLock,
-		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
-	}
-	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, htlccli.GetCmdRefundHTLC(), args)
-}
-
 func QueryHTLCExec(clientCtx client.Context, hashLock string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		hashLock,

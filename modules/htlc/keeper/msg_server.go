@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -40,28 +41,34 @@ func (m msgServer) CreateHTLC(goCtx context.Context, msg *types.MsgCreateHTLC) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.CreateHTLC(
+	id, err := m.Keeper.CreateHTLC(
 		ctx,
 		sender,
 		to,
 		msg.ReceiverOnOtherChain,
+		msg.SenderOnOtherChain,
 		msg.Amount,
 		hashLock,
 		msg.Timestamp,
 		msg.TimeLock,
-	); err != nil {
+		msg.Transfer,
+	)
+	if err != nil {
 		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeCreateHTLC,
+			sdk.NewAttribute(types.AttributeKeyID, id.String()),
 			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
 			sdk.NewAttribute(types.AttributeKeyReceiver, msg.To),
 			sdk.NewAttribute(types.AttributeKeyReceiverOnOtherChain, msg.ReceiverOnOtherChain),
+			sdk.NewAttribute(types.AttributeKeySenderOnOtherChain, msg.SenderOnOtherChain),
 			sdk.NewAttribute(types.AttributeKeyAmount, msg.Amount.String()),
 			sdk.NewAttribute(types.AttributeKeyHashLock, msg.HashLock),
 			sdk.NewAttribute(types.AttributeKeyTimeLock, fmt.Sprintf("%d", msg.TimeLock)),
+			sdk.NewAttribute(types.AttributeKeyTransfer, strconv.FormatBool(msg.Transfer)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -73,7 +80,7 @@ func (m msgServer) CreateHTLC(goCtx context.Context, msg *types.MsgCreateHTLC) (
 }
 
 func (m msgServer) ClaimHTLC(goCtx context.Context, msg *types.MsgClaimHTLC) (*types.MsgClaimHTLCResponse, error) {
-	hashLock, err := hex.DecodeString(msg.HashLock)
+	id, err := hex.DecodeString(msg.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -84,16 +91,20 @@ func (m msgServer) ClaimHTLC(goCtx context.Context, msg *types.MsgClaimHTLC) (*t
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.ClaimHTLC(ctx, hashLock, secret); err != nil {
+	hashLock, transfer, direction, err := m.Keeper.ClaimHTLC(ctx, id, secret)
+	if err != nil {
 		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeClaimHTLC,
+			sdk.NewAttribute(types.AttributeKeyID, msg.Id),
+			sdk.NewAttribute(types.AttributeKeyHashLock, hashLock),
 			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
-			sdk.NewAttribute(types.AttributeKeyHashLock, msg.HashLock),
 			sdk.NewAttribute(types.AttributeKeySecret, msg.Secret),
+			sdk.NewAttribute(types.AttributeKeyTransfer, strconv.FormatBool(transfer)),
+			sdk.NewAttribute(types.AttributeKeyDirection, direction.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -102,30 +113,4 @@ func (m msgServer) ClaimHTLC(goCtx context.Context, msg *types.MsgClaimHTLC) (*t
 		),
 	})
 	return &types.MsgClaimHTLCResponse{}, nil
-}
-
-func (m msgServer) RefundHTLC(goCtx context.Context, msg *types.MsgRefundHTLC) (*types.MsgRefundHTLCResponse, error) {
-	hashLock, err := hex.DecodeString(msg.HashLock)
-	if err != nil {
-		return nil, err
-	}
-
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.RefundHTLC(ctx, hashLock); err != nil {
-		return nil, err
-	}
-
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeRefundHTLC,
-			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
-			sdk.NewAttribute(types.AttributeKeyHashLock, msg.HashLock),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-		),
-	})
-	return &types.MsgRefundHTLCResponse{}, nil
 }
