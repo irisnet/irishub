@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"time"
 
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
@@ -106,6 +107,25 @@ func (k Keeper) createHTLT(
 	asset, err := k.GetAsset(ctx, amount[0].Denom)
 	if err != nil {
 		return direction, err
+	}
+
+	if err = k.ValidateLiveAsset(ctx, amount[0]); err != nil {
+		return direction, err
+	}
+
+	// Swap amount must be within the specified swap amount limits
+	if amount[0].Amount.LT(asset.MinSwapAmount) || amount[0].Amount.GT(asset.MaxSwapAmount) {
+		return direction, sdkerrors.Wrapf(types.ErrInvalidAmount, "amount %d outside range [%s, %s]", amount[0].Amount, asset.MinSwapAmount, asset.MaxSwapAmount)
+	}
+
+	// Unix timestamp must be in range [-15 mins, 30 mins] of the current time
+	pastTimestampLimit := ctx.BlockTime().Add(time.Duration(-15) * time.Minute).Unix()
+	futureTimestampLimit := ctx.BlockTime().Add(time.Duration(30) * time.Minute).Unix()
+	if timestamp < uint64(pastTimestampLimit) || timestamp >= uint64(futureTimestampLimit) {
+		return direction, sdkerrors.Wrap(types.ErrInvalidTimestamp, fmt.Sprintf(
+			"timestamp can neither be 15 minutes ahead of the current time, nor 30 minutes later. block time: %s, timestamp: %s",
+			ctx.BlockTime().String(), time.Unix(int64(timestamp), 0).UTC().String()),
+		)
 	}
 
 	deputyAddress, _ := sdk.AccAddressFromBech32(asset.DeputyAddress)
