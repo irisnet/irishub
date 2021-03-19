@@ -110,6 +110,7 @@ import (
 	"github.com/irisnet/irishub/address"
 	irisappparams "github.com/irisnet/irishub/app/params"
 	"github.com/irisnet/irishub/lite"
+	migratehtlc "github.com/irisnet/irishub/migrate/htlc"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
@@ -548,10 +549,12 @@ func NewIrisApp(
 	))
 	app.SetEndBlocker(app.EndBlocker)
 	// Set software upgrade execution logic
-	app.RegisterUpgradePlan("v1",
-		nil,
+	app.RegisterUpgradePlan(
+		"v1", nil,
 		func(ctx sdk.Context, plan sdkupgrade.Plan) {
-			//TODO your migerate code
+			if err := migratehtlc.Migrate(ctx, appCodec, app.htlcKeeper, app.bankKeeper); err != nil {
+				panic(err)
+			}
 		},
 	)
 
@@ -731,8 +734,7 @@ func (app *IrisApp) SimulationManager() *module.SimulationManager {
 	return app.sm
 }
 
-// RegisterAPIRoutes registers all application module routes with the provided
-// API server.
+// RegisterAPIRoutes registers all application module routes with the provided API server.
 func (app *IrisApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
 	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
@@ -763,8 +765,11 @@ func (app *IrisApp) RegisterTendermintService(clientCtx client.Context) {
 }
 
 // RegisterUpgradePlan implements the upgrade execution logic of the upgrade module
-func (app *IrisApp) RegisterUpgradePlan(planName string,
-	upgrades *store.StoreUpgrades, upgradeHandler sdkupgrade.UpgradeHandler) {
+func (app *IrisApp) RegisterUpgradePlan(
+	planName string,
+	upgrades *store.StoreUpgrades,
+	upgradeHandler sdkupgrade.UpgradeHandler,
+) {
 	upgradeInfo, err := app.upgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
 		app.Logger().Info("not found upgrade plan", "planName", planName, "err", err.Error())
