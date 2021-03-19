@@ -24,6 +24,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
+	store "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -78,6 +79,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
+	sdkupgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/irisnet/irismod/modules/coinswap"
@@ -545,6 +547,13 @@ func NewIrisApp(
 		encodingConfig.TxConfig.SignModeHandler(),
 	))
 	app.SetEndBlocker(app.EndBlocker)
+	// Set software upgrade execution logic
+	app.RegisterUpgradePlan("v1",
+		nil,
+		func(ctx sdk.Context, plan sdkupgrade.Plan) {
+			//TODO your migerate code
+		},
+	)
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -751,6 +760,23 @@ func (app *IrisApp) RegisterTxService(clientCtx client.Context) {
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *IrisApp) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
+}
+
+// RegisterUpgradePlan implements the upgrade execution logic of the upgrade module
+func (app *IrisApp) RegisterUpgradePlan(planName string,
+	upgrades *store.StoreUpgrades, upgradeHandler sdkupgrade.UpgradeHandler) {
+	upgradeInfo, err := app.upgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		app.Logger().Info("not found upgrade plan", "planName", planName, "err", err.Error())
+		return
+	}
+
+	if upgradeInfo.Name == planName && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		// this configures a no-op upgrade handler for the planName upgrade
+		app.upgradeKeeper.SetUpgradeHandler(planName, upgradeHandler)
+		// configure store loader that checks if version+1 == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(sdkupgrade.UpgradeStoreLoader(upgradeInfo.Height, upgrades))
+	}
 }
 
 // GetMaccPerms returns a copy of the module account permissions
