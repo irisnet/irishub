@@ -20,6 +20,8 @@ const (
 	MinTimeLock = 50
 	// MaxTimeLock is the maximum time span for HTLC in blocks
 	MaxTimeLock = 25480
+	// MinDenomLength is the min length of the htlt token denom
+	MinDenomLength = 6
 )
 
 // ValidateReceiverOnOtherChain verifies if the receiver on the other chain is legal

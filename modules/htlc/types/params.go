@@ -82,7 +82,10 @@ func validateAssetParams(i interface{}) error {
 
 	coinDenoms := make(map[string]bool)
 	for _, asset := range assetParams {
-		if err := sdk.ValidateDenom(asset.Denom); err != nil || !strings.HasPrefix(asset.Denom, FormatHTLTAssetPrefix) {
+		if err := sdk.ValidateDenom(asset.Denom); err != nil ||
+			!strings.HasPrefix(asset.Denom, FormatHTLTAssetPrefix) ||
+			strings.ToLower(asset.Denom) != asset.Denom ||
+			len(asset.Denom) < MinDenomLength {
 			return fmt.Errorf(fmt.Sprintf("invalid asset denom: %s", asset.Denom))
 		}
 
@@ -110,6 +113,14 @@ func validateAssetParams(i interface{}) error {
 
 		if asset.FixedFee.IsNegative() {
 			return fmt.Errorf("asset %s cannot have a negative fixed fee %s", asset.Denom, asset.FixedFee)
+		}
+
+		if asset.MinBlockLock < MinTimeLock {
+			return fmt.Errorf("asset %s has minimum block lock < min block lock %d > %d", asset.Denom, asset.MinBlockLock, MinTimeLock)
+		}
+
+		if asset.MaxBlockLock > MaxTimeLock {
+			return fmt.Errorf("asset %s has maximum block lock > max block lock %d > %d", asset.Denom, asset.MaxBlockLock, MaxTimeLock)
 		}
 
 		if asset.MinBlockLock > asset.MaxBlockLock {
