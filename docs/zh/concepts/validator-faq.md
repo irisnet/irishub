@@ -243,7 +243,7 @@ Linux可以打开（每个进程）的默认文件数是 `1024`，而 `iris` 进
 
 比较两个`Consensus Pubkey`：
 
-- 从[区块浏览器](https://www.irisplorer.io/#/validators)中，您可以在“验证人详情”页中找到该验证人声明的`Consensus Pubkey`。
+- 从[区块浏览器](https://irishub.iobscan.io/#/staking)中，您可以在“验证人详情”页中找到该验证人声明的`Consensus Pubkey`。
 
 - 通过 `iris tendermint show-validator --home=<iris-home>` 检查正在使用的`Consensus Pubkey`。
 
@@ -266,5 +266,3 @@ Linux可以打开（每个进程）的默认文件数是 `1024`，而 `iris` 进
 ## 加入社区
 
 - Discord：<https://discord.gg/yPsTf4cgPh>
-- Riot：<https://riot.im/app/#/room/#irisvalidators:matrix.org>
-- QQ：834063323
