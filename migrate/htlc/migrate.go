@@ -1,6 +1,8 @@
 package htlc
 
 import (
+	"time"
+
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -80,5 +82,47 @@ func Migrate(ctx sdk.Context, cdc codec.Marshaler, k htlckeeper.Keeper, bk bankk
 		k.SetHTLC(ctx, newHTLC, id)
 	}
 
+	// Set default params
+	k.SetParams(ctx, PresetHTLTParams())
+
 	return nil
+}
+
+func PresetHTLTParams() htlctypes.Params {
+	return htlctypes.Params{
+		AssetParams: []htlctypes.AssetParam{
+			{
+				Denom: "htltbcbnb",
+				SupplyLimit: htlctypes.SupplyLimit{
+					Limit:          sdk.NewInt(350000000000000),
+					TimeLimited:    false,
+					TimeBasedLimit: sdk.ZeroInt(),
+					TimePeriod:     time.Hour,
+				},
+				Active:        true,
+				DeputyAddress: "iaa1kznrznww4pd6gx0zwrpthjk68fdmqypj55j94s",
+				FixedFee:      sdk.NewInt(1000),
+				MinSwapAmount: sdk.OneInt(),
+				MaxSwapAmount: sdk.NewInt(1000000000000),
+				MinBlockLock:  htlctypes.DefaultMinBlockLock,
+				MaxBlockLock:  htlctypes.DefaultMaxBlockLock,
+			},
+			{
+				Denom: "htltbcbusd",
+				SupplyLimit: htlctypes.SupplyLimit{
+					Limit:          sdk.NewInt(100000000000000),
+					TimeLimited:    true,
+					TimeBasedLimit: sdk.NewInt(50000000000),
+					TimePeriod:     time.Hour,
+				},
+				Active:        true,
+				DeputyAddress: "iaa1kznrznww4pd6gx0zwrpthjk68fdmqypj55j94s",
+				FixedFee:      sdk.NewInt(1000),
+				MinSwapAmount: sdk.OneInt(),
+				MaxSwapAmount: sdk.NewInt(1000000000000),
+				MinBlockLock:  htlctypes.DefaultMinBlockLock,
+				MaxBlockLock:  htlctypes.DefaultMaxBlockLock,
+			},
+		},
+	}
 }
