@@ -25,7 +25,7 @@ func Migrate(ctx sdk.Context, cdc codec.Marshaler, k htlckeeper.Keeper, bk bankk
 	for ; iterator.Valid(); iterator.Next() {
 		hashLock := tmbytes.HexBytes(iterator.Key()[1:])
 
-		var htlc HTLC
+		var htlc OldHTLC
 		cdc.MustUnmarshalBinaryBare(iterator.Value(), &htlc)
 
 		sender, err := sdk.AccAddressFromBech32(htlc.Sender)
