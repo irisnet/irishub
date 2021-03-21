@@ -249,5 +249,3 @@ That means you have **Lost Your Validator Forever!** You can only create a new o
 ## Community Channels
 
 - Discord: <https://discord.gg/yPsTf4cgPh>
-- Riot: <https://riot.im/app/#/room/#irisvalidators:matrix.org>
-- QQ: 834063323
