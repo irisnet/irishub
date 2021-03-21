@@ -25,39 +25,39 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// HTLCState defines the state of an HTLC
-type HTLCState int32
+// HTLCStatus defines the state of an HTLC
+type HTLCStatus int32
 
 const (
 	// HTLC_STATE_OPEN defines an open state.
-	Open HTLCState = 0
+	Open HTLCStatus = 0
 	// HTLC_STATE_COMPLETED defines a completed state.
-	Completed HTLCState = 1
+	Completed HTLCStatus = 1
 	// HTLC_STATE_EXPIRED defines an expired state.
-	Expired HTLCState = 2
+	Expired HTLCStatus = 2
 	// HTLC_STATE_REFUNDED defines a refunded state.
-	Refunded HTLCState = 3
+	Refunded HTLCStatus = 3
 )
 
-var HTLCState_name = map[int32]string{
+var HTLCStatus_name = map[int32]string{
 	0: "HTLC_STATE_OPEN",
 	1: "HTLC_STATE_COMPLETED",
 	2: "HTLC_STATE_EXPIRED",
 	3: "HTLC_STATE_REFUNDED",
 }
 
-var HTLCState_value = map[string]int32{
+var HTLCStatus_value = map[string]int32{
 	"HTLC_STATE_OPEN":      0,
 	"HTLC_STATE_COMPLETED": 1,
 	"HTLC_STATE_EXPIRED":   2,
 	"HTLC_STATE_REFUNDED":  3,
 }
 
-func (x HTLCState) String() string {
-	return proto.EnumName(HTLCState_name, int32(x))
+func (x HTLCStatus) String() string {
+	return proto.EnumName(HTLCStatus_name, int32(x))
 }
 
-func (HTLCState) EnumDescriptor() ([]byte, []int) {
+func (HTLCStatus) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_c03699801a204f8b, []int{0}
 }
 
@@ -70,7 +70,7 @@ type HTLC struct {
 	Secret               string                                   `protobuf:"bytes,5,opt,name=secret,proto3" json:"secret,omitempty"`
 	Timestamp            uint64                                   `protobuf:"varint,6,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	ExpirationHeight     uint64                                   `protobuf:"varint,7,opt,name=expiration_height,json=expirationHeight,proto3" json:"expiration_height,omitempty" yaml:"expiration_height"`
-	State                HTLCState                                `protobuf:"varint,8,opt,name=state,proto3,enum=irismod.htlc.HTLCState" json:"state,omitempty"`
+	State                HTLCStatus                               `protobuf:"varint,8,opt,name=state,proto3,enum=irismod.htlc.HTLCStatus" json:"state,omitempty"`
 }
 
 func (m *HTLC) Reset()         { *m = HTLC{} }
@@ -107,7 +107,7 @@ func (m *HTLC) XXX_DiscardUnknown() {
 var xxx_messageInfo_HTLC proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterEnum("irismod.htlc.HTLCState", HTLCState_name, HTLCState_value)
+	proto.RegisterEnum("irismod.htlc.HTLCStatus", HTLCStatus_name, HTLCStatus_value)
 	proto.RegisterType((*HTLC)(nil), "irismod.htlc.HTLC")
 }
 
@@ -582,7 +582,7 @@ func (m *HTLC) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.State |= HTLCState(b&0x7F) << shift
+				m.State |= HTLCStatus(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
