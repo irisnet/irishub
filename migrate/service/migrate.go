@@ -17,5 +17,8 @@ func Migrate(ctx sdk.Context, k servicekeeper.Keeper, bk bankkeeper.Keeper) erro
 	if err != nil {
 		return err
 	}
+	params := k.GetParams(ctx)
+	params.RestrictedServiceFeeDenom = false
+	k.SetParams(ctx, params)
 	return bk.SendCoinsFromAccountToModule(ctx, oldAcc, servicetypes.FeeCollectorName, bk.GetAllBalances(ctx, oldAcc))
 }
