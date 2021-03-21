@@ -32097,6 +32097,8 @@ paths:
                     format: uint64
                   base_denom:
                     type: string
+                  restricted_service_fee_denom:
+                    type: boolean
                 title: Params defines service module's parameters
               res:
                 type: object
@@ -53563,6 +53565,8 @@ definitions:
         format: uint64
       base_denom:
         type: string
+      restricted_service_fee_denom:
+        type: boolean
     title: Params defines service module's parameters
   irismod.service.QueryBindingResponse:
     type: object
@@ -53765,6 +53769,8 @@ definitions:
             format: uint64
           base_denom:
             type: string
+          restricted_service_fee_denom:
+            type: boolean
         title: Params defines service module's parameters
       res:
         type: object
