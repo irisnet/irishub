@@ -38,7 +38,7 @@ bc77e49df0de4d70ab6f97f1e3a17bfb51a1ea7a@34.80.202.172:26656
 
 ### 水龙头
 
-欢迎加入我们的【[Discord 社区](https://discord.gg/Z6PXeTb5Mt)】申请测试通证
+欢迎加入我们的【[nyancat-faucet](https://discord.gg/Z6PXeTb5Mt)】频道申请测试通证
 
 申请方法：在 [nyancat-faucet](https://discord.gg/Z6PXeTb5Mt) 频道中，发送：`$faucet <your_addr>`，每个 Discord 账号每 24 小时只可领取一次测试通证（NYAN）
 
@@ -48,4 +48,4 @@ bc77e49df0de4d70ab6f97f1e3a17bfb51a1ea7a@34.80.202.172:26656
 
 ## 社区
 
-欢迎加入我们的社区进行讨论：[nyancat testnet channel](https://discord.gg/9cSt7MX2fn)
+欢迎加入我们的社区进行讨论：[nyancat testnet](https://discord.gg/9cSt7MX2fn)
