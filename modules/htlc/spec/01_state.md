@@ -69,7 +69,7 @@ type SwapDirection int32
 
 const (
     // INVALID defines an htlt invalid direction.
-    Invalid SwapDirection = 0
+    None SwapDirection = 0
     // INCOMING defines an htlt incoming direction.
     Incoming SwapDirection = 1
     // OUTGOING defines an htlt outgoing direction.
@@ -77,13 +77,13 @@ const (
 )
 
 var SwapDirection_name = map[int32]string{
-    0: "INVALID",
+    0: "NONE",
     1: "INCOMING",
     2: "OUTGOING",
 }
 
 var SwapDirection_value = map[string]int32{
-    "INVALID":  0,
+    "NONE":  0,
     "INCOMING": 1,
     "OUTGOING": 2,
 }

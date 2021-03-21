@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"encoding/hex"
-	"fmt"
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -65,9 +64,6 @@ func (m msgServer) CreateHTLC(goCtx context.Context, msg *types.MsgCreateHTLC) (
 			sdk.NewAttribute(types.AttributeKeyReceiver, msg.To),
 			sdk.NewAttribute(types.AttributeKeyReceiverOnOtherChain, msg.ReceiverOnOtherChain),
 			sdk.NewAttribute(types.AttributeKeySenderOnOtherChain, msg.SenderOnOtherChain),
-			sdk.NewAttribute(types.AttributeKeyAmount, msg.Amount.String()),
-			sdk.NewAttribute(types.AttributeKeyHashLock, msg.HashLock),
-			sdk.NewAttribute(types.AttributeKeyTimeLock, fmt.Sprintf("%d", msg.TimeLock)),
 			sdk.NewAttribute(types.AttributeKeyTransfer, strconv.FormatBool(msg.Transfer)),
 		),
 		sdk.NewEvent(
@@ -76,7 +72,9 @@ func (m msgServer) CreateHTLC(goCtx context.Context, msg *types.MsgCreateHTLC) (
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	})
-	return &types.MsgCreateHTLCResponse{}, nil
+	return &types.MsgCreateHTLCResponse{
+		Id: id.String(),
+	}, nil
 }
 
 func (m msgServer) ClaimHTLC(goCtx context.Context, msg *types.MsgClaimHTLC) (*types.MsgClaimHTLCResponse, error) {

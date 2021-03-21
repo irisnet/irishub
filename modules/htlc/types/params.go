@@ -116,15 +116,15 @@ func validateAssetParams(i interface{}) error {
 		}
 
 		if asset.MinBlockLock < MinTimeLock {
-			return fmt.Errorf("asset %s has minimum block lock < min block lock %d > %d", asset.Denom, asset.MinBlockLock, MinTimeLock)
+			return fmt.Errorf("asset %s has minimum block lock %d < min htlc block lock %d", asset.Denom, asset.MinBlockLock, MinTimeLock)
 		}
 
 		if asset.MaxBlockLock > MaxTimeLock {
-			return fmt.Errorf("asset %s has maximum block lock > max block lock %d > %d", asset.Denom, asset.MaxBlockLock, MaxTimeLock)
+			return fmt.Errorf("asset %s has maximum block lock %d > max htlc block lock %d", asset.Denom, asset.MaxBlockLock, MaxTimeLock)
 		}
 
 		if asset.MinBlockLock > asset.MaxBlockLock {
-			return fmt.Errorf("asset %s has minimum block lock > maximum block lock %d > %d", asset.Denom, asset.MinBlockLock, asset.MaxBlockLock)
+			return fmt.Errorf("asset %s has minimum block lock %d > maximum block lock %d", asset.Denom, asset.MinBlockLock, asset.MaxBlockLock)
 		}
 
 		if !asset.MinSwapAmount.IsPositive() {

@@ -32,7 +32,9 @@ message MsgCreateHTLC {
 }
 
 // MsgCreateHTLCResponse defines the Msg/CreateHTLC response type
-message MsgCreateHTLCResponse {}
+message MsgCreateHTLCResponse {
+    string id = 1;
+}
 
 // MsgClaimHTLC defines a message to claim an HTLC
 message MsgClaimHTLC {

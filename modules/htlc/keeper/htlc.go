@@ -39,6 +39,10 @@ func (k Keeper) CreateHTLC(
 
 	expirationHeight := uint64(ctx.BlockHeight()) + timeLock
 
+	if k.Maccs[to.String()] {
+		return id, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", to)
+	}
+
 	var direction types.SwapDirection
 	if transfer {
 		// create HTLT
@@ -96,10 +100,6 @@ func (k Keeper) createHTLT(
 ) {
 	var direction types.SwapDirection
 
-	if k.Maccs[to.String()] {
-		return direction, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", to)
-	}
-
 	if len(amount) != 1 {
 		return direction, sdkerrors.Wrapf(types.ErrInvalidAmount, amount.String())
 	}
@@ -118,9 +118,9 @@ func (k Keeper) createHTLT(
 		return direction, sdkerrors.Wrapf(types.ErrInvalidAmount, "amount %d outside range [%s, %s]", amount[0].Amount, asset.MinSwapAmount, asset.MaxSwapAmount)
 	}
 
-	// Unix timestamp must be in range [-15 mins, 30 mins] of the current time
-	pastTimestampLimit := ctx.BlockTime().Add(time.Duration(-15) * time.Minute).Unix()
-	futureTimestampLimit := ctx.BlockTime().Add(time.Duration(30) * time.Minute).Unix()
+	// Unix timestamp must be in range [-15 mins, 30 mins) of the current time
+	pastTimestampLimit := ctx.BlockTime().Add(-15 * time.Minute).Unix()
+	futureTimestampLimit := ctx.BlockTime().Add(30 * time.Minute).Unix()
 	if timestamp < uint64(pastTimestampLimit) || timestamp >= uint64(futureTimestampLimit) {
 		return direction, sdkerrors.Wrap(types.ErrInvalidTimestamp, fmt.Sprintf(
 			"timestamp can neither be 15 minutes ahead of the current time, nor 30 minutes later. block time: %s, timestamp: %s",
@@ -161,7 +161,7 @@ func (k Keeper) createHTLT(
 			return direction, sdkerrors.Wrapf(types.ErrInvalidTimeLock, "height span %d outside range [%d, %d]", timeLock, asset.MinBlockLock, asset.MaxBlockLock)
 		}
 		// Amount in outgoing swaps must be able to pay the deputy's fixed fee.
-		if amount[0].Amount.LTE(asset.FixedFee.Add(asset.MinSwapAmount)) {
+		if amount[0].Amount.LT(asset.FixedFee.Add(asset.MinSwapAmount)) {
 			return direction, sdkerrors.Wrap(types.ErrInsufficientAmount, amount[0].String())
 		}
 		if err := k.IncrementOutgoingAssetSupply(ctx, amount[0]); err != nil {
@@ -192,33 +192,33 @@ func (k Keeper) ClaimHTLC(
 	// query the HTLC
 	htlc, found := k.GetHTLC(ctx, id)
 	if !found {
-		return "", false, types.Invalid, sdkerrors.Wrap(types.ErrUnknownHTLC, id.String())
+		return "", false, types.None, sdkerrors.Wrap(types.ErrUnknownHTLC, id.String())
 	}
 
 	// check if the HTLC is open
 	if htlc.State != types.Open {
-		return "", false, types.Invalid, sdkerrors.Wrap(types.ErrHTLCNotOpen, id.String())
+		return "", false, types.None, sdkerrors.Wrap(types.ErrHTLCNotOpen, id.String())
 	}
 
 	hashLock, _ := hex.DecodeString(htlc.HashLock)
 
 	// check if the secret matches with the hash lock
 	if !bytes.Equal(types.GetHashLock(secret, htlc.Timestamp), hashLock) {
-		return "", false, types.Invalid, sdkerrors.Wrap(types.ErrInvalidSecret, secret.String())
+		return "", false, types.None, sdkerrors.Wrap(types.ErrInvalidSecret, secret.String())
 	}
 
 	to, err := sdk.AccAddressFromBech32(htlc.To)
 	if err != nil {
-		return "", false, types.Invalid, err
+		return "", false, types.None, err
 	}
 
 	if htlc.Transfer {
 		if err := k.claimHTLT(ctx, htlc); err != nil {
-			return "", false, types.Invalid, err
+			return "", false, types.None, err
 		}
 	} else {
 		if err := k.claimHTLC(ctx, htlc.Amount, to); err != nil {
-			return "", false, types.Invalid, err
+			return "", false, types.None, err
 		}
 	}
 

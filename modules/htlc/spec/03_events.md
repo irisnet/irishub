@@ -8,7 +8,7 @@ order: 3
 
 | Type        | Attribute Key | Attribute Value |
 | :---------- | :------------ | :-------------- |
-| refund_htlc | id            | {hashID}        |
+| refund_htlc | id            | {htlcID}        |
 
 ## Handlers
 
@@ -21,9 +21,6 @@ order: 3
 | create_htlc | receiver                | {receiverAddress}      |
 | create_htlc | receiver_on_other_chain | {receiverOnOtherChain} |
 | create_htlc | sender_on_other_chain   | {senderOnOtherChain}   |
-| create_htlc | amount                  | {amount}               |
-| create_htlc | hash_lock               | {hashLock}             |
-| create_htlc | time_lock               | {timeLock}             |
 | create_htlc | transfer                | `true`/`false`         |
 | message     | module                  | htlc                   |
 | message     | sender                  | {senderAddress}        |
