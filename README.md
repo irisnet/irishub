@@ -20,8 +20,8 @@ See the [install instructions](https://www.irisnet.org/docs/get-started/install.
 
 ## Resources
 
-* Explorer: <https://www.irisplorer.io>
-* Riot chat: <https://riot.im/app/#/room/#irisvalidators:matrix.org>
+* Explorer: <https://irishub.iobscan.io/>
+* Discord: <https://discord.gg/rUVw3RWfKp>
 
 ## How To Contribute
 
