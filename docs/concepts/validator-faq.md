@@ -226,7 +226,7 @@ The default number of files Linux can open (per-process) is `1024`. `iris` is kn
 
 Compare the two `Consensus Pubkey`:
 
-- From [Explorer](https://www.irisplorer.io/#/validators), you can find the `Consensus Pubkey` which you declared for your validator in the Validator Detail page.
+- From [Explorer](https://irishub.iobscan.io/#/staking), you can find the `Consensus Pubkey` which you declared for your validator in the Validator Detail page.
 
 - Check the `Consensus Pubkey` which you are now using via `iris tendermint show-validator --home=<iris-home>`
 
