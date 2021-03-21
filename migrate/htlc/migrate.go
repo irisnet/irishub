@@ -76,7 +76,7 @@ func Migrate(ctx sdk.Context, cdc codec.Marshaler, k htlckeeper.Keeper, bk bankk
 			State:                state,
 			ClosedBlock:          closedBlock,
 			Transfer:             false,
-			Direction:            htlctypes.Invalid,
+			Direction:            htlctypes.None,
 		}
 		// Set new htlc
 		k.SetHTLC(ctx, newHTLC, id)
