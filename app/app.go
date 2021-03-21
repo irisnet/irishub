@@ -111,6 +111,7 @@ import (
 	irisappparams "github.com/irisnet/irishub/app/params"
 	"github.com/irisnet/irishub/lite"
 	migratehtlc "github.com/irisnet/irishub/migrate/htlc"
+	migrateservice "github.com/irisnet/irishub/migrate/service"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
@@ -552,7 +553,12 @@ func NewIrisApp(
 	app.RegisterUpgradePlan(
 		"v1", nil,
 		func(ctx sdk.Context, plan sdkupgrade.Plan) {
+			// migrate htlc
 			if err := migratehtlc.Migrate(ctx, appCodec, app.htlcKeeper, app.bankKeeper); err != nil {
+				panic(err)
+			}
+			// migrate service
+			if err := migrateservice.Migrate(ctx, app.serviceKeeper, app.bankKeeper); err != nil {
 				panic(err)
 			}
 		},

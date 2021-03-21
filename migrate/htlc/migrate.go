@@ -8,11 +8,11 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
 	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
-	"github.com/irisnet/irismod/modules/htlc/types"
+	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 )
 
 func Migrate(ctx sdk.Context, cdc codec.Marshaler, k htlckeeper.Keeper, bk bankkeeper.Keeper) error {
-	store := ctx.KVStore(sdk.NewKVStoreKey(types.StoreKey))
+	store := ctx.KVStore(sdk.NewKVStoreKey(htlctypes.StoreKey))
 
 	// Delete expired queue
 	store.Delete(HTLCExpiredQueueKey)
@@ -34,33 +34,33 @@ func Migrate(ctx sdk.Context, cdc codec.Marshaler, k htlckeeper.Keeper, bk bankk
 		if err != nil {
 			return err
 		}
-		id := types.GetID(sender, receiver, htlc.Amount, hashLock)
+		id := htlctypes.GetID(sender, receiver, htlc.Amount, hashLock)
 		expirationHeight := htlc.ExpirationHeight
 		closedBlock := uint64(0)
 
-		var state types.HTLCState
+		var state htlctypes.HTLCState
 		switch htlc.State {
 		case Open:
-			state = types.Open
+			state = htlctypes.Open
 			// Add to expired queue
 			k.AddHTLCToExpiredQueue(ctx, expirationHeight, id)
 		case Completed:
-			state = types.Completed
+			state = htlctypes.Completed
 		case Expired:
 			// Refund expired htlc
-			state = types.Refunded
-			if err = bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sender, htlc.Amount); err != nil {
+			state = htlctypes.Refunded
+			if err := bk.SendCoinsFromModuleToAccount(ctx, htlctypes.ModuleName, sender, htlc.Amount); err != nil {
 				return err
 			}
 			closedBlock = uint64(ctx.BlockHeight())
 		case Refunded:
-			state = types.Refunded
+			state = htlctypes.Refunded
 		}
 
 		// Delete origin htlc
 		store.Delete(GetHTLCKey(hashLock))
 
-		newHTLC := types.HTLC{
+		newHTLC := htlctypes.HTLC{
 			Id:                   id.String(),
 			Sender:               htlc.Sender,
 			To:                   htlc.To,
@@ -74,7 +74,7 @@ func Migrate(ctx sdk.Context, cdc codec.Marshaler, k htlckeeper.Keeper, bk bankk
 			State:                state,
 			ClosedBlock:          closedBlock,
 			Transfer:             false,
-			Direction:            types.Invalid,
+			Direction:            htlctypes.Invalid,
 		}
 		// Set new htlc
 		k.SetHTLC(ctx, newHTLC, id)
