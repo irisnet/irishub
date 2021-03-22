@@ -13,8 +13,8 @@ import (
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 )
 
-func Migrate(ctx sdk.Context, cdc codec.Marshaler, k htlckeeper.Keeper, bk bankkeeper.Keeper) error {
-	store := ctx.KVStore(sdk.NewKVStoreKey(htlctypes.StoreKey))
+func Migrate(ctx sdk.Context, cdc codec.Marshaler, k htlckeeper.Keeper, bk bankkeeper.Keeper, key *sdk.KVStoreKey) error {
+	store := ctx.KVStore(key)
 
 	// Delete expired queue
 	store.Delete(HTLCExpiredQueueKey)

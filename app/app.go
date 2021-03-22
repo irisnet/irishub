@@ -550,10 +550,10 @@ func NewIrisApp(
 	app.SetEndBlocker(app.EndBlocker)
 	// Set software upgrade execution logic
 	app.RegisterUpgradePlan(
-		"v1", nil,
+		"v1", &store.StoreUpgrades{},
 		func(ctx sdk.Context, plan sdkupgrade.Plan) {
 			// migrate htlc
-			if err := migratehtlc.Migrate(ctx, appCodec, app.htlcKeeper, app.bankKeeper); err != nil {
+			if err := migratehtlc.Migrate(ctx, appCodec, app.htlcKeeper, app.bankKeeper, keys[htlctypes.StoreKey]); err != nil {
 				panic(err)
 			}
 			// migrate service
