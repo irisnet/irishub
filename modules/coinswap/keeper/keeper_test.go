@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	denomStandard = types.StandardDenom
+	denomStandard = sdk.DefaultBondDenom
 	denomBTC      = "btc"
 	denomETH      = "eth"
 	unidenomBTC   = types.FormatUniABSPrefix + denomBTC

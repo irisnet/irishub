@@ -14,7 +14,7 @@ func NewGenesisState(params Params, denom string) *GenesisState {
 
 // DefaultGenesisState creates a default GenesisState object
 func DefaultGenesisState() *GenesisState {
-	return NewGenesisState(DefaultParams(), StandardDenom)
+	return NewGenesisState(DefaultParams(), sdk.DefaultBondDenom)
 }
 
 // ValidateGenesis validates the given genesis state

@@ -9,11 +9,6 @@ import (
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
-const (
-	// StandardDenom for coinswap
-	StandardDenom = sdk.DefaultBondDenom
-)
-
 // Parameter store keys
 var (
 	KeyFee           = []byte("Fee")           // fee key

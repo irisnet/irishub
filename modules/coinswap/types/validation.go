@@ -54,10 +54,6 @@ func ValidateMaxToken(maxToken sdk.Coin) error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid maxToken (%s)", maxToken.String())
 	}
 
-	if maxToken.Denom == StandardDenom {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("max token must not be standard token: %s", StandardDenom))
-	}
-
 	if strings.HasPrefix(maxToken.Denom, FormatUniABSPrefix) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "max token must be non-liquidity token")
 	}

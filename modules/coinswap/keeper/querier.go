@@ -31,10 +31,7 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuer
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
-	uniDenom, err := types.GetUniDenomFromDenom(params.Denom)
-	if err != nil {
-		return nil, err
-	}
+	uniDenom := types.GetUniDenomFromDenom(params.Denom)
 
 	standardDenom := k.GetStandardDenom(ctx)
 	reservePool, err := k.GetReservePool(ctx, uniDenom)

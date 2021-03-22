@@ -92,10 +92,11 @@ func (k Keeper) Swap(ctx sdk.Context, msg *types.MsgSwapOrder) error {
 // AddLiquidity adds liquidity to the specified pool
 func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.Coin, error) {
 	standardDenom := k.GetStandardDenom(ctx)
-	uniDenom, err := types.GetUniDenomFromDenom(msg.MaxToken.Denom)
-	if err != nil {
-		return sdk.Coin{}, err
+	if standardDenom == msg.MaxToken.Denom {
+		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrInvalidDenom,
+			"MaxToken: %s should not be StandardDenom", msg.MaxToken.String())
 	}
+	uniDenom := types.GetUniDenomFromDenom(msg.MaxToken.Denom)
 
 	liquidity := k.bk.GetSupply(ctx).GetTotal().AmountOf(uniDenom)
 

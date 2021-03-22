@@ -202,8 +202,7 @@ func createReservePool(suite *TestSuite, denom string) (sdk.AccAddress, sdk.AccA
 		),
 	)
 
-	uniDenom, err := types.GetUniDenomFromDenom(denom)
-	suite.NoError(err)
+	uniDenom := types.GetUniDenomFromDenom(denom)
 	reservePoolAddr := types.GetReservePoolAddr(uniDenom)
 
 	depositAmt, _ := sdk.NewIntFromString("1000")
@@ -213,7 +212,7 @@ func createReservePool(suite *TestSuite, denom string) (sdk.AccAddress, sdk.AccA
 	minReward := sdk.NewInt(1)
 	deadline := time.Now().Add(1 * time.Minute)
 	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender.String())
-	_, err = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
+	_, err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
 	suite.NoError(err)
 
 	moduleAccountBalances := suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()

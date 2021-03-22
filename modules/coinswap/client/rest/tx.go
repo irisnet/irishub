@@ -151,11 +151,7 @@ func removeLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		uniDenom, e := types.GetUniDenomFromDenom(denom)
-		if e != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, e.Error())
-			return
-		}
+		uniDenom := types.GetUniDenomFromDenom(denom)
 
 		msg := types.NewMsgRemoveLiquidity(
 			minToken, sdk.NewCoin(uniDenom, liquidityAmt), minStandard, deadline.Unix(), req.Sender,

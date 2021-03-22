@@ -60,17 +60,6 @@ func TestMsgAddLiquidity_ValidateBasic(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "right test case",
-			wantErr: true,
-			fields: fields{
-				MaxToken:         buildCoin("stake", 1000),
-				ExactStandardAmt: sdk.NewInt(100),
-				MinLiquidity:     sdk.NewInt(100),
-				Deadline:         1611213344,
-				Sender:           sender,
-			},
-		},
-		{
 			name:    "invalid MaxToken denom",
 			wantErr: true,
 			fields: fields{

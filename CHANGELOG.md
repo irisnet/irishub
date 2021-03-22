@@ -39,6 +39,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ### Bug Fixes
 
+* (modules/coinswap) [\#161](https://github.com/irisnet/irismod/pull/161) Fix coinswap token validation.
 * (modules/htlc) [\#157](https://github.com/irisnet/irismod/pull/157) Fix htlc params validation.
 * (modules/htlc) [\#156](https://github.com/irisnet/irismod/pull/156) Fix validation when creating HTLT.
 * (modules/coinswap) [\#155](https://github.com/irisnet/irismod/pull/155) Fix min liquidity check in add liquidity.

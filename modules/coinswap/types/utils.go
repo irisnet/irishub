@@ -20,11 +20,8 @@ func GetTokenPairByDenom(inputDenom, outputDenom string) string {
 }
 
 // GetUniDenomFromDenom returns the uni denom for the provided denomination.
-func GetUniDenomFromDenom(denom string) (string, error) {
-	if denom == StandardDenom {
-		return "", ErrMustStandardDenom
-	}
-	return fmt.Sprintf(FormatUniDenom, denom), nil
+func GetUniDenomFromDenom(denom string) string {
+	return fmt.Sprintf(FormatUniDenom, denom)
 }
 
 // GetCoinDenomFromUniDenom returns the token denom by uni denom

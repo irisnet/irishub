@@ -20,10 +20,7 @@ func (k Keeper) Liquidity(c context.Context, req *types.QueryLiquidityRequest) (
 	}
 
 	tokenDenom := req.Denom
-	uniDenom, err := types.GetUniDenomFromDenom(tokenDenom)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-	}
+	uniDenom := types.GetUniDenomFromDenom(tokenDenom)
 
 	ctx := sdk.UnwrapSDKContext(c)
 	reservePool, err := k.GetReservePool(ctx, uniDenom)
