@@ -30838,12 +30838,12 @@ paths:
                   direction:
                     type: string
                     enum:
-                      - INVALID
+                      - NONE
                       - INCOMING
                       - OUTGOING
-                    default: INVALID
+                    default: NONE
                     description: |-
-                      - INVALID: INVALID defines an htlt invalid direction.
+                      - NONE: NONE defines an htlt none direction.
                        - INCOMING: INCOMING defines an htlt incoming direction.
                        - OUTGOING: OUTGOING defines an htlt outgoing direction.
                     title: SwapDirection defines the direction of an HTLT
@@ -53568,12 +53568,12 @@ definitions:
       direction:
         type: string
         enum:
-          - INVALID
+          - NONE
           - INCOMING
           - OUTGOING
-        default: INVALID
+        default: NONE
         description: |-
-          - INVALID: INVALID defines an htlt invalid direction.
+          - NONE: NONE defines an htlt none direction.
            - INCOMING: INCOMING defines an htlt incoming direction.
            - OUTGOING: OUTGOING defines an htlt outgoing direction.
         title: SwapDirection defines the direction of an HTLT
@@ -53835,12 +53835,12 @@ definitions:
           direction:
             type: string
             enum:
-              - INVALID
+              - NONE
               - INCOMING
               - OUTGOING
-            default: INVALID
+            default: NONE
             description: |-
-              - INVALID: INVALID defines an htlt invalid direction.
+              - NONE: NONE defines an htlt none direction.
                - INCOMING: INCOMING defines an htlt incoming direction.
                - OUTGOING: OUTGOING defines an htlt outgoing direction.
             title: SwapDirection defines the direction of an HTLT
@@ -53902,12 +53902,12 @@ definitions:
   irismod.htlc.SwapDirection:
     type: string
     enum:
-      - INVALID
+      - NONE
       - INCOMING
       - OUTGOING
-    default: INVALID
+    default: NONE
     description: |-
-      - INVALID: INVALID defines an htlt invalid direction.
+      - NONE: NONE defines an htlt none direction.
        - INCOMING: INCOMING defines an htlt incoming direction.
        - OUTGOING: OUTGOING defines an htlt outgoing direction.
     title: SwapDirection defines the direction of an HTLT
