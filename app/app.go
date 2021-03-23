@@ -397,11 +397,17 @@ func NewIrisApp(
 	app.evidenceKeeper = *evidenceKeeper
 
 	app.guardianKeeper = guardiankeeper.NewKeeper(appCodec, keys[guardiantypes.StoreKey])
+
 	app.tokenKeeper = tokenkeeper.NewKeeper(
-		appCodec, keys[tokentypes.StoreKey], app.GetSubspace(tokentypes.ModuleName),
-		app.bankKeeper, authtypes.FeeCollectorName,
+		appCodec,
+		keys[tokentypes.StoreKey],
+		app.GetSubspace(tokentypes.ModuleName),
+		app.bankKeeper,
+		app.ModuleAccountAddrs(),
+		authtypes.FeeCollectorName,
 	)
 	app.recordKeeper = recordkeeper.NewKeeper(appCodec, keys[recordtypes.StoreKey])
+
 	app.nftKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey])
 
 	app.htlcKeeper = htlckeeper.NewKeeper(
@@ -413,21 +419,37 @@ func NewIrisApp(
 	)
 
 	app.coinswapKeeper = coinswapkeeper.NewKeeper(
-		appCodec, keys[coinswaptypes.StoreKey], app.GetSubspace(coinswaptypes.ModuleName),
-		app.bankKeeper, app.accountKeeper,
+		appCodec,
+		keys[coinswaptypes.StoreKey],
+		app.GetSubspace(coinswaptypes.ModuleName),
+		app.bankKeeper,
+		app.accountKeeper,
+		app.ModuleAccountAddrs(),
 	)
 
 	app.serviceKeeper = servicekeeper.NewKeeper(
-		appCodec, keys[servicetypes.StoreKey], app.accountKeeper, app.bankKeeper,
-		app.GetSubspace(servicetypes.ModuleName), servicetypes.FeeCollectorName,
+		appCodec,
+		keys[servicetypes.StoreKey],
+		app.accountKeeper,
+		app.bankKeeper,
+		app.GetSubspace(servicetypes.ModuleName),
+		app.ModuleAccountAddrs(),
+		servicetypes.FeeCollectorName,
 	)
 
 	app.oracleKeeper = oraclekeeper.NewKeeper(
-		appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName),
+		appCodec,
+		keys[oracletypes.StoreKey],
+		app.GetSubspace(oracletypes.ModuleName),
 		app.serviceKeeper,
 	)
 
-	app.randomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey], app.bankKeeper, app.serviceKeeper)
+	app.randomKeeper = randomkeeper.NewKeeper(
+		appCodec,
+		keys[randomtypes.StoreKey],
+		app.bankKeeper,
+		app.serviceKeeper,
+	)
 
 	/****  Module Options ****/
 	var skipGenesisInvariants = false
