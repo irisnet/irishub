@@ -104,8 +104,8 @@ func PresetHTLTParams() htlctypes.Params {
 				FixedFee:      sdk.NewInt(1000),
 				MinSwapAmount: sdk.OneInt(),
 				MaxSwapAmount: sdk.NewInt(1000000000000),
-				MinBlockLock:  htlctypes.DefaultMinBlockLock,
-				MaxBlockLock:  htlctypes.DefaultMaxBlockLock,
+				MinBlockLock:  50,
+				MaxBlockLock:  34560,
 			},
 			{
 				Denom: "htltbcbusd",
@@ -120,8 +120,8 @@ func PresetHTLTParams() htlctypes.Params {
 				FixedFee:      sdk.NewInt(1000),
 				MinSwapAmount: sdk.OneInt(),
 				MaxSwapAmount: sdk.NewInt(1000000000000),
-				MinBlockLock:  htlctypes.DefaultMinBlockLock,
-				MaxBlockLock:  htlctypes.DefaultMaxBlockLock,
+				MinBlockLock:  50,
+				MaxBlockLock:  34560,
 			},
 		},
 	}
