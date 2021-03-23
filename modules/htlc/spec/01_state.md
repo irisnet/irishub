@@ -60,7 +60,7 @@ var HTLCState_value = map[string]int32{
 
 `SwapDirection` defines the direction of an HTLT
 
-- `INVALID` defines an htlt invalid direction
+- `NONE` defines an htlt invalid direction
 - `INCOMING` defines an htlt incoming direction
 - `OUTGOING` defines an htlt outgoing direction
 
@@ -68,7 +68,7 @@ var HTLCState_value = map[string]int32{
 type SwapDirection int32
 
 const (
-    // INVALID defines an htlt invalid direction.
+    // NONE defines an htlt invalid direction.
     None SwapDirection = 0
     // INCOMING defines an htlt incoming direction.
     Incoming SwapDirection = 1

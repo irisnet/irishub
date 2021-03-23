@@ -44,8 +44,8 @@ enum HTLCState {
 enum SwapDirection {
     option (gogoproto.goproto_enum_prefix) = false;
 
-    // INVALID defines an htlt invalid direction.
-    INVALID = 0 [ (gogoproto.enumvalue_customname) = "None" ];
+    // NONE defines an htlt none direction.
+    NONE = 0 [ (gogoproto.enumvalue_customname) = "None" ];
     // INCOMING defines an htlt incoming direction.
     INCOMING = 1 [ (gogoproto.enumvalue_customname) = "Incoming" ];
     // OUTGOING defines an htlt outgoing direction.
