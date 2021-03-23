@@ -156,13 +156,17 @@ func (k Keeper) createHTLT(
 			return direction, err
 		}
 	case types.Outgoing:
-		// Outgoing swaps must have a height span within the accepted range
+		// Outgoing swaps must have a time lock within the accepted range
 		if timeLock < asset.MinBlockLock || timeLock > asset.MaxBlockLock {
-			return direction, sdkerrors.Wrapf(types.ErrInvalidTimeLock, "height span %d outside range [%d, %d]", timeLock, asset.MinBlockLock, asset.MaxBlockLock)
+			return direction, sdkerrors.Wrapf(types.ErrInvalidTimeLock, "time lock %d outside range [%d, %d]", timeLock, asset.MinBlockLock, asset.MaxBlockLock)
 		}
 		// Amount in outgoing swaps must be able to pay the deputy's fixed fee.
 		if amount[0].Amount.LT(asset.FixedFee.Add(asset.MinSwapAmount)) {
-			return direction, sdkerrors.Wrap(types.ErrInsufficientAmount, amount[0].String())
+			return direction, sdkerrors.Wrapf(
+				types.ErrInsufficientAmount,
+				"amount %s < fixed fee %s + min swap amount %s",
+				amount[0].String(), asset.FixedFee.String(), asset.MinSwapAmount,
+			)
 		}
 		if err := k.IncrementOutgoingAssetSupply(ctx, amount[0]); err != nil {
 			return direction, err
@@ -172,7 +176,7 @@ func (k Keeper) createHTLT(
 			return direction, err
 		}
 	default:
-		return direction, sdkerrors.Wrapf(types.ErrInvalidSwapDirection, direction.String())
+		return direction, sdkerrors.Wrapf(types.ErrInvalidDirection, direction.String())
 	}
 
 	return direction, nil
@@ -268,7 +272,7 @@ func (k Keeper) claimHTLT(ctx sdk.Context, htlc types.HTLC) error {
 			return err
 		}
 	default:
-		return sdkerrors.Wrapf(types.ErrInvalidSwapDirection, htlc.Direction.String())
+		return sdkerrors.Wrapf(types.ErrInvalidDirection, htlc.Direction.String())
 	}
 
 	return nil
