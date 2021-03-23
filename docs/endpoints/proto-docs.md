@@ -7725,7 +7725,7 @@ SwapDirection defines the direction of an HTLT
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
-| INVALID | 0 | INVALID defines an htlt invalid direction. |
+| NONE | 0 | NONE defines an htlt none direction. |
 | INCOMING | 1 | INCOMING defines an htlt incoming direction. |
 | OUTGOING | 2 | OUTGOING defines an htlt outgoing direction. |
 
