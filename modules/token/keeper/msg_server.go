@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/token/types"
 )
@@ -25,6 +26,10 @@ func (m msgServer) IssueToken(goCtx context.Context, msg *types.MsgIssueToken) (
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
 		return nil, err
+	}
+
+	if m.Keeper.blockedAddrs[msg.Owner] {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.Owner)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -105,6 +110,10 @@ func (m msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 		recipient = owner
 	}
 
+	if m.Keeper.blockedAddrs[recipient.String()] {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", recipient)
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := m.Keeper.DeductMintTokenFee(ctx, owner, msg.Symbol); err != nil {
@@ -168,6 +177,10 @@ func (m msgServer) TransferTokenOwner(goCtx context.Context, msg *types.MsgTrans
 	dstOwner, err := sdk.AccAddressFromBech32(msg.DstOwner)
 	if err != nil {
 		return nil, err
+	}
+
+	if m.Keeper.blockedAddrs[msg.DstOwner] {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.DstOwner)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)

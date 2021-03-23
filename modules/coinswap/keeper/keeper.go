@@ -18,18 +18,26 @@ import (
 
 // Keeper of the coinswap store
 type Keeper struct {
-	cdc        codec.Marshaler
-	storeKey   sdk.StoreKey
-	bk         types.BankKeeper
-	ak         types.AccountKeeper
-	paramSpace paramstypes.Subspace
+	cdc          codec.Marshaler
+	storeKey     sdk.StoreKey
+	bk           types.BankKeeper
+	ak           types.AccountKeeper
+	paramSpace   paramstypes.Subspace
+	blockedAddrs map[string]bool
 }
 
 // NewKeeper returns a coinswap keeper. It handles:
 // - creating new ModuleAccounts for each trading pair
 // - burning and minting liquidity coins
 // - sending to and from ModuleAccounts
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, paramSpace paramstypes.Subspace, bk types.BankKeeper, ak types.AccountKeeper) Keeper {
+func NewKeeper(
+	cdc codec.Marshaler,
+	key sdk.StoreKey,
+	paramSpace paramstypes.Subspace,
+	bk types.BankKeeper,
+	ak types.AccountKeeper,
+	blockedAddrs map[string]bool,
+) Keeper {
 	// ensure coinswap module account is set
 	if addr := ak.GetModuleAddress(types.ModuleName); addr == nil {
 		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
@@ -41,11 +49,12 @@ func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, paramSpace paramstypes.Sub
 	}
 
 	return Keeper{
-		storeKey:   key,
-		bk:         bk,
-		ak:         ak,
-		cdc:        cdc,
-		paramSpace: paramSpace,
+		storeKey:     key,
+		bk:           bk,
+		ak:           ak,
+		cdc:          cdc,
+		paramSpace:   paramSpace,
+		blockedAddrs: blockedAddrs,
 	}
 }
 

@@ -39,10 +39,6 @@ func (k Keeper) CreateHTLC(
 
 	expirationHeight := uint64(ctx.BlockHeight()) + timeLock
 
-	if k.Maccs[to.String()] {
-		return id, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", to)
-	}
-
 	var direction types.SwapDirection
 	if transfer {
 		// create HTLT
@@ -122,9 +118,12 @@ func (k Keeper) createHTLT(
 	pastTimestampLimit := ctx.BlockTime().Add(-15 * time.Minute).Unix()
 	futureTimestampLimit := ctx.BlockTime().Add(30 * time.Minute).Unix()
 	if timestamp < uint64(pastTimestampLimit) || timestamp >= uint64(futureTimestampLimit) {
-		return direction, sdkerrors.Wrap(types.ErrInvalidTimestamp, fmt.Sprintf(
-			"timestamp can neither be 15 minutes ahead of the current time, nor 30 minutes later. block time: %s, timestamp: %s",
-			ctx.BlockTime().String(), time.Unix(int64(timestamp), 0).UTC().String()),
+		return direction, sdkerrors.Wrap(
+			types.ErrInvalidTimestamp,
+			fmt.Sprintf(
+				"timestamp can neither be 15 minutes ahead of the current time, nor 30 minutes later. block time: %s, timestamp: %s",
+				ctx.BlockTime().String(), time.Unix(int64(timestamp), 0).UTC().String(),
+			),
 		)
 	}
 

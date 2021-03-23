@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/htlc/types"
 )
@@ -37,6 +38,10 @@ func (m msgServer) CreateHTLC(goCtx context.Context, msg *types.MsgCreateHTLC) (
 	hashLock, err := hex.DecodeString(msg.HashLock)
 	if err != nil {
 		return nil, err
+	}
+
+	if m.Keeper.blockedAddrs[msg.To] {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.To)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)

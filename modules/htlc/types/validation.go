@@ -56,7 +56,6 @@ func ValidateID(id string) error {
 	if len(id) != HTLCIDLength {
 		return sdkerrors.Wrapf(ErrInvalidID, "length of the htlc id must be %d", HTLCIDLength)
 	}
-
 	if _, err := hex.DecodeString(id); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidID, "id must be a hex encoded string")
 	}
@@ -68,7 +67,6 @@ func ValidateHashLock(hashLock string) error {
 	if len(hashLock) != HashLockLength {
 		return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d", HashLockLength)
 	}
-
 	if _, err := hex.DecodeString(hashLock); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidHashLock, "hash lock must be a hex encoded string")
 	}
@@ -88,7 +86,6 @@ func ValidateSecret(secret string) error {
 	if len(secret) != SecretLength {
 		return sdkerrors.Wrapf(ErrInvalidSecret, "length of the secret must be %d", SecretLength)
 	}
-
 	if _, err := hex.DecodeString(secret); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidSecret, "secret must be a hex encoded string")
 	}

@@ -14,20 +14,21 @@ import (
 )
 
 type Keeper struct {
-	storeKey sdk.StoreKey
-	cdc      codec.Marshaler
-
-	bankKeeper types.BankKeeper
-
+	storeKey         sdk.StoreKey
+	cdc              codec.Marshaler
+	bankKeeper       types.BankKeeper
+	paramSpace       paramstypes.Subspace
+	blockedAddrs     map[string]bool
 	feeCollectorName string
-
-	// params subspace
-	paramSpace paramstypes.Subspace
 }
 
 func NewKeeper(
-	cdc codec.Marshaler, key sdk.StoreKey, paramSpace paramstypes.Subspace,
-	bankKeeper types.BankKeeper, feeCollectorName string,
+	cdc codec.Marshaler,
+	key sdk.StoreKey,
+	paramSpace paramstypes.Subspace,
+	bankKeeper types.BankKeeper,
+	blockedAddrs map[string]bool,
+	feeCollectorName string,
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !paramSpace.HasKeyTable() {
@@ -40,6 +41,7 @@ func NewKeeper(
 		paramSpace:       paramSpace,
 		bankKeeper:       bankKeeper,
 		feeCollectorName: feeCollectorName,
+		blockedAddrs:     blockedAddrs,
 	}
 }
 

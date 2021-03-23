@@ -142,6 +142,10 @@ func (m msgServer) SetWithdrawAddress(goCtx context.Context, msg *types.MsgSetWi
 		return nil, err
 	}
 
+	if m.Keeper.blockedAddrs[msg.WithdrawAddress] {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.WithdrawAddress)
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	m.Keeper.SetWithdrawAddress(ctx, owner, withdrawAddress)
 

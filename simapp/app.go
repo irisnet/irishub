@@ -369,26 +369,43 @@ func NewSimApp(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	app.TokenKeeper = tokenkeeper.NewKeeper(
-		appCodec, keys[tokentypes.StoreKey], app.GetSubspace(tokentypes.ModuleName),
-		app.BankKeeper, authtypes.FeeCollectorName,
+		appCodec,
+		keys[tokentypes.StoreKey],
+		app.GetSubspace(tokentypes.ModuleName),
+		app.BankKeeper,
+		app.ModuleAccountAddrs(),
+		authtypes.FeeCollectorName,
 	)
 	app.RecordKeeper = recordkeeper.NewKeeper(appCodec, keys[recordtypes.StoreKey])
 
 	app.NFTKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey])
 
 	app.HTLCKeeper = htlckeeper.NewKeeper(
-		appCodec, keys[htlctypes.StoreKey], app.GetSubspace(htlctypes.ModuleName),
-		app.AccountKeeper, app.BankKeeper, app.ModuleAccountAddrs(),
+		appCodec,
+		keys[htlctypes.StoreKey],
+		app.GetSubspace(htlctypes.ModuleName),
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.ModuleAccountAddrs(),
 	)
 
 	app.CoinswapKeeper = coinswapkeeper.NewKeeper(
-		appCodec, keys[coinswaptypes.StoreKey], app.GetSubspace(coinswaptypes.ModuleName),
-		app.BankKeeper, app.AccountKeeper,
+		appCodec,
+		keys[coinswaptypes.StoreKey],
+		app.GetSubspace(coinswaptypes.ModuleName),
+		app.BankKeeper,
+		app.AccountKeeper,
+		app.ModuleAccountAddrs(),
 	)
 
 	app.ServiceKeeper = servicekeeper.NewKeeper(
-		appCodec, keys[servicetypes.StoreKey], app.AccountKeeper, app.BankKeeper,
-		app.GetSubspace(servicetypes.ModuleName), servicetypes.FeeCollectorName,
+		appCodec,
+		keys[servicetypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.GetSubspace(servicetypes.ModuleName),
+		app.ModuleAccountAddrs(),
+		servicetypes.FeeCollectorName,
 	)
 
 	app.OracleKeeper = oracleKeeper.NewKeeper(

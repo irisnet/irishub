@@ -21,7 +21,7 @@ type Keeper struct {
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
 	paramSpace    paramstypes.Subspace
-
+	blockedAddrs  map[string]bool
 	// name of the fee collector
 	feeCollectorName string
 
@@ -42,6 +42,7 @@ func NewKeeper(
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	paramSpace paramstypes.Subspace,
+	blockedAddrs map[string]bool,
 	feeCollectorName string,
 ) Keeper {
 	// ensure service module accounts are set
@@ -63,8 +64,9 @@ func NewKeeper(
 		cdc:              cdc,
 		accountKeeper:    accountKeeper,
 		bankKeeper:       bankKeeper,
-		feeCollectorName: feeCollectorName,
 		paramSpace:       paramSpace,
+		blockedAddrs:     blockedAddrs,
+		feeCollectorName: feeCollectorName,
 	}
 
 	keeper.respCallbacks = make(map[string]types.ResponseCallback)
