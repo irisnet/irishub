@@ -67,7 +67,7 @@ func TestMsgCreateHTLCValidation(t *testing.T) {
 	invalidAmount := sdk.Coins{}
 	invalidHashLock := "0x"
 	invalidSmallTimeLock := uint64(49)
-	invalidLargeTimeLock := uint64(25481)
+	invalidLargeTimeLock := uint64(34561)
 
 	testMsgs := []MsgCreateHTLC{
 		NewMsgCreateHTLC(senderStr, recipientStr, receiverOnOtherChain, senderOnOtherChain, amount, hashLockStr, timestamp, timeLock, notTransfer),             // valid htlc msg

@@ -19,7 +19,7 @@ const (
 	// MinTimeLock is the minimum time span for HTLC in blocks
 	MinTimeLock = 50
 	// MaxTimeLock is the maximum time span for HTLC in blocks
-	MaxTimeLock = 25480
+	MaxTimeLock = 34560
 	// MinDenomLength is the min length of the htlt token denom
 	MinDenomLength = 6
 )
