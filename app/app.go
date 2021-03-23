@@ -7,6 +7,7 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
+	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -22,6 +23,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
+	store "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -76,6 +78,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
+	sdkupgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/irisnet/irismod/modules/coinswap"
@@ -106,6 +109,8 @@ import (
 	"github.com/irisnet/irishub/address"
 	irisappparams "github.com/irisnet/irishub/app/params"
 	"github.com/irisnet/irishub/lite"
+	migratehtlc "github.com/irisnet/irishub/migrate/htlc"
+	migrateservice "github.com/irisnet/irishub/migrate/service"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
@@ -132,7 +137,10 @@ var (
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
-			paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler, upgradeclient.CancelProposalHandler,
+			paramsclient.ProposalHandler,
+			distrclient.ProposalHandler,
+			upgradeclient.ProposalHandler,
+			upgradeclient.CancelProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -142,6 +150,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+
 		guardian.AppModuleBasic{},
 		token.AppModuleBasic{},
 		record.AppModuleBasic{},
@@ -163,30 +172,27 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		tokentypes.ModuleName:          {authtypes.Minter, authtypes.Burner},
-		htlctypes.ModuleName:           nil,
+		htlctypes.ModuleName:           {authtypes.Minter, authtypes.Burner},
 		coinswaptypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
 		servicetypes.DepositAccName:    {authtypes.Burner},
 		servicetypes.RequestAccName:    nil,
 		servicetypes.FeeCollectorName:  {authtypes.Burner},
 	}
 
-	// module accounts that are allowed to receive tokens
-	allowedReceivingModAcc = map[string]bool{
-		distrtypes.ModuleName: true,
-	}
-
 	nativeToken tokentypes.Token
 )
 
-// Verify app interface at compile time
-var _ simapp.App = (*IrisApp)(nil)
+var (
+	_ simapp.App              = (*IrisApp)(nil)
+	_ servertypes.Application = (*IrisApp)(nil)
+)
 
 // IrisApp extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
 // capabilities aren't needed for testing.
 type IrisApp struct {
 	*baseapp.BaseApp
-	cdc               *codec.LegacyAmino
+	legacyAmino       *codec.LegacyAmino
 	appCodec          codec.Marshaler
 	interfaceRegistry types.InterfaceRegistry
 
@@ -281,7 +287,7 @@ func NewIrisApp(
 
 	// TODO: Remove cdc in favor of appCodec once all modules are migrated.
 	appCodec := encodingConfig.Marshaler
-	cdc := encodingConfig.Amino
+	legacyAmino := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
 	bApp := baseapp.NewBaseApp(appName, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
@@ -302,7 +308,7 @@ func NewIrisApp(
 
 	app := &IrisApp{
 		BaseApp:           bApp,
-		cdc:               cdc,
+		legacyAmino:       legacyAmino,
 		appCodec:          appCodec,
 		interfaceRegistry: interfaceRegistry,
 		invCheckPeriod:    invCheckPeriod,
@@ -311,7 +317,7 @@ func NewIrisApp(
 		memKeys:           memKeys,
 	}
 
-	app.paramsKeeper = initParamsKeeper(appCodec, cdc, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
+	app.paramsKeeper = initParamsKeeper(appCodec, legacyAmino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
 
 	// set the BaseApp's parameter store
 	bApp.SetParamStore(app.paramsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramskeeper.ConsensusParamsKeyTable()))
@@ -326,7 +332,7 @@ func NewIrisApp(
 		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
 	)
 	app.bankKeeper = bankkeeper.NewBaseKeeper(
-		appCodec, keys[banktypes.StoreKey], app.accountKeeper, app.GetSubspace(banktypes.ModuleName), app.BlockedAddrs(),
+		appCodec, keys[banktypes.StoreKey], app.accountKeeper, app.GetSubspace(banktypes.ModuleName), app.ModuleAccountAddrs(),
 	)
 	stakingKeeper := stakingkeeper.NewKeeper(
 		appCodec, keys[stakingtypes.StoreKey], app.accountKeeper, app.bankKeeper, app.GetSubspace(stakingtypes.ModuleName),
@@ -391,31 +397,59 @@ func NewIrisApp(
 	app.evidenceKeeper = *evidenceKeeper
 
 	app.guardianKeeper = guardiankeeper.NewKeeper(appCodec, keys[guardiantypes.StoreKey])
+
 	app.tokenKeeper = tokenkeeper.NewKeeper(
-		appCodec, keys[tokentypes.StoreKey], app.GetSubspace(tokentypes.ModuleName),
-		app.bankKeeper, authtypes.FeeCollectorName,
+		appCodec,
+		keys[tokentypes.StoreKey],
+		app.GetSubspace(tokentypes.ModuleName),
+		app.bankKeeper,
+		app.ModuleAccountAddrs(),
+		authtypes.FeeCollectorName,
 	)
 	app.recordKeeper = recordkeeper.NewKeeper(appCodec, keys[recordtypes.StoreKey])
+
 	app.nftKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey])
 
-	app.htlcKeeper = htlckeeper.NewKeeper(appCodec, keys[htlctypes.StoreKey], app.accountKeeper, app.bankKeeper)
+	app.htlcKeeper = htlckeeper.NewKeeper(
+		appCodec, keys[htlctypes.StoreKey],
+		app.GetSubspace(htlctypes.ModuleName),
+		app.accountKeeper,
+		app.bankKeeper,
+		app.ModuleAccountAddrs(),
+	)
 
 	app.coinswapKeeper = coinswapkeeper.NewKeeper(
-		appCodec, keys[coinswaptypes.StoreKey], app.GetSubspace(coinswaptypes.ModuleName),
-		app.bankKeeper, app.accountKeeper,
+		appCodec,
+		keys[coinswaptypes.StoreKey],
+		app.GetSubspace(coinswaptypes.ModuleName),
+		app.bankKeeper,
+		app.accountKeeper,
+		app.ModuleAccountAddrs(),
 	)
 
 	app.serviceKeeper = servicekeeper.NewKeeper(
-		appCodec, keys[servicetypes.StoreKey], app.accountKeeper, app.bankKeeper,
-		app.GetSubspace(servicetypes.ModuleName), servicetypes.FeeCollectorName,
+		appCodec,
+		keys[servicetypes.StoreKey],
+		app.accountKeeper,
+		app.bankKeeper,
+		app.GetSubspace(servicetypes.ModuleName),
+		app.ModuleAccountAddrs(),
+		servicetypes.FeeCollectorName,
 	)
 
 	app.oracleKeeper = oraclekeeper.NewKeeper(
-		appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName),
+		appCodec,
+		keys[oracletypes.StoreKey],
+		app.GetSubspace(oracletypes.ModuleName),
 		app.serviceKeeper,
 	)
 
-	app.randomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey], app.bankKeeper, app.serviceKeeper)
+	app.randomKeeper = randomkeeper.NewKeeper(
+		appCodec,
+		keys[randomtypes.StoreKey],
+		app.bankKeeper,
+		app.serviceKeeper,
+	)
 
 	/****  Module Options ****/
 	var skipGenesisInvariants = false
@@ -536,6 +570,20 @@ func NewIrisApp(
 		encodingConfig.TxConfig.SignModeHandler(),
 	))
 	app.SetEndBlocker(app.EndBlocker)
+	// Set software upgrade execution logic
+	app.RegisterUpgradePlan(
+		"v1.1", &store.StoreUpgrades{},
+		func(ctx sdk.Context, plan sdkupgrade.Plan) {
+			// migrate htlc
+			if err := migratehtlc.Migrate(ctx, appCodec, app.htlcKeeper, app.bankKeeper, keys[htlctypes.StoreKey]); err != nil {
+				panic(err)
+			}
+			// migrate service
+			if err := migrateservice.Migrate(ctx, app.serviceKeeper, app.bankKeeper); err != nil {
+				panic(err)
+			}
+		},
+	)
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -583,7 +631,9 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 // InitChainer application update at chain initialization
 func (app *IrisApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState GenesisState
-	app.cdc.MustUnmarshalJSON(req.AppStateBytes, &genesisState)
+	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
+		panic(err)
+	}
 
 	// add system service at InitChainer, overwrite if it exists
 	var serviceGenState servicetypes.GenesisState
@@ -611,23 +661,12 @@ func (app *IrisApp) ModuleAccountAddrs() map[string]bool {
 	return modAccAddrs
 }
 
-// BlockedAddrs returns all the app's module account addresses that are not
-// allowed to receive external tokens.
-func (app *IrisApp) BlockedAddrs() map[string]bool {
-	blockedAddrs := make(map[string]bool)
-	for acc := range maccPerms {
-		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = !allowedReceivingModAcc[acc]
-	}
-
-	return blockedAddrs
-}
-
-// LegacyAmino returns IrisApp's amino codec.
+// LegacyAmino returns SimApp's amino codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
 func (app *IrisApp) LegacyAmino() *codec.LegacyAmino {
-	return app.cdc
+	return app.legacyAmino
 }
 
 // AppCodec returns IrisApp's app codec.
@@ -677,23 +716,21 @@ func (app *IrisApp) SimulationManager() *module.SimulationManager {
 	return app.sm
 }
 
-// RegisterAPIRoutes registers all application module routes with the provided
-// API server.
+// RegisterAPIRoutes registers all application module routes with the provided API server.
 func (app *IrisApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
 	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
 	// Register legacy tx routes.
 	authrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
-
 	// Register new tendermint queries routes from grpc-gateway.
 	tmservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
-
 	// Register new tx routes from grpc-gateway.
 	authtx.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// Register legacy and grpc-gateway routes for all modules.
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
+	// register swagger API from root so that other applications can override easily
 	if apiConfig.Swagger {
 		lite.RegisterSwaggerAPI(clientCtx, apiSvr.Router)
 	}
@@ -707,6 +744,26 @@ func (app *IrisApp) RegisterTxService(clientCtx client.Context) {
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *IrisApp) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
+}
+
+// RegisterUpgradePlan implements the upgrade execution logic of the upgrade module
+func (app *IrisApp) RegisterUpgradePlan(
+	planName string,
+	upgrades *store.StoreUpgrades,
+	upgradeHandler sdkupgrade.UpgradeHandler,
+) {
+	upgradeInfo, err := app.upgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		app.Logger().Info("not found upgrade plan", "planName", planName, "err", err.Error())
+		return
+	}
+
+	if upgradeInfo.Name == planName && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		// this configures a no-op upgrade handler for the planName upgrade
+		app.upgradeKeeper.SetUpgradeHandler(planName, upgradeHandler)
+		// configure store loader that checks if version+1 == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(sdkupgrade.UpgradeStoreLoader(upgradeInfo.Height, upgrades))
+	}
 }
 
 // GetMaccPerms returns a copy of the module account permissions

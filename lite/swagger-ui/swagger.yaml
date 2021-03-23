@@ -19071,6 +19071,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: order_by
+          description: |2-
+             - ORDER_BY_UNSPECIFIED: ORDER_BY_UNSPECIFIED specifies an unknown sorting order. OrderBy defaults to ASC in this case.
+             - ORDER_BY_ASC: ORDER_BY_ASC defines ascending order
+             - ORDER_BY_DESC: ORDER_BY_DESC defines descending order
+          in: query
+          required: false
+          type: string
+          enum:
+            - ORDER_BY_UNSPECIFIED
+            - ORDER_BY_ASC
+            - ORDER_BY_DESC
+          default: ORDER_BY_UNSPECIFIED
       tags:
         - Service
     post:
@@ -30755,7 +30768,7 @@ paths:
                         }
       tags:
         - Query
-  '/irismod/htlc/htlcs/{hash_lock}':
+  '/irismod/htlc/htlcs/{id}':
     get:
       summary: HTLC queries the HTLC by the specified hash lock
       operationId: HTLC
@@ -30768,11 +30781,15 @@ paths:
               htlc:
                 type: object
                 properties:
+                  id:
+                    type: string
                   sender:
                     type: string
                   to:
                     type: string
                   receiver_on_other_chain:
+                    type: string
+                  sender_on_other_chain:
                     type: string
                   amount:
                     type: array
@@ -30791,6 +30808,8 @@ paths:
                         custom method
 
                         signatures required by gogoproto.
+                  hash_lock:
+                    type: string
                   secret:
                     type: string
                   timestamp:
@@ -30804,15 +30823,30 @@ paths:
                     enum:
                       - HTLC_STATE_OPEN
                       - HTLC_STATE_COMPLETED
-                      - HTLC_STATE_EXPIRED
                       - HTLC_STATE_REFUNDED
                     default: HTLC_STATE_OPEN
                     description: |-
                       - HTLC_STATE_OPEN: HTLC_STATE_OPEN defines an open state.
                        - HTLC_STATE_COMPLETED: HTLC_STATE_COMPLETED defines a completed state.
-                       - HTLC_STATE_EXPIRED: HTLC_STATE_EXPIRED defines an expired state.
                        - HTLC_STATE_REFUNDED: HTLC_STATE_REFUNDED defines a refunded state.
                     title: HTLCState defines the state of an HTLC
+                  closed_block:
+                    type: string
+                    format: uint64
+                  transfer:
+                    type: boolean
+                  direction:
+                    type: string
+                    enum:
+                      - INVALID
+                      - INCOMING
+                      - OUTGOING
+                    default: INVALID
+                    description: |-
+                      - INVALID: INVALID defines an htlt invalid direction.
+                       - INCOMING: INCOMING defines an htlt incoming direction.
+                       - OUTGOING: OUTGOING defines an htlt outgoing direction.
+                    title: SwapDirection defines the direction of an HTLT
                 title: HTLC defines the struct of an HTLC
             title: >-
               QueryBalanceResponse is the response type for the Query/HTLC RPC
@@ -30840,8 +30874,293 @@ paths:
                       type: string
                       format: byte
       parameters:
-        - name: hash_lock
-          description: address is the address to query balances for
+        - name: id
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /irismod/htlc/params:
+    get:
+      summary: Params queries the htlc parameters
+      operationId: HTLCParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                type: object
+                properties:
+                  asset_params:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        supply_limit:
+                          type: object
+                          properties:
+                            limit:
+                              type: string
+                            time_limited:
+                              type: boolean
+                            time_period:
+                              type: string
+                            time_based_limit:
+                              type: string
+                        active:
+                          type: boolean
+                        deputy_address:
+                          type: string
+                        fixed_fee:
+                          type: string
+                        min_swap_amount:
+                          type: string
+                        max_swap_amount:
+                          type: string
+                        min_block_lock:
+                          type: string
+                          format: uint64
+                        max_block_lock:
+                          type: string
+                          format: uint64
+                title: Params defines token module's parameters
+            title: >-
+              QueryParamsResponse is response type for the Query/Parameters RPC
+              method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Query
+  /irismod/htlc/supplies:
+    get:
+      summary: AssetSupplies queries the supplies of all assets
+      operationId: AssetSupplies
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              asset_supplies:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    incoming_supply:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    outgoing_supply:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    current_supply:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    time_limited_current_supply:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    time_elapsed:
+                      type: string
+            title: >-
+              QueryAssetSuppliesResponse is response type for the
+              Query/AssetSupplies RPC method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Query
+  '/irismod/htlc/supplies/{denom}':
+    get:
+      summary: AssetSupply queries the supply of an asset
+      operationId: AssetSupply
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              asset_supply:
+                type: object
+                properties:
+                  incoming_supply:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+                  outgoing_supply:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+                  current_supply:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+                  time_limited_current_supply:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+                  time_elapsed:
+                    type: string
+            title: >-
+              QueryAssetSupplyResponse is response type for the
+              Query/AssetSupply RPC method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: denom
           in: path
           required: true
           type: string
@@ -46820,6 +47139,19 @@ definitions:
       Single is the mode info for a single signer. It is structured as a message
       to allow for additional fields such as locale for SIGN_MODE_TEXTUAL in the
       future
+  cosmos.tx.v1beta1.OrderBy:
+    type: string
+    enum:
+      - ORDER_BY_UNSPECIFIED
+      - ORDER_BY_ASC
+      - ORDER_BY_DESC
+    default: ORDER_BY_UNSPECIFIED
+    description: >-
+      - ORDER_BY_UNSPECIFIED: ORDER_BY_UNSPECIFIED specifies an unknown sorting
+      order. OrderBy defaults to ASC in this case.
+       - ORDER_BY_ASC: ORDER_BY_ASC defines ascending order
+       - ORDER_BY_DESC: ORDER_BY_DESC defines descending order
+    title: OrderBy defines the sorting order
   cosmos.tx.v1beta1.SignerInfo:
     type: object
     properties:
@@ -53094,14 +53426,103 @@ definitions:
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
     title: QueryTotalBurnResponse is response type for the Query/TotalBurn RPC method
+  irismod.htlc.AssetParam:
+    type: object
+    properties:
+      denom:
+        type: string
+      supply_limit:
+        type: object
+        properties:
+          limit:
+            type: string
+          time_limited:
+            type: boolean
+          time_period:
+            type: string
+          time_based_limit:
+            type: string
+      active:
+        type: boolean
+      deputy_address:
+        type: string
+      fixed_fee:
+        type: string
+      min_swap_amount:
+        type: string
+      max_swap_amount:
+        type: string
+      min_block_lock:
+        type: string
+        format: uint64
+      max_block_lock:
+        type: string
+        format: uint64
+  irismod.htlc.AssetSupply:
+    type: object
+    properties:
+      incoming_supply:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+        description: |-
+          Coin defines a token with a denomination and an amount.
+
+          NOTE: The amount field is an Int which implements the custom method
+          signatures required by gogoproto.
+      outgoing_supply:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+        description: |-
+          Coin defines a token with a denomination and an amount.
+
+          NOTE: The amount field is an Int which implements the custom method
+          signatures required by gogoproto.
+      current_supply:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+        description: |-
+          Coin defines a token with a denomination and an amount.
+
+          NOTE: The amount field is an Int which implements the custom method
+          signatures required by gogoproto.
+      time_limited_current_supply:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+        description: |-
+          Coin defines a token with a denomination and an amount.
+
+          NOTE: The amount field is an Int which implements the custom method
+          signatures required by gogoproto.
+      time_elapsed:
+        type: string
   irismod.htlc.HTLC:
     type: object
     properties:
+      id:
+        type: string
       sender:
         type: string
       to:
         type: string
       receiver_on_other_chain:
+        type: string
+      sender_on_other_chain:
         type: string
       amount:
         type: array
@@ -53117,6 +53538,8 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
+      hash_lock:
+        type: string
       secret:
         type: string
       timestamp:
@@ -53130,41 +53553,240 @@ definitions:
         enum:
           - HTLC_STATE_OPEN
           - HTLC_STATE_COMPLETED
-          - HTLC_STATE_EXPIRED
           - HTLC_STATE_REFUNDED
         default: HTLC_STATE_OPEN
         description: |-
           - HTLC_STATE_OPEN: HTLC_STATE_OPEN defines an open state.
            - HTLC_STATE_COMPLETED: HTLC_STATE_COMPLETED defines a completed state.
-           - HTLC_STATE_EXPIRED: HTLC_STATE_EXPIRED defines an expired state.
            - HTLC_STATE_REFUNDED: HTLC_STATE_REFUNDED defines a refunded state.
         title: HTLCState defines the state of an HTLC
+      closed_block:
+        type: string
+        format: uint64
+      transfer:
+        type: boolean
+      direction:
+        type: string
+        enum:
+          - INVALID
+          - INCOMING
+          - OUTGOING
+        default: INVALID
+        description: |-
+          - INVALID: INVALID defines an htlt invalid direction.
+           - INCOMING: INCOMING defines an htlt incoming direction.
+           - OUTGOING: OUTGOING defines an htlt outgoing direction.
+        title: SwapDirection defines the direction of an HTLT
     title: HTLC defines the struct of an HTLC
   irismod.htlc.HTLCState:
     type: string
     enum:
       - HTLC_STATE_OPEN
       - HTLC_STATE_COMPLETED
-      - HTLC_STATE_EXPIRED
       - HTLC_STATE_REFUNDED
     default: HTLC_STATE_OPEN
     description: |-
       - HTLC_STATE_OPEN: HTLC_STATE_OPEN defines an open state.
        - HTLC_STATE_COMPLETED: HTLC_STATE_COMPLETED defines a completed state.
-       - HTLC_STATE_EXPIRED: HTLC_STATE_EXPIRED defines an expired state.
        - HTLC_STATE_REFUNDED: HTLC_STATE_REFUNDED defines a refunded state.
     title: HTLCState defines the state of an HTLC
+  irismod.htlc.Params:
+    type: object
+    properties:
+      asset_params:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            supply_limit:
+              type: object
+              properties:
+                limit:
+                  type: string
+                time_limited:
+                  type: boolean
+                time_period:
+                  type: string
+                time_based_limit:
+                  type: string
+            active:
+              type: boolean
+            deputy_address:
+              type: string
+            fixed_fee:
+              type: string
+            min_swap_amount:
+              type: string
+            max_swap_amount:
+              type: string
+            min_block_lock:
+              type: string
+              format: uint64
+            max_block_lock:
+              type: string
+              format: uint64
+    title: Params defines token module's parameters
+  irismod.htlc.QueryAssetSuppliesResponse:
+    type: object
+    properties:
+      asset_supplies:
+        type: array
+        items:
+          type: object
+          properties:
+            incoming_supply:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            outgoing_supply:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            current_supply:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            time_limited_current_supply:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            time_elapsed:
+              type: string
+    title: >-
+      QueryAssetSuppliesResponse is response type for the Query/AssetSupplies
+      RPC method
+  irismod.htlc.QueryAssetSupplyResponse:
+    type: object
+    properties:
+      asset_supply:
+        type: object
+        properties:
+          incoming_supply:
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+            description: >-
+              Coin defines a token with a denomination and an amount.
+
+
+              NOTE: The amount field is an Int which implements the custom
+              method
+
+              signatures required by gogoproto.
+          outgoing_supply:
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+            description: >-
+              Coin defines a token with a denomination and an amount.
+
+
+              NOTE: The amount field is an Int which implements the custom
+              method
+
+              signatures required by gogoproto.
+          current_supply:
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+            description: >-
+              Coin defines a token with a denomination and an amount.
+
+
+              NOTE: The amount field is an Int which implements the custom
+              method
+
+              signatures required by gogoproto.
+          time_limited_current_supply:
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+            description: >-
+              Coin defines a token with a denomination and an amount.
+
+
+              NOTE: The amount field is an Int which implements the custom
+              method
+
+              signatures required by gogoproto.
+          time_elapsed:
+            type: string
+    title: >-
+      QueryAssetSupplyResponse is response type for the Query/AssetSupply RPC
+      method
   irismod.htlc.QueryHTLCResponse:
     type: object
     properties:
       htlc:
         type: object
         properties:
+          id:
+            type: string
           sender:
             type: string
           to:
             type: string
           receiver_on_other_chain:
+            type: string
+          sender_on_other_chain:
             type: string
           amount:
             type: array
@@ -53183,6 +53805,8 @@ definitions:
                 method
 
                 signatures required by gogoproto.
+          hash_lock:
+            type: string
           secret:
             type: string
           timestamp:
@@ -53196,17 +53820,97 @@ definitions:
             enum:
               - HTLC_STATE_OPEN
               - HTLC_STATE_COMPLETED
-              - HTLC_STATE_EXPIRED
               - HTLC_STATE_REFUNDED
             default: HTLC_STATE_OPEN
             description: |-
               - HTLC_STATE_OPEN: HTLC_STATE_OPEN defines an open state.
                - HTLC_STATE_COMPLETED: HTLC_STATE_COMPLETED defines a completed state.
-               - HTLC_STATE_EXPIRED: HTLC_STATE_EXPIRED defines an expired state.
                - HTLC_STATE_REFUNDED: HTLC_STATE_REFUNDED defines a refunded state.
             title: HTLCState defines the state of an HTLC
+          closed_block:
+            type: string
+            format: uint64
+          transfer:
+            type: boolean
+          direction:
+            type: string
+            enum:
+              - INVALID
+              - INCOMING
+              - OUTGOING
+            default: INVALID
+            description: |-
+              - INVALID: INVALID defines an htlt invalid direction.
+               - INCOMING: INCOMING defines an htlt incoming direction.
+               - OUTGOING: OUTGOING defines an htlt outgoing direction.
+            title: SwapDirection defines the direction of an HTLT
         title: HTLC defines the struct of an HTLC
     title: QueryBalanceResponse is the response type for the Query/HTLC RPC method
+  irismod.htlc.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        type: object
+        properties:
+          asset_params:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                supply_limit:
+                  type: object
+                  properties:
+                    limit:
+                      type: string
+                    time_limited:
+                      type: boolean
+                    time_period:
+                      type: string
+                    time_based_limit:
+                      type: string
+                active:
+                  type: boolean
+                deputy_address:
+                  type: string
+                fixed_fee:
+                  type: string
+                min_swap_amount:
+                  type: string
+                max_swap_amount:
+                  type: string
+                min_block_lock:
+                  type: string
+                  format: uint64
+                max_block_lock:
+                  type: string
+                  format: uint64
+        title: Params defines token module's parameters
+    title: QueryParamsResponse is response type for the Query/Parameters RPC method
+  irismod.htlc.SupplyLimit:
+    type: object
+    properties:
+      limit:
+        type: string
+      time_limited:
+        type: boolean
+      time_period:
+        type: string
+      time_based_limit:
+        type: string
+  irismod.htlc.SwapDirection:
+    type: string
+    enum:
+      - INVALID
+      - INCOMING
+      - OUTGOING
+    default: INVALID
+    description: |-
+      - INVALID: INVALID defines an htlt invalid direction.
+       - INCOMING: INCOMING defines an htlt incoming direction.
+       - OUTGOING: OUTGOING defines an htlt outgoing direction.
+    title: SwapDirection defines the direction of an HTLT
   irismod.coinswap.QueryLiquidityResponse:
     type: object
     properties:

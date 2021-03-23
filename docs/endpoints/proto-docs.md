@@ -455,6 +455,7 @@ order: 6
     - [SimulateResponse](#cosmos.tx.v1beta1.SimulateResponse)
   
     - [BroadcastMode](#cosmos.tx.v1beta1.BroadcastMode)
+    - [OrderBy](#cosmos.tx.v1beta1.OrderBy)
   
     - [Service](#cosmos.tx.v1beta1.Service)
   
@@ -509,17 +510,27 @@ order: 6
     - [Msg](#irishub.guardian.Msg)
   
 - [htlc/htlc.proto](#htlc/htlc.proto)
+    - [AssetParam](#irismod.htlc.AssetParam)
+    - [AssetSupply](#irismod.htlc.AssetSupply)
     - [HTLC](#irismod.htlc.HTLC)
+    - [Params](#irismod.htlc.Params)
+    - [SupplyLimit](#irismod.htlc.SupplyLimit)
   
     - [HTLCState](#irismod.htlc.HTLCState)
+    - [SwapDirection](#irismod.htlc.SwapDirection)
   
 - [htlc/genesis.proto](#htlc/genesis.proto)
     - [GenesisState](#irismod.htlc.GenesisState)
-    - [GenesisState.PendingHtlcsEntry](#irismod.htlc.GenesisState.PendingHtlcsEntry)
   
 - [htlc/query.proto](#htlc/query.proto)
+    - [QueryAssetSuppliesRequest](#irismod.htlc.QueryAssetSuppliesRequest)
+    - [QueryAssetSuppliesResponse](#irismod.htlc.QueryAssetSuppliesResponse)
+    - [QueryAssetSupplyRequest](#irismod.htlc.QueryAssetSupplyRequest)
+    - [QueryAssetSupplyResponse](#irismod.htlc.QueryAssetSupplyResponse)
     - [QueryHTLCRequest](#irismod.htlc.QueryHTLCRequest)
     - [QueryHTLCResponse](#irismod.htlc.QueryHTLCResponse)
+    - [QueryParamsRequest](#irismod.htlc.QueryParamsRequest)
+    - [QueryParamsResponse](#irismod.htlc.QueryParamsResponse)
   
     - [Query](#irismod.htlc.Query)
   
@@ -528,8 +539,6 @@ order: 6
     - [MsgClaimHTLCResponse](#irismod.htlc.MsgClaimHTLCResponse)
     - [MsgCreateHTLC](#irismod.htlc.MsgCreateHTLC)
     - [MsgCreateHTLCResponse](#irismod.htlc.MsgCreateHTLCResponse)
-    - [MsgRefundHTLC](#irismod.htlc.MsgRefundHTLC)
-    - [MsgRefundHTLCResponse](#irismod.htlc.MsgRefundHTLCResponse)
   
     - [Msg](#irismod.htlc.Msg)
   
@@ -6914,6 +6923,7 @@ RPC method.
 | ----- | ---- | ----- | ----------- |
 | `events` | [string](#string) | repeated | events is the list of transaction event type. |
 | `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an pagination for the request. |
+| `order_by` | [OrderBy](#cosmos.tx.v1beta1.OrderBy) |  |  |
 
 
 
@@ -6984,6 +6994,19 @@ BroadcastMode specifies the broadcast mode for the TxService.Broadcast RPC metho
 | BROADCAST_MODE_BLOCK | 1 | BROADCAST_MODE_BLOCK defines a tx broadcasting mode where the client waits for the tx to be committed in a block. |
 | BROADCAST_MODE_SYNC | 2 | BROADCAST_MODE_SYNC defines a tx broadcasting mode where the client waits for a CheckTx execution response only. |
 | BROADCAST_MODE_ASYNC | 3 | BROADCAST_MODE_ASYNC defines a tx broadcasting mode where the client returns immediately. |
+
+
+
+<a name="cosmos.tx.v1beta1.OrderBy"></a>
+
+### OrderBy
+OrderBy defines the sorting order
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| ORDER_BY_UNSPECIFIED | 0 | ORDER_BY_UNSPECIFIED specifies an unknown sorting order. OrderBy defaults to ASC in this case. |
+| ORDER_BY_ASC | 1 | ORDER_BY_ASC defines ascending order |
+| ORDER_BY_DESC | 2 | ORDER_BY_DESC defines descending order |
 
 
  <!-- end enums -->
@@ -7577,6 +7600,48 @@ Msg defines the guardian Msg service
 
 
 
+<a name="irismod.htlc.AssetParam"></a>
+
+### AssetParam
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `denom` | [string](#string) |  | name of the asset |
+| `supply_limit` | [SupplyLimit](#irismod.htlc.SupplyLimit) |  | asset supply limit |
+| `active` | [bool](#bool) |  | denotes if asset is available or paused |
+| `deputy_address` | [string](#string) |  | the address of the relayer process |
+| `fixed_fee` | [string](#string) |  | the fixed fee charged by the relayer process for outgoing swaps |
+| `min_swap_amount` | [string](#string) |  | Minimum swap amount |
+| `max_swap_amount` | [string](#string) |  | Maximum swap amount |
+| `min_block_lock` | [uint64](#uint64) |  | Minimum swap block lock |
+| `max_block_lock` | [uint64](#uint64) |  | Maximum swap block lock |
+
+
+
+
+
+
+<a name="irismod.htlc.AssetSupply"></a>
+
+### AssetSupply
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `incoming_supply` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `outgoing_supply` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `current_supply` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `time_limited_current_supply` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `time_elapsed` | [google.protobuf.Duration](#google.protobuf.Duration) |  |  |
+
+
+
+
+
+
 <a name="irismod.htlc.HTLC"></a>
 
 ### HTLC
@@ -7585,14 +7650,53 @@ HTLC defines the struct of an HTLC
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| `id` | [string](#string) |  |  |
 | `sender` | [string](#string) |  |  |
 | `to` | [string](#string) |  |  |
 | `receiver_on_other_chain` | [string](#string) |  |  |
+| `sender_on_other_chain` | [string](#string) |  |  |
 | `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `hash_lock` | [string](#string) |  |  |
 | `secret` | [string](#string) |  |  |
 | `timestamp` | [uint64](#uint64) |  |  |
 | `expiration_height` | [uint64](#uint64) |  |  |
 | `state` | [HTLCState](#irismod.htlc.HTLCState) |  |  |
+| `closed_block` | [uint64](#uint64) |  |  |
+| `transfer` | [bool](#bool) |  |  |
+| `direction` | [SwapDirection](#irismod.htlc.SwapDirection) |  |  |
+
+
+
+
+
+
+<a name="irismod.htlc.Params"></a>
+
+### Params
+Params defines token module's parameters
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `asset_params` | [AssetParam](#irismod.htlc.AssetParam) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.htlc.SupplyLimit"></a>
+
+### SupplyLimit
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `limit` | [string](#string) |  | the absolute supply limit for an asset |
+| `time_limited` | [bool](#bool) |  | boolean for if the supply is also limited by time |
+| `time_period` | [google.protobuf.Duration](#google.protobuf.Duration) |  | the duration for which the supply time limit applies |
+| `time_based_limit` | [string](#string) |  | the supply limit for an asset for each time period |
 
 
 
@@ -7610,8 +7714,20 @@ HTLCState defines the state of an HTLC
 | ---- | ------ | ----------- |
 | HTLC_STATE_OPEN | 0 | HTLC_STATE_OPEN defines an open state. |
 | HTLC_STATE_COMPLETED | 1 | HTLC_STATE_COMPLETED defines a completed state. |
-| HTLC_STATE_EXPIRED | 2 | HTLC_STATE_EXPIRED defines an expired state. |
-| HTLC_STATE_REFUNDED | 3 | HTLC_STATE_REFUNDED defines a refunded state. |
+| HTLC_STATE_REFUNDED | 2 | HTLC_STATE_REFUNDED defines a refunded state. |
+
+
+
+<a name="irismod.htlc.SwapDirection"></a>
+
+### SwapDirection
+SwapDirection defines the direction of an HTLT
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| INVALID | 0 | INVALID defines an htlt invalid direction. |
+| INCOMING | 1 | INCOMING defines an htlt incoming direction. |
+| OUTGOING | 2 | OUTGOING defines an htlt outgoing direction. |
 
 
  <!-- end enums -->
@@ -7637,23 +7753,10 @@ GenesisState defines the HTLC module's genesis state
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `pending_htlcs` | [GenesisState.PendingHtlcsEntry](#irismod.htlc.GenesisState.PendingHtlcsEntry) | repeated |  |
-
-
-
-
-
-
-<a name="irismod.htlc.GenesisState.PendingHtlcsEntry"></a>
-
-### GenesisState.PendingHtlcsEntry
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `key` | [string](#string) |  |  |
-| `value` | [HTLC](#irismod.htlc.HTLC) |  |  |
+| `params` | [Params](#irismod.htlc.Params) |  |  |
+| `pending_htlcs` | [HTLC](#irismod.htlc.HTLC) | repeated |  |
+| `supplies` | [AssetSupply](#irismod.htlc.AssetSupply) | repeated |  |
+| `previous_block_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 
 
 
@@ -7676,6 +7779,61 @@ GenesisState defines the HTLC module's genesis state
 
 
 
+<a name="irismod.htlc.QueryAssetSuppliesRequest"></a>
+
+### QueryAssetSuppliesRequest
+QueryAssetSuppliesRequest is request type for the Query/AssetSupplies RPC method
+
+
+
+
+
+
+<a name="irismod.htlc.QueryAssetSuppliesResponse"></a>
+
+### QueryAssetSuppliesResponse
+QueryAssetSuppliesResponse is response type for the Query/AssetSupplies RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `asset_supplies` | [AssetSupply](#irismod.htlc.AssetSupply) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.htlc.QueryAssetSupplyRequest"></a>
+
+### QueryAssetSupplyRequest
+QueryAssetSupplyRequest is request type for the Query/AssetSupply RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `denom` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.htlc.QueryAssetSupplyResponse"></a>
+
+### QueryAssetSupplyResponse
+QueryAssetSupplyResponse is response type for the Query/AssetSupply RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `asset_supply` | [AssetSupply](#irismod.htlc.AssetSupply) |  |  |
+
+
+
+
+
+
 <a name="irismod.htlc.QueryHTLCRequest"></a>
 
 ### QueryHTLCRequest
@@ -7684,7 +7842,7 @@ QueryHTLCRequest is the request type for the Query/HTLC RPC method
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `hash_lock` | [string](#string) |  | address is the address to query balances for |
+| `id` | [string](#string) |  |  |
 
 
 
@@ -7705,6 +7863,31 @@ QueryBalanceResponse is the response type for the Query/HTLC RPC method
 
 
 
+
+<a name="irismod.htlc.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+QueryParamsRequest is request type for the Query/Parameters RPC method
+
+
+
+
+
+
+<a name="irismod.htlc.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+QueryParamsResponse is response type for the Query/Parameters RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#irismod.htlc.Params) |  |  |
+
+
+
+
+
  <!-- end messages -->
 
  <!-- end enums -->
@@ -7719,7 +7902,10 @@ Query provides defines the gRPC querier service
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `HTLC` | [QueryHTLCRequest](#irismod.htlc.QueryHTLCRequest) | [QueryHTLCResponse](#irismod.htlc.QueryHTLCResponse) | HTLC queries the HTLC by the specified hash lock | GET|/irismod/htlc/htlcs/{hash_lock}|
+| `HTLC` | [QueryHTLCRequest](#irismod.htlc.QueryHTLCRequest) | [QueryHTLCResponse](#irismod.htlc.QueryHTLCResponse) | HTLC queries the HTLC by the specified hash lock | GET|/irismod/htlc/htlcs/{id}|
+| `AssetSupply` | [QueryAssetSupplyRequest](#irismod.htlc.QueryAssetSupplyRequest) | [QueryAssetSupplyResponse](#irismod.htlc.QueryAssetSupplyResponse) | AssetSupply queries the supply of an asset | GET|/irismod/htlc/supplies/{denom}|
+| `AssetSupplies` | [QueryAssetSuppliesRequest](#irismod.htlc.QueryAssetSuppliesRequest) | [QueryAssetSuppliesResponse](#irismod.htlc.QueryAssetSuppliesResponse) | AssetSupplies queries the supplies of all assets | GET|/irismod/htlc/supplies|
+| `Params` | [QueryParamsRequest](#irismod.htlc.QueryParamsRequest) | [QueryParamsResponse](#irismod.htlc.QueryParamsResponse) | Params queries the htlc parameters | GET|/irismod/htlc/params|
 
  <!-- end services -->
 
@@ -7741,7 +7927,7 @@ MsgClaimHTLC defines a message to claim an HTLC
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `sender` | [string](#string) |  |  |
-| `hash_lock` | [string](#string) |  |  |
+| `id` | [string](#string) |  |  |
 | `secret` | [string](#string) |  |  |
 
 
@@ -7770,10 +7956,12 @@ MsgCreateHTLC defines a message to create an HTLC
 | `sender` | [string](#string) |  |  |
 | `to` | [string](#string) |  |  |
 | `receiver_on_other_chain` | [string](#string) |  |  |
+| `sender_on_other_chain` | [string](#string) |  |  |
 | `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | `hash_lock` | [string](#string) |  |  |
 | `timestamp` | [uint64](#uint64) |  |  |
 | `time_lock` | [uint64](#uint64) |  |  |
+| `transfer` | [bool](#bool) |  |  |
 
 
 
@@ -7786,30 +7974,9 @@ MsgCreateHTLC defines a message to create an HTLC
 MsgCreateHTLCResponse defines the Msg/CreateHTLC response type
 
 
-
-
-
-
-<a name="irismod.htlc.MsgRefundHTLC"></a>
-
-### MsgRefundHTLC
-MsgRefundHTLC defines a message to refund an HTLC
-
-
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `sender` | [string](#string) |  |  |
-| `hash_lock` | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="irismod.htlc.MsgRefundHTLCResponse"></a>
-
-### MsgRefundHTLCResponse
-MsgRefundHTLCResponse defines the Msg/RefundHTLC response type
+| `id` | [string](#string) |  |  |
 
 
 
@@ -7825,13 +7992,12 @@ MsgRefundHTLCResponse defines the Msg/RefundHTLC response type
 <a name="irismod.htlc.Msg"></a>
 
 ### Msg
-Msg defines the HTLC Msg service.
+Msg defines the HTLC Msg service
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `CreateHTLC` | [MsgCreateHTLC](#irismod.htlc.MsgCreateHTLC) | [MsgCreateHTLCResponse](#irismod.htlc.MsgCreateHTLCResponse) | CreateHTLC defines a method for creating a HTLC. | |
+| `CreateHTLC` | [MsgCreateHTLC](#irismod.htlc.MsgCreateHTLC) | [MsgCreateHTLCResponse](#irismod.htlc.MsgCreateHTLCResponse) | CreateHTLC defines a method for creating a HTLC | |
 | `ClaimHTLC` | [MsgClaimHTLC](#irismod.htlc.MsgClaimHTLC) | [MsgClaimHTLCResponse](#irismod.htlc.MsgClaimHTLCResponse) | ClaimHTLC defines a method for claiming a HTLC | |
-| `RefundHTLC` | [MsgRefundHTLC](#irismod.htlc.MsgRefundHTLC) | [MsgRefundHTLCResponse](#irismod.htlc.MsgRefundHTLCResponse) | RefundHTLC defines a method for refunding a HTLC. | |
 
  <!-- end services -->
 

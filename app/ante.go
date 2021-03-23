@@ -7,10 +7,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
+	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	oraclekeeper "github.com/irisnet/irismod/modules/oracle/keeper"
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
-
-	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 )
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
