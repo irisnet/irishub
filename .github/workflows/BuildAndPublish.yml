@@ -1,29 +1,62 @@
 name: BuildAndPublish
 on:
-  create:
+  pull_request:
   push:
     branches:
       - master
     tags:
-      - v.*
+      - "v[0-9]+.[0-9]+.[0-9]+"     # Push events to matching v*, i.e. v1.0, v20.15.10
+      - "v[0-9]+.[0-9]+.[0-9]+-rc*" # Push events to matching v*, i.e. v1.0-rc1, v20.15.10-rc5
 
 jobs:
   build-images:
     name: Build Images
-#    runs-on: self-hosted
     runs-on: ubuntu-16.04
     steps:
       - name: Checkout source code
         uses: actions/checkout@v1
-      - name: Build irishub image
-        run: source ~/.bashrc; sudo docker build -t irisnet/irishub:latest .
-
-#   push-images:
-#     name: Push Images
-#     runs-on: self-hosted
-#     needs: build-images
-#     steps:
-      - name: Login dockerhub
-        run: sudo docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_PASS}}
-      - name: Publish irishub image
-        run: sudo docker push irisnet/irishub:latest
+      - name: Prepare
+        id: prep
+        run: |
+          DOCKER_IMAGE=irisnet/irishub
+          VERSION=noop
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+          elif [[ $GITHUB_REF == refs/heads/* ]]; then
+            VERSION=$(echo ${GITHUB_REF#refs/heads/} | sed -r 's#/+#-#g')
+            [ "${{ github.event.repository.default_branch }}" = "$VERSION" ] && VERSION=latest
+          fi
+          TAGS="${DOCKER_IMAGE}:${VERSION}"
+          echo ::set-output name=version::${VERSION}
+          echo ::set-output name=tags::${TAGS}
+          echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          
+      # Install QEMU 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      
+      # Use buildx instead of build
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        
+      # Login so we can push the image
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{secrets.DOCKER_USER}}
+          password: ${{secrets.DOCKER_PASS}}
+  
+      # Using the github action, push the IRISHub amd64/arm64 image to Docker Hub
+      - name: Publish to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.prep.outputs.tags }}
+          platforms: linux/amd64,linux/arm64
+          
+#       - name: Build irishub image
+#         run: source ~/.bashrc; sudo docker build -t irisnet/irishub:latest .
+#       - name: Login dockerhub
+#         run: sudo docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_PASS}}
+#       - name: Publish irishub image
+#         run: sudo docker push irisnet/irishub:latest
