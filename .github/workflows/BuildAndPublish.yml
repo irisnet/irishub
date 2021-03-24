@@ -46,7 +46,7 @@ jobs:
           username: ${{secrets.DOCKER_USER}}
           password: ${{secrets.DOCKER_PASS}}
   
-      # Using the github action, push the Gaia amd64/arm64 image to Docker Hub
+      # Using the github action, push the IRISHub amd64/arm64 image to Docker Hub
       - name: Publish to Docker Hub
         uses: docker/build-push-action@v2
         with:
