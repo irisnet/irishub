@@ -53,6 +53,24 @@ func (p Params) String() string {
 	return string(out)
 }
 
+func NewAssetParam(
+	denom string, coinID int, limit SupplyLimit, active bool,
+	deputyAddr string, fixedFee sdk.Int, minSwapAmount sdk.Int,
+	maxSwapAmount sdk.Int, minBlockLock uint64, maxBlockLock uint64,
+) AssetParam {
+	return AssetParam{
+		Denom:         denom,
+		SupplyLimit:   limit,
+		Active:        active,
+		DeputyAddress: deputyAddr,
+		FixedFee:      fixedFee,
+		MinSwapAmount: minSwapAmount,
+		MaxSwapAmount: maxSwapAmount,
+		MinBlockLock:  minBlockLock,
+		MaxBlockLock:  maxBlockLock,
+	}
+}
+
 // String returns a human readable string representation of the parameters.
 func (p AssetParam) String() string {
 	out, _ := yaml.Marshal(p)

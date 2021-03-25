@@ -25,7 +25,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 
 	var incomingSupplies sdk.Coins
 	var outgoingSupplies sdk.Coins
-	for _, htlc := range data.PendingHtlcs {
+	for _, htlc := range data.Htlcs {
 		id, err := hex.DecodeString(htlc.Id)
 		if err != nil {
 			panic(err.Error())
@@ -96,11 +96,11 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 
 // ExportGenesis outputs the genesis state
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	pendingHTLCs := []types.HTLC{}
+	htlcs := []types.HTLC{}
 	k.IterateHTLCs(
 		ctx,
 		func(_ tmbytes.HexBytes, h types.HTLC) (stop bool) {
-			pendingHTLCs = append(pendingHTLCs, h)
+			htlcs = append(htlcs, h)
 			return false
 		},
 	)
@@ -113,7 +113,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	return types.NewGenesisState(
 		k.GetParams(ctx),
-		pendingHTLCs,
+		htlcs,
 		supplies,
 		previousBlockTime,
 	)

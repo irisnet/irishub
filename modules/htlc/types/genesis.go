@@ -8,10 +8,10 @@ import (
 )
 
 // NewGenesisState constructs a new GenesisState instance
-func NewGenesisState(params Params, pendingHTLCs []HTLC, Supplies []AssetSupply, previousBlockTime time.Time) *GenesisState {
+func NewGenesisState(params Params, htlcs []HTLC, Supplies []AssetSupply, previousBlockTime time.Time) *GenesisState {
 	return &GenesisState{
 		Params:            params,
-		PendingHtlcs:      pendingHTLCs,
+		Htlcs:             htlcs,
 		Supplies:          Supplies,
 		PreviousBlockTime: previousBlockTime,
 	}
@@ -21,7 +21,7 @@ func NewGenesisState(params Params, pendingHTLCs []HTLC, Supplies []AssetSupply,
 func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
 		Params:            DefaultParams(),
-		PendingHtlcs:      []HTLC{},
+		Htlcs:             []HTLC{},
 		Supplies:          DefaultAssetSupplies(),
 		PreviousBlockTime: DefaultPreviousBlockTime,
 	}
@@ -34,7 +34,7 @@ func ValidateGenesis(data GenesisState) error {
 	}
 
 	ids := map[string]bool{}
-	for _, htlc := range data.PendingHtlcs {
+	for _, htlc := range data.Htlcs {
 		if ids[htlc.Id] {
 			return fmt.Errorf("found duplicate htlc ID %s", htlc.Id)
 		}
