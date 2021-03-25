@@ -43,7 +43,7 @@ func ValidateSenderOnOtherChain(senderOnOtherChain string) error {
 // ValidateAmount verifies whether the given amount is legal
 func ValidateAmount(transfer bool, amount sdk.Coins) error {
 	if transfer && len(amount) != 1 {
-		return sdkerrors.Wrapf(ErrInvalidAmount, amount.String())
+		return sdkerrors.Wrapf(ErrInvalidAmount, "amount %s must contain exactly one coin", amount.String())
 	}
 	if !(amount.IsValid() && amount.IsAllPositive()) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "the transferred amount must be valid")

@@ -21,7 +21,7 @@ var (
 	ErrAssetNotSupported           = sdkerrors.Register(ModuleName, 14, "asset not found")
 	ErrAssetNotActive              = sdkerrors.Register(ModuleName, 15, "asset is currently inactive")
 	ErrInvalidAccount              = sdkerrors.Register(ModuleName, 16, "invalid account")
-	ErrInvalidAmount               = sdkerrors.Register(ModuleName, 17, "amount must contain exactly one coin")
+	ErrInvalidAmount               = sdkerrors.Register(ModuleName, 17, "invalid amount")
 	ErrInsufficientAmount          = sdkerrors.Register(ModuleName, 18, "amount cannot cover the deputy fixed fee")
 	ErrExceedsSupplyLimit          = sdkerrors.Register(ModuleName, 19, "asset supply over limit")
 	ErrExceedsTimeBasedSupplyLimit = sdkerrors.Register(ModuleName, 20, "asset supply over limit for current time period")

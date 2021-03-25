@@ -97,7 +97,7 @@ func (k Keeper) createHTLT(
 	var direction types.SwapDirection
 
 	if len(amount) != 1 {
-		return direction, sdkerrors.Wrapf(types.ErrInvalidAmount, amount.String())
+		return direction, sdkerrors.Wrapf(types.ErrInvalidAmount, "amount %s must contain exactly one coin", amount.String())
 	}
 
 	asset, err := k.GetAsset(ctx, amount[0].Denom)
@@ -111,7 +111,7 @@ func (k Keeper) createHTLT(
 
 	// Swap amount must be within the specified swap amount limits
 	if amount[0].Amount.LT(asset.MinSwapAmount) || amount[0].Amount.GT(asset.MaxSwapAmount) {
-		return direction, sdkerrors.Wrapf(types.ErrInvalidAmount, "amount %d outside range [%s, %s]", amount[0].Amount, asset.MinSwapAmount, asset.MaxSwapAmount)
+		return direction, sdkerrors.Wrapf(types.ErrInvalidAmount, "amount %s outside range [%s, %s]", amount[0].Amount, asset.MinSwapAmount.String(), asset.MaxSwapAmount)
 	}
 
 	// Unix timestamp must be in range [-15 mins, 30 mins) of the current time
