@@ -3,12 +3,12 @@ module github.com/irisnet/irishub
 go 1.15
 
 require (
-	github.com/cosmos/cosmos-sdk v0.42.2
+	github.com/cosmos/cosmos-sdk v0.42.3
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.4.3
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/irisnet/irismod v1.3.2-0.20210323114742-f91fe8540384
+	github.com/irisnet/irismod v1.3.2-0.20210325050024-fb2190310ce5
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
