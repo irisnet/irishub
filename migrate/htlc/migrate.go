@@ -14,6 +14,10 @@ import (
 )
 
 func Migrate(ctx sdk.Context, cdc codec.Marshaler, k htlckeeper.Keeper, bk bankkeeper.Keeper, key *sdk.KVStoreKey) error {
+	if err := k.EnsureModuleAccountPermissions(ctx); err != nil {
+		return err
+	}
+
 	store := ctx.KVStore(key)
 
 	// Delete expired queue
