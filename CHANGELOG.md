@@ -37,6 +37,8 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ## [Unreleased]
 
+## [v1.4.0] - 2021-03-26
+
 ### Bug Fixes
 
 * (modules/coinswap) [\#161](https://github.com/irisnet/irismod/pull/161) Fix coinswap token validation.
@@ -48,6 +50,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ### Improvements
 
+* [\#167](https://github.com/irisnet/irismod/pull/167) Bump cosmos-sdk version to [v0.42.3](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.42.3).
 * (modules/htlc) [\#158](https://github.com/irisnet/irismod/pull/158) Improve htlc.
 * (modules/token)[\#154](https://github.com/irisnet/irismod/pull/154) Add reserved token prefix.
 * (modules/coinswap)[\#151](https://github.com/irisnet/irismod/pull/151) Replace prefix `swap/` with `swap`.
@@ -149,3 +152,4 @@ Ref: https://keepachangelog.com/en/1.0.0/
 [v1.2.1]: https://github.com/irisnet/irismod/releases/tag/v1.2.1
 [v1.3.0]: https://github.com/irisnet/irismod/releases/tag/v1.3.0
 [v1.3.1]: https://github.com/irisnet/irismod/releases/tag/v1.3.1
+[v1.4.0]: https://github.com/irisnet/irismod/releases/tag/v1.4.0
