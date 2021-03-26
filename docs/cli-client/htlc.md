@@ -70,14 +70,6 @@ Claim an opened HTLC
 iris tx htlc claim [hash-lock] [secret] [flags] --from=mykey
 ```
 
-## iris tx htlc refund
-
-Refund from an expired HTLC
-
-```bash
-iris tx htlc refund [hash-lock] [flags] --from=mykey
-```
-
 ## iris query htlc htlc
 
 Query details of an HTLC

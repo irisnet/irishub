@@ -49,18 +49,10 @@ Supposed that Alice swaps BTC for IRIS with Bob. The atomic swap process between
 | hashLock  | string   | the hash lock identifying the HTLC to be claimed                                                                           |
 | secret    | string   | a random number which generates the hash lock together with timestamp (if provided), being of 32 bytes in hexadecimal form |
 
-### Refund HTLC message
-
-| **Field** | **Type** | **Description**                                  |
-| --------- | -------- | ------------------------------------------------ |
-| hashLock  | string   | the hash lock identifying the HTLC to be refuned |
-
 ## Actions
 
 - [Create HTLC](../cli-client/htlc.md#iris-tx-htlc-create)
 
 - [Claim HTLC](../cli-client/htlc.md#iris-tx-htlc-claim)
-
-- [Refund HTLC](../cli-client/htlc.md#iris-tx-htlc-refund)
 
 - [Query HTLC](../cli-client/htlc.md#iris-query-htlc-htlc)

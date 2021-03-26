@@ -70,14 +70,6 @@ iris tx htlc create \
 iris tx htlc claim [hash-lock] [secret] [flags] --from=mykey
 ```
 
-## iris tx htlc refund
-
-从过期的 HTLC 中取回退款。
-
-```bash
-iris tx htlc refund [hash-lock] [flags] --from=mykey
-```
-
 ## iris query htlc htlc
 
 查询一个 HTLC 的详细信息。
