@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 1.1.0-rc0
+## 1.1.0
 
 *March 23th, 2021*
 
