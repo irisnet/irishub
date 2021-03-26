@@ -34,7 +34,7 @@ iris query params subspace [subspace] [key] [flags]
 | `MaxValidators`     | 最大验证人数量         | 100       |
 | `MaxEntries`        | 解绑、转委托的最大数量 | 7         |
 | `BondDenom`         | 可抵押的代币           | uiris     |
-| `HistoricalEntries` |                        | 100       |
+| `HistoricalEntries` | 历史条目数             | 100       |
 
 ## mint
 
@@ -96,7 +96,7 @@ AssetParam参数如下：
 | -------------------------- | -------------------------- | -------------------------------------------- |
 | `AssetParam.Denom`         | 资产名                     | "htltbcbnb"                                  |
 | `AssetParam.SupplyLimit`   | 资产最大供应量             | 100000                                       |
-| `AssetParam.Active`        |                            | 是否激活                                     | true |
+| `AssetParam.Active`        | 是否激活                   | true                                         |
 | `AssetParam.DeputyAddress` | 代理人的IRISHub地址        | “iaa18n3x722r4jpwmshlxnw3ehlpfzywupzefthcz5” |
 | `AssetParam.FixedFee`      | 代理人在其他链的固定手续费 | 1000                                         |
 | `AssetParam.MinSwapAmount` | 最小交换金额               | 1                                            |

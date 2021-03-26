@@ -35,7 +35,7 @@ Among them, the parameters available for query for each subspace are as follows:
 | `MaxValidators`     | Maximum number of validators                                    | 100       |
 | `MaxEntries`        | The maximum number of unbinding/redelegation orders in progress | 7         |
 | `BondDenom`         | Bond denom                                                      | uiris     |
-| `HistoricalEntries` |                                                                 | 100       |
+| `HistoricalEntries` | The number of historical entries                                | 100       |
 
 ## mint
 
@@ -103,7 +103,7 @@ AssetParam参数如下：
 | -------------------------- | --------------------------------- | -------------------------------------------- |
 | `AssetParam.Denom`         | The name  of asset                | "htltbcbnb"                                  |
 | `AssetParam.SupplyLimit`   | The supply limit of  asset        | 100000                                       |
-| `AssetParam.Active`        |                                   | Asset state: live or paused                  | true |
+| `AssetParam.Active`        | Asset state: live or paused       | true                                         |
 | `AssetParam.DeputyAddress` | Deputy's IRISHub address          | “iaa18n3x722r4jpwmshlxnw3ehlpfzywupzefthcz5” |
 | `AssetParam.FixedFee`      | Deputy's fixed fee on other chain | 1000                                         |
 | `AssetParam.MinSwapAmount` | Minimum swap amount               | 1                                            |
