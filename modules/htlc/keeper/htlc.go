@@ -163,8 +163,8 @@ func (k Keeper) createHTLT(
 		if amount[0].Amount.LT(asset.FixedFee.Add(asset.MinSwapAmount)) {
 			return direction, sdkerrors.Wrapf(
 				types.ErrInsufficientAmount,
-				"amount %s < fixed fee %s + min swap amount %s",
-				amount[0].String(), asset.FixedFee.String(), asset.MinSwapAmount,
+				"amount %s is less than fixed fee %s add min swap amount %s",
+				amount[0].String(), asset.FixedFee.String(), asset.MinSwapAmount.String(),
 			)
 		}
 		if err := k.IncrementOutgoingAssetSupply(ctx, amount[0]); err != nil {

@@ -42,17 +42,15 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 	}
 
 	testCases := []struct {
-		name        string
-		args        args
-		expectPass  bool
-		expectedErr string
+		name       string
+		args       args
+		expectPass bool
 	}{{
 		name: "default",
 		args: args{
 			assetParams: []types.AssetParam{},
 		},
-		expectPass:  true,
-		expectedErr: "",
+		expectPass: true,
 	}, {
 		name: "valid single asset",
 		args: args{
@@ -71,8 +69,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  true,
-		expectedErr: "",
+		expectPass: true,
 	}, {
 		name: "valid single asset time limited",
 		args: args{
@@ -91,8 +88,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  true,
-		expectedErr: "",
+		expectPass: true,
 	}, {
 		name: "valid multi asset",
 		args: args{
@@ -123,8 +119,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  true,
-		expectedErr: "",
+		expectPass: true,
 	}, {
 		name: "invalid denom - empty",
 		args: args{
@@ -142,8 +137,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  false,
-		expectedErr: "invalid asset denom",
+		expectPass: false,
 	}, {
 		name: "invalid denom - bad format",
 		args: args{
@@ -162,8 +156,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  false,
-		expectedErr: "invalid asset denom",
+		expectPass: false,
 	}, {
 		name: "min block lock equal max block lock",
 		args: args{
@@ -182,8 +175,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  true,
-		expectedErr: "",
+		expectPass: true,
 	}, {
 		name: "min block lock greater max block lock",
 		args: args{
@@ -202,8 +194,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  false,
-		expectedErr: "asset htltbnb",
+		expectPass: false,
 	}, {
 		name: "min swap not positive",
 		args: args{
@@ -222,8 +213,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  false,
-		expectedErr: "must have a positive minimum swap",
+		expectPass: false,
 	}, {
 		name: "max swap not positive",
 		args: args{
@@ -242,8 +232,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  false,
-		expectedErr: "must have a positive maximum swap",
+		expectPass: false,
 	}, {
 		name: "min swap greater max swap",
 		args: args{
@@ -262,8 +251,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  false,
-		expectedErr: "minimum swap amount > maximum swap amount",
+		expectPass: false,
 	}, {
 		name: "negative asset limit",
 		args: args{
@@ -285,8 +273,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  false,
-		expectedErr: "invalid (negative) supply limit",
+		expectPass: false,
 	}, {
 		name: "negative asset time limit",
 		args: args{
@@ -309,8 +296,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  false,
-		expectedErr: "invalid (negative) supply time limit",
+		expectPass: false,
 	}, {
 		name: "asset time limit greater than overall limit",
 		args: args{
@@ -334,8 +320,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  false,
-		expectedErr: "supply time limit > supply limit",
+		expectPass: false,
 	}, {
 		name: "duplicate denom",
 		args: args{
@@ -366,8 +351,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				),
 			},
 		},
-		expectPass:  false,
-		expectedErr: "duplicate denom",
+		expectPass: false,
 	}}
 
 	for _, tc := range testCases {
@@ -378,7 +362,6 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				suite.Require().NoError(err, tc.name)
 			} else {
 				suite.Require().Error(err, tc.name)
-				suite.Require().Contains(err.Error(), tc.expectedErr)
 			}
 		})
 	}

@@ -23,9 +23,9 @@ func CreateHTLCExec(clientCtx client.Context, from string, extraArgs ...string) 
 	return clitestutil.ExecTestCLICmd(clientCtx, htlccli.GetCmdCreateHTLC(), args)
 }
 
-func ClaimHTLCExec(clientCtx client.Context, from string, hashLock string, secret string, extraArgs ...string) (testutil.BufferWriter, error) {
+func ClaimHTLCExec(clientCtx client.Context, from string, id string, secret string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		hashLock,
+		id,
 		secret,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
@@ -34,9 +34,9 @@ func ClaimHTLCExec(clientCtx client.Context, from string, hashLock string, secre
 	return clitestutil.ExecTestCLICmd(clientCtx, htlccli.GetCmdClaimHTLC(), args)
 }
 
-func QueryHTLCExec(clientCtx client.Context, hashLock string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryHTLCExec(clientCtx client.Context, id string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		hashLock,
+		id,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)

@@ -112,7 +112,7 @@ func validateAssetParams(i interface{}) error {
 		}
 
 		if asset.SupplyLimit.TimeBasedLimit.GT(asset.SupplyLimit.Limit) {
-			return fmt.Errorf(fmt.Sprintf("asset %s cannot have supply time limit > supply limit: %s>%s", asset.Denom, asset.SupplyLimit.TimeBasedLimit, asset.SupplyLimit.Limit))
+			return fmt.Errorf(fmt.Sprintf("asset %s cannot have supply time limit greater than supply limit: %s>%s", asset.Denom, asset.SupplyLimit.TimeBasedLimit, asset.SupplyLimit.Limit))
 		}
 
 		if _, found := coinDenoms[asset.Denom]; found {
@@ -130,15 +130,15 @@ func validateAssetParams(i interface{}) error {
 		}
 
 		if asset.MinBlockLock < MinTimeLock {
-			return fmt.Errorf("asset %s has minimum block lock %d < min htlc block lock %d", asset.Denom, asset.MinBlockLock, MinTimeLock)
+			return fmt.Errorf("asset %s has minimum time lock %d less than min htlc time lock %d", asset.Denom, asset.MinBlockLock, MinTimeLock)
 		}
 
 		if asset.MaxBlockLock > MaxTimeLock {
-			return fmt.Errorf("asset %s has maximum block lock %d > max htlc block lock %d", asset.Denom, asset.MaxBlockLock, MaxTimeLock)
+			return fmt.Errorf("asset %s has maximum time lock %d  greater than max htlc time lock %d", asset.Denom, asset.MaxBlockLock, MaxTimeLock)
 		}
 
 		if asset.MinBlockLock > asset.MaxBlockLock {
-			return fmt.Errorf("asset %s has minimum block lock %d > maximum block lock %d", asset.Denom, asset.MinBlockLock, asset.MaxBlockLock)
+			return fmt.Errorf("asset %s has minimum time lock %d greater than maximum time lock %d", asset.Denom, asset.MinBlockLock, asset.MaxBlockLock)
 		}
 
 		if !asset.MinSwapAmount.IsPositive() {
@@ -150,7 +150,7 @@ func validateAssetParams(i interface{}) error {
 		}
 
 		if asset.MinSwapAmount.GT(asset.MaxSwapAmount) {
-			return fmt.Errorf("asset %s has minimum swap amount > maximum swap amount %s > %s", asset.Denom, asset.MinSwapAmount, asset.MaxSwapAmount)
+			return fmt.Errorf("asset %s has minimum swap amount %s greater than maximum swap amount %s", asset.Denom, asset.MinSwapAmount, asset.MaxSwapAmount)
 		}
 	}
 
