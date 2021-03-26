@@ -2,13 +2,13 @@
 
 ## Unreleased
 
-## 1.1.0-rc0
+## 1.1.0
 
 *March 23th, 2021*
 
 * [\#2592](https://github.com/irisnet/irishub/pull/2592) Bump cosmos-sdk version to [v0.42.2](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.42.2)
 * [\#2588](https://github.com/irisnet/irishub/pull/2588) Bump tendermint verion to [v0.34.8](https://github.com/tendermint/tendermint/releases/tag/v0.34.8)
-* [\#2592](https://github.com/irisnet/irishub/pull/2592) Bump irismod version to [v1.4.0](https://github.com/irisnet/irismod/blob/master/CHANGELOG.md#unreleased)
+* [\#2592](https://github.com/irisnet/irishub/pull/2592) Bump irismod version to [v1.4.0](https://github.com/irisnet/irismod/releases/tag/v1.4.0)
 * [\#2589](https://github.com/irisnet/irishub/issues/2589) Migrate irishub from v1.0 to v1.1
 
 ## 1.0.1

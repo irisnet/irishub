@@ -7754,7 +7754,7 @@ GenesisState defines the HTLC module's genesis state
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `params` | [Params](#irismod.htlc.Params) |  |  |
-| `pending_htlcs` | [HTLC](#irismod.htlc.HTLC) | repeated |  |
+| `htlcs` | [HTLC](#irismod.htlc.HTLC) | repeated |  |
 | `supplies` | [AssetSupply](#irismod.htlc.AssetSupply) | repeated |  |
 | `previous_block_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 
