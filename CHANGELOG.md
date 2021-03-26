@@ -4,7 +4,7 @@
 
 ## 1.1.0
 
-*March 23th, 2021*
+*March 26th, 2021*
 
 * [\#2592](https://github.com/irisnet/irishub/pull/2592) Bump cosmos-sdk version to [v0.42.2](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.42.2)
 * [\#2588](https://github.com/irisnet/irishub/pull/2588) Bump tendermint verion to [v0.34.8](https://github.com/tendermint/tendermint/releases/tag/v0.34.8)
