@@ -45,6 +45,7 @@ iris tx htlc create \
 | --hash-lock               | bytesHex |          |         | The sha256 hash generated from secret (and timestamp if provided), generated from `secret` if omitted |
 | --time-lock               | string   | Yes      |         | The number of blocks to wait before the asset may be returned to                                      |
 | --timestamp               | uint     |          |         | The timestamp in seconds for generating hash lock if provided                                         |
+| --transfer                | bool     |          |         | Whether it is an HTLT transaction                                                                     |
 
 ### Create an HTLC
 

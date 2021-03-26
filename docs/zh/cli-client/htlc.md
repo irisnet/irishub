@@ -45,6 +45,7 @@ iris tx htlc create \
 | --hash-lock               | bytesHex |      |      | 由 secret 和时间戳（如果提供）生成的 sha256 哈希，缺省将使用 secre 生成 |
 | --time-lock               | string   | 是   |      | 资金锁定的区块数                                                        |
 | --timestamp               | uint     |      |      | 参与生成 hash lock 的 10 位时间戳（可选）                               |
+| --transfer                | bool     |      |      | 是否是HTLT交易                                                          |
 
 ### 创建HTLC
 

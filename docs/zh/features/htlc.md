@@ -40,6 +40,7 @@
 | hashLock             | string   | 由secret（和timestamp，如果提供）生成的sha256哈希值；32字节，十六进制表示 |
 | timestamp            | uint64   | 时间戳，如果提供则参与hash生成；精度为秒                                  |
 | timeLock             | uint64   | 过期区块数；[50, 25480] （大于5分钟，小于48小时）                         |
+| transfer             | bool     | 是否是HTLT交易                                                            |
 
 ### 认领HTLC消息
 
