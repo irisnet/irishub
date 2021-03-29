@@ -625,6 +625,7 @@ func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) ab
 
 // EndBlocker application updates every end block
 func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+	app.htlcKeeper.EnsureModuleAccountPermissions(ctx)
 	return app.mm.EndBlock(ctx, req)
 }
 
