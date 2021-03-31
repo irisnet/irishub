@@ -18,8 +18,7 @@ import (
 	"github.com/irisnet/irismod/modules/service"
 )
 
-// ExportAppStateAndValidators exports the state of the application for a genesis
-// file.
+// ExportAppStateAndValidators exports the state of the application for a genesis file.
 func (app *IrisApp) ExportAppStateAndValidators(
 	forZeroHeight bool, jailAllowedAddrs []string,
 ) (servertypes.ExportedApp, error) {

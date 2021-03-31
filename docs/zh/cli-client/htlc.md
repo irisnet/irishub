@@ -4,10 +4,9 @@
 
 在 HTLC 生命周期中有下面的几种状态：
 
-- open：HTLC是可申领的
-- completed：HTLC已经被申领
-- expired：HTLC过期并且可退还
-- refunded：HTLC已退还
+- open：HTLC 是可申领的
+- completed：HTLC 已经被申领
+- refunded：HTLC 已退还
 
 ## 可用命令
 
@@ -15,7 +14,6 @@
 | ------------------------------ | ---------------------------------------------------- |
 | [create](#iris-tx-htlc-create) | 创建 HTLC                                            |
 | [claim](#iris-tx-htlc-claim)   | 将一个 OPEN 状态的 HTLC 中锁定的资金发放到收款人地址 |
-| [refund](#iris-tx-htlc-refund) | 从过期的 HTLC 中取回退款                             |
 | [htlc](#iris-query-htlc-htlc)  | 查询一个 HTLC 的详细信息                             |
 
 ## iris tx htlc create
@@ -26,55 +24,36 @@
 iris tx htlc create \
     --to=<recipient> \
     --receiver-on-other-chain=<receiver-on-other-chain> \
+    --sender-on-other-chain=<sender-on-other-chain> \
     --amount=<amount> \
-    --secret=<secret> \
     --hash-lock=<hash-lock> \
+    --secret=<secret> \
     --timestamp=<timestamp> \
     --time-lock=<time-lock> \
+    --transfer=<true | false> \
     --from=mykey
 ```
 
 **标识：**
 
-| 名称，速记                | 类型     | 必须 | 默认 | 描述                                                                    |
-| ------------------------- | -------- | ---- | ---- | ----------------------------------------------------------------------- |
-| --to                      | string   | 是   |      | Bech32 编码的收款人地址                                                 |
-| --receiver-on-other-chain | bytesHex |      |      | 另一条链上的 HTLC 认领接收地址                                          |
-| --amount                  | string   | 是   |      | 要发送的金额                                                            |
-| --secret                  | bytesHex |      |      | 用于生成 hash lock 的 secret，缺省将随机生成                            |
-| --hash-lock               | bytesHex |      |      | 由 secret 和时间戳（如果提供）生成的 sha256 哈希，缺省将使用 secre 生成 |
-| --time-lock               | string   | 是   |      | 资金锁定的区块数                                                        |
-| --timestamp               | uint     |      |      | 参与生成 hash lock 的 10 位时间戳（可选）                               |
-
-### 创建HTLC
-
-```bash
-iris tx htlc create \
---from=node0 \
---to=faa1zx6n0jussc3lx0dk0rax6zsk80vgzyy7kyfud5 \
---receiver-on-other-chain=0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826 \
---amount=10iris \
---secret=382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41 \
---time-lock=50 \
---timestamp=1580000000 \
---fees=0.3iris \
---chain-id=irishub
-```
+| 名称，速记                | 类型   | 必须 | 默认  | 描述                                                                    |
+| ------------------------- | ------ | ---- | ----- | ----------------------------------------------------------------------- |
+| --to                      | string | 是   |       | Bech32 编码的收款人地址                                                 |
+| --receiver-on-other-chain | string |      |       | 另一条链上的 HTLC 认领接收地址                                          |
+| --receiver-on-other-chain | string |      |       | 另一条链上对应 HTLC 的创建者地址                                        |
+| --amount                  | string | 是   |       | 要发送的金额                                                            |
+| --secret                  | string |      |       | 用于生成 hash lock 的 secret，缺省将随机生成                            |
+| --hash-lock               | string |      |       | 由 secret 和时间戳（如果提供）生成的 sha256 哈希，缺省将使用 secre 生成 |
+| --time-lock               | string | 是   |       | 资金锁定的区块数                                                        |
+| --timestamp               | uint   |      |       | 参与生成 hash lock 的 10 位时间戳（可选）                               |
+| --transfer                | bool   |      | false | 是否是 HTLT 交易                                                        |
 
 ## iris tx htlc claim
 
 将 HTLC 中锁定的资金发送到收款人地址。
 
 ```bash
-iris tx htlc claim [hash-lock] [secret] [flags] --from=mykey
-```
-
-## iris tx htlc refund
-
-从过期的 HTLC 中取回退款。
-
-```bash
-iris tx htlc refund [hash-lock] [flags] --from=mykey
+iris tx htlc claim [id] [secret] [flags] --from=mykey
 ```
 
 ## iris query htlc htlc
@@ -82,25 +61,29 @@ iris tx htlc refund [hash-lock] [flags] --from=mykey
 查询一个 HTLC 的详细信息。
 
 ```bash
-iris query htlc htlc <hash-lock>
+iris query htlc htlc <id>
 ```
 
-### 查询HTLC详细信息
+## iris query htlc params
+
+查询 HTLC 模块参数
 
 ```bash
-iris query htlc htlc bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf
+iris query htlc params
 ```
 
-执行完命令后，获得 HTLC 的详细信息如下。
+## iris query htlc supplies
+
+查询所有 HTLT 资产的 supply
 
 ```bash
-HTLC:
-        Sender:               faa1a2g4k9w3v2d2l4c4q5rvvu7ggjcrfnynvrpqze
-        To:                   faa1zx6n0jussc3lx0dk0rax6zsk80vgzyy7kyfud5
-        ReceiverOnOtherChain: 0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826
-        Amount:               10iris
-        Secret:               382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41
-        Timestamp:            1580000000
-        ExpireHeight:         59
-        State:                completed
+iris query htlc supplies
+```
+
+## iris query htlc supply
+
+查询一个 HTLT 资产的 supply
+
+```bash
+iris query htlc supply [denom]
 ```

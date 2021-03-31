@@ -32,23 +32,19 @@ func (vtd ValidateTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulat
 		switch msg := msg.(type) {
 		case *ibctransfertypes.MsgTransfer:
 			if containSwapCoin(msg.Token) {
-				return ctx, sdkerrors.Wrap(
-					sdkerrors.ErrInvalidRequest, "can't transfer coinswap liquidity tokens through the IBC module")
+				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "can't transfer coinswap liquidity tokens through the IBC module")
 			}
 		case *tokentypes.MsgBurnToken:
 			if _, err := vtd.tk.GetToken(ctx, msg.Symbol); err != nil {
-				return ctx, sdkerrors.Wrap(
-					sdkerrors.ErrInvalidRequest, "burnt failed, only native tokens can be burnt")
+				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "burnt failed, only native tokens can be burnt")
 			}
 		case *govtypes.MsgSubmitProposal:
 			if containSwapCoin(msg.InitialDeposit...) {
-				return ctx, sdkerrors.Wrap(
-					sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
+				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
 			}
 		case *govtypes.MsgDeposit:
 			if containSwapCoin(msg.Amount...) {
-				return ctx, sdkerrors.Wrap(
-					sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
+				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
 			}
 		}
 	}
@@ -69,8 +65,7 @@ func (vsd ValidateServiceDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 		switch msg := msg.(type) {
 		case *servicetypes.MsgCallService:
 			if msg.Repeated {
-				return ctx, sdkerrors.Wrap(
-					sdkerrors.ErrInvalidRequest, "currently does not support to create repeatable service invocation")
+				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "currently does not support to create repeatable service invocation")
 			}
 		}
 	}

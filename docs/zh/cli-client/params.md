@@ -34,7 +34,7 @@ iris query params subspace [subspace] [key] [flags]
 | `MaxValidators`     | 最大验证人数量         | 100       |
 | `MaxEntries`        | 解绑、转委托的最大数量 | 7         |
 | `BondDenom`         | 可抵押的代币           | uiris     |
-| `HistoricalEntries` |                        | 100       |
+| `HistoricalEntries` | 历史条目数             | 100       |
 
 ## mint
 
@@ -84,6 +84,27 @@ iris query params subspace [subspace] [key] [flags]
 | `IssueTokenBaseFee` | 发行代币所需支付的基准费用 | 60000 * 10^6 uiris |
 | `MintTokenFeeRatio` | 增发代币的费率             | 0.1                |
 
+## htlc
+
+| key           | description                    | default |
+| ------------- | ------------------------------ | ------- |
+| `AssetParams` | 支持的资产列表，`[]AssetParam` | None    |
+
+AssetParam参数如下：
+
+| key                        | description                | Example                                      |
+| -------------------------- | -------------------------- | -------------------------------------------- |
+| `AssetParam.Denom`         | 资产名                     | "htltbcbnb"                                  |
+| `AssetParam.SupplyLimit`   | 资产最大供应量             | 100000                                       |
+| `AssetParam.Active`        | 是否激活                   | true                                         |
+| `AssetParam.DeputyAddress` | 代理人的IRISHub地址        | “iaa18n3x722r4jpwmshlxnw3ehlpfzywupzefthcz5” |
+| `AssetParam.FixedFee`      | 代理人在其他链的固定手续费 | 1000                                         |
+| `AssetParam.MinSwapAmount` | 最小交换金额               | 1                                            |
+| `AssetParam.MaxSwapAmount` | 最大交换金额               | 10000                                        |
+| `AssetParam.MinBlockLock`  | 最小交换到期高度           | 50                                           |
+| `AssetParam.MaxBlockLock`  | 最大交换到期高度           | 25480                                        |
+
+
 ## coinswap
 
 | key   | description    | default |
@@ -92,14 +113,15 @@ iris query params subspace [subspace] [key] [flags]
 
 ## service
 
-| key                    | description                 | default   |
-| ---------------------- | --------------------------- | --------- |
-| `MaxRequestTimeout`    | 最大请求超时时间            | 100(区块) |
-| `MinDepositMultiple`   | 最小抵押倍数                | 200       |
-| `MinDeposit`           | 最小抵押数量                | 6000uiris |
-| `ServiceFeeTax`        | 服务费率                    | 0.1       |
-| `SlashFraction`        | 惩罚系数                    | 0.001     |
-| `ComplaintRetrospect`  | 投诉周期                    | 15d       |
-| `ArbitrationTimeLimit` | 仲裁周期                    | 5d        |
-| `TxSizeLimit`          | 交易最大字节数(service模块) | 4000      |
-| `BaseDenom`            | 服务费支持的代币            | uiris     |
+| key                         | description                 | default   |
+| --------------------------- | --------------------------- | --------- |
+| `MaxRequestTimeout`         | 最大请求超时时间            | 100(区块) |
+| `MinDepositMultiple`        | 最小抵押倍数                | 200       |
+| `MinDeposit`                | 最小抵押数量                | 6000uiris |
+| `ServiceFeeTax`             | 服务费率                    | 0.1       |
+| `SlashFraction`             | 惩罚系数                    | 0.001     |
+| `ComplaintRetrospect`       | 投诉周期                    | 15d       |
+| `ArbitrationTimeLimit`      | 仲裁周期                    | 5d        |
+| `TxSizeLimit`               | 交易最大字节数(service模块) | 4000      |
+| `BaseDenom`                 | 服务费支持的代币            | uiris     |
+| `RestrictedServiceFeeDenom` | 限制服务费token             | false     |

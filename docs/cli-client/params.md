@@ -35,7 +35,7 @@ Among them, the parameters available for query for each subspace are as follows:
 | `MaxValidators`     | Maximum number of validators                                    | 100       |
 | `MaxEntries`        | The maximum number of unbinding/redelegation orders in progress | 7         |
 | `BondDenom`         | Bond denom                                                      | uiris     |
-| `HistoricalEntries` |                                                                 | 100       |
+| `HistoricalEntries` | The number of historical entries                                | 100       |
 
 ## mint
 
@@ -91,16 +91,37 @@ Among them, the parameters available for query for each subspace are as follows:
 | --------------- | ----------------------------- | ------- |
 | `StandardDenom` | The name of the token charged | uiris   |
 
+## htlc
+
+| key           | description                              | default |
+| ------------- | ---------------------------------------- | ------- |
+| `AssetParams` | Array of supported assets,`[]AssetParam` | None    |
+
+AssetParam参数如下：
+
+| key                        | description                       | Example                                      |
+| -------------------------- | --------------------------------- | -------------------------------------------- |
+| `AssetParam.Denom`         | The name  of asset                | "htltbcbnb"                                  |
+| `AssetParam.SupplyLimit`   | The supply limit of  asset        | 100000                                       |
+| `AssetParam.Active`        | Asset state: live or paused       | true                                         |
+| `AssetParam.DeputyAddress` | Deputy's IRISHub address          | “iaa18n3x722r4jpwmshlxnw3ehlpfzywupzefthcz5” |
+| `AssetParam.FixedFee`      | Deputy's fixed fee on other chain | 1000                                         |
+| `AssetParam.MinSwapAmount` | Minimum swap amount               | 1                                            |
+| `AssetParam.MaxSwapAmount` | Maximum swap amount               | 10000                                        |
+| `AssetParam.MinBlockLock`  | Minimum swap expire height        | 50                                           |
+| `AssetParam.MaxBlockLock`  | Maximum swap expire height        | 25480                                        |
+
 ## service
 
-| key                    | description                                         | default    |
-| ---------------------- | --------------------------------------------------- | ---------- |
-| `MaxRequestTimeout`    | Maximum service request timeout                     | 100(block) |
-| `MinDepositMultiple`   | Minimum deposit multiple                            | 200        |
-| `MinDeposit`           | Minimum deposit amount                              | 6000uiris  |
-| `ServiceFeeTax`        | Service rate                                        | 0.1        |
-| `SlashFraction`        | Slash  Fraction                                     | 0.001      |
-| `ComplaintRetrospect`  | Complaint Retrospect                                | 15d        |
-| `ArbitrationTimeLimit` | Arbitration period                                  | 5d         |
-| `TxSizeLimit`          | The maximum number of bytes per service transaction | 4000       |
-| `BaseDenom`            | Tokens supported by service fees                    | uiris      |
+| key                         | description                                         | default    |
+| --------------------------- | --------------------------------------------------- | ---------- |
+| `MaxRequestTimeout`         | Maximum service request timeout                     | 100(block) |
+| `MinDepositMultiple`        | Minimum deposit multiple                            | 200        |
+| `MinDeposit`                | Minimum deposit amount                              | 6000uiris  |
+| `ServiceFeeTax`             | Service rate                                        | 0.1        |
+| `SlashFraction`             | Slash fraction                                      | 0.001      |
+| `ComplaintRetrospect`       | Complaint retrospect                                | 15d        |
+| `ArbitrationTimeLimit`      | Arbitration period                                  | 5d         |
+| `TxSizeLimit`               | The maximum number of bytes per service transaction | 4000       |
+| `BaseDenom`                 | Tokens supported by service fees                    | uiris      |
+| `RestrictedServiceFeeDenom` | Restricted service fee denom                        | false      |
