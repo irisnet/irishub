@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: IRIShub - Legacy REST and gRPC Gateway docs
   description: 'A REST interface for state queries, legacy transactions'
-  version: 1.1.0
+  version: 1.1.1
 paths:
   /node_info:
     get:
