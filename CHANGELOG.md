@@ -8,8 +8,8 @@
 
 ### Application
 
-* [\#2611](https://github.com/irisnet/irishub/pull/2611)  Bump SDK version to [v0.42.4](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.42.4)
-* [\#2611](https://github.com/irisnet/irishub/pull/2611) Bump Tendermint version to [v0.34.9](https://github.com/tendermint/tendermint/releases/tag/v0.34.9)
+* [\#2611](https://github.com/irisnet/irishub/pull/2611) Bump cosmos-sdk version to [v0.42.4](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.42.4)
+* [\#2611](https://github.com/irisnet/irishub/pull/2611) Bump tendermint version to [v0.34.9](https://github.com/tendermint/tendermint/releases/tag/v0.34.9)
 
 ## 1.1.0
 
