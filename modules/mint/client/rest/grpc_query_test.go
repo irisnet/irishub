@@ -43,7 +43,7 @@ func TestIntegrationTestSuite(t *testing.T) {
 	suite.Run(t, new(IntegrationTestSuite))
 }
 
-func (s *IntegrationTestSuite) TestHtlc() {
+func (s *IntegrationTestSuite) TestParams() {
 	val := s.network.Validators[0]
 	baseURL := val.APIAddress
 	//------test GetCmdQueryParams()-------------
