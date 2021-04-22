@@ -10,6 +10,12 @@ order: 3
 
 ## 运行全节点
 
+### Start node from genesis
+
+:::tip
+必须使用 irishub [v1.0.1](https://github.com/irisnet/irishub/releases/tag/v1.0.1) 初始化你的节点
+:::
+
 ```bash
 # 初始化节点
 iris init <moniker> --chain-id=irishub-1
@@ -21,6 +27,13 @@ curl -o ~/.iris/config/genesis.json https://raw.githubusercontent.com/irisnet/ma
 # 启动节点（也可使用 nohup 或 systemd 等方式后台运行）
 iris start
 ```
+
+接下来，你的节点将执行所有链升级过程。在每次升级之间，你必须使用特定的版本同步区块。不用担心在升级高度使用旧版本，节点会自动停止。
+
+| 提案 | 起始高度 | 升级高度 | irishub 版本 |
+| -------- | ------------ | -------------- | ----- |
+| genesis  |  9146456     |  9593205  | [v1.0.1](https://github.com/irisnet/irishub/releases/tag/v1.0.1) |
+| [#1](https://irishub.iobscan.io/#/ProposalsDetail/1)  |  9593205     |    | [v1.1.0](https://github.com/irisnet/irishub/releases/tag/v1.1.0) |
 
 :::tip
 您可能会看到一些连接错误，这没关系，P2P网络正在尝试查找可用的连接

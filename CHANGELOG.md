@@ -2,11 +2,26 @@
 
 ## Unreleased
 
+## 1.1.1
+
+*April 21th, 2021*
+
+### Application
+
+* [\#2611](https://github.com/irisnet/irishub/pull/2611) Bump cosmos-sdk version to [v0.42.4](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.42.4)
+* [\#2611](https://github.com/irisnet/irishub/pull/2611) Bump tendermint version to [v0.34.9](https://github.com/tendermint/tendermint/releases/tag/v0.34.9)
+
 ## 1.1.0
 
 *March 26th, 2021*
 
-* [\#2592](https://github.com/irisnet/irishub/pull/2592) Bump cosmos-sdk version to [v0.42.2](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.42.2)
+### CLI
+
+* [\#2592](https://github.com/irisnet/irishub/pull/2592) Bump irismod version to [v1.4.0](https://github.com/irisnet/irismod/releases/tag/v1.4.0)
+
+### Application
+
+* [\#2602](https://github.com/irisnet/irishub/pull/2602) Bump cosmos-sdk version to [v0.42.2](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.42.3)
 * [\#2588](https://github.com/irisnet/irishub/pull/2588) Bump tendermint verion to [v0.34.8](https://github.com/tendermint/tendermint/releases/tag/v0.34.8)
 * [\#2592](https://github.com/irisnet/irishub/pull/2592) Bump irismod version to [v1.4.0](https://github.com/irisnet/irismod/releases/tag/v1.4.0)
 * [\#2589](https://github.com/irisnet/irishub/issues/2589) Migrate irishub from v1.0 to v1.1
@@ -14,6 +29,8 @@
 ## 1.0.1
 
 *February 18th, 2021*
+
+### Application
 
 This release fixes a downstream security issue which impacts Cosmos SDK users.
 See the [Tendermint v0.34.7 SDK changelog](https://github.com/tendermint/tendermint/blob/v0.34.x/CHANGELOG.md#v0347) for details.
