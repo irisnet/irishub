@@ -11,7 +11,6 @@ import (
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
 	"github.com/irisnet/irismod/modules/token/keeper"
@@ -69,10 +68,10 @@ func WeightedOperations(
 	)
 
 	return simulation.WeightedOperations{
-		//simtypes.NewWeightedOperation(
-		//	weightIssue,
-		//	SimulateIssueToken(k, ak),
-		//),
+		// simulation.NewWeightedOperation(
+		// 	weightIssue,
+		// 	SimulateIssueToken(k, ak, bk),
+		// ),
 		simulation.NewWeightedOperation(
 			weightEdit,
 			SimulateEditToken(k, ak, bk),
@@ -89,7 +88,7 @@ func WeightedOperations(
 }
 
 // SimulateIssueToken tests and runs a single msg issue a new token
-func SimulateIssueToken(k keeper.Keeper, ak authkeeper.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
+func SimulateIssueToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
 		accs []simtypes.Account, chainID string,
@@ -140,7 +139,10 @@ func SimulateEditToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 		accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
-		token, _ := selectOneToken(ctx, k, ak, bk, false)
+		token, _, skip := selectOneToken(ctx, k, ak, bk, false)
+		if skip {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgEditToken, "skip edit token"), nil, nil
+		}
 		msg := types.NewMsgEditToken(token.GetName(), token.GetSymbol(), token.GetMaxSupply(), types.True, token.GetOwner().String())
 
 		simAccount, found := simtypes.FindAccount(accs, token.GetOwner())
@@ -187,7 +189,10 @@ func SimulateMintToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 		accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
-		token, maxFee := selectOneToken(ctx, k, ak, bk, true)
+		token, maxFee, skip := selectOneToken(ctx, k, ak, bk, true)
+		if skip {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgMintToken, "skip mint token"), nil, nil
+		}
 		simToAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := types.NewMsgMintToken(token.GetSymbol(), token.GetOwner().String(), simToAccount.Address.String(), 100)
 
@@ -233,7 +238,10 @@ func SimulateTransferTokenOwner(k keeper.Keeper, ak types.AccountKeeper, bk type
 		accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
-		token, _ := selectOneToken(ctx, k, ak, bk, false)
+		token, _, skip := selectOneToken(ctx, k, ak, bk, false)
+		if skip {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferTokenOwner, "skip TransferTokenOwner"), nil, nil
+		}
 		var simToAccount, _ = simtypes.RandomAcc(r, accs)
 		for simToAccount.Address.Equals(token.GetOwner()) {
 			simToAccount, _ = simtypes.RandomAcc(r, accs)
@@ -284,10 +292,10 @@ func selectOneToken(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	mint bool,
-) (token types.TokenI, maxFees sdk.Coins) {
+) (token types.TokenI, maxFees sdk.Coins, skip bool) {
 	tokens := k.GetTokens(ctx, nil)
 	if len(tokens) == 0 {
-		panic("No token available")
+		return token, maxFees, true
 	}
 
 	for _, t := range tokens {
@@ -295,7 +303,7 @@ func selectOneToken(
 			continue
 		}
 		if !mint {
-			return t, nil
+			return t, nil, false
 		}
 
 		mintFee, err := k.GetTokenMintFee(ctx, t.GetSymbol())
@@ -313,7 +321,7 @@ func selectOneToken(
 		token = t
 		return
 	}
-	panic("No token mintable")
+	return token, maxFees, true
 }
 
 func randStringBetween(r *rand.Rand, min, max int) string {
@@ -325,7 +333,7 @@ func randStringBetween(r *rand.Rand, min, max int) string {
 func genToken(ctx sdk.Context,
 	r *rand.Rand,
 	k keeper.Keeper,
-	ak authkeeper.AccountKeeper,
+	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	accs []simtypes.Account,
 ) (types.Token, sdk.Coins) {
@@ -351,7 +359,7 @@ func genToken(ctx sdk.Context,
 func filterAccount(
 	ctx sdk.Context,
 	r *rand.Rand,
-	ak authkeeper.AccountKeeper,
+	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	accs []simtypes.Account, fee sdk.Coin,
 ) (owner sdk.AccAddress, maxFees sdk.Coins) {

@@ -3,6 +3,8 @@ package simulation
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -40,7 +42,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 		// 10% of accounts own an NFT
 		if simState.Rand.Intn(100) < 10 {
 			baseNFT := types.NewBaseNFT(
-				simtypes.RandStringOfLength(simState.Rand, 20), // id
+				RandnNFTID(simState.Rand, types.MinDenomLen, types.MaxDenomLen), // id
 				simtypes.RandStringOfLength(simState.Rand, 10),
 				acc.Address,
 				simtypes.RandStringOfLength(simState.Rand, 45), // tokenURI
@@ -67,4 +69,10 @@ func RandomizedGenState(simState *module.SimulationState) {
 	fmt.Printf("Selected randomly generated %s parameters:\n%s\n", types.ModuleName, bz)
 
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(nftGenesis)
+}
+
+func RandnNFTID(r *rand.Rand, min, max int) string {
+	n := simtypes.RandIntBetween(r, min, max)
+	id := simtypes.RandStringOfLength(r, n)
+	return strings.ToLower(id)
 }
