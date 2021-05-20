@@ -992,7 +992,10 @@ func (m *BaseNFT) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthNft
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthNft
 			}
 			if (iNdEx + skippy) > l {
@@ -1170,7 +1173,10 @@ func (m *Denom) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthNft
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthNft
 			}
 			if (iNdEx + skippy) > l {
@@ -1284,7 +1290,10 @@ func (m *IDCollection) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthNft
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthNft
 			}
 			if (iNdEx + skippy) > l {
@@ -1400,7 +1409,10 @@ func (m *Owner) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthNft
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthNft
 			}
 			if (iNdEx + skippy) > l {
@@ -1517,7 +1529,10 @@ func (m *Collection) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthNft
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthNft
 			}
 			if (iNdEx + skippy) > l {
