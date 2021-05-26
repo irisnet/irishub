@@ -1,0 +1,70 @@
+syntax = "proto3";
+package irismod.farm;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/farm/types";
+option (gogoproto.goproto_getters_all) = false;
+
+message FarmPool {
+  option (gogoproto.equal) = true;
+
+  string name = 1;
+  string creator = 2;
+  string description = 3;
+  uint64 start_height = 4;
+  uint64 end_height = 5;
+  uint64 last_height_distr_rewards = 6;
+  bool destructible = 7;
+  cosmos.base.v1beta1.Coin total_lp_token_locked = 8 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+    (gogoproto.nullable) = false
+  ];
+  repeated RewardRule rules = 9 [ (gogoproto.nullable) = false ];
+}
+
+message RewardRule {
+  option (gogoproto.equal) = true;
+
+  string reward = 1;
+  string total_reward = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+  string remaining_reward = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+  string reward_per_block = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+  string reward_per_share = 5 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message FarmInfo {
+  option (gogoproto.equal) = true;
+
+  string pool_name = 1;
+  string address = 2;
+  string locked = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+  repeated cosmos.base.v1beta1.Coin reward_debt = 4 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message Params {
+  cosmos.base.v1beta1.Coin create_pool_fee = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+    (gogoproto.nullable) = false
+  ];
+  uint32 max_reward_category_n = 4;
+}

@@ -268,6 +268,19 @@ func (k Keeper) GetReservePool(ctx sdk.Context, uniDenom string) (coins sdk.Coin
 	return k.bk.GetAllBalances(ctx, acc.GetAddress()), nil
 }
 
+// ValidatePool Verify the legitimacy of the liquidity pool
+func (k Keeper) ValidatePool(ctx sdk.Context, uniDenom string) error {
+	if err := types.ValidateUniDenom(uniDenom); err != nil {
+		return err
+	}
+
+	_, err := k.GetReservePool(ctx, uniDenom)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // GetParams gets the parameters for the coinswap module.
 func (k Keeper) GetParams(ctx sdk.Context) types.Params {
 	var swapParams types.Params

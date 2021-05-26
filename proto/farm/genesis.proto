@@ -1,0 +1,14 @@
+syntax = "proto3";
+package irismod.farm;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+import "farm/farm.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/farm/types";
+
+message GenesisState {
+  Params params = 1 [ (gogoproto.nullable) = false ];
+  repeated FarmPool pools = 2 [ (gogoproto.nullable) = false ];
+  repeated FarmInfo farm_infos = 3 [ (gogoproto.nullable) = false ];
+}
