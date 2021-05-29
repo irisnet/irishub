@@ -2,17 +2,21 @@ package cmd
 
 import (
 	"bufio"
+	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 
 	"github.com/spf13/cobra"
 
+	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/keys"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 
 	"github.com/irisnet/irishub/keystore"
 )
@@ -52,6 +56,7 @@ The pass backend requires GnuPG: https://gnupg.org/
 		keys.AddKeyCommand(),
 		keys.ExportKeyCommand(),
 		importKeyCommand(),
+		exportLegacyKeyCommand(),
 		keys.ListKeysCmd(),
 		keys.ShowKeysCmd(),
 		flags.LineBreak,
@@ -100,9 +105,68 @@ func importKeyCommand() *cobra.Command {
 	}
 }
 
+const (
+	flagUnarmoredHex = "unarmored-hex"
+	flagUnsafe       = "unsafe"
+)
+
+func exportLegacyKeyCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "export-legacy <name>",
+		Short: "Export private keys as legacy keystore",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			buf := bufio.NewReader(cmd.InOrStdin())
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			return exportUnsafeUnarmored(cmd, args[0], buf, clientCtx.Keyring)
+
+		},
+	}
+
+	return cmd
+}
+
 func getArmor(privBytes []byte, passphrase string) (string, error) {
 	if !json.Valid(privBytes) {
 		return string(privBytes), nil
 	}
 	return keystore.RecoveryAndExportPrivKeyArmor(privBytes, passphrase)
+}
+
+func exportUnsafeUnarmored(cmd *cobra.Command, uid string, buf *bufio.Reader, kr keyring.Keyring) error {
+	// confirm deletion, unless -y is passed
+	if yes, err := input.GetConfirmation("WARNING: The private key will be exported only for RAINBOW now. Continue?", buf, cmd.ErrOrStderr()); err != nil {
+		return err
+	} else if !yes {
+		return nil
+	}
+
+	hexPrivKey, err := keyring.NewUnsafe(kr).UnsafeExportPrivKeyHex(uid)
+	if err != nil {
+		return err
+	}
+
+	privKey, _ := hex.DecodeString(hexPrivKey)
+
+	encryptPassword, err := input.GetPassword("Enter passphrase to encrypt the exported key:", buf)
+	if err != nil {
+		return err
+	}
+	encryptedKeyJSON, err := keystore.GenerateKeyStore(secp256k1.PrivKey(privKey), encryptPassword)
+	if err != nil {
+		return err
+	}
+
+	jsonString, err := json.MarshalIndent(encryptedKeyJSON, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(jsonString))
+
+	return nil
 }
