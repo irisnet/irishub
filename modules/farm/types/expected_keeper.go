@@ -13,9 +13,7 @@ type BankKeeper interface {
 	GetAllBalances(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 }
 
-type CoinswapKeeper interface {
-	ValidatePool(ctx sdk.Context, lpTokenDenom string) error
-}
+type ValidateLPToken func(ctx sdk.Context, lpTokenDenom string) error
 
 // AccountKeeper defines the expected account keeper (noalias)
 type AccountKeeper interface {

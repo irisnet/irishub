@@ -20,16 +20,16 @@ type Keeper struct {
 	paramSpace paramstypes.Subspace
 	// name of the fee collector
 	feeCollectorName string
+	validateLPToken  types.ValidateLPToken
 	bk               types.BankKeeper
 	ak               types.AccountKeeper
-	ck               types.CoinswapKeeper
 }
 
 func NewKeeper(cdc codec.Marshaler,
 	storeKey sdk.StoreKey,
 	bk types.BankKeeper,
 	ak types.AccountKeeper,
-	ck types.CoinswapKeeper,
+	validateLPToken types.ValidateLPToken,
 	paramSpace paramstypes.Subspace,
 	feeCollectorName string,
 ) Keeper {
@@ -47,7 +47,7 @@ func NewKeeper(cdc codec.Marshaler,
 		cdc:              cdc,
 		bk:               bk,
 		ak:               ak,
-		ck:               ck,
+		validateLPToken:  validateLPToken,
 		paramSpace:       paramSpace,
 		feeCollectorName: feeCollectorName,
 	}

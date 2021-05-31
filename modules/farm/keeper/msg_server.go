@@ -58,7 +58,7 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 	}
 
 	//check valid lp token denom
-	if err := m.Keeper.ck.ValidatePool(ctx, msg.LpTokenDenom); err != nil {
+	if err := m.Keeper.validateLPToken(ctx, msg.LpTokenDenom); err != nil {
 		return nil, sdkerrors.Wrapf(
 			types.ErrInvalidLPToken,
 			"The lp token denom[%s] is not exist",
