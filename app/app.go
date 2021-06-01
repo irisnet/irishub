@@ -183,6 +183,7 @@ var (
 		servicetypes.RequestAccName:    nil,
 		servicetypes.FeeCollectorName:  {authtypes.Burner},
 		farmtypes.ModuleName:           nil,
+		farmtypes.RewardDistrAccount:   nil,
 	}
 
 	nativeToken tokentypes.Token
@@ -463,7 +464,7 @@ func NewIrisApp(
 		keys[farmtypes.StoreKey],
 		app.bankKeeper,
 		app.accountKeeper,
-		app.coinswapKeeper,
+		func(ctx sdk.Context, lpTokenDenom string) error { return nil },
 		app.GetSubspace(farmtypes.ModuleName),
 		authtypes.FeeCollectorName,
 	)
