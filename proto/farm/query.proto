@@ -28,23 +28,24 @@ message QueryPoolsRequest { string name = 1; }
 message FarmPoolEntry {
   string name = 1;
   string creator = 2;
-  uint64 start_height = 3;
-  uint64 end_height = 4;
-  bool destructible = 5;
-  bool expired = 6;
-  cosmos.base.v1beta1.Coin total_lp_token_locked = 7 [
+  string description = 3;
+  uint64 start_height = 4;
+  uint64 end_height = 5;
+  bool destructible = 6;
+  bool expired = 7;
+  cosmos.base.v1beta1.Coin total_lp_token_locked = 8 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.nullable) = false
   ];
-  repeated cosmos.base.v1beta1.Coin total_reward = 8 [
+  repeated cosmos.base.v1beta1.Coin total_reward = 9 [
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.nullable) = false
   ];
-  repeated cosmos.base.v1beta1.Coin remaining_reward = 9 [
+  repeated cosmos.base.v1beta1.Coin remaining_reward = 10 [
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.nullable) = false
   ];
-  repeated cosmos.base.v1beta1.Coin reward_per_block = 10 [
+  repeated cosmos.base.v1beta1.Coin reward_per_block = 11 [
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.nullable) = false
   ];

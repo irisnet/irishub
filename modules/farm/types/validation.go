@@ -30,7 +30,7 @@ func ValidatePoolName(poolName string) error {
 // ValidateDescription validates the pool name
 func ValidateDescription(description string) error {
 	if len(description) > MaxDescriptionLength {
-		return sdkerrors.Wrap(ErrInvalidPoolName, description)
+		return sdkerrors.Wrap(ErrInvalidDescription, description)
 	}
 	return nil
 }
@@ -57,10 +57,12 @@ func ValidateReward(rewardPerBlock, totalReward sdk.Coins) error {
 		return sdkerrors.Wrapf(ErrNotMatch, "The length of rewardPerBlock and totalReward must be the same")
 	}
 
-	for _, r := range totalReward {
-		if !rewardPerBlock.AmountOf(r.Denom).IsPositive() {
-			return sdkerrors.Wrapf(ErrNotMatch, "rewardPerBlock and totalReward token types are inconsistent")
-		}
+	if !rewardPerBlock.IsAllPositive() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "The rewardPerBlock should be greater than zero")
+	}
+
+	if !totalReward.IsAllGTE(rewardPerBlock) {
+		return sdkerrors.Wrapf(ErrNotMatch, "The totalReward should be greater than or equal to rewardPerBlock")
 	}
 	return nil
 }

@@ -205,7 +205,7 @@ func (k Keeper) Stake(ctx sdk.Context, poolName string,
 	rewards, rewardDebt := pool.CaclRewards(farmInfo, lpToken.Amount)
 	//reward users
 	if rewards.IsAllPositive() {
-		if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName,
+		if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.RewardCollector,
 			sender, rewards); err != nil {
 			return reward, err
 		}
@@ -261,8 +261,7 @@ func (k Keeper) Unstake(ctx sdk.Context, poolName string,
 		)
 	}
 
-	expired := pool.IsExpired(ctx.BlockHeight())
-	if expired {
+	if pool.IsExpired(ctx.BlockHeight()) {
 		//If the farm has ended, the reward rules cannot be updated
 		pool.Rules = k.GetRewardRules(ctx, pool.Name)
 		pool.TotalLpTokenLocked = pool.TotalLpTokenLocked.Sub(lpToken)
@@ -274,23 +273,20 @@ func (k Keeper) Unstake(ctx sdk.Context, poolName string,
 			return nil, err
 		}
 	}
-	sentCoins := sdk.NewCoins(lpToken)
-	//compute farmer rewards
-	rewards, rewardDebt := pool.CaclRewards(farmInfo, lpToken.Amount.Neg())
-	if rewards.IsAllPositive() {
-		sentCoins = sentCoins.Add(rewards...)
-	}
-	//distribute reward
+
+	//unstake lpToken to sender account
 	if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName,
-		sender, sentCoins); err != nil {
+		sender, sdk.NewCoins(lpToken)); err != nil {
 		return nil, err
 	}
 
-	//update remaining reward
-	if expired {
-		for _, r := range pool.Rules {
-			r.RemainingReward = r.RemainingReward.Sub(rewards.AmountOf(r.Reward))
-			k.SetRewardRule(ctx, poolName, r)
+	//compute farmer rewards
+	rewards, rewardDebt := pool.CaclRewards(farmInfo, lpToken.Amount.Neg())
+	if rewards.IsAllPositive() {
+		//distribute reward
+		if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.RewardCollector,
+			sender, rewards); err != nil {
+			return nil, err
 		}
 	}
 
@@ -340,7 +336,7 @@ func (k Keeper) Harvest(ctx sdk.Context, poolName string,
 	rewards, rewardDebt := pool.CaclRewards(farmInfo, amtAdded)
 	//reward users
 	if rewards.IsAllPositive() {
-		if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sender, rewards); err != nil {
+		if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.RewardCollector, sender, rewards); err != nil {
 			return nil, err
 		}
 	}
@@ -352,7 +348,7 @@ func (k Keeper) Harvest(ctx sdk.Context, poolName string,
 
 // Refund refund the remaining reward to pool creator
 func (k Keeper) Refund(ctx sdk.Context, pool types.FarmPool) error {
-	pool, rewardTotal, err := k.UpdatePool(ctx, pool, sdk.ZeroInt(), true)
+	pool, _, err := k.UpdatePool(ctx, pool, sdk.ZeroInt(), true)
 	if err != nil {
 		return err
 	}
@@ -366,7 +362,7 @@ func (k Keeper) Refund(ctx sdk.Context, pool types.FarmPool) error {
 	for _, r := range pool.Rules {
 		refundTotal = refundTotal.Add(sdk.NewCoin(r.Reward, r.RemainingReward))
 
-		r.RemainingReward = rewardTotal.AmountOf(r.Reward)
+		r.RemainingReward = sdk.ZeroInt()
 		k.SetRewardRule(ctx, pool.Name, r)
 	}
 
@@ -434,6 +430,14 @@ func (k Keeper) UpdatePool(ctx sdk.Context,
 
 			rewardTotal = rewardTotal.Add(coinCollected)
 			k.SetRewardRule(ctx, pool.Name, rules[i])
+		}
+	}
+
+	//escrow the collected rewards to the `RewardCollector` account
+	if rewardTotal.IsAllPositive() {
+		if err := k.bk.SendCoinsFromModuleToModule(ctx,
+			types.ModuleName, types.RewardCollector, rewardTotal); err != nil {
+			return pool, rewardTotal, err
 		}
 	}
 

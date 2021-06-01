@@ -95,6 +95,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 	expectedContents := farmtypes.FarmPoolEntry{
 		Name:               farmPool,
 		Creator:            creator.String(),
+		Description:        description,
 		StartHeight:        uint64(startHeight),
 		EndHeight:          uint64(startHeight + 101),
 		Destructible:       destructible,
