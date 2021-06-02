@@ -183,7 +183,7 @@ var (
 		servicetypes.RequestAccName:    nil,
 		servicetypes.FeeCollectorName:  {authtypes.Burner},
 		farmtypes.ModuleName:           nil,
-		farmtypes.RewardDistrAccount:   nil,
+		farmtypes.RewardCollector:      nil,
 	}
 
 	nativeToken tokentypes.Token
@@ -521,7 +521,7 @@ func NewIrisApp(
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
-		servicetypes.ModuleName,
+		servicetypes.ModuleName, farmtypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
