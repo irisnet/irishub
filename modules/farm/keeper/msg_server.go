@@ -39,11 +39,11 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 		)
 	}
 
-	if maxRewardCategoryN := m.Keeper.MaxRewardCategoryN(ctx); uint32(len(msg.TotalReward)) > maxRewardCategoryN {
+	if maxRewardCategories := m.Keeper.MaxRewardCategories(ctx); uint32(len(msg.TotalReward)) > maxRewardCategories {
 		return nil, sdkerrors.Wrapf(
 			types.ErrInvalidRewardRule,
 			"the max reward category num is [%d], but got [%d]",
-			maxRewardCategoryN,
+			maxRewardCategories,
 			len(msg.TotalReward),
 		)
 	}

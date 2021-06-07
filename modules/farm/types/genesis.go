@@ -17,8 +17,8 @@ func NewGenesisState(params Params, pools []FarmPool, farmInfos []FarmInfo) *Gen
 func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
 		Params: Params{
-			CreatePoolFee:      sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000)),
-			MaxRewardCategoryN: 2,
+			CreatePoolFee:       sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000)),
+			MaxRewardCategories: 2,
 		},
 	}
 }
