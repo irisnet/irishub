@@ -28,6 +28,8 @@ var (
 	FarmPoolRuleKey   = []byte{0x02} // key for farm pool reward rule
 	FarmerKey         = []byte{0x03} // key for farmer
 	ActiveFarmPoolKey = []byte{0x04} // key for active farm pool
+	// Separator for string key
+	Delimiter = []byte{0x00}
 )
 
 func KeyFarmPool(poolName string) []byte {
@@ -35,11 +37,13 @@ func KeyFarmPool(poolName string) []byte {
 }
 
 func KeyRewardRule(poolName, reward string) []byte {
-	return append(append(FarmPoolRuleKey, []byte(poolName)...), []byte(reward)...)
+	key := append(FarmPoolRuleKey, []byte(poolName)...)
+	return append(append(key, Delimiter...), []byte(reward)...)
 }
 
 func PrefixRewardRule(poolName string) []byte {
-	return append(FarmPoolRuleKey, []byte(poolName)...)
+	key := append(FarmPoolRuleKey, []byte(poolName)...)
+	return append(key, Delimiter...)
 }
 
 func KeyFarmInfo(address, poolName string) []byte {
@@ -50,10 +54,10 @@ func PrefixFarmInfo(address string) []byte {
 	return append(FarmerKey, []byte(address)...)
 }
 
-func KeyActiveFarmPool(expiredHeight uint64, poolName string) []byte {
-	return append(append(ActiveFarmPoolKey, sdk.Uint64ToBigEndian(expiredHeight)...), []byte(poolName)...)
+func KeyActiveFarmPool(height uint64, poolName string) []byte {
+	return append(append(ActiveFarmPoolKey, sdk.Uint64ToBigEndian(height)...), []byte(poolName)...)
 }
 
-func PrefixActiveFarmPool(expiredHeight uint64) []byte {
-	return append(ActiveFarmPoolKey, sdk.Uint64ToBigEndian(expiredHeight)...)
+func PrefixActiveFarmPool(height uint64) []byte {
+	return append(ActiveFarmPoolKey, sdk.Uint64ToBigEndian(height)...)
 }

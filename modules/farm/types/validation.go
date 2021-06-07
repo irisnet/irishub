@@ -42,6 +42,9 @@ func ValidateLpTokenDenom(denom string) error {
 
 // ValidateCoins validates the coin
 func ValidateCoins(coins ...sdk.Coin) error {
+	if !sdk.NewCoins(coins...).IsAllPositive() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "The coin should be greater than zero")
+	}
 	return sdk.NewCoins(coins...).Validate()
 }
 
@@ -55,10 +58,6 @@ func ValidateAddress(sender string) error {
 func ValidateReward(rewardPerBlock, totalReward sdk.Coins) error {
 	if len(rewardPerBlock) != len(totalReward) {
 		return sdkerrors.Wrapf(ErrNotMatch, "The length of rewardPerBlock and totalReward must be the same")
-	}
-
-	if !rewardPerBlock.IsAllPositive() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "The rewardPerBlock should be greater than zero")
 	}
 
 	if !totalReward.IsAllGTE(rewardPerBlock) {
