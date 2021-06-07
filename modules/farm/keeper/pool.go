@@ -61,34 +61,30 @@ func (k Keeper) CreatePool(ctx sdk.Context, name string,
 
 // Destroy destroy an exist farm pool
 func (k Keeper) DestroyPool(ctx sdk.Context, poolName string,
-	creator sdk.AccAddress) error {
+	creator sdk.AccAddress) (sdk.Coins, error) {
 	pool, exist := k.GetPool(ctx, poolName)
 	if !exist {
-		return sdkerrors.Wrapf(types.ErrNotExistPool, "not exist pool [%s]", poolName)
+		return nil, sdkerrors.Wrapf(types.ErrNotExistPool, "not exist pool [%s]", poolName)
 	}
 
 	if creator.String() != pool.Creator {
-		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "creator [%s] is not the creator of the pool", creator.String())
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "creator [%s] is not the creator of the pool", creator.String())
 	}
 
 	if !pool.Destructible {
-		return sdkerrors.Wrapf(
+		return nil, sdkerrors.Wrapf(
 			types.ErrInvalidOperate, "pool [%s] is not destructible", poolName)
 	}
 
 	if pool.IsExpired(ctx.BlockHeight()) {
-		return sdkerrors.Wrapf(types.ErrExpiredPool,
+		return nil, sdkerrors.Wrapf(types.ErrExpiredPool,
 			"pool [%s] has expired at height[%d], current [%d]",
 			poolName,
 			pool.EndHeight,
 			ctx.BlockHeight(),
 		)
 	}
-
-	if err := k.Refund(ctx, pool); err != nil {
-		return sdkerrors.Wrapf(types.ErrNotExistPool, "not exist pool [%s]", poolName)
-	}
-	return nil
+	return k.Refund(ctx, pool)
 }
 
 // AppendReward creates an new farm pool
@@ -347,15 +343,15 @@ func (k Keeper) Harvest(ctx sdk.Context, poolName string,
 }
 
 // Refund refund the remaining reward to pool creator
-func (k Keeper) Refund(ctx sdk.Context, pool types.FarmPool) error {
+func (k Keeper) Refund(ctx sdk.Context, pool types.FarmPool) (sdk.Coins, error) {
 	pool, _, err := k.UpdatePool(ctx, pool, sdk.ZeroInt(), true)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	creator, err := sdk.AccAddressFromBech32(pool.Creator)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var refundTotal sdk.Coins
@@ -370,19 +366,19 @@ func (k Keeper) Refund(ctx sdk.Context, pool types.FarmPool) error {
 		//refund the total remaining reward to creator
 		if err := k.bk.SendCoinsFromModuleToAccount(ctx,
 			types.ModuleName, creator, refundTotal); err != nil {
-			return err
+			return nil, err
 		}
 	}
 	//remove record
 	k.DequeueActivePool(ctx, pool.Name, pool.EndHeight)
-	return nil
+	return refundTotal, nil
 }
 
 // UpdatePool is responsible for updating the status information of the farm pool, including the total accumulated bonus from the last time the bonus was distributed to the present, the current remaining bonus in the farm pool, and the ratio of the current liquidity token to the bonus.
 
 // Note that when multiple transactions at the same block height trigger the farm pool update at the same time, only the first transaction will trigger the `RewardPerShare` update operation
 
-// This method returns the updated farm pool and the bonuses collected in this period
+// UpdatePool returns the updated farm pool and the reward collected in this period
 func (k Keeper) UpdatePool(ctx sdk.Context,
 	pool types.FarmPool,
 	amount sdk.Int,

@@ -141,7 +141,7 @@ func (suite *KeeperTestSuite) TestDestroyPool() {
 	newCtx := suite.app.BaseApp.NewContext(isCheckTx, tmproto.Header{
 		Height: 10,
 	})
-	err = suite.keeper.DestroyPool(newCtx, testPoolName, testCreator)
+	_, err = suite.keeper.DestroyPool(newCtx, testPoolName, testCreator)
 	suite.Require().NoError(err)
 
 	//check farm pool

@@ -97,7 +97,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 		Creator:            creator.String(),
 		Description:        description,
 		StartHeight:        uint64(startHeight),
-		EndHeight:          uint64(startHeight + 101),
+		EndHeight:          uint64(startHeight + 100),
 		Destructible:       destructible,
 		Expired:            false,
 		TotalLpTokenLocked: sdk.NewCoin(lpTokenDenom, sdk.ZeroInt()),

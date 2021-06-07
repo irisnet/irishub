@@ -97,7 +97,7 @@ func (s *IntegrationTestSuite) TestRest() {
 		Description:        description,
 		Creator:            creator.String(),
 		StartHeight:        uint64(startHeight),
-		EndHeight:          uint64(startHeight + 101),
+		EndHeight:          uint64(startHeight + 100),
 		Destructible:       destructible,
 		Expired:            false,
 		TotalLpTokenLocked: sdk.NewCoin(lpTokenDenom, sdk.ZeroInt()),

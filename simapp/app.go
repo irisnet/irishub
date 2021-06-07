@@ -479,7 +479,7 @@ func NewSimApp(
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
-		servicetypes.ModuleName,
+		servicetypes.ModuleName, farmtypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are

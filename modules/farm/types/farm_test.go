@@ -36,7 +36,7 @@ func TestFarmPool_ExpiredHeight(t *testing.T) {
 					},
 				},
 			},
-			want: 201,
+			want: 200,
 		},
 		{
 			name: "test case 2",
@@ -51,7 +51,7 @@ func TestFarmPool_ExpiredHeight(t *testing.T) {
 					},
 				},
 			},
-			want: 111,
+			want: 110,
 		},
 	}
 	for _, tt := range tests {

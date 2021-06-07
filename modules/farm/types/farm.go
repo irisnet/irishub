@@ -7,18 +7,18 @@ import (
 )
 
 func (pool FarmPool) ExpiredHeight() uint64 {
-	var expiredHeight = uint64(math.MaxUint64)
+	var targetInteval = uint64(math.MaxUint64)
 	for _, r := range pool.Rules {
 		inteval := r.TotalReward.Quo(r.RewardPerBlock).Uint64()
-		if inteval+pool.StartHeight < expiredHeight {
-			expiredHeight = inteval + pool.StartHeight
+		if targetInteval > inteval {
+			targetInteval = inteval
 		}
 	}
-	return expiredHeight + 1
+	return pool.StartHeight + targetInteval
 }
 
 func (pool FarmPool) IsExpired(height int64) bool {
-	return pool.EndHeight <= uint64(height)
+	return pool.EndHeight < uint64(height)
 }
 
 func (pool FarmPool) CaclRewards(farmInfo FarmInfo, deltaAmt sdk.Int) (rewards, rewardDebt sdk.Coins) {

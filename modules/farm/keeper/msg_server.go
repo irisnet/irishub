@@ -100,7 +100,9 @@ func (m msgServer) DestroyPool(goCtx context.Context, msg *types.MsgDestroyPool)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.DestroyPool(ctx, msg.PoolName, creator); err != nil {
+
+	refundCoin, err := m.Keeper.DestroyPool(ctx, msg.PoolName, creator)
+	if err != nil {
 		return nil, err
 	}
 	ctx.EventManager().EmitEvents(sdk.Events{
@@ -108,6 +110,7 @@ func (m msgServer) DestroyPool(goCtx context.Context, msg *types.MsgDestroyPool)
 			types.EventTypeDestroyPool,
 			sdk.NewAttribute(types.AttributeValueCreator, msg.Creator),
 			sdk.NewAttribute(types.AttributeValuePoolName, msg.PoolName),
+			sdk.NewAttribute(types.AttributeValueAmount, refundCoin.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
