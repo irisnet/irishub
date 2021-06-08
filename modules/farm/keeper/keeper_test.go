@@ -8,10 +8,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/stretchr/testify/suite"
+
 	"github.com/irisnet/irismod/modules/farm/keeper"
 	"github.com/irisnet/irismod/modules/farm/types"
 	"github.com/irisnet/irismod/simapp"
-	"github.com/stretchr/testify/suite"
 )
 
 var (
