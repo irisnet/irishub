@@ -195,7 +195,7 @@ func SimulateMsgAppendReward(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAppendReward, "farm pool is not exist"), nil, nil
 		}
 
-		if farmPool.IsExpired(ctx.BlockHeight()) {
+		if k.Expired(ctx, farmPool) {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAppendReward, "farmPool has expired"), nil, nil
 		}
 
@@ -277,7 +277,7 @@ func SimulateMsgStake(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeep
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStake, "the farm activity has not yet started"), nil, nil
 		}
 
-		if farmPool.IsExpired(ctx.BlockHeight()) {
+		if k.Expired(ctx, farmPool) {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStake, "the farm activity has ended"), nil, nil
 		}
 
@@ -421,7 +421,7 @@ func SimulateMsgHarvest(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUnstake, "farm pool is not exist"), nil, nil
 		}
 
-		if farmPool.IsExpired(ctx.BlockHeight()) {
+		if k.Expired(ctx, farmPool) {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgHarvest, "farm pool has expired"), nil, nil
 		}
 
@@ -483,7 +483,7 @@ func SimulateMsgDestroyPool(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDestroyPool, "farm pool is not destructible"), nil, nil
 		}
 
-		if farmPool.IsExpired(ctx.BlockHeight()) {
+		if k.Expired(ctx, farmPool) {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDestroyPool, "farm pool has expired"), nil, nil
 		}
 

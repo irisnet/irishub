@@ -46,7 +46,7 @@ func (k Keeper) Pools(goctx context.Context,
 			StartHeight:        pool.StartHeight,
 			EndHeight:          pool.EndHeight,
 			Destructible:       pool.Destructible,
-			Expired:            pool.IsExpired(ctx.BlockHeight()),
+			Expired:            k.Expired(ctx, pool),
 			TotalLpTokenLocked: pool.TotalLpTokenLocked,
 			TotalReward:        totalReward,
 			RemainingReward:    remainingReward,
@@ -93,7 +93,7 @@ func (k Keeper) Farmer(goctx context.Context,
 			continue
 		}
 
-		if !pool.IsExpired(ctx.BlockHeight()) {
+		if !k.Expired(ctx, pool) {
 			pool, _, err = k.UpdatePool(cacheCtx, pool, sdk.ZeroInt(), false)
 			if err != nil {
 				return nil, err

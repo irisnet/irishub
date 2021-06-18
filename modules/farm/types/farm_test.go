@@ -61,7 +61,8 @@ func TestFarmPool_ExpiredHeight(t *testing.T) {
 				StartHeight: tt.fields.BeginHeight,
 				Rules:       tt.fields.Rules,
 			}
-			if got := fp.ExpiredHeight(); got != tt.want {
+			expiredHeight, _ := fp.ExpiredHeight()
+			if got := expiredHeight; got != tt.want {
 				t.Errorf("FarmPool.ExpiredHeight() = %v, want %v", got, tt.want)
 			}
 		})
