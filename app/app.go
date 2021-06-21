@@ -507,7 +507,7 @@ func NewIrisApp(
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
 		oracle.NewAppModule(appCodec, app.oracleKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
-		farm.NewAppModule(appCodec, app.farmkeeper),
+		farm.NewAppModule(appCodec, app.farmkeeper, app.accountKeeper, app.bankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -567,7 +567,7 @@ func NewIrisApp(
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
 		oracle.NewAppModule(appCodec, app.oracleKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
-		farm.NewAppModule(appCodec, app.farmkeeper),
+		farm.NewAppModule(appCodec, app.farmkeeper, app.accountKeeper, app.bankKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
