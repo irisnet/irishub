@@ -464,7 +464,7 @@ func NewIrisApp(
 		keys[farmtypes.StoreKey],
 		app.bankKeeper,
 		app.accountKeeper,
-		app.coinswapKeeper.ValidatePool,
+		func(ctx sdk.Context, lpTokenDenom string) error { return nil },
 		app.GetSubspace(farmtypes.ModuleName),
 		authtypes.FeeCollectorName,
 	)
