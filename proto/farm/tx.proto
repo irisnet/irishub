@@ -15,8 +15,8 @@ service Msg {
   // DestroyPool defines a method for destroying a existed farm pool
   rpc DestroyPool(MsgDestroyPool) returns (MsgDestroyPoolResponse);
 
-  // AppendReward defines a method for appending reward to a existed farm pool
-  rpc AppendReward(MsgAppendReward) returns (MsgAppendRewardResponse);
+  // AdjustPool defines a method for adjusting the farm pool params
+  rpc AdjustPool(MsgAdjustPool) returns (MsgAdjustPoolResponse);
 
   // Stake defines a method for staking some lp token to a farm pool
   rpc Stake(MsgStake) returns (MsgStakeResponse);
@@ -35,7 +35,7 @@ message MsgCreatePool {
   string name = 1;
   string description = 2;
   string lp_token_denom = 3;
-  uint64 start_height = 4;
+  int64 start_height = 4;
   repeated cosmos.base.v1beta1.Coin reward_per_block = 5 [
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.nullable) = false
@@ -44,7 +44,7 @@ message MsgCreatePool {
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.nullable) = false
   ];
-  bool destructible = 7;
+  bool editable = 7;
   string creator = 8;
 }
 
@@ -55,15 +55,19 @@ message MsgDestroyPool {
   string creator = 2;
 }
 
-message MsgAppendReward {
+message MsgAdjustPool {
   option (gogoproto.equal) = true;
 
   string pool_name = 1;
-  repeated cosmos.base.v1beta1.Coin amount = 2 [
+  repeated cosmos.base.v1beta1.Coin AdditionalReward = 2 [
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.nullable) = false
   ];
-  string creator = 3;
+  repeated cosmos.base.v1beta1.Coin RewardPerBlock = 3 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable) = false
+  ];
+  string creator = 4;
 }
 
 message MsgStake {
@@ -97,12 +101,7 @@ message MsgHarvest {
 
 message MsgCreatePoolResponse {}
 message MsgDestroyPoolResponse {}
-message MsgAppendRewardResponse {
-  repeated cosmos.base.v1beta1.Coin remaining_reward = 8 [
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
-    (gogoproto.nullable) = false
-  ];
-}
+message MsgAdjustPoolResponse {}
 message MsgStakeResponse {
   repeated cosmos.base.v1beta1.Coin reward = 2 [
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",

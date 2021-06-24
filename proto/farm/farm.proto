@@ -13,10 +13,10 @@ message FarmPool {
   string name = 1;
   string creator = 2;
   string description = 3;
-  uint64 start_height = 4;
-  uint64 end_height = 5;
-  uint64 last_height_distr_rewards = 6;
-  bool destructible = 7;
+  int64 start_height = 4;
+  int64 end_height = 5;
+  int64 last_height_distr_rewards = 6;
+  bool editable = 7;
   cosmos.base.v1beta1.Coin total_lp_token_locked = 8 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.nullable) = false

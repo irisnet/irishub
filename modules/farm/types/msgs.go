@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
@@ -11,8 +12,8 @@ const (
 	// TypeMsgDestroyPool is the type for MsgDestroyPool
 	TypeMsgDestroyPool = "destroy_pool"
 
-	// TypeMsgMsgAppendReward is the type for MsgAppendReward
-	TypeMsgAppendReward = "append_reward"
+	// TypeMsgAdjustPool is the type for MsgAdjustPool
+	TypeMsgAdjustPool = "adjust_pool"
 
 	// TypeMsgStake is the type for MsgStake
 	TypeMsgStake = "stake"
@@ -27,7 +28,7 @@ const (
 var (
 	_ sdk.Msg = &MsgCreatePool{}
 	_ sdk.Msg = &MsgDestroyPool{}
-	_ sdk.Msg = &MsgAppendReward{}
+	_ sdk.Msg = &MsgAdjustPool{}
 	_ sdk.Msg = &MsgStake{}
 	_ sdk.Msg = &MsgUnstake{}
 	_ sdk.Msg = &MsgHarvest{}
@@ -114,31 +115,43 @@ func (msg MsgDestroyPool) GetSigners() []sdk.AccAddress {
 
 // -----------------------------------------------------------------------------
 // Route implements Msg
-func (msg MsgAppendReward) Route() string { return RouterKey }
+func (msg MsgAdjustPool) Route() string { return RouterKey }
 
 // Type implements Msg
-func (msg MsgAppendReward) Type() string { return TypeMsgAppendReward }
+func (msg MsgAdjustPool) Type() string { return TypeMsgAdjustPool }
 
 // ValidateBasic implements Msg
-func (msg MsgAppendReward) ValidateBasic() error {
+func (msg MsgAdjustPool) ValidateBasic() error {
 	if err := ValidateAddress(msg.Creator); err != nil {
 		return err
 	}
 
-	if err := ValidateCoins(msg.Amount...); err != nil {
-		return err
+	if msg.AdditionalReward == nil && msg.RewardPerBlock == nil {
+		return sdkerrors.Wrap(ErrAllEmpty, "AdditionalReward and RewardPerBlock")
+	}
+
+	if msg.AdditionalReward != nil {
+		if err := ValidateCoins(msg.AdditionalReward...); err != nil {
+			return err
+		}
+	}
+
+	if msg.RewardPerBlock != nil {
+		if err := ValidateCoins(msg.RewardPerBlock...); err != nil {
+			return err
+		}
 	}
 	return ValidatePoolName(msg.PoolName)
 }
 
 // GetSignBytes implements Msg
-func (msg MsgAppendReward) GetSignBytes() []byte {
+func (msg MsgAdjustPool) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(&msg)
 	return sdk.MustSortJSON(bz)
 }
 
 // GetSigners implements Msg
-func (msg MsgAppendReward) GetSigners() []sdk.AccAddress {
+func (msg MsgAdjustPool) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)

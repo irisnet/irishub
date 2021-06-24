@@ -29,9 +29,9 @@ message FarmPoolEntry {
   string name = 1;
   string creator = 2;
   string description = 3;
-  uint64 start_height = 4;
-  uint64 end_height = 5;
-  bool destructible = 6;
+  int64 start_height = 4;
+  int64 end_height = 5;
+  bool editable = 6;
   bool expired = 7;
   cosmos.base.v1beta1.Coin total_lp_token_locked = 8 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",

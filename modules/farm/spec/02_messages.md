@@ -13,10 +13,10 @@ type MsgCreatePool struct {
     Name           string
     Description    string
     LpTokenDenom   string
-    StartHeight    uint64
+    StartHeight    int64
     RewardPerBlock sdk.Coins
     TotalReward    sdk.Coins
-    Destructible   bool
+    Editable       bool
     Creator        string
 }
 ```
@@ -56,14 +56,15 @@ When creator actively destroys the pool, it will also trigger the recalculation 
 
 When the pool becomes inactive (expired or ended), the user can only unstake his staking `lptoken` from the pool and get rewards, or it can be retrieved multiple times, but the reward obtained are the same as all at once. note that `RewardPerShare` will no longer be updated at this time
 
-## MsgAppendReward
+## MsgAdjustPool
 
-Creators can use `MsgAppendReward` to add reward to the pool before the end of the activity to achieve the purpose of extending the activity.
+Creators can use `MsgAdjustPool` to add reward to the pool before the end of the activity to achieve the purpose of extending the activity.
 
 ```go
-type MsgAppendReward struct {
+type MsgAdjustPool struct {
     PoolName string
-    Amount   sdk.Coins
+    AdditionalReward sdk.Coins
+    RewardPerBlock   sdk.Coins
     Creator  string
 }
 ```

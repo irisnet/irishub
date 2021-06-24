@@ -29,10 +29,10 @@ type FarmPool struct {
     Name                   string                                  
     Creator                string                                  
     Description            string                                  
-    StartHeight            uint64                                  
-    EndHeight              uint64                                  
-    LastHeightDistrRewards uint64                                  
-    Destructible           bool                                    
+    StartHeight            int64                                  
+    EndHeight              int64                                  
+    LastHeightDistrRewards int64                                  
+    Editable               bool                                    
     TotalLpTokenLocked     sdk.Coin 
     Rules                  []RewardRule                            
 }
@@ -52,7 +52,7 @@ type RewardRule struct {
 - `StartHeight`: the starting height of the farm pool activity, but the user's reward is not calculated from this height, but calculated from the moment the user staking.
 - `EndHeight`: the end height of the farm pool activity. After this height, users can no longer perform stake transactions, and the reward ends after this height. The activity will be removed from the active farm pool. If there are remaining bonuses, will be refunded to the creator of the pool.
 - `LastHeightDistrRewards`: `LastHeightDistrRewards` records the height of the pool that triggered the reward distribution last time. When the reward distribution is triggered next time, it will use `LastHeightDistrRewards` as the starting height and the current height as the ending height. The total rewards generated during this time period are calculated.
-- `Destructible`: whether the farm pool can be actively destroyed by the creator, after the farm pool is destroyed, the profit calculation ends, and the remaining money is returned to the creator.
+- `Editable`: whether the farm pool can be actively destroyed by the creator, after the farm pool is destroyed, the profit calculation ends, and the remaining money is returned to the creator.
 - `TotalLpTokenLocked`: the farm pool accepts collateralized token denom, and the denom rules can be set by the users of moudle.
 
 ## RewardRule

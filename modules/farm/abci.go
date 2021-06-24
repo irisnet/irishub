@@ -10,7 +10,7 @@ import (
 // EndBlocker handles block beginning logic for farm
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 	logger := k.Logger(ctx).With("handler", "endBlocker")
-	k.IteratorExpiredPool(ctx, uint64(ctx.BlockHeight()), func(pool types.FarmPool) {
+	k.IteratorExpiredPool(ctx, ctx.BlockHeight(), func(pool types.FarmPool) {
 		logger.Info(
 			"The farm pool has expired, refund to creator",
 			"poolName", pool.Name,

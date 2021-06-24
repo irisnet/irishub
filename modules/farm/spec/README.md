@@ -21,7 +21,7 @@ This specification describes the creation, destruction, additional bonuses, stak
 2. **[Messages](02_messages.md)**
    - [MsgCreatePool](02_messages.md#msgCreatePool)
    - [MsgDestroyPool](02_messages.md#msgDestroyPool)
-   - [MsgAppendReward](02_messages.md#msgAppendReward)
+   - [MsgAdjustPool](02_messages.md#msgAdjustPool)
    - [MsgStake](02_messages.md#msgStake)
    - [MsgUnstake](02_messages.md#msgUnstake)
    - [MsgHarvest](02_messages.md#msgHarvest)

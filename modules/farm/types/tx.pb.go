@@ -34,10 +34,10 @@ type MsgCreatePool struct {
 	Name           string                                   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description    string                                   `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	LpTokenDenom   string                                   `protobuf:"bytes,3,opt,name=lp_token_denom,json=lpTokenDenom,proto3" json:"lp_token_denom,omitempty"`
-	StartHeight    uint64                                   `protobuf:"varint,4,opt,name=start_height,json=startHeight,proto3" json:"start_height,omitempty"`
+	StartHeight    int64                                    `protobuf:"varint,4,opt,name=start_height,json=startHeight,proto3" json:"start_height,omitempty"`
 	RewardPerBlock github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,5,rep,name=reward_per_block,json=rewardPerBlock,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"reward_per_block"`
 	TotalReward    github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,6,rep,name=total_reward,json=totalReward,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"total_reward"`
-	Destructible   bool                                     `protobuf:"varint,7,opt,name=destructible,proto3" json:"destructible,omitempty"`
+	Editable       bool                                     `protobuf:"varint,7,opt,name=editable,proto3" json:"editable,omitempty"`
 	Creator        string                                   `protobuf:"bytes,8,opt,name=creator,proto3" json:"creator,omitempty"`
 }
 
@@ -112,24 +112,25 @@ func (m *MsgDestroyPool) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDestroyPool proto.InternalMessageInfo
 
-type MsgAppendReward struct {
-	PoolName string                                   `protobuf:"bytes,1,opt,name=pool_name,json=poolName,proto3" json:"pool_name,omitempty"`
-	Amount   github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
-	Creator  string                                   `protobuf:"bytes,3,opt,name=creator,proto3" json:"creator,omitempty"`
+type MsgAdjustPool struct {
+	PoolName         string                                   `protobuf:"bytes,1,opt,name=pool_name,json=poolName,proto3" json:"pool_name,omitempty"`
+	AdditionalReward github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=AdditionalReward,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"AdditionalReward"`
+	RewardPerBlock   github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,3,rep,name=RewardPerBlock,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"RewardPerBlock"`
+	Creator          string                                   `protobuf:"bytes,4,opt,name=creator,proto3" json:"creator,omitempty"`
 }
 
-func (m *MsgAppendReward) Reset()         { *m = MsgAppendReward{} }
-func (m *MsgAppendReward) String() string { return proto.CompactTextString(m) }
-func (*MsgAppendReward) ProtoMessage()    {}
-func (*MsgAppendReward) Descriptor() ([]byte, []int) {
+func (m *MsgAdjustPool) Reset()         { *m = MsgAdjustPool{} }
+func (m *MsgAdjustPool) String() string { return proto.CompactTextString(m) }
+func (*MsgAdjustPool) ProtoMessage()    {}
+func (*MsgAdjustPool) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6b714bf6ff5a5095, []int{2}
 }
-func (m *MsgAppendReward) XXX_Unmarshal(b []byte) error {
+func (m *MsgAdjustPool) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgAppendReward) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgAdjustPool) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgAppendReward.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgAdjustPool.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -139,17 +140,17 @@ func (m *MsgAppendReward) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return b[:n], nil
 	}
 }
-func (m *MsgAppendReward) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgAppendReward.Merge(m, src)
+func (m *MsgAdjustPool) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAdjustPool.Merge(m, src)
 }
-func (m *MsgAppendReward) XXX_Size() int {
+func (m *MsgAdjustPool) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgAppendReward) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgAppendReward.DiscardUnknown(m)
+func (m *MsgAdjustPool) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAdjustPool.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgAppendReward proto.InternalMessageInfo
+var xxx_messageInfo_MsgAdjustPool proto.InternalMessageInfo
 
 type MsgStake struct {
 	PoolName string                                  `protobuf:"bytes,1,opt,name=pool_name,json=poolName,proto3" json:"pool_name,omitempty"`
@@ -339,22 +340,21 @@ func (m *MsgDestroyPoolResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDestroyPoolResponse proto.InternalMessageInfo
 
-type MsgAppendRewardResponse struct {
-	RemainingReward github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,8,rep,name=remaining_reward,json=remainingReward,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"remaining_reward"`
+type MsgAdjustPoolResponse struct {
 }
 
-func (m *MsgAppendRewardResponse) Reset()         { *m = MsgAppendRewardResponse{} }
-func (m *MsgAppendRewardResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgAppendRewardResponse) ProtoMessage()    {}
-func (*MsgAppendRewardResponse) Descriptor() ([]byte, []int) {
+func (m *MsgAdjustPoolResponse) Reset()         { *m = MsgAdjustPoolResponse{} }
+func (m *MsgAdjustPoolResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgAdjustPoolResponse) ProtoMessage()    {}
+func (*MsgAdjustPoolResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6b714bf6ff5a5095, []int{8}
 }
-func (m *MsgAppendRewardResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgAdjustPoolResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgAppendRewardResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgAdjustPoolResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgAppendRewardResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgAdjustPoolResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -364,17 +364,17 @@ func (m *MsgAppendRewardResponse) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
-func (m *MsgAppendRewardResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgAppendRewardResponse.Merge(m, src)
+func (m *MsgAdjustPoolResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAdjustPoolResponse.Merge(m, src)
 }
-func (m *MsgAppendRewardResponse) XXX_Size() int {
+func (m *MsgAdjustPoolResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgAppendRewardResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgAppendRewardResponse.DiscardUnknown(m)
+func (m *MsgAdjustPoolResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAdjustPoolResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgAppendRewardResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgAdjustPoolResponse proto.InternalMessageInfo
 
 type MsgStakeResponse struct {
 	Reward github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=reward,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"reward"`
@@ -490,13 +490,13 @@ var xxx_messageInfo_MsgHarvestResponse proto.InternalMessageInfo
 func init() {
 	proto.RegisterType((*MsgCreatePool)(nil), "irismod.farm.MsgCreatePool")
 	proto.RegisterType((*MsgDestroyPool)(nil), "irismod.farm.MsgDestroyPool")
-	proto.RegisterType((*MsgAppendReward)(nil), "irismod.farm.MsgAppendReward")
+	proto.RegisterType((*MsgAdjustPool)(nil), "irismod.farm.MsgAdjustPool")
 	proto.RegisterType((*MsgStake)(nil), "irismod.farm.MsgStake")
 	proto.RegisterType((*MsgUnstake)(nil), "irismod.farm.MsgUnstake")
 	proto.RegisterType((*MsgHarvest)(nil), "irismod.farm.MsgHarvest")
 	proto.RegisterType((*MsgCreatePoolResponse)(nil), "irismod.farm.MsgCreatePoolResponse")
 	proto.RegisterType((*MsgDestroyPoolResponse)(nil), "irismod.farm.MsgDestroyPoolResponse")
-	proto.RegisterType((*MsgAppendRewardResponse)(nil), "irismod.farm.MsgAppendRewardResponse")
+	proto.RegisterType((*MsgAdjustPoolResponse)(nil), "irismod.farm.MsgAdjustPoolResponse")
 	proto.RegisterType((*MsgStakeResponse)(nil), "irismod.farm.MsgStakeResponse")
 	proto.RegisterType((*MsgUnstakeResponse)(nil), "irismod.farm.MsgUnstakeResponse")
 	proto.RegisterType((*MsgHarvestResponse)(nil), "irismod.farm.MsgHarvestResponse")
@@ -505,54 +505,53 @@ func init() {
 func init() { proto.RegisterFile("farm/tx.proto", fileDescriptor_6b714bf6ff5a5095) }
 
 var fileDescriptor_6b714bf6ff5a5095 = []byte{
-	// 738 bytes of a gzipped FileDescriptorProto
+	// 731 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x56, 0xcd, 0x6e, 0xd3, 0x4a,
-	0x18, 0x8d, 0x93, 0x34, 0x4d, 0xbf, 0xa4, 0x3f, 0xb2, 0xee, 0x6d, 0x7d, 0xd3, 0x7b, 0x9d, 0xdc,
-	0x50, 0x44, 0x36, 0xb5, 0x69, 0xd9, 0xb1, 0x41, 0xb4, 0x45, 0x54, 0x42, 0xa9, 0x4a, 0x28, 0x1b,
-	0x36, 0x91, 0x7f, 0x06, 0xd7, 0x8a, 0x3d, 0x63, 0x79, 0x26, 0x2d, 0x7d, 0x0b, 0x78, 0x03, 0xb6,
-	0xc0, 0x92, 0x15, 0x6f, 0xd0, 0x0d, 0x52, 0x97, 0x88, 0x45, 0x81, 0x76, 0xc3, 0x63, 0xa0, 0x19,
-	0xff, 0xd4, 0x69, 0x82, 0xc5, 0xa2, 0x80, 0x58, 0x65, 0x72, 0xce, 0xcc, 0xf9, 0xce, 0xcc, 0x1c,
-	0x7f, 0x36, 0xcc, 0x3e, 0x35, 0x42, 0x5f, 0x67, 0xcf, 0xb4, 0x20, 0x24, 0x8c, 0xc8, 0x75, 0x37,
-	0x74, 0xa9, 0x4f, 0x6c, 0x8d, 0xc3, 0x0d, 0xd5, 0x22, 0xd4, 0x27, 0x54, 0x37, 0x0d, 0x8a, 0xf4,
-	0x83, 0x35, 0x13, 0x31, 0x63, 0x4d, 0xb7, 0x88, 0x8b, 0xa3, 0xd9, 0x8d, 0xbf, 0x1c, 0xe2, 0x10,
-	0x31, 0xd4, 0xf9, 0x28, 0x42, 0xdb, 0xef, 0x4a, 0x30, 0xdb, 0xa5, 0xce, 0x66, 0x88, 0x0c, 0x86,
-	0x76, 0x09, 0xf1, 0x64, 0x19, 0xca, 0xd8, 0xf0, 0x91, 0x22, 0xb5, 0xa4, 0xce, 0x4c, 0x4f, 0x8c,
-	0xe5, 0x16, 0xd4, 0x6c, 0x44, 0xad, 0xd0, 0x0d, 0x98, 0x4b, 0xb0, 0x52, 0x14, 0x54, 0x16, 0x92,
-	0x57, 0x60, 0xce, 0x0b, 0xfa, 0x8c, 0x0c, 0x10, 0xee, 0xdb, 0x08, 0x13, 0x5f, 0x29, 0x89, 0x49,
-	0x75, 0x2f, 0xd8, 0xe3, 0xe0, 0x16, 0xc7, 0xe4, 0xff, 0xa1, 0x4e, 0x99, 0x11, 0xb2, 0xfe, 0x3e,
-	0x72, 0x9d, 0x7d, 0xa6, 0x94, 0x5b, 0x52, 0xa7, 0xdc, 0xab, 0x09, 0x6c, 0x5b, 0x40, 0xf2, 0x10,
-	0x16, 0x42, 0x74, 0x68, 0x84, 0x76, 0x3f, 0x40, 0x61, 0xdf, 0xf4, 0x88, 0x35, 0x50, 0xa6, 0x5a,
-	0xa5, 0x4e, 0x6d, 0xfd, 0x1f, 0x2d, 0xda, 0xa1, 0xc6, 0x77, 0xa8, 0xc5, 0x3b, 0xd4, 0x36, 0x89,
-	0x8b, 0x37, 0x6e, 0x1e, 0x9f, 0x36, 0x0b, 0xaf, 0x3f, 0x35, 0x3b, 0x8e, 0xcb, 0xf6, 0x87, 0xa6,
-	0x66, 0x11, 0x5f, 0x8f, 0x8f, 0x23, 0xfa, 0x59, 0xa5, 0xf6, 0x40, 0x67, 0x47, 0x01, 0xa2, 0x62,
-	0x01, 0xed, 0xcd, 0x45, 0x45, 0x76, 0x51, 0xb8, 0xc1, 0x4b, 0xc8, 0x18, 0xea, 0x8c, 0x30, 0xc3,
-	0xeb, 0x47, 0xb8, 0x52, 0xb9, 0xfa, 0x92, 0x35, 0x51, 0xa0, 0x27, 0xf4, 0xe5, 0x36, 0xd4, 0x6d,
-	0x44, 0x59, 0x38, 0xb4, 0x98, 0x6b, 0x7a, 0x48, 0x99, 0x6e, 0x49, 0x9d, 0x6a, 0x6f, 0x04, 0x93,
-	0x15, 0x98, 0xb6, 0xf8, 0xbd, 0x90, 0x50, 0xa9, 0x8a, 0xc3, 0x4c, 0xfe, 0xde, 0x2e, 0x7f, 0x7d,
-	0xd9, 0x94, 0xda, 0x5d, 0x98, 0xeb, 0x52, 0x67, 0x8b, 0x2f, 0x21, 0x47, 0xe2, 0xee, 0x96, 0x61,
-	0x26, 0x20, 0xc4, 0xeb, 0x67, 0x2e, 0xb0, 0xca, 0x81, 0x1d, 0x7e, 0x89, 0x19, 0xb9, 0xe2, 0x24,
-	0xb9, 0xb7, 0x12, 0xcc, 0x77, 0xa9, 0x73, 0x37, 0x08, 0x10, 0xb6, 0x63, 0x9b, 0xb9, 0x82, 0x16,
-	0x54, 0x0c, 0x9f, 0x0c, 0x31, 0x53, 0x8a, 0x57, 0x7f, 0x5a, 0xb1, 0x74, 0xd6, 0x75, 0x69, 0x92,
-	0xeb, 0x57, 0x12, 0x54, 0xbb, 0xd4, 0x79, 0xc4, 0x8c, 0x01, 0xca, 0xb7, 0x6b, 0x66, 0xec, 0x4a,
-	0xf9, 0x76, 0x75, 0x6e, 0xf7, 0xe3, 0x69, 0xf3, 0xc6, 0x0f, 0xda, 0x4d, 0xdd, 0x2e, 0x42, 0x85,
-	0x22, 0x6c, 0xa3, 0xc4, 0x6c, 0xfc, 0x2f, 0xf6, 0xfa, 0x46, 0x02, 0xe8, 0x52, 0xe7, 0x31, 0xa6,
-	0x7f, 0x82, 0xdb, 0xfb, 0xc2, 0xec, 0xb6, 0x11, 0x1e, 0x20, 0xca, 0xf2, 0xcd, 0x5e, 0x08, 0x15,
-	0x27, 0x08, 0x2d, 0xc1, 0xdf, 0x23, 0x2d, 0xa6, 0x87, 0x68, 0x40, 0x30, 0x45, 0x6d, 0x05, 0x16,
-	0x47, 0x03, 0x9c, 0x32, 0x2f, 0x24, 0x58, 0xba, 0x94, 0xc5, 0x84, 0x93, 0x0f, 0x78, 0x87, 0xf0,
-	0x0d, 0x17, 0xbb, 0xd8, 0x49, 0x1e, 0xd7, 0xea, 0xd5, 0x07, 0x70, 0x3e, 0x2d, 0x12, 0xd5, 0x6f,
-	0x1f, 0xc2, 0x42, 0x12, 0xb4, 0xd4, 0x8b, 0x05, 0x95, 0xd8, 0xc1, 0xcf, 0x78, 0x04, 0x22, 0xe9,
-	0xf6, 0x11, 0xc8, 0x17, 0xa9, 0xf9, 0x1d, 0xa5, 0xe3, 0x0c, 0xfc, 0xd2, 0xd2, 0xeb, 0xef, 0x4b,
-	0x50, 0xea, 0x52, 0x47, 0xde, 0x01, 0xc8, 0xbc, 0x9d, 0x96, 0xb5, 0xec, 0x4b, 0x4f, 0x1b, 0xc9,
-	0x55, 0xe3, 0x5a, 0x0e, 0x99, 0x9a, 0x7f, 0x08, 0xb5, 0x6c, 0xcb, 0xfc, 0x77, 0x6c, 0x4d, 0x86,
-	0x6d, 0xac, 0xe4, 0xb1, 0xa9, 0xe4, 0x1e, 0xd4, 0x47, 0xba, 0xe6, 0x7f, 0x63, 0xab, 0xb2, 0x74,
-	0xe3, 0x7a, 0x2e, 0x9d, 0xaa, 0xde, 0x81, 0xa9, 0xa8, 0xab, 0x2d, 0x8e, 0xcd, 0x17, 0x78, 0x43,
-	0x9d, 0x8c, 0xa7, 0x02, 0xf7, 0x60, 0x3a, 0x69, 0x35, 0xca, 0xd8, 0xd4, 0x98, 0x69, 0xb4, 0xbe,
-	0xc7, 0x64, 0x65, 0x92, 0x26, 0x30, 0x2e, 0x13, 0x33, 0x13, 0x64, 0x2e, 0x85, 0x66, 0xe3, 0xc1,
-	0xf1, 0x17, 0xb5, 0x70, 0x7c, 0xa6, 0x4a, 0x27, 0x67, 0xaa, 0xf4, 0xf9, 0x4c, 0x95, 0x9e, 0x9f,
-	0xab, 0x85, 0x93, 0x73, 0xb5, 0xf0, 0xe1, 0x5c, 0x2d, 0x3c, 0x59, 0xcd, 0xe4, 0x83, 0x2b, 0x61,
-	0xc4, 0xf4, 0x58, 0x51, 0xf7, 0x89, 0x3d, 0xf4, 0x10, 0xd5, 0xa3, 0xaf, 0x1f, 0x1e, 0x15, 0xb3,
-	0x22, 0xbe, 0x5e, 0x6e, 0x7d, 0x0b, 0x00, 0x00, 0xff, 0xff, 0x02, 0x4b, 0x87, 0x33, 0x12, 0x09,
-	0x00, 0x00,
+	0x14, 0x8e, 0x93, 0x34, 0x4d, 0x4f, 0xd2, 0xa8, 0x1a, 0xdd, 0xdb, 0xeb, 0x9b, 0x5e, 0x39, 0xb9,
+	0xa1, 0x12, 0xd9, 0xd4, 0xa6, 0x65, 0xc7, 0x06, 0xf5, 0x07, 0x51, 0x09, 0xa5, 0x2a, 0x06, 0x36,
+	0x6c, 0x2c, 0xff, 0x0c, 0xae, 0x89, 0xed, 0xb1, 0x66, 0x26, 0x2d, 0x7d, 0x0b, 0x1e, 0x81, 0x2d,
+	0xb0, 0x62, 0xcb, 0x0b, 0xd0, 0x65, 0x97, 0x88, 0x45, 0x81, 0x76, 0xc3, 0x63, 0x20, 0x8f, 0x9d,
+	0xc4, 0xc1, 0x21, 0xb0, 0x68, 0x41, 0xac, 0x3c, 0xf3, 0x9d, 0x99, 0xef, 0x9c, 0x39, 0xdf, 0x39,
+	0xe3, 0x81, 0xc5, 0x27, 0x26, 0x0d, 0x34, 0xfe, 0x4c, 0x8d, 0x28, 0xe1, 0x04, 0xd5, 0x3d, 0xea,
+	0xb1, 0x80, 0x38, 0x6a, 0x0c, 0x37, 0x15, 0x9b, 0xb0, 0x80, 0x30, 0xcd, 0x32, 0x19, 0xd6, 0x0e,
+	0xd7, 0x2d, 0xcc, 0xcd, 0x75, 0xcd, 0x26, 0x5e, 0x98, 0xac, 0x6e, 0xfe, 0xe5, 0x12, 0x97, 0x88,
+	0xa1, 0x16, 0x8f, 0x12, 0xb4, 0xf3, 0xa6, 0x04, 0x8b, 0x3d, 0xe6, 0x6e, 0x53, 0x6c, 0x72, 0xbc,
+	0x4f, 0x88, 0x8f, 0x10, 0x94, 0x43, 0x33, 0xc0, 0xb2, 0xd4, 0x96, 0xba, 0x0b, 0xba, 0x18, 0xa3,
+	0x36, 0xd4, 0x1c, 0xcc, 0x6c, 0xea, 0x45, 0xdc, 0x23, 0xa1, 0x5c, 0x14, 0xa6, 0x2c, 0x84, 0x56,
+	0xa1, 0xe1, 0x47, 0x06, 0x27, 0x7d, 0x1c, 0x1a, 0x0e, 0x0e, 0x49, 0x20, 0x97, 0xc4, 0xa2, 0xba,
+	0x1f, 0x3d, 0x8c, 0xc1, 0x9d, 0x18, 0x43, 0xff, 0x43, 0x9d, 0x71, 0x93, 0x72, 0xe3, 0x00, 0x7b,
+	0xee, 0x01, 0x97, 0xcb, 0x6d, 0xa9, 0x5b, 0xd2, 0x6b, 0x02, 0xdb, 0x15, 0x10, 0x1a, 0xc0, 0x12,
+	0xc5, 0x47, 0x26, 0x75, 0x8c, 0x08, 0x53, 0xc3, 0xf2, 0x89, 0xdd, 0x97, 0xe7, 0xda, 0xa5, 0x6e,
+	0x6d, 0xe3, 0x5f, 0x35, 0x39, 0xa1, 0x1a, 0x9f, 0x50, 0x4d, 0x4f, 0xa8, 0x6e, 0x13, 0x2f, 0xdc,
+	0xba, 0x71, 0x72, 0xd6, 0x2a, 0xbc, 0xfa, 0xd8, 0xea, 0xba, 0x1e, 0x3f, 0x18, 0x58, 0xaa, 0x4d,
+	0x02, 0x2d, 0x4d, 0x47, 0xf2, 0x59, 0x63, 0x4e, 0x5f, 0xe3, 0xc7, 0x11, 0x66, 0x62, 0x03, 0xd3,
+	0x1b, 0x89, 0x93, 0x7d, 0x4c, 0xb7, 0x62, 0x17, 0x28, 0x84, 0x3a, 0x27, 0xdc, 0xf4, 0x8d, 0x04,
+	0x97, 0x2b, 0x97, 0xef, 0xb2, 0x26, 0x1c, 0xe8, 0x82, 0x1f, 0x35, 0xa1, 0x8a, 0x1d, 0x8f, 0x9b,
+	0x96, 0x8f, 0xe5, 0xf9, 0xb6, 0xd4, 0xad, 0xea, 0xa3, 0x39, 0x92, 0x61, 0xde, 0x8e, 0xf5, 0x20,
+	0x54, 0xae, 0x8a, 0x24, 0x0e, 0xa7, 0xb7, 0xca, 0x5f, 0x5e, 0xb4, 0xa4, 0x4e, 0x0f, 0x1a, 0x3d,
+	0xe6, 0xee, 0x60, 0xc6, 0x29, 0x39, 0x16, 0x9a, 0xad, 0xc0, 0x42, 0x44, 0x88, 0x6f, 0x64, 0x84,
+	0xab, 0xc6, 0xc0, 0x5e, 0x2c, 0x5e, 0x86, 0xae, 0x38, 0x8d, 0xee, 0x6d, 0x51, 0x94, 0xc0, 0xa6,
+	0xf3, 0x74, 0xc0, 0xf8, 0x8f, 0xe9, 0x8e, 0x60, 0x69, 0xd3, 0x71, 0xbc, 0x58, 0xf5, 0xe1, 0x69,
+	0xe4, 0xe2, 0xe5, 0x67, 0x2b, 0xe7, 0x04, 0x31, 0x68, 0xe8, 0x13, 0xa2, 0xc9, 0xa5, 0x2b, 0xa8,
+	0x8b, 0x49, 0x17, 0xd9, 0xe4, 0x95, 0xa7, 0x25, 0xef, 0xa5, 0x04, 0xd5, 0x1e, 0x73, 0x1f, 0x70,
+	0xb3, 0x8f, 0x67, 0xe7, 0xcd, 0x82, 0x8a, 0x19, 0x90, 0x41, 0xc8, 0x85, 0x0a, 0x33, 0xc3, 0xd6,
+	0xe2, 0xb0, 0x3f, 0x9c, 0xb5, 0xae, 0xff, 0x64, 0xd8, 0x7a, 0xca, 0x8c, 0x96, 0xa1, 0xc2, 0x70,
+	0xe8, 0x60, 0x9a, 0x76, 0x5f, 0x3a, 0x4b, 0x63, 0x7d, 0x2d, 0x01, 0xf4, 0x98, 0xfb, 0x28, 0x64,
+	0x7f, 0x42, 0xb4, 0x77, 0x45, 0xb0, 0xbb, 0x26, 0x3d, 0xc4, 0x8c, 0xcf, 0x0e, 0x76, 0x4c, 0x54,
+	0x9c, 0x42, 0xf4, 0x0f, 0xfc, 0x3d, 0x71, 0xc3, 0xe9, 0x98, 0x45, 0x24, 0x64, 0xb8, 0x23, 0xc3,
+	0xf2, 0x64, 0x1f, 0x8d, 0x2c, 0xc9, 0x96, 0x71, 0x47, 0x8c, 0x0c, 0x47, 0xb0, 0x34, 0x54, 0x7b,
+	0x88, 0x21, 0x1b, 0x2a, 0xf4, 0xca, 0xda, 0x20, 0xa5, 0xee, 0x1c, 0x03, 0x1a, 0x4b, 0xf7, 0x3b,
+	0x5c, 0xa7, 0x42, 0xfc, 0x52, 0xd7, 0x1b, 0xef, 0x4a, 0x50, 0xea, 0x31, 0x17, 0xed, 0x01, 0x64,
+	0xfe, 0x50, 0x2b, 0x6a, 0xf6, 0xc7, 0xa7, 0x4e, 0x88, 0xdb, 0xbc, 0x36, 0xc3, 0x38, 0x0a, 0xfe,
+	0x3e, 0xd4, 0xb2, 0xd7, 0xe7, 0x7f, 0xb9, 0x3d, 0x19, 0x6b, 0x73, 0x75, 0x96, 0x75, 0x44, 0xb9,
+	0x07, 0x90, 0xbd, 0x41, 0x73, 0x7b, 0xc6, 0xc6, 0x29, 0x21, 0xe6, 0x2b, 0x0d, 0xdd, 0x86, 0xb9,
+	0xe4, 0x52, 0x59, 0xce, 0xad, 0x16, 0x78, 0x53, 0x99, 0x8e, 0x8f, 0x08, 0xee, 0xc0, 0xfc, 0xb0,
+	0xd3, 0xe5, 0xdc, 0xd2, 0xd4, 0xd2, 0x6c, 0x7f, 0xcf, 0x92, 0xa5, 0x19, 0xf6, 0x60, 0x9e, 0x26,
+	0xb5, 0x4c, 0xa1, 0xf9, 0xa6, 0x5c, 0xb6, 0xee, 0x9d, 0x7c, 0x56, 0x0a, 0x27, 0xe7, 0x8a, 0x74,
+	0x7a, 0xae, 0x48, 0x9f, 0xce, 0x15, 0xe9, 0xf9, 0x85, 0x52, 0x38, 0xbd, 0x50, 0x0a, 0xef, 0x2f,
+	0x94, 0xc2, 0xe3, 0xb5, 0x4c, 0x65, 0xc4, 0x4c, 0x21, 0xe6, 0x5a, 0xca, 0xa8, 0x05, 0xc4, 0x19,
+	0xf8, 0x98, 0x69, 0xc9, 0xdb, 0x27, 0x2e, 0x12, 0xab, 0x22, 0xde, 0x2e, 0x37, 0xbf, 0x06, 0x00,
+	0x00, 0xff, 0xff, 0x93, 0x83, 0x09, 0xa1, 0x10, 0x09, 0x00, 0x00,
 }
 
 func (this *MsgCreatePool) Equal(that interface{}) bool {
@@ -602,7 +601,7 @@ func (this *MsgCreatePool) Equal(that interface{}) bool {
 			return false
 		}
 	}
-	if this.Destructible != that1.Destructible {
+	if this.Editable != that1.Editable {
 		return false
 	}
 	if this.Creator != that1.Creator {
@@ -637,14 +636,14 @@ func (this *MsgDestroyPool) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MsgAppendReward) Equal(that interface{}) bool {
+func (this *MsgAdjustPool) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*MsgAppendReward)
+	that1, ok := that.(*MsgAdjustPool)
 	if !ok {
-		that2, ok := that.(MsgAppendReward)
+		that2, ok := that.(MsgAdjustPool)
 		if ok {
 			that1 = &that2
 		} else {
@@ -659,11 +658,19 @@ func (this *MsgAppendReward) Equal(that interface{}) bool {
 	if this.PoolName != that1.PoolName {
 		return false
 	}
-	if len(this.Amount) != len(that1.Amount) {
+	if len(this.AdditionalReward) != len(that1.AdditionalReward) {
 		return false
 	}
-	for i := range this.Amount {
-		if !this.Amount[i].Equal(&that1.Amount[i]) {
+	for i := range this.AdditionalReward {
+		if !this.AdditionalReward[i].Equal(&that1.AdditionalReward[i]) {
+			return false
+		}
+	}
+	if len(this.RewardPerBlock) != len(that1.RewardPerBlock) {
+		return false
+	}
+	for i := range this.RewardPerBlock {
+		if !this.RewardPerBlock[i].Equal(&that1.RewardPerBlock[i]) {
 			return false
 		}
 	}
@@ -776,8 +783,8 @@ type MsgClient interface {
 	CreatePool(ctx context.Context, in *MsgCreatePool, opts ...grpc.CallOption) (*MsgCreatePoolResponse, error)
 	// DestroyPool defines a method for destroying a existed farm pool
 	DestroyPool(ctx context.Context, in *MsgDestroyPool, opts ...grpc.CallOption) (*MsgDestroyPoolResponse, error)
-	// AppendReward defines a method for appending reward to a existed farm pool
-	AppendReward(ctx context.Context, in *MsgAppendReward, opts ...grpc.CallOption) (*MsgAppendRewardResponse, error)
+	// AdjustPool defines a method for adjusting the farm pool params
+	AdjustPool(ctx context.Context, in *MsgAdjustPool, opts ...grpc.CallOption) (*MsgAdjustPoolResponse, error)
 	// Stake defines a method for staking some lp token to a farm pool
 	Stake(ctx context.Context, in *MsgStake, opts ...grpc.CallOption) (*MsgStakeResponse, error)
 	// Unstake defines a method for unstaking some lp token from a farm pool and
@@ -813,9 +820,9 @@ func (c *msgClient) DestroyPool(ctx context.Context, in *MsgDestroyPool, opts ..
 	return out, nil
 }
 
-func (c *msgClient) AppendReward(ctx context.Context, in *MsgAppendReward, opts ...grpc.CallOption) (*MsgAppendRewardResponse, error) {
-	out := new(MsgAppendRewardResponse)
-	err := c.cc.Invoke(ctx, "/irismod.farm.Msg/AppendReward", in, out, opts...)
+func (c *msgClient) AdjustPool(ctx context.Context, in *MsgAdjustPool, opts ...grpc.CallOption) (*MsgAdjustPoolResponse, error) {
+	out := new(MsgAdjustPoolResponse)
+	err := c.cc.Invoke(ctx, "/irismod.farm.Msg/AdjustPool", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -855,8 +862,8 @@ type MsgServer interface {
 	CreatePool(context.Context, *MsgCreatePool) (*MsgCreatePoolResponse, error)
 	// DestroyPool defines a method for destroying a existed farm pool
 	DestroyPool(context.Context, *MsgDestroyPool) (*MsgDestroyPoolResponse, error)
-	// AppendReward defines a method for appending reward to a existed farm pool
-	AppendReward(context.Context, *MsgAppendReward) (*MsgAppendRewardResponse, error)
+	// AdjustPool defines a method for adjusting the farm pool params
+	AdjustPool(context.Context, *MsgAdjustPool) (*MsgAdjustPoolResponse, error)
 	// Stake defines a method for staking some lp token to a farm pool
 	Stake(context.Context, *MsgStake) (*MsgStakeResponse, error)
 	// Unstake defines a method for unstaking some lp token from a farm pool and
@@ -876,8 +883,8 @@ func (*UnimplementedMsgServer) CreatePool(ctx context.Context, req *MsgCreatePoo
 func (*UnimplementedMsgServer) DestroyPool(ctx context.Context, req *MsgDestroyPool) (*MsgDestroyPoolResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DestroyPool not implemented")
 }
-func (*UnimplementedMsgServer) AppendReward(ctx context.Context, req *MsgAppendReward) (*MsgAppendRewardResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AppendReward not implemented")
+func (*UnimplementedMsgServer) AdjustPool(ctx context.Context, req *MsgAdjustPool) (*MsgAdjustPoolResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdjustPool not implemented")
 }
 func (*UnimplementedMsgServer) Stake(ctx context.Context, req *MsgStake) (*MsgStakeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Stake not implemented")
@@ -929,20 +936,20 @@ func _Msg_DestroyPool_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_AppendReward_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgAppendReward)
+func _Msg_AdjustPool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAdjustPool)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).AppendReward(ctx, in)
+		return srv.(MsgServer).AdjustPool(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/irismod.farm.Msg/AppendReward",
+		FullMethod: "/irismod.farm.Msg/AdjustPool",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).AppendReward(ctx, req.(*MsgAppendReward))
+		return srv.(MsgServer).AdjustPool(ctx, req.(*MsgAdjustPool))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1014,8 +1021,8 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_DestroyPool_Handler,
 		},
 		{
-			MethodName: "AppendReward",
-			Handler:    _Msg_AppendReward_Handler,
+			MethodName: "AdjustPool",
+			Handler:    _Msg_AdjustPool_Handler,
 		},
 		{
 			MethodName: "Stake",
@@ -1061,9 +1068,9 @@ func (m *MsgCreatePool) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x42
 	}
-	if m.Destructible {
+	if m.Editable {
 		i--
-		if m.Destructible {
+		if m.Editable {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -1165,7 +1172,7 @@ func (m *MsgDestroyPool) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgAppendReward) Marshal() (dAtA []byte, err error) {
+func (m *MsgAdjustPool) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1175,12 +1182,12 @@ func (m *MsgAppendReward) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgAppendReward) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgAdjustPool) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgAppendReward) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgAdjustPool) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1190,12 +1197,26 @@ func (m *MsgAppendReward) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Creator)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
 	}
-	if len(m.Amount) > 0 {
-		for iNdEx := len(m.Amount) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.RewardPerBlock) > 0 {
+		for iNdEx := len(m.RewardPerBlock) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Amount[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.RewardPerBlock[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.AdditionalReward) > 0 {
+		for iNdEx := len(m.AdditionalReward) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.AdditionalReward[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1393,7 +1414,7 @@ func (m *MsgDestroyPoolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgAppendRewardResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgAdjustPoolResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1403,30 +1424,16 @@ func (m *MsgAppendRewardResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgAppendRewardResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgAdjustPoolResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgAppendRewardResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgAdjustPoolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.RemainingReward) > 0 {
-		for iNdEx := len(m.RemainingReward) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.RemainingReward[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x42
-		}
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -1585,7 +1592,7 @@ func (m *MsgCreatePool) Size() (n int) {
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if m.Destructible {
+	if m.Editable {
 		n += 2
 	}
 	l = len(m.Creator)
@@ -1612,7 +1619,7 @@ func (m *MsgDestroyPool) Size() (n int) {
 	return n
 }
 
-func (m *MsgAppendReward) Size() (n int) {
+func (m *MsgAdjustPool) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1622,8 +1629,14 @@ func (m *MsgAppendReward) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if len(m.Amount) > 0 {
-		for _, e := range m.Amount {
+	if len(m.AdditionalReward) > 0 {
+		for _, e := range m.AdditionalReward {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.RewardPerBlock) > 0 {
+		for _, e := range m.RewardPerBlock {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -1708,18 +1721,12 @@ func (m *MsgDestroyPoolResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgAppendRewardResponse) Size() (n int) {
+func (m *MsgAdjustPoolResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.RemainingReward) > 0 {
-		for _, e := range m.RemainingReward {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
 	return n
 }
 
@@ -1913,7 +1920,7 @@ func (m *MsgCreatePool) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.StartHeight |= uint64(b&0x7F) << shift
+				m.StartHeight |= int64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1988,7 +1995,7 @@ func (m *MsgCreatePool) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 7:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Destructible", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Editable", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -2005,7 +2012,7 @@ func (m *MsgCreatePool) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.Destructible = bool(v != 0)
+			m.Editable = bool(v != 0)
 		case 8:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
@@ -2179,7 +2186,7 @@ func (m *MsgDestroyPool) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgAppendReward) Unmarshal(dAtA []byte) error {
+func (m *MsgAdjustPool) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2202,10 +2209,10 @@ func (m *MsgAppendReward) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgAppendReward: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgAdjustPool: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgAppendReward: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgAdjustPool: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2242,7 +2249,7 @@ func (m *MsgAppendReward) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AdditionalReward", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2269,12 +2276,46 @@ func (m *MsgAppendReward) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Amount = append(m.Amount, types.Coin{})
-			if err := m.Amount[len(m.Amount)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.AdditionalReward = append(m.AdditionalReward, types.Coin{})
+			if err := m.AdditionalReward[len(m.AdditionalReward)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RewardPerBlock", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RewardPerBlock = append(m.RewardPerBlock, types.Coin{})
+			if err := m.RewardPerBlock[len(m.RewardPerBlock)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
 			}
@@ -2853,7 +2894,7 @@ func (m *MsgDestroyPoolResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgAppendRewardResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgAdjustPoolResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2876,46 +2917,12 @@ func (m *MsgAppendRewardResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgAppendRewardResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgAdjustPoolResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgAppendRewardResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgAdjustPoolResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RemainingReward", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.RemainingReward = append(m.RemainingReward, types.Coin{})
-			if err := m.RemainingReward[len(m.RemainingReward)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])

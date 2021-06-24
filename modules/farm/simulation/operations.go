@@ -121,7 +121,7 @@ func SimulateMsgCreatePool(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 
 		totalReward := GenTotalReward(r, spendable)
 		lpTokenDenom := GenLpToken(r, spendable)
-		destructible := GenDestructible(r)
+		editable := GenDestructible(r)
 		startHeight := GenStartHeight(r, ctx)
 		rewardPerBlock := GenRewardPerBlock(r, totalReward)
 
@@ -151,7 +151,7 @@ func SimulateMsgCreatePool(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 			StartHeight:    startHeight,
 			RewardPerBlock: sdk.Coins{sdk.NewCoin(rewardPerBlock.Denom, rewardPerBlock.Amount)},
 			TotalReward:    sdk.NewCoins(totalReward),
-			Destructible:   destructible,
+			Editable:       editable,
 			Creator:        simAccount.Address.String(),
 		}
 
@@ -192,46 +192,46 @@ func SimulateMsgAppendReward(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 
 		farmPool, exist := genRandomFarmPool(ctx, k, r)
 		if !exist {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAppendReward, "farm pool is not exist"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "farm pool is not exist"), nil, nil
 		}
 
 		if k.Expired(ctx, farmPool) {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAppendReward, "farmPool has expired"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "farmPool has expired"), nil, nil
 		}
 
 		creator, err := sdk.AccAddressFromBech32(farmPool.Creator)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAppendReward, "invalid address"), nil, err
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "invalid address"), nil, err
 		}
 
 		simAccount, found := simtypes.FindAccount(accs, creator)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAppendReward, "unable to find account"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "unable to find account"), nil, nil
 		}
 
 		account := ak.GetAccount(ctx, simAccount.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
 		if spendable.IsZero() {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAppendReward, "Insufficient funds"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "Insufficient funds"), nil, nil
 		}
 
 		rules := k.GetRewardRules(ctx, farmPool.Name)
 		amount := GenAppendReward(r, rules, spendable)
 		if amount.IsZero() {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAppendReward, "Insufficient funds"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "Insufficient funds"), nil, nil
 		}
 
 		// Need to subtract the appendReward balance
 		balance, hasNeg := spendable.SafeSub(amount)
 		if hasNeg {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAppendReward, "Insufficient funds"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "Insufficient funds"), nil, nil
 		}
 
-		msg := &types.MsgAppendReward{
-			PoolName: farmPool.Name,
-			Amount:   amount,
-			Creator:  farmPool.Creator,
+		msg := &types.MsgAdjustPool{
+			PoolName:         farmPool.Name,
+			AdditionalReward: amount,
+			Creator:          farmPool.Creator,
 		}
 
 		fees, err := simtypes.RandomFees(r, ctx, balance)
@@ -273,7 +273,7 @@ func SimulateMsgStake(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeep
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStake, "farm pool is not exist"), nil, nil
 		}
 
-		if farmPool.StartHeight > uint64(ctx.BlockHeight()) {
+		if farmPool.StartHeight > ctx.BlockHeight() {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStake, "the farm activity has not yet started"), nil, nil
 		}
 
@@ -471,16 +471,16 @@ func SimulateMsgDestroyPool(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 
 		creator, err := sdk.AccAddressFromBech32(farmPool.Creator)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAppendReward, "invalid address"), nil, err
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "invalid address"), nil, err
 		}
 
 		simAccount, found := simtypes.FindAccount(accs, creator)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAppendReward, "unable to find account"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "unable to find account"), nil, nil
 		}
 
-		if !farmPool.Destructible {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDestroyPool, "farm pool is not destructible"), nil, nil
+		if !farmPool.Editable {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDestroyPool, "farm pool is not editable"), nil, nil
 		}
 
 		if k.Expired(ctx, farmPool) {
@@ -496,7 +496,7 @@ func SimulateMsgDestroyPool(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
 		if spendable.IsZero() {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAppendReward, "Insufficient funds"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "Insufficient funds"), nil, nil
 		}
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
@@ -541,9 +541,9 @@ func GenLpToken(r *rand.Rand, spendableCoin sdk.Coins) sdk.Coin {
 }
 
 // GenStartHeight randomized startHeight
-func GenStartHeight(r *rand.Rand, ctx sdk.Context) uint64 {
+func GenStartHeight(r *rand.Rand, ctx sdk.Context) int64 {
 	curHeight := int(ctx.BlockHeight())
-	return uint64(r.Intn(curHeight) + curHeight)
+	return int64(r.Intn(curHeight) + curHeight)
 }
 
 // GenRewardPerBlock randomized rewardPerBlock
@@ -589,12 +589,12 @@ func GenFarmPoolName(r *rand.Rand) string {
 	return simtypes.RandStringOfLength(r, 10)
 }
 
-// GenDestructible randomized destructible
+// GenDestructible randomized editable
 func GenDestructible(r *rand.Rand) bool {
 	return r.Int()%2 == 0
 }
 
-// GenDescription randomized destructible
+// GenDescription randomized editable
 func GenDescription(r *rand.Rand) string {
 	return simtypes.RandStringOfLength(r, 100)
 }

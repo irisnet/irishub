@@ -59,7 +59,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 	rewardPerBlock := sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10)))
 	lpTokenDenom := s.cfg.BondDenom
 	totalReward := sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(1000)))
-	destructible := true
+	editable := true
 	farmPool := "iris-atom"
 
 	globalFlags := []string{
@@ -74,7 +74,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 		fmt.Sprintf("--%s=%s", farmcli.FlagRewardPerBlock, rewardPerBlock),
 		fmt.Sprintf("--%s=%s", farmcli.FlagLPTokenDenom, lpTokenDenom),
 		fmt.Sprintf("--%s=%s", farmcli.FlagTotalReward, totalReward),
-		fmt.Sprintf("--%s=%v", farmcli.FlagDestructible, destructible),
+		fmt.Sprintf("--%s=%v", farmcli.FlagEditable, editable),
 	}
 
 	args = append(args, globalFlags...)
@@ -96,9 +96,9 @@ func (s *IntegrationTestSuite) TestFarm() {
 		Name:               farmPool,
 		Creator:            creator.String(),
 		Description:        description,
-		StartHeight:        uint64(startHeight),
-		EndHeight:          uint64(startHeight + 100),
-		Destructible:       destructible,
+		StartHeight:        startHeight,
+		EndHeight:          startHeight + 100,
+		Editable:           editable,
 		Expired:            false,
 		TotalLpTokenLocked: sdk.NewCoin(lpTokenDenom, sdk.ZeroInt()),
 		TotalReward:        totalReward,
@@ -114,11 +114,15 @@ func (s *IntegrationTestSuite) TestFarm() {
 
 	respType = proto.Message(&sdk.TxResponse{})
 	reward := sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(1000)))
+
+	args = []string{
+		fmt.Sprintf("--%s=%v", farmcli.FlagAdditionalReward, reward.String()),
+	}
+	args = append(args, globalFlags...)
 	bz, err = testutil.AppendRewardExec(clientCtx,
 		creator.String(),
 		farmPool,
-		reward.String(),
-		globalFlags...,
+		args...,
 	)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())

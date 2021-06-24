@@ -26,13 +26,12 @@ The farm module emits the following events:
 | message      | module        | farm            |
 | message      | sender        | {senderAddress} |
 
-### MsgAppendReward
+### MsgAdjustPool
 
 | Type          | Attribute Key | Attribute Value |
 | :------------ | :------------ | :-------------- |
 | append_reward | creator       | {creator}       |
 | append_reward | pool_name     | {pool_name}     |
-| append_reward | reward        | {reward}        |
 | message       | module        | farm            |
 | message       | sender        | {senderAddress} |
 

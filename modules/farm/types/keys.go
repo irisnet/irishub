@@ -54,10 +54,10 @@ func PrefixFarmInfo(address string) []byte {
 	return append(FarmerKey, []byte(address)...)
 }
 
-func KeyActiveFarmPool(height uint64, poolName string) []byte {
-	return append(append(ActiveFarmPoolKey, sdk.Uint64ToBigEndian(height)...), []byte(poolName)...)
+func KeyActiveFarmPool(height int64, poolName string) []byte {
+	return append(append(ActiveFarmPoolKey, sdk.Uint64ToBigEndian(uint64(height))...), []byte(poolName)...)
 }
 
-func PrefixActiveFarmPool(height uint64) []byte {
-	return append(ActiveFarmPoolKey, sdk.Uint64ToBigEndian(height)...)
+func PrefixActiveFarmPool(height int64) []byte {
+	return append(ActiveFarmPoolKey, sdk.Uint64ToBigEndian(uint64(height))...)
 }

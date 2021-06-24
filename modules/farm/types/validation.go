@@ -59,9 +59,15 @@ func ValidateReward(rewardPerBlock, totalReward sdk.Coins) error {
 	if len(rewardPerBlock) != len(totalReward) {
 		return sdkerrors.Wrapf(ErrNotMatch, "The length of rewardPerBlock and totalReward must be the same")
 	}
-
-	if !totalReward.IsAllGTE(rewardPerBlock) {
-		return sdkerrors.Wrapf(ErrNotMatch, "The totalReward should be greater than or equal to rewardPerBlock")
+	for i := range totalReward {
+		if !totalReward[i].IsGTE(rewardPerBlock[i]) {
+			return sdkerrors.Wrapf(ErrNotMatch, "The totalReward should be greater than or equal to rewardPerBlock")
+		}
+		//uint64 overflow check
+		h := totalReward[i].Amount.Quo(rewardPerBlock[i].Amount)
+		if !h.IsInt64() {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "Can not convert to int64, overflow")
+		}
 	}
 	return nil
 }

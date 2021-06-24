@@ -79,6 +79,12 @@ func (k Keeper) GetPool(ctx sdk.Context, poolName string) (types.FarmPool, bool)
 	return pool, true
 }
 
+func (k Keeper) SetRewardRules(ctx sdk.Context, poolName string, rules types.RewardRules) {
+	for _, r := range rules {
+		k.SetRewardRule(ctx, poolName, r)
+	}
+}
+
 func (k Keeper) SetRewardRule(ctx sdk.Context, poolName string, rule types.RewardRule) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryBare(&rule)
