@@ -8,13 +8,13 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/simapp/helpers"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
 	"github.com/irisnet/irismod/modules/record/types"
+	"github.com/irisnet/irismod/simapp/helpers"
 )
 
 // Simulation operation weights constants
@@ -60,7 +60,7 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 
 		simAccount, found := simtypes.FindAccount(accs, creator)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateRecord, err.Error()), nil, fmt.Errorf("account %s not found", record.Creator)
+			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateRecord, "creator not found"), nil, fmt.Errorf("account %s not found", record.Creator)
 		}
 
 		account := ak.GetAccount(ctx, creator)
@@ -72,6 +72,7 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 		}
 		txGen := simappparams.MakeTestEncodingConfig().TxConfig
 		tx, _ := helpers.GenTx(
+			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
