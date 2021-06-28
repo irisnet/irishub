@@ -487,6 +487,43 @@ order: 6
     - [Period](#cosmos.vesting.v1beta1.Period)
     - [PeriodicVestingAccount](#cosmos.vesting.v1beta1.PeriodicVestingAccount)
   
+- [farm/farm.proto](#farm/farm.proto)
+    - [FarmInfo](#irismod.farm.FarmInfo)
+    - [FarmPool](#irismod.farm.FarmPool)
+    - [Params](#irismod.farm.Params)
+    - [RewardRule](#irismod.farm.RewardRule)
+  
+- [farm/genesis.proto](#farm/genesis.proto)
+    - [GenesisState](#irismod.farm.GenesisState)
+  
+- [farm/query.proto](#farm/query.proto)
+    - [FarmPoolEntry](#irismod.farm.FarmPoolEntry)
+    - [LockedInfo](#irismod.farm.LockedInfo)
+    - [QueryFarmerRequest](#irismod.farm.QueryFarmerRequest)
+    - [QueryFarmerResponse](#irismod.farm.QueryFarmerResponse)
+    - [QueryParamsRequest](#irismod.farm.QueryParamsRequest)
+    - [QueryParamsResponse](#irismod.farm.QueryParamsResponse)
+    - [QueryPoolsRequest](#irismod.farm.QueryPoolsRequest)
+    - [QueryPoolsResponse](#irismod.farm.QueryPoolsResponse)
+  
+    - [Query](#irismod.farm.Query)
+  
+- [farm/tx.proto](#farm/tx.proto)
+    - [MsgAdjustPool](#irismod.farm.MsgAdjustPool)
+    - [MsgAdjustPoolResponse](#irismod.farm.MsgAdjustPoolResponse)
+    - [MsgCreatePool](#irismod.farm.MsgCreatePool)
+    - [MsgCreatePoolResponse](#irismod.farm.MsgCreatePoolResponse)
+    - [MsgDestroyPool](#irismod.farm.MsgDestroyPool)
+    - [MsgDestroyPoolResponse](#irismod.farm.MsgDestroyPoolResponse)
+    - [MsgHarvest](#irismod.farm.MsgHarvest)
+    - [MsgHarvestResponse](#irismod.farm.MsgHarvestResponse)
+    - [MsgStake](#irismod.farm.MsgStake)
+    - [MsgStakeResponse](#irismod.farm.MsgStakeResponse)
+    - [MsgUnstake](#irismod.farm.MsgUnstake)
+    - [MsgUnstakeResponse](#irismod.farm.MsgUnstakeResponse)
+  
+    - [Msg](#irismod.farm.Msg)
+  
 - [guardian/guardian.proto](#guardian/guardian.proto)
     - [Super](#irishub.guardian.Super)
   
@@ -7374,6 +7411,500 @@ periodically vests by unlocking coins during each specified period.
  <!-- end enums -->
 
  <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="farm/farm.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## farm/farm.proto
+
+
+
+<a name="irismod.farm.FarmInfo"></a>
+
+### FarmInfo
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `address` | [string](#string) |  |  |
+| `locked` | [string](#string) |  |  |
+| `reward_debt` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.farm.FarmPool"></a>
+
+### FarmPool
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [string](#string) |  |  |
+| `creator` | [string](#string) |  |  |
+| `description` | [string](#string) |  |  |
+| `start_height` | [int64](#int64) |  |  |
+| `end_height` | [int64](#int64) |  |  |
+| `last_height_distr_rewards` | [int64](#int64) |  |  |
+| `editable` | [bool](#bool) |  |  |
+| `total_lp_token_locked` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `rules` | [RewardRule](#irismod.farm.RewardRule) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.farm.Params"></a>
+
+### Params
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `create_pool_fee` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `max_reward_categories` | [uint32](#uint32) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.RewardRule"></a>
+
+### RewardRule
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `reward` | [string](#string) |  |  |
+| `total_reward` | [string](#string) |  |  |
+| `remaining_reward` | [string](#string) |  |  |
+| `reward_per_block` | [string](#string) |  |  |
+| `reward_per_share` | [string](#string) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="farm/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## farm/genesis.proto
+
+
+
+<a name="irismod.farm.GenesisState"></a>
+
+### GenesisState
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#irismod.farm.Params) |  |  |
+| `pools` | [FarmPool](#irismod.farm.FarmPool) | repeated |  |
+| `farm_infos` | [FarmInfo](#irismod.farm.FarmInfo) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="farm/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## farm/query.proto
+
+
+
+<a name="irismod.farm.FarmPoolEntry"></a>
+
+### FarmPoolEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [string](#string) |  |  |
+| `creator` | [string](#string) |  |  |
+| `description` | [string](#string) |  |  |
+| `start_height` | [int64](#int64) |  |  |
+| `end_height` | [int64](#int64) |  |  |
+| `editable` | [bool](#bool) |  |  |
+| `expired` | [bool](#bool) |  |  |
+| `total_lp_token_locked` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `total_reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `remaining_reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `reward_per_block` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.farm.LockedInfo"></a>
+
+### LockedInfo
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `locked` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `pending_reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryFarmerRequest"></a>
+
+### QueryFarmerRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `farmer` | [string](#string) |  |  |
+| `pool_name` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryFarmerResponse"></a>
+
+### QueryFarmerResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `list` | [LockedInfo](#irismod.farm.LockedInfo) | repeated |  |
+| `height` | [int64](#int64) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+
+
+
+
+
+
+
+<a name="irismod.farm.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#irismod.farm.Params) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryPoolsRequest"></a>
+
+### QueryPoolsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryPoolsResponse"></a>
+
+### QueryPoolsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `list` | [FarmPoolEntry](#irismod.farm.FarmPoolEntry) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="irismod.farm.Query"></a>
+
+### Query
+
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `Pools` | [QueryPoolsRequest](#irismod.farm.QueryPoolsRequest) | [QueryPoolsResponse](#irismod.farm.QueryPoolsResponse) |  | GET|/irismod/farm/pools|
+| `Farmer` | [QueryFarmerRequest](#irismod.farm.QueryFarmerRequest) | [QueryFarmerResponse](#irismod.farm.QueryFarmerResponse) |  | GET|/irismod/farm/farmers/{farmer}|
+| `Params` | [QueryParamsRequest](#irismod.farm.QueryParamsRequest) | [QueryParamsResponse](#irismod.farm.QueryParamsResponse) | Params queries the htlc parameters | GET|/irismod/farm/params|
+
+ <!-- end services -->
+
+
+
+<a name="farm/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## farm/tx.proto
+
+
+
+<a name="irismod.farm.MsgAdjustPool"></a>
+
+### MsgAdjustPool
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `AdditionalReward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `RewardPerBlock` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `creator` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgAdjustPoolResponse"></a>
+
+### MsgAdjustPoolResponse
+
+
+
+
+
+
+
+<a name="irismod.farm.MsgCreatePool"></a>
+
+### MsgCreatePool
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [string](#string) |  |  |
+| `description` | [string](#string) |  |  |
+| `lp_token_denom` | [string](#string) |  |  |
+| `start_height` | [int64](#int64) |  |  |
+| `reward_per_block` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `total_reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `editable` | [bool](#bool) |  |  |
+| `creator` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgCreatePoolResponse"></a>
+
+### MsgCreatePoolResponse
+
+
+
+
+
+
+
+<a name="irismod.farm.MsgDestroyPool"></a>
+
+### MsgDestroyPool
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `creator` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgDestroyPoolResponse"></a>
+
+### MsgDestroyPoolResponse
+
+
+
+
+
+
+
+<a name="irismod.farm.MsgHarvest"></a>
+
+### MsgHarvest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `sender` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgHarvestResponse"></a>
+
+### MsgHarvestResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgStake"></a>
+
+### MsgStake
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `sender` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgStakeResponse"></a>
+
+### MsgStakeResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgUnstake"></a>
+
+### MsgUnstake
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `sender` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgUnstakeResponse"></a>
+
+### MsgUnstakeResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="irismod.farm.Msg"></a>
+
+### Msg
+Msg defines the farm Msg service.
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `CreatePool` | [MsgCreatePool](#irismod.farm.MsgCreatePool) | [MsgCreatePoolResponse](#irismod.farm.MsgCreatePoolResponse) | CreatePool defines a method for creating a new farm pool | |
+| `DestroyPool` | [MsgDestroyPool](#irismod.farm.MsgDestroyPool) | [MsgDestroyPoolResponse](#irismod.farm.MsgDestroyPoolResponse) | DestroyPool defines a method for destroying a existed farm pool | |
+| `AdjustPool` | [MsgAdjustPool](#irismod.farm.MsgAdjustPool) | [MsgAdjustPoolResponse](#irismod.farm.MsgAdjustPoolResponse) | AdjustPool defines a method for adjusting the farm pool params | |
+| `Stake` | [MsgStake](#irismod.farm.MsgStake) | [MsgStakeResponse](#irismod.farm.MsgStakeResponse) | Stake defines a method for staking some lp token to a farm pool | |
+| `Unstake` | [MsgUnstake](#irismod.farm.MsgUnstake) | [MsgUnstakeResponse](#irismod.farm.MsgUnstakeResponse) | Unstake defines a method for unstaking some lp token from a farm pool and withdraw some reward | |
+| `Harvest` | [MsgHarvest](#irismod.farm.MsgHarvest) | [MsgHarvestResponse](#irismod.farm.MsgHarvestResponse) | Harvest defines a method withdraw some reward from a farm pool | |
 
  <!-- end services -->
 
