@@ -162,6 +162,14 @@
             }
         },
         {
+            "url": "./tmp-swagger-gen/farm/query.swagger.json",
+            "operationIds": {
+                "rename": {
+                    "Params": "FarmParams"
+                }
+            }
+        },
+        {
             "url": "./tmp-swagger-gen/nft/query.swagger.json",
             "operationIds": {
                 "rename": {
