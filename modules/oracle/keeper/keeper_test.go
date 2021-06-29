@@ -312,3 +312,26 @@ func (m MockServiceKeeper) PauseRequestContext(ctx sdk.Context, requestContextID
 	m.cxtMap[strings.ToUpper(hex.EncodeToString(requestContextID))] = reqCtx
 	return nil
 }
+func (m MockServiceKeeper) AddServiceBinding(
+	ctx sdk.Context,
+	serviceName string,
+	provider sdk.AccAddress,
+	deposit sdk.Coins,
+	pricing string,
+	qos uint64,
+	options string,
+	owner sdk.AccAddress,
+) error {
+	return nil
+}
+func (m MockServiceKeeper) AddServiceDefinition(
+	ctx sdk.Context,
+	name,
+	description string,
+	tags []string,
+	author sdk.AccAddress,
+	authorDescription,
+	schemas string,
+) error {
+	return nil
+}

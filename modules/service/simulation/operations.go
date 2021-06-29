@@ -799,7 +799,9 @@ func SimulateMsgPauseRequestContext(ak types.AccountKeeper, bk types.BankKeeper,
 		if !found {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPauseRequestContext, "requestContext not found"), nil, nil
 		}
-
+		if len(requestContext.ModuleName) > 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPauseRequestContext, "not authorized operation"), nil, nil
+		}
 		consumer, err := sdk.AccAddressFromBech32(requestContext.Consumer)
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPauseRequestContext, "invalid address"), nil, nil
@@ -862,6 +864,9 @@ func SimulateMsgStartRequestContext(ak types.AccountKeeper, bk types.BankKeeper,
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStartRequestContext, "requestContext non repeated"), nil, nil
 		}
 
+		if len(requestContext.ModuleName) > 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStartRequestContext, "not authorized operation"), nil, nil
+		}
 		consumer, err := sdk.AccAddressFromBech32(requestContext.Consumer)
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStartRequestContext, "invalid address"), nil, nil
@@ -922,6 +927,9 @@ func SimulateMsgKillRequestContext(ak types.AccountKeeper, bk types.BankKeeper, 
 
 		if !requestContext.Repeated {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgKillRequestContext, "requestContext non repeated"), nil, nil
+		}
+		if len(requestContext.ModuleName) > 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgKillRequestContext, "not authorized operation"), nil, nil
 		}
 		consumer, err := sdk.AccAddressFromBech32(requestContext.Consumer)
 		if err != nil {
@@ -984,7 +992,9 @@ func SimulateMsgUpdateRequestContext(ak types.AccountKeeper, bk types.BankKeeper
 		if requestContext.State == types.COMPLETED {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateRequestContext, "request context completed"), nil, nil
 		}
-
+		if len(requestContext.ModuleName) > 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateRequestContext, "not authorized operation"), nil, nil
+		}
 		consumer, err := sdk.AccAddressFromBech32(requestContext.Consumer)
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateRequestContext, "invalid address"), nil, nil

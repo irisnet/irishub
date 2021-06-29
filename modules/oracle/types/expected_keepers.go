@@ -4,6 +4,7 @@ import (
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	service "github.com/irisnet/irismod/modules/service/exported"
 )
@@ -65,6 +66,25 @@ type ServiceKeeper interface {
 		requestContextID tmbytes.HexBytes,
 		consumer sdk.AccAddress,
 	) error
+	AddServiceBinding(
+		ctx sdk.Context,
+		serviceName string,
+		provider sdk.AccAddress,
+		deposit sdk.Coins,
+		pricing string,
+		qos uint64,
+		options string,
+		owner sdk.AccAddress,
+	) error
+	AddServiceDefinition(
+		ctx sdk.Context,
+		name,
+		description string,
+		tags []string,
+		author sdk.AccAddress,
+		authorDescription,
+		schemas string,
+	) error
 }
 
 // AuthKeeper defines the expected auth keeper (noalias)
@@ -75,3 +95,10 @@ type AuthKeeper interface {
 var (
 	RequestContextStateFromString = service.RequestContextStateFromString
 )
+
+type BankKeeper interface {
+	SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
+}
+type AccountKeeper interface {
+	GetAccount(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
+}

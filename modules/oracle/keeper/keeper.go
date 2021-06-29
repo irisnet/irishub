@@ -353,3 +353,6 @@ func (k Keeper) ModuleServiceRequest(ctx sdk.Context, input string) (result stri
 
 	return
 }
+func (k Keeper) GetServiceKeeper() types.ServiceKeeper {
+	return k.sk
+}
