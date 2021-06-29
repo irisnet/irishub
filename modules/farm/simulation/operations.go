@@ -4,26 +4,25 @@ import (
 	"math/rand"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/simapp/helpers"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	"github.com/cosmos/cosmos-sdk/x/simulation"
 
 	"github.com/irisnet/irismod/modules/farm/keeper"
 	"github.com/irisnet/irismod/modules/farm/types"
-
-	"github.com/cosmos/cosmos-sdk/codec"
-	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	"github.com/cosmos/cosmos-sdk/x/simulation"
 )
 
 // Simulation operation weights constants
 const (
-	OpWeightMsgCreatePool   = "op_weight_msg_create_pool"
-	OpWeightMsgAppendReward = "op_weight_msg_append_reward"
-	OpWeightMsgStake        = "op_weight_msg_stake"
-	OpWeightMsgUnStake      = "op_weight_msg_unStake"
-	OpWeightMsgHarvest      = "op_weight_msg_harvest"
-	OpWeightMsgDestroyPool  = "op_weight_msg_destroy_pool"
+	OpWeightMsgCreatePool = "op_weight_msg_create_pool"
+	OpWeightMsgAdjustPool  = "op_weight_msg_adjust_pool"
+	OpWeightMsgStake       = "op_weight_msg_stake"
+	OpWeightMsgUnStake     = "op_weight_msg_unStake"
+	OpWeightMsgHarvest     = "op_weight_msg_harvest"
+	OpWeightMsgDestroyPool = "op_weight_msg_destroy_pool"
 )
 
 // WeightedOperations returns all the operations from the module with their respective weights
@@ -33,12 +32,12 @@ func WeightedOperations(
 	k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simulation.WeightedOperations {
 
 	var (
-		weightMsgCreatePool   int
-		weightMsgAppendReward int
-		weightMsgStake        int
-		weightMsgUnStake      int
-		weightMsgHarvest      int
-		weightMsgDestroyPool  int
+		weightMsgCreatePool  int
+		weightMsgAdjustPool  int
+		weightMsgStake       int
+		weightMsgUnStake     int
+		weightMsgHarvest     int
+		weightMsgDestroyPool int
 	)
 
 	appParams.GetOrGenerate(cdc, OpWeightMsgCreatePool, &weightMsgCreatePool, nil,
@@ -46,9 +45,14 @@ func WeightedOperations(
 			weightMsgCreatePool = 30
 		},
 	)
-	appParams.GetOrGenerate(cdc, OpWeightMsgAppendReward, &weightMsgAppendReward, nil,
+	appParams.GetOrGenerate(cdc, OpWeightMsgAdjustPool, &weightMsgAdjustPool, nil,
 		func(_ *rand.Rand) {
-			weightMsgAppendReward = 30
+			weightMsgAdjustPool = 30
+		},
+	)
+	appParams.GetOrGenerate(cdc, OpWeightMsgStake, &weightMsgStake, nil,
+		func(_ *rand.Rand) {
+			weightMsgStake = 50
 		},
 	)
 	appParams.GetOrGenerate(cdc, OpWeightMsgStake, &weightMsgStake, nil,
@@ -78,8 +82,8 @@ func WeightedOperations(
 			SimulateMsgCreatePool(k, ak, bk),
 		),
 		simulation.NewWeightedOperation(
-			weightMsgAppendReward,
-			SimulateMsgAppendReward(k, ak, bk),
+			weightMsgAdjustPool,
+			SimulateMsgAdjustPool(k, ak, bk),
 		),
 		simulation.NewWeightedOperation(
 			weightMsgStake,
@@ -185,7 +189,7 @@ func SimulateMsgCreatePool(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 	}
 }
 
-func SimulateMsgAppendReward(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
+func SimulateMsgAdjustPool(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
@@ -197,6 +201,10 @@ func SimulateMsgAppendReward(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 
 		if k.Expired(ctx, farmPool) {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "farmPool has expired"), nil, nil
+		}
+
+		if !farmPool.Editable {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "farmPool is not editable"), nil, nil
 		}
 
 		creator, err := sdk.AccAddressFromBech32(farmPool.Creator)
@@ -216,6 +224,12 @@ func SimulateMsgAppendReward(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "Insufficient funds"), nil, nil
 		}
 
+		rewardPerBlock := GenRewardPerBlock(r, spendable[r.Intn(len(spendable))])
+
+		if rewardPerBlock.Amount.IsZero() {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "Insufficient funds"), nil, nil
+		}
+
 		rules := k.GetRewardRules(ctx, farmPool.Name)
 		amount := GenAppendReward(r, rules, spendable)
 		if amount.IsZero() {
@@ -231,6 +245,7 @@ func SimulateMsgAppendReward(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 		msg := &types.MsgAdjustPool{
 			PoolName:         farmPool.Name,
 			AdditionalReward: amount,
+			RewardPerBlock:   sdk.Coins{sdk.NewCoin(rewardPerBlock.Denom, rewardPerBlock.Amount)},
 			Creator:          farmPool.Creator,
 		}
 
