@@ -3,6 +3,7 @@ package simulation
 import (
 	"fmt"
 	"math/rand"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -18,6 +19,7 @@ import (
 
 // Simulation operation weights constants
 const (
+	OpWeightMsgIssueDenom  = "op_weight_msg_issue_denom"
 	OpWeightMsgMintNFT     = "op_weight_msg_mint_nft"
 	OpWeightMsgEditNFT     = "op_weight_msg_edit_nft_tokenData"
 	OpWeightMsgTransferNFT = "op_weight_msg_transfer_nft"
@@ -30,7 +32,13 @@ func WeightedOperations(
 	cdc codec.JSONMarshaler,
 	k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simulation.WeightedOperations {
 
-	var weightMint, weightEdit, weightBurn, weightTransfer int
+	var weightIssueDenom, weightMint, weightEdit, weightBurn, weightTransfer int
+	appParams.GetOrGenerate(
+		cdc, OpWeightMsgIssueDenom, &weightIssueDenom, nil,
+		func(_ *rand.Rand) {
+			weightIssueDenom = 50
+		},
+	)
 	appParams.GetOrGenerate(
 		cdc, OpWeightMsgMintNFT, &weightMint, nil,
 		func(_ *rand.Rand) {
@@ -61,6 +69,10 @@ func WeightedOperations(
 
 	return simulation.WeightedOperations{
 		simulation.NewWeightedOperation(
+			weightIssueDenom,
+			SimulateMsgIssueDenom(ak, bk),
+		),
+		simulation.NewWeightedOperation(
 			weightMint,
 			SimulateMsgMintNFT(k, ak, bk),
 		),
@@ -76,6 +88,52 @@ func WeightedOperations(
 			weightBurn,
 			SimulateMsgBurnNFT(k, ak, bk),
 		),
+	}
+}
+
+func SimulateMsgIssueDenom(ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
+	return func(
+		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
+	) (
+		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
+	) {
+
+		simAccount, _ := simtypes.RandomAcc(r, accs)
+		denomId := strings.ToLower(simtypes.RandStringOfLength(r, 20))
+		denomName := strings.ToLower(simtypes.RandStringOfLength(r, 20))
+		msg := types.NewMsgIssueDenom(
+			denomId,
+			denomName,
+			"",
+			simAccount.Address.String(),
+		)
+		account := ak.GetAccount(ctx, simAccount.Address)
+		spendable := bk.SpendableCoins(ctx, account.GetAddress())
+		fees, err := simtypes.RandomFees(r, ctx, spendable)
+		if err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeTransfer, err.Error()), nil, err
+		}
+
+		txGen := simappparams.MakeTestEncodingConfig().TxConfig
+		tx, err := helpers.GenTx(
+			txGen,
+			[]sdk.Msg{msg},
+			fees,
+			helpers.DefaultGenTxGas,
+			chainID,
+			[]uint64{account.GetAccountNumber()},
+			[]uint64{account.GetSequence()},
+			simAccount.PrivKey,
+		)
+		if err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+		}
+
+		if _, _, err = app.Deliver(txGen.TxEncoder(), tx); err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeTransfer, err.Error()), nil, err
+		}
+
+		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }
 

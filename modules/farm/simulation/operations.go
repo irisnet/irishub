@@ -17,7 +17,7 @@ import (
 
 // Simulation operation weights constants
 const (
-	OpWeightMsgCreatePool = "op_weight_msg_create_pool"
+	OpWeightMsgCreatePool  = "op_weight_msg_create_pool"
 	OpWeightMsgAdjustPool  = "op_weight_msg_adjust_pool"
 	OpWeightMsgStake       = "op_weight_msg_stake"
 	OpWeightMsgUnStake     = "op_weight_msg_unStake"
