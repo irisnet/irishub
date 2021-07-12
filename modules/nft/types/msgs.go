@@ -7,11 +7,12 @@ import (
 
 // constant used to indicate that some field should not be updated
 const (
-	TypeMsgIssueDenom  = "issue_denom"
-	TypeMsgTransferNFT = "transfer_nft"
-	TypeMsgEditNFT     = "edit_nft"
-	TypeMsgMintNFT     = "mint_nft"
-	TypeMsgBurnNFT     = "burn_nft"
+	TypeMsgIssueDenom    = "issue_denom"
+	TypeMsgTransferNFT   = "transfer_nft"
+	TypeMsgEditNFT       = "edit_nft"
+	TypeMsgMintNFT       = "mint_nft"
+	TypeMsgBurnNFT       = "burn_nft"
+	TypeMsgTransferDenom = "transfer_denom"
 )
 
 var (
@@ -20,15 +21,19 @@ var (
 	_ sdk.Msg = &MsgEditNFT{}
 	_ sdk.Msg = &MsgMintNFT{}
 	_ sdk.Msg = &MsgBurnNFT{}
+	_ sdk.Msg = &MsgTransferDenom{}
 )
 
 // NewMsgIssueDenom is a constructor function for MsgSetName
-func NewMsgIssueDenom(denomID, denomName, schema, sender string) *MsgIssueDenom {
+func NewMsgIssueDenom(denomID, denomName, schema, sender, symbol string, mintRestricted, updateRestricted bool) *MsgIssueDenom {
 	return &MsgIssueDenom{
-		Sender: sender,
-		Id:     denomID,
-		Name:   denomName,
-		Schema: schema,
+		Sender:           sender,
+		Id:               denomID,
+		Name:             denomName,
+		Schema:           schema,
+		Symbol:           symbol,
+		MintRestricted:   mintRestricted,
+		UpdateRestricted: updateRestricted,
 	}
 }
 
@@ -255,6 +260,50 @@ func (msg MsgBurnNFT) GetSignBytes() []byte {
 
 // GetSigners Implements Msg.
 func (msg MsgBurnNFT) GetSigners() []sdk.AccAddress {
+	from, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
+}
+
+// NewMsgTransferDenom is a constructor function for msgTransferDenom
+func NewMsgTransferDenom(denomId, sender, recipient string) *MsgTransferDenom {
+	return &MsgTransferDenom{
+		Id:        denomId,
+		Sender:    sender,
+		Recipient: recipient,
+	}
+}
+
+// Route Implements Msg
+func (msg MsgTransferDenom) Route() string { return RouterKey }
+
+// Type Implements Msg
+func (msg MsgTransferDenom) Type() string { return TypeMsgTransferDenom }
+
+// ValidateBasic Implements Msg.
+func (msg MsgTransferDenom) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+	}
+	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
+	}
+	if err := ValidateDenomID(msg.Id); err != nil {
+		return err
+	}
+	return nil
+}
+
+// GetSignBytes Implements Msg.
+func (msg MsgTransferDenom) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(&msg)
+	return sdk.MustSortJSON(bz)
+}
+
+// GetSigners Implements Msg.
+func (msg MsgTransferDenom) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		panic(err)

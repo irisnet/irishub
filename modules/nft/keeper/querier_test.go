@@ -207,7 +207,7 @@ func (suite *KeeperSuite) TestQueryDenoms() {
 	suite.NoError(err)
 	suite.NotNil(res)
 
-	denoms := []string{denomID, denomID2}
+	denoms := []string{denomID, denomID2, denomID3}
 
 	var out []types.Denom
 	suite.legacyAmino.MustUnmarshalJSON(res, &out)

@@ -84,9 +84,9 @@ func (k Keeper) Collection(c context.Context, request *types.QueryCollectionRequ
 func (k Keeper) Denom(c context.Context, request *types.QueryDenomRequest) (*types.QueryDenomResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
-	denomObject, err := k.GetDenom(ctx, request.DenomId)
-	if err != nil {
-		return nil, err
+	denomObject, found := k.GetDenom(ctx, request.DenomId)
+	if !found {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", request.DenomId)
 	}
 
 	return &types.QueryDenomResponse{Denom: &denomObject}, nil

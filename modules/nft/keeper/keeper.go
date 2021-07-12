@@ -33,9 +33,11 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 // IssueDenom issues a denom according to the given params
 func (k Keeper) IssueDenom(ctx sdk.Context,
-	id, name, schema string,
-	creator sdk.AccAddress) error {
-	return k.SetDenom(ctx, types.NewDenom(id, name, schema, creator))
+	id, name, schema, symbol string,
+	creator sdk.AccAddress,
+	mintRestricted, updateRestricted bool,
+) error {
+	return k.SetDenom(ctx, types.NewDenom(id, name, schema, symbol, creator, mintRestricted, updateRestricted))
 }
 
 // MintNFT mints an NFT and manages the NFT's existence within Collections and Owners
@@ -43,8 +45,13 @@ func (k Keeper) MintNFT(
 	ctx sdk.Context, denomID, tokenID, tokenNm,
 	tokenURI, tokenData string, owner sdk.AccAddress,
 ) error {
-	if !k.HasDenomID(ctx, denomID) {
+	denom, found := k.GetDenom(ctx, denomID)
+	if !found {
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", denomID)
+	}
+
+	if denom.MintRestricted && denom.Creator != owner.String() {
+		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to mint NFT of denom %s", denom.Creator, denomID)
 	}
 
 	if k.HasNFT(ctx, denomID, tokenID) {
@@ -72,10 +79,17 @@ func (k Keeper) EditNFT(
 	ctx sdk.Context, denomID, tokenID, tokenNm,
 	tokenURI, tokenData string, owner sdk.AccAddress,
 ) error {
-	if !k.HasDenomID(ctx, denomID) {
+	denom, found := k.GetDenom(ctx, denomID)
+	if !found {
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", denomID)
 	}
 
+	if denom.UpdateRestricted {
+		// if true , nobody can update the NFT under this denom
+		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "nobody can update the NFT under this denom %s", denom.Id)
+	}
+
+	// just the owner of NFT can edit
 	nft, err := k.Authorize(ctx, denomID, tokenID, owner)
 	if err != nil {
 		return err
@@ -145,6 +159,30 @@ func (k Keeper) BurnNFT(ctx sdk.Context, denomID, tokenID string, owner sdk.AccA
 	k.deleteNFT(ctx, denomID, nft)
 	k.deleteOwner(ctx, denomID, tokenID, owner)
 	k.decreaseSupply(ctx, denomID)
+
+	return nil
+}
+
+// TransferDenomOwner transfers the ownership of the given denom to the new owner
+func (k Keeper) TransferDenomOwner(
+	ctx sdk.Context, denomID string, srcOwner, dstOwner sdk.AccAddress,
+) error {
+	denom, found := k.GetDenom(ctx, denomID)
+	if !found {
+		return sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", denomID)
+	}
+
+	// authorize
+	if srcOwner.String() != denom.Creator {
+		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to transfer denom %s", srcOwner.String(), denomID)
+	}
+
+	denom.Creator = dstOwner.String()
+
+	err := k.UpdateDenom(ctx, denom)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

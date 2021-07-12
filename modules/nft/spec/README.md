@@ -21,6 +21,7 @@ NFTs on application specific blockchains share some but not all features as thei
    - [Owners](./01_state.md#owners)
 1. **[Messages](./02_messages.md)**
    - [Issue Denom](./02_messages.md#msgissuedenom)
+   - [Transfer Denom](./02_messages.md#msgtransferdenom)
    - [Transfer NFT](./02_messages.md#msgtransfernft)
    - [Edit NFT](./02_messages.md#msgtransfernft)
    - [Mint NFT](./02_messages.md#msgmintnft)

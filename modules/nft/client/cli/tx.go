@@ -32,6 +32,7 @@ func NewTxCmd() *cobra.Command {
 		GetCmdEditNFT(),
 		GetCmdTransferNFT(),
 		GetCmdBurnNFT(),
+		GetCmdTransferDenom(),
 	)
 
 	return txCmd
@@ -46,6 +47,9 @@ func GetCmdIssueDenom() *cobra.Command {
 			"$ %s tx nft issue <denom-id> "+
 				"--from=<key-name> "+
 				"--name=<denom-name> "+
+				"--symbol=<denom-symbol> "+
+				"--mint-restricted=<mint-restricted> "+
+				"--update-restricted=<update-restricted> "+
 				"--schema=<schema-content or path to schema.json> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
@@ -66,6 +70,18 @@ func GetCmdIssueDenom() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			symbol, err := cmd.Flags().GetString(FlagSymbol)
+			if err != nil {
+				return err
+			}
+			mintRestricted, err := cmd.Flags().GetBool(FlagMintRestricted)
+			if err != nil {
+				return err
+			}
+			updateRestricted, err := cmd.Flags().GetBool(FlagUpdateRestricted)
+			if err != nil {
+				return err
+			}
 			optionsContent, err := ioutil.ReadFile(schema)
 			if err == nil {
 				schema = string(optionsContent)
@@ -76,6 +92,9 @@ func GetCmdIssueDenom() *cobra.Command {
 				denomName,
 				schema,
 				clientCtx.GetFromAddress().String(),
+				symbol,
+				mintRestricted,
+				updateRestricted,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -84,6 +103,8 @@ func GetCmdIssueDenom() *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsIssueDenom)
+	_ = cmd.MarkFlagRequired(FlagMintRestricted)
+	_ = cmd.MarkFlagRequired(FlagUpdateRestricted)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
@@ -299,6 +320,46 @@ func GetCmdBurnNFT() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdTransferDenom is the CLI command for sending a TransferDenom transaction
+func GetCmdTransferDenom() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "transfer-denom [recipient] [denom-id]",
+		Long: "Transfer an Denom to a recipient.",
+		Example: fmt.Sprintf(
+			"$ %s tx nft transfer-denom <denom-id> <recipient> "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			if _, err := sdk.AccAddressFromBech32(args[1]); err != nil {
+				return err
+			}
+
+			msg := types.NewMsgTransferDenom(
+				args[0],
+				clientCtx.GetFromAddress().String(),
+				args[1],
+			)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+	cmd.Flags().AddFlagSet(FsTransferDenom)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd

@@ -33,8 +33,8 @@ func (k Keeper) SetCollection(ctx sdk.Context, collection types.Collection) erro
 
 // GetCollection returns the collection by the specified denom ID
 func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection, error) {
-	denom, err := k.GetDenom(ctx, denomID)
-	if err != nil {
+	denom, found := k.GetDenom(ctx, denomID)
+	if !found {
 		return types.Collection{}, sdkerrors.Wrapf(types.ErrInvalidDenom, "denomID %s not existed ", denomID)
 	}
 
@@ -44,8 +44,8 @@ func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection
 
 // GetPaginateCollection returns the collection by the specified denom ID
 func (k Keeper) GetPaginateCollection(ctx sdk.Context, request *types.QueryCollectionRequest, denomID string) (types.Collection, *query.PageResponse, error) {
-	denom, err := k.GetDenom(ctx, denomID)
-	if err != nil {
+	denom, found := k.GetDenom(ctx, denomID)
+	if !found {
 		return types.Collection{}, nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "denomID %s not existed ", denomID)
 	}
 	var nfts []exported.NFT

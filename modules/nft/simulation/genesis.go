@@ -26,6 +26,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 				Name:    doggos,
 				Schema:  "",
 				Creator: "",
+				Symbol:  "dog",
 			},
 			types.NFTs{},
 		),
@@ -35,6 +36,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 				Name:    kitties,
 				Schema:  "",
 				Creator: "",
+				Symbol:  "kit",
 			},
 			types.NFTs{}),
 	)

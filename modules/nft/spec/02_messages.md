@@ -10,6 +10,9 @@ This message defines a type of nft, there can be multiple nft of the same type
 | Name      | `string` | The denomination name of the NFT, necessary as multiple denominations are able to be represented on each chain.                  |
 | Sender    | `string` | The account address of the user sending the NFT. By default it is __not__ required that the sender is also the owner of the NFT. |
 | Schema    | `string` | NFT specifications defined under this category                                                                                   |
+| Symbol    | `string` | The abbreviated name of a specific NFT type                                                                                 |
+| MintRestricted    | `bool` | MintRestricted is true means that only Denom owners can issue NFTs under this category, false means anyone can         |                                                                        |
+| UpdateRestricted    | `bool` | UpdateRestricted is true means that no one in this category can update the NFT, false means that only the owner of this NFT can update   |                                                                             |
 
 ```go
 type MsgIssueDenom struct {
@@ -17,6 +20,9 @@ type MsgIssueDenom struct {
     Name   string
     Schema string
     Sender string
+    Symbol string
+    MintRestricted bool
+    UpdateRestricted bool
 }
 ```
 
@@ -115,5 +121,23 @@ type MsgBurnNFT struct {
     Id      string
     DenomId string
     Sender  string
+}
+```
+
+## MsgTransferDenom
+This message is used by the owner of the NFT classification to transfer the ownership of the NFT classification to others
+
+| **Field** | **Type** | **Description**                                                                                                                  |
+| :-------- | :------- | :------------------------------------------------------------------------------------------------------------------------------- |
+| ID        | `string` | The unique ID of the Denom being transferred.                                                                                      | 
+| Sender    | `string` | The account address of the user sending the Denom. |
+| Recipient | `string` | The account address who will receive the Denom as a result of the transfer transaction.                                            |
+
+```go
+// MsgTransferDenom defines an SDK message for transferring an Denom to recipient.
+type MsgTransferDenom struct {
+    Id        string
+    Sender    string
+    Recipient string
 }
 ```

@@ -11,10 +11,13 @@ func (suite *KeeperSuite) TestSetCollection() {
 	nft2 := types.NewBaseNFT(tokenID2, tokenNm, address, tokenURI, tokenData)
 
 	denomE := types.Denom{
-		Id:      denomID,
-		Name:    denomNm,
-		Schema:  schema,
-		Creator: address.String(),
+		Id:               denomID,
+		Name:             denomNm,
+		Schema:           schema,
+		Creator:          address.String(),
+		Symbol:           denomSymbol,
+		MintRestricted:   true,
+		UpdateRestricted: true,
 	}
 
 	collection2 := types.Collection{

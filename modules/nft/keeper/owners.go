@@ -82,9 +82,9 @@ func (k Keeper) setOwner(ctx sdk.Context,
 
 func (k Keeper) swapOwner(ctx sdk.Context, denomID, tokenID string, srcOwner, dstOwner sdk.AccAddress) {
 
-	//delete old owner key
+	// delete old owner key
 	k.deleteOwner(ctx, denomID, tokenID, srcOwner)
 
-	//set new owner key
+	// set new owner key
 	k.setOwner(ctx, denomID, tokenID, dstOwner)
 }

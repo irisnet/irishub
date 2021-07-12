@@ -19,12 +19,14 @@ import (
 )
 
 var (
-	denomID = "denomid"
-	denomNm = "denomnm"
-	schema  = "{a:a,b:b}"
+	denomID     = "denomid"
+	denomNm     = "denomnm"
+	denomSymbol = "denomSymbol"
+	schema      = "{a:a,b:b}"
 
-	denomID2 = "denomid2"
-	denomNm2 = "denom2nm"
+	denomID2     = "denomid2"
+	denomNm2     = "denom2nm"
+	denomSymbol2 = "denomSymbol2"
 
 	tokenID  = "tokenid"
 	tokenID2 = "tokenid2"
@@ -33,6 +35,10 @@ var (
 	tokenNm  = "tokennm"
 	tokenNm2 = "tokennm2"
 	tokenNm3 = "tokennm3"
+
+	denomID3     = "denomid3"
+	denomNm3     = "denom3nm"
+	denomSymbol3 = "denomSymbol3"
 
 	address   = CreateTestAddrs(1)[0]
 	address2  = CreateTestAddrs(2)[1]
@@ -68,17 +74,20 @@ func (suite *KeeperSuite) SetupTest() {
 	types.RegisterQueryServer(queryHelper, app.NFTKeeper)
 	suite.queryClient = types.NewQueryClient(queryHelper)
 
-	err := suite.keeper.IssueDenom(suite.ctx, denomID, denomNm, schema, address)
+	err := suite.keeper.IssueDenom(suite.ctx, denomID, denomNm, schema, denomSymbol, address, false, false)
 	suite.NoError(err)
 
 	// MintNFT shouldn't fail when collection does not exist
-	err = suite.keeper.IssueDenom(suite.ctx, denomID2, denomNm2, schema, address)
+	err = suite.keeper.IssueDenom(suite.ctx, denomID2, denomNm2, schema, denomSymbol2, address, false, false)
 	suite.NoError(err)
 
-	// collections should equal 1
+	err = suite.keeper.IssueDenom(suite.ctx, denomID3, denomNm3, schema, denomSymbol3, address3, true, true)
+	suite.NoError(err)
+
+	// collections should equal 3
 	collections := suite.keeper.GetCollections(suite.ctx)
 	suite.NotEmpty(collections)
-	suite.Equal(len(collections), 2)
+	suite.Equal(len(collections), 3)
 }
 
 func TestKeeperSuite(t *testing.T) {
@@ -93,6 +102,15 @@ func (suite *KeeperSuite) TestMintNFT() {
 	// MintNFT shouldn't fail when collection exists
 	err = suite.keeper.MintNFT(suite.ctx, denomID, tokenID2, tokenNm2, tokenURI, tokenData, address)
 	suite.NoError(err)
+
+	// MintNFT should fail when owner not equal to denom owner
+	err = suite.keeper.MintNFT(suite.ctx, denomID3, tokenID3, tokenNm3, tokenURI, tokenData, address)
+	suite.Error(err)
+
+	// MintNFT shouldn't fail when owner equal to denom owner
+	err = suite.keeper.MintNFT(suite.ctx, denomID3, tokenID3, tokenNm3, tokenURI, tokenData, address3)
+	suite.NoError(err)
+
 }
 
 func (suite *KeeperSuite) TestUpdateNFT() {
@@ -112,6 +130,10 @@ func (suite *KeeperSuite) TestUpdateNFT() {
 	err = suite.keeper.EditNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI2, tokenData, address)
 	suite.NoError(err)
 
+	// EditNFT should fail when NFT failed to authorize
+	err = suite.keeper.EditNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI2, tokenData, address2)
+	suite.Error(err)
+
 	// GetNFT should get the NFT with new tokenURI
 	receivedNFT, err := suite.keeper.GetNFT(suite.ctx, denomID, tokenID)
 	suite.NoError(err)
@@ -119,6 +141,13 @@ func (suite *KeeperSuite) TestUpdateNFT() {
 
 	// EditNFT shouldn't fail when NFT exists
 	err = suite.keeper.EditNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI2, tokenData, address2)
+	suite.Error(err)
+
+	err = suite.keeper.MintNFT(suite.ctx, denomID3, denomID3, tokenID3, tokenURI, tokenData, address3)
+	suite.NoError(err)
+
+	// EditNFT should fail if updateRestricted equal to true, nobody can update the NFT under this denom
+	err = suite.keeper.EditNFT(suite.ctx, denomID3, denomID3, tokenID3, tokenURI, tokenData, address3)
 	suite.Error(err)
 }
 
@@ -128,17 +157,33 @@ func (suite *KeeperSuite) TestTransferOwner() {
 	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address)
 	suite.NoError(err)
 
-	//invalid owner
+	// invalid owner
 	err = suite.keeper.TransferOwner(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address2, address3)
 	suite.Error(err)
 
-	//right
+	// right
 	err = suite.keeper.TransferOwner(suite.ctx, denomID, tokenID, tokenNm2, tokenURI2, tokenData, address, address2)
 	suite.NoError(err)
 
 	nft, err := suite.keeper.GetNFT(suite.ctx, denomID, tokenID)
 	suite.NoError(err)
 	suite.Equal(tokenURI2, nft.GetURI())
+}
+
+func (suite *KeeperSuite) TestTransferDenom() {
+
+	// invalid owner
+	err := suite.keeper.TransferDenomOwner(suite.ctx, denomID, address3, address)
+	suite.Error(err)
+
+	// right
+	err = suite.keeper.TransferDenomOwner(suite.ctx, denomID, address, address3)
+	suite.NoError(err)
+
+	denom, _ := suite.keeper.GetDenom(suite.ctx, denomID)
+
+	// denom.Creator should equal to address3 after transfer
+	suite.Equal(denom.Creator, address3.String())
 }
 
 func (suite *KeeperSuite) TestBurnNFT() {

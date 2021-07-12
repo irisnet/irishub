@@ -6,7 +6,7 @@ import "gogoproto/gogo.proto";
 option go_package = "github.com/irisnet/irismod/modules/nft/types";
 option (gogoproto.goproto_getters_all) = false;
 
-// Msg defines the htlc Msg service.
+// Msg defines the nft Msg service.
 service Msg {
     // IssueDenom defines a method for issue a denom.
     rpc IssueDenom(MsgIssueDenom) returns (MsgIssueDenomResponse);
@@ -22,6 +22,9 @@ service Msg {
 
     // BurnNFT defines a method for burning a nft.
     rpc BurnNFT(MsgBurnNFT) returns (MsgBurnNFTResponse);
+
+    // TransferDenom defines a method for transferring a denom.
+    rpc TransferDenom(MsgTransferDenom) returns (MsgTransferDenomResponse);
 }
 
 // MsgIssueDenom defines an SDK message for creating a new denom.
@@ -32,6 +35,9 @@ message MsgIssueDenom {
     string name = 2;
     string schema = 3;
     string sender = 4;
+    string symbol = 5;
+    bool mint_restricted = 6 ;
+    bool update_restricted = 7 ;
 }
 
 // MsgIssueDenomResponse defines the Msg/IssueDenom response type.
@@ -95,3 +101,15 @@ message MsgBurnNFT {
 
 // MsgBurnNFTResponse defines the Msg/BurnNFT response type.
 message MsgBurnNFTResponse {}
+
+
+// MsgTransferDenom defines an SDK message for transferring an denom to recipient.
+message MsgTransferDenom {
+    option (gogoproto.equal) = true;
+    string id = 1;
+    string sender = 2;
+    string recipient = 3;
+}
+
+// MsgTransferDenomResponse defines the Msg/TransferDenom response type.
+message MsgTransferDenomResponse {}

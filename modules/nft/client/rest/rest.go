@@ -20,11 +20,14 @@ const (
 )
 
 type issueDenomReq struct {
-	BaseReq rest.BaseReq `json:"base_req"`
-	Owner   string       `json:"owner"`
-	ID      string       `json:"id"`
-	Name    string       `json:"name"`
-	Schema  string       `json:"schema"`
+	BaseReq          rest.BaseReq `json:"base_req"`
+	Owner            string       `json:"owner"`
+	ID               string       `json:"id"`
+	Name             string       `json:"name"`
+	Schema           string       `json:"schema"`
+	Symbol           string       `json:"symbol"`
+	MintRestricted   bool         `json:"mint_restricted"`
+	UpdateRestricted bool         `json:"update_restricted"`
 }
 
 type mintNFTReq struct {
