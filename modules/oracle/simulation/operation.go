@@ -92,7 +92,7 @@ func SimulateCreateFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreateFeed, "Failed to generate service definition"), nil, err
 		}
-		providers := GenServiceBindingsAndProviders(ctx, serviceName, owner,  k.GetServiceKeeper(), accs, r, bk)
+		providers := GenServiceBindingsAndProviders(ctx, serviceName, owner, k.GetServiceKeeper(), accs, r, bk)
 		if len(providers) == 0 {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreateFeed, "Failed to generate service bindings"), nil, nil
 		}
