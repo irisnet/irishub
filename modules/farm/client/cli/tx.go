@@ -84,6 +84,10 @@ func GetCmdCreateFarmPool() *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsCreateFarmPool)
+	_ = cmd.MarkFlagRequired(FlagStartHeight)
+	_ = cmd.MarkFlagRequired(FlagRewardPerBlock)
+	_ = cmd.MarkFlagRequired(FlagLPTokenDenom)
+	_ = cmd.MarkFlagRequired(FlagTotalReward)
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }

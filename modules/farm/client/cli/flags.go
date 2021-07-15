@@ -1,4 +1,3 @@
-// nolint
 package cli
 
 import (
@@ -12,7 +11,7 @@ const (
 	FlagLPTokenDenom     = "lp-token-denom"
 	FlagTotalReward      = "total-reward"
 	FlagEditable         = "editable"
-	FlagFarmPool         = "farm-pool"
+	FlagFarmPool         = "pool-name"
 	FlagAdditionalReward = "additional-reward"
 )
 

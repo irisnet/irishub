@@ -54,7 +54,7 @@ func (msg MsgCreatePool) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateCoins(msg.RewardPerBlock...); err != nil {
+	if err := ValidateCoins("RewardPerBlock", msg.RewardPerBlock...); err != nil {
 		return err
 	}
 
@@ -62,7 +62,7 @@ func (msg MsgCreatePool) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateCoins(msg.TotalReward...); err != nil {
+	if err := ValidateCoins("TotalReward", msg.TotalReward...); err != nil {
 		return err
 	}
 	return ValidateReward(msg.RewardPerBlock, msg.TotalReward)
@@ -131,13 +131,13 @@ func (msg MsgAdjustPool) ValidateBasic() error {
 	}
 
 	if msg.AdditionalReward != nil {
-		if err := ValidateCoins(msg.AdditionalReward...); err != nil {
+		if err := ValidateCoins("AdditionalReward", msg.AdditionalReward...); err != nil {
 			return err
 		}
 	}
 
 	if msg.RewardPerBlock != nil {
-		if err := ValidateCoins(msg.RewardPerBlock...); err != nil {
+		if err := ValidateCoins("RewardPerBlock", msg.RewardPerBlock...); err != nil {
 			return err
 		}
 	}
@@ -172,7 +172,7 @@ func (msg MsgStake) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateCoins(msg.Amount); err != nil {
+	if err := ValidateCoins("Amount", msg.Amount); err != nil {
 		return err
 	}
 	return ValidatePoolName(msg.PoolName)
@@ -206,7 +206,7 @@ func (msg MsgUnstake) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateCoins(msg.Amount); err != nil {
+	if err := ValidateCoins("Amount", msg.Amount); err != nil {
 		return err
 	}
 	return ValidatePoolName(msg.PoolName)

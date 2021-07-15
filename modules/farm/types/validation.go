@@ -41,9 +41,9 @@ func ValidateLpTokenDenom(denom string) error {
 }
 
 // ValidateCoins validates the coin
-func ValidateCoins(coins ...sdk.Coin) error {
+func ValidateCoins(field string, coins ...sdk.Coin) error {
 	if !sdk.NewCoins(coins...).IsAllPositive() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "The coin should be greater than zero")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "The %s should be greater than zero", field)
 	}
 	return sdk.NewCoins(coins...).Validate()
 }

@@ -131,6 +131,8 @@ func (k Keeper) AdjustPool(ctx sdk.Context,
 		return err
 	}
 
+	availableReward := sdk.NewCoins()
+	remainingHeight := pool.EndHeight - ctx.BlockHeight()
 	rules := types.RewardRules(pool.Rules)
 	if reward != nil {
 		if !rules.Contains(reward) {
@@ -143,6 +145,8 @@ func (k Keeper) AdjustPool(ctx sdk.Context,
 		}
 
 		for i := range rules {
+			coin := sdk.NewCoin(rules[i].Reward, rules[i].RewardPerBlock.Mul(sdk.NewInt(remainingHeight)))
+			availableReward = availableReward.Add(coin)
 			rules[i].TotalReward = rules[i].TotalReward.Add(reward.AmountOf(rules[i].Reward))
 			rules[i].RemainingReward = rules[i].RemainingReward.Add(reward.AmountOf(rules[i].Reward))
 		}
@@ -153,15 +157,19 @@ func (k Keeper) AdjustPool(ctx sdk.Context,
 	}
 	k.SetRewardRules(ctx, pool.Name, pool.Rules)
 
-	//If the activity has already started,
-	//  use the current height as the starting point to calculate the end height,
-	//if it has not yet started,
-	//  use the planned start height to calculate the end height
-	var startHeight = ctx.BlockHeight()
-	if pool.StartHeight >= ctx.BlockHeight() {
-		startHeight = pool.StartHeight
+	//expiredHeight = [(srcEndHeight-curHeight)*srcRewardPerBlock +appendReward]/RewardPerBlock + curHeight
+	availableReward = availableReward.Add(reward...)
+	coinPerBlock := types.RewardRules(pool.Rules).CoinPerBlock()
+	availableHeight := availableReward[0].Amount.
+		Quo(coinPerBlock.AmountOf(availableReward[0].Denom)).Int64()
+	for _, c := range availableReward[1:] {
+		rpb := coinPerBlock.AmountOf(c.Denom)
+		inteval := c.Amount.Quo(rpb).Int64()
+		if availableHeight > inteval {
+			availableHeight = inteval
+		}
 	}
-	expiredHeight := startHeight + pool.RemainingHeight()
+	expiredHeight := ctx.BlockHeight() + availableHeight
 	//if the expiration height does not change,
 	// there is no need to update the pool and the expired queue
 	if expiredHeight == pool.EndHeight {

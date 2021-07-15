@@ -51,10 +51,7 @@ func GetCmdQueryFarmPools() *cobra.Command {
 			return clientCtx.PrintProto(resp)
 		},
 	}
-
-	cmd.Flags().AddFlagSet(FsQueryFarmPool)
 	flags.AddQueryFlagsToCmd(cmd)
-
 	return cmd
 }
 
@@ -81,10 +78,7 @@ func GetCmdQueryFarmPool() *cobra.Command {
 			return clientCtx.PrintProto(resp)
 		},
 	}
-
-	cmd.Flags().AddFlagSet(FsQueryFarmPool)
 	flags.AddQueryFlagsToCmd(cmd)
-
 	return cmd
 }
 
