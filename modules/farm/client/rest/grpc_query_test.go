@@ -112,8 +112,8 @@ func (s *IntegrationTestSuite) TestRest() {
 
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
-	pools := respType.(*farmtypes.QueryPoolsResponse)
-	s.Require().EqualValues(expectedContents, *pools.List[0])
+	result := respType.(*farmtypes.QueryPoolsResponse)
+	s.Require().EqualValues(expectedContents, *result.Pools[0])
 
 	_, err = s.network.WaitForHeight(startHeight)
 	s.Require().NoError(err)

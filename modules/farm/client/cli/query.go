@@ -24,32 +24,56 @@ func GetQueryCmd() *cobra.Command {
 	}
 	queryCmd.AddCommand(
 		GetCmdQueryFarmPools(),
+		GetCmdQueryFarmPool(),
 		GetCmdQueryFarmer(),
 		GetCmdQueryParams(),
 	)
 	return queryCmd
 }
 
-// GetCmdQueryFarmPools implements the query the farm pool.
+// GetCmdQueryFarmPools implements the query the farm pool by page.
 func GetCmdQueryFarmPools() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "pools",
-		Example: fmt.Sprintf("$ %s query farm pools --pool-name <Farm Pool Name>", version.AppName),
-		Short:   "Query a farm",
-		Args:    cobra.MaximumNArgs(1),
+		Example: fmt.Sprintf("$ %s query farm pools", version.AppName),
+		Short:   "Query farm pools by page",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			var poolName string
-			if len(args) > 0 {
-				poolName = args[0]
+
+			queryClient := types.NewQueryClient(clientCtx)
+			resp, err := queryClient.Pools(context.Background(), &types.QueryPoolsRequest{})
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(resp)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsQueryFarmPool)
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdQueryFarmPools implements the query a farm pool.
+func GetCmdQueryFarmPool() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "pool",
+		Example: fmt.Sprintf("$ %s query farm pool <Farm Pool Name>", version.AppName),
+		Short:   "Query a farm pool",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
-			resp, err := queryClient.Pools(context.Background(), &types.QueryPoolsRequest{
-				Name: poolName,
+			resp, err := queryClient.Pool(context.Background(), &types.QueryPoolRequest{
+				Name: args[0],
 			})
 			if err != nil {
 				return err

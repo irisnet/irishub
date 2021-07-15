@@ -3,8 +3,12 @@ package keeper
 import (
 	"context"
 
+	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/types/query"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/irisnet/irismod/modules/farm/types"
 )
@@ -15,21 +19,11 @@ func (k Keeper) Pools(goctx context.Context,
 	request *types.QueryPoolsRequest) (*types.QueryPoolsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goctx)
 
-	var pools []types.FarmPool
-	if len(request.Name) > 0 {
-		pool, exist := k.GetPool(ctx, request.Name)
-		if !exist {
-			return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, request.Name)
-		}
-		pools = append(pools, pool)
-	} else {
-		k.IteratorAllPools(ctx, func(pool types.FarmPool) {
-			pools = append(pools, pool)
-		})
-	}
-
 	var list []*types.FarmPoolEntry
-	for _, pool := range pools {
+	prefixStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.FarmPoolKey)
+	pageRes, err := query.Paginate(prefixStore, request.Pagination, func(_ []byte, value []byte) error {
+		var pool types.FarmPool
+		k.cdc.MustUnmarshalBinaryBare(value, &pool)
 		var totalReward sdk.Coins
 		var remainingReward sdk.Coins
 		var rewardPerBlock sdk.Coins
@@ -52,8 +46,56 @@ func (k Keeper) Pools(goctx context.Context,
 			RemainingReward:    remainingReward,
 			RewardPerBlock:     rewardPerBlock,
 		})
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
-	return &types.QueryPoolsResponse{List: list}, nil
+	return &types.QueryPoolsResponse{
+		Pools:      list,
+		Pagination: pageRes,
+	}, nil
+}
+
+func (k Keeper) Pool(goctx context.Context,
+	request *types.QueryPoolRequest) (*types.QueryPoolResponse, error) {
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "empty request")
+	}
+
+	if len(request.Name) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "pool name can not be empty")
+	}
+	ctx := sdk.UnwrapSDKContext(goctx)
+
+	pool, exist := k.GetPool(ctx, request.Name)
+	if !exist {
+		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, request.Name)
+	}
+
+	var totalReward sdk.Coins
+	var remainingReward sdk.Coins
+	var rewardPerBlock sdk.Coins
+	k.IteratorRewardRules(ctx, pool.Name, func(r types.RewardRule) {
+		totalReward = totalReward.Add(sdk.NewCoin(r.Reward, r.TotalReward))
+		remainingReward = remainingReward.Add(sdk.NewCoin(r.Reward, r.RemainingReward))
+		rewardPerBlock = rewardPerBlock.Add(sdk.NewCoin(r.Reward, r.RewardPerBlock))
+	})
+
+	poolEntry := &types.FarmPoolEntry{
+		Name:               pool.Name,
+		Creator:            pool.Creator,
+		Description:        pool.Description,
+		StartHeight:        pool.StartHeight,
+		EndHeight:          pool.EndHeight,
+		Editable:           pool.Editable,
+		Expired:            k.Expired(ctx, pool),
+		TotalLpTokenLocked: pool.TotalLpTokenLocked,
+		TotalReward:        totalReward,
+		RemainingReward:    remainingReward,
+		RewardPerBlock:     rewardPerBlock,
+	}
+	return &types.QueryPoolResponse{Pool: poolEntry}, nil
 }
 
 func (k Keeper) Farmer(goctx context.Context,

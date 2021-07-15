@@ -2,6 +2,7 @@ syntax = "proto3";
 package irismod.farm;
 
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "farm/farm.proto";
@@ -11,6 +12,10 @@ option go_package = "github.com/irisnet/irismod/modules/farm/types";
 service Query {
   rpc Pools(QueryPoolsRequest) returns (QueryPoolsResponse) {
     option (google.api.http).get = "/irismod/farm/pools";
+  }
+
+  rpc Pool(QueryPoolRequest) returns (QueryPoolResponse) {
+    option (google.api.http).get = "/irismod/farm/pool/{name}";
   }
 
   rpc Farmer(QueryFarmerRequest) returns (QueryFarmerResponse) {
@@ -23,7 +28,9 @@ service Query {
   }
 }
 
-message QueryPoolsRequest { string name = 1; }
+message QueryPoolsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
+}
 
 message FarmPoolEntry {
   string name = 1;
@@ -51,7 +58,13 @@ message FarmPoolEntry {
   ];
 }
 
-message QueryPoolsResponse { repeated FarmPoolEntry list = 1; }
+message QueryPoolsResponse {
+  repeated FarmPoolEntry pools = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryPoolRequest { string name = 1; }
+message QueryPoolResponse { FarmPoolEntry pool = 1; }
 
 message QueryFarmerRequest {
   string farmer = 1;

@@ -27,6 +27,15 @@ func CreateFarmPoolExec(clientCtx client.Context,
 	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdCreateFarmPool(), args)
 }
 
+func QueryFarmPoolsExec(clientCtx client.Context, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := []string{
+		fmt.Sprintf("--%s=json", cli.OutputFlag),
+	}
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdQueryFarmPools(), args)
+}
+
 func QueryFarmPoolExec(clientCtx client.Context, poolName string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		poolName,
@@ -34,7 +43,7 @@ func QueryFarmPoolExec(clientCtx client.Context, poolName string, extraArgs ...s
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdQueryFarmPools(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdQueryFarmPool(), args)
 }
 
 // AppendRewardExec creates a redelegate message.

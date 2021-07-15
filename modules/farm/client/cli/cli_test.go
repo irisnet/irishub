@@ -91,7 +91,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-	respType = proto.Message(&farmtypes.QueryPoolsResponse{})
+	respType = proto.Message(&farmtypes.QueryPoolResponse{})
 	expectedContents := farmtypes.FarmPoolEntry{
 		Name:               farmPool,
 		Creator:            creator.String(),
@@ -109,8 +109,8 @@ func (s *IntegrationTestSuite) TestFarm() {
 	bz, err = testutil.QueryFarmPoolExec(val.ClientCtx, farmPool)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	pools := respType.(*farmtypes.QueryPoolsResponse)
-	s.Require().EqualValues(expectedContents, *pools.List[0])
+	result := respType.(*farmtypes.QueryPoolResponse)
+	s.Require().EqualValues(expectedContents, *result.Pool)
 
 	respType = proto.Message(&sdk.TxResponse{})
 	reward := sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(1000)))
@@ -180,8 +180,8 @@ func (s *IntegrationTestSuite) TestFarm() {
 	bz, err = testutil.QueryFarmerExec(val.ClientCtx, creator.String(), queryFarmerArgs...)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), queryFarmerRespType))
-	result := queryFarmerRespType.(*farmtypes.QueryFarmerResponse)
-	s.Require().EqualValues(expectFarmer, *result.List[0])
+	result1 := queryFarmerRespType.(*farmtypes.QueryFarmerResponse)
+	s.Require().EqualValues(expectFarmer, *result1.List[0])
 
 	bz, err = testutil.DestroyExec(clientCtx,
 		creator.String(),
