@@ -183,6 +183,7 @@ var (
 		servicetypes.RequestAccName:    nil,
 		servicetypes.FeeCollectorName:  {authtypes.Burner},
 		farmtypes.ModuleName:           nil,
+		farmtypes.RewardCollector:      nil,
 	}
 
 	nativeToken tokentypes.Token
