@@ -463,7 +463,7 @@ func NewIrisApp(
 		keys[farmtypes.StoreKey],
 		app.bankKeeper,
 		app.accountKeeper,
-		app.coinswapKeeper,
+		app.coinswapKeeper.ValidatePool,
 		app.GetSubspace(farmtypes.ModuleName),
 		authtypes.FeeCollectorName,
 	)
@@ -504,9 +504,9 @@ func NewIrisApp(
 		htlc.NewAppModule(appCodec, app.htlcKeeper, app.accountKeeper, app.bankKeeper),
 		coinswap.NewAppModule(appCodec, app.coinswapKeeper, app.accountKeeper, app.bankKeeper),
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
-		oracle.NewAppModule(appCodec, app.oracleKeeper),
+		oracle.NewAppModule(appCodec, app.oracleKeeper, app.accountKeeper, app.bankKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
-		farm.NewAppModule(appCodec, app.farmkeeper),
+		farm.NewAppModule(appCodec, app.farmkeeper, app.accountKeeper, app.bankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -520,7 +520,7 @@ func NewIrisApp(
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
-		servicetypes.ModuleName,
+		servicetypes.ModuleName, farmtypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -564,9 +564,9 @@ func NewIrisApp(
 		htlc.NewAppModule(appCodec, app.htlcKeeper, app.accountKeeper, app.bankKeeper),
 		coinswap.NewAppModule(appCodec, app.coinswapKeeper, app.accountKeeper, app.bankKeeper),
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
-		oracle.NewAppModule(appCodec, app.oracleKeeper),
+		oracle.NewAppModule(appCodec, app.oracleKeeper, app.accountKeeper, app.bankKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
-		farm.NewAppModule(appCodec, app.farmkeeper),
+		farm.NewAppModule(appCodec, app.farmkeeper, app.accountKeeper, app.bankKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
