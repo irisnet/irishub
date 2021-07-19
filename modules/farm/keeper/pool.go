@@ -131,9 +131,14 @@ func (k Keeper) AdjustPool(ctx sdk.Context,
 		return err
 	}
 
+	rules := types.RewardRules(pool.Rules)
+	if rewardPerBlock != nil && !rewardPerBlock.DenomsSubsetOf(rules.RewardsPerBlock()) {
+		return sdkerrors.Wrapf(types.ErrInvalidAppend, "rewardPerBlock: %s", rewardPerBlock.String())
+	}
+
 	availableReward := sdk.NewCoins()
 	remainingHeight := pool.EndHeight - ctx.BlockHeight()
-	rules := types.RewardRules(pool.Rules)
+
 	if reward != nil {
 		if !rules.Contains(reward) {
 			return sdkerrors.Wrapf(types.ErrInvalidAppend, reward.String())
@@ -159,11 +164,11 @@ func (k Keeper) AdjustPool(ctx sdk.Context,
 
 	//expiredHeight = [(srcEndHeight-curHeight)*srcRewardPerBlock +appendReward]/RewardPerBlock + curHeight
 	availableReward = availableReward.Add(reward...)
-	coinPerBlock := types.RewardRules(pool.Rules).CoinPerBlock()
+	rewardsPerBlock := types.RewardRules(pool.Rules).RewardsPerBlock()
 	availableHeight := availableReward[0].Amount.
-		Quo(coinPerBlock.AmountOf(availableReward[0].Denom)).Int64()
+		Quo(rewardsPerBlock.AmountOf(availableReward[0].Denom)).Int64()
 	for _, c := range availableReward[1:] {
-		rpb := coinPerBlock.AmountOf(c.Denom)
+		rpb := rewardsPerBlock.AmountOf(c.Denom)
 		inteval := c.Amount.Quo(rpb).Int64()
 		if availableHeight > inteval {
 			availableHeight = inteval

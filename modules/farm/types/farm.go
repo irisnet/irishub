@@ -49,9 +49,9 @@ func (rs RewardRules) Contains(reward sdk.Coins) bool {
 	return reward.DenomsSubsetOf(allRewards)
 }
 
-func (rs RewardRules) UpdateWith(rewarPerBlockd sdk.Coins) RewardRules {
+func (rs RewardRules) UpdateWith(rewardPerBlock sdk.Coins) RewardRules {
 	for i := range rs {
-		rewardAmt := rewarPerBlockd.AmountOf(rs[i].Reward)
+		rewardAmt := rewardPerBlock.AmountOf(rs[i].Reward)
 		if rewardAmt.IsPositive() {
 			rs[i].RewardPerBlock = rewardAmt
 		}
@@ -59,7 +59,7 @@ func (rs RewardRules) UpdateWith(rewarPerBlockd sdk.Coins) RewardRules {
 	return rs
 }
 
-func (rs RewardRules) CoinPerBlock() (coins sdk.Coins) {
+func (rs RewardRules) RewardsPerBlock() (coins sdk.Coins) {
 	for _, r := range rs {
 		coins = coins.Add(sdk.NewCoin(r.Reward, r.RewardPerBlock))
 	}
