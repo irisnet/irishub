@@ -30,10 +30,10 @@ iris start
 
 Next, your node will process all chain upgrades. Between each upgrade, you must use the specified version to catch up with the block. Don't worry about using the old version at the upgrade height, the node will be halted automatically.
 
-| Proposal                                             | Start height | Upgrade height | irishub version                                                                                                                   |
-| ---------------------------------------------------- | ------------ | -------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| genesis                                              | 9146456      | 9593205        | [v1.0.1](https://github.com/irisnet/irishub/releases/tag/v1.0.1)                                                                  |
-| [#1](https://irishub.iobscan.io/#/ProposalsDetail/1) | 9593206      |                | [v1.1.0](https://github.com/irisnet/irishub/releases/tag/v1.1.0),[v1.1.1](https://github.com/irisnet/irishub/releases/tag/v1.1.1) |
+| Proposal | Start height | Upgrade height | irishub version |
+| -------- | ------------ | -------------- | ----- |
+| genesis  |  9146456     |  9593205  | [v1.0.1](https://github.com/irisnet/irishub/releases/tag/v1.0.1) |
+| [#1](https://irishub.iobscan.io/#/ProposalsDetail/1)  |  9593205     |    | [v1.1.0](https://github.com/irisnet/irishub/releases/tag/v1.1.0) |
 
 :::tip
 You may see some connection errors, it does not matter, the P2P network is trying to find available connections
