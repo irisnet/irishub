@@ -13,20 +13,10 @@ func (k Keeper) HasDenomID(ctx sdk.Context, id string) bool {
 	return store.Has(types.KeyDenomID(id))
 }
 
-// HasDenomNm returns whether the specified denom name exists
-func (k Keeper) HasDenomNm(ctx sdk.Context, name string) bool {
-	store := ctx.KVStore(k.storeKey)
-	return store.Has(types.KeyDenomName(name))
-}
-
 // SetDenom is responsible for saving the definition of denom
 func (k Keeper) SetDenom(ctx sdk.Context, denom types.Denom) error {
 	if k.HasDenomID(ctx, denom.Id) {
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "denomID %s has already exists", denom.Id)
-	}
-
-	if k.HasDenomNm(ctx, denom.Name) {
-		return sdkerrors.Wrapf(types.ErrInvalidDenom, "denomName %s has already exists", denom.Name)
 	}
 
 	store := ctx.KVStore(k.storeKey)

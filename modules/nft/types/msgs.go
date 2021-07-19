@@ -52,7 +52,7 @@ func (msg MsgIssueDenom) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
-	return ValidateDenomName(msg.Name)
+	return nil
 }
 
 // GetSignBytes Implements Msg.
