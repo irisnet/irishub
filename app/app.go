@@ -505,7 +505,7 @@ func NewIrisApp(
 		htlc.NewAppModule(appCodec, app.htlcKeeper, app.accountKeeper, app.bankKeeper),
 		coinswap.NewAppModule(appCodec, app.coinswapKeeper, app.accountKeeper, app.bankKeeper),
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
-		oracle.NewAppModule(appCodec, app.oracleKeeper),
+		oracle.NewAppModule(appCodec, app.oracleKeeper, app.accountKeeper, app.bankKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
 		farm.NewAppModule(appCodec, app.farmkeeper, app.accountKeeper, app.bankKeeper),
 	)
@@ -565,7 +565,7 @@ func NewIrisApp(
 		htlc.NewAppModule(appCodec, app.htlcKeeper, app.accountKeeper, app.bankKeeper),
 		coinswap.NewAppModule(appCodec, app.coinswapKeeper, app.accountKeeper, app.bankKeeper),
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
-		oracle.NewAppModule(appCodec, app.oracleKeeper),
+		oracle.NewAppModule(appCodec, app.oracleKeeper, app.accountKeeper, app.bankKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
 		farm.NewAppModule(appCodec, app.farmkeeper, app.accountKeeper, app.bankKeeper),
 	)
