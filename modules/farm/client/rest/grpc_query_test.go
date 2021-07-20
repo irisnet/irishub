@@ -106,13 +106,13 @@ func (s *IntegrationTestSuite) TestRest() {
 		RewardPerBlock:     rewardPerBlock,
 	}
 
-	respType = proto.Message(&farmtypes.QueryPoolsResponse{})
+	respType = proto.Message(&farmtypes.QueryFarmPoolsResponse{})
 	queryPoolURL := fmt.Sprintf("%s/irismod/farm/pools", baseURL)
 	resp, err := rest.GetRequest(queryPoolURL)
 
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
-	result := respType.(*farmtypes.QueryPoolsResponse)
+	result := respType.(*farmtypes.QueryFarmPoolsResponse)
 	s.Require().EqualValues(expectedContents, *result.Pools[0])
 
 	_, err = s.network.WaitForHeight(startHeight)

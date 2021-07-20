@@ -10,11 +10,11 @@ import "farm/farm.proto";
 option go_package = "github.com/irisnet/irismod/modules/farm/types";
 
 service Query {
-  rpc Pools(QueryPoolsRequest) returns (QueryPoolsResponse) {
+  rpc FarmPools(QueryFarmPoolsRequest) returns (QueryFarmPoolsResponse) {
     option (google.api.http).get = "/irismod/farm/pools";
   }
 
-  rpc Pool(QueryPoolRequest) returns (QueryPoolResponse) {
+  rpc FarmPool(QueryFarmPoolRequest) returns (QueryFarmPoolResponse) {
     option (google.api.http).get = "/irismod/farm/pool/{name}";
   }
 
@@ -28,7 +28,7 @@ service Query {
   }
 }
 
-message QueryPoolsRequest {
+message QueryFarmPoolsRequest {
   cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
@@ -58,13 +58,13 @@ message FarmPoolEntry {
   ];
 }
 
-message QueryPoolsResponse {
+message QueryFarmPoolsResponse {
   repeated FarmPoolEntry pools = 1;
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message QueryPoolRequest { string name = 1; }
-message QueryPoolResponse { FarmPoolEntry pool = 1; }
+message QueryFarmPoolRequest { string name = 1; }
+message QueryFarmPoolResponse { FarmPoolEntry pool = 1; }
 
 message QueryFarmerRequest {
   string farmer = 1;

@@ -91,7 +91,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-	respType = proto.Message(&farmtypes.QueryPoolResponse{})
+	respType = proto.Message(&farmtypes.QueryFarmPoolResponse{})
 	expectedContents := farmtypes.FarmPoolEntry{
 		Name:               farmPool,
 		Creator:            creator.String(),
@@ -109,7 +109,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 	bz, err = testutil.QueryFarmPoolExec(val.ClientCtx, farmPool)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	result := respType.(*farmtypes.QueryPoolResponse)
+	result := respType.(*farmtypes.QueryFarmPoolResponse)
 	s.Require().EqualValues(expectedContents, *result.Pool)
 
 	respType = proto.Message(&sdk.TxResponse{})

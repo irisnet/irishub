@@ -44,7 +44,7 @@ func GetCmdQueryFarmPools() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
-			resp, err := queryClient.Pools(context.Background(), &types.QueryPoolsRequest{})
+			resp, err := queryClient.FarmPools(context.Background(), &types.QueryFarmPoolsRequest{})
 			if err != nil {
 				return err
 			}
@@ -69,7 +69,7 @@ func GetCmdQueryFarmPool() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
-			resp, err := queryClient.Pool(context.Background(), &types.QueryPoolRequest{
+			resp, err := queryClient.FarmPool(context.Background(), &types.QueryFarmPoolRequest{
 				Name: args[0],
 			})
 			if err != nil {

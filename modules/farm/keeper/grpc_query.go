@@ -15,8 +15,8 @@ import (
 
 var _ types.QueryServer = Keeper{}
 
-func (k Keeper) Pools(goctx context.Context,
-	request *types.QueryPoolsRequest) (*types.QueryPoolsResponse, error) {
+func (k Keeper) FarmPools(goctx context.Context,
+	request *types.QueryFarmPoolsRequest) (*types.QueryFarmPoolsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goctx)
 
 	var list []*types.FarmPoolEntry
@@ -51,14 +51,14 @@ func (k Keeper) Pools(goctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	return &types.QueryPoolsResponse{
+	return &types.QueryFarmPoolsResponse{
 		Pools:      list,
 		Pagination: pageRes,
 	}, nil
 }
 
-func (k Keeper) Pool(goctx context.Context,
-	request *types.QueryPoolRequest) (*types.QueryPoolResponse, error) {
+func (k Keeper) FarmPool(goctx context.Context,
+	request *types.QueryFarmPoolRequest) (*types.QueryFarmPoolResponse, error) {
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -95,7 +95,7 @@ func (k Keeper) Pool(goctx context.Context,
 		RemainingReward:    remainingReward,
 		RewardPerBlock:     rewardPerBlock,
 	}
-	return &types.QueryPoolResponse{Pool: poolEntry}, nil
+	return &types.QueryFarmPoolResponse{Pool: poolEntry}, nil
 }
 
 func (k Keeper) Farmer(goctx context.Context,
