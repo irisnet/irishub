@@ -31397,16 +31397,139 @@ paths:
                       format: byte
       tags:
         - Query
-  /irismod/farm/pools:
+  '/irismod/farm/pool/{name}':
     get:
-      operationId: Pools
+      operationId: FarmPool
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              list:
+              pool:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  creator:
+                    type: string
+                  description:
+                    type: string
+                  start_height:
+                    type: string
+                    format: int64
+                  end_height:
+                    type: string
+                    format: int64
+                  editable:
+                    type: boolean
+                  expired:
+                    type: boolean
+                  total_lp_token_locked:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+                  total_reward:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                  remaining_reward:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                  reward_per_block:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: name
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /irismod/farm/pools:
+    get:
+      operationId: FarmPools
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              pools:
                 type: array
                 items:
                   type: object
@@ -31496,6 +31619,33 @@ paths:
                           custom method
 
                           signatures required by gogoproto.
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
         default:
           description: An unexpected error response.
           schema:
@@ -31519,10 +31669,52 @@ paths:
                       type: string
                       format: byte
       parameters:
-        - name: name
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
           in: query
           required: false
           type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/irismod/nft/collections/{denom_id}':
@@ -31549,6 +31741,12 @@ paths:
                         type: string
                       creator:
                         type: string
+                      symbol:
+                        type: string
+                      mint_restricted:
+                        type: boolean
+                      update_restricted:
+                        type: boolean
                     title: Denom defines a type of NFT
                   nfts:
                     type: array
@@ -31744,6 +31942,12 @@ paths:
                       type: string
                     creator:
                       type: string
+                    symbol:
+                      type: string
+                    mint_restricted:
+                      type: boolean
+                    update_restricted:
+                      type: boolean
                   title: Denom defines a type of NFT
               pagination:
                 type: object
@@ -31867,6 +32071,12 @@ paths:
                     type: string
                   creator:
                     type: string
+                  symbol:
+                    type: string
+                  mint_restricted:
+                    type: boolean
+                  update_restricted:
+                    type: boolean
                 title: Denom defines a type of NFT
             title: >-
               QueryDenomResponse is the response type for the Query/Denom RPC
@@ -54343,58 +54553,29 @@ definitions:
       max_reward_categories:
         type: integer
         format: int64
-  irismod.farm.QueryFarmerResponse:
+  irismod.farm.QueryFarmPoolResponse:
     type: object
     properties:
-      list:
-        type: array
-        items:
-          type: object
-          properties:
-            pool_name:
-              type: string
-            locked:
-              type: object
-              properties:
-                denom:
-                  type: string
-                amount:
-                  type: string
-              description: >-
-                Coin defines a token with a denomination and an amount.
-
-
-                NOTE: The amount field is an Int which implements the custom
-                method
-
-                signatures required by gogoproto.
-            pending_reward:
-              type: array
-              items:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-      height:
-        type: string
-        format: int64
-  irismod.farm.QueryParamsResponse:
-    type: object
-    properties:
-      params:
+      pool:
         type: object
         properties:
-          create_pool_fee:
+          name:
+            type: string
+          creator:
+            type: string
+          description:
+            type: string
+          start_height:
+            type: string
+            format: int64
+          end_height:
+            type: string
+            format: int64
+          editable:
+            type: boolean
+          expired:
+            type: boolean
+          total_lp_token_locked:
             type: object
             properties:
               denom:
@@ -54409,13 +54590,61 @@ definitions:
               method
 
               signatures required by gogoproto.
-          max_reward_categories:
-            type: integer
-            format: int64
-  irismod.farm.QueryPoolsResponse:
+          total_reward:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+          remaining_reward:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+          reward_per_block:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+  irismod.farm.QueryFarmPoolsResponse:
     type: object
     properties:
-      list:
+      pools:
         type: array
         items:
           type: object
@@ -54502,6 +54731,100 @@ definitions:
                   method
 
                   signatures required by gogoproto.
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  irismod.farm.QueryFarmerResponse:
+    type: object
+    properties:
+      list:
+        type: array
+        items:
+          type: object
+          properties:
+            pool_name:
+              type: string
+            locked:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            pending_reward:
+              type: array
+              items:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+      height:
+        type: string
+        format: int64
+  irismod.farm.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        type: object
+        properties:
+          create_pool_fee:
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+            description: >-
+              Coin defines a token with a denomination and an amount.
+
+
+              NOTE: The amount field is an Int which implements the custom
+              method
+
+              signatures required by gogoproto.
+          max_reward_categories:
+            type: integer
+            format: int64
   irismod.nft.BaseNFT:
     type: object
     properties:
@@ -54530,6 +54853,12 @@ definitions:
             type: string
           creator:
             type: string
+          symbol:
+            type: string
+          mint_restricted:
+            type: boolean
+          update_restricted:
+            type: boolean
         title: Denom defines a type of NFT
       nfts:
         type: array
@@ -54559,6 +54888,12 @@ definitions:
         type: string
       creator:
         type: string
+      symbol:
+        type: string
+      mint_restricted:
+        type: boolean
+      update_restricted:
+        type: boolean
     title: Denom defines a type of NFT
   irismod.nft.IDCollection:
     type: object
@@ -54605,6 +54940,12 @@ definitions:
                 type: string
               creator:
                 type: string
+              symbol:
+                type: string
+              mint_restricted:
+                type: boolean
+              update_restricted:
+                type: boolean
             title: Denom defines a type of NFT
           nfts:
             type: array
@@ -54665,6 +55006,12 @@ definitions:
             type: string
           creator:
             type: string
+          symbol:
+            type: string
+          mint_restricted:
+            type: boolean
+          update_restricted:
+            type: boolean
         title: Denom defines a type of NFT
     title: QueryDenomResponse is the response type for the Query/Denom RPC method
   irismod.nft.QueryDenomsResponse:
@@ -54683,6 +55030,12 @@ definitions:
               type: string
             creator:
               type: string
+            symbol:
+              type: string
+            mint_restricted:
+              type: boolean
+            update_restricted:
+              type: boolean
           title: Denom defines a type of NFT
       pagination:
         type: object
