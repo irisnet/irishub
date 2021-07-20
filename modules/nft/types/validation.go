@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 	"regexp"
+	"strings"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
