@@ -113,10 +113,10 @@ func GetCmdIssueDenom() *cobra.Command {
 // GetCmdMintNFT is the CLI command for a MintNFT transaction
 func GetCmdMintNFT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "mint [denom-id] [token-id]",
+		Use:  "mint [denom-id] [nft-id]",
 		Long: "Mint an NFT and set the owner to the recipient.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft mint <denom-id> <token-id> "+
+			"$ %s tx nft mint <denom-id> <nft-id> "+
 				"--uri=<uri> "+
 				"--recipient=<recipient> "+
 				"--from=<key-name> "+
@@ -184,10 +184,10 @@ func GetCmdMintNFT() *cobra.Command {
 // GetCmdEditNFT is the CLI command for sending an MsgEditNFT transaction
 func GetCmdEditNFT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "edit [denom-id] [token-id]",
+		Use:  "edit [denom-id] [nft-id]",
 		Long: "Edit the token data of an NFT.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft edit <denom-id> <token-id> "+
+			"$ %s tx nft edit <denom-id> <nft-id> "+
 				"--uri=<uri> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
@@ -236,10 +236,10 @@ func GetCmdEditNFT() *cobra.Command {
 // GetCmdTransferNFT is the CLI command for sending a TransferNFT transaction
 func GetCmdTransferNFT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "transfer [recipient] [denom-id] [token-id]",
+		Use:  "transfer [recipient] [denom-id] [nft-id]",
 		Long: "Transfer an NFT to a recipient.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft transfer <recipient> <denom-id> <token-id> "+
+			"$ %s tx nft transfer <recipient> <denom-id> <nft-id> "+
 				"--uri=<uri> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
@@ -293,10 +293,10 @@ func GetCmdTransferNFT() *cobra.Command {
 // GetCmdBurnNFT is the CLI command for sending a BurnNFT transaction
 func GetCmdBurnNFT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "burn [denom-id] [token-id]",
+		Use:  "burn [denom-id] [nft-id]",
 		Long: "Burn an NFT.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft burn <denom-id> <token-id> "+
+			"$ %s tx nft burn <denom-id> <nft-id> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
