@@ -117,7 +117,8 @@ func (k Keeper) TransferOwner(
 	ctx sdk.Context, denomID, tokenID, tokenNm, tokenURI,
 	tokenData string, srcOwner, dstOwner sdk.AccAddress,
 ) error {
-	if !k.HasDenomID(ctx, denomID) {
+	denom, found := k.GetDenom(ctx, denomID)
+	if !found {
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", denomID)
 	}
 
@@ -128,14 +129,16 @@ func (k Keeper) TransferOwner(
 
 	nft.Owner = dstOwner.String()
 
+	if denom.UpdateRestricted && (types.Modified(tokenNm) || types.Modified(tokenURI) || types.Modified(tokenData)) {
+		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "It is restricted to update NFT under this denom %s", denom.Id)
+	}
+
 	if types.Modified(tokenNm) {
 		nft.Name = tokenNm
 	}
-
 	if types.Modified(tokenURI) {
 		nft.URI = tokenURI
 	}
-
 	if types.Modified(tokenData) {
 		nft.Data = tokenData
 	}

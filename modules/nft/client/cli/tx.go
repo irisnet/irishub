@@ -331,7 +331,7 @@ func GetCmdTransferDenom() *cobra.Command {
 		Use:  "transfer-denom [recipient] [denom-id]",
 		Long: "Transfer an Denom to a recipient.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft transfer-denom <denom-id> <recipient> "+
+			"$ %s tx nft transfer-denom <recipient> <denom-id> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
@@ -344,14 +344,14 @@ func GetCmdTransferDenom() *cobra.Command {
 				return err
 			}
 
-			if _, err := sdk.AccAddressFromBech32(args[1]); err != nil {
+			if _, err := sdk.AccAddressFromBech32(args[0]); err != nil {
 				return err
 			}
 
 			msg := types.NewMsgTransferDenom(
-				args[0],
-				clientCtx.GetFromAddress().String(),
 				args[1],
+				clientCtx.GetFromAddress().String(),
+				args[0],
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

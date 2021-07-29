@@ -131,8 +131,8 @@ func QueryNFTExec(clientCtx client.Context, denomID string, tokenID string, extr
 
 func TransferDenomExec(clientCtx client.Context, from string, recipient string, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		denomID,
 		recipient,
+		denomID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 
