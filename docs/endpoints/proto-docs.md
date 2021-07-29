@@ -499,12 +499,14 @@ order: 6
 - [farm/query.proto](#farm/query.proto)
     - [FarmPoolEntry](#irismod.farm.FarmPoolEntry)
     - [LockedInfo](#irismod.farm.LockedInfo)
+    - [QueryFarmPoolRequest](#irismod.farm.QueryFarmPoolRequest)
+    - [QueryFarmPoolResponse](#irismod.farm.QueryFarmPoolResponse)
+    - [QueryFarmPoolsRequest](#irismod.farm.QueryFarmPoolsRequest)
+    - [QueryFarmPoolsResponse](#irismod.farm.QueryFarmPoolsResponse)
     - [QueryFarmerRequest](#irismod.farm.QueryFarmerRequest)
     - [QueryFarmerResponse](#irismod.farm.QueryFarmerResponse)
     - [QueryParamsRequest](#irismod.farm.QueryParamsRequest)
     - [QueryParamsResponse](#irismod.farm.QueryParamsResponse)
-    - [QueryPoolsRequest](#irismod.farm.QueryPoolsRequest)
-    - [QueryPoolsResponse](#irismod.farm.QueryPoolsResponse)
   
     - [Query](#irismod.farm.Query)
   
@@ -837,6 +839,8 @@ order: 6
     - [MsgIssueDenomResponse](#irismod.nft.MsgIssueDenomResponse)
     - [MsgMintNFT](#irismod.nft.MsgMintNFT)
     - [MsgMintNFTResponse](#irismod.nft.MsgMintNFTResponse)
+    - [MsgTransferDenom](#irismod.nft.MsgTransferDenom)
+    - [MsgTransferDenomResponse](#irismod.nft.MsgTransferDenomResponse)
     - [MsgTransferNFT](#irismod.nft.MsgTransferNFT)
     - [MsgTransferNFTResponse](#irismod.nft.MsgTransferNFTResponse)
   
@@ -7590,6 +7594,67 @@ periodically vests by unlocking coins during each specified period.
 
 
 
+<a name="irismod.farm.QueryFarmPoolRequest"></a>
+
+### QueryFarmPoolRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryFarmPoolResponse"></a>
+
+### QueryFarmPoolResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool` | [FarmPoolEntry](#irismod.farm.FarmPoolEntry) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryFarmPoolsRequest"></a>
+
+### QueryFarmPoolsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryFarmPoolsResponse"></a>
+
+### QueryFarmPoolsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pools` | [FarmPoolEntry](#irismod.farm.FarmPoolEntry) | repeated |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
 <a name="irismod.farm.QueryFarmerRequest"></a>
 
 ### QueryFarmerRequest
@@ -7646,36 +7711,6 @@ periodically vests by unlocking coins during each specified period.
 
 
 
-
-<a name="irismod.farm.QueryPoolsRequest"></a>
-
-### QueryPoolsRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `name` | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="irismod.farm.QueryPoolsResponse"></a>
-
-### QueryPoolsResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `list` | [FarmPoolEntry](#irismod.farm.FarmPoolEntry) | repeated |  |
-
-
-
-
-
  <!-- end messages -->
 
  <!-- end enums -->
@@ -7690,7 +7725,8 @@ periodically vests by unlocking coins during each specified period.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `Pools` | [QueryPoolsRequest](#irismod.farm.QueryPoolsRequest) | [QueryPoolsResponse](#irismod.farm.QueryPoolsResponse) |  | GET|/irismod/farm/pools|
+| `FarmPools` | [QueryFarmPoolsRequest](#irismod.farm.QueryFarmPoolsRequest) | [QueryFarmPoolsResponse](#irismod.farm.QueryFarmPoolsResponse) |  | GET|/irismod/farm/pools|
+| `FarmPool` | [QueryFarmPoolRequest](#irismod.farm.QueryFarmPoolRequest) | [QueryFarmPoolResponse](#irismod.farm.QueryFarmPoolResponse) |  | GET|/irismod/farm/pool/{name}|
 | `Farmer` | [QueryFarmerRequest](#irismod.farm.QueryFarmerRequest) | [QueryFarmerResponse](#irismod.farm.QueryFarmerResponse) |  | GET|/irismod/farm/farmers/{farmer}|
 | `Params` | [QueryParamsRequest](#irismod.farm.QueryParamsRequest) | [QueryParamsResponse](#irismod.farm.QueryParamsResponse) | Params queries the htlc parameters | GET|/irismod/farm/params|
 
@@ -11716,6 +11752,9 @@ Denom defines a type of NFT
 | `name` | [string](#string) |  |  |
 | `schema` | [string](#string) |  |  |
 | `creator` | [string](#string) |  |  |
+| `symbol` | [string](#string) |  |  |
+| `mint_restricted` | [bool](#bool) |  |  |
+| `update_restricted` | [bool](#bool) |  |  |
 
 
 
@@ -12089,6 +12128,9 @@ MsgIssueDenom defines an SDK message for creating a new denom.
 | `name` | [string](#string) |  |  |
 | `schema` | [string](#string) |  |  |
 | `sender` | [string](#string) |  |  |
+| `symbol` | [string](#string) |  |  |
+| `mint_restricted` | [bool](#bool) |  |  |
+| `update_restricted` | [bool](#bool) |  |  |
 
 
 
@@ -12136,6 +12178,33 @@ MsgMintNFTResponse defines the Msg/MintNFT response type.
 
 
 
+<a name="irismod.nft.MsgTransferDenom"></a>
+
+### MsgTransferDenom
+MsgTransferDenom defines an SDK message for transferring an denom to recipient.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [string](#string) |  |  |
+| `sender` | [string](#string) |  |  |
+| `recipient` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.nft.MsgTransferDenomResponse"></a>
+
+### MsgTransferDenomResponse
+MsgTransferDenomResponse defines the Msg/TransferDenom response type.
+
+
+
+
+
+
 <a name="irismod.nft.MsgTransferNFT"></a>
 
 ### MsgTransferNFT
@@ -12176,7 +12245,7 @@ MsgTransferNFTResponse defines the Msg/TransferNFT response type.
 <a name="irismod.nft.Msg"></a>
 
 ### Msg
-Msg defines the htlc Msg service.
+Msg defines the nft Msg service.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -12185,6 +12254,7 @@ Msg defines the htlc Msg service.
 | `EditNFT` | [MsgEditNFT](#irismod.nft.MsgEditNFT) | [MsgEditNFTResponse](#irismod.nft.MsgEditNFTResponse) | RefundHTLC defines a method for editing a nft. | |
 | `TransferNFT` | [MsgTransferNFT](#irismod.nft.MsgTransferNFT) | [MsgTransferNFTResponse](#irismod.nft.MsgTransferNFTResponse) | TransferNFT defines a method for transferring a nft. | |
 | `BurnNFT` | [MsgBurnNFT](#irismod.nft.MsgBurnNFT) | [MsgBurnNFTResponse](#irismod.nft.MsgBurnNFTResponse) | BurnNFT defines a method for burning a nft. | |
+| `TransferDenom` | [MsgTransferDenom](#irismod.nft.MsgTransferDenom) | [MsgTransferDenomResponse](#irismod.nft.MsgTransferDenomResponse) | TransferDenom defines a method for transferring a denom. | |
 
  <!-- end services -->
 
