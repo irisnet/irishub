@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"fmt"
+
 	flag "github.com/spf13/pflag"
 
 	"github.com/irisnet/irismod/modules/token/types"
@@ -29,7 +31,7 @@ func init() {
 	FsIssueToken.String(FlagSymbol, "", "The token symbol. Once created, it cannot be modified")
 	FsIssueToken.String(FlagName, "", "The token name, e.g. IRIS Network")
 	FsIssueToken.String(FlagMinUnit, "", "The minimum unit name of the token, e.g. wei")
-	FsIssueToken.Uint32(FlagScale, 0, "The token decimals. The maximum value is 18")
+	FsIssueToken.Uint32(FlagScale, 0, fmt.Sprintf("The token decimals, the maximum value is %d", types.MaximumScale))
 	FsIssueToken.Uint64(FlagInitialSupply, 0, "The initial supply of the token")
 	FsIssueToken.Uint64(FlagMaxSupply, types.MaximumMaxSupply, "The maximum supply of the token")
 	FsIssueToken.Bool(FlagMintable, false, "Whether the token can be minted, default to false")
