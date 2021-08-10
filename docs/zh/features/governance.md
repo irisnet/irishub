@@ -174,5 +174,5 @@ iris tx gov submit-proposal community-pool-spend proposal.json --from=<key-name>
 
 ### 软件升级
 
-软件升级的用法请参考 [`Upgrade`](https://github.com/irisnet/irishub/blob/master/docs/zh/features/upgrade.md)
+软件升级的用法请参考 [`Upgrade`](./upgrade.md)
 
