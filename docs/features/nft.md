@@ -6,7 +6,7 @@
 
 nft on the chain are identified by `ID`. With the help of the secure and non-tamperable features of the blockchain, the ownership of nft will be clarified. The transaction process of nft among members will also be publicly recorded to facilitate traceability and dispute settlement.
 
-nft metadata (`metadata`) can be stored directly on the chain, or the `URI` of its storage source outside the chain can be stored on the chain. nft metadata is organized according to a specific [JSON Schema](https://JSON-Schema.org/). [Here](./nft-metadata.json) is an example of metadata JSON Schema.
+nft metadata (`metadata`) can be stored directly on the chain, or the `URI` of its storage source outside the chain can be stored on the chain. nft metadata is organized according to a specific [JSON Schema](https://JSON-Schema.org/). [Here](https://github.com/irisnet/irishub/blob/master/docs/features/nft-metadata.json) is an example of metadata JSON Schema.
 
 nft need to be issued before creation to declare their abstract properties:
 
