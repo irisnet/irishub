@@ -31,16 +31,13 @@ func (suite *TestSuite) TestNewQuerier() {
 	suite.Error(err)
 	suite.Nil(res)
 
-	// init liquidity.
-
-	initVars(suite)
 	btcAmt, _ := sdk.NewIntFromString("100")
 	standardAmt, _ := sdk.NewIntFromString("10000000000000000000")
 	depositCoin := sdk.NewCoin(denomBTC, btcAmt)
 	minReward := sdk.NewInt(1)
 	deadline := time.Now().Add(1 * time.Minute)
 	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender1.String())
-	_, _ = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
+	lptCoin, _ := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
 
 	// test queryLiquidity
 
@@ -53,14 +50,14 @@ func (suite *TestSuite) TestNewQuerier() {
 	res, err = querier(suite.ctx, []string{types.QueryLiquidity}, req)
 	suite.NoError(err)
 
-	var redelRes types.QueryLiquidityResponse
-	errRes = suite.app.LegacyAmino().UnmarshalJSON(res, &redelRes)
+	var respone types.QueryLiquidityResponse
+	errRes = suite.app.LegacyAmino().UnmarshalJSON(res, &respone)
 	suite.NoError(errRes)
 	standard := sdk.NewCoin(denomStandard, standardAmt)
 	token := sdk.NewCoin(denomBTC, btcAmt)
-	liquidity := sdk.NewCoin(unidenomBTC, standardAmt)
-	suite.Equal(standard, redelRes.Standard)
-	suite.Equal(token, redelRes.Token)
-	suite.Equal(liquidity, redelRes.Liquidity)
-	suite.Equal(suite.app.CoinswapKeeper.GetParams(suite.ctx).Fee.String(), redelRes.Fee)
+	liquidity := sdk.NewCoin(lptCoin.Denom, standardAmt)
+	suite.Equal(standard, respone.Standard)
+	suite.Equal(token, respone.Token)
+	suite.Equal(liquidity, respone.Liquidity)
+	suite.Equal(suite.app.CoinswapKeeper.GetParams(suite.ctx).Fee.String(), respone.Fee)
 }

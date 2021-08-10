@@ -98,9 +98,9 @@ func addLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 func removeLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		denom := vars[RestPoolID]
+		lptDenom := vars[RestPoolID]
 
-		if err := sdk.ValidateDenom(denom); err != nil {
+		if err := sdk.ValidateDenom(lptDenom); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -151,10 +151,8 @@ func removeLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		uniDenom := types.GetUniDenomFromDenom(denom)
-
 		msg := types.NewMsgRemoveLiquidity(
-			minToken, sdk.NewCoin(uniDenom, liquidityAmt), minStandard, deadline.Unix(), req.Sender,
+			minToken, sdk.NewCoin(lptDenom, liquidityAmt), minStandard, deadline.Unix(), req.Sender,
 		)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

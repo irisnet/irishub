@@ -105,30 +105,31 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.C
 		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrInvalidDenom,
 			"MaxToken: %s should not be StandardDenom", msg.MaxToken.String())
 	}
-	uniDenom := types.GetUniDenomFromDenom(msg.MaxToken.Denom)
-
-	liquidity := k.bk.GetSupply(ctx).GetTotal().AmountOf(uniDenom)
-
 	var mintLiquidityAmt sdk.Int
 	var depositToken sdk.Coin
 	var standardCoin = sdk.NewCoin(standardDenom, msg.ExactStandardAmt)
 
+	poolId := types.GetPoolId(msg.MaxToken.Denom)
+	pool, exists := k.GetPool(ctx, poolId)
+
 	// calculate amount of UNI to be minted for sender
 	// and coin amount to be deposited
-	if liquidity.IsZero() {
+	if !exists {
 		mintLiquidityAmt = msg.ExactStandardAmt
 		if mintLiquidityAmt.LT(msg.MinLiquidity) {
 			return sdk.Coin{}, sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("liquidity amount not met, user expected: no less than %s, actual: %s", msg.MinLiquidity.String(), mintLiquidityAmt.String()))
 		}
 		depositToken = sdk.NewCoin(msg.MaxToken.Denom, msg.MaxToken.Amount)
+		pool = k.CreatePool(ctx, msg.MaxToken.Denom)
 	} else {
-		reservePool, err := k.GetReservePool(ctx, uniDenom)
+		balances, err := k.GetPoolBalances(ctx, pool.EscrowAddress)
 		if err != nil {
 			return sdk.Coin{}, err
 		}
 
-		standardReserveAmt := reservePool.AmountOf(standardDenom)
-		tokenReserveAmt := reservePool.AmountOf(msg.MaxToken.Denom)
+		standardReserveAmt := balances.AmountOf(standardDenom)
+		tokenReserveAmt := balances.AmountOf(msg.MaxToken.Denom)
+		liquidity := k.bk.GetSupply(ctx).GetTotal().AmountOf(pool.LptDenom)
 
 		mintLiquidityAmt = (liquidity.Mul(msg.ExactStandardAmt)).Quo(standardReserveAmt)
 		if mintLiquidityAmt.LT(msg.MinLiquidity) {
@@ -147,6 +148,11 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.C
 		return sdk.Coin{}, err
 	}
 
+	reservePoolAddress, err := sdk.AccAddressFromBech32(pool.EscrowAddress)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeAddLiquidity,
@@ -154,19 +160,23 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.C
 			sdk.NewAttribute(types.AttributeValueTokenPair, types.GetTokenPairByDenom(msg.MaxToken.Denom, standardDenom)),
 		),
 	)
-
-	return k.addLiquidity(ctx, sender, standardCoin, depositToken, uniDenom, mintLiquidityAmt)
+	return k.addLiquidity(ctx, sender, reservePoolAddress, standardCoin, depositToken, pool.LptDenom, mintLiquidityAmt)
 }
 
-func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, standardCoin, token sdk.Coin, uniDenom string, mintLiquidityAmt sdk.Int) (sdk.Coin, error) {
+func (k Keeper) addLiquidity(ctx sdk.Context,
+	sender sdk.AccAddress,
+	reservePoolAddress sdk.AccAddress,
+	standardCoin, token sdk.Coin,
+	lptDenom string,
+	mintLiquidityAmt sdk.Int,
+) (sdk.Coin, error) {
 	depositedTokens := sdk.NewCoins(standardCoin, token)
-	poolAddr := types.GetReservePoolAddr(uniDenom)
 	// transfer deposited token into coinswaps Account
-	if err := k.bk.SendCoins(ctx, sender, poolAddr, depositedTokens); err != nil {
+	if err := k.bk.SendCoins(ctx, sender, reservePoolAddress, depositedTokens); err != nil {
 		return sdk.Coin{}, err
 	}
 
-	mintToken := sdk.NewCoin(uniDenom, mintLiquidityAmt)
+	mintToken := sdk.NewCoin(lptDenom, mintLiquidityAmt)
 	mintTokens := sdk.NewCoins(mintToken)
 	if err := k.bk.MintCoins(ctx, types.ModuleName, mintTokens); err != nil {
 		return sdk.Coin{}, err
@@ -181,22 +191,23 @@ func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, standardCoi
 // RemoveLiquidity removes liquidity from the specified pool
 func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) (sdk.Coins, error) {
 	standardDenom := k.GetStandardDenom(ctx)
-	uniDenom := msg.WithdrawLiquidity.Denom
 
-	minTokenDenom, err := types.GetCoinDenomFromUniDenom(uniDenom)
+	pool, exists := k.GetPoolByLptDenom(ctx, msg.WithdrawLiquidity.Denom)
+	if !exists {
+		return nil, sdkerrors.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", msg.WithdrawLiquidity.Denom)
+	}
+
+	balances, err := k.GetPoolBalances(ctx, pool.EscrowAddress)
 	if err != nil {
 		return nil, err
 	}
 
-	// check if reserve pool exists
-	reservePool, err := k.GetReservePool(ctx, uniDenom)
-	if err != nil {
-		return nil, err
-	}
+	lptDenom := msg.WithdrawLiquidity.Denom
+	minTokenDenom := pool.CounterpartyDenom
 
-	standardReserveAmt := reservePool.AmountOf(standardDenom)
-	tokenReserveAmt := reservePool.AmountOf(minTokenDenom)
-	liquidityReserve := k.bk.GetSupply(ctx).GetTotal().AmountOf(uniDenom)
+	standardReserveAmt := balances.AmountOf(standardDenom)
+	tokenReserveAmt := balances.AmountOf(minTokenDenom)
+	liquidityReserve := k.bk.GetSupply(ctx).GetTotal().AmountOf(lptDenom)
 	if standardReserveAmt.LT(msg.MinStandardAmt) {
 		return nil, sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", standardDenom, msg.MinStandardAmt.String(), standardReserveAmt.String()))
 	}
@@ -204,7 +215,7 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) 
 		return nil, sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", minTokenDenom, msg.MinToken.String(), tokenReserveAmt.String()))
 	}
 	if liquidityReserve.LT(msg.WithdrawLiquidity.Amount) {
-		return nil, sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", uniDenom, msg.WithdrawLiquidity.Amount.String(), liquidityReserve.String()))
+		return nil, sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", lptDenom, msg.WithdrawLiquidity.Amount.String(), liquidityReserve.String()))
 	}
 
 	// calculate amount of UNI to be burned for sender
@@ -222,7 +233,6 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) 
 	if tokenWithdrawCoin.Amount.LT(msg.MinToken) {
 		return nil, sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("token amount not met, user expected: no less than %s, actual: %s", sdk.NewCoin(minTokenDenom, msg.MinToken).String(), tokenWithdrawCoin.String()))
 	}
-	poolAddr := types.GetReservePoolAddr(uniDenom)
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -233,6 +243,11 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) 
 	)
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	poolAddr, err := sdk.AccAddressFromBech32(pool.EscrowAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -256,29 +271,6 @@ func (k Keeper) removeLiquidity(ctx sdk.Context, poolAddr, sender sdk.AccAddress
 	coins := sdk.NewCoins(irisWithdrawCoin, tokenWithdrawCoin)
 
 	return coins, k.bk.SendCoins(ctx, poolAddr, sender, coins)
-}
-
-// GetReservePool returns the total balance of the reserve pool at the provided denomination.
-func (k Keeper) GetReservePool(ctx sdk.Context, uniDenom string) (coins sdk.Coins, err error) {
-	swapPoolAccAddr := types.GetReservePoolAddr(uniDenom)
-	acc := k.ak.GetAccount(ctx, swapPoolAccAddr)
-	if acc == nil {
-		return nil, sdkerrors.Wrap(types.ErrReservePoolNotExists, uniDenom)
-	}
-	return k.bk.GetAllBalances(ctx, acc.GetAddress()), nil
-}
-
-// ValidatePool Verify the legitimacy of the liquidity pool
-func (k Keeper) ValidatePool(ctx sdk.Context, uniDenom string) error {
-	if err := types.ValidateUniDenom(uniDenom); err != nil {
-		return err
-	}
-
-	_, err := k.GetReservePool(ctx, uniDenom)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // GetParams gets the parameters for the coinswap module.
@@ -309,20 +301,4 @@ func (k Keeper) GetStandardDenom(ctx sdk.Context) string {
 	var denomWrap = gogotypes.StringValue{}
 	k.cdc.MustUnmarshalBinaryBare(bz, &denomWrap)
 	return denomWrap.Value
-}
-
-// GetUniDenomFromDenoms returns the uni denom for the provided denominations.
-func (k Keeper) GetUniDenomFromDenoms(ctx sdk.Context, denom1, denom2 string) (string, error) {
-	if denom1 == denom2 {
-		return "", types.ErrEqualDenom
-	}
-
-	standardDenom := k.GetStandardDenom(ctx)
-	if denom1 != standardDenom && denom2 != standardDenom {
-		return "", sdkerrors.Wrap(types.ErrNotContainStandardDenom, fmt.Sprintf("standard denom: %s,denom1: %s,denom2: %s", standardDenom, denom1, denom2))
-	}
-	if denom1 == standardDenom {
-		return fmt.Sprintf(types.FormatUniDenom, denom2), nil
-	}
-	return fmt.Sprintf(types.FormatUniDenom, denom1), nil
 }

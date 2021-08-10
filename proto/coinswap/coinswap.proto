@@ -9,23 +9,35 @@ option (gogoproto.goproto_getters_all) = false;
 
 // Input defines the properties of order's input
 message Input {
-    string address = 1;
-    cosmos.base.v1beta1.Coin coin = 2 [ (gogoproto.nullable) = false ];
+  string address = 1;
+  cosmos.base.v1beta1.Coin coin = 2 [ (gogoproto.nullable) = false ];
 }
 
 // Output defines the properties of order's output
 message Output {
-    string address = 1;
-    cosmos.base.v1beta1.Coin coin = 2 [ (gogoproto.nullable) = false ];
+  string address = 1;
+  cosmos.base.v1beta1.Coin coin = 2 [ (gogoproto.nullable) = false ];
+}
+
+message Pool {
+  string id = 1;
+  // denom of base coin of the pool
+  string standard_denom = 2;
+  // denom of counterparty coin of the pool
+  string counterparty_denom = 3;
+  // escrow account for deposit tokens
+  string escrow_address = 4;
+  // denom of the liquidity pool coin
+  string lpt_denom = 5;
 }
 
 // Params defines token module's parameters
 message Params {
-    option (gogoproto.equal) = true;
-    option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_stringer) = false;
 
-    cosmos.base.v1beta1.Coin fee = 1 [
-        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-        (gogoproto.nullable) = false
-    ];
+  cosmos.base.v1beta1.Coin fee = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
 }

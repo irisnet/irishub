@@ -9,21 +9,20 @@ option go_package = "github.com/irisnet/irismod/modules/coinswap/types";
 
 // Query creates service with coinswap as rpc
 service Query {
-    // Liquidity returns the total liquidity available for the provided denomination
-    rpc Liquidity(QueryLiquidityRequest) returns (QueryLiquidityResponse) {
-        option (google.api.http).get = "/irismod/coinswap/liquidities/{denom}";
-    }
+  // Liquidity returns the total liquidity available for the provided
+  // denomination
+  rpc Liquidity(QueryLiquidityRequest) returns (QueryLiquidityResponse) {
+    option (google.api.http).get = "/irismod/coinswap/liquidities/{denom}";
+  }
 }
 
 // QueryLiquidityRequest is request type for the Query/Liquidity RPC method
-message QueryLiquidityRequest {
-    string denom = 1;
-}
+message QueryLiquidityRequest { string denom = 1; }
 
 // QueryLiquidityResponse is response type for the Query/Liquidity RPC method
 message QueryLiquidityResponse {
-    cosmos.base.v1beta1.Coin standard = 1 [ (gogoproto.nullable) = false ];
-    cosmos.base.v1beta1.Coin token = 2 [ (gogoproto.nullable) = false ];
-    cosmos.base.v1beta1.Coin liquidity = 3 [ (gogoproto.nullable) = false ];
-    string fee = 4;
+  cosmos.base.v1beta1.Coin standard = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.v1beta1.Coin token = 2 [ (gogoproto.nullable) = false ];
+  cosmos.base.v1beta1.Coin liquidity = 3 [ (gogoproto.nullable) = false ];
+  string fee = 4;
 }

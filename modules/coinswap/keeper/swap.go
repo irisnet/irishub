@@ -10,12 +10,12 @@ import (
 )
 
 func (k Keeper) swapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coinSold, coinBought sdk.Coin) error {
-	uniDenom, err := k.GetUniDenomFromDenoms(ctx, coinSold.Denom, coinBought.Denom)
+	lptDenom, err := k.GetLptDenomFromDenoms(ctx, coinSold.Denom, coinBought.Denom)
 	if err != nil {
 		return err
 	}
 
-	poolAddr := types.GetReservePoolAddr(uniDenom)
+	poolAddr := types.GetReservePoolAddr(lptDenom)
 	if err := k.bk.SendCoins(ctx, sender, poolAddr, sdk.NewCoins(coinSold)); err != nil {
 		return err
 	}
@@ -34,14 +34,17 @@ Calculate the amount of another token to be received based on the exact amount o
 @return : amount of the token that will be received
 */
 func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin, boughtTokenDenom string) (sdk.Int, error) {
-	uniDenom, err := k.GetUniDenomFromDenoms(ctx, exactSoldCoin.Denom, boughtTokenDenom)
+	lptDenom, err := k.GetLptDenomFromDenoms(ctx, exactSoldCoin.Denom, boughtTokenDenom)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	reservePool, err := k.GetReservePool(ctx, uniDenom)
+
+	reservePoolAddress := types.GetReservePoolAddr(lptDenom).String()
+	reservePool, err := k.GetPoolBalances(ctx, reservePoolAddress)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
+
 	inputReserve := reservePool.AmountOf(exactSoldCoin.Denom)
 	outputReserve := reservePool.AmountOf(boughtTokenDenom)
 
@@ -145,14 +148,17 @@ Calculate the amount of the token to be paid based on the exact amount of the to
 @return: actual amount of the token to be paid
 */
 func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Coin, soldTokenDenom string) (sdk.Int, error) {
-	uniDenom, err := k.GetUniDenomFromDenoms(ctx, exactBoughtCoin.Denom, soldTokenDenom)
-	if err != nil {
-		return sdk.ZeroInt(), sdkerrors.Wrap(types.ErrReservePoolNotExists, uniDenom)
-	}
-	reservePool, err := k.GetReservePool(ctx, uniDenom)
+	lptDenom, err := k.GetLptDenomFromDenoms(ctx, exactBoughtCoin.Denom, soldTokenDenom)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
+
+	poolAddr := types.GetReservePoolAddr(lptDenom).String()
+	reservePool, err := k.GetPoolBalances(ctx, poolAddr)
+	if err != nil {
+		return sdk.ZeroInt(), err
+	}
+
 	outputReserve := reservePool.AmountOf(exactBoughtCoin.Denom)
 	inputReserve := reservePool.AmountOf(soldTokenDenom)
 

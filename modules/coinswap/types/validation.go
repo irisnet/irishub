@@ -14,8 +14,8 @@ func ValidateInput(input Input) error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid input (%s)", input.Coin.String())
 	}
 
-	if strings.HasPrefix(input.Coin.Denom, FormatUniABSPrefix) {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid input denom, should not begin with (%s)", FormatUniABSPrefix)
+	if strings.HasPrefix(input.Coin.Denom, LptTokenPrefix) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid input denom, should not begin with (%s)", LptTokenPrefix)
 	}
 
 	if _, err := sdk.AccAddressFromBech32(input.Address); err != nil {
@@ -30,8 +30,8 @@ func ValidateOutput(output Output) error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid output (%s)", output.Coin.String())
 	}
 
-	if strings.HasPrefix(output.Coin.Denom, FormatUniABSPrefix) {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid output denom, should not begin with (%s)", FormatUniABSPrefix)
+	if strings.HasPrefix(output.Coin.Denom, LptTokenPrefix) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid output denom, should not begin with (%s)", LptTokenPrefix)
 	}
 
 	if _, err := sdk.AccAddressFromBech32(output.Address); err != nil {
@@ -54,7 +54,7 @@ func ValidateMaxToken(maxToken sdk.Coin) error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid maxToken (%s)", maxToken.String())
 	}
 
-	if strings.HasPrefix(maxToken.Denom, FormatUniABSPrefix) {
+	if strings.HasPrefix(maxToken.Denom, LptTokenPrefix) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "max token must be non-liquidity token")
 	}
 	return nil
@@ -90,7 +90,7 @@ func ValidateWithdrawLiquidity(liquidity sdk.Coin) error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid withdrawLiquidity (%s)", liquidity.String())
 	}
 
-	if err := ValidateUniDenom(liquidity.Denom); err != nil {
+	if err := ValidateLptDenom(liquidity.Denom); err != nil {
 		return err
 	}
 	return nil
@@ -104,10 +104,10 @@ func ValidateMinStandardAmt(minStandardAmt sdk.Int) error {
 	return nil
 }
 
-// ValidateUniDenom returns nil if the uni denom is valid
-func ValidateUniDenom(uniDenom string) error {
-	if !strings.HasPrefix(uniDenom, FormatUniABSPrefix) {
-		return sdkerrors.Wrap(ErrInvalidDenom, uniDenom)
+// ValidateLptDenom returns nil if the Liquidity pool token denom is valid
+func ValidateLptDenom(lptDenom string) error {
+	if !strings.HasPrefix(lptDenom, LptTokenPrefix) {
+		return sdkerrors.Wrap(ErrInvalidDenom, lptDenom)
 	}
 	return nil
 }

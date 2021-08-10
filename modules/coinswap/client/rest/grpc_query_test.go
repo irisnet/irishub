@@ -48,6 +48,10 @@ func (s *IntegrationTestSuite) SetupSuite() {
 
 	_, err := s.network.WaitForHeight(1)
 	s.Require().NoError(err)
+
+	sdk.SetCoinDenomRegex(func() string {
+		return `[a-zA-Z][a-zA-Z0-9/\-]{2,127}`
+	})
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -73,7 +77,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	maxSupply := int64(200000000)
 	mintable := true
 	baseURL := val.APIAddress
-	uniKitty := coinswaptypes.GetUniDenomFromDenom(symbol)
+	lptDenom := "lpt-1"
 
 	//------test GetCmdIssueToken()-------------
 	args := []string{
@@ -167,7 +171,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	coins := balances.Balances
 	s.Require().Equal("99999000", coins.AmountOf(symbol).String())
 	s.Require().Equal("399985965", coins.AmountOf(sdk.DefaultBondDenom).String())
-	s.Require().Equal("1000", coins.AmountOf(uniKitty).String())
+	s.Require().Equal("1000", coins.AmountOf(lptDenom).String())
 
 	url := fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
 	resp, err := rest.GetRequest(url)
@@ -229,7 +233,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	coins = balances.Balances
 	s.Require().Equal("99996999", coins.AmountOf(symbol).String())
 	s.Require().Equal("399983955", coins.AmountOf(sdk.DefaultBondDenom).String())
-	s.Require().Equal("3000", coins.AmountOf(uniKitty).String())
+	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
 
 	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
 	resp, err = rest.GetRequest(url)
@@ -291,7 +295,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	coins = balances.Balances
 	s.Require().Equal("99995999", coins.AmountOf(symbol).String())
 	s.Require().Equal("399984693", coins.AmountOf(sdk.DefaultBondDenom).String())
-	s.Require().Equal("3000", coins.AmountOf(uniKitty).String())
+	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
 
 	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
 	resp, err = rest.GetRequest(url)
@@ -353,7 +357,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	coins = balances.Balances
 	s.Require().Equal("99996999", coins.AmountOf(symbol).String())
 	s.Require().Equal("399983930", coins.AmountOf(sdk.DefaultBondDenom).String())
-	s.Require().Equal("3000", coins.AmountOf(uniKitty).String())
+	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
 
 	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
 	resp, err = rest.GetRequest(url)
@@ -364,7 +368,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 
 	// Test remove liquidity (remove part)
 	msgRemoveLiquidity := &coinswaptypes.MsgRemoveLiquidity{
-		WithdrawLiquidity: sdk.NewCoin(uniKitty, sdk.NewInt(2000)),
+		WithdrawLiquidity: sdk.NewCoin(lptDenom, sdk.NewInt(2000)),
 		MinToken:          sdk.NewInt(2000),
 		MinStandardAmt:    sdk.NewInt(2000),
 		Deadline:          deadline.Unix(),
@@ -410,7 +414,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	coins = balances.Balances
 	s.Require().Equal("99998999", coins.AmountOf(symbol).String())
 	s.Require().Equal("399985923", coins.AmountOf(sdk.DefaultBondDenom).String())
-	s.Require().Equal("1000", coins.AmountOf(uniKitty).String())
+	s.Require().Equal("1000", coins.AmountOf(lptDenom).String())
 
 	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
 	resp, err = rest.GetRequest(url)
@@ -421,7 +425,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 
 	// Test remove liquidity (remove all)
 	msgRemoveLiquidity = &coinswaptypes.MsgRemoveLiquidity{
-		WithdrawLiquidity: sdk.NewCoin(uniKitty, sdk.NewInt(1000)),
+		WithdrawLiquidity: sdk.NewCoin(lptDenom, sdk.NewInt(1000)),
 		MinToken:          sdk.NewInt(1000),
 		MinStandardAmt:    sdk.NewInt(1000),
 		Deadline:          deadline.Unix(),
@@ -467,7 +471,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	coins = balances.Balances
 	s.Require().Equal("100000000", coins.AmountOf(symbol).String())
 	s.Require().Equal("399986915", coins.AmountOf(sdk.DefaultBondDenom).String())
-	s.Require().Equal("0", coins.AmountOf(uniKitty).String())
+	s.Require().Equal("0", coins.AmountOf(lptDenom).String())
 
 	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
 	resp, err = rest.GetRequest(url)
