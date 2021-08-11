@@ -3,6 +3,7 @@ package simulation
 import (
 	"fmt"
 	"math/rand"
+	"regexp"
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -23,6 +24,7 @@ const (
 	OpWeightMsgEditToken          = "op_weight_msg_edit_token"
 	OpWeightMsgMintToken          = "op_weight_msg_mint_token"
 	OpWeightMsgTransferTokenOwner = "op_weight_msg_transfer_token_owner"
+	OpWeightMsgBurnToken          = "op_weight_msg_burn_token"
 )
 
 var (
@@ -38,11 +40,11 @@ func WeightedOperations(
 	bk types.BankKeeper,
 ) simulation.WeightedOperations {
 
-	var weightIssue, weightEdit, weightMint, weightTransfer int
+	var weightIssue, weightEdit, weightMint, weightTransfer, weightBurn int
 	appParams.GetOrGenerate(
 		cdc, OpWeightMsgIssueToken, &weightIssue, nil,
 		func(_ *rand.Rand) {
-			weightIssue = 100
+			weightIssue = 10
 		},
 	)
 
@@ -67,11 +69,18 @@ func WeightedOperations(
 		},
 	)
 
+	appParams.GetOrGenerate(
+		cdc, OpWeightMsgBurnToken, &weightBurn, nil,
+		func(_ *rand.Rand) {
+			weightBurn = 50
+		},
+	)
+
 	return simulation.WeightedOperations{
-		// simulation.NewWeightedOperation(
-		// 	weightIssue,
-		// 	SimulateIssueToken(k, ak, bk),
-		// ),
+		simulation.NewWeightedOperation(
+			weightIssue,
+			SimulateIssueToken(k, ak, bk),
+		),
 		simulation.NewWeightedOperation(
 			weightEdit,
 			SimulateEditToken(k, ak, bk),
@@ -83,6 +92,10 @@ func WeightedOperations(
 		simulation.NewWeightedOperation(
 			weightTransfer,
 			SimulateTransferTokenOwner(k, ak, bk),
+		),
+		simulation.NewWeightedOperation(
+			weightBurn,
+			SimulateBurnToken(k, ak, bk),
 		),
 	}
 }
@@ -286,6 +299,66 @@ func SimulateTransferTokenOwner(k keeper.Keeper, ak types.AccountKeeper, bk type
 	}
 }
 
+// SimulateBurnToken tests and runs a single msg burn a existed token
+func SimulateBurnToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
+	return func(
+		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
+		accs []simtypes.Account, chainID string,
+	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
+
+		token, _, skip := selectOneToken(ctx, k, ak, bk, false)
+		if skip {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferTokenOwner, "skip burnToken"), nil, nil
+		}
+
+		owner, _ := sdk.AccAddressFromBech32(token.GetOwner().String())
+		account := ak.GetAccount(ctx, owner)
+		spendable := bk.SpendableCoins(ctx, account.GetAddress())
+		amount := spendable.AmountOf(token.GetSymbol())
+		if !amount.IsPositive() {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBurnToken, "Insufficient funds"), nil, nil
+		}
+		amount2 := r.Intn(int(amount.Int64()))
+		spendable, hasNeg := spendable.SafeSub(sdk.Coins{sdk.NewCoin(token.GetSymbol(), sdk.NewInt(int64(amount2)))})
+		if hasNeg {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBurnToken, "Insufficient funds"), nil, nil
+		}
+
+		msg := types.NewMsgBurnToken(token.GetSymbol(), token.GetOwner().String(), uint64(amount2))
+
+		ownerAccount, found := simtypes.FindAccount(accs, token.GetOwner())
+		if !found {
+			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), fmt.Sprintf("account %s not found", token.GetOwner())), nil, fmt.Errorf("account %s not found", token.GetOwner())
+		}
+
+		fees, err := simtypes.RandomFees(r, ctx, spendable)
+		if err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+		}
+
+		txGen := simappparams.MakeTestEncodingConfig().TxConfig
+		tx, err := helpers.GenTx(
+			txGen,
+			[]sdk.Msg{msg},
+			fees,
+			helpers.DefaultGenTxGas,
+			chainID,
+			[]uint64{account.GetAccountNumber()},
+			[]uint64{account.GetSequence()},
+			ownerAccount.PrivKey,
+		)
+		if err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+		}
+
+		if _, _, err = app.Deliver(txGen.TxEncoder(), tx); err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to deliver tx"), nil, nil
+		}
+
+		return simtypes.NewOperationMsg(msg, true, "simulate mint token"), nil, nil
+	}
+}
+
 func selectOneToken(
 	ctx sdk.Context,
 	k keeper.Keeper,
@@ -377,8 +450,19 @@ loop:
 }
 
 func randToken(r *rand.Rand, accs []simtypes.Account) types.Token {
-	symbol := randStringBetween(r, types.MinimumSymbolLen, types.MaximumSymbolLen)
-	minUint := randStringBetween(r, types.MinimumMinUnitLen, types.MaximumMinUnitLen)
+	keywords := strings.Join([]string{"peg", "ibc", "swap", "htlt"}, "|")
+	regexpKeywordsFmt := fmt.Sprintf("^(%s).*", keywords)
+	regexpKeyword := regexp.MustCompile(regexpKeywordsFmt).MatchString
+
+	var symbol, minUint string
+	for {
+		symbol = randStringBetween(r, types.MinimumSymbolLen, types.MaximumSymbolLen)
+		minUint = symbol
+		if !regexpKeyword(symbol) {
+			break
+		}
+	}
+
 	name := randStringBetween(r, 1, types.MaximumNameLen)
 	scale := simtypes.RandIntBetween(r, 1, int(types.MaximumScale))
 	initialSupply := r.Int63n(int64(types.MaximumInitSupply))
