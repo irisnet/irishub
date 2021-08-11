@@ -611,7 +611,7 @@ func NewIrisApp(
 			Added: []string{farmtypes.StoreKey},
 		},
 		func(ctx sdk.Context, plan sdkupgrade.Plan) {
-			// migrate htlc
+			// migrate coinswap
 			if err := coinswapv150.Migrate(ctx, app.coinswapKeeper, app.bankKeeper, app.accountKeeper); err != nil {
 				panic(err)
 			}
