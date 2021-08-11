@@ -607,12 +607,16 @@ func NewIrisApp(
 	)
 
 	app.RegisterUpgradePlan(
-		"v1.2", &store.StoreUpgrades{},
+		"v1.2", &store.StoreUpgrades{
+			Added: []string{farmtypes.StoreKey},
+		},
 		func(ctx sdk.Context, plan sdkupgrade.Plan) {
 			// migrate htlc
 			if err := coinswapv150.Migrate(ctx, app.coinswapKeeper, app.bankKeeper, app.accountKeeper); err != nil {
 				panic(err)
 			}
+			// init farm params
+			app.farmkeeper.SetParams(ctx, farmtypes.DefaultParams())
 		},
 	)
 
