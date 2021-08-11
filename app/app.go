@@ -83,6 +83,7 @@ import (
 
 	"github.com/irisnet/irismod/modules/coinswap"
 	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
+	coinswapv150 "github.com/irisnet/irismod/modules/coinswap/migrations/v150"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	"github.com/irisnet/irismod/modules/htlc"
 	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
@@ -600,6 +601,16 @@ func NewIrisApp(
 			}
 			// migrate service
 			if err := migrateservice.Migrate(ctx, app.serviceKeeper, app.bankKeeper); err != nil {
+				panic(err)
+			}
+		},
+	)
+
+	app.RegisterUpgradePlan(
+		"v1.2", &store.StoreUpgrades{},
+		func(ctx sdk.Context, plan sdkupgrade.Plan) {
+			// migrate htlc
+			if err := coinswapv150.Migrate(ctx, app.coinswapKeeper, app.bankKeeper, app.accountKeeper); err != nil {
 				panic(err)
 			}
 		},
