@@ -74,7 +74,7 @@ func (vsd ValidateServiceDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 
 func containSwapCoin(coins ...sdk.Coin) bool {
 	for _, coin := range coins {
-		if strings.HasPrefix(coin.Denom, coinswaptypes.FormatUniABSPrefix) {
+		if strings.HasPrefix(coin.Denom, coinswaptypes.LptTokenPrefix) {
 			return true
 		}
 	}
