@@ -130,6 +130,11 @@ var (
 	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome string
 
+	// Denominations can be 3 ~ 128 characters long and support letters, followed by either
+	// a letter, a number, ('-'), or a separator ('/').
+	// overwite sdk reDnmString
+	reDnmString = `[a-zA-Z][a-zA-Z0-9/-]{2,127}`
+
 	// ModuleBasics defines the module BasicManager is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
 	// and genesis verification.
@@ -251,7 +256,12 @@ type IrisApp struct {
 }
 
 func init() {
+	// set bech32 prefix
 	address.ConfigureBech32Prefix()
+
+	// set coin denom regexs
+	sdk.SetCoinDenomRegex(DefaultCoinDenomRegex)
+
 	nativeToken = tokentypes.Token{
 		Symbol:        "iris",
 		Name:          "Irishub staking token",
@@ -285,6 +295,11 @@ func init() {
 		nativeToken.Mintable,
 		owner,
 	)
+}
+
+// DefaultCoinDenomRegex returns the default regex string
+func DefaultCoinDenomRegex() string {
+	return reDnmString
 }
 
 // NewIrisApp returns a reference to an initialized IrisApp.
