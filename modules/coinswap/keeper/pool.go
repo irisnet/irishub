@@ -11,7 +11,7 @@ import (
 
 // CreatePool create a liquidity that saves relevant information about popular pool tokens
 func (k Keeper) CreatePool(ctx sdk.Context, counterpartyDenom string) types.Pool {
-	sequence := k.getPoolSequence(ctx)
+	sequence := k.getSequence(ctx)
 	lptDenom := types.GetLptDenom(sequence)
 	pool := &types.Pool{
 		Id:                types.GetPoolId(counterpartyDenom),
@@ -20,7 +20,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, counterpartyDenom string) types.Pool
 		EscrowAddress:     types.GetReservePoolAddr(lptDenom).String(),
 		LptDenom:          lptDenom,
 	}
-	k.increasePoolSequence(ctx, sequence)
+	k.setSequence(ctx, sequence+1)
 	k.setPool(ctx, pool)
 	return *pool
 }
@@ -36,6 +36,19 @@ func (k Keeper) GetPool(ctx sdk.Context, poolId string) (types.Pool, bool) {
 	pool := &types.Pool{}
 	k.cdc.MustUnmarshalBinaryBare(bz, pool)
 	return *pool, true
+}
+
+// GetAllPools return all the liquidity pools
+func (k Keeper) GetAllPools(ctx sdk.Context) (pools []types.Pool) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, []byte(types.KeyPool))
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var pool types.Pool
+		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &pool)
+		pools = append(pools, pool)
+	}
+	return
 }
 
 // GetPoolByLptDenom return the liquidity pool by the specified anotherCoinDenom
@@ -125,8 +138,8 @@ func (k Keeper) setPool(ctx sdk.Context, pool *types.Pool) {
 	store.Set(types.GetLptDenomKey(pool.LptDenom), poolIdBz)
 }
 
-// getPoolSequence gets the next pool sequence from the store.
-func (k Keeper) getPoolSequence(ctx sdk.Context) uint64 {
+// getSequence gets the next pool sequence from the store.
+func (k Keeper) getSequence(ctx sdk.Context) uint64 {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get([]byte(types.KeyNextPoolSequence))
 	if bz == nil {
@@ -135,9 +148,9 @@ func (k Keeper) getPoolSequence(ctx sdk.Context) uint64 {
 	return sdk.BigEndianToUint64(bz)
 }
 
-// increasePoolSequence sets the next pool sequence to the store.
-func (k Keeper) increasePoolSequence(ctx sdk.Context, sequence uint64) {
+// setSequence sets the next pool sequence to the store.
+func (k Keeper) setSequence(ctx sdk.Context, sequence uint64) {
 	store := ctx.KVStore(k.storeKey)
-	bz := sdk.Uint64ToBigEndian(sequence + 1)
+	bz := sdk.Uint64ToBigEndian(sequence)
 	store.Set([]byte(types.KeyNextPoolSequence), bz)
 }

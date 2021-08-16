@@ -2,6 +2,8 @@ package types
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/tendermint/tendermint/crypto"
 
@@ -26,4 +28,12 @@ func GetPoolId(counterpartyDenom string) string {
 // GetLptDenom returns the pool coin denom by specified sequence.
 func GetLptDenom(sequence uint64) string {
 	return fmt.Sprintf(LptTokenFormat, sequence)
+}
+
+func ParseLptDenom(lptDenom string) (uint64, error) {
+	result := strings.Split(lptDenom, "-")
+	if len(result) != 2 {
+		return 0, fmt.Errorf("invalid lpt denom: %s", lptDenom)
+	}
+	return strconv.ParseUint(result[1], 10, 64)
 }

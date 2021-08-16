@@ -106,7 +106,7 @@ func ValidateMinStandardAmt(minStandardAmt sdk.Int) error {
 
 // ValidateLptDenom returns nil if the Liquidity pool token denom is valid
 func ValidateLptDenom(lptDenom string) error {
-	if !strings.HasPrefix(lptDenom, LptTokenPrefix) {
+	if _, err := ParseLptDenom(lptDenom); err != nil {
 		return sdkerrors.Wrap(ErrInvalidDenom, lptDenom)
 	}
 	return nil

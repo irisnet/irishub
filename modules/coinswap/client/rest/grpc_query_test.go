@@ -173,7 +173,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("399985965", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("1000", coins.AmountOf(lptDenom).String())
 
-	url := fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
+	url := fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, lptDenom)
 	resp, err := rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().Equal("1000", gjson.Get(string(resp), "result.standard.amount").String())
@@ -235,7 +235,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("399983955", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
+	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().Equal("3000", gjson.Get(string(resp), "result.standard.amount").String())
@@ -297,7 +297,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("399984693", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
+	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().Equal("2252", gjson.Get(string(resp), "result.standard.amount").String())
@@ -359,7 +359,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("399983930", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
+	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().Equal("3005", gjson.Get(string(resp), "result.standard.amount").String())
@@ -416,7 +416,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("399985923", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("1000", coins.AmountOf(lptDenom).String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
+	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().Equal("1002", gjson.Get(string(resp), "result.standard.amount").String())
@@ -473,7 +473,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("399986915", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("0", coins.AmountOf(lptDenom).String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, symbol)
+	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().Equal("0", gjson.Get(string(resp), "result.standard.amount").String())

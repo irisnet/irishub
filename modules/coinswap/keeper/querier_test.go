@@ -41,7 +41,7 @@ func (suite *TestSuite) TestNewQuerier() {
 
 	// test queryLiquidity
 
-	bz, errRes := legacyAmino.MarshalJSON(types.QueryLiquidityParams{Denom: denomBTC})
+	bz, errRes := legacyAmino.MarshalJSON(types.QueryLiquidityParams{Denom: lptCoin.Denom})
 	suite.NoError(errRes)
 
 	req.Path = fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryLiquidity)

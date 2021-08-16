@@ -31,8 +31,7 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuer
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
-	poolId := types.GetPoolId(params.Denom)
-	pool, exists := k.GetPool(ctx, poolId)
+	pool, exists := k.GetPoolByLptDenom(ctx, params.Denom)
 	if !exists {
 		return nil, sdkerrors.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", params.Denom)
 	}
