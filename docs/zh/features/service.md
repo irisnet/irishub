@@ -181,19 +181,19 @@ iris q service schema pricing
 
 ```bash
 # 创建一个重复性的请求上下文（无回调函数）
-irisc tx service call --service-name=<service name> --data=<request input> --providers=<provider list> --service-fee-cap=1iris --timeout 50 --repeated --frequency=50 --total=100
+iris tx service call --service-name=<service name> --data=<request input> --providers=<provider list> --service-fee-cap=1iris --timeout 50 --repeated --frequency=50 --total=100
 
 # 更新一个存在的请求上下文
-irisc tx service update <request-context-id> --frequency=20 --total=200
+iris tx service update <request-context-id> --frequency=20 --total=200
 
 # 暂停一个正在运行的请求上下文
-irisc tx service pause <request-context-id>
+iris tx service pause <request-context-id>
 
 # 启动一个暂停的请求上下文
-irisc tx service start <request-context-id>
+iris tx service start <request-context-id>
 
 # 永久终止一个请求上下文
-irisc tx service kill <request-context-id>
+iris tx service kill <request-context-id>
 
 # 通过 ID 查询请求上下文
 iris q service request-context <request-context-id>
