@@ -6,8 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tidwall/gjson"
-
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
 
@@ -173,12 +171,16 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("399985965", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("1000", coins.AmountOf(lptDenom).String())
 
-	url := fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, lptDenom)
+	queryPoolResponse := proto.Message(&coinswaptypes.QueryPoolResponse{})
+	url := fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
 	resp, err := rest.GetRequest(url)
 	s.Require().NoError(err)
-	s.Require().Equal("1000", gjson.Get(string(resp), "result.standard.amount").String())
-	s.Require().Equal("1000", gjson.Get(string(resp), "result.token.amount").String())
-	s.Require().Equal("1000", gjson.Get(string(resp), "result.liquidity.amount").String())
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolResponse))
+
+	queryPool := queryPoolResponse.(*coinswaptypes.QueryPoolResponse)
+	s.Require().Equal("1000", queryPool.Pool.Standard.Amount.String())
+	s.Require().Equal("1000", queryPool.Pool.Token.Amount.String())
+	s.Require().Equal("1000", queryPool.Pool.Lpt.Amount.String())
 
 	// test add liquidity (poor exist)
 	status, err = clientCtx.Client.Status(context.Background())
@@ -235,12 +237,14 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("399983955", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, lptDenom)
+	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
-	s.Require().Equal("3000", gjson.Get(string(resp), "result.standard.amount").String())
-	s.Require().Equal("3001", gjson.Get(string(resp), "result.token.amount").String())
-	s.Require().Equal("3000", gjson.Get(string(resp), "result.liquidity.amount").String())
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolResponse))
+
+	s.Require().Equal("3000", queryPool.Pool.Standard.Amount.String())
+	s.Require().Equal("3001", queryPool.Pool.Token.Amount.String())
+	s.Require().Equal("3000", queryPool.Pool.Lpt.Amount.String())
 
 	// test sell order
 	msgSellOrder := &coinswaptypes.MsgSwapOrder{
@@ -297,12 +301,14 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("399984693", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, lptDenom)
+	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
-	s.Require().Equal("2252", gjson.Get(string(resp), "result.standard.amount").String())
-	s.Require().Equal("4001", gjson.Get(string(resp), "result.token.amount").String())
-	s.Require().Equal("3000", gjson.Get(string(resp), "result.liquidity.amount").String())
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolResponse))
+
+	s.Require().Equal("2252", queryPool.Pool.Standard.Amount.String())
+	s.Require().Equal("4001", queryPool.Pool.Token.Amount.String())
+	s.Require().Equal("3000", queryPool.Pool.Lpt.Amount.String())
 
 	// test buy order
 	msgBuyOrder := &coinswaptypes.MsgSwapOrder{
@@ -359,12 +365,14 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("399983930", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, lptDenom)
+	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
-	s.Require().Equal("3005", gjson.Get(string(resp), "result.standard.amount").String())
-	s.Require().Equal("3001", gjson.Get(string(resp), "result.token.amount").String())
-	s.Require().Equal("3000", gjson.Get(string(resp), "result.liquidity.amount").String())
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolResponse))
+
+	s.Require().Equal("3005", queryPool.Pool.Standard.Amount.String())
+	s.Require().Equal("3001", queryPool.Pool.Token.Amount.String())
+	s.Require().Equal("3000", queryPool.Pool.Lpt.Amount.String())
 
 	// Test remove liquidity (remove part)
 	msgRemoveLiquidity := &coinswaptypes.MsgRemoveLiquidity{
@@ -416,12 +424,14 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("399985923", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("1000", coins.AmountOf(lptDenom).String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, lptDenom)
+	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
-	s.Require().Equal("1002", gjson.Get(string(resp), "result.standard.amount").String())
-	s.Require().Equal("1001", gjson.Get(string(resp), "result.token.amount").String())
-	s.Require().Equal("1000", gjson.Get(string(resp), "result.liquidity.amount").String())
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolResponse))
+
+	s.Require().Equal("1002", queryPool.Pool.Standard.Amount.String())
+	s.Require().Equal("1001", queryPool.Pool.Token.Amount.String())
+	s.Require().Equal("1000", queryPool.Pool.Lpt.Amount.String())
 
 	// Test remove liquidity (remove all)
 	msgRemoveLiquidity = &coinswaptypes.MsgRemoveLiquidity{
@@ -473,10 +483,21 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("399986915", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("0", coins.AmountOf(lptDenom).String())
 
-	url = fmt.Sprintf("%s/coinswap/liquidities/%s", baseURL, lptDenom)
+	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
-	s.Require().Equal("0", gjson.Get(string(resp), "result.standard.amount").String())
-	s.Require().Equal("0", gjson.Get(string(resp), "result.token.amount").String())
-	s.Require().Equal("0", gjson.Get(string(resp), "result.liquidity.amount").String())
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolResponse))
+
+	s.Require().Equal("0", queryPool.Pool.Standard.Amount.String())
+	s.Require().Equal("0", queryPool.Pool.Token.Amount.String())
+	s.Require().Equal("0", queryPool.Pool.Lpt.Amount.String())
+
+	queryPoolsResponse := proto.Message(&coinswaptypes.QueryPoolsResponse{})
+	url = fmt.Sprintf("%s/irismod/coinswap/pools", baseURL)
+	resp, err = rest.GetRequest(url)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolsResponse))
+
+	queryPools := queryPoolsResponse.(*coinswaptypes.QueryPoolsResponse)
+	s.Require().Len(queryPools.Pools, 1)
 }

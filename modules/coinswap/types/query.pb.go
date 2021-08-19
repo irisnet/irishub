@@ -7,6 +7,7 @@ import (
 	context "context"
 	fmt "fmt"
 	types "github.com/cosmos/cosmos-sdk/types"
+	query "github.com/cosmos/cosmos-sdk/types/query"
 	_ "github.com/gogo/protobuf/gogoproto"
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
@@ -30,23 +31,23 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// QueryLiquidityRequest is request type for the Query/Liquidity RPC method
-type QueryLiquidityRequest struct {
-	Denom string `protobuf:"bytes,1,opt,name=denom,proto3" json:"denom,omitempty"`
+// QueryPoolRequest is request type for the Query/Pool RPC method
+type QueryPoolRequest struct {
+	LptDenom string `protobuf:"bytes,1,opt,name=lpt_denom,json=lptDenom,proto3" json:"lpt_denom,omitempty"`
 }
 
-func (m *QueryLiquidityRequest) Reset()         { *m = QueryLiquidityRequest{} }
-func (m *QueryLiquidityRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryLiquidityRequest) ProtoMessage()    {}
-func (*QueryLiquidityRequest) Descriptor() ([]byte, []int) {
+func (m *QueryPoolRequest) Reset()         { *m = QueryPoolRequest{} }
+func (m *QueryPoolRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryPoolRequest) ProtoMessage()    {}
+func (*QueryPoolRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2cabf8423404f12f, []int{0}
 }
-func (m *QueryLiquidityRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryPoolRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryLiquidityRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryPoolRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryLiquidityRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryPoolRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -56,45 +57,42 @@ func (m *QueryLiquidityRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *QueryLiquidityRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryLiquidityRequest.Merge(m, src)
+func (m *QueryPoolRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryPoolRequest.Merge(m, src)
 }
-func (m *QueryLiquidityRequest) XXX_Size() int {
+func (m *QueryPoolRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryLiquidityRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryLiquidityRequest.DiscardUnknown(m)
+func (m *QueryPoolRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryPoolRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryLiquidityRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryPoolRequest proto.InternalMessageInfo
 
-func (m *QueryLiquidityRequest) GetDenom() string {
+func (m *QueryPoolRequest) GetLptDenom() string {
 	if m != nil {
-		return m.Denom
+		return m.LptDenom
 	}
 	return ""
 }
 
-// QueryLiquidityResponse is response type for the Query/Liquidity RPC method
-type QueryLiquidityResponse struct {
-	Standard  types.Coin `protobuf:"bytes,1,opt,name=standard,proto3" json:"standard"`
-	Token     types.Coin `protobuf:"bytes,2,opt,name=token,proto3" json:"token"`
-	Liquidity types.Coin `protobuf:"bytes,3,opt,name=liquidity,proto3" json:"liquidity"`
-	Fee       string     `protobuf:"bytes,4,opt,name=fee,proto3" json:"fee,omitempty"`
+// QueryPoolResponse is response type for the Query/Pool RPC method
+type QueryPoolResponse struct {
+	Pool PoolInfo `protobuf:"bytes,1,opt,name=pool,proto3" json:"pool"`
 }
 
-func (m *QueryLiquidityResponse) Reset()         { *m = QueryLiquidityResponse{} }
-func (m *QueryLiquidityResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryLiquidityResponse) ProtoMessage()    {}
-func (*QueryLiquidityResponse) Descriptor() ([]byte, []int) {
+func (m *QueryPoolResponse) Reset()         { *m = QueryPoolResponse{} }
+func (m *QueryPoolResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryPoolResponse) ProtoMessage()    {}
+func (*QueryPoolResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2cabf8423404f12f, []int{1}
 }
-func (m *QueryLiquidityResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryPoolResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryLiquidityResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryPoolResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryLiquidityResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryPoolResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -104,40 +102,207 @@ func (m *QueryLiquidityResponse) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-func (m *QueryLiquidityResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryLiquidityResponse.Merge(m, src)
+func (m *QueryPoolResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryPoolResponse.Merge(m, src)
 }
-func (m *QueryLiquidityResponse) XXX_Size() int {
+func (m *QueryPoolResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryLiquidityResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryLiquidityResponse.DiscardUnknown(m)
+func (m *QueryPoolResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryPoolResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryLiquidityResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryPoolResponse proto.InternalMessageInfo
 
-func (m *QueryLiquidityResponse) GetStandard() types.Coin {
+func (m *QueryPoolResponse) GetPool() PoolInfo {
+	if m != nil {
+		return m.Pool
+	}
+	return PoolInfo{}
+}
+
+// QueryPoolsRequest is request type for the Query/Pools RPC method
+type QueryPoolsRequest struct {
+	// pagination defines an optional pagination for the request.
+	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QueryPoolsRequest) Reset()         { *m = QueryPoolsRequest{} }
+func (m *QueryPoolsRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryPoolsRequest) ProtoMessage()    {}
+func (*QueryPoolsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2cabf8423404f12f, []int{2}
+}
+func (m *QueryPoolsRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryPoolsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryPoolsRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryPoolsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryPoolsRequest.Merge(m, src)
+}
+func (m *QueryPoolsRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryPoolsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryPoolsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryPoolsRequest proto.InternalMessageInfo
+
+func (m *QueryPoolsRequest) GetPagination() *query.PageRequest {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
+// QueryPoolsResponse is response type for the Query/Pools RPC method
+type QueryPoolsResponse struct {
+	Pools      []PoolInfo          `protobuf:"bytes,1,rep,name=pools,proto3" json:"pools"`
+	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QueryPoolsResponse) Reset()         { *m = QueryPoolsResponse{} }
+func (m *QueryPoolsResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryPoolsResponse) ProtoMessage()    {}
+func (*QueryPoolsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2cabf8423404f12f, []int{3}
+}
+func (m *QueryPoolsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryPoolsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryPoolsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryPoolsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryPoolsResponse.Merge(m, src)
+}
+func (m *QueryPoolsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryPoolsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryPoolsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryPoolsResponse proto.InternalMessageInfo
+
+func (m *QueryPoolsResponse) GetPools() []PoolInfo {
+	if m != nil {
+		return m.Pools
+	}
+	return nil
+}
+
+func (m *QueryPoolsResponse) GetPagination() *query.PageResponse {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
+type PoolInfo struct {
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// escrow account for deposit tokens
+	EscrowAddress string `protobuf:"bytes,2,opt,name=escrow_address,json=escrowAddress,proto3" json:"escrow_address,omitempty"`
+	// main token balance
+	Standard types.Coin `protobuf:"bytes,3,opt,name=standard,proto3" json:"standard"`
+	// counterparty token balance
+	Token types.Coin `protobuf:"bytes,4,opt,name=token,proto3" json:"token"`
+	// liquidity token balance
+	Lpt types.Coin `protobuf:"bytes,5,opt,name=lpt,proto3" json:"lpt"`
+	// liquidity pool fee
+	Fee string `protobuf:"bytes,6,opt,name=fee,proto3" json:"fee,omitempty"`
+}
+
+func (m *PoolInfo) Reset()         { *m = PoolInfo{} }
+func (m *PoolInfo) String() string { return proto.CompactTextString(m) }
+func (*PoolInfo) ProtoMessage()    {}
+func (*PoolInfo) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2cabf8423404f12f, []int{4}
+}
+func (m *PoolInfo) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PoolInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_PoolInfo.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *PoolInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PoolInfo.Merge(m, src)
+}
+func (m *PoolInfo) XXX_Size() int {
+	return m.Size()
+}
+func (m *PoolInfo) XXX_DiscardUnknown() {
+	xxx_messageInfo_PoolInfo.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PoolInfo proto.InternalMessageInfo
+
+func (m *PoolInfo) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *PoolInfo) GetEscrowAddress() string {
+	if m != nil {
+		return m.EscrowAddress
+	}
+	return ""
+}
+
+func (m *PoolInfo) GetStandard() types.Coin {
 	if m != nil {
 		return m.Standard
 	}
 	return types.Coin{}
 }
 
-func (m *QueryLiquidityResponse) GetToken() types.Coin {
+func (m *PoolInfo) GetToken() types.Coin {
 	if m != nil {
 		return m.Token
 	}
 	return types.Coin{}
 }
 
-func (m *QueryLiquidityResponse) GetLiquidity() types.Coin {
+func (m *PoolInfo) GetLpt() types.Coin {
 	if m != nil {
-		return m.Liquidity
+		return m.Lpt
 	}
 	return types.Coin{}
 }
 
-func (m *QueryLiquidityResponse) GetFee() string {
+func (m *PoolInfo) GetFee() string {
 	if m != nil {
 		return m.Fee
 	}
@@ -145,38 +310,51 @@ func (m *QueryLiquidityResponse) GetFee() string {
 }
 
 func init() {
-	proto.RegisterType((*QueryLiquidityRequest)(nil), "irismod.coinswap.QueryLiquidityRequest")
-	proto.RegisterType((*QueryLiquidityResponse)(nil), "irismod.coinswap.QueryLiquidityResponse")
+	proto.RegisterType((*QueryPoolRequest)(nil), "irismod.coinswap.QueryPoolRequest")
+	proto.RegisterType((*QueryPoolResponse)(nil), "irismod.coinswap.QueryPoolResponse")
+	proto.RegisterType((*QueryPoolsRequest)(nil), "irismod.coinswap.QueryPoolsRequest")
+	proto.RegisterType((*QueryPoolsResponse)(nil), "irismod.coinswap.QueryPoolsResponse")
+	proto.RegisterType((*PoolInfo)(nil), "irismod.coinswap.PoolInfo")
 }
 
 func init() { proto.RegisterFile("coinswap/query.proto", fileDescriptor_2cabf8423404f12f) }
 
 var fileDescriptor_2cabf8423404f12f = []byte{
-	// 373 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xbf, 0x4b, 0x2b, 0x41,
-	0x10, 0xc7, 0x6f, 0xf3, 0xe3, 0xf1, 0xb2, 0xaf, 0x09, 0x4b, 0x9e, 0x9c, 0x41, 0x4e, 0x09, 0x48,
-	0xd2, 0x64, 0x97, 0x44, 0xac, 0xc4, 0x26, 0x96, 0xda, 0x98, 0xd2, 0x6e, 0x2f, 0xb7, 0x9e, 0x8b,
-	0xb9, 0x9d, 0xcb, 0xed, 0x9e, 0x12, 0xc4, 0xc6, 0x5e, 0x10, 0x2c, 0xfc, 0x97, 0x52, 0x06, 0x6c,
-	0x6c, 0x14, 0x49, 0xfc, 0x43, 0xe4, 0xee, 0x92, 0x0b, 0x04, 0xc1, 0x74, 0xb3, 0x3b, 0xf3, 0x99,
-	0xfd, 0xce, 0x77, 0x16, 0xd7, 0x06, 0x20, 0x95, 0xbe, 0xe5, 0x21, 0x1b, 0xc5, 0x22, 0x1a, 0xd3,
-	0x30, 0x02, 0x03, 0xa4, 0x2a, 0x23, 0xa9, 0x03, 0xf0, 0xe8, 0x32, 0x5b, 0x77, 0x06, 0xa0, 0x03,
-	0xd0, 0xcc, 0xe5, 0x5a, 0xb0, 0x9b, 0x8e, 0x2b, 0x0c, 0xef, 0xb0, 0x24, 0x9b, 0x11, 0xf5, 0x9a,
-	0x0f, 0x3e, 0xa4, 0x21, 0x4b, 0xa2, 0xc5, 0xed, 0x8e, 0x0f, 0xe0, 0x0f, 0x05, 0xe3, 0xa1, 0x64,
-	0x5c, 0x29, 0x30, 0xdc, 0x48, 0x50, 0x3a, 0xcb, 0x36, 0xda, 0xf8, 0xff, 0x79, 0xf2, 0xe8, 0x99,
-	0x1c, 0xc5, 0xd2, 0x93, 0x66, 0xdc, 0x17, 0xa3, 0x58, 0x68, 0x43, 0x6a, 0xb8, 0xec, 0x09, 0x05,
-	0x81, 0x8d, 0xf6, 0x50, 0xab, 0xd2, 0xcf, 0x0e, 0x8d, 0x77, 0x84, 0xb7, 0xd6, 0xeb, 0x75, 0x08,
-	0x4a, 0x0b, 0x72, 0x84, 0xff, 0x6a, 0xc3, 0x95, 0xc7, 0x23, 0x2f, 0x65, 0xfe, 0x75, 0xb7, 0x69,
-	0x26, 0x98, 0x26, 0x82, 0xe9, 0x42, 0x30, 0x3d, 0x01, 0xa9, 0x7a, 0xa5, 0xc9, 0xc7, 0xae, 0xd5,
-	0xcf, 0x01, 0x72, 0x88, 0xcb, 0x06, 0xae, 0x85, 0xb2, 0x0b, 0x9b, 0x91, 0x59, 0x35, 0x39, 0xc6,
-	0x95, 0xe1, 0x52, 0x88, 0x5d, 0xdc, 0x0c, 0x5d, 0x11, 0xa4, 0x8a, 0x8b, 0x97, 0x42, 0xd8, 0xa5,
-	0x74, 0xc2, 0x24, 0xec, 0xbe, 0x20, 0x5c, 0x4e, 0xe7, 0x23, 0x8f, 0x08, 0x57, 0xf2, 0x21, 0x49,
-	0x93, 0xae, 0x6f, 0x83, 0xfe, 0x68, 0x5b, 0xbd, 0xf5, 0x7b, 0x61, 0xe6, 0x57, 0xa3, 0xfd, 0xf0,
-	0xfa, 0xf5, 0x5c, 0x68, 0x92, 0x7d, 0xb6, 0x20, 0x58, 0xfe, 0x0d, 0x96, 0x0a, 0xa5, 0xd0, 0xec,
-	0x2e, 0x35, 0xfe, 0xbe, 0x77, 0x3a, 0x99, 0x39, 0x68, 0x3a, 0x73, 0xd0, 0xe7, 0xcc, 0x41, 0x4f,
-	0x73, 0xc7, 0x9a, 0xce, 0x1d, 0xeb, 0x6d, 0xee, 0x58, 0x17, 0x1d, 0x5f, 0x9a, 0xab, 0xd8, 0xa5,
-	0x03, 0x08, 0xd2, 0x56, 0x4a, 0x98, 0xbc, 0x65, 0x00, 0x5e, 0x3c, 0x14, 0x7a, 0xd5, 0xda, 0x8c,
-	0x43, 0xa1, 0xdd, 0x3f, 0xe9, 0xf2, 0x0f, 0xbe, 0x03, 0x00, 0x00, 0xff, 0xff, 0xe4, 0xd7, 0x08,
-	0xc5, 0x7a, 0x02, 0x00, 0x00,
+	// 539 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x93, 0xcb, 0x6e, 0x13, 0x3f,
+	0x14, 0xc6, 0x33, 0xb9, 0x54, 0x89, 0xff, 0xfa, 0x57, 0xc1, 0xaa, 0xc4, 0x34, 0xa0, 0x69, 0x35,
+	0xa5, 0x80, 0x40, 0x1a, 0x2b, 0xe5, 0xb2, 0x61, 0x45, 0x41, 0xa0, 0x8a, 0x4d, 0xc9, 0x12, 0x16,
+	0x95, 0x93, 0x71, 0x07, 0x8b, 0x89, 0x8f, 0x3b, 0x76, 0xa8, 0x2a, 0x60, 0xc3, 0x13, 0x20, 0x21,
+	0xde, 0xa9, 0xcb, 0x4a, 0x6c, 0x58, 0x21, 0x94, 0xf0, 0x14, 0x5d, 0x21, 0x5f, 0x92, 0x4e, 0x8a,
+	0x08, 0xd9, 0x79, 0xec, 0xef, 0xfb, 0xce, 0xef, 0xd8, 0x67, 0xd0, 0xda, 0x00, 0xb8, 0x50, 0xc7,
+	0x54, 0x92, 0xa3, 0x11, 0x2b, 0x4e, 0x12, 0x59, 0x80, 0x06, 0xdc, 0xe6, 0x05, 0x57, 0x43, 0x48,
+	0x93, 0xe9, 0x69, 0x27, 0x1a, 0x80, 0x1a, 0x82, 0x22, 0x7d, 0xaa, 0x18, 0x79, 0xd7, 0xed, 0x33,
+	0x4d, 0xbb, 0xc4, 0x9c, 0x3a, 0x47, 0x67, 0x2d, 0x83, 0x0c, 0xec, 0x92, 0x98, 0x95, 0xdf, 0xbd,
+	0x9e, 0x01, 0x64, 0x39, 0x23, 0x54, 0x72, 0x42, 0x85, 0x00, 0x4d, 0x35, 0x07, 0xa1, 0xfc, 0xe9,
+	0x9d, 0x72, 0xa6, 0x2d, 0x3f, 0x4b, 0x96, 0x34, 0xe3, 0xc2, 0x8a, 0x9d, 0x36, 0x26, 0xa8, 0xfd,
+	0xd2, 0x28, 0xf6, 0x01, 0xf2, 0x1e, 0x3b, 0x1a, 0x31, 0xa5, 0xf1, 0x35, 0xd4, 0xca, 0xa5, 0x3e,
+	0x48, 0x99, 0x80, 0x61, 0x18, 0x6c, 0x06, 0xb7, 0x5b, 0xbd, 0x66, 0x2e, 0xf5, 0x53, 0xf3, 0x1d,
+	0xef, 0xa1, 0x2b, 0x25, 0x83, 0x92, 0x20, 0x14, 0xc3, 0xf7, 0x51, 0x5d, 0x02, 0xe4, 0x56, 0xfc,
+	0xdf, 0x4e, 0x27, 0xb9, 0xdc, 0x66, 0x62, 0xd4, 0x7b, 0xe2, 0x10, 0x76, 0xeb, 0xa7, 0x3f, 0x36,
+	0x2a, 0x3d, 0xab, 0x8e, 0x5f, 0x97, 0xa2, 0xd4, 0xb4, 0xf8, 0x33, 0x84, 0x2e, 0x20, 0x7d, 0xe0,
+	0xcd, 0xc4, 0x75, 0x94, 0x98, 0x8e, 0x12, 0x77, 0xa1, 0xbe, 0xa3, 0x64, 0x9f, 0x66, 0xcc, 0x7b,
+	0x7b, 0x25, 0x67, 0xfc, 0x35, 0x40, 0xb8, 0x9c, 0xee, 0x49, 0x1f, 0xa2, 0x86, 0xa9, 0xad, 0xc2,
+	0x60, 0xb3, 0xb6, 0x14, 0xaa, 0x93, 0xe3, 0xe7, 0x73, 0x58, 0x55, 0x8b, 0x75, 0xeb, 0x9f, 0x58,
+	0xae, 0xe8, 0x1c, 0xd7, 0x79, 0x80, 0x9a, 0xd3, 0x12, 0x78, 0x15, 0x55, 0x79, 0xea, 0xaf, 0xb8,
+	0xca, 0x53, 0xbc, 0x8d, 0x56, 0x99, 0x1a, 0x14, 0x70, 0x7c, 0x40, 0xd3, 0xb4, 0x60, 0x4a, 0xd9,
+	0x4a, 0xad, 0xde, 0xff, 0x6e, 0xf7, 0xb1, 0xdb, 0xc4, 0x8f, 0x50, 0x53, 0x69, 0x2a, 0x52, 0x5a,
+	0xa4, 0x61, 0xcd, 0xa2, 0xac, 0xcf, 0xa1, 0x4c, 0x21, 0x9e, 0x00, 0x17, 0xbe, 0x8d, 0x99, 0x01,
+	0x3f, 0x40, 0x0d, 0x0d, 0x6f, 0x99, 0x08, 0xeb, 0xcb, 0x39, 0x9d, 0x1a, 0x77, 0x51, 0x2d, 0x97,
+	0x3a, 0x6c, 0x2c, 0x67, 0x32, 0x5a, 0xdc, 0x46, 0xb5, 0x43, 0xc6, 0xc2, 0x15, 0xdb, 0x82, 0x59,
+	0xee, 0x9c, 0x07, 0xa8, 0x61, 0x1f, 0x05, 0x7f, 0x40, 0x75, 0x73, 0x0b, 0x38, 0xfe, 0xf3, 0x01,
+	0x2e, 0xcf, 0x63, 0x67, 0x6b, 0xa1, 0xc6, 0xdd, 0x71, 0x7c, 0xf7, 0xd3, 0xb7, 0x5f, 0x5f, 0xaa,
+	0xdb, 0x78, 0x8b, 0x78, 0x31, 0x99, 0xfd, 0x81, 0xf6, 0x05, 0xc9, 0xfb, 0xd9, 0x4c, 0x7f, 0xc4,
+	0x0a, 0x35, 0xec, 0x58, 0xe0, 0x45, 0xd1, 0xd3, 0x91, 0xec, 0xdc, 0x58, 0x2c, 0xf2, 0x00, 0x1b,
+	0x16, 0x60, 0x1d, 0x5f, 0xfd, 0x0b, 0xc0, 0xee, 0x8b, 0xd3, 0x71, 0x14, 0x9c, 0x8d, 0xa3, 0xe0,
+	0xe7, 0x38, 0x0a, 0x3e, 0x4f, 0xa2, 0xca, 0xd9, 0x24, 0xaa, 0x7c, 0x9f, 0x44, 0x95, 0x57, 0xdd,
+	0x8c, 0xeb, 0x37, 0xa3, 0x7e, 0x32, 0x80, 0xa1, 0x35, 0x0b, 0xa6, 0x67, 0x21, 0x43, 0x48, 0x47,
+	0x39, 0x53, 0x17, 0x61, 0xfa, 0x44, 0x32, 0xd5, 0x5f, 0xb1, 0xbf, 0xef, 0xbd, 0xdf, 0x01, 0x00,
+	0x00, 0xff, 0xff, 0x71, 0xd8, 0x60, 0x92, 0x68, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -191,8 +369,11 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
-	// Liquidity returns the total liquidity available for the provided denomination
-	Liquidity(ctx context.Context, in *QueryLiquidityRequest, opts ...grpc.CallOption) (*QueryLiquidityResponse, error)
+	// Pool returns the liquidity pool for the provided
+	// lpt_denom
+	Pool(ctx context.Context, in *QueryPoolRequest, opts ...grpc.CallOption) (*QueryPoolResponse, error)
+	// Pools returns all the liquidity pools available
+	Pools(ctx context.Context, in *QueryPoolsRequest, opts ...grpc.CallOption) (*QueryPoolsResponse, error)
 }
 
 type queryClient struct {
@@ -203,9 +384,18 @@ func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) Liquidity(ctx context.Context, in *QueryLiquidityRequest, opts ...grpc.CallOption) (*QueryLiquidityResponse, error) {
-	out := new(QueryLiquidityResponse)
-	err := c.cc.Invoke(ctx, "/irismod.coinswap.Query/Liquidity", in, out, opts...)
+func (c *queryClient) Pool(ctx context.Context, in *QueryPoolRequest, opts ...grpc.CallOption) (*QueryPoolResponse, error) {
+	out := new(QueryPoolResponse)
+	err := c.cc.Invoke(ctx, "/irismod.coinswap.Query/Pool", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) Pools(ctx context.Context, in *QueryPoolsRequest, opts ...grpc.CallOption) (*QueryPoolsResponse, error) {
+	out := new(QueryPoolsResponse)
+	err := c.cc.Invoke(ctx, "/irismod.coinswap.Query/Pools", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -214,36 +404,60 @@ func (c *queryClient) Liquidity(ctx context.Context, in *QueryLiquidityRequest, 
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
-	// Liquidity returns the total liquidity available for the provided denomination
-	Liquidity(context.Context, *QueryLiquidityRequest) (*QueryLiquidityResponse, error)
+	// Pool returns the liquidity pool for the provided
+	// lpt_denom
+	Pool(context.Context, *QueryPoolRequest) (*QueryPoolResponse, error)
+	// Pools returns all the liquidity pools available
+	Pools(context.Context, *QueryPoolsRequest) (*QueryPoolsResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
 type UnimplementedQueryServer struct {
 }
 
-func (*UnimplementedQueryServer) Liquidity(ctx context.Context, req *QueryLiquidityRequest) (*QueryLiquidityResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Liquidity not implemented")
+func (*UnimplementedQueryServer) Pool(ctx context.Context, req *QueryPoolRequest) (*QueryPoolResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Pool not implemented")
+}
+func (*UnimplementedQueryServer) Pools(ctx context.Context, req *QueryPoolsRequest) (*QueryPoolsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Pools not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 	s.RegisterService(&_Query_serviceDesc, srv)
 }
 
-func _Query_Liquidity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryLiquidityRequest)
+func _Query_Pool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryPoolRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).Liquidity(ctx, in)
+		return srv.(QueryServer).Pool(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/irismod.coinswap.Query/Liquidity",
+		FullMethod: "/irismod.coinswap.Query/Pool",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Liquidity(ctx, req.(*QueryLiquidityRequest))
+		return srv.(QueryServer).Pool(ctx, req.(*QueryPoolRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_Pools_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryPoolsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Pools(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/irismod.coinswap.Query/Pools",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Pools(ctx, req.(*QueryPoolsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -253,15 +467,19 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Liquidity",
-			Handler:    _Query_Liquidity_Handler,
+			MethodName: "Pool",
+			Handler:    _Query_Pool_Handler,
+		},
+		{
+			MethodName: "Pools",
+			Handler:    _Query_Pools_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "coinswap/query.proto",
 }
 
-func (m *QueryLiquidityRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryPoolRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -271,27 +489,27 @@ func (m *QueryLiquidityRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryLiquidityRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryPoolRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryLiquidityRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryPoolRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Denom) > 0 {
-		i -= len(m.Denom)
-		copy(dAtA[i:], m.Denom)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.Denom)))
+	if len(m.LptDenom) > 0 {
+		i -= len(m.LptDenom)
+		copy(dAtA[i:], m.LptDenom)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.LptDenom)))
 		i--
 		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryLiquidityResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryPoolResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -301,12 +519,129 @@ func (m *QueryLiquidityResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryLiquidityResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryPoolResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryLiquidityResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryPoolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.Pool.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintQuery(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryPoolsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryPoolsRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryPoolsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryPoolsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryPoolsResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryPoolsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Pools) > 0 {
+		for iNdEx := len(m.Pools) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Pools[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *PoolInfo) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PoolInfo) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PoolInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -316,10 +651,10 @@ func (m *QueryLiquidityResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 		copy(dAtA[i:], m.Fee)
 		i = encodeVarintQuery(dAtA, i, uint64(len(m.Fee)))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x32
 	}
 	{
-		size, err := m.Liquidity.MarshalToSizedBuffer(dAtA[:i])
+		size, err := m.Lpt.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -327,7 +662,7 @@ func (m *QueryLiquidityResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 		i = encodeVarintQuery(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0x1a
+	dAtA[i] = 0x2a
 	{
 		size, err := m.Token.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
@@ -337,7 +672,7 @@ func (m *QueryLiquidityResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 		i = encodeVarintQuery(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0x12
+	dAtA[i] = 0x22
 	{
 		size, err := m.Standard.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
@@ -347,7 +682,21 @@ func (m *QueryLiquidityResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 		i = encodeVarintQuery(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0xa
+	dAtA[i] = 0x1a
+	if len(m.EscrowAddress) > 0 {
+		i -= len(m.EscrowAddress)
+		copy(dAtA[i:], m.EscrowAddress)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.EscrowAddress)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -362,30 +711,81 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *QueryLiquidityRequest) Size() (n int) {
+func (m *QueryPoolRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.Denom)
+	l = len(m.LptDenom)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
 }
 
-func (m *QueryLiquidityResponse) Size() (n int) {
+func (m *QueryPoolResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
+	l = m.Pool.Size()
+	n += 1 + l + sovQuery(uint64(l))
+	return n
+}
+
+func (m *QueryPoolsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryPoolsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Pools) > 0 {
+		for _, e := range m.Pools {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *PoolInfo) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	l = len(m.EscrowAddress)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
 	l = m.Standard.Size()
 	n += 1 + l + sovQuery(uint64(l))
 	l = m.Token.Size()
 	n += 1 + l + sovQuery(uint64(l))
-	l = m.Liquidity.Size()
+	l = m.Lpt.Size()
 	n += 1 + l + sovQuery(uint64(l))
 	l = len(m.Fee)
 	if l > 0 {
@@ -400,7 +800,7 @@ func sovQuery(x uint64) (n int) {
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *QueryLiquidityRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryPoolRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -423,15 +823,15 @@ func (m *QueryLiquidityRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryLiquidityRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryPoolRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryLiquidityRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryPoolRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Denom", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LptDenom", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -459,7 +859,7 @@ func (m *QueryLiquidityRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Denom = string(dAtA[iNdEx:postIndex])
+			m.LptDenom = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -467,10 +867,7 @@ func (m *QueryLiquidityRequest) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
@@ -485,7 +882,7 @@ func (m *QueryLiquidityRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryLiquidityResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryPoolResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -508,13 +905,366 @@ func (m *QueryLiquidityResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryLiquidityResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryPoolResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryLiquidityResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryPoolResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pool", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Pool.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryPoolsRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryPoolsRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryPoolsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageRequest{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryPoolsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryPoolsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryPoolsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pools", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Pools = append(m.Pools, PoolInfo{})
+			if err := m.Pools[len(m.Pools)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageResponse{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PoolInfo) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PoolInfo: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PoolInfo: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EscrowAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.EscrowAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Standard", wireType)
 			}
@@ -547,7 +1297,7 @@ func (m *QueryLiquidityResponse) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 2:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Token", wireType)
 			}
@@ -580,9 +1330,9 @@ func (m *QueryLiquidityResponse) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 3:
+		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Liquidity", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Lpt", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -609,11 +1359,11 @@ func (m *QueryLiquidityResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.Liquidity.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Lpt.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 4:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Fee", wireType)
 			}
@@ -651,10 +1401,7 @@ func (m *QueryLiquidityResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
