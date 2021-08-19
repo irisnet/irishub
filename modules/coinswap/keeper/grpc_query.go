@@ -6,43 +6,87 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/types/query"
 
 	"github.com/irisnet/irismod/modules/coinswap/types"
 )
 
 var _ types.QueryServer = Keeper{}
 
-// Liquidity returns the liquidity pool information of the denom
-func (k Keeper) Liquidity(c context.Context, req *types.QueryLiquidityRequest) (*types.QueryLiquidityResponse, error) {
+// Pool returns the liquidity pool information of the denom
+func (k Keeper) Pool(c context.Context, req *types.QueryPoolRequest) (*types.QueryPoolResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	pool, exists := k.GetPoolByLptDenom(ctx, req.Denom)
+	pool, exists := k.GetPoolByLptDenom(ctx, req.LptDenom)
 	if !exists {
-		return nil, sdkerrors.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", req.Denom)
+		return nil, sdkerrors.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", req.LptDenom)
 	}
 
-	standardDenom := k.GetStandardDenom(ctx)
-	reservePool, err := k.GetPoolBalancesByLptDenom(ctx, pool.LptDenom)
+	balances, err := k.GetPoolBalancesByLptDenom(ctx, pool.LptDenom)
 	if err != nil {
 		return nil, err
 	}
 
-	standard := sdk.NewCoin(standardDenom, reservePool.AmountOf(standardDenom))
-	token := sdk.NewCoin(pool.CounterpartyDenom, reservePool.AmountOf(pool.CounterpartyDenom))
-	liquidity := sdk.NewCoin(pool.LptDenom, k.bk.GetSupply(ctx).GetTotal().AmountOf(pool.LptDenom))
-
-	swapParams := k.GetParams(ctx)
-	fee := swapParams.Fee.String()
-	res := types.QueryLiquidityResponse{
-		Standard:  standard,
-		Token:     token,
-		Liquidity: liquidity,
-		Fee:       fee,
+	supply := k.bk.GetSupply(ctx)
+	standard := sdk.NewCoin(pool.StandardDenom, balances.AmountOf(pool.StandardDenom))
+	token := sdk.NewCoin(pool.CounterpartyDenom, balances.AmountOf(pool.CounterpartyDenom))
+	liquidity := sdk.NewCoin(pool.LptDenom, supply.GetTotal().AmountOf(pool.LptDenom))
+	params := k.GetParams(ctx)
+	res := types.QueryPoolResponse{
+		Pool: types.PoolInfo{
+			Id:            pool.Id,
+			EscrowAddress: pool.EscrowAddress,
+			Standard:      standard,
+			Token:         token,
+			Lpt:           liquidity,
+			Fee:           params.Fee.String(),
+		},
 	}
 	return &res, nil
+}
+
+func (k Keeper) Pools(c context.Context, req *types.QueryPoolsRequest) (*types.QueryPoolsResponse, error) {
+	if req == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "empty request")
+	}
+	ctx := sdk.UnwrapSDKContext(c)
+	supply := k.bk.GetSupply(ctx).GetTotal()
+	params := k.GetParams(ctx)
+
+	var pools []types.PoolInfo
+
+	store := ctx.KVStore(k.storeKey)
+	nftStore := prefix.NewStore(store, []byte(types.KeyPool))
+	pageRes, err := query.Paginate(nftStore, req.Pagination, func(key []byte, value []byte) error {
+		var pool types.Pool
+		k.cdc.MustUnmarshalBinaryBare(value, &pool)
+
+		balances, err := k.GetPoolBalancesByLptDenom(ctx, pool.LptDenom)
+		if err != nil {
+			return err
+		}
+
+		pools = append(pools, types.PoolInfo{
+			Id:            pool.Id,
+			EscrowAddress: pool.EscrowAddress,
+			Standard:      sdk.NewCoin(pool.StandardDenom, balances.AmountOf(pool.StandardDenom)),
+			Token:         sdk.NewCoin(pool.CounterpartyDenom, balances.AmountOf(pool.CounterpartyDenom)),
+			Lpt:           sdk.NewCoin(pool.LptDenom, supply.AmountOf(pool.LptDenom)),
+			Fee:           params.Fee.String(),
+		})
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &types.QueryPoolsResponse{
+		Pagination: pageRes,
+		Pools:      pools,
+	}, nil
 }

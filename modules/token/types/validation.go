@@ -32,12 +32,15 @@ const (
 const (
 	ReservedPeg  = "peg"
 	ReservedIBC  = "ibc"
+	ReservedTIBC = "tibc"
 	ReservedLpt  = "lpt"
 	ReservedHTLT = "htlt"
 )
 
 var (
-	keywords          = strings.Join([]string{ReservedPeg, ReservedIBC, ReservedLpt, ReservedHTLT}, "|")
+	keywords = strings.Join([]string{
+		ReservedPeg, ReservedIBC, ReservedLpt, ReservedHTLT, ReservedTIBC,
+	}, "|")
 	regexpKeywordsFmt = fmt.Sprintf("^(%s).*", keywords)
 	regexpKeyword     = regexp.MustCompile(regexpKeywordsFmt).MatchString
 

@@ -13,12 +13,12 @@ import (
 )
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
-	// query liquidity
-	r.HandleFunc(fmt.Sprintf("/%s/liquidities/{%s}", types.ModuleName, RestPoolID), queryLiquidityHandlerFn(cliCtx)).Methods("GET")
+	// query pool
+	r.HandleFunc(fmt.Sprintf("/%s/pools/{%s}", types.ModuleName, RestPoolID), queryPoolsHandlerFn(cliCtx)).Methods("GET")
 }
 
 // HTTP request handler to query liquidity information.
-func queryLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
+func queryPoolsHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		denom := vars[RestPoolID]
@@ -28,8 +28,8 @@ func queryLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		params := types.QueryLiquidityParams{
-			Denom: denom,
+		params := types.QueryPoolParams{
+			LptDenom: denom,
 		}
 
 		bz, err := cliCtx.LegacyAmino.MarshalJSON(params)
@@ -38,7 +38,7 @@ func queryLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryLiquidity)
+		route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryPool)
 		res, height, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
