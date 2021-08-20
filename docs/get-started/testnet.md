@@ -12,7 +12,13 @@ After IRIS Hub 1.0 upgrade of mainnet, **Nyancat Testnet** starts to operate as 
 - RPC: http://35.234.10.84:26657/
 - REST: http://35.234.10.84:1317/swagger/
 
-## Running a Node
+
+
+## Run a Full Node
+
+### Start node from genesis
+::tip 
+You must use Irishub [v1.1.1](https://github.com/irisnet/irishub/releases/tag/v1.1.1)[ ](https://github.com/irisnet/irishub/releases/tag/v1.0.1) to initialize your node::
 
 ```bash
 # init node
@@ -26,8 +32,7 @@ curl -o ~/.iris/config/genesis.json https://raw.githubusercontent.com/irisnet/te
 iris start
 ```
 
-### Tip
-You must use Irishub [v1.1.1](https://github.com/irisnet/irishub/releases/tag/v1.1.1)[ ](https://github.com/irisnet/irishub/releases/tag/v1.0.1) to initialize your node
+
 
 ## Faucet
 

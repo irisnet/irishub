@@ -12,9 +12,14 @@ order: 4
 - RPC: http://35.234.10.84:26657/
 - REST: http://35.234.10.84:1317/swagger/
 
+
+
 ## 运行全节点
 
 #### 从genesis开始运行节点
+
+::提示
+必须使用 irishub [v1.1.1](https://github.com/irisnet/irishub/releases/tag/v1.1.1)[ ](https://github.com/irisnet/irishub/releases/tag/v1.0.1) 初始化你的节点::
 
 ```bash
 # 初始化节点
@@ -27,10 +32,6 @@ curl -o ~/.iris/config/genesis.json https://raw.githubusercontent.com/irisnet/te
 # 启动节点（也可使用 nohup 或 systemd 等方式后台运行）
 iris start
 ```
-
-### 提示
-
-必须使用 irishub [v1.1.1](https://github.com/irisnet/irishub/releases/tag/v1.1.1)[ ](https://github.com/irisnet/irishub/releases/tag/v1.0.1) 初始化你的节点
 
 
 
