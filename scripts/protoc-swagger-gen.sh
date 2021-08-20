@@ -2,8 +2,8 @@
 
 set -eo pipefail
 
-SDK_VERSION=v0.42.4
-IRISMOD_VERSION=v1.4.1-0.20210720074551-f967c7c04531
+SDK_VERSION=v0.42.9
+IRISMOD_VERSION=v1.4.1-0.20210820100038-3ce2e8f7874d
 
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/third_party/proto
