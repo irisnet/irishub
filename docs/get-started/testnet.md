@@ -12,29 +12,27 @@ After IRIS Hub 1.0 upgrade of mainnet, **Nyancat Testnet** starts to operate as 
 - RPC: http://35.234.10.84:26657/
 - REST: http://35.234.10.84:1317/swagger/
 
-## Running a Node
 
-If you'd like to setup a test node yourself instead of using the public endpoints, it'll be the same as joining [IRIS Hub Mainnet](https://stage.irisnet.org/docs/get-started/mainnet.html), except that:
 
-### Genesis File
+## Run a Full Node
 
-[Download](https://github.com/irisnet/testnets/raw/master/nyancat/config/genesis.json)
-
-### Peers
-
-Add the following `seeds` and `persistent_peers` in the `config.toml`:
-
-Seeds:
+### Start node from genesis
+::tip 
+You must use Irishub [v1.1.1](https://github.com/irisnet/irishub/releases/tag/v1.1.1)[ ](https://github.com/irisnet/irishub/releases/tag/v1.0.1) to initialize your node::
 
 ```bash
-07e58f179b2b7101b72f04248f542f67af8993bd@35.234.10.84:26656
+# init node
+iris init <moniker> --chain-id=nyancat-8
+
+# download public config.toml and genesis.json
+curl -o ~/.iris/config/config.toml https://github.com/irisnet/testnets/blob/master/nyancat/config/config.toml
+curl -o ~/.iris/config/genesis.json https://raw.githubusercontent.com/irisnet/testnets/master/nyancat/config/genesis.json
+
+# Start the node (also running in the background, such as nohup or systemd)
+iris start
 ```
 
-Persistent Peers:
 
-```bash
-bc77e49df0de4d70ab6f97f1e3a17bfb51a1ea7a@34.80.202.172:26656
-```
 
 ## Faucet
 
