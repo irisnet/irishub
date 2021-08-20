@@ -50,7 +50,7 @@ func (msg MsgCreatePool) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateLpTokenDenom(msg.LpTokenDenom); err != nil {
+	if err := ValidateLpTokenDenom(msg.LptDenom); err != nil {
 		return err
 	}
 

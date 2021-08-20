@@ -93,17 +93,17 @@ func (s *IntegrationTestSuite) TestRest() {
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	expectedContents := farmtypes.FarmPoolEntry{
-		Name:               farmPool,
-		Description:        description,
-		Creator:            creator.String(),
-		StartHeight:        startHeight,
-		EndHeight:          startHeight + 100,
-		Editable:           editable,
-		Expired:            false,
-		TotalLpTokenLocked: sdk.NewCoin(lpTokenDenom, sdk.ZeroInt()),
-		TotalReward:        totalReward,
-		RemainingReward:    totalReward,
-		RewardPerBlock:     rewardPerBlock,
+		Name:            farmPool,
+		Description:     description,
+		Creator:         creator.String(),
+		StartHeight:     startHeight,
+		EndHeight:       startHeight + 100,
+		Editable:        editable,
+		Expired:         false,
+		TotalLptLocked:  sdk.NewCoin(lpTokenDenom, sdk.ZeroInt()),
+		TotalReward:     totalReward,
+		RemainingReward: totalReward,
+		RewardPerBlock:  rewardPerBlock,
 	}
 
 	respType = proto.Message(&farmtypes.QueryFarmPoolsResponse{})

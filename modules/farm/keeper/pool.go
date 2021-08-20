@@ -30,13 +30,13 @@ func (k Keeper) CreatePool(ctx sdk.Context, name string,
 	}
 
 	pool := types.FarmPool{
-		Name:               name,
-		Creator:            creator.String(),
-		Description:        description,
-		StartHeight:        startHeight,
-		Editable:           editable,
-		TotalLpTokenLocked: sdk.NewCoin(lpTokenDenom, sdk.ZeroInt()),
-		Rules:              []types.RewardRule{},
+		Name:           name,
+		Creator:        creator.String(),
+		Description:    description,
+		StartHeight:    startHeight,
+		Editable:       editable,
+		TotalLptLocked: sdk.NewCoin(lpTokenDenom, sdk.ZeroInt()),
+		Rules:          []types.RewardRule{},
 	}
 
 	//save farm rule
@@ -148,10 +148,17 @@ func (k Keeper) AdjustPool(ctx sdk.Context,
 			creator, types.ModuleName, reward); err != nil {
 			return err
 		}
+		availableReward = availableReward.Add(reward...)
+	}
 
-		for i := range rules {
-			coin := sdk.NewCoin(rules[i].Reward, rules[i].RewardPerBlock.Mul(sdk.NewInt(remainingHeight)))
-			availableReward = availableReward.Add(coin)
+	for i := range rules {
+		availableReward = availableReward.Add(
+			sdk.NewCoin(
+				rules[i].Reward,
+				rules[i].RewardPerBlock.Mul(sdk.NewInt(remainingHeight)),
+			),
+		)
+		if reward != nil {
 			rules[i].TotalReward = rules[i].TotalReward.Add(reward.AmountOf(rules[i].Reward))
 			rules[i].RemainingReward = rules[i].RemainingReward.Add(reward.AmountOf(rules[i].Reward))
 		}
@@ -163,7 +170,6 @@ func (k Keeper) AdjustPool(ctx sdk.Context,
 	k.SetRewardRules(ctx, pool.Name, pool.Rules)
 
 	//expiredHeight = [(srcEndHeight-curHeight)*srcRewardPerBlock +appendReward]/RewardPerBlock + curHeight
-	availableReward = availableReward.Add(reward...)
 	rewardsPerBlock := types.RewardRules(pool.Rules).RewardsPerBlock()
 	availableHeight := availableReward[0].Amount.
 		Quo(rewardsPerBlock.AmountOf(availableReward[0].Denom)).Int64()
@@ -215,7 +221,7 @@ func (k Keeper) updatePool(ctx sdk.Context,
 	var rewardTotal sdk.Coins
 	//when there are multiple farm operations in the same block, the value needs to be updated once
 	if height > pool.LastHeightDistrRewards &&
-		pool.TotalLpTokenLocked.Amount.GT(sdk.ZeroInt()) {
+		pool.TotalLptLocked.Amount.GT(sdk.ZeroInt()) {
 		blockInterval := height - pool.LastHeightDistrRewards
 		for i := range rules {
 			rewardCollected := rules[i].RewardPerBlock.MulRaw(int64(blockInterval))
@@ -234,7 +240,7 @@ func (k Keeper) updatePool(ctx sdk.Context,
 				)
 			}
 			newRewardPerShare := sdk.NewDecFromInt(rewardCollected).
-				QuoInt(pool.TotalLpTokenLocked.Amount)
+				QuoInt(pool.TotalLptLocked.Amount)
 			rules[i].RewardPerShare = rules[i].RewardPerShare.Add(newRewardPerShare)
 			rules[i].RemainingReward = rules[i].RemainingReward.Sub(rewardCollected)
 
@@ -251,9 +257,9 @@ func (k Keeper) updatePool(ctx sdk.Context,
 		}
 	}
 
-	pool.TotalLpTokenLocked = sdk.NewCoin(
-		pool.TotalLpTokenLocked.Denom,
-		pool.TotalLpTokenLocked.Amount.Add(amount),
+	pool.TotalLptLocked = sdk.NewCoin(
+		pool.TotalLptLocked.Denom,
+		pool.TotalLptLocked.Amount.Add(amount),
 	)
 	pool.LastHeightDistrRewards = ctx.BlockHeight()
 	if isDestroy {

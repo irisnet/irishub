@@ -39,7 +39,7 @@ func ValidateGenesis(data GenesisState) error {
 			return err
 		}
 
-		if err := ValidateCoins("TotalLpTokenLocked", pool.TotalLpTokenLocked); err != nil {
+		if err := ValidateCoins("TotalLptLocked", pool.TotalLptLocked); err != nil {
 			return err
 		}
 

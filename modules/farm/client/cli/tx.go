@@ -70,7 +70,7 @@ func GetCmdCreateFarmPool() *cobra.Command {
 			msg := types.MsgCreatePool{
 				Name:           args[0],
 				Description:    description,
-				LpTokenDenom:   lpTokenDenom,
+				LptDenom:       lpTokenDenom,
 				StartHeight:    startHeight,
 				RewardPerBlock: rewardPerBlock,
 				TotalReward:    totalReward,

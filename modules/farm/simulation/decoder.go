@@ -33,10 +33,10 @@ func NewDecodeStore(cdc codec.Marshaler) func(kvA, kvB kv.Pair) string {
 			return fmt.Sprintf("%v\n%v", farmerA, farmerB)
 
 		case bytes.Equal(kvA.Key[:1], types.ActiveFarmPoolKey):
-			var ActiveFarmPoolA, ActiverFarmPoolB types.FarmPool
+			var ActiveFarmPoolA, ActiveFarmPoolB types.FarmPool
 			cdc.MustUnmarshalBinaryBare(kvA.Value, &ActiveFarmPoolA)
-			cdc.MustUnmarshalBinaryBare(kvA.Value, &ActiverFarmPoolB)
-			return fmt.Sprintf("%v\n%v", ActiveFarmPoolA, ActiverFarmPoolB)
+			cdc.MustUnmarshalBinaryBare(kvA.Value, &ActiveFarmPoolB)
+			return fmt.Sprintf("%v\n%v", ActiveFarmPoolA, ActiveFarmPoolB)
 
 		default:
 			panic(fmt.Sprintf("invalid farm key prefix %X", kvA.Key[:1]))

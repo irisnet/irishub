@@ -35,10 +35,10 @@ func (k Keeper) Stake(ctx sdk.Context, poolName string,
 		)
 	}
 
-	if lpToken.Denom != pool.TotalLpTokenLocked.Denom {
+	if lpToken.Denom != pool.TotalLptLocked.Denom {
 		return reward, sdkerrors.Wrapf(types.ErrNotMatch,
 			"pool [%s] only accept [%s] token, but got [%s]",
-			poolName, pool.TotalLpTokenLocked.Denom, lpToken.Denom)
+			poolName, pool.TotalLptLocked.Denom, lpToken.Denom)
 	}
 
 	if err := k.bk.SendCoinsFromAccountToModule(ctx,
@@ -86,11 +86,11 @@ func (k Keeper) Unstake(ctx sdk.Context, poolName string,
 		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, poolName)
 	}
 
-	//lpToken demon must be same as pool.TotalLpTokenLocked.Denom
-	if lpToken.Denom != pool.TotalLpTokenLocked.Denom {
+	//lpToken demon must be same as pool.TotalLptLocked.Denom
+	if lpToken.Denom != pool.TotalLptLocked.Denom {
 		return nil, sdkerrors.Wrapf(types.ErrNotMatch,
 			"pool [%s] only accept [%s] token, but got [%s]",
-			poolName, pool.TotalLpTokenLocked.Denom, lpToken.Denom)
+			poolName, pool.TotalLptLocked.Denom, lpToken.Denom)
 	}
 
 	//farmInfo must be exist
@@ -113,18 +113,18 @@ func (k Keeper) Unstake(ctx sdk.Context, poolName string,
 	}
 
 	//the lp token unstaked must be less than pool
-	if pool.TotalLpTokenLocked.Amount.LT(lpToken.Amount) {
+	if pool.TotalLptLocked.Amount.LT(lpToken.Amount) {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
 			"farmer locked lp token [%s], but farm pool total: [%s]",
 			farmInfo.Locked.String(),
-			pool.TotalLpTokenLocked.Amount.String(),
+			pool.TotalLptLocked.Amount.String(),
 		)
 	}
 
 	if k.Expired(ctx, pool) {
 		//If the farm has ended, the reward rules cannot be updated
 		pool.Rules = k.GetRewardRules(ctx, pool.Name)
-		pool.TotalLpTokenLocked = pool.TotalLpTokenLocked.Sub(lpToken)
+		pool.TotalLptLocked = pool.TotalLptLocked.Sub(lpToken)
 		k.SetPool(ctx, pool)
 	} else {
 		//update pool reward shards

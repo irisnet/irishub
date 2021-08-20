@@ -16,7 +16,7 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 			"poolName", pool.Name,
 			"endHeight", pool.EndHeight,
 			"lastHeightDistrRewards", pool.LastHeightDistrRewards,
-			"totalLpTokenLocked", pool.TotalLpTokenLocked,
+			"totalLptLocked", pool.TotalLptLocked,
 			"creator", pool.Creator,
 		)
 		if _, err := k.Refund(ctx, pool); err != nil {

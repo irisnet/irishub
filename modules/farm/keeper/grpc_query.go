@@ -34,17 +34,17 @@ func (k Keeper) FarmPools(goctx context.Context,
 		})
 
 		list = append(list, &types.FarmPoolEntry{
-			Name:               pool.Name,
-			Creator:            pool.Creator,
-			Description:        pool.Description,
-			StartHeight:        pool.StartHeight,
-			EndHeight:          pool.EndHeight,
-			Editable:           pool.Editable,
-			Expired:            k.Expired(ctx, pool),
-			TotalLpTokenLocked: pool.TotalLpTokenLocked,
-			TotalReward:        totalReward,
-			RemainingReward:    remainingReward,
-			RewardPerBlock:     rewardPerBlock,
+			Name:            pool.Name,
+			Creator:         pool.Creator,
+			Description:     pool.Description,
+			StartHeight:     pool.StartHeight,
+			EndHeight:       pool.EndHeight,
+			Editable:        pool.Editable,
+			Expired:         k.Expired(ctx, pool),
+			TotalLptLocked:  pool.TotalLptLocked,
+			TotalReward:     totalReward,
+			RemainingReward: remainingReward,
+			RewardPerBlock:  rewardPerBlock,
 		})
 		return nil
 	})
@@ -83,17 +83,17 @@ func (k Keeper) FarmPool(goctx context.Context,
 	})
 
 	poolEntry := &types.FarmPoolEntry{
-		Name:               pool.Name,
-		Creator:            pool.Creator,
-		Description:        pool.Description,
-		StartHeight:        pool.StartHeight,
-		EndHeight:          pool.EndHeight,
-		Editable:           pool.Editable,
-		Expired:            k.Expired(ctx, pool),
-		TotalLpTokenLocked: pool.TotalLpTokenLocked,
-		TotalReward:        totalReward,
-		RemainingReward:    remainingReward,
-		RewardPerBlock:     rewardPerBlock,
+		Name:            pool.Name,
+		Creator:         pool.Creator,
+		Description:     pool.Description,
+		StartHeight:     pool.StartHeight,
+		EndHeight:       pool.EndHeight,
+		Editable:        pool.Editable,
+		Expired:         k.Expired(ctx, pool),
+		TotalLptLocked:  pool.TotalLptLocked,
+		TotalReward:     totalReward,
+		RemainingReward: remainingReward,
+		RewardPerBlock:  rewardPerBlock,
 	}
 	return &types.QueryFarmPoolResponse{Pool: poolEntry}, nil
 }
@@ -130,7 +130,7 @@ func (k Keeper) Farmer(goctx context.Context,
 		if pool.StartHeight > ctx.BlockHeight() {
 			list = append(list, &types.LockedInfo{
 				PoolName: farmer.PoolName,
-				Locked:   sdk.NewCoin(pool.TotalLpTokenLocked.Denom, farmer.Locked),
+				Locked:   sdk.NewCoin(pool.TotalLptLocked.Denom, farmer.Locked),
 			})
 			continue
 		}
@@ -147,7 +147,7 @@ func (k Keeper) Farmer(goctx context.Context,
 		rewards, _ := pool.CaclRewards(farmer, sdk.ZeroInt())
 		list = append(list, &types.LockedInfo{
 			PoolName:      farmer.PoolName,
-			Locked:        sdk.NewCoin(pool.TotalLpTokenLocked.Denom, farmer.Locked),
+			Locked:        sdk.NewCoin(pool.TotalLptLocked.Denom, farmer.Locked),
 			PendingReward: rewards,
 		})
 	}

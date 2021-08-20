@@ -29,7 +29,7 @@ func RewardInvariant(k Keeper) sdk.Invariant {
 		balance := k.bk.GetAllBalances(ctx, k.ak.GetModuleAddress(types.ModuleName))
 
 		k.IteratorAllPools(ctx, func(pool types.FarmPool) {
-			expectedBalance = expectedBalance.Add(pool.TotalLpTokenLocked)
+			expectedBalance = expectedBalance.Add(pool.TotalLptLocked)
 			k.IteratorRewardRules(ctx, pool.Name, func(r types.RewardRule) {
 				expectedBalance = expectedBalance.Add(sdk.NewCoin(r.Reward, r.RemainingReward))
 			})

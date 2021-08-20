@@ -151,7 +151,7 @@ func SimulateMsgCreatePool(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 		msg := &types.MsgCreatePool{
 			Name:           name,
 			Description:    GenDescription(r),
-			LpTokenDenom:   lpTokenDenom.Denom,
+			LptDenom:       lpTokenDenom.Denom,
 			StartHeight:    startHeight,
 			RewardPerBlock: sdk.Coins{sdk.NewCoin(rewardPerBlock.Denom, rewardPerBlock.Amount)},
 			TotalReward:    sdk.NewCoins(totalReward),
@@ -386,7 +386,7 @@ func SimulateMsgUnStake(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 		amount := farmInfo.Locked
 		msg := &types.MsgUnstake{
 			PoolName: farmPool.Name,
-			Amount:   sdk.NewCoin(farmPool.TotalLpTokenLocked.Denom, amount),
+			Amount:   sdk.NewCoin(farmPool.TotalLptLocked.Denom, amount),
 			Sender:   account.GetAddress().String(),
 		}
 
@@ -586,17 +586,17 @@ func GenAppendReward(r *rand.Rand, rules types.RewardRules, spendable sdk.Coins)
 // GenStake randomized stake
 func GenStake(r *rand.Rand, pool types.FarmPool, spendable sdk.Coins) sdk.Coin {
 	for _, coin := range spendable {
-		if coin.Denom != pool.TotalLpTokenLocked.Denom {
+		if coin.Denom != pool.TotalLptLocked.Denom {
 			break
 		}
-		return sdk.NewCoin(pool.TotalLpTokenLocked.Denom, simtypes.RandomAmount(r, coin.Amount))
+		return sdk.NewCoin(pool.TotalLptLocked.Denom, simtypes.RandomAmount(r, coin.Amount))
 	}
-	return sdk.NewCoin(pool.TotalLpTokenLocked.Denom, sdk.ZeroInt())
+	return sdk.NewCoin(pool.TotalLptLocked.Denom, sdk.ZeroInt())
 }
 
 // GenUnStake randomized unStake
 func GenUnStake(r *rand.Rand, pool types.FarmPool, info types.FarmInfo) sdk.Coin {
-	return sdk.NewCoin(pool.TotalLpTokenLocked.Denom, simtypes.RandomAmount(r, info.Locked))
+	return sdk.NewCoin(pool.TotalLptLocked.Denom, simtypes.RandomAmount(r, info.Locked))
 }
 
 // GenFarmPoolName randomized farmPoolName

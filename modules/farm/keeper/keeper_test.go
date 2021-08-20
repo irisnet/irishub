@@ -95,7 +95,7 @@ func (suite *KeeperTestSuite) TestCreatePool() {
 
 	suite.Require().Equal(testPoolName, pool.Name)
 	suite.Require().Equal(testPoolDescription, pool.Description)
-	suite.Require().Equal(testLPTokenDenom, pool.TotalLpTokenLocked.Denom)
+	suite.Require().Equal(testLPTokenDenom, pool.TotalLptLocked.Denom)
 	suite.Require().Equal(testBeginHeight, pool.StartHeight)
 	suite.Require().Equal(testDestructible, pool.Editable)
 	suite.Require().Equal(testCreator.String(), pool.Creator)
@@ -483,7 +483,7 @@ func (suite *KeeperTestSuite) AssertUnstake(height int64,
 	pool, exist := suite.keeper.GetPool(ctx, testPoolName)
 	suite.Require().True(exist)
 	suite.Require().Equal(
-		pool.TotalLpTokenLocked.String(), poolSrc.TotalLpTokenLocked.Sub(unstakeCoin).String())
+		pool.TotalLptLocked.String(), poolSrc.TotalLptLocked.Sub(unstakeCoin).String())
 
 	//check reward rules again
 	rules := suite.keeper.GetRewardRules(ctx, testPoolName)

@@ -40,7 +40,7 @@ message FarmPoolEntry {
   int64 end_height = 5;
   bool editable = 6;
   bool expired = 7;
-  cosmos.base.v1beta1.Coin total_lp_token_locked = 8 [
+  cosmos.base.v1beta1.Coin total_lpt_locked = 8 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.nullable) = false
   ];
