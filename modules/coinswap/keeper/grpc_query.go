@@ -16,8 +16,8 @@ import (
 
 var _ types.QueryServer = Keeper{}
 
-// Pool returns the liquidity pool information of the denom
-func (k Keeper) Pool(c context.Context, req *types.QueryPoolRequest) (*types.QueryPoolResponse, error) {
+// LiquidityPool returns the liquidity pool information of the denom
+func (k Keeper) LiquidityPool(c context.Context, req *types.QueryLiquidityPoolRequest) (*types.QueryLiquidityPoolResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -38,7 +38,7 @@ func (k Keeper) Pool(c context.Context, req *types.QueryPoolRequest) (*types.Que
 	token := sdk.NewCoin(pool.CounterpartyDenom, balances.AmountOf(pool.CounterpartyDenom))
 	liquidity := sdk.NewCoin(pool.LptDenom, supply.GetTotal().AmountOf(pool.LptDenom))
 	params := k.GetParams(ctx)
-	res := types.QueryPoolResponse{
+	res := types.QueryLiquidityPoolResponse{
 		Pool: types.PoolInfo{
 			Id:            pool.Id,
 			EscrowAddress: pool.EscrowAddress,
@@ -51,7 +51,7 @@ func (k Keeper) Pool(c context.Context, req *types.QueryPoolRequest) (*types.Que
 	return &res, nil
 }
 
-func (k Keeper) Pools(c context.Context, req *types.QueryPoolsRequest) (*types.QueryPoolsResponse, error) {
+func (k Keeper) LiquidityPools(c context.Context, req *types.QueryLiquidityPoolsRequest) (*types.QueryLiquidityPoolsResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -85,7 +85,7 @@ func (k Keeper) Pools(c context.Context, req *types.QueryPoolsRequest) (*types.Q
 	if err != nil {
 		return nil, err
 	}
-	return &types.QueryPoolsResponse{
+	return &types.QueryLiquidityPoolsResponse{
 		Pagination: pageRes,
 		Pools:      pools,
 	}, nil

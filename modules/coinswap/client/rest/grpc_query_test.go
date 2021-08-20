@@ -171,13 +171,13 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("399985965", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("1000", coins.AmountOf(lptDenom).String())
 
-	queryPoolResponse := proto.Message(&coinswaptypes.QueryPoolResponse{})
+	queryPoolResponse := proto.Message(&coinswaptypes.QueryLiquidityPoolResponse{})
 	url := fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
 	resp, err := rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolResponse))
 
-	queryPool := queryPoolResponse.(*coinswaptypes.QueryPoolResponse)
+	queryPool := queryPoolResponse.(*coinswaptypes.QueryLiquidityPoolResponse)
 	s.Require().Equal("1000", queryPool.Pool.Standard.Amount.String())
 	s.Require().Equal("1000", queryPool.Pool.Token.Amount.String())
 	s.Require().Equal("1000", queryPool.Pool.Lpt.Amount.String())
@@ -492,12 +492,12 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().Equal("0", queryPool.Pool.Token.Amount.String())
 	s.Require().Equal("0", queryPool.Pool.Lpt.Amount.String())
 
-	queryPoolsResponse := proto.Message(&coinswaptypes.QueryPoolsResponse{})
+	queryPoolsResponse := proto.Message(&coinswaptypes.QueryLiquidityPoolsResponse{})
 	url = fmt.Sprintf("%s/irismod/coinswap/pools", baseURL)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolsResponse))
 
-	queryPools := queryPoolsResponse.(*coinswaptypes.QueryPoolsResponse)
+	queryPools := queryPoolsResponse.(*coinswaptypes.QueryLiquidityPoolsResponse)
 	s.Require().Len(queryPools.Pools, 1)
 }

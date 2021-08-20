@@ -50,7 +50,7 @@ func (suite *TestSuite) TestNewQuerier() {
 	res, err = querier(suite.ctx, []string{types.QueryPool}, req)
 	suite.NoError(err)
 
-	var respone types.QueryPoolResponse
+	var respone types.QueryLiquidityPoolResponse
 	errRes = suite.app.LegacyAmino().UnmarshalJSON(res, &respone)
 	suite.NoError(errRes)
 	standard := sdk.NewCoin(denomStandard, standardAmt)

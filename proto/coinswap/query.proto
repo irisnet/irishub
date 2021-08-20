@@ -10,34 +10,40 @@ option go_package = "github.com/irisnet/irismod/modules/coinswap/types";
 
 // Query creates service with coinswap as rpc
 service Query {
-  // Pool returns the liquidity pool for the provided
+  // LiquidityPool returns the liquidity pool for the provided
   // lpt_denom
-  rpc Pool(QueryPoolRequest) returns (QueryPoolResponse) {
+  rpc LiquidityPool(QueryLiquidityPoolRequest)
+      returns (QueryLiquidityPoolResponse) {
     option (google.api.http).get = "/irismod/coinswap/pools/{lpt_denom}";
   }
 
-  // Pools returns all the liquidity pools available
-  rpc Pools(QueryPoolsRequest) returns (QueryPoolsResponse) {
+  // LiquidityPools returns all the liquidity pools available
+  rpc LiquidityPools(QueryLiquidityPoolsRequest)
+      returns (QueryLiquidityPoolsResponse) {
     option (google.api.http).get = "/irismod/coinswap/pools";
   }
 }
 
-// QueryPoolRequest is request type for the Query/Pool RPC method
-message QueryPoolRequest { string lpt_denom = 1; }
+// QueryLiquidityPoolRequest is request type for the Query/LiquidityPool RPC
+// method
+message QueryLiquidityPoolRequest { string lpt_denom = 1; }
 
-// QueryPoolResponse is response type for the Query/Pool RPC method
-message QueryPoolResponse {
+// QueryLiquidityPoolResponse is response type for the Query/LiquidityPool RPC
+// method
+message QueryLiquidityPoolResponse {
   PoolInfo pool = 1 [ (gogoproto.nullable) = false ];
 }
 
-// QueryPoolsRequest is request type for the Query/Pools RPC method
-message QueryPoolsRequest {
+// QueryLiquidityPoolsRequest is request type for the Query/LiquidityPools RPC
+// method
+message QueryLiquidityPoolsRequest {
   // pagination defines an optional pagination for the request.
   cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-// QueryPoolsResponse is response type for the Query/Pools RPC method
-message QueryPoolsResponse {
+// QueryLiquidityPoolsResponse is response type for the Query/LiquidityPools RPC
+// method
+message QueryLiquidityPoolsResponse {
   repeated PoolInfo pools = 1 [ (gogoproto.nullable) = false ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

@@ -32,7 +32,7 @@ func queryPool(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierCd
 	}
 
 	c := sdk.WrapSDKContext(ctx)
-	response, err := k.Pool(c, &types.QueryPoolRequest{LptDenom: params.LptDenom})
+	response, err := k.LiquidityPool(c, &types.QueryLiquidityPoolRequest{LptDenom: params.LptDenom})
 	if err != nil {
 		return nil, err
 	}
