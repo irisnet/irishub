@@ -1548,7 +1548,7 @@ paths:
                 type: string
                 description: bech32 encoded address
                 example: iva1sltcyjm5k0edlg59t47lsyw8gtgc3nudrwey98
-              delegation:
+              amount:
                 type: object
                 properties:
                   denom:
@@ -1763,9 +1763,15 @@ paths:
                 type: string
                 description: bech32 encoded address
                 example: iva1sltcyjm5k0edlg59t47lsyw8gtgc3nudrwey98
-              shares:
-                type: string
-                example: '100'
+              amount:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                    example: stake
+                  amount:
+                    type: string
+                    example: '50'
       tags:
         - Staking
       consumes:
@@ -7235,6 +7241,8 @@ paths:
                           type: string
                           title: checksum
                       title: Module is the type for VersionInfo
+                  cosmos_sdk_version:
+                    type: string
                 description: VersionInfo is the type for the GetNodeInfoResponse message.
             description: >-
               GetNodeInfoResponse is the request type for the Query/GetNodeInfo
@@ -31166,68 +31174,109 @@ paths:
           type: string
       tags:
         - Query
-  '/irismod/coinswap/liquidities/{denom}':
+  /irismod/coinswap/pools:
     get:
-      summary: >-
-        Liquidity returns the total liquidity available for the provided
-        denomination
-      operationId: Liquidity
+      summary: LiquidityPools returns all the liquidity pools available
+      operationId: LiquidityPools
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              standard:
+              pools:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    escrow_address:
+                      type: string
+                      title: escrow account for deposit tokens
+                    standard:
+                      title: main token balance
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    token:
+                      title: counterparty token balance
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    lpt:
+                      title: liquidity token balance
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    fee:
+                      type: string
+                      title: liquidity pool fee
+              pagination:
                 type: object
                 properties:
-                  denom:
+                  next_key:
                     type: string
-                  amount:
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
                     type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
                 description: >-
-                  Coin defines a token with a denomination and an amount.
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
 
+                  corresponding request message has used PageRequest.
 
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-              token:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-              liquidity:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-              fee:
-                type: string
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
             title: >-
-              QueryLiquidityResponse is response type for the Query/Liquidity
-              RPC method
+              QueryLiquidityPoolsResponse is response type for the
+              Query/LiquidityPools RPC
+
+              method
         default:
           description: An unexpected error response.
           schema:
@@ -31251,7 +31300,154 @@ paths:
                       type: string
                       format: byte
       parameters:
-        - name: denom
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/irismod/coinswap/pools/{lpt_denom}':
+    get:
+      summary: |-
+        LiquidityPool returns the liquidity pool for the provided
+        lpt_denom
+      operationId: LiquidityPool
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              pool:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  escrow_address:
+                    type: string
+                    title: escrow account for deposit tokens
+                  standard:
+                    title: main token balance
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+                  token:
+                    title: counterparty token balance
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+                  lpt:
+                    title: liquidity token balance
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+                  fee:
+                    type: string
+                    title: liquidity pool fee
+            title: >-
+              QueryLiquidityPoolResponse is response type for the
+              Query/LiquidityPool RPC
+
+              method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: lpt_denom
           in: path
           required: true
           type: string
@@ -31425,7 +31621,7 @@ paths:
                     type: boolean
                   expired:
                     type: boolean
-                  total_lp_token_locked:
+                  total_lpt_locked:
                     type: object
                     properties:
                       denom:
@@ -31550,7 +31746,7 @@ paths:
                       type: boolean
                     expired:
                       type: boolean
-                    total_lp_token_locked:
+                    total_lpt_locked:
                       type: object
                       properties:
                         denom:
@@ -37921,6 +38117,8 @@ definitions:
                   type: string
                   title: checksum
               title: Module is the type for VersionInfo
+          cosmos_sdk_version:
+            type: string
         description: VersionInfo is the type for the GetNodeInfoResponse message.
     description: >-
       GetNodeInfoResponse is the request type for the Query/GetNodeInfo RPC
@@ -38357,6 +38555,8 @@ definitions:
               type: string
               title: checksum
           title: Module is the type for VersionInfo
+      cosmos_sdk_version:
+        type: string
     description: VersionInfo is the type for the GetNodeInfoResponse message.
   tendermint.crypto.PublicKey:
     type: object
@@ -54389,10 +54589,16 @@ definitions:
        - INCOMING: INCOMING defines an htlt incoming direction.
        - OUTGOING: OUTGOING defines an htlt outgoing direction.
     title: SwapDirection defines the direction of an HTLT
-  irismod.coinswap.QueryLiquidityResponse:
+  irismod.coinswap.PoolInfo:
     type: object
     properties:
+      id:
+        type: string
+      escrow_address:
+        type: string
+        title: escrow account for deposit tokens
       standard:
+        title: main token balance
         type: object
         properties:
           denom:
@@ -54405,6 +54611,7 @@ definitions:
           NOTE: The amount field is an Int which implements the custom method
           signatures required by gogoproto.
       token:
+        title: counterparty token balance
         type: object
         properties:
           denom:
@@ -54416,7 +54623,8 @@ definitions:
 
           NOTE: The amount field is an Int which implements the custom method
           signatures required by gogoproto.
-      liquidity:
+      lpt:
+        title: liquidity token balance
         type: object
         properties:
           denom:
@@ -54430,7 +54638,168 @@ definitions:
           signatures required by gogoproto.
       fee:
         type: string
-    title: QueryLiquidityResponse is response type for the Query/Liquidity RPC method
+        title: liquidity pool fee
+  irismod.coinswap.QueryLiquidityPoolResponse:
+    type: object
+    properties:
+      pool:
+        type: object
+        properties:
+          id:
+            type: string
+          escrow_address:
+            type: string
+            title: escrow account for deposit tokens
+          standard:
+            title: main token balance
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+            description: >-
+              Coin defines a token with a denomination and an amount.
+
+
+              NOTE: The amount field is an Int which implements the custom
+              method
+
+              signatures required by gogoproto.
+          token:
+            title: counterparty token balance
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+            description: >-
+              Coin defines a token with a denomination and an amount.
+
+
+              NOTE: The amount field is an Int which implements the custom
+              method
+
+              signatures required by gogoproto.
+          lpt:
+            title: liquidity token balance
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+            description: >-
+              Coin defines a token with a denomination and an amount.
+
+
+              NOTE: The amount field is an Int which implements the custom
+              method
+
+              signatures required by gogoproto.
+          fee:
+            type: string
+            title: liquidity pool fee
+    title: >-
+      QueryLiquidityPoolResponse is response type for the Query/LiquidityPool
+      RPC
+
+      method
+  irismod.coinswap.QueryLiquidityPoolsResponse:
+    type: object
+    properties:
+      pools:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            escrow_address:
+              type: string
+              title: escrow account for deposit tokens
+            standard:
+              title: main token balance
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            token:
+              title: counterparty token balance
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            lpt:
+              title: liquidity token balance
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            fee:
+              type: string
+              title: liquidity pool fee
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+    title: >-
+      QueryLiquidityPoolsResponse is response type for the Query/LiquidityPools
+      RPC
+
+      method
   irismod.farm.FarmPoolEntry:
     type: object
     properties:
@@ -54450,7 +54819,7 @@ definitions:
         type: boolean
       expired:
         type: boolean
-      total_lp_token_locked:
+      total_lpt_locked:
         type: object
         properties:
           denom:
@@ -54575,7 +54944,7 @@ definitions:
             type: boolean
           expired:
             type: boolean
-          total_lp_token_locked:
+          total_lpt_locked:
             type: object
             properties:
               denom:
@@ -54665,7 +55034,7 @@ definitions:
               type: boolean
             expired:
               type: boolean
-            total_lp_token_locked:
+            total_lpt_locked:
               type: object
               properties:
                 denom:
