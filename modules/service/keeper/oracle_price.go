@@ -47,13 +47,13 @@ func (k Keeper) GetExchangedPrice(
 }
 
 // GetExchangeRate retrieves the exchange rate of the given pair by the oracle module service
-func (k Keeper) GetExchangeRate(ctx sdk.Context, baseDenom, quoteDenom string) (sdk.Dec, error) {
+func (k Keeper) GetExchangeRate(ctx sdk.Context, quoteDenom, baseDenom string) (sdk.Dec, error) {
 	exchangeRateSvc, exist := k.GetModuleServiceByModuleName(types.RegisterModuleName)
 	if !exist {
 		return sdk.Dec{}, sdkerrors.Wrapf(types.ErrInvalidModuleService, "module service does not exist: %s", types.RegisterModuleName)
 	}
 
-	inputBody := fmt.Sprintf(`{"pair":"%s-%s"}`, baseDenom, quoteDenom)
+	inputBody := fmt.Sprintf(`{"pair":"%s-%s"}`, quoteDenom, baseDenom)
 	input := fmt.Sprintf(`{"header":{},"body":%s`, inputBody)
 	if err := types.ValidateRequestInputBody(types.OraclePriceSchemas, inputBody); err != nil {
 		return sdk.Dec{}, err
