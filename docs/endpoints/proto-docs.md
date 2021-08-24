@@ -17,13 +17,21 @@ order: 6
     - [Input](#irismod.coinswap.Input)
     - [Output](#irismod.coinswap.Output)
     - [Params](#irismod.coinswap.Params)
+    - [Pool](#irismod.coinswap.Pool)
   
 - [coinswap/genesis.proto](#coinswap/genesis.proto)
     - [GenesisState](#irismod.coinswap.GenesisState)
   
+- [cosmos/base/query/v1beta1/pagination.proto](#cosmos/base/query/v1beta1/pagination.proto)
+    - [PageRequest](#cosmos.base.query.v1beta1.PageRequest)
+    - [PageResponse](#cosmos.base.query.v1beta1.PageResponse)
+  
 - [coinswap/query.proto](#coinswap/query.proto)
-    - [QueryLiquidityRequest](#irismod.coinswap.QueryLiquidityRequest)
-    - [QueryLiquidityResponse](#irismod.coinswap.QueryLiquidityResponse)
+    - [PoolInfo](#irismod.coinswap.PoolInfo)
+    - [QueryLiquidityPoolRequest](#irismod.coinswap.QueryLiquidityPoolRequest)
+    - [QueryLiquidityPoolResponse](#irismod.coinswap.QueryLiquidityPoolResponse)
+    - [QueryLiquidityPoolsRequest](#irismod.coinswap.QueryLiquidityPoolsRequest)
+    - [QueryLiquidityPoolsResponse](#irismod.coinswap.QueryLiquidityPoolsResponse)
   
     - [Query](#irismod.coinswap.Query)
   
@@ -65,10 +73,6 @@ order: 6
 - [cosmos/bank/v1beta1/genesis.proto](#cosmos/bank/v1beta1/genesis.proto)
     - [Balance](#cosmos.bank.v1beta1.Balance)
     - [GenesisState](#cosmos.bank.v1beta1.GenesisState)
-  
-- [cosmos/base/query/v1beta1/pagination.proto](#cosmos/base/query/v1beta1/pagination.proto)
-    - [PageRequest](#cosmos.base.query.v1beta1.PageRequest)
-    - [PageResponse](#cosmos.base.query.v1beta1.PageResponse)
   
 - [cosmos/bank/v1beta1/query.proto](#cosmos/bank/v1beta1/query.proto)
     - [QueryAllBalancesRequest](#cosmos.bank.v1beta1.QueryAllBalancesRequest)
@@ -1177,6 +1181,25 @@ Params defines token module's parameters
 
 
 
+
+<a name="irismod.coinswap.Pool"></a>
+
+### Pool
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [string](#string) |  |  |
+| `standard_denom` | [string](#string) |  | denom of base coin of the pool |
+| `counterparty_denom` | [string](#string) |  | denom of counterparty coin of the pool |
+| `escrow_address` | [string](#string) |  | escrow account for deposit tokens |
+| `lpt_denom` | [string](#string) |  | denom of the liquidity pool coin |
+
+
+
+
+
  <!-- end messages -->
 
  <!-- end enums -->
@@ -1204,6 +1227,70 @@ GenesisState defines the coinswap module's genesis state
 | ----- | ---- | ----- | ----------- |
 | `params` | [Params](#irismod.coinswap.Params) |  |  |
 | `standard_denom` | [string](#string) |  |  |
+| `pool` | [Pool](#irismod.coinswap.Pool) | repeated |  |
+| `sequence` | [uint64](#uint64) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="cosmos/base/query/v1beta1/pagination.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## cosmos/base/query/v1beta1/pagination.proto
+
+
+
+<a name="cosmos.base.query.v1beta1.PageRequest"></a>
+
+### PageRequest
+PageRequest is to be embedded in gRPC request messages for efficient
+pagination. Ex:
+
+ message SomeRequest {
+         Foo some_parameter = 1;
+         PageRequest pagination = 2;
+ }
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [bytes](#bytes) |  | key is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. |
+| `offset` | [uint64](#uint64) |  | offset is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. |
+| `limit` | [uint64](#uint64) |  | limit is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. |
+| `count_total` | [bool](#bool) |  | count_total is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. |
+
+
+
+
+
+
+<a name="cosmos.base.query.v1beta1.PageResponse"></a>
+
+### PageResponse
+PageResponse is to be embedded in gRPC response messages where the
+corresponding request message has used PageRequest.
+
+ message SomeResponse {
+         repeated Bar results = 1;
+         PageResponse page = 2;
+ }
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `next_key` | [bytes](#bytes) |  | next_key is the key to be passed to PageRequest.key to query the next page most efficiently |
+| `total` | [uint64](#uint64) |  | total is total number of results available if PageRequest.count_total was set, its value is undefined otherwise |
 
 
 
@@ -1226,33 +1313,85 @@ GenesisState defines the coinswap module's genesis state
 
 
 
-<a name="irismod.coinswap.QueryLiquidityRequest"></a>
+<a name="irismod.coinswap.PoolInfo"></a>
 
-### QueryLiquidityRequest
-QueryLiquidityRequest is request type for the Query/Liquidity RPC method
+### PoolInfo
+
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `denom` | [string](#string) |  |  |
+| `id` | [string](#string) |  |  |
+| `escrow_address` | [string](#string) |  | escrow account for deposit tokens |
+| `standard` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  | main token balance |
+| `token` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  | counterparty token balance |
+| `lpt` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  | liquidity token balance |
+| `fee` | [string](#string) |  | liquidity pool fee |
 
 
 
 
 
 
-<a name="irismod.coinswap.QueryLiquidityResponse"></a>
+<a name="irismod.coinswap.QueryLiquidityPoolRequest"></a>
 
-### QueryLiquidityResponse
-QueryLiquidityResponse is response type for the Query/Liquidity RPC method
+### QueryLiquidityPoolRequest
+QueryLiquidityPoolRequest is request type for the Query/LiquidityPool RPC
+method
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `standard` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
-| `token` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
-| `liquidity` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
-| `fee` | [string](#string) |  |  |
+| `lpt_denom` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.coinswap.QueryLiquidityPoolResponse"></a>
+
+### QueryLiquidityPoolResponse
+QueryLiquidityPoolResponse is response type for the Query/LiquidityPool RPC
+method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool` | [PoolInfo](#irismod.coinswap.PoolInfo) |  |  |
+
+
+
+
+
+
+<a name="irismod.coinswap.QueryLiquidityPoolsRequest"></a>
+
+### QueryLiquidityPoolsRequest
+QueryLiquidityPoolsRequest is request type for the Query/LiquidityPools RPC
+method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request. |
+
+
+
+
+
+
+<a name="irismod.coinswap.QueryLiquidityPoolsResponse"></a>
+
+### QueryLiquidityPoolsResponse
+QueryLiquidityPoolsResponse is response type for the Query/LiquidityPools RPC
+method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pools` | [PoolInfo](#irismod.coinswap.PoolInfo) | repeated |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
 
 
 
@@ -1272,7 +1411,8 @@ Query creates service with coinswap as rpc
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `Liquidity` | [QueryLiquidityRequest](#irismod.coinswap.QueryLiquidityRequest) | [QueryLiquidityResponse](#irismod.coinswap.QueryLiquidityResponse) | Liquidity returns the total liquidity available for the provided denomination | GET|/irismod/coinswap/liquidities/{denom}|
+| `LiquidityPool` | [QueryLiquidityPoolRequest](#irismod.coinswap.QueryLiquidityPoolRequest) | [QueryLiquidityPoolResponse](#irismod.coinswap.QueryLiquidityPoolResponse) | LiquidityPool returns the liquidity pool for the provided lpt_denom | GET|/irismod/coinswap/pools/{lpt_denom}|
+| `LiquidityPools` | [QueryLiquidityPoolsRequest](#irismod.coinswap.QueryLiquidityPoolsRequest) | [QueryLiquidityPoolsResponse](#irismod.coinswap.QueryLiquidityPoolsResponse) | LiquidityPools returns all the liquidity pools available | GET|/irismod/coinswap/pools|
 
  <!-- end services -->
 
@@ -1758,68 +1898,6 @@ GenesisState defines the bank module's genesis state.
 | `balances` | [Balance](#cosmos.bank.v1beta1.Balance) | repeated | balances is an array containing the balances of all the accounts. |
 | `supply` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | supply represents the total supply. |
 | `denom_metadata` | [Metadata](#cosmos.bank.v1beta1.Metadata) | repeated | denom_metadata defines the metadata of the differents coins. |
-
-
-
-
-
- <!-- end messages -->
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-<a name="cosmos/base/query/v1beta1/pagination.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## cosmos/base/query/v1beta1/pagination.proto
-
-
-
-<a name="cosmos.base.query.v1beta1.PageRequest"></a>
-
-### PageRequest
-PageRequest is to be embedded in gRPC request messages for efficient
-pagination. Ex:
-
- message SomeRequest {
-         Foo some_parameter = 1;
-         PageRequest pagination = 2;
- }
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `key` | [bytes](#bytes) |  | key is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. |
-| `offset` | [uint64](#uint64) |  | offset is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. |
-| `limit` | [uint64](#uint64) |  | limit is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. |
-| `count_total` | [bool](#bool) |  | count_total is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. |
-
-
-
-
-
-
-<a name="cosmos.base.query.v1beta1.PageResponse"></a>
-
-### PageResponse
-PageResponse is to be embedded in gRPC response messages where the
-corresponding request message has used PageRequest.
-
- message SomeResponse {
-         repeated Bar results = 1;
-         PageResponse page = 2;
- }
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `next_key` | [bytes](#bytes) |  | next_key is the key to be passed to PageRequest.key to query the next page most efficiently |
-| `total` | [uint64](#uint64) |  | total is total number of results available if PageRequest.count_total was set, its value is undefined otherwise |
 
 
 
@@ -2896,6 +2974,7 @@ VersionInfo is the type for the GetNodeInfoResponse message.
 | `build_tags` | [string](#string) |  |  |
 | `go_version` | [string](#string) |  |  |
 | `build_deps` | [Module](#cosmos.base.tendermint.v1beta1.Module) | repeated |  |
+| `cosmos_sdk_version` | [string](#string) |  |  |
 
 
 
@@ -7460,7 +7539,7 @@ periodically vests by unlocking coins during each specified period.
 | `end_height` | [int64](#int64) |  |  |
 | `last_height_distr_rewards` | [int64](#int64) |  |  |
 | `editable` | [bool](#bool) |  |  |
-| `total_lp_token_locked` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `total_lpt_locked` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
 | `rules` | [RewardRule](#irismod.farm.RewardRule) | repeated |  |
 
 
@@ -7567,7 +7646,7 @@ periodically vests by unlocking coins during each specified period.
 | `end_height` | [int64](#int64) |  |  |
 | `editable` | [bool](#bool) |  |  |
 | `expired` | [bool](#bool) |  |  |
-| `total_lp_token_locked` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `total_lpt_locked` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
 | `total_reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | `remaining_reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | `reward_per_block` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
@@ -7750,8 +7829,8 @@ periodically vests by unlocking coins during each specified period.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `pool_name` | [string](#string) |  |  |
-| `AdditionalReward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
-| `RewardPerBlock` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `additional_reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `reward_per_block` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | `creator` | [string](#string) |  |  |
 
 
@@ -7779,7 +7858,7 @@ periodically vests by unlocking coins during each specified period.
 | ----- | ---- | ----- | ----------- |
 | `name` | [string](#string) |  |  |
 | `description` | [string](#string) |  |  |
-| `lp_token_denom` | [string](#string) |  |  |
+| `lpt_denom` | [string](#string) |  |  |
 | `start_height` | [int64](#int64) |  |  |
 | `reward_per_block` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | `total_reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |

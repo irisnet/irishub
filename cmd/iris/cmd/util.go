@@ -41,6 +41,7 @@ var (
 			registerCmdWithArgs("staking", "unbond", 1).
 			registerCmdWithArgs("distribution", "fund-community-pool", 0).
 			registerCmdWithArgs("gov", "deposit", 1).
+			registerCmdWithArgs("ibc-transfer", "transfer", 3).
 			registerCmdForResponse("bank", "balances", "balances", filedTypeArray).
 			registerCmdForResponse("bank", "total", "supply", filedTypeArray).
 			registerCmdForResponse("gov", "params", "deposit_params.min_deposit", filedTypeArray).
