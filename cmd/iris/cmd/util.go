@@ -242,14 +242,21 @@ func (it coinConverter) parseFlags(cmd *cobra.Command, flag *pflag.Flag, cmdNm s
 }
 
 func (it coinConverter) parseArgs(cmd *cobra.Command, args []string) {
-	if command, ok := it.cmds[cmd.Name()]; ok {
-		if cmd.Parent().Name() == command.parentCmd {
-			if field, ok := it.getFromArgs(cmd.Name()); ok && len(args) > 0 {
-				if res, err := it.convertCoins(cmd, args[field.index]); err == nil {
-					args[field.index] = res
-				}
-			}
+	command, ok := it.cmds[cmd.Name()]
+	if !ok {
+		return
+	}
+
+	if cmd.Parent().Name() != command.parentCmd {
+		return
+	}
+
+	if field, ok := it.getFromArgs(cmd.Name()); ok && len(args) > 0 {
+		res, err := it.convertCoins(cmd, args[field.index])
+		if err != nil {
+			return
 		}
+		args[field.index] = res
 	}
 }
 
