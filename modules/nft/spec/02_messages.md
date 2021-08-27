@@ -6,7 +6,7 @@ This message defines a type of nft, there can be multiple nft of the same type
 
 | **Field** | **Type** | **Description**                                                                                                                  |
 | :-------- | :------- | :------------------------------------------------------------------------------------------------------------------------------- |
-| Name      | `Id`     | The denomination ID of the NFT, necessary as multiple denominations are able to be represented on each chain.                    |
+| Id      | `string`     | The denomination ID of the NFT, necessary as multiple denominations are able to be represented on each chain.                    |
 | Name      | `string` | The denomination name of the NFT, necessary as multiple denominations are able to be represented on each chain.                  |
 | Sender    | `string` | The account address of the user sending the NFT. By default it is __not__ required that the sender is also the owner of the NFT. |
 | Schema    | `string` | NFT specifications defined under this category                                                                                   |
