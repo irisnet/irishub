@@ -631,7 +631,7 @@ func NewIrisApp(
 				panic(err)
 			}
 			// init farm params
-			amount := sdk.NewIntWithDecimal(5000, int(nativeToken.Scale))
+			amount := sdk.NewIntWithDecimal(1000, int(nativeToken.Scale))
 			param := farmtypes.Params{
 				CreatePoolFee:       sdk.NewCoin(nativeToken.MinUnit, amount),
 				MaxRewardCategories: 2,
