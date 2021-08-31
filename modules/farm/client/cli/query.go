@@ -44,7 +44,14 @@ func GetCmdQueryFarmPools() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
-			resp, err := queryClient.FarmPools(context.Background(), &types.QueryFarmPoolsRequest{})
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			resp, err := queryClient.FarmPools(context.Background(), &types.QueryFarmPoolsRequest{
+				Pagination: pageReq,
+			})
 			if err != nil {
 				return err
 			}
