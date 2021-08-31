@@ -36,8 +36,8 @@ iris tx nft issue [denom-id] [flags]
 | --data          |          | Off-chain metadata for supplementation (JSON object)            |             |
 | --schema        |          | Denom data structure definition |             |
 | --symbol        |          | The symbol of the denom         |             |
-| --mint-restricted          |       | Issuance of NFT restrictions, true means that only Denom owners can issue NFTs under this category, false means anyone can |             |
-| --update-restricted        |       | Update the NFT limit, true means that no one under this category can update the NFT, false means that only the owner of this NFT can update |             |
+| --mint-restricted          |       | This field indicates whether there are restrictions on the issuance of NFTs under this category, true means that only Denom owners can issue NFTs under this category, false means anyone can |             |
+| --update-restricted        |       | This field indicates whether there are restrictions on updating NFTs under this category, true means that no one under this category can update the NFT, false means that only the owner of this NFT can update |             |
 
 ## iris tx nft transfer-denom
 

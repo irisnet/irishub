@@ -16,9 +16,9 @@ nft need to be issued before creation to declare their abstract properties:
 
 -_Symbol_: the symbol of the token
 
--_Mint-restricted_: issuance of NFT restrictions, true means that only Denom owners can issue NFTs under this category, false means anyone can
+-_Mint-restricted_: This field indicates whether there are restrictions on the issuance of NFTs under this category, true means that only Denom owners can issue NFTs under this category, false means anyone can
 
--_Update-restricted_: update the NFT limit, true means that no one under this category can update the NFT, false means that only the owner of this NFT can update
+-_Update-restricted_: This field indicates whether there are restrictions on updating NFTs under this category, true means that no one under this category can update the NFT, false means that only the owner of this NFT can update
 
 -_Metadata Specification_: The JSON Schema that nft metadata should follow
 
