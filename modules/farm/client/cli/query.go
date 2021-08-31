@@ -52,6 +52,7 @@ func GetCmdQueryFarmPools() *cobra.Command {
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
+	flags.AddPaginationFlagsToCmd(cmd, "pools")
 	return cmd
 }
 
