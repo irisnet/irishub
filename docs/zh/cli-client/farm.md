@@ -40,7 +40,7 @@ iris tx farm create <Farm Pool Name> [flags]
 在`Farm`池结束前调整池的参数，例如`reward-per-block`、`total-reward`。
 
 ```bash
-iris tx farm create <Farm Pool Name> [flags]
+iris tx farm adjust <Farm Pool Name> [flags]
 ```
 
 **标志：**

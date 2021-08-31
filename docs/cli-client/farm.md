@@ -40,7 +40,7 @@ iris tx farm create <Farm Pool Name> [flags]
 Adjust the parameters of the pool before the farm pool ends, such as `reward-per-block`, `total-reward`.
 
 ```bash
-iris tx farm create <Farm Pool Name> [flags]
+iris tx farm adjust <Farm Pool Name> [flags]
 ```
 
 **Flags:**
@@ -68,7 +68,7 @@ iris tx farm stake <Farm Pool Name> <lp token> [flags]
 
 ### iris tx farm harvest
 
-The farmer gets his rewards back.
+The farmer withdraws his rewards back.
 
 ```bash
 iris tx farm harvest <Farm Pool Name>
