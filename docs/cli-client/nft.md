@@ -7,6 +7,7 @@
 | Name                                     | Description                                                                            |
 | ---------------------------------------- | -------------------------------------------------------------------------------------- |
 | [issue](#iris-tx-nft-issue)              | Specify the nft Denom (nft category) and metadata JSON Schema to issue nft.            |
+| [transfer-denom](#iris-tx-nft-transfer-denom)  | The owner of the NFT classification can transfer the ownership of the NFT classification to others.           |
 | [mint](#iris-tx-nft-mint)                | Additional issuance (create) of specific nft of this type can be made.                 |
 | [edit](#iris-tx-nft-edit)                | The metadata of the specified nft can be updated.                                      |
 | [transfer](#iris-tx-nft-transfer)        | Transfer designated nft.                                                               |
@@ -31,7 +32,20 @@ iris tx nft issue [denom-id] [flags]
 | Name, shorthand | Required | Default                         | Description |
 | --------------- | -------- | ------------------------------- | ----------- |
 | --name          |          | The name of the denom           |             |
+| --uri           |          | The uri of the denom            |             |
+| --data          |          | Off-chain metadata for supplementation (JSON object)            |             |
 | --schema        |          | Denom data structure definition |             |
+| --symbol        |          | The symbol of the denom         |             |
+| --mint-restricted          |       | Issuance of NFT restrictions, true means that only Denom owners can issue NFTs under this category, false means anyone can |             |
+| --update-restricted        |       | Update the NFT limit, true means that no one under this category can update the NFT, false means that only the owner of this NFT can update |             |
+
+## iris tx nft transfer-denom
+
+The owner of the NFT classification can transfer the ownership of the NFT classification to others.
+
+```bash
+iris tx nft transfer-denom [recipient] [denom-id]
+```
 
 ## iris tx nft mint
 

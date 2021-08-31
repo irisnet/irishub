@@ -14,6 +14,12 @@ nft need to be issued before creation to declare their abstract properties:
 
 -_Denom ID_: the globally unique nft category identifier of Denom
 
+-_Symbol_: the symbol of the token
+
+-_Mint-restricted_: issuance of NFT restrictions, true means that only Denom owners can issue NFTs under this category, false means anyone can
+
+-_Update-restricted_: update the NFT limit, true means that no one under this category can update the NFT, false means that only the owner of this NFT can update
+
 -_Metadata Specification_: The JSON Schema that nft metadata should follow
 
 Each specific nft is described by the following elements:
@@ -35,7 +41,17 @@ Specify the nft Denom (nft category) and metadata JSON Schema to issue nft.
 `CLI`
 
 ```bash
-iris tx nft issue <denom-id> --from=<key-name> --name=<denom-name> --schema=<schema-content or path/to/schema.json> --chain-id=<chain-id> --fees=<fee>
+iris tx nft issue <denom-id> --from=<key-name> --name=<denom-name> --schema=<schema-content or path/to/schema.json> --symbol=<denom-symbol> --mint-restricted=<mint-restricted>  --update-restricted=<update-restricted> --chain-id=<chain-id> --fees=<fee>
+```
+
+### transfer denom
+
+The owner of the NFT classification can transfer the ownership of the NFT classification to others.
+
+`CLI`
+
+```bash
+iris tx nft transfer-denom <recipient> <denom-id>
 ```
 
 ### Additional issuance
