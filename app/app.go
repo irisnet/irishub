@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
