@@ -37,6 +37,17 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ## [Unreleased]
 
+### Improvements
+
+* [\#218](https://github.com/irisnet/irismod/pull/218) Bump cosmos-sdk version to [v0.42.9](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.42.9).
+* (modules/nft) [\#224](https://github.com/irisnet/irismod/pull/224) Remove the check of denomId in the query.
+* (modules/coinswap) [\#221](https://github.com/irisnet/irismod/pull/221) Refactor coinswap module grpc APIs.
+* (modules/coinswap) [\#219](https://github.com/irisnet/irismod/pull/219) Refactor coinswap module, the liquidity pool is named with lpt-{index}, and the index is incremented from 1.
+* (modules/nft) [\#212](https://github.com/irisnet/irismod/pull/212) Make the order of commands parameters consistent.
+* (modules/nft) [\#183](https://github.com/irisnet/irismod/issues/183) Enhance NFT module, make it compatible with ERC721 and restrict mint and update operations.
+* [\#180](https://github.com/irisnet/irismod/issues/180) Add simulation tests. 
+* (modules/farm) [\#179](https://github.com/irisnet/irismod/issues/179) Add farm module.
+
 ## [v1.4.0] - 2021-03-26
 
 ### Bug Fixes

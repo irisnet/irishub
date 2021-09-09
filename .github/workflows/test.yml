@@ -14,3 +14,15 @@ jobs:
           GO111MODULE: "on"
         with:
           args: make test-unit
+  test-sim:
+    name: Test Simulations
+    runs-on: ubuntu-16.04
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v1
+      - name: Run simulation tests
+        uses: cedrickring/golang-action/go1.15@1.6.0
+        env:
+          GO111MODULE: "on"
+        with:
+          args: make test-sim-nondeterminism-fast

@@ -403,6 +403,10 @@ func SimulateMsgIssueDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 		mintRestricted := genRandomBool(r)
 		updateRestricted := genRandomBool(r)
 
+		if err := types.ValidateDenomID(denomId); err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferDenom, "invalid denom"), nil, nil
+		}
+
 		denom, _ := k.GetDenom(ctx, denomId)
 		if denom.Size() != 0 {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferDenom, "denom exist"), nil, nil
