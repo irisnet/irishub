@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -107,7 +108,6 @@ import (
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
-	"github.com/irisnet/irishub/address"
 	irisappparams "github.com/irisnet/irishub/app/params"
 	"github.com/irisnet/irishub/lite"
 	migratehtlc "github.com/irisnet/irishub/migrate/htlc"
@@ -258,7 +258,12 @@ type IrisApp struct {
 
 func init() {
 	// set bech32 prefix
-	address.ConfigureBech32Prefix()
+	fmt.Println(1)
+	fmt.Println(sdk.GetConfig().GetBech32AccountAddrPrefix())
+	fmt.Println(2)
+	fmt.Println(sdk.GetConfig().GetBech32AccountAddrPrefix())
+	fmt.Println(3)
+	fmt.Println(sdk.GetConfig().GetBech32AccountAddrPrefix())
 
 	// set coin denom regexs
 	sdk.SetCoinDenomRegex(DefaultCoinDenomRegex)
@@ -280,7 +285,6 @@ func init() {
 	}
 
 	DefaultNodeHome = filepath.Join(userHomeDir, ".iris")
-
 	owner, err := sdk.AccAddressFromBech32(nativeToken.Owner)
 	if err != nil {
 		panic(err)

@@ -26,6 +26,7 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/server"
 	srvconfig "github.com/cosmos/cosmos-sdk/server/config"
+	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -203,8 +204,8 @@ func InitTestnet(
 			return err
 		}
 
-		accTokens := sdk.TokensFromConsensusPower(1000)
-		accStakingTokens := sdk.TokensFromConsensusPower(500)
+		accTokens := sdk.TokensFromConsensusPower(1000, cosmostypes.Int{})       //TODO  待确认
+		accStakingTokens := sdk.TokensFromConsensusPower(500, cosmostypes.Int{}) //TODO  待确认
 		coins := sdk.Coins{
 			sdk.NewCoin(fmt.Sprintf("%stoken", nodeDirName), accTokens),
 			sdk.NewCoin(sdk.DefaultBondDenom, accStakingTokens),
@@ -213,7 +214,7 @@ func InitTestnet(
 		genBalances = append(genBalances, banktypes.Balance{Address: addr.String(), Coins: coins.Sort()})
 		genAccounts = append(genAccounts, authtypes.NewBaseAccount(addr, nil, 0, 0))
 
-		valTokens := sdk.TokensFromConsensusPower(100)
+		valTokens := sdk.TokensFromConsensusPower(100, cosmostypes.Int{}) // TODO 待确认
 		createValMsg, err := stakingtypes.NewMsgCreateValidator(
 			sdk.ValAddress(addr),
 			valPubKeys[i],
@@ -277,11 +278,11 @@ func initGenFiles(
 	genAccounts []authtypes.GenesisAccount, genBalances []banktypes.Balance,
 	genFiles []string, numValidators int,
 ) error {
-	appGenState := mbm.DefaultGenesis(clientCtx.JSONMarshaler)
+	appGenState := mbm.DefaultGenesis(clientCtx.Codec)
 
 	// add the profiler and trustees in the genesis state
 	var guardianGenState guardiantypes.GenesisState
-	clientCtx.JSONMarshaler.MustUnmarshalJSON(appGenState[guardiantypes.ModuleName], &guardianGenState)
+	clientCtx.Codec.MustUnmarshalJSON(appGenState[guardiantypes.ModuleName], &guardianGenState)
 
 	for _, account := range genAccounts {
 		guardian := guardiantypes.NewSuper(
@@ -290,11 +291,11 @@ func initGenFiles(
 		)
 		guardianGenState.Supers = append(guardianGenState.Supers, guardian)
 	}
-	appGenState[guardiantypes.ModuleName] = clientCtx.JSONMarshaler.MustMarshalJSON(&guardianGenState)
+	appGenState[guardiantypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&guardianGenState)
 
 	// set the accounts in the genesis state
 	var authGenState authtypes.GenesisState
-	clientCtx.JSONMarshaler.MustUnmarshalJSON(appGenState[authtypes.ModuleName], &authGenState)
+	clientCtx.Codec.MustUnmarshalJSON(appGenState[authtypes.ModuleName], &authGenState)
 
 	accounts, err := authtypes.PackAccounts(genAccounts)
 	if err != nil {
@@ -302,14 +303,14 @@ func initGenFiles(
 	}
 
 	authGenState.Accounts = accounts
-	appGenState[authtypes.ModuleName] = clientCtx.JSONMarshaler.MustMarshalJSON(&authGenState)
+	appGenState[authtypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&authGenState)
 
 	// set the balances in the genesis state
 	var bankGenState banktypes.GenesisState
-	clientCtx.JSONMarshaler.MustUnmarshalJSON(appGenState[banktypes.ModuleName], &bankGenState)
+	clientCtx.Codec.MustUnmarshalJSON(appGenState[banktypes.ModuleName], &bankGenState)
 
 	bankGenState.Balances = genBalances
-	appGenState[banktypes.ModuleName] = clientCtx.JSONMarshaler.MustMarshalJSON(&bankGenState)
+	appGenState[banktypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&bankGenState)
 
 	appGenStateJSON, err := json.MarshalIndent(appGenState, "", "  ")
 	if err != nil {
@@ -356,7 +357,7 @@ func collectGenFiles(
 			return err
 		}
 
-		nodeAppState, err := genutil.GenAppStateFromConfig(clientCtx.JSONMarshaler, clientCtx.TxConfig, nodeConfig, initCfg, *genDoc, genBalIterator)
+		nodeAppState, err := genutil.GenAppStateFromConfig(clientCtx.Codec, clientCtx.TxConfig, nodeConfig, initCfg, *genDoc, genBalIterator)
 		if err != nil {
 			return err
 		}
