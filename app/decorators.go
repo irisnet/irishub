@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
 
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
