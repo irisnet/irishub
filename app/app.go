@@ -257,14 +257,6 @@ type IrisApp struct {
 }
 
 func init() {
-	// set bech32 prefix
-	fmt.Println(1)
-	fmt.Println(sdk.GetConfig().GetBech32AccountAddrPrefix())
-	fmt.Println(2)
-	fmt.Println(sdk.GetConfig().GetBech32AccountAddrPrefix())
-	fmt.Println(3)
-	fmt.Println(sdk.GetConfig().GetBech32AccountAddrPrefix())
-
 	// set coin denom regexs
 	sdk.SetCoinDenomRegex(DefaultCoinDenomRegex)
 
