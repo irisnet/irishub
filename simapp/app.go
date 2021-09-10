@@ -1,8 +1,6 @@
 package simapp
 
 import (
-	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
-	_ "github.com/irisnet/irishub/address"
 	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 	"io"
 	"net/http"
@@ -58,6 +56,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/evidence"
 	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
 	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
+	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/cosmos/cosmos-sdk/x/gov"

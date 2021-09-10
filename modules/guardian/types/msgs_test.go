@@ -2,7 +2,6 @@ package types
 
 import (
 	"fmt"
-	_ "github.com/irisnet/irishub/address"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -10,6 +9,8 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/address"
 )
 
 // nolint: deadcode unused
@@ -21,6 +22,10 @@ var (
 	description    = "description"
 	nilDescription = ""
 )
+
+func init() {
+	address.ConfigureBech32Prefix()
+}
 
 // ----------------------------------------------
 // test MsgAddSuper

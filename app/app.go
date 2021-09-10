@@ -107,6 +107,7 @@ import (
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
+	"github.com/irisnet/irishub/address"
 	irisappparams "github.com/irisnet/irishub/app/params"
 	"github.com/irisnet/irishub/lite"
 	migratehtlc "github.com/irisnet/irishub/migrate/htlc"
@@ -256,6 +257,9 @@ type IrisApp struct {
 }
 
 func init() {
+	// set bech32 prefix
+	address.ConfigureBech32Prefix()
+
 	// set coin denom regexs
 	sdk.SetCoinDenomRegex(DefaultCoinDenomRegex)
 
@@ -484,14 +488,6 @@ func NewIrisApp(
 		app.GetSubspace(farmtypes.ModuleName),
 		authtypes.FeeCollectorName,
 	)
-
-	//func NewKeeper(cdc codec.BinaryCodec, storeKey sdk.StoreKey, ak feegrant.AccountKeeper) Keeper {
-	//	return Keeper{
-	//	cdc:        cdc,
-	//	storeKey:   storeKey,
-	//	authKeeper: ak,
-	//}
-	//}
 
 	/****  Module Options ****/
 	var skipGenesisInvariants = false

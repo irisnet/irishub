@@ -256,9 +256,6 @@ func createIncrementalAccounts(accNum int) []sdk.AccAddress {
 // AddTestAddrsFromPubKeys adds the addresses into the SimApp providing only the public keys.
 func AddTestAddrsFromPubKeys(app *SimApp, ctx sdk.Context, pubKeys []cryptotypes.PubKey, accAmt sdk.Int) {
 	initCoins := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), accAmt))
-
-	//setTotalSupply(app, ctx, accAmt, len(pubKeys))
-
 	// fill all the addresses with some coins, set the loose pool tokens simultaneously
 	for _, pubKey := range pubKeys {
 		saveAccount(app, ctx, sdk.AccAddress(pubKey.Address()), initCoins)
@@ -295,7 +292,6 @@ func addTestAddrs(app *SimApp, ctx sdk.Context, accNum int, accAmt sdk.Int, stra
 func saveAccount(app *SimApp, ctx sdk.Context, addr sdk.AccAddress, initCoins sdk.Coins) {
 	acc := app.AccountKeeper.NewAccountWithAddress(ctx, addr)
 	app.AccountKeeper.SetAccount(ctx, acc)
-	//err := app.BankKeeper.AddCoins(ctx, addr, initCoins)
 	if err := app.BankKeeper.MintCoins(ctx, minttypes.ModuleName, initCoins); err != nil {
 		panic(err)
 	}

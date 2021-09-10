@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/cosmos/cosmos-sdk/server/config"
 	"io"
 	"os"
 	"path/filepath"
@@ -20,6 +19,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/snapshots"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -57,7 +57,6 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 			}
 			converter.handlePreRun(cmd, args)
 			return server.InterceptConfigsPreRunHandler(cmd, config.DefaultConfigTemplate, nil)
-			//TODO 待处理
 		},
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {
 			converter.handlePostRun(cmd)
@@ -70,7 +69,6 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
-	//authclient.Codec = encodingConfig.Marshaler //TODO 待确认删除
 
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),

@@ -36,7 +36,7 @@ const (
 	Bech32PrefixConsPub = Bech32ChainPrefix + PrefixConsensus + PrefixPublic
 )
 
-func init() {
+func ConfigureBech32Prefix() {
 	config := sdk.GetConfig()
 	config.SetBech32PrefixForAccount(Bech32PrefixAccAddr, Bech32PrefixAccPub)
 	config.SetBech32PrefixForValidator(Bech32PrefixValAddr, Bech32PrefixValPub)
