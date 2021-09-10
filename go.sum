@@ -454,8 +454,8 @@ github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NH
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/influxdata/influxdb v1.2.3-0.20180221223340-01288bdb0883/go.mod h1:qZna6X/4elxqT3yI9iZYdZrWWdeFOOprn86kgg4+IzY=
 github.com/influxdata/influxdb1-client v0.0.0-20191209144304-8bf82d3c094d/go.mod h1:qj24IKcXYK6Iy9ceXlo3Tc+vtHo9lIhSX5JddghvEPo=
-github.com/irisnet/irismod v1.4.1-0.20210910035235-f1ee15ccec27 h1:3bzOKmTwSL6hUclfrbNPEc8/HrU28gQsFvOdoaLtpbU=
-github.com/irisnet/irismod v1.4.1-0.20210910035235-f1ee15ccec27/go.mod h1:3RQ0ZOTulrldS/fSsC1QDhfYA9frv+Lf5gCGf7j+JkY=
+github.com/irisnet/irismod v1.4.1-0.20210910063133-8e019ad3a7af h1:FoafVC1xTaQCopEV00PkktZ5tF9ANJmCrCQq2uSyAGo=
+github.com/irisnet/irismod v1.4.1-0.20210910063133-8e019ad3a7af/go.mod h1:3RQ0ZOTulrldS/fSsC1QDhfYA9frv+Lf5gCGf7j+JkY=
 github.com/jackpal/go-nat-pmp v1.0.2-0.20160603034137-1fa385a6f458/go.mod h1:QPH045xvCAeXUZOxsnwmrtiCoxIr9eob+4orBN1SBKc=
 github.com/jedisct1/go-minisign v0.0.0-20190909160543-45766022959e/go.mod h1:G1CVv03EnqU1wYL2dFwXxW2An0az9JTl/ZsqXQeBlkU=
 github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
