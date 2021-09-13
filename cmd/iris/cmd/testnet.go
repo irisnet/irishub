@@ -204,8 +204,8 @@ func InitTestnet(
 			return err
 		}
 
-		accTokens := sdk.TokensFromConsensusPower(1000, cosmostypes.Int{})       //TODO  待确认
-		accStakingTokens := sdk.TokensFromConsensusPower(500, cosmostypes.Int{}) //TODO  待确认
+		accTokens := sdk.TokensFromConsensusPower(1000, cosmostypes.Int{})       //TODO
+		accStakingTokens := sdk.TokensFromConsensusPower(500, cosmostypes.Int{}) //TODO
 		coins := sdk.Coins{
 			sdk.NewCoin(fmt.Sprintf("%stoken", nodeDirName), accTokens),
 			sdk.NewCoin(sdk.DefaultBondDenom, accStakingTokens),
@@ -214,7 +214,7 @@ func InitTestnet(
 		genBalances = append(genBalances, banktypes.Balance{Address: addr.String(), Coins: coins.Sort()})
 		genAccounts = append(genAccounts, authtypes.NewBaseAccount(addr, nil, 0, 0))
 
-		valTokens := sdk.TokensFromConsensusPower(100, cosmostypes.Int{}) // TODO 待确认
+		valTokens := sdk.TokensFromConsensusPower(100, cosmostypes.Int{}) // TODO
 		createValMsg, err := stakingtypes.NewMsgCreateValidator(
 			sdk.ValAddress(addr),
 			valPubKeys[i],
