@@ -19,7 +19,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/snapshots"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -56,7 +55,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 				return err
 			}
 			converter.handlePreRun(cmd, args)
-			return server.InterceptConfigsPreRunHandler(cmd, config.DefaultConfigTemplate, nil)
+			return server.InterceptConfigsPreRunHandler(cmd, "", nil)
 		},
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {
 			converter.handlePostRun(cmd)

@@ -5,10 +5,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	minttypes "github.com/irisnet/irishub/modules/mint/types"
 	"strconv"
 	"testing"
 	"time"
+
+	minttypes "github.com/irisnet/irishub/modules/mint/types"
 
 	"github.com/stretchr/testify/require"
 
@@ -278,7 +279,6 @@ func addTestAddrs(app *SimApp, ctx sdk.Context, accNum int, accAmt sdk.Int, stra
 	testAddrs := strategy(accNum)
 
 	initCoins := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), accAmt))
-	//	setTotalSupply(app, ctx, accAmt, accNum)
 
 	// fill all the addresses with some coins, set the loose pool tokens simultaneously
 	for _, addr := range testAddrs {
