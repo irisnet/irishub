@@ -118,7 +118,6 @@ func InitTestnet(
 	if chainID == "" {
 		chainID = "chain-" + tmrand.NewRand().Str(6)
 	}
-	fmt.Print
 
 	nodeIDs := make([]string, numValidators)
 	valPubKeys := make([]cryptotypes.PubKey, numValidators)
@@ -204,8 +203,8 @@ func InitTestnet(
 			return err
 		}
 
-		accTokens := sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)       //TODO
-		accStakingTokens := sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction) //TODO
+		accTokens := sdk.TokensFromConsensusPower(1000, sdk.Int{})
+		accStakingTokens := sdk.TokensFromConsensusPower(500, sdk.Int{})
 		coins := sdk.Coins{
 			sdk.NewCoin(fmt.Sprintf("%stoken", nodeDirName), accTokens),
 			sdk.NewCoin(sdk.DefaultBondDenom, accStakingTokens),
@@ -214,7 +213,7 @@ func InitTestnet(
 		genBalances = append(genBalances, banktypes.Balance{Address: addr.String(), Coins: coins.Sort()})
 		genAccounts = append(genAccounts, authtypes.NewBaseAccount(addr, nil, 0, 0))
 
-		valTokens := sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction) // TODO
+		valTokens := sdk.TokensFromConsensusPower(100, sdk.Int{})
 		createValMsg, err := stakingtypes.NewMsgCreateValidator(
 			sdk.ValAddress(addr),
 			valPubKeys[i],
