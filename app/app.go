@@ -423,7 +423,7 @@ func NewIrisApp(
 	)
 	// register the proposal types
 	app.tibcKeeper = tibckeeper.NewKeeper(
-		appCodec, keys[tibchost.StoreKey], app.GetSubspace(tibchost.ModuleName), app.stakingKeeper, scopedTIBCKeeper,
+		appCodec, keys[tibchost.StoreKey], app.GetSubspace(tibchost.ModuleName), app.stakingKeeper,
 	)
 
 	govRouter := govtypes.NewRouter()
