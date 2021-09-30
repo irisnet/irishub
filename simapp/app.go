@@ -1,7 +1,6 @@
 package simapp
 
 import (
-	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 	"io"
 	"net/http"
 	"os"
@@ -57,6 +56,7 @@ import (
 	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
 	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
+	feegrantmodule "github.com/cosmos/cosmos-sdk/x/feegrant/module"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/cosmos/cosmos-sdk/x/gov"
@@ -81,7 +81,6 @@ import (
 	ibctransferkeeper "github.com/cosmos/ibc-go/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/modules/core/02-client"
 	porttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
@@ -118,6 +117,19 @@ import (
 	"github.com/irisnet/irishub/modules/mint"
 	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
+
+	tibcnfttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer"
+	tibcnfttransferkeeper "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/keeper"
+	tibcnfttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/types"
+	tibc "github.com/bianjieai/tibc-go/modules/tibc/core"
+	tibcclient "github.com/bianjieai/tibc-go/modules/tibc/core/02-client"
+	tibcclienttypes "github.com/bianjieai/tibc-go/modules/tibc/core/02-client/types"
+	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
+	tibcrouting "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing"
+	tibcroutingtypes "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing/types"
+	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
+	tibcmock "github.com/bianjieai/tibc-go/modules/tibc/testing/mock"
+	"github.com/cosmos/cosmos-sdk/x/feegrant"
 )
 
 const appName = "SimApp"
@@ -136,12 +148,17 @@ var (
 		capability.AppModuleBasic{},
 		staking.AppModuleBasic{},
 		mint.AppModuleBasic{},
+		feegrantmodule.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
 			paramsclient.ProposalHandler,
 			distrclient.ProposalHandler,
 			upgradeclient.ProposalHandler,
 			upgradeclient.CancelProposalHandler,
+			tibcclient.CreateClientProposalHandler,
+			tibcclient.UpgradeClientProposalHandler,
+			tibcclient.RegisterRelayerProposalHandler,
+			tibcrouting.SetRoutingRulesProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -161,6 +178,8 @@ var (
 		service.AppModuleBasic{},
 		oracle.AppModuleBasic{},
 		random.AppModuleBasic{},
+		tibc.AppModuleBasic{},
+		tibcnfttransfer.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -178,6 +197,7 @@ var (
 		servicetypes.DepositAccName:    {authtypes.Burner},
 		servicetypes.RequestAccName:    nil,
 		servicetypes.FeeCollectorName:  {authtypes.Burner},
+		tibcnfttypes.ModuleName:        nil,
 	}
 )
 
@@ -203,7 +223,7 @@ type SimApp struct {
 	memKeys map[string]*sdk.MemoryStoreKey
 
 	// keepers
-	FeegrantKeeper   feegrantkeeper.Keeper
+	FeeGrantKeeper   feegrantkeeper.Keeper
 	AccountKeeper    authkeeper.AccountKeeper
 	BankKeeper       bankkeeper.Keeper
 	CapabilityKeeper *capabilitykeeper.Keeper
@@ -233,6 +253,13 @@ type SimApp struct {
 	ServiceKeeper  servicekeeper.Keeper
 	OracleKeeper   oracleKeeper.Keeper
 	RandomKeeper   randomkeeper.Keeper
+
+	TIBCKeeper        *tibckeeper.Keeper // TIBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	NftTransferKeeper tibcnfttransferkeeper.Keeper
+
+	// make scoped keepers public for test purposes
+	ScopedTIBCKeeper     capabilitykeeper.ScopedKeeper
+	ScopedTIBCMockKeeper capabilitykeeper.ScopedKeeper
 
 	// the module manager
 	mm *module.Manager
@@ -269,11 +296,12 @@ func NewSimApp(
 
 	keys := sdk.NewKVStoreKeys(
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
-		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
+		minttypes.StoreKey, feegrant.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey, recordtypes.StoreKey,
 		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
+		tibchost.StoreKey,tibcnfttypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -301,10 +329,15 @@ func NewSimApp(
 	// NOTE: the IBC mock keeper and application module is used only for testing core IBC. Do
 	// note replicate if you do not need to test core IBC or light clients.
 	scopedIBCMockKeeper := app.CapabilityKeeper.ScopeToModule(ibcmock.ModuleName)
+	scopedTIBCKeeper := app.CapabilityKeeper.ScopeToModule(tibchost.ModuleName)
 
+	// Create TIBC Keeper
+	app.TIBCKeeper = tibckeeper.NewKeeper(
+		appCodec, keys[tibchost.StoreKey], app.GetSubspace(tibchost.ModuleName), app.StakingKeeper, scopedTIBCKeeper,
+	)
 	// add keepers
-	app.FeegrantKeeper = feegrantkeeper.NewKeeper(appCodec,
-		keys[farmtypes.StoreKey],
+	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec,
+		keys[feegrant.StoreKey],
 		app.AccountKeeper,
 	)
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
@@ -349,13 +382,26 @@ func NewSimApp(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibchost.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
+		AddRoute(tibcclienttypes.RouterKey, tibcclient.NewClientProposalHandler(app.TIBCKeeper.ClientKeeper)).
+		AddRoute(tibcroutingtypes.RouterKey, tibcrouting.NewSetRoutingProposalHandler(app.TIBCKeeper.RoutingKeeper))
 
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
 		&stakingKeeper, govRouter,
 	)
+	// Create Transfer Keepers
+	app.NftTransferKeeper = tibcnfttransferkeeper.NewKeeper(
+		appCodec, keys[tibcnfttypes.StoreKey], app.GetSubspace(tibcnfttypes.ModuleName),
+		app.AccountKeeper, app.NFTKeeper,
+		app.TIBCKeeper.PacketKeeper, app.TIBCKeeper.ClientKeeper,
+	)
+	nfttransferModule := tibcnfttransfer.NewAppModule(app.NftTransferKeeper)
 
+	tibcmockModule := tibcmock.NewAppModule()
+	tibcRouter := tibcroutingtypes.NewRouter()
+	tibcRouter.AddRoute(tibcnfttypes.ModuleName, nfttransferModule)
+	tibcRouter.AddRoute(tibcmock.ModuleName, tibcmockModule)
+	app.TIBCKeeper.SetRouter(tibcRouter)
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
@@ -363,7 +409,6 @@ func NewSimApp(
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
-
 	// NOTE: the IBC mock keeper and application module is used only for testing core IBC. Do
 	// note replicate if you do not need to test core IBC or light clients.
 	mockModule := ibcmock.NewAppModule(scopedIBCMockKeeper, &app.IBCKeeper.PortKeeper)
@@ -456,6 +501,7 @@ func NewSimApp(
 		crisis.NewAppModule(&app.CrisisKeeper, skipGenesisInvariants),
 		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
 		mint.NewAppModule(appCodec, app.MintKeeper),
+		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
@@ -473,6 +519,7 @@ func NewSimApp(
 		service.NewAppModule(appCodec, app.ServiceKeeper, app.AccountKeeper, app.BankKeeper),
 		oracle.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper),
 		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
+		tibc.NewAppModule(app.TIBCKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -482,11 +529,11 @@ func NewSimApp(
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName,
 		slashingtypes.ModuleName, evidencetypes.ModuleName, stakingtypes.ModuleName,
-		ibchost.ModuleName, htlctypes.ModuleName, randomtypes.ModuleName,
+		ibchost.ModuleName, htlctypes.ModuleName, randomtypes.ModuleName, tibchost.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
-		servicetypes.ModuleName,
+		servicetypes.ModuleName, tibchost.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -496,10 +543,10 @@ func NewSimApp(
 	// can do so safely.
 	app.mm.SetOrderInitGenesis(
 		capabilitytypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
-		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
+		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName, feegrant.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
 		guardiantypes.ModuleName, tokentypes.ModuleName, nfttypes.ModuleName, htlctypes.ModuleName, recordtypes.ModuleName,
-		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName,
+		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName, tibchost.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -519,6 +566,7 @@ func NewSimApp(
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
 		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
 		mint.NewAppModule(appCodec, app.MintKeeper),
+		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
@@ -535,6 +583,7 @@ func NewSimApp(
 		service.NewAppModule(appCodec, app.ServiceKeeper, app.AccountKeeper, app.BankKeeper),
 		oracle.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper),
 		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
+		tibc.NewAppModule(app.TIBCKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -550,7 +599,7 @@ func NewSimApp(
 	anteHandler, err := ante.NewAnteHandler(ante.HandlerOptions{
 		AccountKeeper:   app.AccountKeeper,
 		BankKeeper:      app.BankKeeper,
-		FeegrantKeeper:  app.FeegrantKeeper,
+		FeegrantKeeper:  app.FeeGrantKeeper,
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 		SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 	})
@@ -577,6 +626,9 @@ func NewSimApp(
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+
+	app.ScopedTIBCKeeper = scopedTIBCKeeper
+	app.ScopedTIBCMockKeeper = scopedIBCMockKeeper
 
 	// NOTE: the IBC mock keeper and application module is used only for testing core IBC. Do
 	// note replicate if you do not need to test core IBC or light clients.
@@ -764,6 +816,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(coinswaptypes.ModuleName)
 	paramsKeeper.Subspace(servicetypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
+	paramsKeeper.Subspace(tibchost.ModuleName)
 
 	return paramsKeeper
 }
