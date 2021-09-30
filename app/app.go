@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	"io"
 	"os"
 	"path/filepath"
@@ -51,6 +50,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/evidence"
 	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
 	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
+	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	feegrantmodule "github.com/cosmos/cosmos-sdk/x/feegrant/module"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
@@ -274,7 +274,6 @@ type IrisApp struct {
 	farmkeeper        farmkeeper.Keeper
 	tibcKeeper        *tibckeeper.Keeper
 	nftTransferKeeper tibcnfttransferkeeper.Keeper
-
 
 	// the module manager
 	mm *module.Manager
