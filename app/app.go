@@ -377,14 +377,15 @@ func NewIrisApp(
 	scopedTransferKeeper := app.capabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedtibcKeeper := app.capabilityKeeper.ScopeToModule(tibchost.ModuleName)
 
+	app.accountKeeper = authkeeper.NewAccountKeeper(
+		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
+	)
 	// add keepers
 	app.feeGrantKeeper = feegrantkeeper.NewKeeper(appCodec,
 		keys[feegrant.StoreKey],
 		app.accountKeeper,
 	)
-	app.accountKeeper = authkeeper.NewAccountKeeper(
-		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
-	)
+
 	app.bankKeeper = bankkeeper.NewBaseKeeper(
 		appCodec, keys[banktypes.StoreKey], app.accountKeeper, app.GetSubspace(banktypes.ModuleName), app.ModuleAccountAddrs(),
 	)

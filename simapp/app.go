@@ -335,13 +335,13 @@ func NewSimApp(
 	app.TIBCKeeper = tibckeeper.NewKeeper(
 		appCodec, keys[tibchost.StoreKey], app.GetSubspace(tibchost.ModuleName), app.StakingKeeper, scopedTIBCKeeper,
 	)
+	app.AccountKeeper = authkeeper.NewAccountKeeper(
+		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
+	)
 	// add keepers
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec,
 		keys[feegrant.StoreKey],
 		app.AccountKeeper,
-	)
-	app.AccountKeeper = authkeeper.NewAccountKeeper(
-		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
 	)
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
 		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), app.ModuleAccountAddrs(),
