@@ -329,7 +329,9 @@ func NewSimApp(
 	// NOTE: the IBC mock keeper and application module is used only for testing core IBC. Do
 	// note replicate if you do not need to test core IBC or light clients.
 	scopedIBCMockKeeper := app.CapabilityKeeper.ScopeToModule(ibcmock.ModuleName)
+
 	scopedTIBCKeeper := app.CapabilityKeeper.ScopeToModule(tibchost.ModuleName)
+	scopedTIBCMockKeeper := app.CapabilityKeeper.ScopeToModule(tibcmock.ModuleName)
 
 	// Create TIBC Keeper
 	app.TIBCKeeper = tibckeeper.NewKeeper(
@@ -628,7 +630,7 @@ func NewSimApp(
 	app.ScopedTransferKeeper = scopedTransferKeeper
 
 	app.ScopedTIBCKeeper = scopedTIBCKeeper
-	app.ScopedTIBCMockKeeper = scopedIBCMockKeeper
+	app.ScopedTIBCMockKeeper = scopedTIBCMockKeeper
 
 	// NOTE: the IBC mock keeper and application module is used only for testing core IBC. Do
 	// note replicate if you do not need to test core IBC or light clients.

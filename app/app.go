@@ -135,7 +135,6 @@ import (
 	tibcrouting "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing"
 	tibcroutingtypes "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing/types"
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
-	tibcmock "github.com/bianjieai/tibc-go/modules/tibc/testing/mock"
 )
 
 const appName = "IrisApp"
@@ -259,6 +258,9 @@ type IrisApp struct {
 	scopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	scopedTransferKeeper capabilitykeeper.ScopedKeeper
 	scopedIBCMockKeeper  capabilitykeeper.ScopedKeeper
+	// tibc
+	scopedTIBCKeeper     capabilitykeeper.ScopedKeeper
+	scopedTIBCMockKeeper capabilitykeeper.ScopedKeeper
 
 	guardianKeeper    guardiankeeper.Keeper
 	tokenKeeper       tokenkeeper.Keeper
@@ -272,6 +274,7 @@ type IrisApp struct {
 	farmkeeper        farmkeeper.Keeper
 	tibcKeeper        *tibckeeper.Keeper
 	nftTransferKeeper tibcnfttransferkeeper.Keeper
+
 
 	// the module manager
 	mm *module.Manager
@@ -375,7 +378,6 @@ func NewIrisApp(
 	app.capabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 	scopedIBCKeeper := app.capabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.capabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
-	scopedtibcKeeper := app.capabilityKeeper.ScopeToModule(tibchost.ModuleName)
 
 	app.accountKeeper = authkeeper.NewAccountKeeper(
 		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
@@ -413,14 +415,16 @@ func NewIrisApp(
 	app.stakingKeeper = *stakingKeeper.SetHooks(
 		stakingtypes.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()),
 	)
-
+	scopedTIBCKeeper := app.capabilityKeeper.ScopeToModule(tibchost.ModuleName)
+	// NOTE: the TIBC mock keeper and application module is used only for testing core TIBC. Do
+	// note replicate if you do not need to test core TIBC or light clients.
 	// Create IBC Keeper
 	app.ibcKeeper = ibckeeper.NewKeeper(
 		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.stakingKeeper, app.upgradeKeeper, scopedIBCKeeper,
 	)
 	// register the proposal types
 	app.tibcKeeper = tibckeeper.NewKeeper(
-		appCodec, keys[tibchost.StoreKey], app.GetSubspace(tibchost.ModuleName), app.stakingKeeper, scopedtibcKeeper,
+		appCodec, keys[tibchost.StoreKey], app.GetSubspace(tibchost.ModuleName), app.stakingKeeper, scopedTIBCKeeper,
 	)
 
 	govRouter := govtypes.NewRouter()
@@ -454,10 +458,8 @@ func NewIrisApp(
 	app.ibcKeeper.SetRouter(ibcRouter)
 
 	nfttransferModule := tibcnfttransfer.NewAppModule(app.nftTransferKeeper)
-	mockModule := tibcmock.NewAppModule()
 	tibcRouter := tibcroutingtypes.NewRouter()
 	tibcRouter.AddRoute(tibcnfttypes.ModuleName, nfttransferModule)
-	tibcRouter.AddRoute(tibcmock.ModuleName, mockModule)
 	app.tibcKeeper.SetRouter(tibcRouter)
 
 	// create evidence keeper with router
@@ -706,7 +708,9 @@ func NewIrisApp(
 		// `loadLatest` is set to true.
 		app.capabilityKeeper.Seal()
 	}
-
+	app.scopedTIBCKeeper = scopedTIBCKeeper
+	app.scopedIBCKeeper = scopedIBCKeeper
+	app.scopedTransferKeeper = scopedTransferKeeper
 	return app
 }
 
