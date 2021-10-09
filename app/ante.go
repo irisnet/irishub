@@ -6,7 +6,7 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-
+	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	oraclekeeper "github.com/irisnet/irismod/modules/oracle/keeper"
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 
@@ -19,6 +19,7 @@ import (
 func NewAnteHandler(
 	ak authkeeper.AccountKeeper,
 	bk bankkeeper.Keeper,
+	fk feegrantkeeper.Keeper,
 	tk tokenkeeper.Keeper,
 	ok oraclekeeper.Keeper,
 	gk guardiankeeper.Keeper,
@@ -33,10 +34,9 @@ func NewAnteHandler(
 		ante.TxTimeoutHeightDecorator{},
 		ante.NewValidateMemoDecorator(ak),
 		ante.NewConsumeGasForTxSizeDecorator(ak),
-		ante.NewRejectFeeGranterDecorator(),
 		ante.NewSetPubKeyDecorator(ak), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(ak),
-		ante.NewDeductFeeDecorator(ak, bk),
+		ante.NewDeductFeeDecorator(ak, bk, fk),
 		ante.NewSigGasConsumeDecorator(ak, sigGasConsumer),
 		ante.NewSigVerificationDecorator(ak, signModeHandler),
 		NewValidateTokenDecorator(tk),
