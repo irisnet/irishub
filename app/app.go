@@ -330,9 +330,16 @@ func DefaultCoinDenomRegex() string {
 
 // NewIrisApp returns a reference to an initialized IrisApp.
 func NewIrisApp(
-	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
-	homePath string, invCheckPeriod uint, encodingConfig irisappparams.EncodingConfig,
-	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
+	logger log.Logger,
+	db dbm.DB,
+	traceStore io.Writer,
+	loadLatest bool,
+	skipUpgradeHeights map[int64]bool,
+	homePath string,
+	invCheckPeriod uint,
+	encodingConfig irisappparams.EncodingConfig,
+	appOpts servertypes.AppOptions,
+	baseAppOptions ...func(*baseapp.BaseApp),
 ) *IrisApp {
 
 	// TODO: Remove cdc in favor of appCodec once all modules are migrated.
@@ -596,7 +603,7 @@ func NewIrisApp(
 	app.mm.SetOrderInitGenesis(
 		capabilitytypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName, feegrant.ModuleName,
-		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,tibchost.ModuleName,
+		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName, tibchost.ModuleName,
 		guardiantypes.ModuleName, tokentypes.ModuleName, nfttypes.ModuleName, htlctypes.ModuleName, recordtypes.ModuleName,
 		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName, farmtypes.ModuleName,
 	)
