@@ -315,14 +315,16 @@ func createReservePool(suite *TestSuite, denom string) (sdk.AccAddress, sdk.AccA
 	amountInit, _ := sdk.NewIntFromString("100000000")
 	addrSender := sdk.AccAddress(getRandomString(20))
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
-	_ = suite.app.BankKeeper.AddCoins(
-		suite.ctx,
-		addrSender,
-		sdk.NewCoins(
-			sdk.NewCoin(denomStandard, amountInit),
-			sdk.NewCoin(denom, amountInit),
-		),
+
+	coins := sdk.NewCoins(
+		sdk.NewCoin(denomStandard, amountInit),
+		sdk.NewCoin(denom, amountInit),
 	)
+
+	err := suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, coins)
+	suite.NoError(err)
+	err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, addrSender, coins)
+	suite.NoError(err)
 
 	depositAmt, _ := sdk.NewIntFromString("1000")
 	depositCoin := sdk.NewCoin(denom, depositAmt)
@@ -331,7 +333,7 @@ func createReservePool(suite *TestSuite, denom string) (sdk.AccAddress, sdk.AccA
 	minReward := sdk.NewInt(1)
 	deadline := time.Now().Add(1 * time.Minute)
 	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender.String())
-	_, err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
+	_, err = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
 	suite.NoError(err)
 
 	poolId := types.GetPoolId(denom)
@@ -339,10 +341,9 @@ func createReservePool(suite *TestSuite, denom string) (sdk.AccAddress, sdk.AccA
 	suite.Require().True(has)
 	reservePoolAddr := types.GetReservePoolAddr(pool.LptDenom)
 
-	moduleAccountBalances := suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances := suite.app.BankKeeper.GetAllBalances(suite.ctx, reservePoolAddr)
 	senderBlances := suite.app.BankKeeper.GetAllBalances(suite.ctx, addrSender)
-	suite.Equal("1000", moduleAccountBalances.AmountOf(pool.LptDenom).String())
+	suite.Equal("1000", suite.app.BankKeeper.GetSupply(suite.ctx, pool.LptDenom).Amount.String())
 
 	expCoins := sdk.NewCoins(
 		sdk.NewInt64Coin(denom, 1000),

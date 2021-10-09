@@ -1,21 +1,14 @@
 package types
 
 import (
-	"github.com/tendermint/tendermint/crypto"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tendermint/tendermint/crypto"
 )
 
-var nativeToken = Token{
-	Symbol:        sdk.DefaultBondDenom,
-	Name:          "Network staking token",
-	Scale:         0,
-	MinUnit:       sdk.DefaultBondDenom,
-	InitialSupply: 2000000000,
-	MaxSupply:     10000000000,
-	Mintable:      true,
-	Owner:         sdk.AccAddress(crypto.AddressHash([]byte(ModuleName))).String(),
-}
+var (
+	nativeToken Token
+	Initialized bool
+)
 
 // NewGenesisState creates a new genesis state.
 func NewGenesisState(params Params, tokens []Token) GenesisState {
@@ -37,10 +30,24 @@ func SetNativeToken(
 	owner sdk.AccAddress,
 ) {
 	nativeToken = NewToken(symbol, name, minUnit, decimal, initialSupply, maxSupply, mintable, owner)
+	Initialized = true
 }
 
-//GetNativeToken returns the system's default native token
+// GetNativeToken returns the system's default native token
 func GetNativeToken() Token {
+	if !Initialized {
+		nativeToken = Token{
+			Symbol:        sdk.DefaultBondDenom,
+			Name:          "Network staking token",
+			Scale:         0,
+			MinUnit:       sdk.DefaultBondDenom,
+			InitialSupply: 2000000000,
+			MaxSupply:     10000000000,
+			Mintable:      true,
+			Owner:         sdk.AccAddress(crypto.AddressHash([]byte(ModuleName))).String(),
+		}
+		Initialized = true
+	}
 	return nativeToken
 }
 

@@ -23,7 +23,7 @@ func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress) (tokens []types
 
 		for ; it.Valid(); it.Next() {
 			var token types.Token
-			k.cdc.MustUnmarshalBinaryBare(it.Value(), &token)
+			k.cdc.MustUnmarshal(it.Value(), &token)
 
 			tokens = append(tokens, &token)
 		}
@@ -35,7 +35,7 @@ func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress) (tokens []types
 
 	for ; it.Valid(); it.Next() {
 		var symbol gogotypes.StringValue
-		k.cdc.MustUnmarshalBinaryBare(it.Value(), &symbol)
+		k.cdc.MustUnmarshal(it.Value(), &symbol)
 
 		token, err := k.getTokenBySymbol(ctx, symbol.Value)
 		if err != nil {
@@ -132,7 +132,7 @@ func (k Keeper) AddBurnCoin(ctx sdk.Context, coin sdk.Coin) {
 		total = total.Add(hasCoin)
 	}
 
-	bz := k.cdc.MustMarshalBinaryBare(&total)
+	bz := k.cdc.MustMarshal(&total)
 	key := types.KeyBurnTokenAmt(coin.Denom)
 
 	store := ctx.KVStore(k.storeKey)
@@ -150,7 +150,7 @@ func (k Keeper) GetBurnCoin(ctx sdk.Context, minUint string) (sdk.Coin, error) {
 	}
 
 	var coin sdk.Coin
-	k.cdc.MustUnmarshalBinaryBare(bz, &coin)
+	k.cdc.MustUnmarshal(bz, &coin)
 
 	return coin, nil
 }
@@ -163,7 +163,7 @@ func (k Keeper) GetAllBurnCoin(ctx sdk.Context) []sdk.Coin {
 	it := sdk.KVStorePrefixIterator(store, types.PeffixBurnTokenAmt)
 	for ; it.Valid(); it.Next() {
 		var coin sdk.Coin
-		k.cdc.MustUnmarshalBinaryBare(it.Value(), &coin)
+		k.cdc.MustUnmarshal(it.Value(), &coin)
 		coins = append(coins, coin)
 	}
 
@@ -185,7 +185,7 @@ func (k Keeper) SetParamSet(ctx sdk.Context, params types.Params) {
 func (k Keeper) setWithOwner(ctx sdk.Context, owner sdk.AccAddress, symbol string) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.StringValue{Value: symbol})
+	bz := k.cdc.MustMarshal(&gogotypes.StringValue{Value: symbol})
 
 	store.Set(types.KeyTokens(owner, symbol), bz)
 }
@@ -193,14 +193,14 @@ func (k Keeper) setWithOwner(ctx sdk.Context, owner sdk.AccAddress, symbol strin
 func (k Keeper) setWithMinUnit(ctx sdk.Context, minUnit, symbol string) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.StringValue{Value: symbol})
+	bz := k.cdc.MustMarshal(&gogotypes.StringValue{Value: symbol})
 
 	store.Set(types.KeyMinUint(minUnit), bz)
 }
 
 func (k Keeper) setToken(ctx sdk.Context, token types.Token) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&token)
+	bz := k.cdc.MustMarshal(&token)
 
 	store.Set(types.KeySymbol(token.Symbol), bz)
 }
@@ -213,7 +213,7 @@ func (k Keeper) getTokenBySymbol(ctx sdk.Context, symbol string) (token types.To
 		return token, sdkerrors.Wrap(types.ErrTokenNotExists, fmt.Sprintf("token symbol %s does not exist", symbol))
 	}
 
-	k.cdc.MustUnmarshalBinaryBare(bz, &token)
+	k.cdc.MustUnmarshal(bz, &token)
 	return token, nil
 }
 
@@ -226,7 +226,7 @@ func (k Keeper) getTokenByMinUnit(ctx sdk.Context, minUnit string) (token types.
 	}
 
 	var symbol gogotypes.StringValue
-	k.cdc.MustUnmarshalBinaryBare(bz, &symbol)
+	k.cdc.MustUnmarshal(bz, &symbol)
 
 	token, err = k.getTokenBySymbol(ctx, symbol.Value)
 	if err != nil {
@@ -249,5 +249,5 @@ func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, symbol string, srcOw
 
 // getTokenSupply queries the token supply from the total supply
 func (k Keeper) getTokenSupply(ctx sdk.Context, denom string) sdk.Int {
-	return k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(denom)
+	return k.bankKeeper.GetSupply(ctx, denom).Amount
 }

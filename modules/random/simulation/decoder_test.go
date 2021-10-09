@@ -17,7 +17,7 @@ import (
 )
 
 func TestDecodeStore(t *testing.T) {
-	cdc, _ := simapp.MakeCodecs()
+	cdc := simapp.MakeTestEncodingConfig().Marshaler
 	dec := simulation.NewDecodeStore(cdc)
 
 	request := types.NewRequest(50, sdk.AccAddress("consumer").String(), hex.EncodeToString([]byte("txHash")), false, nil, "")
@@ -26,8 +26,8 @@ func TestDecodeStore(t *testing.T) {
 
 	kvPairs := kv.Pairs{
 		Pairs: []kv.Pair{
-			{Key: types.KeyRandom(reqID), Value: cdc.MustMarshalBinaryBare(&random)},
-			{Key: types.KeyRandomRequestQueue(100, reqID), Value: cdc.MustMarshalBinaryBare(&request)},
+			{Key: types.KeyRandom(reqID), Value: cdc.MustMarshal(&random)},
+			{Key: types.KeyRandomRequestQueue(100, reqID), Value: cdc.MustMarshal(&request)},
 			{Key: []byte{0x30}, Value: []byte{0x50}},
 		},
 	}

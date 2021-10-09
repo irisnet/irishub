@@ -33,10 +33,10 @@ func (k Keeper) LiquidityPool(c context.Context, req *types.QueryLiquidityPoolRe
 		return nil, err
 	}
 
-	supply := k.bk.GetSupply(ctx)
 	standard := sdk.NewCoin(pool.StandardDenom, balances.AmountOf(pool.StandardDenom))
 	token := sdk.NewCoin(pool.CounterpartyDenom, balances.AmountOf(pool.CounterpartyDenom))
-	liquidity := sdk.NewCoin(pool.LptDenom, supply.GetTotal().AmountOf(pool.LptDenom))
+	liquidity := k.bk.GetSupply(ctx, pool.LptDenom)
+
 	params := k.GetParams(ctx)
 	res := types.QueryLiquidityPoolResponse{
 		Pool: types.PoolInfo{
@@ -56,7 +56,6 @@ func (k Keeper) LiquidityPools(c context.Context, req *types.QueryLiquidityPools
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
-	supply := k.bk.GetSupply(ctx).GetTotal()
 	params := k.GetParams(ctx)
 
 	var pools []types.PoolInfo
@@ -65,7 +64,7 @@ func (k Keeper) LiquidityPools(c context.Context, req *types.QueryLiquidityPools
 	nftStore := prefix.NewStore(store, []byte(types.KeyPool))
 	pageRes, err := query.Paginate(nftStore, req.Pagination, func(key []byte, value []byte) error {
 		var pool types.Pool
-		k.cdc.MustUnmarshalBinaryBare(value, &pool)
+		k.cdc.MustUnmarshal(value, &pool)
 
 		balances, err := k.GetPoolBalancesByLptDenom(ctx, pool.LptDenom)
 		if err != nil {
@@ -77,7 +76,7 @@ func (k Keeper) LiquidityPools(c context.Context, req *types.QueryLiquidityPools
 			EscrowAddress: pool.EscrowAddress,
 			Standard:      sdk.NewCoin(pool.StandardDenom, balances.AmountOf(pool.StandardDenom)),
 			Token:         sdk.NewCoin(pool.CounterpartyDenom, balances.AmountOf(pool.CounterpartyDenom)),
-			Lpt:           sdk.NewCoin(pool.LptDenom, supply.AmountOf(pool.LptDenom)),
+			Lpt:           k.bk.GetSupply(ctx, pool.LptDenom),
 			Fee:           params.Fee.String(),
 		})
 		return nil

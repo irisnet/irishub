@@ -8,13 +8,14 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/simapp/helpers"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
 	"github.com/irisnet/irismod/modules/record/types"
-	"github.com/irisnet/irismod/simapp/helpers"
+	irishelpers "github.com/irisnet/irismod/simapp/helpers"
 )
 
 // Simulation operation weights constants
@@ -25,9 +26,10 @@ const (
 // WeightedOperations returns all the operations from the module with their respective weights
 func WeightedOperations(
 	appParams simtypes.AppParams,
-	cdc codec.JSONMarshaler,
+	cdc codec.JSONCodec,
 	ak types.AccountKeeper,
-	bk types.BankKeeper) simulation.WeightedOperations {
+	bk types.BankKeeper,
+) simulation.WeightedOperations {
 	var weightCreate int
 	appParams.GetOrGenerate(
 		cdc, OpWeightMsgCreateRecord, &weightCreate, nil,
@@ -48,7 +50,9 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
 		accs []simtypes.Account, chainID string,
-	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
+	) (
+		simtypes.OperationMsg, []simtypes.FutureOperation, error,
+	) {
 
 		record, err := genRecord(r, accs)
 		if err != nil {
@@ -70,10 +74,10 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateRecord, err.Error()), nil, err
 		}
-		txGen := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, _ := helpers.GenTx(
+		txConfig := simappparams.MakeTestEncodingConfig().TxConfig
+		tx, _ := irishelpers.GenTx(
 			r,
-			txGen,
+			txConfig,
 			[]sdk.Msg{msg},
 			fees,
 			helpers.DefaultGenTxGas,
@@ -83,11 +87,11 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 			simAccount.PrivKey,
 		)
 
-		if _, _, err = app.Deliver(txGen.TxEncoder(), tx); err != nil {
+		if _, _, err = app.Deliver(txConfig.TxEncoder(), tx); err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateRecord, err.Error()), nil, err
 		}
 
-		return simtypes.NewOperationMsg(msg, true, "simulate issue token"), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "simulate issue token", nil), nil, nil
 	}
 }
 

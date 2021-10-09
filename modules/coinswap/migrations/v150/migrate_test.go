@@ -141,7 +141,7 @@ func setupWithGenesisAccounts() (*simapp.SimApp, verifyFunc) {
 		// Verify the balance of poolAddrBTC
 		{
 			srcPoolBTCBalances := app.BankKeeper.GetAllBalances(ctx, poolAddrBTC)
-			assert.Nil(t, srcPoolBTCBalances)
+			assert.True(t, srcPoolBTCBalances.IsZero())
 
 			poolBTCAddr, err := sdk.AccAddressFromBech32(btcPool.EscrowAddress)
 			assert.NoError(t, err)
@@ -153,7 +153,7 @@ func setupWithGenesisAccounts() (*simapp.SimApp, verifyFunc) {
 		// Verify the balance of poolAddrETH
 		{
 			srcPoolETHBalances := app.BankKeeper.GetAllBalances(ctx, poolAddrETH)
-			assert.Nil(t, srcPoolETHBalances)
+			assert.True(t, srcPoolETHBalances.IsZero())
 
 			poolETHAddr, err := sdk.AccAddressFromBech32(ethPool.EscrowAddress)
 			assert.NoError(t, err)

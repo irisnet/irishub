@@ -18,7 +18,7 @@ import (
 
 // Keeper of the coinswap store
 type Keeper struct {
-	cdc          codec.Marshaler
+	cdc          codec.BinaryCodec
 	storeKey     sdk.StoreKey
 	bk           types.BankKeeper
 	ak           types.AccountKeeper
@@ -31,7 +31,7 @@ type Keeper struct {
 // - burning and minting liquidity coins
 // - sending to and from ModuleAccounts
 func NewKeeper(
-	cdc codec.Marshaler,
+	cdc codec.BinaryCodec,
 	key sdk.StoreKey,
 	paramSpace paramstypes.Subspace,
 	bk types.BankKeeper,
@@ -129,7 +129,7 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.C
 
 		standardReserveAmt := balances.AmountOf(standardDenom)
 		tokenReserveAmt := balances.AmountOf(msg.MaxToken.Denom)
-		liquidity := k.bk.GetSupply(ctx).GetTotal().AmountOf(pool.LptDenom)
+		liquidity := k.bk.GetSupply(ctx, pool.LptDenom).Amount
 
 		mintLiquidityAmt = (liquidity.Mul(msg.ExactStandardAmt)).Quo(standardReserveAmt)
 		if mintLiquidityAmt.LT(msg.MinLiquidity) {
@@ -207,7 +207,7 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) 
 
 	standardReserveAmt := balances.AmountOf(standardDenom)
 	tokenReserveAmt := balances.AmountOf(minTokenDenom)
-	liquidityReserve := k.bk.GetSupply(ctx).GetTotal().AmountOf(lptDenom)
+	liquidityReserve := k.bk.GetSupply(ctx, lptDenom).Amount
 	if standardReserveAmt.LT(msg.MinStandardAmt) {
 		return nil, sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", standardDenom, msg.MinStandardAmt.String(), standardReserveAmt.String()))
 	}
@@ -289,7 +289,7 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 func (k Keeper) SetStandardDenom(ctx sdk.Context, denom string) {
 	store := ctx.KVStore(k.storeKey)
 	denomWrap := gogotypes.StringValue{Value: denom}
-	bz := k.cdc.MustMarshalBinaryBare(&denomWrap)
+	bz := k.cdc.MustMarshal(&denomWrap)
 	store.Set(types.KeyStandardDenom, bz)
 }
 
@@ -299,6 +299,6 @@ func (k Keeper) GetStandardDenom(ctx sdk.Context) string {
 	bz := store.Get(types.KeyStandardDenom)
 
 	var denomWrap = gogotypes.StringValue{}
-	k.cdc.MustUnmarshalBinaryBare(bz, &denomWrap)
+	k.cdc.MustUnmarshal(bz, &denomWrap)
 	return denomWrap.Value
 }

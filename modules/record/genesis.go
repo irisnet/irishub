@@ -26,7 +26,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	var records []types.Record
 	for ; recordsIterator.Valid(); recordsIterator.Next() {
 		var record types.Record
-		types.ModuleCdc.MustUnmarshalBinaryBare(recordsIterator.Value(), &record)
+		types.ModuleCdc.MustUnmarshal(recordsIterator.Value(), &record)
 		records = append(records, record)
 	}
 

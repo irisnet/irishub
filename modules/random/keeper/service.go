@@ -25,7 +25,7 @@ func (k Keeper) RequestService(ctx sdk.Context, consumer sdk.AccAddress, service
 	var bindings []servicetypes.ServiceBinding
 	for ; iterator.Valid(); iterator.Next() {
 		var binding servicetypes.ServiceBinding
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &binding)
+		k.cdc.MustUnmarshal(iterator.Value(), &binding)
 
 		bindings = append(bindings, binding)
 	}

@@ -8,7 +8,9 @@ import (
 )
 
 // CreatePool creates an new farm pool
-func (k Keeper) CreatePool(ctx sdk.Context, name string,
+func (k Keeper) CreatePool(
+	ctx sdk.Context,
+	name string,
 	description string,
 	lpTokenDenom string,
 	startHeight int64,
@@ -65,8 +67,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, name string,
 }
 
 // Destroy destroy an exist farm pool
-func (k Keeper) DestroyPool(ctx sdk.Context, poolName string,
-	creator sdk.AccAddress) (sdk.Coins, error) {
+func (k Keeper) DestroyPool(ctx sdk.Context, poolName string, creator sdk.AccAddress) (sdk.Coins, error) {
 	pool, exist := k.GetPool(ctx, poolName)
 	if !exist {
 		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, poolName)
@@ -93,7 +94,8 @@ func (k Keeper) DestroyPool(ctx sdk.Context, poolName string,
 }
 
 // AdjustPool adjusts farm pool parameters
-func (k Keeper) AdjustPool(ctx sdk.Context,
+func (k Keeper) AdjustPool(
+	ctx sdk.Context,
 	poolName string,
 	reward sdk.Coins,
 	rewardPerBlock sdk.Coins,
@@ -171,8 +173,7 @@ func (k Keeper) AdjustPool(ctx sdk.Context,
 
 	//expiredHeight = [(srcEndHeight-curHeight)*srcRewardPerBlock +appendReward]/RewardPerBlock + curHeight
 	rewardsPerBlock := types.RewardRules(pool.Rules).RewardsPerBlock()
-	availableHeight := availableReward[0].Amount.
-		Quo(rewardsPerBlock.AmountOf(availableReward[0].Denom)).Int64()
+	availableHeight := availableReward[0].Amount.Quo(rewardsPerBlock.AmountOf(availableReward[0].Denom)).Int64()
 	for _, c := range availableReward[1:] {
 		rpb := rewardsPerBlock.AmountOf(c.Denom)
 		inteval := c.Amount.Quo(rpb).Int64()
@@ -200,17 +201,18 @@ func (k Keeper) AdjustPool(ctx sdk.Context,
 // Note that when multiple transactions at the same block height trigger the farm pool update at the same time, only the first transaction will trigger the `RewardPerShare` update operation
 
 // updatePool returns the updated farm pool and the reward collected in this period
-func (k Keeper) updatePool(ctx sdk.Context,
+func (k Keeper) updatePool(
+	ctx sdk.Context,
 	pool types.FarmPool,
 	amount sdk.Int,
 	isDestroy bool,
 ) (types.FarmPool, sdk.Coins, error) {
 	height := ctx.BlockHeight()
 	if height < pool.LastHeightDistrRewards {
-		return pool, nil, sdkerrors.Wrapf(types.ErrExpiredHeight,
+		return pool, nil, sdkerrors.Wrapf(
+			types.ErrExpiredHeight,
 			"invalid height: [%d], last distribution height: [%d]",
-			height,
-			pool.LastHeightDistrRewards,
+			height, pool.LastHeightDistrRewards,
 		)
 	}
 
@@ -227,20 +229,19 @@ func (k Keeper) updatePool(ctx sdk.Context,
 			rewardCollected := rules[i].RewardPerBlock.MulRaw(int64(blockInterval))
 			coinCollected := sdk.NewCoin(rules[i].Reward, rewardCollected)
 			if rules[i].RemainingReward.LT(rewardCollected) {
-				k.Logger(ctx).Error("The remaining amount is not enough to pay the bonus",
+				k.Logger(ctx).Error(
+					"The remaining amount is not enough to pay the bonus",
 					"poolName", pool.Name,
 					"remainingReward", rules[i].RemainingReward.String(),
 					"rewardCollected", rewardCollected.String(),
 				)
-				return pool, nil, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
+				return pool, nil, sdkerrors.Wrapf(
+					sdkerrors.ErrInsufficientFunds,
 					"the remaining reward of the pool [%s] is [%s], but got [%s]",
-					pool.Name,
-					sdk.NewCoin(rules[i].Reward, rules[i].RemainingReward).String(),
-					coinCollected,
+					pool.Name, sdk.NewCoin(rules[i].Reward, rules[i].RemainingReward).String(), coinCollected,
 				)
 			}
-			newRewardPerShare := sdk.NewDecFromInt(rewardCollected).
-				QuoInt(pool.TotalLptLocked.Amount)
+			newRewardPerShare := sdk.NewDecFromInt(rewardCollected).QuoInt(pool.TotalLptLocked.Amount)
 			rules[i].RewardPerShare = rules[i].RewardPerShare.Add(newRewardPerShare)
 			rules[i].RemainingReward = rules[i].RemainingReward.Sub(rewardCollected)
 
@@ -251,8 +252,7 @@ func (k Keeper) updatePool(ctx sdk.Context,
 
 	//escrow the collected rewards to the `RewardCollector` account
 	if rewardTotal.IsAllPositive() {
-		if err := k.bk.SendCoinsFromModuleToModule(ctx,
-			types.ModuleName, types.RewardCollector, rewardTotal); err != nil {
+		if err := k.bk.SendCoinsFromModuleToModule(ctx, types.ModuleName, types.RewardCollector, rewardTotal); err != nil {
 			return pool, rewardTotal, err
 		}
 	}

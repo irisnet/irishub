@@ -14,7 +14,7 @@ func (k Keeper) GetFarmInfo(ctx sdk.Context, poolName, address string) (info typ
 		return info, false
 	}
 
-	k.cdc.MustUnmarshalBinaryBare(bz, &info)
+	k.cdc.MustUnmarshal(bz, &info)
 	return info, true
 }
 
@@ -24,7 +24,7 @@ func (k Keeper) IteratorFarmInfo(ctx sdk.Context, address string, fun func(farme
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var farmer types.FarmInfo
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &farmer)
+		k.cdc.MustUnmarshal(iterator.Value(), &farmer)
 		fun(farmer)
 	}
 }
@@ -35,7 +35,7 @@ func (k Keeper) IteratorAllFarmInfo(ctx sdk.Context, fun func(farmer types.FarmI
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var farmer types.FarmInfo
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &farmer)
+		k.cdc.MustUnmarshal(iterator.Value(), &farmer)
 		fun(farmer)
 	}
 }
@@ -43,7 +43,7 @@ func (k Keeper) IteratorAllFarmInfo(ctx sdk.Context, fun func(farmer types.FarmI
 // SetFarmer save the farmer information
 func (k Keeper) SetFarmInfo(ctx sdk.Context, farmer types.FarmInfo) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&farmer)
+	bz := k.cdc.MustMarshal(&farmer)
 	store.Set(types.KeyFarmInfo(farmer.Address, farmer.PoolName), bz)
 }
 

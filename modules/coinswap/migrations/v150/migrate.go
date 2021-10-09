@@ -15,11 +15,12 @@ import (
 func Migrate(ctx sdk.Context, k coinswapkeeper.Keeper, bk bankkeeper.Keeper, ak authkeeper.AccountKeeper) error {
 	// 1. Query all current liquidity tokens
 	var lptDenoms []string
-	for _, coin := range bk.GetSupply(ctx).GetTotal() {
+	bk.IterateTotalSupply(ctx, func(coin sdk.Coin) bool {
 		if strings.HasPrefix(coin.GetDenom(), FormatUniABSPrefix) {
 			lptDenoms = append(lptDenoms, coin.GetDenom())
 		}
-	}
+		return false
+	})
 
 	// 2. Create a new liquidity pool based on the results of the first step
 	standardDenom := k.GetStandardDenom(ctx)
@@ -28,8 +29,7 @@ func Migrate(ctx sdk.Context, k coinswapkeeper.Keeper, bk bankkeeper.Keeper, ak 
 		counterpartyDenom := strings.TrimPrefix(ltpDenom, FormatUniABSPrefix)
 		pools[ltpDenom] = k.CreatePool(ctx, counterpartyDenom)
 		//3. Transfer tokens from the old liquidity to the newly created liquidity pool
-		err := migratePool(ctx, bk, pools[ltpDenom], ltpDenom, standardDenom)
-		if err != nil {
+		if err := migratePool(ctx, bk, pools[ltpDenom], ltpDenom, standardDenom); err != nil {
 			return err
 		}
 	}
@@ -76,10 +76,8 @@ func migrateProvider(ctx sdk.Context,
 	if err := bk.MintCoins(ctx, coinswaptypes.ModuleName, mintTokens); err != nil {
 		return err
 	}
-	if err := bk.SendCoinsFromModuleToAccount(ctx, coinswaptypes.ModuleName, provider, mintTokens); err != nil {
-		return err
-	}
-	return nil
+
+	return bk.SendCoinsFromModuleToAccount(ctx, coinswaptypes.ModuleName, provider, mintTokens)
 }
 
 func migratePool(ctx sdk.Context,
@@ -102,9 +100,5 @@ func migratePool(ctx sdk.Context,
 		return err
 	}
 
-	err = bk.SendCoins(ctx, originPoolAddress, dstPoolAddress, transferCoins)
-	if err != nil {
-		return err
-	}
-	return nil
+	return bk.SendCoins(ctx, originPoolAddress, dstPoolAddress, transferCoins)
 }

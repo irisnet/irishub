@@ -88,7 +88,7 @@ func (s *IntegrationTestSuite) TestRest() {
 		args...,
 	)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -111,7 +111,7 @@ func (s *IntegrationTestSuite) TestRest() {
 	resp, err := rest.GetRequest(queryPoolURL)
 
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
 	result := respType.(*farmtypes.QueryFarmPoolsResponse)
 	s.Require().EqualValues(expectedContents, *result.Pools[0])
 
@@ -127,7 +127,7 @@ func (s *IntegrationTestSuite) TestRest() {
 		globalFlags...,
 	)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -141,7 +141,7 @@ func (s *IntegrationTestSuite) TestRest() {
 	queryFarmInfoURL := fmt.Sprintf("%s/irismod/farm/farmers/%s", baseURL, creator.String())
 	resp, err = rest.GetRequest(queryFarmInfoURL)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryFarmerRespType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, queryFarmerRespType))
 	farmer := queryFarmerRespType.(*farmtypes.QueryFarmerResponse)
 	s.Require().EqualValues(expectFarmer, *farmer.List[0])
 }

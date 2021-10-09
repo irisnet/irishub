@@ -92,7 +92,7 @@ func (s *IntegrationTestSuite) TestRandom() {
 	expectedCode := uint32(0)
 	bz, err := servicetestutil.BindServiceExec(clientCtx, provider.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -112,7 +112,7 @@ func (s *IntegrationTestSuite) TestRandom() {
 
 	bz, err = randomtestutil.RequestRandomExec(clientCtx, from.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 	requestID := gjson.Get(txResp.RawLog, "0.events.1.attributes.0.value").String()
@@ -123,7 +123,7 @@ func (s *IntegrationTestSuite) TestRandom() {
 	resp, err := rest.GetRequest(url)
 	respType = proto.Message(&randomtypes.QueryRandomRequestQueueResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
 	qrrResp := respType.(*randomtypes.QueryRandomRequestQueueResponse)
 	s.Require().NoError(err)
 	s.Require().Len(qrrResp.Requests, 1)
@@ -173,7 +173,7 @@ func (s *IntegrationTestSuite) TestRandom() {
 	bz, err = servicetestutil.RespondServiceExec(clientCtx, provider.String(), args...)
 
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -182,7 +182,7 @@ func (s *IntegrationTestSuite) TestRandom() {
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&randomtypes.QueryRandomResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
 	randomResp := respType.(*randomtypes.QueryRandomResponse)
 	s.Require().NoError(err)
 	s.Require().NotNil(randomResp.Random.Value)

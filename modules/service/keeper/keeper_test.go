@@ -9,13 +9,14 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/tidwall/gjson"
 
+	v040 "github.com/cosmos/cosmos-sdk/x/auth/legacy/v040"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 
 	"github.com/irisnet/irismod/modules/service/keeper"
 	"github.com/irisnet/irismod/modules/service/types"
@@ -73,7 +74,7 @@ var (
 type KeeperTestSuite struct {
 	suite.Suite
 
-	cdc    codec.Marshaler
+	cdc    codec.Codec
 	ctx    sdk.Context
 	keeper *keeper.Keeper
 	app    *simapp.SimApp
@@ -107,11 +108,18 @@ func (suite *KeeperTestSuite) setTestAddrs() {
 	testConsumer = testAddrs[4]
 }
 
-func (suite *KeeperTestSuite) addCoins(addr sdk.AccAddress, coins sdk.Coins) {
-	supply := suite.app.BankKeeper.GetSupply(suite.ctx)
-	suite.app.BankKeeper.SetSupply(suite.ctx, banktypes.NewSupply(supply.GetTotal().Add(coins...)))
+func (suite *KeeperTestSuite) addCoinsToAddr(addr sdk.AccAddress, coins sdk.Coins) {
+	err := suite.app.BankKeeper.MintCoins(suite.ctx, minttypes.ModuleName, coins)
+	suite.NoError(err)
+	err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, minttypes.ModuleName, addr, coins)
+	suite.NoError(err)
+}
 
-	suite.app.BankKeeper.AddCoins(suite.ctx, addr, coins)
+func (suite *KeeperTestSuite) addCoinsToModule(name string, coins sdk.Coins) {
+	err := suite.app.BankKeeper.MintCoins(suite.ctx, minttypes.ModuleName, coins)
+	suite.NoError(err)
+	err = suite.app.BankKeeper.SendCoinsFromModuleToModule(suite.ctx, minttypes.ModuleName, name, coins)
+	suite.NoError(err)
 }
 
 func (suite *KeeperTestSuite) setServiceDefinition() {
@@ -178,7 +186,7 @@ func (suite *KeeperTestSuite) TestBindService() {
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		suite.Equal(testProvider, sdk.AccAddress(iterator.Key()[sdk.AddrLen+1:]))
+		suite.Equal(testProvider, sdk.AccAddress(iterator.Key()[v040.AddrLen+1:]))
 	}
 
 	// update binding
@@ -243,15 +251,13 @@ func (suite *KeeperTestSuite) TestEnableServiceBinding() {
 func (suite *KeeperTestSuite) TestRefundDeposit() {
 	disabledTime := time.Now().UTC()
 	suite.setServiceBinding(false, disabledTime, testProvider, testOwner)
-
-	err := suite.app.BankKeeper.AddCoins(suite.ctx, suite.keeper.GetServiceDepositAccount(suite.ctx).GetAddress(), testDeposit)
-	suite.NoError(err)
+	suite.addCoinsToModule(types.DepositAccName, testDeposit)
 
 	params := suite.keeper.GetParams(suite.ctx)
 	blockTime := disabledTime.Add(params.ArbitrationTimeLimit).Add(params.ComplaintRetrospect)
 	suite.ctx = suite.ctx.WithBlockTime(blockTime)
 
-	err = suite.keeper.RefundDeposit(suite.ctx, testServiceName, testProvider, testOwner)
+	err := suite.keeper.RefundDeposit(suite.ctx, testServiceName, testProvider, testOwner)
 	suite.NoError(err)
 
 	svcBinding, found := suite.keeper.GetServiceBinding(suite.ctx, testServiceName, testProvider)
@@ -401,7 +407,7 @@ func (suite *KeeperTestSuite) TestKeeperRequestService() {
 
 	for ; iterator.Valid(); iterator.Next() {
 		var requestID gogotypes.BytesValue
-		suite.cdc.MustUnmarshalBinaryBare(iterator.Value(), &requestID)
+		suite.cdc.MustUnmarshal(iterator.Value(), &requestID)
 
 		request, found := suite.keeper.GetRequest(ctx, requestID.Value)
 		suite.True(found)
@@ -419,7 +425,7 @@ func (suite *KeeperTestSuite) TestKeeperRequestService() {
 	var requestProviders []sdk.AccAddress
 	for ; iterator.Valid(); iterator.Next() {
 		var requestIDBz gogotypes.BytesValue
-		suite.cdc.MustUnmarshalBinaryBare(iterator.Value(), &requestIDBz)
+		suite.cdc.MustUnmarshal(iterator.Value(), &requestIDBz)
 
 		requestID := requestIDBz.Value
 		request, found := suite.keeper.GetRequest(ctx, requestID)
@@ -471,7 +477,7 @@ func (suite *KeeperTestSuite) TestKeeperRespondService() {
 	requestContext.BatchCounter++
 	suite.keeper.SetRequestContext(ctx, requestContextID, requestContext)
 
-	suite.addCoins(consumer, testServiceFee2)
+	suite.addCoinsToAddr(consumer, testServiceFee2)
 
 	requestID1 := suite.setRequest(ctx, consumer, provider, requestContextID, testServiceFee)
 	requestID2 := suite.setRequest(ctx, consumer, provider, requestContextID, testServiceFee)
@@ -618,48 +624,54 @@ func (suite *KeeperTestSuite) TestGetMinDeposit() {
 	suite.NoError(err)
 
 	minDeposit, err := suite.keeper.GetMinDeposit(suite.ctx, pricing)
+	suite.NoError(err)
 	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000))), minDeposit)
 
 	pricing1, err := types.ParsePricing(testPricing1)
 	suite.NoError(err)
 
 	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing1)
+	suite.NoError(err)
 	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(50000))), minDeposit)
 
 	pricing2, err := types.ParsePricing(testPricing2)
 	suite.NoError(err)
 
 	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing2)
+	suite.NoError(err)
 	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000))), minDeposit)
 
 	pricing3, err := types.ParsePricing(testPricing3)
 	suite.NoError(err)
 
 	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing3)
+	suite.NoError(err)
 	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(0))), minDeposit)
 
 	pricing4, err := types.ParsePricing(testPricing4)
 	suite.NoError(err)
 
-	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing4)
+	_, err = suite.keeper.GetMinDeposit(suite.ctx, pricing4)
 	suite.NotNil(err, "should error when the exchange rate is zero")
 
 	pricing5, err := types.ParsePricing(testPricing5)
 	suite.NoError(err)
 
-	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing5)
+	_, err = suite.keeper.GetMinDeposit(suite.ctx, pricing5)
 	suite.NotNil(err, "should error when the feed does not exist")
 
 	pricing6, err := types.ParsePricing(testPricing6)
 	suite.NoError(err)
 
 	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing6)
+	suite.NoError(err)
 	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(500000))), minDeposit)
 
 	pricing7, err := types.ParsePricing(testPricing7)
 	suite.NoError(err)
 
 	minDeposit, err = suite.keeper.GetMinDeposit(suite.ctx, pricing7)
+	suite.NoError(err)
 	suite.Equal(sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000))), minDeposit)
 }
 

@@ -14,7 +14,8 @@ import (
 // on the simulation
 func ParamChanges(r *rand.Rand) []simtypes.ParamChange {
 	return []simtypes.ParamChange{
-		simulation.NewSimParamChange(types.ModuleName, string(types.KeyFee),
+		simulation.NewSimParamChange(
+			types.ModuleName, string(types.KeyFee),
 			func(r *rand.Rand) string {
 				return sdk.NewDecWithPrec(r.Int63n(3), 3).String() // 0.1%~0.3%
 			},

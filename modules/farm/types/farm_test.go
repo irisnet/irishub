@@ -17,43 +17,40 @@ func TestFarmPool_ExpiredHeight(t *testing.T) {
 		name   string
 		fields fields
 		want   int64
-	}{
-		{
-			name: "test case 1",
-			fields: fields{
-				Name:        "pool_1",
-				BeginHeight: 100,
-				Rules: []RewardRule{
-					{
-						Reward:         sdk.DefaultBondDenom,
-						TotalReward:    sdk.NewInt(10000),
-						RewardPerBlock: sdk.NewInt(100),
-					},
-					{
-						Reward:         sdk.DefaultBondDenom,
-						TotalReward:    sdk.NewInt(100000),
-						RewardPerBlock: sdk.NewInt(100),
-					},
+	}{{
+		name: "test case 1",
+		fields: fields{
+			Name:        "pool_1",
+			BeginHeight: 100,
+			Rules: []RewardRule{
+				{
+					Reward:         sdk.DefaultBondDenom,
+					TotalReward:    sdk.NewInt(10000),
+					RewardPerBlock: sdk.NewInt(100),
+				},
+				{
+					Reward:         sdk.DefaultBondDenom,
+					TotalReward:    sdk.NewInt(100000),
+					RewardPerBlock: sdk.NewInt(100),
 				},
 			},
-			want: 200,
 		},
-		{
-			name: "test case 2",
-			fields: fields{
-				Name:        "pool_2",
-				BeginHeight: 10,
-				Rules: []RewardRule{
-					{
-						Reward:         sdk.DefaultBondDenom,
-						TotalReward:    sdk.NewInt(10000),
-						RewardPerBlock: sdk.NewInt(100),
-					},
+		want: 200,
+	}, {
+		name: "test case 2",
+		fields: fields{
+			Name:        "pool_2",
+			BeginHeight: 10,
+			Rules: []RewardRule{
+				{
+					Reward:         sdk.DefaultBondDenom,
+					TotalReward:    sdk.NewInt(10000),
+					RewardPerBlock: sdk.NewInt(100),
 				},
 			},
-			want: 110,
 		},
-	}
+		want: 110,
+	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fp := FarmPool{
@@ -83,71 +80,68 @@ func TestFarmPool_CaclRewards(t *testing.T) {
 		args           args
 		wantRewards    sdk.Coins
 		wantDewardDebt sdk.Coins
-	}{
-		{
-			name: "test case 1",
-			fields: fields{
-				Rules: []RewardRule{
-					{
-						Reward:         sdk.DefaultBondDenom,
-						RewardPerShare: sdk.NewDec(100),
-					},
-					{
-						Reward:         "uiris",
-						RewardPerShare: sdk.NewDecWithPrec(1, 1),
-					},
+	}{{
+		name: "test case 1",
+		fields: fields{
+			Rules: []RewardRule{
+				{
+					Reward:         sdk.DefaultBondDenom,
+					RewardPerShare: sdk.NewDec(100),
+				},
+				{
+					Reward:         "uiris",
+					RewardPerShare: sdk.NewDecWithPrec(1, 1),
 				},
 			},
-			args: args{
-				farmInfo: FarmInfo{
-					Locked:     sdk.NewInt(10),
-					RewardDebt: []sdk.Coin{},
-				},
-				deltaAmt: sdk.NewInt(10),
-			},
-			wantRewards: sdk.NewCoins(
-				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1000)),
-				sdk.NewCoin("uiris", sdk.NewInt(1)),
-			),
-			wantDewardDebt: sdk.NewCoins(
-				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(2000)),
-				sdk.NewCoin("uiris", sdk.NewInt(2)),
-			),
 		},
-		{
-			name: "test case 2",
-			fields: fields{
-				Rules: []RewardRule{
-					{
-						Reward:         sdk.DefaultBondDenom,
-						RewardPerShare: sdk.NewDec(100),
-					},
-					{
-						Reward:         "uiris",
-						RewardPerShare: sdk.NewDecWithPrec(10, 1),
-					},
-				},
+		args: args{
+			farmInfo: FarmInfo{
+				Locked:     sdk.NewInt(10),
+				RewardDebt: []sdk.Coin{},
 			},
-			args: args{
-				farmInfo: FarmInfo{
-					Locked: sdk.NewInt(10),
-					RewardDebt: sdk.NewCoins(
-						sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(500)),
-						sdk.NewCoin("uiris", sdk.NewInt(5)),
-					),
-				},
-				deltaAmt: sdk.NewInt(10),
-			},
-			wantRewards: sdk.NewCoins(
-				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(500)),
-				sdk.NewCoin("uiris", sdk.NewInt(5)),
-			),
-			wantDewardDebt: sdk.NewCoins(
-				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(2000)),
-				sdk.NewCoin("uiris", sdk.NewInt(20)),
-			),
+			deltaAmt: sdk.NewInt(10),
 		},
-	}
+		wantRewards: sdk.NewCoins(
+			sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1000)),
+			sdk.NewCoin("uiris", sdk.NewInt(1)),
+		),
+		wantDewardDebt: sdk.NewCoins(
+			sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(2000)),
+			sdk.NewCoin("uiris", sdk.NewInt(2)),
+		),
+	}, {
+		name: "test case 2",
+		fields: fields{
+			Rules: []RewardRule{
+				{
+					Reward:         sdk.DefaultBondDenom,
+					RewardPerShare: sdk.NewDec(100),
+				},
+				{
+					Reward:         "uiris",
+					RewardPerShare: sdk.NewDecWithPrec(10, 1),
+				},
+			},
+		},
+		args: args{
+			farmInfo: FarmInfo{
+				Locked: sdk.NewInt(10),
+				RewardDebt: sdk.NewCoins(
+					sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(500)),
+					sdk.NewCoin("uiris", sdk.NewInt(5)),
+				),
+			},
+			deltaAmt: sdk.NewInt(10),
+		},
+		wantRewards: sdk.NewCoins(
+			sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(500)),
+			sdk.NewCoin("uiris", sdk.NewInt(5)),
+		),
+		wantDewardDebt: sdk.NewCoins(
+			sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(2000)),
+			sdk.NewCoin("uiris", sdk.NewInt(20)),
+		),
+	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fp := FarmPool{

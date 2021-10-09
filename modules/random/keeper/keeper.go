@@ -14,14 +14,14 @@ import (
 
 // Keeper defines the random module Keeper
 type Keeper struct {
-	cdc           codec.Marshaler
+	cdc           codec.Codec
 	storeKey      sdk.StoreKey
 	bankKeeper    types.BankKeeper
 	serviceKeeper types.ServiceKeeper
 }
 
 // NewKeeper returns a new random keeper
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, bankKeeper types.BankKeeper, serviceKeeper types.ServiceKeeper) Keeper {
+func NewKeeper(cdc codec.Codec, key sdk.StoreKey, bankKeeper types.BankKeeper, serviceKeeper types.ServiceKeeper) Keeper {
 	keeper := Keeper{
 		cdc:           cdc,
 		storeKey:      key,
@@ -40,7 +40,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 // GetCdc returns the cdc
-func (k Keeper) GetCdc() codec.Marshaler {
+func (k Keeper) GetCdc() codec.BinaryCodec {
 	return k.cdc
 }
 
@@ -83,14 +83,14 @@ func (k Keeper) RequestRandom(
 // SetRandom stores the random number
 func (k Keeper) SetRandom(ctx sdk.Context, reqID []byte, random types.Random) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&random)
+	bz := k.cdc.MustMarshal(&random)
 	store.Set(types.KeyRandom(reqID), bz)
 }
 
 // EnqueueRandomRequest enqueues the random number request
 func (k Keeper) EnqueueRandomRequest(ctx sdk.Context, height int64, reqID []byte, request types.Request) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&request)
+	bz := k.cdc.MustMarshal(&request)
 	store.Set(types.KeyRandomRequestQueue(height, reqID), bz)
 }
 
@@ -103,7 +103,7 @@ func (k Keeper) DequeueRandomRequest(ctx sdk.Context, height int64, reqID []byte
 // SetOracleRandRequest stores the oracle random number request
 func (k Keeper) SetOracleRandRequest(ctx sdk.Context, requestContextID []byte, request types.Request) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&request)
+	bz := k.cdc.MustMarshal(&request)
 	store.Set(types.KeyOracleRandomRequest(requestContextID), bz)
 }
 
@@ -117,7 +117,7 @@ func (k Keeper) GetOracleRandRequest(ctx sdk.Context, requestContextID []byte) (
 	}
 
 	var request types.Request
-	k.cdc.MustUnmarshalBinaryBare(bz, &request)
+	k.cdc.MustUnmarshal(bz, &request)
 
 	return request, nil
 }
@@ -138,7 +138,7 @@ func (k Keeper) GetRandom(ctx sdk.Context, reqID []byte) (types.Random, error) {
 	}
 
 	var random types.Random
-	k.cdc.MustUnmarshalBinaryBare(bz, &random)
+	k.cdc.MustUnmarshal(bz, &random)
 
 	return random, nil
 }
@@ -152,7 +152,7 @@ func (k Keeper) IterateRandoms(ctx sdk.Context, op func(r types.Random) (stop bo
 
 	for ; iterator.Valid(); iterator.Next() {
 		var random types.Random
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &random)
+		k.cdc.MustUnmarshal(iterator.Value(), &random)
 
 		if stop := op(random); stop {
 			break
@@ -178,7 +178,7 @@ func (k Keeper) IterateRandomRequestQueue(ctx sdk.Context, op func(h int64, reqI
 		reqID := iterator.Key()[9:]
 
 		var request types.Request
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &request)
+		k.cdc.MustUnmarshal(iterator.Value(), &request)
 
 		if stop := op(int64(height), reqID, request); stop {
 			break

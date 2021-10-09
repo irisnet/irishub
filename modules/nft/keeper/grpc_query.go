@@ -100,7 +100,7 @@ func (k Keeper) Denoms(c context.Context, req *types.QueryDenomsRequest) (*types
 	denomStore := prefix.NewStore(store, types.KeyDenomID(""))
 	pageRes, err := query.Paginate(denomStore, req.Pagination, func(key []byte, value []byte) error {
 		var denom types.Denom
-		k.cdc.MustUnmarshalBinaryBare(value, &denom)
+		k.cdc.MustUnmarshal(value, &denom)
 		denoms = append(denoms, denom)
 		return nil
 	})

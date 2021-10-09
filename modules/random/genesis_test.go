@@ -31,7 +31,7 @@ var (
 type GenesisTestSuite struct {
 	suite.Suite
 
-	cdc    codec.JSONMarshaler
+	cdc    codec.JSONCodec
 	ctx    sdk.Context
 	keeper keeper.Keeper
 }

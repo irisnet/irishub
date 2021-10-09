@@ -328,7 +328,7 @@ func (k Keeper) KillRequestContext(
 func (k Keeper) SetRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes, requestContext types.RequestContext) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&requestContext)
+	bz := k.cdc.MustMarshal(&requestContext)
 	store.Set(types.GetRequestContextKey(requestContextID), bz)
 }
 
@@ -348,7 +348,7 @@ func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID tmbytes.HexB
 		return requestContext, false
 	}
 
-	k.cdc.MustUnmarshalBinaryBare(bz, &requestContext)
+	k.cdc.MustUnmarshal(bz, &requestContext)
 	return requestContext, true
 }
 
@@ -366,7 +366,7 @@ func (k Keeper) IterateRequestContexts(
 		requestContextID := iterator.Key()[1:]
 
 		var requestContext types.RequestContext
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &requestContext)
+		k.cdc.MustUnmarshal(iterator.Value(), &requestContext)
 
 		if stop := op(requestContextID, requestContext); stop {
 			break
@@ -476,7 +476,7 @@ func (k Keeper) buildRequest(
 func (k Keeper) SetCompactRequest(ctx sdk.Context, requestID tmbytes.HexBytes, request types.CompactRequest) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&request)
+	bz := k.cdc.MustMarshal(&request)
 	store.Set(types.GetRequestKey(requestID), bz)
 }
 
@@ -489,7 +489,7 @@ func (k Keeper) GetCompactRequest(ctx sdk.Context, requestID tmbytes.HexBytes) (
 		return request, false
 	}
 
-	k.cdc.MustUnmarshalBinaryBare(bz, &request)
+	k.cdc.MustUnmarshal(bz, &request)
 	return request, true
 }
 
@@ -555,7 +555,7 @@ func (k Keeper) IterateRequests(
 		requestID := iterator.Key()[1:]
 
 		var request types.CompactRequest
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &request)
+		k.cdc.MustUnmarshal(iterator.Value(), &request)
 
 		if stop := op(requestID, request); stop {
 			break
@@ -603,7 +603,7 @@ func (k Keeper) AddActiveRequestByBinding(
 ) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.BytesValue{Value: requestID})
+	bz := k.cdc.MustMarshal(&gogotypes.BytesValue{Value: requestID})
 	store.Set(types.GetActiveRequestKey(serviceName, provider, expirationHeight, requestID), bz)
 }
 
@@ -623,7 +623,7 @@ func (k Keeper) DeleteActiveRequestByBinding(
 func (k Keeper) AddActiveRequestByID(ctx sdk.Context, requestID tmbytes.HexBytes) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.BytesValue{Value: requestID})
+	bz := k.cdc.MustMarshal(&gogotypes.BytesValue{Value: requestID})
 	store.Set(types.GetActiveRequestKeyByID(requestID), bz)
 }
 
@@ -643,7 +643,7 @@ func (k Keeper) IsRequestActive(ctx sdk.Context, requestID tmbytes.HexBytes) boo
 func (k Keeper) AddRequestBatchExpiration(ctx sdk.Context, requestContextID tmbytes.HexBytes, expirationHeight int64) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.BytesValue{Value: requestContextID})
+	bz := k.cdc.MustMarshal(&gogotypes.BytesValue{Value: requestContextID})
 	store.Set(types.GetExpiredRequestBatchKey(requestContextID, expirationHeight), bz)
 
 	k.SetRequestBatchExpirationHeight(ctx, requestContextID, expirationHeight)
@@ -667,7 +667,7 @@ func (k Keeper) HasRequestBatchExpiration(ctx sdk.Context, requestContextID tmby
 func (k Keeper) AddNewRequestBatch(ctx sdk.Context, requestContextID tmbytes.HexBytes, requestBatchHeight int64) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.BytesValue{Value: requestContextID})
+	bz := k.cdc.MustMarshal(&gogotypes.BytesValue{Value: requestContextID})
 	store.Set(types.GetNewRequestBatchKey(requestContextID, requestBatchHeight), bz)
 
 	k.SetNewRequestBatchHeight(ctx, requestContextID, requestBatchHeight)
@@ -691,7 +691,7 @@ func (k Keeper) HasNewRequestBatch(ctx sdk.Context, requestContextID tmbytes.Hex
 func (k Keeper) SetRequestBatchExpirationHeight(ctx sdk.Context, requestContextID tmbytes.HexBytes, expirationHeight int64) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.Int64Value{Value: expirationHeight})
+	bz := k.cdc.MustMarshal(&gogotypes.Int64Value{Value: expirationHeight})
 	store.Set(types.GetExpiredRequestBatchHeightKey(requestContextID), bz)
 }
 
@@ -705,7 +705,7 @@ func (k Keeper) DeleteRequestBatchExpirationHeight(ctx sdk.Context, requestConte
 func (k Keeper) SetNewRequestBatchHeight(ctx sdk.Context, requestContextID tmbytes.HexBytes, requestBatchHeight int64) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.Int64Value{Value: requestBatchHeight})
+	bz := k.cdc.MustMarshal(&gogotypes.Int64Value{Value: requestBatchHeight})
 	store.Set(types.GetNewRequestBatchHeightKey(requestContextID), bz)
 }
 
@@ -728,7 +728,7 @@ func (k Keeper) IterateExpiredRequestBatch(
 
 	for ; iterator.Valid(); iterator.Next() {
 		var requestContextID gogotypes.BytesValue
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &requestContextID)
+		k.cdc.MustUnmarshal(iterator.Value(), &requestContextID)
 
 		requestContext, _ := k.GetRequestContext(ctx, requestContextID.Value)
 
@@ -749,7 +749,7 @@ func (k Keeper) IterateNewRequestBatch(
 
 	for ; iterator.Valid(); iterator.Next() {
 		var requestContextID gogotypes.BytesValue
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &requestContextID)
+		k.cdc.MustUnmarshal(iterator.Value(), &requestContextID)
 
 		requestContext, _ := k.GetRequestContext(ctx, requestContextID.Value)
 
@@ -786,7 +786,7 @@ func (k Keeper) IterateActiveRequests(
 
 	for ; iterator.Valid(); iterator.Next() {
 		var requestID gogotypes.BytesValue
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &requestID)
+		k.cdc.MustUnmarshal(iterator.Value(), &requestID)
 
 		request, _ := k.GetRequest(ctx, requestID.Value)
 
@@ -944,7 +944,7 @@ func (k Keeper) Callback(ctx sdk.Context, requestContextID tmbytes.HexBytes) {
 func (k Keeper) SetResponse(ctx sdk.Context, requestID tmbytes.HexBytes, response types.Response) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&response)
+	bz := k.cdc.MustMarshal(&response)
 	store.Set(types.GetResponseKey(requestID), bz)
 }
 
@@ -957,7 +957,7 @@ func (k Keeper) GetResponse(ctx sdk.Context, requestID tmbytes.HexBytes) (respon
 		return response, false
 	}
 
-	k.cdc.MustUnmarshalBinaryBare(bz, &response)
+	k.cdc.MustUnmarshal(bz, &response)
 	return response, true
 }
 
@@ -982,7 +982,7 @@ func (k Keeper) IterateResponses(
 		requestID := iterator.Key()[1:]
 
 		var response types.Response
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &response)
+		k.cdc.MustUnmarshal(iterator.Value(), &response)
 
 		if stop := op(requestID, response); stop {
 			break
@@ -1004,7 +1004,7 @@ func (k Keeper) GetResponseOutputs(ctx sdk.Context, requestContextID tmbytes.Hex
 	var outputs []string
 	for ; iterator.Valid(); iterator.Next() {
 		var response types.Response
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &response)
+		k.cdc.MustUnmarshal(iterator.Value(), &response)
 
 		if len(response.Output) > 0 {
 			outputs = append(outputs, response.Output)
@@ -1035,7 +1035,7 @@ func (k Keeper) SetRequestVolume(
 ) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.UInt64Value{Value: volume})
+	bz := k.cdc.MustMarshal(&gogotypes.UInt64Value{Value: volume})
 	store.Set(types.GetRequestVolumeKey(consumer, serviceName, provider), bz)
 }
 
@@ -1054,7 +1054,7 @@ func (k Keeper) GetRequestVolume(
 	}
 
 	var volume gogotypes.UInt64Value
-	k.cdc.MustUnmarshalBinaryBare(bz, &volume)
+	k.cdc.MustUnmarshal(bz, &volume)
 
 	return volume.Value
 }
@@ -1186,7 +1186,7 @@ func TxHash(ctx sdk.Context) []byte {
 func (k Keeper) SetInternalIndex(ctx sdk.Context, index int64) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.Int64Value{
+	bz := k.cdc.MustMarshal(&gogotypes.Int64Value{
 		Value: index,
 	})
 	store.Set(types.InternalCounterKey, bz)
@@ -1201,7 +1201,7 @@ func (k Keeper) GetInternalIndex(ctx sdk.Context) int64 {
 	}
 
 	var index gogotypes.Int64Value
-	k.cdc.MustUnmarshalBinaryBare(bz, &index)
+	k.cdc.MustUnmarshal(bz, &index)
 	k.SetInternalIndex(ctx, index.Value+1)
 	return index.Value
 }

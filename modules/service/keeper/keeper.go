@@ -15,29 +15,21 @@ import (
 
 // Keeper defines the service keeper
 type Keeper struct {
-	storeKey sdk.StoreKey
-	cdc      codec.Marshaler
-
-	accountKeeper types.AccountKeeper
-	bankKeeper    types.BankKeeper
-	paramSpace    paramstypes.Subspace
-	blockedAddrs  map[string]bool
-	// name of the fee collector
-	feeCollectorName string
-
-	// used to map the module name to response callback
-	respCallbacks map[string]types.ResponseCallback
-
-	// used to map the module name to state callback
-	stateCallbacks map[string]types.StateCallback
-
-	// used to map the module name to module service
-	moduleServices map[string]*types.ModuleService
+	storeKey         sdk.StoreKey
+	cdc              codec.Codec
+	accountKeeper    types.AccountKeeper
+	bankKeeper       types.BankKeeper
+	paramSpace       paramstypes.Subspace
+	blockedAddrs     map[string]bool
+	feeCollectorName string                            // name of the fee collector
+	respCallbacks    map[string]types.ResponseCallback // used to map the module name to response callback
+	stateCallbacks   map[string]types.StateCallback    // used to map the module name to state callback
+	moduleServices   map[string]*types.ModuleService   // used to map the module name to module service
 }
 
 // NewKeeper creates a new service Keeper instance
 func NewKeeper(
-	cdc codec.Marshaler,
+	cdc codec.Codec,
 	key sdk.StoreKey,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,

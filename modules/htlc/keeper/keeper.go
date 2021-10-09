@@ -16,7 +16,7 @@ import (
 // Keeper defines the HTLC keeper
 type Keeper struct {
 	storeKey      sdk.StoreKey
-	cdc           codec.Marshaler
+	cdc           codec.Codec
 	paramSpace    paramstypes.Subspace
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
@@ -25,7 +25,7 @@ type Keeper struct {
 
 // NewKeeper creates a new HTLC Keeper instance
 func NewKeeper(
-	cdc codec.Marshaler,
+	cdc codec.Codec,
 	key sdk.StoreKey,
 	paramSpace paramstypes.Subspace,
 	accountKeeper types.AccountKeeper,

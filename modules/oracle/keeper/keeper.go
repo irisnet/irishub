@@ -21,7 +21,7 @@ import (
 
 // Keeper defines a struct for the oracle keeper
 type Keeper struct {
-	cdc        codec.Marshaler
+	cdc        codec.Codec
 	storeKey   sdk.StoreKey
 	sk         types.ServiceKeeper
 	paramSpace paramtypes.Subspace
@@ -29,7 +29,7 @@ type Keeper struct {
 
 // NewKeeper returns an instance of the oracle Keeper
 func NewKeeper(
-	cdc codec.Marshaler,
+	cdc codec.Codec,
 	storeKey sdk.StoreKey,
 	paramSpace paramtypes.Subspace,
 	sk types.ServiceKeeper,

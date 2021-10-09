@@ -109,7 +109,7 @@ func (s *IntegrationTestSuite) TestHTLC() {
 	expectedCode := uint32(0)
 	bz, err := banktestutil.MsgSendExec(ctx, s.network.Validators[0].Address, Deputy, cs(c(sdk.DefaultBondDenom, 50000000)), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -202,7 +202,7 @@ func (s *IntegrationTestSuite) TestHTLC() {
 
 	bz, err = htlctestutil.CreateHTLCExec(ctx, testCases[0].args.sender.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -227,7 +227,7 @@ func (s *IntegrationTestSuite) TestHTLC() {
 	respType = proto.Message(&htlctypes.HTLC{})
 	bz, err = htlctestutil.QueryHTLCExec(ctx, expectedhtlc.Id)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	htlcItem := respType.(*htlctypes.HTLC)
 	s.Require().Equal(expectedhtlc.String(), htlcItem.String())
 
@@ -243,21 +243,21 @@ func (s *IntegrationTestSuite) TestHTLC() {
 
 	bz, err = htlctestutil.ClaimHTLCExec(ctx, testCases[0].args.sender.String(), expectedhtlc.Id, testCases[0].args.secret.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	respType = proto.Message(&htlctypes.HTLC{})
 	bz, err = htlctestutil.QueryHTLCExec(ctx, expectedhtlc.Id)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	htlcItem = respType.(*htlctypes.HTLC)
 	s.Require().Equal(htlctypes.Completed.String(), htlcItem.State.String())
 
 	coinType := proto.Message(&sdk.Coin{})
 	out, err := simapp.QueryBalanceExec(ctx, testCases[0].args.receiver.String(), sdk.DefaultBondDenom)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(out.Bytes(), coinType))
 	balance := coinType.(*sdk.Coin)
 	s.Require().Equal("400001000stake", balance.String())
 
@@ -285,7 +285,7 @@ func (s *IntegrationTestSuite) TestHTLC() {
 
 	bz, err = htlctestutil.CreateHTLCExec(ctx, testCases[1].args.sender.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -310,7 +310,7 @@ func (s *IntegrationTestSuite) TestHTLC() {
 	respType = proto.Message(&htlctypes.HTLC{})
 	bz, err = htlctestutil.QueryHTLCExec(ctx, expectedhtlt.Id)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	htltItem := respType.(*htlctypes.HTLC)
 	s.Require().Equal(expectedhtlt.String(), htltItem.String())
 
@@ -326,14 +326,14 @@ func (s *IntegrationTestSuite) TestHTLC() {
 
 	bz, err = htlctestutil.ClaimHTLCExec(ctx, testCases[1].args.sender.String(), expectedhtlt.Id, testCases[1].args.secret.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	respType = proto.Message(&htlctypes.HTLC{})
 	bz, err = htlctestutil.QueryHTLCExec(ctx, expectedhtlc.Id)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	htltItem = respType.(*htlctypes.HTLC)
 	s.Require().Equal(htlctypes.Completed.String(), htltItem.State.String())
 
@@ -361,7 +361,7 @@ func (s *IntegrationTestSuite) TestHTLC() {
 
 	bz, err = htlctestutil.CreateHTLCExec(ctx, testCases[2].args.sender.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -386,7 +386,7 @@ func (s *IntegrationTestSuite) TestHTLC() {
 	respType = proto.Message(&htlctypes.HTLC{})
 	bz, err = htlctestutil.QueryHTLCExec(ctx, expectedhtlt.Id)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	htltItem = respType.(*htlctypes.HTLC)
 	s.Require().Equal(expectedhtlt.String(), htltItem.String())
 
@@ -402,14 +402,14 @@ func (s *IntegrationTestSuite) TestHTLC() {
 
 	bz, err = htlctestutil.ClaimHTLCExec(ctx, testCases[2].args.sender.String(), expectedhtlt.Id, testCases[2].args.secret.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	respType = proto.Message(&htlctypes.HTLC{})
 	bz, err = htlctestutil.QueryHTLCExec(ctx, expectedhtlc.Id)
 	s.Require().NoError(err)
-	s.Require().NoError(ctx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	htltItem = respType.(*htlctypes.HTLC)
 	s.Require().Equal(htlctypes.Completed.String(), htltItem.State.String())
 

@@ -18,11 +18,11 @@ import (
 // Keeper of the record store
 type Keeper struct {
 	storeKey sdk.StoreKey
-	cdc      codec.Marshaler
+	cdc      codec.Codec
 }
 
 // NewKeeper returns a record keeper
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey) Keeper {
+func NewKeeper(cdc codec.Codec, key sdk.StoreKey) Keeper {
 	keeper := Keeper{
 		storeKey: key,
 		cdc:      cdc,
@@ -38,7 +38,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 // AddRecord adds a record
 func (k Keeper) AddRecord(ctx sdk.Context, record types.Record) []byte {
 	store := ctx.KVStore(k.storeKey)
-	recordBz := k.cdc.MustMarshalBinaryBare(&record)
+	recordBz := k.cdc.MustMarshal(&record)
 	intraTxCounter := k.GetIntraTxCounter(ctx)
 
 	bz := make([]byte, 4+len(recordBz))
@@ -57,7 +57,7 @@ func (k Keeper) AddRecord(ctx sdk.Context, record types.Record) []byte {
 func (k Keeper) GetRecord(ctx sdk.Context, recordID []byte) (record types.Record, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	if bz := store.Get(types.GetRecordKey(recordID)); bz != nil {
-		k.cdc.MustUnmarshalBinaryBare(bz, &record)
+		k.cdc.MustUnmarshal(bz, &record)
 		return record, true
 	}
 	return record, false
@@ -79,7 +79,7 @@ func (k Keeper) GetIntraTxCounter(ctx sdk.Context) uint32 {
 	}
 
 	var counter gogotypes.UInt32Value
-	k.cdc.MustUnmarshalBinaryBare(b, &counter)
+	k.cdc.MustUnmarshal(b, &counter)
 
 	return counter.Value
 }
@@ -88,7 +88,7 @@ func (k Keeper) GetIntraTxCounter(ctx sdk.Context) uint32 {
 func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter uint32) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.UInt32Value{Value: counter})
+	bz := k.cdc.MustMarshal(&gogotypes.UInt32Value{Value: counter})
 	store.Set(types.IntraTxCounterKey, bz)
 }
 

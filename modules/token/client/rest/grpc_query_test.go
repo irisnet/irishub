@@ -83,17 +83,17 @@ func (s *IntegrationTestSuite) TestToken() {
 	bz, err := tokentestutil.IssueTokenExec(clientCtx, from.String(), args...)
 
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
-	tokenSymbol := gjson.Get(txResp.RawLog, "0.events.0.attributes.0.value").String()
+	tokenSymbol := gjson.Get(txResp.RawLog, "0.events.4.attributes.0.value").String()
 
 	//------test GetCmdQueryTokens()-------------
 	url := fmt.Sprintf("%s/irismod/token/tokens", baseURL)
 	resp, err := rest.GetRequest(url)
 	respType = proto.Message(&tokentypes.QueryTokensResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
 	tokensResp := respType.(*tokentypes.QueryTokensResponse)
 	s.Require().Equal(2, len(tokensResp.Tokens))
 
@@ -103,7 +103,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	respType = proto.Message(&tokentypes.QueryTokenResponse{})
 	var token tokentypes.TokenI
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
 	tokenResp := respType.(*tokentypes.QueryTokenResponse)
 	err = clientCtx.InterfaceRegistry.UnpackAny(tokenResp.Token, &token)
 	s.Require().NoError(err)
@@ -116,7 +116,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&tokentypes.QueryFeesResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
 	feeResp := respType.(*tokentypes.QueryFeesResponse)
 	expectedFeeResp := "{\"exist\":true,\"issue_fee\":{\"denom\":\"stake\",\"amount\":\"13015\"},\"mint_fee\":{\"denom\":\"stake\",\"amount\":\"1301\"}}"
 	result, _ := json.Marshal(feeResp)
@@ -127,7 +127,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&tokentypes.QueryParamsResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
 	paramsResp := respType.(*tokentypes.QueryParamsResponse)
 	s.Require().NoError(err)
 	expectedParams := "{\"token_tax_rate\":\"0.400000000000000000\",\"issue_token_base_fee\":{\"denom\":\"stake\",\"amount\":\"60000\"},\"mint_token_fee_ratio\":\"0.100000000000000000\"}"

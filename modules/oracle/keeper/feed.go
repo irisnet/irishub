@@ -21,7 +21,7 @@ func (k Keeper) GetFeed(ctx sdk.Context, feedName string) (feed types.Feed, foun
 	if bz == nil {
 		return feed, false
 	}
-	k.cdc.MustUnmarshalBinaryBare(bz, &feed)
+	k.cdc.MustUnmarshal(bz, &feed)
 	return feed, true
 }
 
@@ -30,7 +30,7 @@ func (k Keeper) GetFeedByReqCtxID(ctx sdk.Context, requestContextID tmbytes.HexB
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.GetReqCtxIDKey(requestContextID))
 	var feedName gogotypes.StringValue
-	k.cdc.MustUnmarshalBinaryBare(bz, &feedName)
+	k.cdc.MustUnmarshal(bz, &feedName)
 	return k.GetFeed(ctx, feedName.Value)
 }
 
@@ -41,7 +41,7 @@ func (k Keeper) IteratorFeeds(ctx sdk.Context, fn func(feed types.Feed)) {
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var res types.Feed
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &res)
+		k.cdc.MustUnmarshal(iterator.Value(), &res)
 		fn(res)
 	}
 }
@@ -57,7 +57,7 @@ func (k Keeper) IteratorFeedsByState(
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var feedName gogotypes.StringValue
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &feedName)
+		k.cdc.MustUnmarshal(iterator.Value(), &feedName)
 		if feed, found := k.GetFeed(ctx, feedName.Value); found {
 			fn(feed)
 		}
@@ -67,10 +67,10 @@ func (k Keeper) IteratorFeedsByState(
 // SetFeed saves a feed to store
 func (k Keeper) SetFeed(ctx sdk.Context, feed types.Feed) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&feed)
+	bz := k.cdc.MustMarshal(&feed)
 	store.Set(types.GetFeedKey(feed.FeedName), bz)
 
-	bz = k.cdc.MustMarshalBinaryBare(&gogotypes.StringValue{Value: feed.FeedName})
+	bz = k.cdc.MustMarshal(&gogotypes.StringValue{Value: feed.FeedName})
 	requestContextID, _ := hex.DecodeString(feed.RequestContextID)
 	store.Set(types.GetReqCtxIDKey(requestContextID), bz)
 }
@@ -87,7 +87,7 @@ func (k Keeper) SetFeedValue(
 	counter := k.getFeedValuesCnt(ctx, feedName)
 	delta := counter - int(latestHistory)
 	k.deleteOldestFeedValue(ctx, feedName, delta+1)
-	bz := k.cdc.MustMarshalBinaryBare(&value)
+	bz := k.cdc.MustMarshal(&value)
 	store.Set(types.GetFeedValueKey(feedName, batchCounter), bz)
 }
 
@@ -98,7 +98,7 @@ func (k Keeper) GetFeedValues(ctx sdk.Context, feedName string) (result types.Fe
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var res types.FeedValue
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &res)
+		k.cdc.MustUnmarshal(iterator.Value(), &res)
 		result = append(result, res)
 	}
 	return
@@ -107,7 +107,7 @@ func (k Keeper) GetFeedValues(ctx sdk.Context, feedName string) (result types.Fe
 // Enqueue puts the feed name to a 'state' queue
 func (k Keeper) Enqueue(ctx sdk.Context, feedName string, state servicetypes.RequestContextState) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.StringValue{Value: feedName})
+	bz := k.cdc.MustMarshal(&gogotypes.StringValue{Value: feedName})
 	store.Set(types.GetFeedStateKey(feedName, state), bz)
 }
 
@@ -127,7 +127,7 @@ func (k Keeper) dequeueAndEnqueue(
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetFeedStateKey(feedName, dequeueState))
 
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.StringValue{Value: feedName})
+	bz := k.cdc.MustMarshal(&gogotypes.StringValue{Value: feedName})
 	store.Set(types.GetFeedStateKey(feedName, enqueueState), bz)
 }
 

@@ -336,7 +336,7 @@ func (k Keeper) HasHTLC(ctx sdk.Context, id tmbytes.HexBytes) bool {
 func (k Keeper) SetHTLC(ctx sdk.Context, htlc types.HTLC, id tmbytes.HexBytes) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&htlc)
+	bz := k.cdc.MustMarshal(&htlc)
 	store.Set(types.GetHTLCKey(id), bz)
 }
 
@@ -347,7 +347,7 @@ func (k Keeper) GetHTLC(ctx sdk.Context, id tmbytes.HexBytes) (htlc types.HTLC, 
 	if bz == nil {
 		return htlc, false
 	}
-	k.cdc.MustUnmarshalBinaryBare(bz, &htlc)
+	k.cdc.MustUnmarshal(bz, &htlc)
 	return htlc, true
 }
 
@@ -377,7 +377,7 @@ func (k Keeper) IterateHTLCs(
 		id := tmbytes.HexBytes(iterator.Key()[1:])
 
 		var htlc types.HTLC
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &htlc)
+		k.cdc.MustUnmarshal(iterator.Value(), &htlc)
 
 		if stop := op(id, htlc); stop {
 			break

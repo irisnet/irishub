@@ -21,8 +21,7 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
 
-func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (*types.MsgCreatePoolResponse,
-	error) {
+func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (*types.MsgCreatePoolResponse, error) {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return nil, err
@@ -34,8 +33,7 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 		return nil, sdkerrors.Wrapf(
 			types.ErrExpiredHeight,
 			"The current block height[%d] is greater than StartHeight[%d]",
-			ctx.BlockHeight(),
-			msg.StartHeight,
+			ctx.BlockHeight(), msg.StartHeight,
 		)
 	}
 
@@ -43,8 +41,7 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 		return nil, sdkerrors.Wrapf(
 			types.ErrInvalidRewardRule,
 			"the max reward category num is [%d], but got [%d]",
-			maxRewardCategories,
-			len(msg.TotalReward),
+			maxRewardCategories, len(msg.TotalReward),
 		)
 	}
 
@@ -61,7 +58,8 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 			msg.LptDenom,
 		)
 	}
-	if err = m.Keeper.CreatePool(ctx,
+	if err = m.Keeper.CreatePool(
+		ctx,
 		msg.Name,
 		msg.Description,
 		msg.LptDenom,
@@ -124,7 +122,8 @@ func (m msgServer) AdjustPool(goCtx context.Context, msg *types.MsgAdjustPool) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err = m.Keeper.AdjustPool(ctx,
+	if err = m.Keeper.AdjustPool(
+		ctx,
 		msg.PoolName,
 		msg.AdditionalReward,
 		msg.RewardPerBlock,

@@ -14,18 +14,17 @@ import (
 
 // Keeper of the farm store
 type Keeper struct {
-	storeKey sdk.StoreKey
-	cdc      codec.Marshaler
-
-	paramSpace paramstypes.Subspace
-	// name of the fee collector
-	feeCollectorName string
+	cdc              codec.Codec
+	storeKey         sdk.StoreKey
+	paramSpace       paramstypes.Subspace
 	validateLPToken  types.ValidateLPToken
 	bk               types.BankKeeper
 	ak               types.AccountKeeper
+	feeCollectorName string // name of the fee collector
 }
 
-func NewKeeper(cdc codec.Marshaler,
+func NewKeeper(
+	cdc codec.Codec,
 	storeKey sdk.StoreKey,
 	bk types.BankKeeper,
 	ak types.AccountKeeper,
@@ -62,7 +61,7 @@ func NewKeeper(cdc codec.Marshaler,
 func (k Keeper) SetPool(ctx sdk.Context, pool types.FarmPool) {
 	pool.Rules = nil
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&pool)
+	bz := k.cdc.MustMarshal(&pool)
 	store.Set(types.KeyFarmPool(pool.Name), bz)
 }
 
@@ -75,7 +74,7 @@ func (k Keeper) GetPool(ctx sdk.Context, poolName string) (types.FarmPool, bool)
 	}
 
 	var pool types.FarmPool
-	k.cdc.MustUnmarshalBinaryBare(bz, &pool)
+	k.cdc.MustUnmarshal(bz, &pool)
 	return pool, true
 }
 
@@ -87,7 +86,7 @@ func (k Keeper) SetRewardRules(ctx sdk.Context, poolName string, rules types.Rew
 
 func (k Keeper) SetRewardRule(ctx sdk.Context, poolName string, rule types.RewardRule) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&rule)
+	bz := k.cdc.MustMarshal(&rule)
 	store.Set(types.KeyRewardRule(poolName, rule.Reward), bz)
 }
 
@@ -97,7 +96,7 @@ func (k Keeper) GetRewardRules(ctx sdk.Context, poolName string) (rules types.Re
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var r types.RewardRule
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &r)
+		k.cdc.MustUnmarshal(iterator.Value(), &r)
 		rules = append(rules, r)
 	}
 	return
@@ -113,7 +112,7 @@ func (k Keeper) IteratorRewardRules(ctx sdk.Context, poolName string, fun func(r
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var r types.RewardRule
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &r)
+		k.cdc.MustUnmarshal(iterator.Value(), &r)
 		fun(r)
 	}
 }

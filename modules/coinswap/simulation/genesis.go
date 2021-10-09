@@ -5,6 +5,4 @@ import (
 )
 
 // RandomizedGenState generates a random GenesisState for coinswap
-func RandomizedGenState(simState *module.SimulationState) {
-
-}
+func RandomizedGenState(simState *module.SimulationState) {}

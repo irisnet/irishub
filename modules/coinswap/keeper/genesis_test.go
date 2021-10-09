@@ -3,10 +3,11 @@ package keeper_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/suite"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irismod/modules/coinswap/types"
-	"github.com/stretchr/testify/suite"
 )
 
 func TestGenesisSuite(t *testing.T) {

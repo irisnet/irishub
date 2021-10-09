@@ -31,7 +31,7 @@ func (k Keeper) AddServiceDefinition(
 func (k Keeper) SetServiceDefinition(ctx sdk.Context, svcDef types.ServiceDefinition) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&svcDef)
+	bz := k.cdc.MustMarshal(&svcDef)
 	store.Set(types.GetServiceDefinitionKey(svcDef.Name), bz)
 }
 
@@ -44,7 +44,7 @@ func (k Keeper) GetServiceDefinition(ctx sdk.Context, serviceName string) (svcDe
 		return svcDef, false
 	}
 
-	k.cdc.MustUnmarshalBinaryBare(bz, &svcDef)
+	k.cdc.MustUnmarshal(bz, &svcDef)
 	return svcDef, true
 }
 
@@ -60,7 +60,7 @@ func (k Keeper) IterateServiceDefinitions(
 
 	for ; iterator.Valid(); iterator.Next() {
 		var definition types.ServiceDefinition
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &definition)
+		k.cdc.MustUnmarshal(iterator.Value(), &definition)
 
 		if stop := op(definition); stop {
 			break

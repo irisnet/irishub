@@ -39,7 +39,8 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
-	registry.RegisterImplementations((*sdk.Msg)(nil),
+	registry.RegisterImplementations(
+		(*sdk.Msg)(nil),
 		&MsgIssueDenom{},
 		&MsgTransferNFT{},
 		&MsgEditNFT{},
@@ -48,7 +49,8 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgTransferDenom{},
 	)
 
-	registry.RegisterImplementations((*exported.NFT)(nil),
+	registry.RegisterImplementations(
+		(*exported.NFT)(nil),
 		&BaseNFT{},
 	)
 
@@ -56,27 +58,27 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 }
 
 // return supply protobuf code
-func MustMarshalSupply(cdc codec.Marshaler, supply uint64) []byte {
+func MustMarshalSupply(cdc codec.Codec, supply uint64) []byte {
 	supplyWrap := gogotypes.UInt64Value{Value: supply}
-	return cdc.MustMarshalBinaryBare(&supplyWrap)
+	return cdc.MustMarshal(&supplyWrap)
 }
 
 // return th supply
-func MustUnMarshalSupply(cdc codec.Marshaler, value []byte) uint64 {
+func MustUnMarshalSupply(cdc codec.Codec, value []byte) uint64 {
 	var supplyWrap gogotypes.UInt64Value
-	cdc.MustUnmarshalBinaryBare(value, &supplyWrap)
+	cdc.MustUnmarshal(value, &supplyWrap)
 	return supplyWrap.Value
 }
 
 // return the tokenID protobuf code
-func MustMarshalTokenID(cdc codec.Marshaler, tokenID string) []byte {
+func MustMarshalTokenID(cdc codec.Codec, tokenID string) []byte {
 	tokenIDWrap := gogotypes.StringValue{Value: tokenID}
-	return cdc.MustMarshalBinaryBare(&tokenIDWrap)
+	return cdc.MustMarshal(&tokenIDWrap)
 }
 
 // return th tokenID
-func MustUnMarshalTokenID(cdc codec.Marshaler, value []byte) string {
+func MustUnMarshalTokenID(cdc codec.Codec, value []byte) string {
 	var tokenIDWrap gogotypes.StringValue
-	cdc.MustUnmarshalBinaryBare(value, &tokenIDWrap)
+	cdc.MustUnmarshal(value, &tokenIDWrap)
 	return tokenIDWrap.Value
 }

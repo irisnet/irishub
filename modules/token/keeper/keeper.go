@@ -15,7 +15,7 @@ import (
 
 type Keeper struct {
 	storeKey         sdk.StoreKey
-	cdc              codec.Marshaler
+	cdc              codec.Codec
 	bankKeeper       types.BankKeeper
 	paramSpace       paramstypes.Subspace
 	blockedAddrs     map[string]bool
@@ -23,7 +23,7 @@ type Keeper struct {
 }
 
 func NewKeeper(
-	cdc codec.Marshaler,
+	cdc codec.Codec,
 	key sdk.StoreKey,
 	paramSpace paramstypes.Subspace,
 	bankKeeper types.BankKeeper,
@@ -121,7 +121,7 @@ func (k Keeper) EditToken(
 	if name != types.DoNotModify {
 		token.Name = name
 
-		metadata := k.bankKeeper.GetDenomMetaData(ctx, token.MinUnit)
+		metadata, _ := k.bankKeeper.GetDenomMetaData(ctx, token.MinUnit)
 		metadata.Description = name
 
 		k.bankKeeper.SetDenomMetaData(ctx, metadata)

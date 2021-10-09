@@ -84,10 +84,10 @@ func (s *IntegrationTestSuite) TestToken() {
 	bz, err := tokentestutil.IssueTokenExec(clientCtx, from.String(), args...)
 
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
-	tokenSymbol := gjson.Get(txResp.RawLog, "0.events.0.attributes.0.value").String()
+	tokenSymbol := gjson.Get(txResp.RawLog, "0.events.4.attributes.0.value").String()
 
 	//------test GetCmdQueryTokens()-------------
 	tokens := &[]tokentypes.TokenI{}
@@ -101,7 +101,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	respType = proto.Message(&types.Any{})
 	bz, err = tokentestutil.QueryTokenExec(clientCtx, tokenSymbol)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*types.Any), &token)
 	s.Require().NoError(err)
 	s.Require().Equal(name, token.GetName())
@@ -112,7 +112,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	respType = proto.Message(&tokentypes.QueryFeesResponse{})
 	bz, err = tokentestutil.QueryFeeExec(clientCtx, symbol)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	feeResp := respType.(*tokentypes.QueryFeesResponse)
 	s.Require().NoError(err)
 	expectedFeeResp := "{\"exist\":true,\"issue_fee\":{\"denom\":\"stake\",\"amount\":\"13015\"},\"mint_fee\":{\"denom\":\"stake\",\"amount\":\"1301\"}}"
@@ -123,7 +123,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	respType = proto.Message(&tokentypes.Params{})
 	bz, err = tokentestutil.QueryParamsExec(clientCtx)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	params := respType.(*tokentypes.Params)
 	s.Require().NoError(err)
 	expectedParams := "{\"token_tax_rate\":\"0.400000000000000000\",\"issue_token_base_fee\":{\"denom\":\"stake\",\"amount\":\"60000\"},\"mint_token_fee_ratio\":\"0.100000000000000000\"}"
@@ -134,7 +134,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	coinType := proto.Message(&sdk.Coin{})
 	out, err := simapp.QueryBalanceExec(clientCtx, from.String(), symbol)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(out.Bytes(), coinType))
 	balance := coinType.(*sdk.Coin)
 	initAmount := balance.Amount.Int64()
 	mintAmount := int64(50000000)
@@ -151,13 +151,13 @@ func (s *IntegrationTestSuite) TestToken() {
 	bz, err = tokentestutil.MintTokenExec(clientCtx, from.String(), symbol, args...)
 
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	out, err = simapp.QueryBalanceExec(clientCtx, from.String(), symbol)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(out.Bytes(), coinType))
 	balance = coinType.(*sdk.Coin)
 	exceptedAmount := initAmount + mintAmount
 	s.Require().Equal(exceptedAmount, balance.Amount.Int64())
@@ -177,13 +177,13 @@ func (s *IntegrationTestSuite) TestToken() {
 	bz, err = tokentestutil.BurnTokenExec(clientCtx, from.String(), symbol, args...)
 
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	out, err = simapp.QueryBalanceExec(clientCtx, from.String(), symbol)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(out.Bytes(), coinType))
 	balance = coinType.(*sdk.Coin)
 	exceptedAmount = exceptedAmount - burnAmount
 	s.Require().Equal(exceptedAmount, balance.Amount.Int64())
@@ -207,7 +207,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	bz, err = tokentestutil.EditTokenExec(clientCtx, from.String(), symbol, args...)
 
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -215,7 +215,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	respType = proto.Message(&types.Any{})
 	bz, err = tokentestutil.QueryTokenExec(clientCtx, tokenSymbol)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*types.Any), &token2)
 	s.Require().NoError(err)
 	s.Require().Equal(newName, token2.GetName())
@@ -236,7 +236,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	bz, err = tokentestutil.TransferTokenOwnerExec(clientCtx, from.String(), symbol, args...)
 
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -244,7 +244,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	respType = proto.Message(&types.Any{})
 	bz, err = tokentestutil.QueryTokenExec(clientCtx, tokenSymbol)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*types.Any), &token3)
 	s.Require().NoError(err)
 	s.Require().Equal(to, token3.GetOwner())

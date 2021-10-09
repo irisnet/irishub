@@ -25,7 +25,7 @@ func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 
 	for ; rqIterator.Valid(); rqIterator.Next() {
 		var request types.Request
-		k.GetCdc().MustUnmarshalBinaryBare(rqIterator.Value(), &request)
+		k.GetCdc().MustUnmarshal(rqIterator.Value(), &request)
 
 		consumer, _ := sdk.AccAddressFromBech32(request.Consumer)
 		serviceContextID, _ := hex.DecodeString(request.ServiceContextID)

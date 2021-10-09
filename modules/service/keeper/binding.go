@@ -8,6 +8,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	v040 "github.com/cosmos/cosmos-sdk/x/auth/legacy/v040"
 
 	"github.com/irisnet/irismod/modules/service/types"
 )
@@ -376,7 +377,7 @@ func (k Keeper) RefundDeposits(ctx sdk.Context) error {
 
 	for ; iterator.Valid(); iterator.Next() {
 		var binding types.ServiceBinding
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &binding)
+		k.cdc.MustUnmarshal(iterator.Value(), &binding)
 
 		bindingOwner, err := sdk.AccAddressFromBech32(binding.Owner)
 		if err != nil {
@@ -398,7 +399,7 @@ func (k Keeper) SetServiceBinding(ctx sdk.Context, svcBinding types.ServiceBindi
 	store := ctx.KVStore(k.storeKey)
 
 	provider, _ := sdk.AccAddressFromBech32(svcBinding.Provider)
-	bz := k.cdc.MustMarshalBinaryBare(&svcBinding)
+	bz := k.cdc.MustMarshal(&svcBinding)
 	store.Set(types.GetServiceBindingKey(svcBinding.ServiceName, provider), bz)
 }
 
@@ -415,7 +416,7 @@ func (k Keeper) GetServiceBinding(
 		return svcBinding, false
 	}
 
-	k.cdc.MustUnmarshalBinaryBare(bz, &svcBinding)
+	k.cdc.MustUnmarshal(bz, &svcBinding)
 	return svcBinding, true
 }
 
@@ -437,7 +438,7 @@ func (k Keeper) GetOwnerServiceBindings(ctx sdk.Context, owner sdk.AccAddress, s
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		bindingKey := iterator.Key()[sdk.AddrLen+1:]
+		bindingKey := iterator.Key()[v040.AddrLen+1:]
 		sepIndex := bytes.Index(bindingKey, types.Delimiter)
 		serviceName := string(bindingKey[0:sepIndex])
 		provider := sdk.AccAddress(bindingKey[sepIndex+1:])
@@ -454,7 +455,7 @@ func (k Keeper) GetOwnerServiceBindings(ctx sdk.Context, owner sdk.AccAddress, s
 func (k Keeper) SetOwner(ctx sdk.Context, provider, owner sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.BytesValue{Value: owner})
+	bz := k.cdc.MustMarshal(&gogotypes.BytesValue{Value: owner})
 	store.Set(types.GetOwnerKey(provider), bz)
 }
 
@@ -468,7 +469,7 @@ func (k Keeper) GetOwner(ctx sdk.Context, provider sdk.AccAddress) (sdk.AccAddre
 	}
 
 	addr := gogotypes.BytesValue{}
-	k.cdc.MustUnmarshalBinaryBare(bz, &addr)
+	k.cdc.MustUnmarshal(bz, &addr)
 	return addr.GetValue(), true
 }
 
@@ -493,7 +494,7 @@ func (k Keeper) SetPricing(
 ) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&pricing)
+	bz := k.cdc.MustMarshal(&pricing)
 	store.Set(types.GetPricingKey(serviceName, provider), bz)
 }
 
@@ -506,7 +507,7 @@ func (k Keeper) GetPricing(ctx sdk.Context, serviceName string, provider sdk.Acc
 		return
 	}
 
-	k.cdc.MustUnmarshalBinaryBare(bz, &pricing)
+	k.cdc.MustUnmarshal(bz, &pricing)
 	return pricing
 }
 
@@ -571,7 +572,7 @@ func (k Keeper) IterateServiceBindings(
 
 	for ; iterator.Valid(); iterator.Next() {
 		var binding types.ServiceBinding
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &binding)
+		k.cdc.MustUnmarshal(iterator.Value(), &binding)
 
 		if stop := op(binding); stop {
 			break
@@ -652,7 +653,7 @@ func (k Keeper) validatePricing(ctx sdk.Context, pricing types.Pricing) error {
 		}
 	}
 
-	if supply := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(priceDenom); !supply.IsPositive() {
+	if supply := k.bankKeeper.GetSupply(ctx, priceDenom).Amount; !supply.IsPositive() {
 		return sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid denom: %s", priceDenom)
 	}
 

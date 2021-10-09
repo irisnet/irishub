@@ -31,10 +31,8 @@ func NewParams(createPoolFee sdk.Coin, maxRewardCategories uint32) Params {
 // ParamSetPairs implements paramstypes.ParamSet
 func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 	return paramstypes.ParamSetPairs{
-		paramstypes.NewParamSetPair(
-			KeyCreatePoolFee, &p.CreatePoolFee, validateCreatePoolFee),
-		paramstypes.NewParamSetPair(
-			KeyMaxRewardCategories, &p.MaxRewardCategories, validateMaxRewardCategories),
+		paramstypes.NewParamSetPair(KeyCreatePoolFee, &p.CreatePoolFee, validateCreatePoolFee),
+		paramstypes.NewParamSetPair(KeyMaxRewardCategories, &p.MaxRewardCategories, validateMaxRewardCategories),
 	}
 }
 

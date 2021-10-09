@@ -12,7 +12,7 @@ func (k Keeper) Expired(ctx sdk.Context, pool types.FarmPool) bool {
 	case height > pool.EndHeight:
 		return true
 	case height == pool.EndHeight:
-		//When Destroy and other operations are at the same block height
+		// When Destroy and other operations are at the same block height
 		key := types.KeyActiveFarmPool(pool.EndHeight, pool.Name)
 		store := ctx.KVStore(k.storeKey)
 		return !store.Has(key)
@@ -36,8 +36,7 @@ func (k Keeper) DequeueActivePool(ctx sdk.Context, poolName string, expiredHeigh
 
 func (k Keeper) IteratorExpiredPool(ctx sdk.Context, height int64, fun func(pool types.FarmPool)) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store,
-		types.PrefixActiveFarmPool(height))
+	iterator := sdk.KVStorePrefixIterator(store, types.PrefixActiveFarmPool(height))
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		poolName := types.MustUnMarshalPoolName(k.cdc, iterator.Value())
@@ -65,7 +64,7 @@ func (k Keeper) IteratorAllPools(ctx sdk.Context, fun func(pool types.FarmPool))
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var pool types.FarmPool
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &pool)
+		k.cdc.MustUnmarshal(iterator.Value(), &pool)
 		fun(pool)
 	}
 }

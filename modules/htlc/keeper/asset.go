@@ -208,14 +208,14 @@ func (k Keeper) GetAssetSupply(ctx sdk.Context, denom string) (assetSupply types
 	if bz == nil {
 		return types.AssetSupply{}, false
 	}
-	k.cdc.MustUnmarshalBinaryBare(bz, &assetSupply)
+	k.cdc.MustUnmarshal(bz, &assetSupply)
 	return assetSupply, true
 }
 
 // SetAssetSupply updates an asset's supply
 func (k Keeper) SetAssetSupply(ctx sdk.Context, supply types.AssetSupply, denom string) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&supply)
+	bz := k.cdc.MustMarshal(&supply)
 	store.Set(types.GetAssetSupplyKey(denom), bz)
 }
 
@@ -231,7 +231,7 @@ func (k Keeper) IterateAssetSupplies(
 
 	for ; iterator.Valid(); iterator.Next() {
 		var supply types.AssetSupply
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &supply)
+		k.cdc.MustUnmarshal(iterator.Value(), &supply)
 
 		if cb(supply) {
 			break
@@ -259,7 +259,7 @@ func (k Keeper) GetPreviousBlockTime(ctx sdk.Context) (blockTime time.Time, foun
 	}
 
 	var timestamp gogotypes.Timestamp
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &timestamp)
+	k.cdc.MustUnmarshalLengthPrefixed(b, &timestamp)
 	blockTime, _ = gogotypes.TimestampFromProto(&timestamp)
 	return blockTime, true
 }
@@ -268,6 +268,6 @@ func (k Keeper) GetPreviousBlockTime(ctx sdk.Context) (blockTime time.Time, foun
 func (k Keeper) SetPreviousBlockTime(ctx sdk.Context, blockTime time.Time) {
 	store := ctx.KVStore(k.storeKey)
 	timestamp, _ := gogotypes.TimestampProto(blockTime)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(timestamp)
+	bz := k.cdc.MustMarshalLengthPrefixed(timestamp)
 	store.Set(types.PreviousBlockTimeKey, bz)
 }

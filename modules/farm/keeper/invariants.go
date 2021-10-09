@@ -36,10 +36,14 @@ func RewardInvariant(k Keeper) sdk.Invariant {
 		})
 
 		broken := !expectedBalance.IsEqual(balance)
-		return sdk.FormatInvariant(types.ModuleName, "module account balance",
+		return sdk.FormatInvariant(
+			types.ModuleName,
+			"module account balance",
 			fmt.Sprintf(
 				"\tsum of accounts coins: %v\n"+
 					"\tbalance:          %v\n",
-				expectedBalance, balance)), broken
+				expectedBalance, balance,
+			),
+		), broken
 	}
 }

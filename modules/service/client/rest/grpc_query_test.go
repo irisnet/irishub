@@ -84,7 +84,7 @@ func (s *IntegrationTestSuite) TestService() {
 	author := val.Address
 	provider := author
 
-	consumerInfo, _, _ := val.ClientCtx.Keyring.NewMnemonic("NewValidator", keyring.English, sdk.FullFundraiserPath, hd.Secp256k1)
+	consumerInfo, _, _ := val.ClientCtx.Keyring.NewMnemonic("NewValidator", keyring.English, sdk.FullFundraiserPath, keyring.DefaultBIP39Passphrase, hd.Secp256k1)
 	consumer := sdk.AccAddress(consumerInfo.GetPubKey().Address())
 
 	reqServiceFee := fmt.Sprintf("50%s", serviceDenom)
@@ -111,7 +111,7 @@ func (s *IntegrationTestSuite) TestService() {
 	expectedCode := uint32(0)
 	bz, err := servicetestutil.DefineServiceExec(clientCtx, author.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -120,7 +120,7 @@ func (s *IntegrationTestSuite) TestService() {
 	resp, err := rest.GetRequest(url)
 	respType = proto.Message(&servicetypes.QueryDefinitionResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
 	serviceDefinitionResp := respType.(*servicetypes.QueryDefinitionResponse)
 	s.Require().Equal(serviceName, serviceDefinitionResp.ServiceDefinition.Name)
 
@@ -141,7 +141,7 @@ func (s *IntegrationTestSuite) TestService() {
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.BindServiceExec(clientCtx, provider.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -150,7 +150,7 @@ func (s *IntegrationTestSuite) TestService() {
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&servicetypes.QueryBindingResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
 	serviceBindingResp := respType.(*servicetypes.QueryBindingResponse)
 	s.Require().Equal(serviceName, serviceBindingResp.ServiceBinding.ServiceName)
 	s.Require().Equal(provider.String(), serviceBindingResp.ServiceBinding.Provider)
@@ -160,7 +160,7 @@ func (s *IntegrationTestSuite) TestService() {
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&servicetypes.QueryBindingsResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
 	serviceBindings := respType.(*servicetypes.QueryBindingsResponse)
 	s.Require().Len(serviceBindings.ServiceBindings, 1)
 
@@ -174,7 +174,7 @@ func (s *IntegrationTestSuite) TestService() {
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.DisableServiceExec(clientCtx, serviceName, provider.String(), provider.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -182,7 +182,7 @@ func (s *IntegrationTestSuite) TestService() {
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&servicetypes.QueryBindingResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
 	serviceBindingResp = respType.(*servicetypes.QueryBindingResponse)
 	s.Require().False(serviceBindingResp.ServiceBinding.Available)
 
@@ -196,7 +196,7 @@ func (s *IntegrationTestSuite) TestService() {
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.RefundDepositExec(clientCtx, serviceName, provider.String(), provider.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -204,7 +204,7 @@ func (s *IntegrationTestSuite) TestService() {
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&servicetypes.QueryBindingResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
 	serviceBindingResp = respType.(*servicetypes.QueryBindingResponse)
 	s.Require().True(serviceBindingResp.ServiceBinding.Deposit.IsZero())
 
@@ -220,7 +220,7 @@ func (s *IntegrationTestSuite) TestService() {
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.EnableServiceExec(clientCtx, serviceName, provider.String(), provider.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -228,7 +228,7 @@ func (s *IntegrationTestSuite) TestService() {
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&servicetypes.QueryBindingResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
 	serviceBindingResp = respType.(*servicetypes.QueryBindingResponse)
 	s.Require().Equal(serviceDeposit, serviceBindingResp.ServiceBinding.Deposit.String())
 
@@ -246,7 +246,7 @@ func (s *IntegrationTestSuite) TestService() {
 	expectedCode = uint32(0)
 	bz, err = banktestutil.MsgSendExec(clientCtx, provider, consumer, amount, args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -266,7 +266,7 @@ func (s *IntegrationTestSuite) TestService() {
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.CallServiceExec(clientCtx, consumer.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 	requestContextId := gjson.Get(txResp.RawLog, "0.events.0.attributes.0.value").String()
@@ -305,7 +305,7 @@ func (s *IntegrationTestSuite) TestService() {
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&servicetypes.QueryRequestsResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
 	requests := respType.(*servicetypes.QueryRequestsResponse).Requests
 	s.Require().Len(requests, 1)
 	s.Require().Equal(requestContextId, requests[0].RequestContextId)
@@ -325,7 +325,7 @@ func (s *IntegrationTestSuite) TestService() {
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.RespondServiceExec(clientCtx, provider.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -334,7 +334,7 @@ func (s *IntegrationTestSuite) TestService() {
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&servicetypes.QueryEarnedFeesResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
 	earnedFees := respType.(*servicetypes.QueryEarnedFeesResponse).Fees
 	s.Require().Equal(expectedEarnedFees, earnedFees.String())
 }

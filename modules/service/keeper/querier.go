@@ -113,7 +113,7 @@ func queryBindings(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQueri
 
 		for ; iterator.Valid(); iterator.Next() {
 			var binding types.ServiceBinding
-			k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &binding)
+			k.cdc.MustUnmarshal(iterator.Value(), &binding)
 
 			bindings = append(bindings, &binding)
 		}
@@ -183,7 +183,7 @@ func queryRequests(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQueri
 	for ; iterator.Valid(); iterator.Next() {
 		var requestID gogotypes.BytesValue
 
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &requestID)
+		k.cdc.MustUnmarshal(iterator.Value(), &requestID)
 
 		request, _ := k.GetRequest(ctx, requestID.Value)
 		requests = append(requests, request)
@@ -272,7 +272,7 @@ func queryResponses(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuer
 
 	for ; iterator.Valid(); iterator.Next() {
 		var response types.Response
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &response)
+		k.cdc.MustUnmarshal(iterator.Value(), &response)
 
 		responses = append(responses, response)
 	}

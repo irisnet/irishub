@@ -3,9 +3,11 @@ package keeper
 import (
 	"fmt"
 
+	gogotypes "github.com/gogo/protobuf/types"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	gogotypes "github.com/gogo/protobuf/types"
+
 	"github.com/irisnet/irismod/modules/coinswap/types"
 )
 
@@ -34,7 +36,7 @@ func (k Keeper) GetPool(ctx sdk.Context, poolId string) (types.Pool, bool) {
 	}
 
 	pool := &types.Pool{}
-	k.cdc.MustUnmarshalBinaryBare(bz, pool)
+	k.cdc.MustUnmarshal(bz, pool)
 	return *pool, true
 }
 
@@ -45,7 +47,7 @@ func (k Keeper) GetAllPools(ctx sdk.Context) (pools []types.Pool) {
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var pool types.Pool
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &pool)
+		k.cdc.MustUnmarshal(iterator.Value(), &pool)
 		pools = append(pools, pool)
 	}
 	return
@@ -60,7 +62,7 @@ func (k Keeper) GetPoolByLptDenom(ctx sdk.Context, lptDenom string) (types.Pool,
 	}
 
 	poolId := &gogotypes.StringValue{}
-	k.cdc.MustUnmarshalBinaryBare(bz, poolId)
+	k.cdc.MustUnmarshal(bz, poolId)
 	return k.GetPool(ctx, poolId.Value)
 }
 
@@ -129,12 +131,12 @@ func (k Keeper) ValidatePool(ctx sdk.Context, lptDenom string) error {
 
 func (k Keeper) setPool(ctx sdk.Context, pool *types.Pool) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(pool)
+	bz := k.cdc.MustMarshal(pool)
 	store.Set(types.GetPoolKey(pool.Id), bz)
 
 	// save by lpt denom
 	poolId := &gogotypes.StringValue{Value: pool.Id}
-	poolIdBz := k.cdc.MustMarshalBinaryBare(poolId)
+	poolIdBz := k.cdc.MustMarshal(poolId)
 	store.Set(types.GetLptDenomKey(pool.LptDenom), poolIdBz)
 }
 

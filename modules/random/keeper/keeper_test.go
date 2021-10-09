@@ -82,7 +82,7 @@ func (suite *KeeperTestSuite) TestRequestRandom() {
 
 	for ; iterator.Valid(); iterator.Next() {
 		var request types.Request
-		suite.app.AppCodec().MustUnmarshalBinaryBare(iterator.Value(), &request)
+		suite.app.AppCodec().MustUnmarshal(iterator.Value(), &request)
 		suite.Equal(expectedRequest, request)
 	}
 }

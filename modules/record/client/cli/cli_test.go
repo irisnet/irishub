@@ -73,7 +73,7 @@ func (s *IntegrationTestSuite) TestRecord() {
 
 	bz, err := recordtestutil.MsgCreateRecordExec(clientCtx, from.String(), digest, digestAlgo, args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -91,7 +91,7 @@ func (s *IntegrationTestSuite) TestRecord() {
 
 	bz, err = recordtestutil.QueryRecordExec(val.ClientCtx, recordID)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	record := respType.(*recordtypes.Record)
 	s.Require().Equal(expectedContents, record.Contents)
 }

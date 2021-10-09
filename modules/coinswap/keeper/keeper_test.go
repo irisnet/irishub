@@ -128,10 +128,9 @@ func (suite *TestSuite) TestLiquidity() {
 
 	lptDenom := pool.LptDenom
 
-	supply := suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances := suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
 	sender1Balances := suite.app.BankKeeper.GetAllBalances(suite.ctx, addrSender1)
-	suite.Equal("10000000000000000000", supply.AmountOf(lptDenom).String())
+	suite.Equal("10000000000000000000", suite.app.BankKeeper.GetSupply(suite.ctx, lptDenom).Amount.String())
 
 	expCoins := sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 100),
@@ -159,10 +158,9 @@ func (suite *TestSuite) TestLiquidity() {
 	_, err = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
 	suite.NoError(err)
 
-	supply = suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
 	sender2Balances := suite.app.BankKeeper.GetAllBalances(suite.ctx, addrSender2)
-	suite.Equal("30000000000000000000", supply.AmountOf(lptDenom).String())
+	suite.Equal("30000000000000000000", suite.app.BankKeeper.GetSupply(suite.ctx, lptDenom).Amount.String())
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 301),
@@ -190,10 +188,9 @@ func (suite *TestSuite) TestLiquidity() {
 	_, err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
 	suite.NoError(err)
 
-	supply = suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
 	sender1Balances = suite.app.BankKeeper.GetAllBalances(suite.ctx, addrSender1)
-	suite.Equal("20000000000000000000", supply.AmountOf(lptDenom).String())
+	suite.Equal("20000000000000000000", suite.app.BankKeeper.GetSupply(suite.ctx, lptDenom).Amount.String())
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 3000000000),
@@ -220,10 +217,9 @@ func (suite *TestSuite) TestLiquidity() {
 	_, err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
 	suite.NoError(err)
 
-	supply = suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
 	sender1Balances = suite.app.BankKeeper.GetAllBalances(suite.ctx, addrSender1)
-	suite.Equal("0", supply.AmountOf(lptDenom).String())
+	suite.Equal("0", suite.app.BankKeeper.GetSupply(suite.ctx, lptDenom).Amount.String())
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 3000000000),

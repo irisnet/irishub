@@ -1,4 +1,4 @@
-package simulation
+package simulation_test
 
 import (
 	"fmt"
@@ -8,11 +8,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
+	"github.com/irisnet/irismod/modules/record/simulation"
 	"github.com/irisnet/irismod/modules/record/types"
+	"github.com/irisnet/irismod/simapp"
 )
 
 var (
@@ -21,8 +22,8 @@ var (
 )
 
 func TestDecodeStore(t *testing.T) {
-	cdc, _ := simapp.MakeCodecs()
-	dec := NewDecodeStore(cdc)
+	cdc := simapp.MakeTestEncodingConfig().Marshaler
+	dec := simulation.NewDecodeStore(cdc)
 
 	txHash := make([]byte, 32)
 	_, _ = rand.Read(txHash)
@@ -30,7 +31,7 @@ func TestDecodeStore(t *testing.T) {
 
 	kvPairs := kv.Pairs{
 		Pairs: []kv.Pair{
-			{Key: types.GetRecordKey(txHash), Value: cdc.MustMarshalBinaryBare(&record)},
+			{Key: types.GetRecordKey(txHash), Value: cdc.MustMarshal(&record)},
 			{Key: []byte{0x99}, Value: []byte{0x99}},
 		},
 	}

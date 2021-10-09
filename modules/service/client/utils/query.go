@@ -11,7 +11,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
+	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 
 	"github.com/irisnet/irismod/modules/service/types"
 )
@@ -56,7 +56,7 @@ func QueryRequestContextByTxQuery(cliCtx client.Context, queryRoute string, para
 	}
 
 	// NOTE: QueryTx is used to facilitate the txs query which does not currently
-	txInfo, err := authclient.QueryTx(cliCtx, txHash.String())
+	txInfo, err := authtx.QueryTx(cliCtx, txHash.String())
 	if err != nil {
 		return requestContext, err
 	}
@@ -84,8 +84,7 @@ I:
 	}
 
 	if len(txInfo.GetTx().GetMsgs()) > msgIndex {
-		if msg := txInfo.GetTx().GetMsgs()[msgIndex]; msg.Type() == types.TypeMsgCallService {
-			requestMsg := msg.(*types.MsgCallService)
+		if requestMsg, ok := txInfo.GetTx().GetMsgs()[msgIndex].(*types.MsgCallService); ok {
 			consumer, err := sdk.AccAddressFromBech32(requestMsg.Consumer)
 			if err != nil {
 				return requestContext, fmt.Errorf("invalid consumer address: %s", consumer)
@@ -211,7 +210,7 @@ func QueryResponseByTxQuery(
 
 	// NOTE: SearchTxs is used to facilitate the txs query which does not currently
 	// support configurable pagination.
-	result, err := authclient.QueryTxsByEvents(cliCtx, events, 1, 1, "")
+	result, err := authtx.QueryTxsByEvents(cliCtx, events, 1, 1, "")
 	if err != nil {
 		return response, err
 	}
@@ -236,8 +235,7 @@ func QueryResponseByTxQuery(
 	}
 
 	for _, msg := range result.Txs[0].GetTx().GetMsgs() {
-		if msg.Type() == types.TypeMsgRespondService {
-			responseMsg := msg.(*types.MsgRespondService)
+		if responseMsg, ok := msg.(*types.MsgRespondService); ok {
 			if responseMsg.RequestId != requestID.String() {
 				continue
 			}

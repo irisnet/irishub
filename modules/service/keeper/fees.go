@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	v040 "github.com/cosmos/cosmos-sdk/x/auth/legacy/v040"
 
 	"github.com/irisnet/irismod/modules/service/types"
 )
@@ -50,7 +51,7 @@ func (k Keeper) SetEarnedFees(ctx sdk.Context, provider sdk.AccAddress, fees sdk
 	store := ctx.KVStore(k.storeKey)
 
 	for i := range fees {
-		bz := k.cdc.MustMarshalBinaryBare(&fees[i])
+		bz := k.cdc.MustMarshal(&fees[i])
 		store.Set(types.GetEarnedFeesKey(provider, fees[i].Denom), bz)
 	}
 }
@@ -64,7 +65,7 @@ func (k Keeper) GetEarnedFees(ctx sdk.Context, provider sdk.AccAddress) (fees sd
 	fees = sdk.NewCoins()
 	for ; iterator.Valid(); iterator.Next() {
 		var balance sdk.Coin
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &balance)
+		k.cdc.MustUnmarshal(iterator.Value(), &balance)
 		fees = fees.Add(balance)
 	}
 
@@ -86,7 +87,7 @@ func (k Keeper) SetOwnerEarnedFees(ctx sdk.Context, owner sdk.AccAddress, fees s
 	store := ctx.KVStore(k.storeKey)
 
 	for i := range fees {
-		bz := k.cdc.MustMarshalBinaryBare(&fees[i])
+		bz := k.cdc.MustMarshal(&fees[i])
 		store.Set(types.GetOwnerEarnedFeesKey(owner, fees[i].Denom), bz)
 	}
 }
@@ -100,7 +101,7 @@ func (k Keeper) GetOwnerEarnedFees(ctx sdk.Context, owner sdk.AccAddress) (fees 
 	fees = sdk.NewCoins()
 	for ; iterator.Valid(); iterator.Next() {
 		var balance sdk.Coin
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &balance)
+		k.cdc.MustUnmarshal(iterator.Value(), &balance)
 		fees = fees.Add(balance)
 	}
 
@@ -153,7 +154,7 @@ func (k Keeper) WithdrawEarnedFees(ctx sdk.Context, owner, provider sdk.AccAddre
 		defer iterator.Close()
 
 		for ; iterator.Valid(); iterator.Next() {
-			provider := sdk.AccAddress(iterator.Key()[sdk.AddrLen+1:])
+			provider := sdk.AccAddress(iterator.Key()[v040.AddrLen+1:])
 			k.DeleteEarnedFees(ctx, provider)
 		}
 
@@ -181,7 +182,7 @@ func (k Keeper) RefundEarnedFees(ctx sdk.Context) error {
 		provider := iterator.Key()[1:]
 
 		var earnedFee sdk.Coin
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &earnedFee)
+		k.cdc.MustUnmarshal(iterator.Value(), &earnedFee)
 
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(
 			ctx, types.RequestAccName, provider, sdk.NewCoins(earnedFee),
@@ -200,7 +201,7 @@ func (k Keeper) RefundServiceFees(ctx sdk.Context) error {
 
 	for ; iterator.Valid(); iterator.Next() {
 		var requestID gogotypes.BytesValue
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &requestID)
+		k.cdc.MustUnmarshal(iterator.Value(), &requestID)
 
 		request, _ := k.GetRequest(ctx, requestID.Value)
 

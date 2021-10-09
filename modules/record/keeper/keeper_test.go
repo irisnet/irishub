@@ -23,7 +23,7 @@ var (
 type KeeperTestSuite struct {
 	suite.Suite
 
-	cdc    codec.Marshaler
+	cdc    codec.Codec
 	ctx    sdk.Context
 	keeper keeper.Keeper
 }
@@ -70,7 +70,7 @@ func (suite *KeeperTestSuite) TestAddRecord() {
 	var records []types.Record
 	for ; recordsIterator.Valid(); recordsIterator.Next() {
 		var record types.Record
-		suite.cdc.MustUnmarshalBinaryBare(recordsIterator.Value(), &record)
+		suite.cdc.MustUnmarshal(recordsIterator.Value(), &record)
 		records = append(records, record)
 	}
 	suite.Equal(2, len(records))

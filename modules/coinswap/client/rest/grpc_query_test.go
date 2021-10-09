@@ -10,15 +10,14 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/client/tx"
+	clienttx "github.com/cosmos/cosmos-sdk/client/tx"
 	codectype "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
-	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
-	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
@@ -96,23 +95,24 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	bz, err := tokentestutil.IssueTokenExec(clientCtx, from.String(), args...)
 
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	respType = proto.Message(&banktypes.QueryAllBalancesResponse{})
 	out, err := simapp.QueryBalancesExec(clientCtx, from.String())
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(out.Bytes(), respType))
 	balances := respType.(*banktypes.QueryAllBalancesResponse)
-	s.Require().Equal("100000000", balances.Balances[0].Amount.String())
-	s.Require().Equal("399986975", balances.Balances[2].Amount.String())
+	fmt.Println(balances.Balances)
+	s.Require().Equal("100000000", balances.Balances.AmountOf(symbol).String())
+	s.Require().Equal("399986975", balances.Balances.AmountOf(sdk.DefaultBondDenom).String())
 
 	var account authtypes.AccountI
 	respType = proto.Message(&codectype.Any{})
 	out, err = simapp.QueryAccountExec(clientCtx, from.String())
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(out.Bytes(), respType))
 	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*codectype.Any), &account)
 	s.Require().NoError(err)
 
@@ -121,7 +121,6 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().NoError(err)
 	deadline := status.SyncInfo.LatestBlockTime.Add(time.Minute)
 
-	txConfig := legacytx.StdTxConfig{Cdc: s.cfg.LegacyAmino}
 	msgAddLiquidity := &coinswaptypes.MsgAddLiquidity{
 		MaxToken:         sdk.NewCoin(symbol, sdk.NewInt(1000)),
 		ExactStandardAmt: sdk.NewInt(1000),
@@ -131,7 +130,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	}
 
 	// prepare txBuilder with msg
-	txBuilder := txConfig.NewTxBuilder()
+	txBuilder := val.ClientCtx.TxConfig.NewTxBuilder()
 	feeAmount := sdk.Coins{sdk.NewInt64Coin(s.cfg.BondDenom, 10)}
 	err = txBuilder.SetMsgs(msgAddLiquidity)
 	s.Require().NoError(err)
@@ -139,34 +138,41 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	txBuilder.SetGasLimit(1000000)
 
 	// setup txFactory
-	txFactory := tx.Factory{}.
+	txFactory := clienttx.Factory{}.
 		WithChainID(val.ClientCtx.ChainID).
 		WithKeybase(val.ClientCtx.Keyring).
-		WithTxConfig(txConfig).
-		WithSignMode(signing.SignMode_SIGN_MODE_LEGACY_AMINO_JSON).
+		WithTxConfig(val.ClientCtx.TxConfig).
+		WithSignMode(signing.SignMode_SIGN_MODE_DIRECT).
 		WithSequence(account.GetSequence())
 
-	// sign Tx (offline mode so we can manually set sequence number)
+	// Sign Tx.
 	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, false, true)
 	s.Require().NoError(err)
 
-	stdTx := txBuilder.GetTx().(legacytx.StdTx)
-	req := authrest.BroadcastReq{
-		Tx:   stdTx,
-		Mode: "block",
+	txBytes, err := val.ClientCtx.TxConfig.TxEncoder()(txBuilder.GetTx())
+	s.Require().NoError(err)
+	req := &tx.BroadcastTxRequest{
+		Mode:    tx.BroadcastMode_BROADCAST_MODE_BLOCK,
+		TxBytes: txBytes,
 	}
-	reqBz, err := val.ClientCtx.LegacyAmino.MarshalJSON(req)
+
+	reqBz, err := val.ClientCtx.Codec.MarshalJSON(req)
 	s.Require().NoError(err)
-	_, err = rest.PostRequest(fmt.Sprintf("%s/txs", baseURL), "application/json", reqBz)
+	res, err := rest.PostRequest(fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL), "application/json", reqBz)
 	s.Require().NoError(err)
+	var result tx.BroadcastTxResponse
+	err = val.ClientCtx.Codec.UnmarshalJSON(res, &result)
+	s.Require().NoError(err)
+	s.Require().Equal(uint32(0), result.TxResponse.Code, "rawlog", result.TxResponse.RawLog)
 
 	respType = proto.Message(&banktypes.QueryAllBalancesResponse{})
 	out, err = simapp.QueryBalancesExec(clientCtx, from.String())
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(out.Bytes(), respType))
 
 	balances = respType.(*banktypes.QueryAllBalancesResponse)
 	coins := balances.Balances
+	fmt.Println(coins)
 	s.Require().Equal("99999000", coins.AmountOf(symbol).String())
 	s.Require().Equal("399985965", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("1000", coins.AmountOf(lptDenom).String())
@@ -175,7 +181,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	url := fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
 	resp, err := rest.GetRequest(url)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolResponse))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, queryPoolResponse))
 
 	queryPool := queryPoolResponse.(*coinswaptypes.QueryLiquidityPoolResponse)
 	s.Require().Equal("1000", queryPool.Pool.Standard.Amount.String())
@@ -187,7 +193,6 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	s.Require().NoError(err)
 	deadline = status.SyncInfo.LatestBlockTime.Add(time.Minute)
 
-	txConfig = legacytx.StdTxConfig{Cdc: s.cfg.LegacyAmino}
 	msgAddLiquidity = &coinswaptypes.MsgAddLiquidity{
 		MaxToken:         sdk.NewCoin(symbol, sdk.NewInt(2001)),
 		ExactStandardAmt: sdk.NewInt(2000),
@@ -197,7 +202,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	}
 
 	// prepare txBuilder with msg
-	txBuilder = txConfig.NewTxBuilder()
+	txBuilder = val.ClientCtx.TxConfig.NewTxBuilder()
 	feeAmount = sdk.Coins{sdk.NewInt64Coin(s.cfg.BondDenom, 10)}
 	err = txBuilder.SetMsgs(msgAddLiquidity)
 	s.Require().NoError(err)
@@ -205,34 +210,40 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	txBuilder.SetGasLimit(1000000)
 
 	// setup txFactory
-	txFactory = tx.Factory{}.
+	txFactory = clienttx.Factory{}.
 		WithChainID(val.ClientCtx.ChainID).
 		WithKeybase(val.ClientCtx.Keyring).
-		WithTxConfig(txConfig).
-		WithSignMode(signing.SignMode_SIGN_MODE_LEGACY_AMINO_JSON).
+		WithTxConfig(val.ClientCtx.TxConfig).
+		WithSignMode(signing.SignMode_SIGN_MODE_DIRECT).
 		WithSequence(account.GetSequence() + 1)
 
-	// sign Tx (offline mode so we can manually set sequence number)
+	// sign Tx
 	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, false, true)
 	s.Require().NoError(err)
 
-	stdTx = txBuilder.GetTx().(legacytx.StdTx)
-	req = authrest.BroadcastReq{
-		Tx:   stdTx,
-		Mode: "block",
+	txBytes, err = val.ClientCtx.TxConfig.TxEncoder()(txBuilder.GetTx())
+	s.Require().NoError(err)
+	req = &tx.BroadcastTxRequest{
+		Mode:    tx.BroadcastMode_BROADCAST_MODE_BLOCK,
+		TxBytes: txBytes,
 	}
-	reqBz, err = val.ClientCtx.LegacyAmino.MarshalJSON(req)
+
+	reqBz, err = val.ClientCtx.Codec.MarshalJSON(req)
 	s.Require().NoError(err)
-	_, err = rest.PostRequest(fmt.Sprintf("%s/txs", baseURL), "application/json", reqBz)
+	res, err = rest.PostRequest(fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL), "application/json", reqBz)
 	s.Require().NoError(err)
+	err = val.ClientCtx.Codec.UnmarshalJSON(res, &result)
+	s.Require().NoError(err)
+	s.Require().Equal(uint32(0), result.TxResponse.Code, "rawlog", result.TxResponse.RawLog)
 
 	respType = proto.Message(&banktypes.QueryAllBalancesResponse{})
 	out, err = simapp.QueryBalancesExec(clientCtx, from.String())
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(out.Bytes(), respType))
 
 	balances = respType.(*banktypes.QueryAllBalancesResponse)
 	coins = balances.Balances
+	fmt.Println(coins)
 	s.Require().Equal("99996999", coins.AmountOf(symbol).String())
 	s.Require().Equal("399983955", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
@@ -240,7 +251,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolResponse))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, queryPoolResponse))
 
 	s.Require().Equal("3000", queryPool.Pool.Standard.Amount.String())
 	s.Require().Equal("3001", queryPool.Pool.Token.Amount.String())
@@ -261,7 +272,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	}
 
 	// prepare txBuilder with msg
-	txBuilder = txConfig.NewTxBuilder()
+	txBuilder = val.ClientCtx.TxConfig.NewTxBuilder()
 	feeAmount = sdk.Coins{sdk.NewInt64Coin(s.cfg.BondDenom, 10)}
 	err = txBuilder.SetMsgs(msgSellOrder)
 	s.Require().NoError(err)
@@ -269,34 +280,40 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	txBuilder.SetGasLimit(1000000)
 
 	// setup txFactory
-	txFactory = tx.Factory{}.
+	txFactory = clienttx.Factory{}.
 		WithChainID(val.ClientCtx.ChainID).
 		WithKeybase(val.ClientCtx.Keyring).
-		WithTxConfig(txConfig).
-		WithSignMode(signing.SignMode_SIGN_MODE_LEGACY_AMINO_JSON).
+		WithTxConfig(val.ClientCtx.TxConfig).
+		WithSignMode(signing.SignMode_SIGN_MODE_DIRECT).
 		WithSequence(account.GetSequence() + 2)
 
 	// sign Tx (offline mode so we can manually set sequence number)
 	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, false, true)
 	s.Require().NoError(err)
 
-	stdTx = txBuilder.GetTx().(legacytx.StdTx)
-	req = authrest.BroadcastReq{
-		Tx:   stdTx,
-		Mode: "block",
+	txBytes, err = val.ClientCtx.TxConfig.TxEncoder()(txBuilder.GetTx())
+	s.Require().NoError(err)
+	req = &tx.BroadcastTxRequest{
+		Mode:    tx.BroadcastMode_BROADCAST_MODE_BLOCK,
+		TxBytes: txBytes,
 	}
-	reqBz, err = val.ClientCtx.LegacyAmino.MarshalJSON(req)
+
+	reqBz, err = val.ClientCtx.Codec.MarshalJSON(req)
 	s.Require().NoError(err)
-	_, err = rest.PostRequest(fmt.Sprintf("%s/txs", baseURL), "application/json", reqBz)
+	_, err = rest.PostRequest(fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL), "application/json", reqBz)
 	s.Require().NoError(err)
+	err = val.ClientCtx.Codec.UnmarshalJSON(res, &result)
+	s.Require().NoError(err)
+	s.Require().Equal(uint32(0), result.TxResponse.Code, "rawlog", result.TxResponse.RawLog)
 
 	respType = proto.Message(&banktypes.QueryAllBalancesResponse{})
 	out, err = simapp.QueryBalancesExec(clientCtx, from.String())
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(out.Bytes(), respType))
 
 	balances = respType.(*banktypes.QueryAllBalancesResponse)
 	coins = balances.Balances
+	fmt.Println(coins)
 	s.Require().Equal("99995999", coins.AmountOf(symbol).String())
 	s.Require().Equal("399984693", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
@@ -304,7 +321,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolResponse))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, queryPoolResponse))
 
 	s.Require().Equal("2252", queryPool.Pool.Standard.Amount.String())
 	s.Require().Equal("4001", queryPool.Pool.Token.Amount.String())
@@ -325,7 +342,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	}
 
 	// prepare txBuilder with msg
-	txBuilder = txConfig.NewTxBuilder()
+	txBuilder = val.ClientCtx.TxConfig.NewTxBuilder()
 	feeAmount = sdk.Coins{sdk.NewInt64Coin(s.cfg.BondDenom, 10)}
 	err = txBuilder.SetMsgs(msgBuyOrder)
 	s.Require().NoError(err)
@@ -333,34 +350,40 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	txBuilder.SetGasLimit(1000000)
 
 	// setup txFactory
-	txFactory = tx.Factory{}.
+	txFactory = clienttx.Factory{}.
 		WithChainID(val.ClientCtx.ChainID).
 		WithKeybase(val.ClientCtx.Keyring).
-		WithTxConfig(txConfig).
-		WithSignMode(signing.SignMode_SIGN_MODE_LEGACY_AMINO_JSON).
+		WithTxConfig(val.ClientCtx.TxConfig).
+		WithSignMode(signing.SignMode_SIGN_MODE_DIRECT).
 		WithSequence(account.GetSequence() + 3)
 
 	// sign Tx (offline mode so we can manually set sequence number)
 	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, false, true)
 	s.Require().NoError(err)
 
-	stdTx = txBuilder.GetTx().(legacytx.StdTx)
-	req = authrest.BroadcastReq{
-		Tx:   stdTx,
-		Mode: "block",
+	txBytes, err = val.ClientCtx.TxConfig.TxEncoder()(txBuilder.GetTx())
+	s.Require().NoError(err)
+	req = &tx.BroadcastTxRequest{
+		Mode:    tx.BroadcastMode_BROADCAST_MODE_BLOCK,
+		TxBytes: txBytes,
 	}
-	reqBz, err = val.ClientCtx.LegacyAmino.MarshalJSON(req)
+
+	reqBz, err = val.ClientCtx.Codec.MarshalJSON(req)
 	s.Require().NoError(err)
-	_, err = rest.PostRequest(fmt.Sprintf("%s/txs", baseURL), "application/json", reqBz)
+	_, err = rest.PostRequest(fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL), "application/json", reqBz)
 	s.Require().NoError(err)
+	err = val.ClientCtx.Codec.UnmarshalJSON(res, &result)
+	s.Require().NoError(err)
+	s.Require().Equal(uint32(0), result.TxResponse.Code, "rawlog", result.TxResponse.RawLog)
 
 	respType = proto.Message(&banktypes.QueryAllBalancesResponse{})
 	out, err = simapp.QueryBalancesExec(clientCtx, from.String())
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(out.Bytes(), respType))
 
 	balances = respType.(*banktypes.QueryAllBalancesResponse)
 	coins = balances.Balances
+	fmt.Println(coins)
 	s.Require().Equal("99996999", coins.AmountOf(symbol).String())
 	s.Require().Equal("399983930", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
@@ -368,7 +391,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolResponse))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, queryPoolResponse))
 
 	s.Require().Equal("3005", queryPool.Pool.Standard.Amount.String())
 	s.Require().Equal("3001", queryPool.Pool.Token.Amount.String())
@@ -384,7 +407,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	}
 
 	// prepare txBuilder with msg
-	txBuilder = txConfig.NewTxBuilder()
+	txBuilder = val.ClientCtx.TxConfig.NewTxBuilder()
 	feeAmount = sdk.Coins{sdk.NewInt64Coin(s.cfg.BondDenom, 10)}
 	err = txBuilder.SetMsgs(msgRemoveLiquidity)
 	s.Require().NoError(err)
@@ -392,34 +415,40 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	txBuilder.SetGasLimit(1000000)
 
 	// setup txFactory
-	txFactory = tx.Factory{}.
+	txFactory = clienttx.Factory{}.
 		WithChainID(val.ClientCtx.ChainID).
 		WithKeybase(val.ClientCtx.Keyring).
-		WithTxConfig(txConfig).
-		WithSignMode(signing.SignMode_SIGN_MODE_LEGACY_AMINO_JSON).
+		WithTxConfig(val.ClientCtx.TxConfig).
+		WithSignMode(signing.SignMode_SIGN_MODE_DIRECT).
 		WithSequence(account.GetSequence() + 4)
 
 	// sign Tx (offline mode so we can manually set sequence number)
 	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, false, true)
 	s.Require().NoError(err)
 
-	stdTx = txBuilder.GetTx().(legacytx.StdTx)
-	req = authrest.BroadcastReq{
-		Tx:   stdTx,
-		Mode: "block",
+	txBytes, err = val.ClientCtx.TxConfig.TxEncoder()(txBuilder.GetTx())
+	s.Require().NoError(err)
+	req = &tx.BroadcastTxRequest{
+		Mode:    tx.BroadcastMode_BROADCAST_MODE_BLOCK,
+		TxBytes: txBytes,
 	}
-	reqBz, err = val.ClientCtx.LegacyAmino.MarshalJSON(req)
+
+	reqBz, err = val.ClientCtx.Codec.MarshalJSON(req)
 	s.Require().NoError(err)
-	_, err = rest.PostRequest(fmt.Sprintf("%s/txs", baseURL), "application/json", reqBz)
+	_, err = rest.PostRequest(fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL), "application/json", reqBz)
 	s.Require().NoError(err)
+	err = val.ClientCtx.Codec.UnmarshalJSON(res, &result)
+	s.Require().NoError(err)
+	s.Require().Equal(uint32(0), result.TxResponse.Code, "rawlog", result.TxResponse.RawLog)
 
 	respType = proto.Message(&banktypes.QueryAllBalancesResponse{})
 	out, err = simapp.QueryBalancesExec(clientCtx, from.String())
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(out.Bytes(), respType))
 
 	balances = respType.(*banktypes.QueryAllBalancesResponse)
 	coins = balances.Balances
+	fmt.Println(coins)
 	s.Require().Equal("99998999", coins.AmountOf(symbol).String())
 	s.Require().Equal("399985923", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("1000", coins.AmountOf(lptDenom).String())
@@ -427,7 +456,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolResponse))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, queryPoolResponse))
 
 	s.Require().Equal("1002", queryPool.Pool.Standard.Amount.String())
 	s.Require().Equal("1001", queryPool.Pool.Token.Amount.String())
@@ -443,7 +472,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	}
 
 	// prepare txBuilder with msg
-	txBuilder = txConfig.NewTxBuilder()
+	txBuilder = val.ClientCtx.TxConfig.NewTxBuilder()
 	feeAmount = sdk.Coins{sdk.NewInt64Coin(s.cfg.BondDenom, 10)}
 	err = txBuilder.SetMsgs(msgRemoveLiquidity)
 	s.Require().NoError(err)
@@ -451,34 +480,40 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	txBuilder.SetGasLimit(1000000)
 
 	// setup txFactory
-	txFactory = tx.Factory{}.
+	txFactory = clienttx.Factory{}.
 		WithChainID(val.ClientCtx.ChainID).
 		WithKeybase(val.ClientCtx.Keyring).
-		WithTxConfig(txConfig).
-		WithSignMode(signing.SignMode_SIGN_MODE_LEGACY_AMINO_JSON).
+		WithTxConfig(val.ClientCtx.TxConfig).
+		WithSignMode(signing.SignMode_SIGN_MODE_DIRECT).
 		WithSequence(account.GetSequence() + 5)
 
 	// sign Tx (offline mode so we can manually set sequence number)
 	err = authclient.SignTx(txFactory, val.ClientCtx, val.Moniker, txBuilder, false, true)
 	s.Require().NoError(err)
 
-	stdTx = txBuilder.GetTx().(legacytx.StdTx)
-	req = authrest.BroadcastReq{
-		Tx:   stdTx,
-		Mode: "block",
+	txBytes, err = val.ClientCtx.TxConfig.TxEncoder()(txBuilder.GetTx())
+	s.Require().NoError(err)
+	req = &tx.BroadcastTxRequest{
+		Mode:    tx.BroadcastMode_BROADCAST_MODE_BLOCK,
+		TxBytes: txBytes,
 	}
-	reqBz, err = val.ClientCtx.LegacyAmino.MarshalJSON(req)
+
+	reqBz, err = val.ClientCtx.Codec.MarshalJSON(req)
 	s.Require().NoError(err)
-	_, err = rest.PostRequest(fmt.Sprintf("%s/txs", baseURL), "application/json", reqBz)
+	_, err = rest.PostRequest(fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL), "application/json", reqBz)
 	s.Require().NoError(err)
+	err = val.ClientCtx.Codec.UnmarshalJSON(res, &result)
+	s.Require().NoError(err)
+	s.Require().Equal(uint32(0), result.TxResponse.Code, "rawlog", result.TxResponse.RawLog)
 
 	respType = proto.Message(&banktypes.QueryAllBalancesResponse{})
 	out, err = simapp.QueryBalancesExec(clientCtx, from.String())
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(out.Bytes(), respType))
 
 	balances = respType.(*banktypes.QueryAllBalancesResponse)
 	coins = balances.Balances
+	fmt.Println(coins)
 	s.Require().Equal("100000000", coins.AmountOf(symbol).String())
 	s.Require().Equal("399986915", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("0", coins.AmountOf(lptDenom).String())
@@ -486,7 +521,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolResponse))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, queryPoolResponse))
 
 	s.Require().Equal("0", queryPool.Pool.Standard.Amount.String())
 	s.Require().Equal("0", queryPool.Pool.Token.Amount.String())
@@ -496,7 +531,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	url = fmt.Sprintf("%s/irismod/coinswap/pools", baseURL)
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, queryPoolsResponse))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, queryPoolsResponse))
 
 	queryPools := queryPoolsResponse.(*coinswaptypes.QueryLiquidityPoolsResponse)
 	s.Require().Len(queryPools.Pools, 1)

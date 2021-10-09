@@ -101,7 +101,7 @@ func (s *IntegrationTestSuite) TestOracle() {
 	bz, err := servicetestutil.DefineServiceExec(clientCtx, author.String(), args...)
 
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -122,7 +122,7 @@ func (s *IntegrationTestSuite) TestOracle() {
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.BindServiceExec(clientCtx, provider.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -152,7 +152,7 @@ func (s *IntegrationTestSuite) TestOracle() {
 
 	bz, err = oracletestutil.CreateFeedExec(clientCtx, creator.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
@@ -161,7 +161,7 @@ func (s *IntegrationTestSuite) TestOracle() {
 	resp, err := rest.GetRequest(url)
 	s.Require().NoError(err)
 	respType = proto.Message(&oracletypes.QueryFeedResponse{})
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
 	feedResp := respType.(*oracletypes.QueryFeedResponse)
 	s.Require().NoError(err)
 	s.Require().Equal(feedName, feedResp.Feed.Feed.FeedName)
@@ -172,7 +172,7 @@ func (s *IntegrationTestSuite) TestOracle() {
 	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
 	respType = proto.Message(&oracletypes.QueryFeedsResponse{})
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
 	feedsResp := respType.(*oracletypes.QueryFeedsResponse)
 	s.Require().NoError(err)
 	s.Require().Len(feedsResp.Feeds, 1)
@@ -183,7 +183,7 @@ func (s *IntegrationTestSuite) TestOracle() {
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&oracletypes.QueryFeedValueResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
 	feedValueResp := respType.(*oracletypes.QueryFeedValueResponse)
 	s.Require().NoError(err)
 	s.Require().Len(feedValueResp.FeedValues, 0)

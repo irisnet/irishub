@@ -8,7 +8,9 @@ import (
 )
 
 // Stake is responsible for the user to mortgage the lp token to the system and get back the reward accumulated before then
-func (k Keeper) Stake(ctx sdk.Context, poolName string,
+func (k Keeper) Stake(
+	ctx sdk.Context,
+	poolName string,
 	lpToken sdk.Coin,
 	sender sdk.AccAddress,
 ) (reward sdk.Coins, err error) {
@@ -18,31 +20,30 @@ func (k Keeper) Stake(ctx sdk.Context, poolName string,
 	}
 
 	if pool.StartHeight > ctx.BlockHeight() {
-		return reward, sdkerrors.Wrapf(types.ErrPoolNotStart,
+		return reward, sdkerrors.Wrapf(
+			types.ErrPoolNotStart,
 			"farm pool [%s] will start at height [%d], current [%d]",
-			poolName,
-			pool.StartHeight,
-			ctx.BlockHeight(),
+			poolName, pool.StartHeight, ctx.BlockHeight(),
 		)
 	}
 
 	if k.Expired(ctx, pool) {
-		return reward, sdkerrors.Wrapf(types.ErrPoolExpired,
+		return reward, sdkerrors.Wrapf(
+			types.ErrPoolExpired,
 			"pool [%s] has expired at height [%d], current [%d]",
-			poolName,
-			pool.EndHeight,
-			ctx.BlockHeight(),
+			poolName, pool.EndHeight, ctx.BlockHeight(),
 		)
 	}
 
 	if lpToken.Denom != pool.TotalLptLocked.Denom {
-		return reward, sdkerrors.Wrapf(types.ErrNotMatch,
+		return reward, sdkerrors.Wrapf(
+			types.ErrNotMatch,
 			"pool [%s] only accept [%s] token, but got [%s]",
-			poolName, pool.TotalLptLocked.Denom, lpToken.Denom)
+			poolName, pool.TotalLptLocked.Denom, lpToken.Denom,
+		)
 	}
 
-	if err := k.bk.SendCoinsFromAccountToModule(ctx,
-		sender, types.ModuleName, sdk.NewCoins(lpToken)); err != nil {
+	if err := k.bk.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, sdk.NewCoins(lpToken)); err != nil {
 		return reward, err
 	}
 
@@ -65,8 +66,7 @@ func (k Keeper) Stake(ctx sdk.Context, poolName string,
 	rewards, rewardDebt := pool.CaclRewards(farmInfo, lpToken.Amount)
 	//reward users
 	if rewards.IsAllPositive() {
-		if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.RewardCollector,
-			sender, rewards); err != nil {
+		if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.RewardCollector, sender, rewards); err != nil {
 			return reward, err
 		}
 	}
@@ -78,9 +78,7 @@ func (k Keeper) Stake(ctx sdk.Context, poolName string,
 }
 
 // Unstake withdraw lp token from farm pool
-func (k Keeper) Unstake(ctx sdk.Context, poolName string,
-	lpToken sdk.Coin,
-	sender sdk.AccAddress) (_ sdk.Coins, err error) {
+func (k Keeper) Unstake(ctx sdk.Context, poolName string, lpToken sdk.Coin, sender sdk.AccAddress) (_ sdk.Coins, err error) {
 	pool, exist := k.GetPool(ctx, poolName)
 	if !exist {
 		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, poolName)
@@ -88,36 +86,38 @@ func (k Keeper) Unstake(ctx sdk.Context, poolName string,
 
 	//lpToken demon must be same as pool.TotalLptLocked.Denom
 	if lpToken.Denom != pool.TotalLptLocked.Denom {
-		return nil, sdkerrors.Wrapf(types.ErrNotMatch,
+		return nil, sdkerrors.Wrapf(
+			types.ErrNotMatch,
 			"pool [%s] only accept [%s] token, but got [%s]",
-			poolName, pool.TotalLptLocked.Denom, lpToken.Denom)
+			poolName, pool.TotalLptLocked.Denom, lpToken.Denom,
+		)
 	}
 
 	//farmInfo must be exist
 	farmInfo, exist := k.GetFarmInfo(ctx, poolName, sender.String())
 	if !exist {
-		return nil, sdkerrors.Wrapf(types.ErrFarmerNotFound,
+		return nil, sdkerrors.Wrapf(
+			types.ErrFarmerNotFound,
 			"farmer [%s] not found in pool [%s]",
-			sender.String(),
-			poolName,
+			sender.String(), poolName,
 		)
 	}
 
 	//the lp token unstaked must be less than staked
 	if farmInfo.Locked.LT(lpToken.Amount) {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
+		return nil, sdkerrors.Wrapf(
+			sdkerrors.ErrInsufficientFunds,
 			"farmer locked lp token [%s], but unstake [%s]",
-			farmInfo.Locked.String(),
-			lpToken.Amount.String(),
+			farmInfo.Locked.String(), lpToken.Amount.String(),
 		)
 	}
 
 	//the lp token unstaked must be less than pool
 	if pool.TotalLptLocked.Amount.LT(lpToken.Amount) {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
+		return nil, sdkerrors.Wrapf(
+			sdkerrors.ErrInsufficientFunds,
 			"farmer locked lp token [%s], but farm pool total: [%s]",
-			farmInfo.Locked.String(),
-			pool.TotalLptLocked.Amount.String(),
+			farmInfo.Locked.String(), pool.TotalLptLocked.Amount.String(),
 		)
 	}
 
@@ -135,8 +135,7 @@ func (k Keeper) Unstake(ctx sdk.Context, poolName string,
 	}
 
 	//unstake lpToken to sender account
-	if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName,
-		sender, sdk.NewCoins(lpToken)); err != nil {
+	if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sender, sdk.NewCoins(lpToken)); err != nil {
 		return nil, err
 	}
 
@@ -144,8 +143,7 @@ func (k Keeper) Unstake(ctx sdk.Context, poolName string,
 	rewards, rewardDebt := pool.CaclRewards(farmInfo, lpToken.Amount.Neg())
 	if rewards.IsAllPositive() {
 		//distribute reward
-		if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.RewardCollector,
-			sender, rewards); err != nil {
+		if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.RewardCollector, sender, rewards); err != nil {
 			return nil, err
 		}
 	}
@@ -161,28 +159,26 @@ func (k Keeper) Unstake(ctx sdk.Context, poolName string,
 }
 
 // Harvest creates an new farm pool
-func (k Keeper) Harvest(ctx sdk.Context, poolName string,
-	sender sdk.AccAddress) (sdk.Coins, error) {
+func (k Keeper) Harvest(ctx sdk.Context, poolName string, sender sdk.AccAddress) (sdk.Coins, error) {
 	pool, exist := k.GetPool(ctx, poolName)
 	if !exist {
 		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, poolName)
 	}
 
 	if k.Expired(ctx, pool) {
-		return nil, sdkerrors.Wrapf(types.ErrPoolExpired,
+		return nil, sdkerrors.Wrapf(
+			types.ErrPoolExpired,
 			"pool [%s] has expired at height [%d], current [%d]",
-			poolName,
-			pool.EndHeight,
-			ctx.BlockHeight(),
+			poolName, pool.EndHeight, ctx.BlockHeight(),
 		)
 	}
 
 	farmInfo, exist := k.GetFarmInfo(ctx, poolName, sender.String())
 	if !exist {
-		return nil, sdkerrors.Wrapf(types.ErrFarmerNotFound,
+		return nil, sdkerrors.Wrapf(
+			types.ErrFarmerNotFound,
 			"farmer [%s] not found in pool [%s]",
-			sender.String(),
-			poolName,
+			sender.String(), poolName,
 		)
 	}
 
@@ -223,15 +219,13 @@ func (k Keeper) Refund(ctx sdk.Context, pool types.FarmPool) (sdk.Coins, error) 
 	var refundTotal sdk.Coins
 	for _, r := range pool.Rules {
 		refundTotal = refundTotal.Add(sdk.NewCoin(r.Reward, r.RemainingReward))
-
 		r.RemainingReward = sdk.ZeroInt()
 		k.SetRewardRule(ctx, pool.Name, r)
 	}
 
 	if refundTotal.IsAllPositive() {
 		//refund the total remaining reward to creator
-		if err := k.bk.SendCoinsFromModuleToAccount(ctx,
-			types.ModuleName, creator, refundTotal); err != nil {
+		if err := k.bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, refundTotal); err != nil {
 			return nil, err
 		}
 	}

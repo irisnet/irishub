@@ -32,7 +32,8 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 
 // RegisterInterfaces registers the interface
 func RegisterInterfaces(registry types.InterfaceRegistry) {
-	registry.RegisterImplementations((*sdk.Msg)(nil),
+	registry.RegisterImplementations(
+		(*sdk.Msg)(nil),
 		&MsgCreatePool{},
 		&MsgDestroyPool{},
 		&MsgAdjustPool{},
@@ -45,14 +46,14 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 }
 
 // MustUnMarshalPoolName return the poolName protobuf code
-func MustMarshalPoolName(cdc codec.Marshaler, poolName string) []byte {
+func MustMarshalPoolName(cdc codec.Codec, poolName string) []byte {
 	poolNameWrap := gogotypes.StringValue{Value: poolName}
-	return cdc.MustMarshalBinaryBare(&poolNameWrap)
+	return cdc.MustMarshal(&poolNameWrap)
 }
 
 // MustUnMarshalPoolName return the poolName
-func MustUnMarshalPoolName(cdc codec.Marshaler, poolName []byte) string {
+func MustUnMarshalPoolName(cdc codec.Codec, poolName []byte) string {
 	var poolNameWrap gogotypes.StringValue
-	cdc.MustUnmarshalBinaryBare(poolName, &poolNameWrap)
+	cdc.MustUnmarshal(poolName, &poolNameWrap)
 	return poolNameWrap.Value
 }

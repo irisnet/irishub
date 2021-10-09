@@ -21,7 +21,7 @@ import (
 type AssetTestSuite struct {
 	suite.Suite
 
-	cdc    codec.JSONMarshaler
+	cdc    codec.BinaryCodec
 	ctx    sdk.Context
 	keeper *keeper.Keeper
 	app    *simapp.SimApp

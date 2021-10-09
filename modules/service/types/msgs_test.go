@@ -604,7 +604,7 @@ func TestMsgCallServiceType(t *testing.T) {
 // TestMsgCallServiceValidation tests ValidateBasic for MsgCallService
 func TestMsgCallServiceValidation(t *testing.T) {
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
-	invalidDenomCoins := sdk.Coins{sdk.Coin{Denom: "eth-min", Amount: sdk.NewInt(1000)}}
+	invalidDenomCoins := sdk.Coins{sdk.Coin{Denom: "eth+min", Amount: sdk.NewInt(1000)}}
 
 	invalidDuplicateProviders := []string{testProvider, testProvider}
 	invalidInput := "iris-usdt"
@@ -1020,7 +1020,7 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 	invalidTimeout := int64(-1)
 	invalidLessRepeatedFreq := uint64(testTimeout) - 10
 	invalidRepeatedTotal := int64(-2)
-	invalidDenomCoins := sdk.Coins{sdk.Coin{Denom: "eth-min", Amount: sdk.NewInt(1000)}}
+	invalidDenomCoins := sdk.Coins{sdk.Coin{Denom: "eth+min", Amount: sdk.NewInt(1000)}}
 
 	testMsgs := []*MsgUpdateRequestContext{
 		NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testTimeout, testRepeatedFreq, testRepeatedTotal, testConsumer), // valid msg

@@ -50,14 +50,14 @@ func (suite *TestSuite) TestNewQuerier() {
 	res, err = querier(suite.ctx, []string{types.QueryPool}, req)
 	suite.NoError(err)
 
-	var respone types.QueryLiquidityPoolResponse
-	errRes = suite.app.LegacyAmino().UnmarshalJSON(res, &respone)
+	var response types.QueryLiquidityPoolResponse
+	errRes = suite.app.LegacyAmino().UnmarshalJSON(res, &response)
 	suite.NoError(errRes)
 	standard := sdk.NewCoin(denomStandard, standardAmt)
 	token := sdk.NewCoin(denomBTC, btcAmt)
 	liquidity := sdk.NewCoin(lptCoin.Denom, standardAmt)
-	suite.Equal(standard, respone.Pool.Standard)
-	suite.Equal(token, respone.Pool.Token)
-	suite.Equal(liquidity, respone.Pool.Lpt)
-	suite.Equal(suite.app.CoinswapKeeper.GetParams(suite.ctx).Fee.String(), respone.Pool.Fee)
+	suite.Equal(standard, response.Pool.Standard)
+	suite.Equal(token, response.Pool.Token)
+	suite.Equal(liquidity, response.Pool.Lpt)
+	suite.Equal(suite.app.CoinswapKeeper.GetParams(suite.ctx).Fee.String(), response.Pool.Fee)
 }

@@ -1,6 +1,7 @@
 package simapp
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -13,26 +14,33 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
-	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
-	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
-	servicetypes "github.com/irisnet/irismod/modules/service/types"
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdksimapp "github.com/cosmos/cosmos-sdk/simapp"
-	"github.com/cosmos/cosmos-sdk/simapp/helpers"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
+	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
+	nfttypes "github.com/irisnet/irismod/modules/nft/types"
+	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
+	randomtypes "github.com/irisnet/irismod/modules/random/types"
+	recordtypes "github.com/irisnet/irismod/modules/record/types"
+	servicetypes "github.com/irisnet/irismod/modules/service/types"
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	"github.com/irisnet/irismod/simapp/helpers"
 )
 
 // Get flags every time the simulator is run
@@ -164,25 +172,30 @@ func TestAppImportExport(t *testing.T) {
 
 	storeKeysPrefixes := []StoreKeysPrefixes{
 		{app.keys[authtypes.StoreKey], newApp.keys[authtypes.StoreKey], [][]byte{}},
-		{app.keys[banktypes.StoreKey], newApp.keys[banktypes.StoreKey], [][]byte{banktypes.BalancesPrefix}},
-		{app.keys[minttypes.StoreKey], newApp.keys[minttypes.StoreKey], [][]byte{}},
 		{app.keys[stakingtypes.StoreKey], newApp.keys[stakingtypes.StoreKey],
 			[][]byte{
-				stakingtypes.UnbondingQueueKey, stakingtypes.RedelegationQueueKey, stakingtypes.ValidatorQueueKey,
-				stakingtypes.HistoricalInfoKey,
+				stakingtypes.UnbondingQueueKey, stakingtypes.RedelegationQueueKey,
+				stakingtypes.ValidatorQueueKey, stakingtypes.HistoricalInfoKey,
 			}}, // ordering may change but it doesn't matter
-		{app.keys[distrtypes.StoreKey], newApp.keys[distrtypes.StoreKey], [][]byte{}},
 		{app.keys[slashingtypes.StoreKey], newApp.keys[slashingtypes.StoreKey], [][]byte{}},
+		{app.keys[minttypes.StoreKey], newApp.keys[minttypes.StoreKey], [][]byte{}},
+		{app.keys[distrtypes.StoreKey], newApp.keys[distrtypes.StoreKey], [][]byte{}},
+		{app.keys[banktypes.StoreKey], newApp.keys[banktypes.StoreKey], [][]byte{banktypes.BalancesPrefix}},
+		{app.keys[paramtypes.StoreKey], newApp.keys[paramtypes.StoreKey], [][]byte{}},
+		{app.keys[govtypes.StoreKey], newApp.keys[govtypes.StoreKey], [][]byte{}},
+		{app.keys[evidencetypes.StoreKey], newApp.keys[evidencetypes.StoreKey], [][]byte{}},
+		{app.keys[capabilitytypes.StoreKey], newApp.keys[capabilitytypes.StoreKey], [][]byte{}},
+		{app.keys[authzkeeper.StoreKey], newApp.keys[authzkeeper.StoreKey], [][]byte{}},
 
-		//check irismod module
+		// check irismod module
 		{app.keys[tokentypes.StoreKey], newApp.keys[tokentypes.StoreKey], [][]byte{}},
-		//{app.keys[recordtypes.StoreKey], newApp.keys[recordtypes.StoreKey], [][]byte{recordtypes.IntraTxCounterKey}},
+		{app.keys[recordtypes.StoreKey], newApp.keys[recordtypes.StoreKey], [][]byte{recordtypes.IntraTxCounterKey}},
 		{app.keys[nfttypes.StoreKey], newApp.keys[nfttypes.StoreKey], [][]byte{}},
 		{app.keys[htlctypes.StoreKey], newApp.keys[htlctypes.StoreKey], [][]byte{}},
 		{app.keys[coinswaptypes.StoreKey], newApp.keys[coinswaptypes.StoreKey], [][]byte{}},
 		{app.keys[servicetypes.StoreKey], newApp.keys[servicetypes.StoreKey], [][]byte{}},
 		{app.keys[oracletypes.StoreKey], newApp.keys[oracletypes.StoreKey], [][]byte{}},
-		// {app.keys[randomtypes.StoreKey], newApp.keys[randomtypes.StoreKey], [][]byte{randomtypes.RandomKey}},
+		{app.keys[randomtypes.StoreKey], newApp.keys[randomtypes.StoreKey], [][]byte{randomtypes.RandomKey}},
 	}
 
 	for _, skp := range storeKeysPrefixes {
@@ -334,8 +347,9 @@ func TestAppStateDeterminism(t *testing.T) {
 
 			if j != 0 {
 				require.Equal(
-					t, string(appHashList[0]), string(appHashList[j]),
-					"non-determinism in seed %d: %d/%d, attempt: %d/%d\n", config.Seed, i+1, numSeeds, j+1, numTimesToRunPerSeed,
+					t, hex.EncodeToString(appHashList[0]), hex.EncodeToString(appHashList[j]),
+					"non-determinism in seed %d: %d/%d, attempt: %d/%d\n",
+					config.Seed, i+1, numSeeds, j+1, numTimesToRunPerSeed,
 				)
 			}
 		}

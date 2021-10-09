@@ -86,7 +86,7 @@ func queryRandomRequestQueueByHeight(ctx sdk.Context, height int64, k Keeper) []
 
 	for ; iterator.Valid(); iterator.Next() {
 		var request types.Request
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &request)
+		k.cdc.MustUnmarshal(iterator.Value(), &request)
 
 		requests = append(requests, request)
 	}

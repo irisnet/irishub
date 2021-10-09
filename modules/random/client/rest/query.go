@@ -54,7 +54,7 @@ func queryRandomHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		}
 
 		var random types.Random
-		if err := cliCtx.JSONMarshaler.UnmarshalJSON(res, &random); err != nil {
+		if err := cliCtx.Codec.UnmarshalJSON(res, &random); err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}

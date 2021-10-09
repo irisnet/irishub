@@ -26,7 +26,7 @@ const (
 
 func WeightedOperations(
 	appParams simtypes.AppParams,
-	cdc codec.JSONMarshaler,
+	cdc codec.JSONCodec,
 	k keeper.Keeper,
 	ak types.AccountKeeper,
 	bk types.BankKeeper) simulation.WeightedOperations {
@@ -127,10 +127,10 @@ func SimulateCreateFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreateFeed, err.Error()), nil, err
 		}
 
-		txGen := simappparams.MakeTestEncodingConfig().TxConfig
+		txConfig := simappparams.MakeTestEncodingConfig().TxConfig
 		tx, err := irishelpers.GenTx(
 			r,
-			txGen,
+			txConfig,
 			[]sdk.Msg{msg},
 			fees,
 			helpers.DefaultGenTxGas,
@@ -143,11 +143,11 @@ func SimulateCreateFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, nil
 		}
 
-		if _, _, err = app.Deliver(txGen.TxEncoder(), tx); err != nil {
+		if _, _, err = app.Deliver(txConfig.TxEncoder(), tx); err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateFeed, err.Error()), nil, nil
 		}
 
-		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
 	}
 }
 
@@ -201,7 +201,7 @@ func SimulateStartFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to deliver tx"), nil, nil
 		}
 
-		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
 	}
 }
 
@@ -257,7 +257,7 @@ func SimulatePauseFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to deliver tx"), nil, nil
 		}
 
-		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
 	}
 }
 
@@ -308,10 +308,10 @@ func SimulateEditFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeep
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreateFeed, err.Error()), nil, err
 		}
 
-		txGen := simappparams.MakeTestEncodingConfig().TxConfig
+		txConfig := simappparams.MakeTestEncodingConfig().TxConfig
 		tx, err := irishelpers.GenTx(
 			r,
-			txGen,
+			txConfig,
 			[]sdk.Msg{msg},
 			fees,
 			helpers.DefaultGenTxGas,
@@ -324,11 +324,11 @@ func SimulateEditFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeep
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, nil
 		}
 
-		if _, _, err = app.Deliver(txGen.TxEncoder(), tx); err != nil {
+		if _, _, err = app.Deliver(txConfig.TxEncoder(), tx); err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateFeed, err.Error()), nil, nil
 		}
 
-		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
 
 	}
 }

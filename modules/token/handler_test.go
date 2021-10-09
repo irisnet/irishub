@@ -37,7 +37,7 @@ func TestHandlerSuite(t *testing.T) {
 type HandlerSuite struct {
 	suite.Suite
 
-	cdc    codec.JSONMarshaler
+	cdc    codec.JSONCodec
 	ctx    sdk.Context
 	keeper tokenkeeper.Keeper
 	bk     bankkeeper.Keeper

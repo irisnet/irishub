@@ -18,7 +18,7 @@ func (k Keeper) GetNFT(ctx sdk.Context, denomID, tokenID string) (nft exported.N
 	}
 
 	var baseNFT types.BaseNFT
-	k.cdc.MustUnmarshalBinaryBare(bz, &baseNFT)
+	k.cdc.MustUnmarshal(bz, &baseNFT)
 
 	return baseNFT, nil
 }
@@ -31,7 +31,7 @@ func (k Keeper) GetNFTs(ctx sdk.Context, denom string) (nfts []exported.NFT) {
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var baseNFT types.BaseNFT
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &baseNFT)
+		k.cdc.MustUnmarshal(iterator.Value(), &baseNFT)
 		nfts = append(nfts, baseNFT)
 	}
 
@@ -62,7 +62,7 @@ func (k Keeper) HasNFT(ctx sdk.Context, denomID, tokenID string) bool {
 func (k Keeper) setNFT(ctx sdk.Context, denomID string, nft types.BaseNFT) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryBare(&nft)
+	bz := k.cdc.MustMarshal(&nft)
 	store.Set(types.KeyNFT(denomID, nft.GetID()), bz)
 }
 

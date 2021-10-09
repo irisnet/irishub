@@ -3,27 +3,27 @@ package keeper
 import (
 	"context"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/irisnet/irismod/modules/farm/types"
 )
 
 var _ types.QueryServer = Keeper{}
 
-func (k Keeper) FarmPools(goctx context.Context,
-	request *types.QueryFarmPoolsRequest) (*types.QueryFarmPoolsResponse, error) {
+func (k Keeper) FarmPools(goctx context.Context, request *types.QueryFarmPoolsRequest) (*types.QueryFarmPoolsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goctx)
 
 	var list []*types.FarmPoolEntry
 	prefixStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.FarmPoolKey)
 	pageRes, err := query.Paginate(prefixStore, request.Pagination, func(_ []byte, value []byte) error {
 		var pool types.FarmPool
-		k.cdc.MustUnmarshalBinaryBare(value, &pool)
+		k.cdc.MustUnmarshal(value, &pool)
 		var totalReward sdk.Coins
 		var remainingReward sdk.Coins
 		var rewardPerBlock sdk.Coins
@@ -98,8 +98,7 @@ func (k Keeper) FarmPool(goctx context.Context,
 	return &types.QueryFarmPoolResponse{Pool: poolEntry}, nil
 }
 
-func (k Keeper) Farmer(goctx context.Context,
-	request *types.QueryFarmerRequest) (*types.QueryFarmerResponse, error) {
+func (k Keeper) Farmer(goctx context.Context, request *types.QueryFarmerRequest) (*types.QueryFarmerResponse, error) {
 	var list []*types.LockedInfo
 	var err error
 	var farmInfos []types.FarmInfo
@@ -158,10 +157,7 @@ func (k Keeper) Farmer(goctx context.Context,
 	}, nil
 }
 
-func (k Keeper) Params(goctx context.Context,
-	request *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+func (k Keeper) Params(goctx context.Context, request *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goctx)
-	return &types.QueryParamsResponse{
-		Params: k.GetParams(ctx),
-	}, nil
+	return &types.QueryParamsResponse{Params: k.GetParams(ctx)}, nil
 }

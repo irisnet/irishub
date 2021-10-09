@@ -67,7 +67,7 @@ func (k Keeper) Bindings(c context.Context, req *types.QueryBindingsRequest) (*t
 		bindingStore := prefix.NewStore(store, types.GetBindingsSubspace(req.ServiceName))
 		pageRes, err = query.Paginate(bindingStore, req.Pagination, func(key []byte, value []byte) error {
 			var binding types.ServiceBinding
-			k.cdc.MustUnmarshalBinaryBare(value, &binding)
+			k.cdc.MustUnmarshal(value, &binding)
 			bindings = append(bindings, &binding)
 			return nil
 		})
@@ -173,7 +173,7 @@ func (k Keeper) Requests(c context.Context, req *types.QueryRequestsRequest) (*t
 	requestStore := prefix.NewStore(store, types.GetActiveRequestSubspace(req.ServiceName, provider))
 	pageRes, err := query.Paginate(requestStore, req.Pagination, func(key []byte, value []byte) error {
 		var requestID gogotypes.BytesValue
-		k.cdc.MustUnmarshalBinaryBare(value, &requestID)
+		k.cdc.MustUnmarshal(value, &requestID)
 		request, _ := k.GetRequest(ctx, requestID.Value)
 		requests = append(requests, &request)
 		return nil
@@ -258,7 +258,7 @@ func (k Keeper) Responses(c context.Context, req *types.QueryResponsesRequest) (
 	responseStore := prefix.NewStore(store, types.GetResponseSubspaceByReqCtx(requestContextId, req.BatchCounter))
 	pageRes, err := query.Paginate(responseStore, req.Pagination, func(key []byte, value []byte) error {
 		var response types.Response
-		k.cdc.MustUnmarshalBinaryBare(value, &response)
+		k.cdc.MustUnmarshal(value, &response)
 		responses = append(responses, &response)
 		return nil
 	})
