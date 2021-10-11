@@ -447,7 +447,7 @@ func NewIrisApp(
 	)
 	app.nftTransferKeeper = tibcnfttransferkeeper.NewKeeper(
 		appCodec, keys[tibcnfttypes.StoreKey], app.GetSubspace(tibcnfttypes.ModuleName),
-		app.accountKeeper, app.nftKeeper,
+		app.accountKeeper, &app.nftKeeper,
 		app.tibcKeeper.PacketKeeper, app.tibcKeeper.ClientKeeper,
 	)
 	// Create Transfer Keepers
