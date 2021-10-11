@@ -65,6 +65,9 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 
 			return server.InterceptConfigsPreRunHandler(cmd, "", nil)
 		},
+		PersistentPostRun: func(cmd *cobra.Command, _ []string) {
+			converter.handlePostRun(cmd)
+		},
 	}
 
 	initRootCmd(rootCmd, encodingConfig)
