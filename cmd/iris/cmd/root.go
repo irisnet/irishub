@@ -52,7 +52,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	rootCmd := &cobra.Command{
 		Use:   "iris",
 		Short: "IRIS Hub app command",
-		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			initClientCtx = client.ReadHomeFlag(initClientCtx, cmd)
 			initClientCtx, err := config.ReadFromClientConfig(initClientCtx)
 			if err != nil {
@@ -62,6 +62,8 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 			if err = client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
+
+			converter.handlePreRun(cmd, args)
 
 			return server.InterceptConfigsPreRunHandler(cmd, "", nil)
 		},
