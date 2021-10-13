@@ -36,6 +36,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	v043bank "github.com/cosmos/cosmos-sdk/x/bank/legacy/v043"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/capability"
 	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
@@ -687,6 +688,10 @@ func NewIrisApp(
 			Added: []string{farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey},
 		},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			// migrate bank store
+			if err := v043bank.MigrateStore(ctx, app.GetKey(banktypes.StoreKey), app.appCodec); err != nil {
+				panic(err)
+			}
 			// migrate coinswap
 			if err := coinswapv150.Migrate(ctx, app.coinswapKeeper, app.bankKeeper, app.accountKeeper); err != nil {
 				panic(err)
