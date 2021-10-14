@@ -489,7 +489,6 @@ func NewIrisApp(
 	)
 	app.recordKeeper = recordkeeper.NewKeeper(appCodec, keys[recordtypes.StoreKey])
 
-
 	app.htlcKeeper = htlckeeper.NewKeeper(
 		appCodec, keys[htlctypes.StoreKey],
 		app.GetSubspace(htlctypes.ModuleName),
@@ -610,9 +609,10 @@ func NewIrisApp(
 		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName, farmtypes.ModuleName,
 	)
 
+	cfg := module.NewConfigurator(appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterInvariants(&app.crisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
-	app.mm.RegisterServices(module.NewConfigurator(appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter()))
+	app.mm.RegisterServices(cfg)
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	//
@@ -679,10 +679,10 @@ func NewIrisApp(
 			if err := migrateservice.Migrate(ctx, app.serviceKeeper, app.bankKeeper); err != nil {
 				panic(err)
 			}
+
 			return fromVM, nil
 		},
 	)
-
 	app.RegisterUpgradePlan(
 		"v1.2", &store.StoreUpgrades{
 			Added: []string{farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey},
@@ -703,7 +703,7 @@ func NewIrisApp(
 				MaxRewardCategories: 2,
 			}
 			app.farmkeeper.SetParams(ctx, param)
-			return fromVM, nil
+			return app.mm.RunMigrations(ctx, cfg, fromVM)
 		},
 	)
 
