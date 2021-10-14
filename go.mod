@@ -4,13 +4,13 @@ go 1.15
 
 require (
 	github.com/bianjieai/tibc-go v0.1.1-0.20211013113400-8ed8223c61f1
-	github.com/cosmos/cosmos-sdk v0.44.1
+	github.com/cosmos/cosmos-sdk v0.44.2
 	github.com/cosmos/ibc-go v1.1.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/irisnet/irismod v1.4.1-0.20210910095539-475575886daf
+	github.com/irisnet/irismod v1.4.1-0.20211014085420-195e02e41823
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
