@@ -4,15 +4,21 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
-	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 )
 
-func Migrate(ctx sdk.Context, k coinswapkeeper.Keeper, bk bankkeeper.Keeper, ak authkeeper.AccountKeeper) error {
+type CoinswapKeeper interface {
+	GetStandardDenom(ctx sdk.Context) string
+	CreatePool(ctx sdk.Context, counterpartyDenom string) coinswaptypes.Pool
+}
+
+func Migrate(ctx sdk.Context,
+	k CoinswapKeeper,
+	bk coinswaptypes.BankKeeper,
+	ak coinswaptypes.AccountKeeper,
+) error {
 	// 1. Query all current liquidity tokens
 	var lptDenoms []string
 	bk.IterateTotalSupply(ctx, func(coin sdk.Coin) bool {
@@ -55,7 +61,7 @@ func Migrate(ctx sdk.Context, k coinswapkeeper.Keeper, bk bankkeeper.Keeper, ak 
 
 func migrateProvider(ctx sdk.Context,
 	originLptCoin sdk.Coin,
-	bk bankkeeper.Keeper,
+	bk coinswaptypes.BankKeeper,
 	pool coinswaptypes.Pool,
 	provider sdk.AccAddress,
 ) error {
@@ -81,7 +87,7 @@ func migrateProvider(ctx sdk.Context,
 }
 
 func migratePool(ctx sdk.Context,
-	bk bankkeeper.Keeper,
+	bk coinswaptypes.BankKeeper,
 	pool coinswaptypes.Pool,
 	ltpDenom, standardDenom string,
 ) error {

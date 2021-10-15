@@ -1,4 +1,4 @@
-package v150
+package v150_test
 
 import (
 	"testing"
@@ -11,6 +11,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
+	"github.com/irisnet/irismod/modules/coinswap/legacy/v150"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	"github.com/irisnet/irismod/simapp"
 )
@@ -26,8 +27,8 @@ const (
 var (
 	addrSender1 = sdk.AccAddress(tmhash.SumTruncated([]byte("addrSender1")))
 	addrSender2 = sdk.AccAddress(tmhash.SumTruncated([]byte("addrSender2")))
-	poolAddrBTC = GetReservePoolAddr(denomLptBTC)
-	poolAddrETH = GetReservePoolAddr(denomLptETH)
+	poolAddrBTC = v150.GetReservePoolAddr(denomLptBTC)
+	poolAddrETH = v150.GetReservePoolAddr(denomLptETH)
 )
 
 type (
@@ -40,7 +41,7 @@ func TestMigrate(t *testing.T) {
 	})
 	app, verify := setupWithGenesisAccounts()
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
-	err := Migrate(ctx, app.CoinswapKeeper, app.BankKeeper, app.AccountKeeper)
+	err := v150.Migrate(ctx, app.CoinswapKeeper, app.BankKeeper, app.AccountKeeper)
 	assert.NoError(t, err)
 
 	//app.BaseApp.Commit()
