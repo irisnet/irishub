@@ -1,6 +1,7 @@
 package v150
 
 import (
+	"fmt"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -19,6 +20,7 @@ func Migrate(ctx sdk.Context,
 	bk coinswaptypes.BankKeeper,
 	ak coinswaptypes.AccountKeeper,
 ) error {
+	fmt.Println("Migrating coinswap module...")
 	// 1. Query all current liquidity tokens
 	var lptDenoms []string
 	bk.IterateTotalSupply(ctx, func(coin sdk.Coin) bool {
