@@ -36,7 +36,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	v043bank "github.com/cosmos/cosmos-sdk/x/bank/legacy/v043"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/capability"
 	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
@@ -86,7 +85,6 @@ import (
 
 	"github.com/irisnet/irismod/modules/coinswap"
 	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
-	coinswapv150 "github.com/irisnet/irismod/modules/coinswap/migrations/v150"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	"github.com/irisnet/irismod/modules/htlc"
 	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
@@ -489,7 +487,6 @@ func NewIrisApp(
 	)
 	app.recordKeeper = recordkeeper.NewKeeper(appCodec, keys[recordtypes.StoreKey])
 
-
 	app.htlcKeeper = htlckeeper.NewKeeper(
 		appCodec, keys[htlctypes.StoreKey],
 		app.GetSubspace(htlctypes.ModuleName),
@@ -610,9 +607,10 @@ func NewIrisApp(
 		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName, farmtypes.ModuleName,
 	)
 
+	cfg := module.NewConfigurator(appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterInvariants(&app.crisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
-	app.mm.RegisterServices(module.NewConfigurator(appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter()))
+	app.mm.RegisterServices(cfg)
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	//
@@ -679,31 +677,47 @@ func NewIrisApp(
 			if err := migrateservice.Migrate(ctx, app.serviceKeeper, app.bankKeeper); err != nil {
 				panic(err)
 			}
+
 			return fromVM, nil
 		},
 	)
-
 	app.RegisterUpgradePlan(
 		"v1.2", &store.StoreUpgrades{
 			Added: []string{farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey},
 		},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			// migrate bank store
-			if err := v043bank.MigrateStore(ctx, app.GetKey(banktypes.StoreKey), app.appCodec); err != nil {
-				panic(err)
-			}
-			// migrate coinswap
-			if err := coinswapv150.Migrate(ctx, app.coinswapKeeper, app.bankKeeper, app.accountKeeper); err != nil {
-				panic(err)
-			}
 			// init farm params
 			amount := sdk.NewIntWithDecimal(1000, int(nativeToken.Scale))
-			param := farmtypes.Params{
-				CreatePoolFee:       sdk.NewCoin(nativeToken.MinUnit, amount),
-				MaxRewardCategories: 2,
-			}
-			app.farmkeeper.SetParams(ctx, param)
-			return fromVM, nil
+			farmtypes.SetDefaultGenesisState(farmtypes.GenesisState{
+				Params: farmtypes.Params{
+					CreatePoolFee:       sdk.NewCoin(nativeToken.MinUnit, amount),
+					MaxRewardCategories: 2,
+				}},
+			)
+			fromVM[authtypes.ModuleName] = 1
+			fromVM[banktypes.ModuleName] = 1
+			fromVM[stakingtypes.ModuleName] = 1
+			fromVM[govtypes.ModuleName] = 1
+			fromVM[distrtypes.ModuleName] = 1
+			fromVM[slashingtypes.ModuleName] = 1
+			fromVM[coinswaptypes.ModuleName] = 1
+			fromVM[capabilitytypes.ModuleName] = capability.AppModule{}.ConsensusVersion()
+			fromVM[genutiltypes.ModuleName] = genutil.AppModule{}.ConsensusVersion()
+			fromVM[minttypes.ModuleName] = mint.AppModule{}.ConsensusVersion()
+			fromVM[paramstypes.ModuleName] = params.AppModule{}.ConsensusVersion()
+			fromVM[crisistypes.ModuleName] = crisis.AppModule{}.ConsensusVersion()
+			fromVM[upgradetypes.ModuleName] = crisis.AppModule{}.ConsensusVersion()
+			fromVM[evidencetypes.ModuleName] = evidence.AppModule{}.ConsensusVersion()
+			fromVM[feegrant.ModuleName] = feegrantmodule.AppModule{}.ConsensusVersion()
+			fromVM[guardiantypes.ModuleName] = guardian.AppModule{}.ConsensusVersion()
+			fromVM[tokentypes.ModuleName] = token.AppModule{}.ConsensusVersion()
+			fromVM[recordtypes.ModuleName] = record.AppModule{}.ConsensusVersion()
+			fromVM[nfttypes.ModuleName] = nft.AppModule{}.ConsensusVersion()
+			fromVM[htlctypes.ModuleName] = htlc.AppModule{}.ConsensusVersion()
+			fromVM[servicetypes.ModuleName] = service.AppModule{}.ConsensusVersion()
+			fromVM[oracletypes.ModuleName] = oracle.AppModule{}.ConsensusVersion()
+			fromVM[randomtypes.ModuleName] = random.AppModule{}.ConsensusVersion()
+			return app.mm.RunMigrations(ctx, cfg, fromVM)
 		},
 	)
 

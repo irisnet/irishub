@@ -131,7 +131,7 @@ func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sd
 // introduced by the module. To avoid wrong/empty versions, the initial version
 // should be set to 1.
 func (am AppModule) ConsensusVersion() uint64 {
-	return 2
+	return 1
 }
 
 // InitGenesis performs genesis initialization for the mint module. It returns
