@@ -694,6 +694,9 @@ func NewIrisApp(
 					MaxRewardCategories: 2,
 				}},
 			)
+			tibcclienttypes.SetDefaultGenesisState(tibcclienttypes.GenesisState{
+				NativeChainName: "irishub-mainnet",
+			})
 			fromVM[authtypes.ModuleName] = 1
 			fromVM[banktypes.ModuleName] = 1
 			fromVM[stakingtypes.ModuleName] = 1
