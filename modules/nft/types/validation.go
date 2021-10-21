@@ -39,7 +39,7 @@ func ValidateDenomID(denomID string) error {
 	if len(denomID) < MinDenomLen || len(denomID) > MaxDenomLen {
 		return sdkerrors.Wrapf(ErrInvalidDenom, "the length of denom(%s) only accepts value [%d, %d]", denomID, MinDenomLen, MaxDenomLen)
 	}
-	if !IsBeginWithAlpha(denomID) || !IsAlphaNumeric(denomID) {
+	if !IsBeginWithAlpha(denomID) || !IsAlphaNumeric(denomID) || strings.HasPrefix(denomID,"tibc-") {
 		return sdkerrors.Wrapf(ErrInvalidDenom, "the denom(%s) only accepts alphanumeric characters, and begin with an english letter", denomID)
 	}
 	return ValidateKeywords(denomID)
