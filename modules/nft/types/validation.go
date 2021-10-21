@@ -13,7 +13,7 @@ import (
 const (
 	DoNotModify = "[do-not-modify]"
 	MinDenomLen = 3
-	MaxDenomLen = 64
+	MaxDenomLen = 128
 
 	MaxTokenURILen = 256
 
