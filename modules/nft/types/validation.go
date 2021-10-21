@@ -43,7 +43,7 @@ func ValidateDenomID(denomID string) error {
 	if !IsBeginWithAlpha(denomID) || !IsAlphaNumeric(denomID) && !boolPrifix {
 			return sdkerrors.Wrapf(ErrInvalidDenom, "the denom(%s) only accepts alphanumeric characters, and begin with an english letter", denomID)
 	}
-	return ValidateKeywords(denomID)
+	return nil
 }
 
 // ValidateTokenID verify that the tokenID is legal
