@@ -642,8 +642,8 @@ github.com/influxdata/roaring v0.4.13-0.20180809181101-fc520f41fab6/go.mod h1:bS
 github.com/influxdata/tdigest v0.0.0-20181121200506-bf2b5ad3c0a9/go.mod h1:Js0mqiSBE6Ffsg94weZZ2c+v/ciT8QRHFOap7EKDrR0=
 github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368/go.mod h1:Wbbw6tYNvwa5dlB6304Sd+82Z3f7PmVZHVKU637d4po=
 github.com/irisnet/irismod v1.4.1-0.20210910095539-475575886daf/go.mod h1:3RQ0ZOTulrldS/fSsC1QDhfYA9frv+Lf5gCGf7j+JkY=
-github.com/irisnet/irismod v1.4.1-0.20211018040513-6c8816eca4b5 h1:Iz7l3qY+HLdQAiK5+JUqv+xjm5en+cKidLPU2QxTl6g=
-github.com/irisnet/irismod v1.4.1-0.20211018040513-6c8816eca4b5/go.mod h1:nyqpvwXmxFd5/MDcIV+q73vjwtKnh8ssG3ywMg4TaGk=
+github.com/irisnet/irismod v1.4.1-0.20211021075334-969a56e99ce9 h1:x8lEY+oviG1rj74LYF7FTHFujmkbFF1231mx5NiLi9M=
+github.com/irisnet/irismod v1.4.1-0.20211021075334-969a56e99ce9/go.mod h1:nyqpvwXmxFd5/MDcIV+q73vjwtKnh8ssG3ywMg4TaGk=
 github.com/jackpal/go-nat-pmp v1.0.2-0.20160603034137-1fa385a6f458/go.mod h1:QPH045xvCAeXUZOxsnwmrtiCoxIr9eob+4orBN1SBKc=
 github.com/jedisct1/go-minisign v0.0.0-20190909160543-45766022959e/go.mod h1:G1CVv03EnqU1wYL2dFwXxW2An0az9JTl/ZsqXQeBlkU=
 github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
