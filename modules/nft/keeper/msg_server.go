@@ -4,6 +4,7 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/nft/types"
 )
@@ -55,7 +56,22 @@ func (m msgServer) MintNFT(goCtx context.Context, msg *types.MsgMintNFT) (*types
 		return nil, err
 	}
 
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	denom, found := m.Keeper.GetDenom(ctx, msg.DenomId)
+	if !found {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", msg.DenomId)
+	}
+
+	if denom.MintRestricted && denom.Creator != sender.String() {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to mint NFT of denom %s", denom.Creator, msg.DenomId)
+	}
+
 	if err := m.Keeper.MintNFT(ctx, msg.DenomId, msg.Id,
 		msg.Name,
 		msg.URI,
