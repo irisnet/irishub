@@ -52,7 +52,7 @@ func (msg MsgIssueDenom) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
-	return nil
+	return ValidateKeywords(msg.Id)
 }
 
 // GetSignBytes Implements Msg.
@@ -203,6 +203,9 @@ func (msg MsgMintNFT) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receipt address (%s)", err)
 	}
 	if err := ValidateDenomID(msg.DenomId); err != nil {
+		return err
+	}
+	if err := ValidateKeywords(msg.DenomId); err != nil {
 		return err
 	}
 	if err := ValidateTokenURI(msg.URI); err != nil {
