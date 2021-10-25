@@ -701,6 +701,7 @@ func NewIrisApp(
 
 			clients := migratetibc.LoadClient(app.appCodec)
 			for _, client := range clients {
+				// init tibc client
 				if err := app.tibcKeeper.ClientKeeper.CreateClient(
 					ctx,
 					client.ChainName,
@@ -709,6 +710,8 @@ func NewIrisApp(
 				); err != nil {
 					panic(err)
 				}
+				// register client relayers
+				app.tibcKeeper.ClientKeeper.RegisterRelayers(ctx, client.ChainName, client.Relayers)
 			}
 
 			fromVM[authtypes.ModuleName] = 1
