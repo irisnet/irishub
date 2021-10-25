@@ -113,6 +113,7 @@ import (
 	"github.com/irisnet/irishub/lite"
 	migratehtlc "github.com/irisnet/irishub/migrate/htlc"
 	migrateservice "github.com/irisnet/irishub/migrate/service"
+	migratetibc "github.com/irisnet/irishub/migrate/tibc"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
@@ -697,6 +698,19 @@ func NewIrisApp(
 			tibcclienttypes.SetDefaultGenesisState(tibcclienttypes.GenesisState{
 				NativeChainName: "irishub-mainnet",
 			})
+
+			clients := migratetibc.LoadClient(app.appCodec)
+			for _, client := range clients {
+				if err := app.tibcKeeper.ClientKeeper.CreateClient(
+					ctx,
+					client.ChainName,
+					client.ClientState,
+					client.ConsensusState,
+				); err != nil {
+					panic(err)
+				}
+			}
+
 			fromVM[authtypes.ModuleName] = 1
 			fromVM[banktypes.ModuleName] = 1
 			fromVM[stakingtypes.ModuleName] = 1

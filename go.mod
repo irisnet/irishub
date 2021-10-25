@@ -1,6 +1,6 @@
 module github.com/irisnet/irishub
 
-go 1.15
+go 1.16
 
 require (
 	github.com/bianjieai/tibc-go v0.1.1-0.20211020073048-9049710367e4
