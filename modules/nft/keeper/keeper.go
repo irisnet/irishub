@@ -45,15 +45,6 @@ func (k Keeper) MintNFT(
 	ctx sdk.Context, denomID, tokenID, tokenNm,
 	tokenURI, tokenData string, owner sdk.AccAddress,
 ) error {
-	denom, found := k.GetDenom(ctx, denomID)
-	if !found {
-		return sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", denomID)
-	}
-
-	if denom.MintRestricted && denom.Creator != owner.String() {
-		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to mint NFT of denom %s", denom.Creator, denomID)
-	}
-
 	if k.HasNFT(ctx, denomID, tokenID) {
 		return sdkerrors.Wrapf(types.ErrNFTAlreadyExists, "NFT %s already exists in collection %s", tokenID, denomID)
 	}

@@ -103,14 +103,6 @@ func (suite *KeeperSuite) TestMintNFT() {
 	err = suite.keeper.MintNFT(suite.ctx, denomID, tokenID2, tokenNm2, tokenURI, tokenData, address)
 	suite.NoError(err)
 
-	// MintNFT should fail when owner not equal to denom owner
-	err = suite.keeper.MintNFT(suite.ctx, denomID3, tokenID3, tokenNm3, tokenURI, tokenData, address)
-	suite.Error(err)
-
-	// MintNFT shouldn't fail when owner equal to denom owner
-	err = suite.keeper.MintNFT(suite.ctx, denomID3, tokenID3, tokenNm3, tokenURI, tokenData, address3)
-	suite.NoError(err)
-
 }
 
 func (suite *KeeperSuite) TestUpdateNFT() {
