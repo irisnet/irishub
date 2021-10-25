@@ -74,6 +74,52 @@
             },
             "timeDelay":"0"
         },
-        "relayers":[]
+        "relayers":[
+            "iaa16m527utc08hu8hqntrzldywwd7hsk0w0fnc8pg"
+        ]
+    },
+    {
+        "chain_name":"eth-testnet3",
+        "consensus_state":{
+            "@type":"/tibc.lightclients.eth.v1.ConsensusState",
+            "timestamp":"1635169106",
+            "number":{
+                "revision_number":"0",
+                "revision_height":"11297530"
+            },
+            "root":"F2NnkA6soyXl14Y1+9lpch1YUbMm98Jz2/se21Nbp78="
+        },
+        "client_state":{
+            "@type":"/tibc.lightclients.eth.v1.ClientState",
+            "header":{
+                "parent_hash":"Je1w5tUCs00mKGJM8hDO+JiA6m5vxVmRThZ9nmB5yJs=",
+                "uncle_hash":"HcxN6N7HXXqrhbVntszUGtMSRRuUinQT8KFC/UDUk0c=",
+                "coinbase":"tMd2qywNnlejYh6yKhxcmDSqGBM=",
+                "root":"F2NnkA6soyXl14Y1+9lpch1YUbMm98Jz2/se21Nbp78=",
+                "tx_hash":"nrZENt7mrBVeSSnbo5pkuKWfq7EOOHfsyO5AbEl+d+Q=",
+                "receipt_hash":"PGkwT3Fo3Dd9oEpwmsBnOYNHkKruATAMN6UkZyuZzUI=",
+                "bloom":"AAQCAAAAAAAAAgAAAAIIAAAAAAAAABAAAAAAAAAAQAAAAAAACBAAAAAAAAEAAAAEAAEAAAAAAAAAAAAAACAAAAAAAAAIIAACAIAQCAAAAAAAAAAAAAAAAIAFAAAAEAAIAAAAAAIAAAAAAACQCAAIAAAAAAAAIEAAAAAAEAAAAAQAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAACAAIgoAAEACAQCAAAAAgAQAAAAAAAQAAABAQAAAQAAAAAAAAAAhAAAAAgAAAAAgAAAAAAAIAAAIAAAAAAAAAAIACAEAAAAAAAAAAAAAAACBAAAAAAAAAAAIgAAAAAQBAAAA==",
+                "difficulty":"2652167097",
+                "height":{
+                    "revision_number":"0",
+                    "revision_height":"11297530"
+                },
+                "gas_limit":"8000000",
+                "gas_used":"353875",
+                "time":"1635169106",
+                "extra":"2IMBCguEZ2V0aIhnbzEuMTcuMoVsaW51eA==",
+                "mix_digest":"uYHcy1rvMc1jVix2c1fQBmGgDILnNGwM66D7Uzg2WCo=",
+                "nonce":"8055440560781788774",
+                "baseFee":"13"
+            },
+            "chain_id":"3",
+            "contract_address":"wEOL1M5oiO92sdc4FFft0DoKVMs=",
+            "trusting_period":"604800",
+            "timeDelay":"0",
+            "blockDelay":"7"
+        },
+        "relayers":[
+            "iaa139mr2qpku5lt53adk387a9x45gzy7ntnqzyxj0"
+        ]
     }
 ]
