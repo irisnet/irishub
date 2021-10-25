@@ -11,5 +11,5 @@ import (
 func TestLoadClient(t *testing.T) {
 	app := simapp.Setup(false)
 	clients := migratetibc.LoadClient(app.AppCodec())
-	require.Equal(t, 1, len(clients))
+	require.Equal(t, 2, len(clients))
 }
