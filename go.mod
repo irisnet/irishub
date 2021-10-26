@@ -3,14 +3,14 @@ module github.com/irisnet/irishub
 go 1.15
 
 require (
-	github.com/bianjieai/tibc-go v0.1.1-0.20211020073048-9049710367e4
+	github.com/bianjieai/tibc-go v0.2.0-alpha
 	github.com/cosmos/cosmos-sdk v0.44.2
 	github.com/cosmos/ibc-go v1.1.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/irisnet/irismod v1.4.1-0.20211018040513-6c8816eca4b5
+	github.com/irisnet/irismod v1.5.0-alpha
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
@@ -29,3 +29,5 @@ require (
 )
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+
+replace github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.34.8-irita-210413.0.20211012090339-cee6e09e8ae3
