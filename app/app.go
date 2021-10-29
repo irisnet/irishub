@@ -721,6 +721,7 @@ func NewIrisApp(
 			fromVM[distrtypes.ModuleName] = 1
 			fromVM[slashingtypes.ModuleName] = 1
 			fromVM[coinswaptypes.ModuleName] = 1
+			fromVM[ibchost.ModuleName] = 1
 			fromVM[capabilitytypes.ModuleName] = capability.AppModule{}.ConsensusVersion()
 			fromVM[genutiltypes.ModuleName] = genutil.AppModule{}.ConsensusVersion()
 			fromVM[minttypes.ModuleName] = mint.AppModule{}.ConsensusVersion()
