@@ -86,7 +86,7 @@ func (s *IntegrationTestSuite) TestGuardian() {
 	respType := proto.Message(&guardiantypes.QuerySupersResponse{})
 	bz, err := guardiantestutil.QuerySupersExec(clientCtx)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	supersResp := respType.(*guardiantypes.QuerySupersResponse)
 	s.Require().Equal(1, len(supersResp.Supers))
 
@@ -105,14 +105,14 @@ func (s *IntegrationTestSuite) TestGuardian() {
 
 	bz, err = guardiantestutil.CreateSuperExec(val.ClientCtx, addr.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	respType = proto.Message(&guardiantypes.QuerySupersResponse{})
 	bz, err = guardiantestutil.QuerySupersExec(clientCtx)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	supersResp = respType.(*guardiantypes.QuerySupersResponse)
 	s.Require().Equal(2, len(supersResp.Supers))
 
@@ -129,14 +129,14 @@ func (s *IntegrationTestSuite) TestGuardian() {
 
 	bz, err = guardiantestutil.DeleteSuperExec(val.ClientCtx, addr.String(), args...)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	respType = proto.Message(&guardiantypes.QuerySupersResponse{})
 	bz, err = guardiantestutil.QuerySupersExec(clientCtx)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	supersResp = respType.(*guardiantypes.QuerySupersResponse)
 	s.Require().Equal(1, len(supersResp.Supers))
 }

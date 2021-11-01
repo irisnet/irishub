@@ -51,7 +51,7 @@ func (s *IntegrationTestSuite) TestParams() {
 	resp, err := rest.GetRequest(url)
 	respType := proto.Message(&minttypes.QueryParamsResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
 	paramsResp := respType.(*minttypes.QueryParamsResponse)
 	s.Require().Equal("stake", paramsResp.Params.MintDenom)
 	s.Require().Equal("0.040000000000000000", paramsResp.Params.Inflation.String())

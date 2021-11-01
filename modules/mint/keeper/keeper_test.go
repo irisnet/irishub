@@ -11,8 +11,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-
 	"github.com/irisnet/irishub/modules/mint/types"
 	"github.com/irisnet/irishub/simapp"
 )
@@ -56,7 +54,6 @@ func (suite *KeeperTestSuite) TestSetGetParamSet() {
 }
 
 func (suite *KeeperTestSuite) TestMintCoins() {
-	suite.app.BankKeeper.SetSupply(suite.ctx, &banktypes.Supply{})
 
 	mintCoins := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(1000)))
 	err := suite.app.MintKeeper.MintCoins(suite.ctx, mintCoins)
@@ -68,7 +65,6 @@ func (suite *KeeperTestSuite) TestMintCoins() {
 }
 
 func (suite *KeeperTestSuite) TestAddCollectedFees() {
-	suite.app.BankKeeper.SetSupply(suite.ctx, &banktypes.Supply{})
 
 	mintCoins := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(1000)))
 

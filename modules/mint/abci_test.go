@@ -8,7 +8,6 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 
 	"github.com/irisnet/irishub/modules/mint"
@@ -39,7 +38,6 @@ func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context) {
 		sdk.NewDecWithPrec(4, 2),
 	))
 	app.MintKeeper.SetMinter(ctx, types.DefaultMinter())
-	app.BankKeeper.SetSupply(ctx, &banktypes.Supply{})
 	app.DistrKeeper.SetFeePool(ctx, distributiontypes.InitialFeePool())
 	return app, ctx
 }

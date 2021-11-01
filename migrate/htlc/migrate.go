@@ -13,7 +13,7 @@ import (
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 )
 
-func Migrate(ctx sdk.Context, cdc codec.Marshaler, k htlckeeper.Keeper, bk bankkeeper.Keeper, key *sdk.KVStoreKey) error {
+func Migrate(ctx sdk.Context, cdc codec.Codec, k htlckeeper.Keeper, bk bankkeeper.Keeper, key *sdk.KVStoreKey) error {
 	if err := k.EnsureModuleAccountPermissions(ctx); err != nil {
 		return err
 	}
@@ -30,7 +30,7 @@ func Migrate(ctx sdk.Context, cdc codec.Marshaler, k htlckeeper.Keeper, bk bankk
 		hashLock := tmbytes.HexBytes(iterator.Key()[1:])
 
 		var htlc OldHTLC
-		cdc.MustUnmarshalBinaryBare(iterator.Value(), &htlc)
+		cdc.MustUnmarshal(iterator.Value(), &htlc)
 
 		sender, err := sdk.AccAddressFromBech32(htlc.Sender)
 		if err != nil {
