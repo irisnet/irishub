@@ -12,6 +12,7 @@
 * [\#2668](https://github.com/irisnet/irishub/pull/2668) Integrated tibc protocol
 * [\#2623](https://github.com/irisnet/irishub/pull/2623) Import farm module
 * [irismod \#219](https://github.com/irisnet/irismod/pull/219) Refactor coinswap module
+* [irismod \#189](https://github.com/irisnet/irismod/pull/189) Enhance nft module
 
 ### Breaking Changes
 
