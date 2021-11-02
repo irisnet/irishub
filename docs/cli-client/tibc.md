@@ -10,7 +10,7 @@
 | [create](#iris-tx-gov-submit-proposal-client-create)              | Create a new TIBC client with the specified client state and consensus state.            |
 | [update](#iris-tx-tibc-update)                |  Update an existing TIBC client with a header.                 |
 | [upgrade](#iris-tx-gov-submit-proposal-client-upgrade)                | Upgrade a TIBC client with the specified client state and consensus state.                                      |
-| [regesiter](#iris-tx-gov-submit-proposal-relayer-register)        | Submit a relayer register proposal for the specified client.                                 |
+| [register](#iris-tx-gov-submit-proposal-relayer-register)        | Submit a relayer register proposal for the specified client.                                 |
 | [header](#iris-query-tibc-client-header)        | Query the latest Tendermint header of the running chain.                                 |
 | [node-state](#iris-query-tibc-client-node-state)        | Query a node consensus state. This result is feed to the client creation transaction.                                 |
 | [relayers](#iris-query-tibc-client-relayers)        | Query all the registered relayers of a client.                                 |
@@ -230,7 +230,7 @@ iris query tibc packet unreceived-packets [source-chain] [dest-chain] [flags]
 | Name                                     | Description                                                                            |
 | ---------------------------------------- | -------------------------------------------------------------------------------------- |
 | [set-rules](#iris-tx-gov-submit-proposal-set-rules)              | Submit a rules set proposal.            |
-| [routing-rules](#iris-query-tibc-routing-routing-rules)                |  Query routing rules commitment..                 |
+| [routing-rules](#iris-query-tibc-routing-routing-rules)                |  Query routing rules commitment.                 |
 
 ### iris tx gov submit-proposal set-rules
 Submit a rules set proposal.
