@@ -1,9 +1,9 @@
 # TIBC
 
-`TIBC` todo
-## Client
+Cosmos 网络和链间生态系统的简洁跨链通信协议。
+## 客户端
 
-### Available Commands
+### 可用命令
 
 | Name                                     | Description                                                                            |
 | ---------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -45,7 +45,7 @@ iris tx tibc update [chain-name] [path/to/header.json]
 
 ## iris tx gov submit-proposal client-upgrade
 
-Submit a client upgrade proposal.
+提交一个客户端升级提案。
 
 ```bash
 iris tx gov submit-proposal client-upgrade [chain-name] [path/to/client_state.json] [path/to/consensus_state.json] [flags]
@@ -141,9 +141,9 @@ iris query tibc client state [chain-name] [flags]
 iris query tibc client states [flags]
 ```
 
-## Packet
+## 数据包
 
-### Available Commands
+### 可用命令
 
 | Name                                     | Description                                                                            |
 | ---------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -224,9 +224,9 @@ iris query tibc packet unreceived-packets [source-chain] [dest-chain] [flags]
 | --sequences          |  int64Slice        |            | 包序列号的逗号分隔列表（默认 []）          |
 
 
-## Routing
+## 路由
 
-### Available Commands
+### 可用命令
 
 | 名称                                     | 描述                                                                            |
 | ---------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -253,9 +253,9 @@ iris tx gov submit-proposal set-rules [path/to/routing_rules.json] [flags]
 iris query tibc routing routing-rules
 ```
 
-## Nft-Transfer
+## NFT转移
 
-### Available Commands
+### 可用命令
 
 | Name                                     | Description                                                                            |
 | ---------------------------------------- | -------------------------------------------------------------------------------------- |

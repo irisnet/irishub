@@ -1,6 +1,6 @@
 # TIBC
 
-`TIBC` todo
+Terse Inter-Blockchain Communication protocol  for the Cosmos network & interchain ecosystem.
 ## Client
 
 ### Available Commands
@@ -43,7 +43,7 @@ Update existing client with a header.
 iris tx tibc update [chain-name] [path/to/header.json]
 ```
 
-## iris tx gov submit-proposal client-upgrade
+### iris tx gov submit-proposal client-upgrade
 
 Submit a client upgrade proposal.
 
@@ -58,7 +58,7 @@ iris tx gov submit-proposal client-upgrade [chain-name] [path/to/client_state.js
 | --description        |          |  |          description of proposal   |
 | --deposit        |          |  |           deposit of proposal  |
 
-## iris tx gov submit-proposal relayer-register
+### iris tx gov submit-proposal relayer-register
 
 Submit a relayer register proposal.
 
