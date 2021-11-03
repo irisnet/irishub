@@ -2,21 +2,77 @@
   {
     "chain_name": "bsnhub-mainnet",
     "consensus_state": {
-      "@type": "/tibc.lightclients.eth.v1.ConsensusState",
-      "timestamp": "1635938396",
-      "number": {
-        "revision_number": "0",
-        "revision_height": "13543580"
-      },
-      "root": "DMSfdPZ995A7UVNVo0ppGInY5BTPtdBL7u71AG5LGqU="
-    },
-    "client_state": {
       "@type": "/tibc.lightclients.tendermint.v1.ConsensusState",
       "timestamp": "2021-11-03T11:09:19.838000955Z",
       "root": {
         "hash": "YXBwX2hhc2g="
       },
       "next_validators_hash": "9DA3EB65E16CC577BFDFDB69E039D074E4FF593DC1E4053151B902F8D94FF5F2"
+    },
+    "client_state": {
+      "@type": "/tibc.lightclients.tendermint.v1.ClientState",
+      "chain_id": "BSN-net",
+      "trust_level": {
+        "numerator": "1",
+        "denominator": "3"
+      },
+      "trusting_period": "8640000s",
+      "unbonding_period": "8640000s",
+      "max_clock_drift": "10s",
+      "latest_height": {
+        "revision_number": "0",
+        "revision_height": "4945409"
+      },
+      "proof_specs": [
+        {
+          "leaf_spec": {
+            "hash": "SHA256",
+            "prehash_key": "NO_HASH",
+            "prehash_value": "SHA256",
+            "length": "VAR_PROTO",
+            "prefix": "AA=="
+          },
+          "inner_spec": {
+            "child_order": [
+              0,
+              1
+            ],
+            "child_size": 33,
+            "min_prefix_length": 4,
+            "max_prefix_length": 12,
+            "empty_child": null,
+            "hash": "SHA256"
+          },
+          "max_depth": 0,
+          "min_depth": 0
+        },
+        {
+          "leaf_spec": {
+            "hash": "SHA256",
+            "prehash_key": "NO_HASH",
+            "prehash_value": "SHA256",
+            "length": "VAR_PROTO",
+            "prefix": "AA=="
+          },
+          "inner_spec": {
+            "child_order": [
+              0,
+              1
+            ],
+            "child_size": 32,
+            "min_prefix_length": 1,
+            "max_prefix_length": 1,
+            "empty_child": null,
+            "hash": "SHA256"
+          },
+          "max_depth": 0,
+          "min_depth": 0
+        }
+      ],
+      "MerklePrefix": {
+        "key_prefix": "dGliYw=="
+      },
+      "timeDelay": "0"
     },
     "relayers": [
       "iaa1vcghfru68sxgpxcd0yfeqt50h8wunf0w574plw"
