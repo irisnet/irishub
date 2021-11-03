@@ -4,7 +4,7 @@
 
 ## 1.2.0
 
-*October 29th, 2021*
+*November 03th, 2021*
 
 ### Application
 
