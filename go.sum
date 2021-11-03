@@ -163,8 +163,8 @@ github.com/bgentry/speakeasy v0.1.0 h1:ByYyxL9InA1OWqxJqqp2A5pYHUrCiAL6K3J+LKSsQ
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
 github.com/bianjieai/tendermint v0.34.8-irita-210413.0.20211012090339-cee6e09e8ae3 h1:M4C+ilCPiP2c2yMdeYaZLwquEBfFa4Uvt1BDviSYD0E=
 github.com/bianjieai/tendermint v0.34.8-irita-210413.0.20211012090339-cee6e09e8ae3/go.mod h1:2u6xthTnwDYLhO38cDYp8CxzKq7hwJFvCXeK1pEErtM=
-github.com/bianjieai/tibc-go v0.2.0-alpha h1:Yr2tR2RXe/UWXtwa5LXn37C8o0so6PM8EMdi3GVJAOc=
-github.com/bianjieai/tibc-go v0.2.0-alpha/go.mod h1:mVk/hXupai7WQot65BtCiEExNTNVu7AmnZhBIVM4Ibc=
+github.com/bianjieai/tibc-go v0.2.0 h1:3EAklRZwdLsTS9G9Q7Wd+N3oZhLOvSCKZRkQbIPCv2s=
+github.com/bianjieai/tibc-go v0.2.0/go.mod h1:/CL8fBEbXUtZU7OIQ2yHf+wzEjlPCCzx6b9r3LJYL2Y=
 github.com/bits-and-blooms/bitset v1.2.0/go.mod h1:gIdJ4wp64HaoK2YrL1Q5/N7Y16edYb8uY+O0FJTyyDA=
 github.com/bketelsen/crypt v0.0.3-0.20200106085610-5cbc8cc4026c/go.mod h1:MKsuJmJgSg28kpZDP6UIiPt0e0Oz0kqKNGyRaWEPv84=
 github.com/bketelsen/crypt v0.0.4/go.mod h1:aI6NrJ0pMGgvZKL1iVgXLnfIFJtfV+bKCoqOes/6LfM=
