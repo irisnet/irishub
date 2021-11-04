@@ -17,7 +17,7 @@
 ### Breaking Changes
 
 * [irismod \#219](https://github.com/irisnet/irismod/pull/219) Liquidity tokens are named as *lpt-{number}*, and the existing liquidity will be automatically modified during the upgrade
-* [cosmos-sdk \#9594](https://github.com/cosmos/cosmos-sdk/pull/9594) Remove legacy REST API. Please see the [REST Endpoints Migration guide](https://docs.cosmos.network/master/migrations/rest.html) to migrate to the new REST endpoints.
+* [cosmos-sdk \#10041](https://github.com/cosmos/cosmos-sdk/pull/10041) Remove broadcast & encode legacy REST endpoints. Please see the REST Endpoints Migration guide to migrate to the new REST endpoints.
 
 ## 1.1.1
 
