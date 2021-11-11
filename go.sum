@@ -138,8 +138,8 @@ github.com/bgentry/speakeasy v0.1.0 h1:ByYyxL9InA1OWqxJqqp2A5pYHUrCiAL6K3J+LKSsQ
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
 github.com/bianjieai/tendermint v0.34.8-irita-210413.0.20211012090339-cee6e09e8ae3 h1:M4C+ilCPiP2c2yMdeYaZLwquEBfFa4Uvt1BDviSYD0E=
 github.com/bianjieai/tendermint v0.34.8-irita-210413.0.20211012090339-cee6e09e8ae3/go.mod h1:2u6xthTnwDYLhO38cDYp8CxzKq7hwJFvCXeK1pEErtM=
-github.com/bianjieai/tibc-go v0.2.1-0.20211111100138-12cb1a88bf52 h1:nOVI5sxZUXjy6PXlgT2mkIa5jS8EjTHe5O1CvGWfzS4=
-github.com/bianjieai/tibc-go v0.2.1-0.20211111100138-12cb1a88bf52/go.mod h1:4Ujz0Lo68+MVyZk1FLiu4kxzlvKvcfZnzZjjhgCjuMQ=
+github.com/bianjieai/tibc-go v0.2.1-0.20211111102030-e85557da3088 h1:w1vPKWxgX2jeADz4fj54fi96E85sdHKuR3YHQuV1+Yc=
+github.com/bianjieai/tibc-go v0.2.1-0.20211111102030-e85557da3088/go.mod h1:vwMiPwq+oQSzC/kiPBScPCrVnGU1t5tdtSaQ1XS3SxQ=
 github.com/bits-and-blooms/bitset v1.2.0/go.mod h1:gIdJ4wp64HaoK2YrL1Q5/N7Y16edYb8uY+O0FJTyyDA=
 github.com/bketelsen/crypt v0.0.3-0.20200106085610-5cbc8cc4026c/go.mod h1:MKsuJmJgSg28kpZDP6UIiPt0e0Oz0kqKNGyRaWEPv84=
 github.com/bketelsen/crypt v0.0.4/go.mod h1:aI6NrJ0pMGgvZKL1iVgXLnfIFJtfV+bKCoqOes/6LfM=
@@ -548,7 +548,6 @@ github.com/influxdata/promql/v2 v2.12.0/go.mod h1:fxOPu+DY0bqCTCECchSRtWfc+0X19y
 github.com/influxdata/roaring v0.4.13-0.20180809181101-fc520f41fab6/go.mod h1:bSgUQ7q5ZLSO+bKBGqJiCBGAl+9DxyW63zLTujjUlOE=
 github.com/influxdata/tdigest v0.0.0-20181121200506-bf2b5ad3c0a9/go.mod h1:Js0mqiSBE6Ffsg94weZZ2c+v/ciT8QRHFOap7EKDrR0=
 github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368/go.mod h1:Wbbw6tYNvwa5dlB6304Sd+82Z3f7PmVZHVKU637d4po=
-github.com/irisnet/irismod v1.4.1-0.20210910095539-475575886daf/go.mod h1:3RQ0ZOTulrldS/fSsC1QDhfYA9frv+Lf5gCGf7j+JkY=
 github.com/irisnet/irismod v1.5.1-0.20211111092104-7c0f464ebf40 h1:Kcl12ClkailT0vYVJ9HssUszb3Ved9Gbk0OrtWXnLmo=
 github.com/irisnet/irismod v1.5.1-0.20211111092104-7c0f464ebf40/go.mod h1:Y4Vb02XdxtXpXDZJxLHvPjkKgLBQ+5S/qnPe3Akv97E=
 github.com/jackpal/go-nat-pmp v1.0.2-0.20160603034137-1fa385a6f458/go.mod h1:QPH045xvCAeXUZOxsnwmrtiCoxIr9eob+4orBN1SBKc=
