@@ -79,6 +79,7 @@ import (
 	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/modules/core"
 	ibcclient "github.com/cosmos/ibc-go/modules/core/02-client"
+	ibcconnectiontypes "github.com/cosmos/ibc-go/modules/core/03-connection/types"
 	porttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
@@ -280,6 +281,8 @@ type IrisApp struct {
 
 	// simulation manager
 	sm *module.SimulationManager
+
+	bts *BlockTimerExecutor
 }
 
 func init() {
@@ -373,6 +376,7 @@ func NewIrisApp(
 		keys:              keys,
 		tkeys:             tkeys,
 		memKeys:           memKeys,
+		bts:               NewBlockTimerExecutor(),
 	}
 
 	app.paramsKeeper = initParamsKeeper(appCodec, legacyAmino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
@@ -759,6 +763,11 @@ func NewIrisApp(
 	app.scopedTIBCKeeper = scopedTIBCKeeper
 	app.scopedIBCKeeper = scopedIBCKeeper
 	app.scopedTransferKeeper = scopedTransferKeeper
+
+	app.AddPatch(10, func(ctx sdk.Context) error {
+		app.ibcKeeper.ConnectionKeeper.SetParams(ctx, ibcconnectiontypes.DefaultParams())
+		return nil
+	})
 	return app
 }
 
@@ -775,6 +784,7 @@ func (app *IrisApp) Name() string { return app.BaseApp.Name() }
 
 // BeginBlocker application updates every begin block
 func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+	app.bts.Start(ctx)
 	return app.mm.BeginBlock(ctx, req)
 }
 
@@ -919,6 +929,10 @@ func (app *IrisApp) RegisterUpgradePlan(
 		// configure store loader that checks if version+1 == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(sdkupgrade.UpgradeStoreLoader(upgradeInfo.Height, upgrades))
 	}
+}
+
+func (app IrisApp) AddPatch(height int64, patch Execute) {
+	app.bts.add(height, patch)
 }
 
 // GetMaccPerms returns a copy of the module account permissions
