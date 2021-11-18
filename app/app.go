@@ -282,7 +282,7 @@ type IrisApp struct {
 	// simulation manager
 	sm *module.SimulationManager
 
-	bts *BlockTimerExecutor
+	bte *BlockTimerExecutor
 }
 
 func init() {
@@ -376,7 +376,7 @@ func NewIrisApp(
 		keys:              keys,
 		tkeys:             tkeys,
 		memKeys:           memKeys,
-		bts:               NewBlockTimerExecutor(),
+		bte:               NewBlockTimerExecutor(),
 	}
 
 	app.paramsKeeper = initParamsKeeper(appCodec, legacyAmino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
@@ -764,7 +764,8 @@ func NewIrisApp(
 	app.scopedIBCKeeper = scopedIBCKeeper
 	app.scopedTransferKeeper = scopedTransferKeeper
 
-	app.AddPatch(10, func(ctx sdk.Context) error {
+	// Expected to happen around
+	app.AddPatch(12636666, func(ctx sdk.Context) error {
 		app.ibcKeeper.ConnectionKeeper.SetParams(ctx, ibcconnectiontypes.DefaultParams())
 		return nil
 	})
@@ -784,7 +785,7 @@ func (app *IrisApp) Name() string { return app.BaseApp.Name() }
 
 // BeginBlocker application updates every begin block
 func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
-	app.bts.Start(ctx)
+	app.bte.Start(ctx)
 	return app.mm.BeginBlock(ctx, req)
 }
 
@@ -932,7 +933,7 @@ func (app *IrisApp) RegisterUpgradePlan(
 }
 
 func (app IrisApp) AddPatch(height int64, patch Execute) {
-	app.bts.add(height, patch)
+	app.bte.add(height, patch)
 }
 
 // GetMaccPerms returns a copy of the module account permissions
