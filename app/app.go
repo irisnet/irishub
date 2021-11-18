@@ -764,7 +764,7 @@ func NewIrisApp(
 	app.scopedIBCKeeper = scopedIBCKeeper
 	app.scopedTransferKeeper = scopedTransferKeeper
 
-	// Expected to happen around
+	// Expected to happen around 2021-11-23 02:00:00(UTC+0)
 	app.AddPatch(12636666, func(ctx sdk.Context) error {
 		app.ibcKeeper.ConnectionKeeper.SetParams(ctx, ibcconnectiontypes.DefaultParams())
 		return nil
