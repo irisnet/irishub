@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 1.2.1
+
+*November 18th, 2021*
+
+### Breaking Changes
+
+* Fix the bug that IRIS Hub Mainnet cannot execute the incoming IBC Txs. Please refer to the [Upgrade Process](https://github.com/irisnet/mainnet/blob/master/upgrade/v1.2.1.md) for more details.
+
 ## 1.2.0
 
 *November 03th, 2021*
