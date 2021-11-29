@@ -1,6 +1,9 @@
 package app
 
 import (
+	"github.com/cosmos/cosmos-sdk/server"
+	authmiddleware "github.com/cosmos/cosmos-sdk/x/auth/middleware"
+	"github.com/spf13/cast"
 	"io"
 	"os"
 	"path/filepath"
@@ -15,7 +18,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
-	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server/api"
@@ -23,12 +25,11 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	store "github.com/cosmos/cosmos-sdk/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
@@ -74,18 +75,13 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	sdkupgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	"github.com/cosmos/ibc-go/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/modules/core/02-client"
-	porttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
 
 	"github.com/irisnet/irismod/modules/coinswap"
 	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
+	"github.com/irisnet/irismod/modules/farm"
+	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
+	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 	"github.com/irisnet/irismod/modules/htlc"
 	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
@@ -113,28 +109,12 @@ import (
 	"github.com/irisnet/irishub/lite"
 	migratehtlc "github.com/irisnet/irishub/migrate/htlc"
 	migrateservice "github.com/irisnet/irishub/migrate/service"
-	migratetibc "github.com/irisnet/irishub/migrate/tibc"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	"github.com/irisnet/irishub/modules/mint"
 	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
-
-	"github.com/irisnet/irismod/modules/farm"
-	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
-	farmtypes "github.com/irisnet/irismod/modules/farm/types"
-
-	tibcnfttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer"
-	tibcnfttransferkeeper "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/keeper"
-	tibcnfttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/types"
-	tibc "github.com/bianjieai/tibc-go/modules/tibc/core"
-	tibcclient "github.com/bianjieai/tibc-go/modules/tibc/core/02-client"
-	tibcclienttypes "github.com/bianjieai/tibc-go/modules/tibc/core/02-client/types"
-	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
-	tibcrouting "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing"
-	tibcroutingtypes "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing/types"
-	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
 )
 
 const appName = "IrisApp"
@@ -164,18 +144,12 @@ var (
 			distrclient.ProposalHandler,
 			upgradeclient.ProposalHandler,
 			upgradeclient.CancelProposalHandler,
-			tibcclient.CreateClientProposalHandler,
-			tibcclient.UpgradeClientProposalHandler,
-			tibcclient.RegisterRelayerProposalHandler,
-			tibcrouting.SetRoutingRulesProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
-		ibc.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
-		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 
@@ -189,8 +163,6 @@ var (
 		oracle.AppModuleBasic{},
 		random.AppModuleBasic{},
 		farm.AppModuleBasic{},
-		tibc.AppModuleBasic{},
-		tibcnfttransfer.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -201,7 +173,6 @@ var (
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		tokentypes.ModuleName:          {authtypes.Minter, authtypes.Burner},
 		htlctypes.ModuleName:           {authtypes.Minter, authtypes.Burner},
 		coinswaptypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
@@ -209,8 +180,8 @@ var (
 		servicetypes.RequestAccName:    nil,
 		servicetypes.FeeCollectorName:  {authtypes.Burner},
 		farmtypes.ModuleName:           nil,
+		nfttypes.ModuleName:           nil,
 		farmtypes.RewardCollector:      nil,
-		tibcnfttypes.ModuleName:        nil,
 	}
 
 	nativeToken tokentypes.Token
@@ -229,13 +200,15 @@ type IrisApp struct {
 	legacyAmino       *codec.LegacyAmino
 	appCodec          codec.Codec
 	interfaceRegistry types.InterfaceRegistry
+	msgSvcRouter      *authmiddleware.MsgServiceRouter
+	legacyRouter      sdk.Router
 
 	invCheckPeriod uint
 
 	// keys to access the substores
-	keys    map[string]*sdk.KVStoreKey
-	tkeys   map[string]*sdk.TransientStoreKey
-	memKeys map[string]*sdk.MemoryStoreKey
+	keys    map[string]*storetypes.KVStoreKey
+	tkeys   map[string]*storetypes.TransientStoreKey
+	memKeys map[string]*storetypes.MemoryStoreKey
 
 	// keepers
 	feeGrantKeeper   feegrantkeeper.Keeper
@@ -250,17 +223,10 @@ type IrisApp struct {
 	crisisKeeper     crisiskeeper.Keeper
 	upgradeKeeper    upgradekeeper.Keeper
 	paramsKeeper     paramskeeper.Keeper
-	ibcKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	evidenceKeeper   evidencekeeper.Keeper
-	transferKeeper   ibctransferkeeper.Keeper
 
 	// make scoped keepers public for test purposes
-	scopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	scopedTransferKeeper capabilitykeeper.ScopedKeeper
-	scopedIBCMockKeeper  capabilitykeeper.ScopedKeeper
 	// tibc
-	scopedTIBCKeeper     capabilitykeeper.ScopedKeeper
-	scopedTIBCMockKeeper capabilitykeeper.ScopedKeeper
 
 	guardianKeeper    guardiankeeper.Keeper
 	tokenKeeper       tokenkeeper.Keeper
@@ -272,14 +238,15 @@ type IrisApp struct {
 	oracleKeeper      oraclekeeper.Keeper
 	randomKeeper      randomkeeper.Keeper
 	farmkeeper        farmkeeper.Keeper
-	tibcKeeper        *tibckeeper.Keeper
-	nftTransferKeeper tibcnfttransferkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
 
 	// simulation manager
 	sm *module.SimulationManager
+
+	// module configurator
+	configurator module.Configurator
 }
 
 func init() {
@@ -355,11 +322,11 @@ func NewIrisApp(
 	keys := sdk.NewKVStoreKeys(
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
-		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
-		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
+		govtypes.StoreKey, paramstypes.StoreKey, upgradetypes.StoreKey,
+		evidencetypes.StoreKey, capabilitytypes.StoreKey,
 		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey, recordtypes.StoreKey,
 		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
-		farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey,
+		farmtypes.StoreKey, feegrant.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -369,6 +336,8 @@ func NewIrisApp(
 		legacyAmino:       legacyAmino,
 		appCodec:          appCodec,
 		interfaceRegistry: interfaceRegistry,
+		legacyRouter:      authmiddleware.NewLegacyRouter(),
+		msgSvcRouter:      authmiddleware.NewMsgServiceRouter(interfaceRegistry),
 		invCheckPeriod:    invCheckPeriod,
 		keys:              keys,
 		tkeys:             tkeys,
@@ -378,15 +347,14 @@ func NewIrisApp(
 	app.paramsKeeper = initParamsKeeper(appCodec, legacyAmino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
 
 	// set the BaseApp's parameter store
-	bApp.SetParamStore(app.paramsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramskeeper.ConsensusParamsKeyTable()))
+	bApp.SetParamStore(app.paramsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable()))
 
 	// add capability keeper and ScopeToModule for ibc module
 	app.capabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
-	scopedIBCKeeper := app.capabilityKeeper.ScopeToModule(ibchost.ModuleName)
-	scopedTransferKeeper := app.capabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 
 	app.accountKeeper = authkeeper.NewAccountKeeper(
 		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
+		sdk.Bech32MainPrefix,
 	)
 	// add keepers
 	app.feeGrantKeeper = feegrantkeeper.NewKeeper(appCodec,
@@ -421,53 +389,17 @@ func NewIrisApp(
 	app.stakingKeeper = *stakingKeeper.SetHooks(
 		stakingtypes.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()),
 	)
-	scopedTIBCKeeper := app.capabilityKeeper.ScopeToModule(tibchost.ModuleName)
-	// NOTE: the TIBC mock keeper and application module is used only for testing core TIBC. Do
-	// note replicate if you do not need to test core TIBC or light clients.
-	// Create IBC Keeper
-	app.ibcKeeper = ibckeeper.NewKeeper(
-		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.stakingKeeper, app.upgradeKeeper, scopedIBCKeeper,
-	)
-	// register the proposal types
-	app.tibcKeeper = tibckeeper.NewKeeper(
-		appCodec, keys[tibchost.StoreKey], app.GetSubspace(tibchost.ModuleName), app.stakingKeeper,
-	)
 
 	govRouter := govtypes.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper)).
-		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.upgradeKeeper)).
-		AddRoute(ibchost.RouterKey, ibcclient.NewClientProposalHandler(app.ibcKeeper.ClientKeeper)).
-		AddRoute(tibcclienttypes.RouterKey, tibcclient.NewClientProposalHandler(app.tibcKeeper.ClientKeeper)).
-		AddRoute(tibcroutingtypes.RouterKey, tibcrouting.NewSetRoutingProposalHandler(app.tibcKeeper.RoutingKeeper))
+		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.upgradeKeeper))
 	app.govKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.accountKeeper, app.bankKeeper,
 		&stakingKeeper, govRouter,
 	)
-	app.nftKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey])
-	app.nftTransferKeeper = tibcnfttransferkeeper.NewKeeper(
-		appCodec, keys[tibcnfttypes.StoreKey], app.GetSubspace(tibcnfttypes.ModuleName),
-		app.accountKeeper, app.nftKeeper,
-		app.tibcKeeper.PacketKeeper, app.tibcKeeper.ClientKeeper,
-	)
-	// Create Transfer Keepers
-	app.transferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-		app.ibcKeeper.ChannelKeeper, &app.ibcKeeper.PortKeeper,
-		app.accountKeeper, app.bankKeeper, scopedTransferKeeper,
-	)
-	transferModule := transfer.NewAppModule(app.transferKeeper)
-
-	// Create static IBC router, add transfer route, then set and seal it
-	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
-	app.ibcKeeper.SetRouter(ibcRouter)
-
-	nfttransferModule := tibcnfttransfer.NewAppModule(app.nftTransferKeeper)
-	tibcRouter := tibcroutingtypes.NewRouter()
-	tibcRouter.AddRoute(tibcnfttypes.ModuleName, nfttransferModule)
-	app.tibcKeeper.SetRouter(tibcRouter)
+	app.nftKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey],app.accountKeeper,app.bankKeeper)
 
 	// create evidence keeper with router
 	evidenceKeeper := evidencekeeper.NewKeeper(
@@ -565,10 +497,7 @@ func NewIrisApp(
 		upgrade.NewAppModule(app.upgradeKeeper),
 		evidence.NewAppModule(app.evidenceKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.accountKeeper, app.bankKeeper, app.feeGrantKeeper, app.interfaceRegistry),
-		ibc.NewAppModule(app.ibcKeeper), tibc.NewAppModule(app.tibcKeeper),
 		params.NewAppModule(app.paramsKeeper),
-		transferModule,
-		nfttransferModule,
 		guardian.NewAppModule(appCodec, app.guardianKeeper),
 		token.NewAppModule(appCodec, app.tokenKeeper, app.accountKeeper, app.bankKeeper),
 		record.NewAppModule(appCodec, app.recordKeeper, app.accountKeeper, app.bankKeeper),
@@ -588,11 +517,11 @@ func NewIrisApp(
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName,
 		slashingtypes.ModuleName, evidencetypes.ModuleName, stakingtypes.ModuleName,
-		ibchost.ModuleName, tibchost.ModuleName, htlctypes.ModuleName, randomtypes.ModuleName, farmtypes.ModuleName,
+		htlctypes.ModuleName, randomtypes.ModuleName, farmtypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
-		servicetypes.ModuleName, farmtypes.ModuleName, tibchost.ModuleName,
+		servicetypes.ModuleName, farmtypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -603,15 +532,15 @@ func NewIrisApp(
 	app.mm.SetOrderInitGenesis(
 		capabilitytypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName, feegrant.ModuleName,
-		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName, tibchost.ModuleName,
+		genutiltypes.ModuleName, evidencetypes.ModuleName,
 		guardiantypes.ModuleName, tokentypes.ModuleName, nfttypes.ModuleName, htlctypes.ModuleName, recordtypes.ModuleName,
 		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName, farmtypes.ModuleName,
 	)
 
-	cfg := module.NewConfigurator(appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterInvariants(&app.crisisKeeper)
-	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
-	app.mm.RegisterServices(cfg)
+	app.mm.RegisterRoutes(app.legacyRouter, app.QueryRouter(), encodingConfig.Amino)
+	app.configurator = module.NewConfigurator(app.appCodec, app.msgSvcRouter, app.GRPCQueryRouter())
+	app.mm.RegisterServices(app.configurator)
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	//
@@ -629,9 +558,6 @@ func NewIrisApp(
 		slashing.NewAppModule(appCodec, app.slashingKeeper, app.accountKeeper, app.bankKeeper, app.stakingKeeper),
 		params.NewAppModule(app.paramsKeeper),
 		evidence.NewAppModule(app.evidenceKeeper),
-		ibc.NewAppModule(app.ibcKeeper),
-		transferModule,
-		nfttransferModule,
 		guardian.NewAppModule(appCodec, app.guardianKeeper),
 		token.NewAppModule(appCodec, app.tokenKeeper, app.accountKeeper, app.bankKeeper),
 		record.NewAppModule(appCodec, app.recordKeeper, app.accountKeeper, app.bankKeeper),
@@ -642,7 +568,6 @@ func NewIrisApp(
 		oracle.NewAppModule(appCodec, app.oracleKeeper, app.accountKeeper, app.bankKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
 		farm.NewAppModule(appCodec, app.farmkeeper, app.accountKeeper, app.bankKeeper),
-		tibc.NewAppModule(app.tibcKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -655,17 +580,8 @@ func NewIrisApp(
 	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
-	app.SetAnteHandler(NewAnteHandler(
-		app.accountKeeper,
-		app.bankKeeper,
-		app.feeGrantKeeper,
-		app.tokenKeeper,
-		app.oracleKeeper,
-		app.guardianKeeper,
-		ante.DefaultSigVerificationGasConsumer,
-		encodingConfig.TxConfig.SignModeHandler(),
-	))
 	app.SetEndBlocker(app.EndBlocker)
+	app.setTxHandler(encodingConfig.TxConfig, cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents)))
 	// Set software upgrade execution logic
 	app.RegisterUpgradePlan(
 		"v1.1", &store.StoreUpgrades{},
@@ -684,7 +600,7 @@ func NewIrisApp(
 	)
 	app.RegisterUpgradePlan(
 		"v1.2", &store.StoreUpgrades{
-			Added: []string{farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey},
+			Added: []string{farmtypes.StoreKey, feegrant.StoreKey},
 		},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			// init farm params
@@ -695,24 +611,6 @@ func NewIrisApp(
 					MaxRewardCategories: 2,
 				}},
 			)
-			tibcclienttypes.SetDefaultGenesisState(tibcclienttypes.GenesisState{
-				NativeChainName: "irishub-mainnet",
-			})
-
-			clients := migratetibc.LoadClient(app.appCodec)
-			for _, client := range clients {
-				// init tibc client
-				if err := app.tibcKeeper.ClientKeeper.CreateClient(
-					ctx,
-					client.ChainName,
-					client.ClientState,
-					client.ConsensusState,
-				); err != nil {
-					panic(err)
-				}
-				// register client relayers
-				app.tibcKeeper.ClientKeeper.RegisterRelayers(ctx, client.ChainName, client.Relayers)
-			}
 
 			fromVM[authtypes.ModuleName] = 1
 			fromVM[banktypes.ModuleName] = 1
@@ -721,7 +619,6 @@ func NewIrisApp(
 			fromVM[distrtypes.ModuleName] = 1
 			fromVM[slashingtypes.ModuleName] = 1
 			fromVM[coinswaptypes.ModuleName] = 1
-			fromVM[ibchost.ModuleName] = 1
 			fromVM[capabilitytypes.ModuleName] = capability.AppModule{}.ConsensusVersion()
 			fromVM[genutiltypes.ModuleName] = genutil.AppModule{}.ConsensusVersion()
 			fromVM[minttypes.ModuleName] = mint.AppModule{}.ConsensusVersion()
@@ -738,7 +635,7 @@ func NewIrisApp(
 			fromVM[servicetypes.ModuleName] = service.AppModule{}.ConsensusVersion()
 			fromVM[oracletypes.ModuleName] = oracle.AppModule{}.ConsensusVersion()
 			fromVM[randomtypes.ModuleName] = random.AppModule{}.ConsensusVersion()
-			return app.mm.RunMigrations(ctx, cfg, fromVM)
+			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 		},
 	)
 
@@ -756,9 +653,6 @@ func NewIrisApp(
 		// `loadLatest` is set to true.
 		app.capabilityKeeper.Seal()
 	}
-	app.scopedTIBCKeeper = scopedTIBCKeeper
-	app.scopedIBCKeeper = scopedIBCKeeper
-	app.scopedTransferKeeper = scopedTransferKeeper
 	return app
 }
 
@@ -840,21 +734,21 @@ func (app *IrisApp) InterfaceRegistry() types.InterfaceRegistry {
 // GetKey returns the KVStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *IrisApp) GetKey(storeKey string) *sdk.KVStoreKey {
+func (app *IrisApp) GetKey(storeKey string) *storetypes.KVStoreKey {
 	return app.keys[storeKey]
 }
 
 // GetTKey returns the TransientStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *IrisApp) GetTKey(storeKey string) *sdk.TransientStoreKey {
+func (app *IrisApp) GetTKey(storeKey string) *storetypes.TransientStoreKey {
 	return app.tkeys[storeKey]
 }
 
 // GetMemKey returns the MemStoreKey for the provided mem key.
 //
 // NOTE: This is solely used for testing purposes.
-func (app *IrisApp) GetMemKey(storeKey string) *sdk.MemoryStoreKey {
+func (app *IrisApp) GetMemKey(storeKey string) *storetypes.MemoryStoreKey {
 	return app.memKeys[storeKey]
 }
 
@@ -874,9 +768,6 @@ func (app *IrisApp) SimulationManager() *module.SimulationManager {
 // RegisterAPIRoutes registers all application module routes with the provided API server.
 func (app *IrisApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
-	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
-	// Register legacy tx routes.
-	authrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
 	// Register new tendermint queries routes from grpc-gateway.
 	tmservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// Register new tx routes from grpc-gateway.
@@ -921,6 +812,29 @@ func (app *IrisApp) RegisterUpgradePlan(
 	}
 }
 
+func (app *IrisApp) setTxHandler(txConfig client.TxConfig, indexEventsStr []string) {
+	indexEvents := map[string]struct{}{}
+	for _, e := range indexEventsStr {
+		indexEvents[e] = struct{}{}
+	}
+	txHandler, err := authmiddleware.NewDefaultTxHandler(authmiddleware.TxHandlerOptions{
+		Debug:            app.Trace(),
+		IndexEvents:      indexEvents,
+		LegacyRouter:     app.legacyRouter,
+		MsgServiceRouter: app.msgSvcRouter,
+		AccountKeeper:    app.accountKeeper,
+		BankKeeper:       app.bankKeeper,
+		FeegrantKeeper:   app.feeGrantKeeper,
+		SignModeHandler:  txConfig.SignModeHandler(),
+		SigGasConsumer:   authmiddleware.DefaultSigVerificationGasConsumer,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	app.SetTxHandler(txHandler)
+}
+
 // GetMaccPerms returns a copy of the module account permissions
 func GetMaccPerms() map[string][]string {
 	dupMaccPerms := make(map[string][]string)
@@ -931,7 +845,7 @@ func GetMaccPerms() map[string][]string {
 }
 
 // initParamsKeeper init params keeper and its subspaces
-func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey sdk.StoreKey) paramskeeper.Keeper {
+func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey storetypes.StoreKey) paramskeeper.Keeper {
 	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 
 	paramsKeeper.Subspace(authtypes.ModuleName)
@@ -942,15 +856,12 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
-	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(tokentypes.ModuleName)
 	paramsKeeper.Subspace(recordtypes.ModuleName)
 	paramsKeeper.Subspace(htlctypes.ModuleName)
 	paramsKeeper.Subspace(coinswaptypes.ModuleName)
 	paramsKeeper.Subspace(servicetypes.ModuleName)
-	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(farmtypes.ModuleName)
-	paramsKeeper.Subspace(tibchost.ModuleName)
 
 	return paramsKeeper
 }

@@ -6,7 +6,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
 
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
@@ -30,10 +29,6 @@ func NewValidateTokenDecorator(tk tokenkeeper.Keeper) ValidateTokenDecorator {
 func (vtd ValidateTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	for _, msg := range tx.GetMsgs() {
 		switch msg := msg.(type) {
-		case *ibctransfertypes.MsgTransfer:
-			if containSwapCoin(msg.Token) {
-				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "can't transfer coinswap liquidity tokens through the IBC module")
-			}
 		case *tokentypes.MsgBurnToken:
 			if _, err := vtd.tk.GetToken(ctx, msg.Symbol); err != nil {
 				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "burnt failed, only native tokens can be burnt")
