@@ -43,9 +43,28 @@ var (
 	flagNumValidators     = "v"
 	flagOutputDir         = "output-dir"
 	flagNodeDaemonHome    = "node-daemon-home"
-	flagNodeCLIHome       = "node-cli-home"
 	flagStartingIPAddress = "starting-ip-address"
 )
+
+type initArgs struct {
+	algo              string
+	chainID           string
+	keyringBackend    string
+	minGasPrices      string
+	nodeDaemonHome    string
+	nodeDirPrefix     string
+	numValidators     int
+	outputDir         string
+	startingIPAddress string
+}
+
+func addTestnetFlagsToCmd(cmd *cobra.Command) {
+	cmd.Flags().Int(flagNumValidators, 4, "Number of validators to initialize the testnet with")
+	cmd.Flags().StringP(flagOutputDir, "o", "./mytestnet", "Directory to store initialization data for the testnet")
+	cmd.Flags().String(flags.FlagChainID, "", "genesis file chain-id, if left blank will be randomly created")
+	cmd.Flags().String(server.FlagMinGasPrices, fmt.Sprintf("0.000006%s", sdk.DefaultBondDenom), "Minimum gas prices to accept for transactions; All fees in a tx must meet this minimum (e.g. 0.01photino,0.001stake)")
+	cmd.Flags().String(flags.FlagKeyAlgorithm, string(hd.Secp256k1Type), "Key signing algorithm to generate keys for")
+}
 
 // get cmd to initialize all files for tendermint testnet and application
 func testnetCmd(mbm module.BasicManager, genBalIterator banktypes.GenesisBalancesIterator) *cobra.Command {
@@ -64,72 +83,53 @@ Example:
 			serverCtx := server.GetServerContextFromCmd(cmd)
 			config := serverCtx.Config
 
-			outputDir, _ := cmd.Flags().GetString(flagOutputDir)
-			keyringBackend, _ := cmd.Flags().GetString(flags.FlagKeyringBackend)
-			chainID, _ := cmd.Flags().GetString(flags.FlagChainID)
-			minGasPrices, _ := cmd.Flags().GetString(server.FlagMinGasPrices)
-			nodeDirPrefix, _ := cmd.Flags().GetString(flagNodeDirPrefix)
-			nodeDaemonHome, _ := cmd.Flags().GetString(flagNodeDaemonHome)
-			nodeCLIHome, _ := cmd.Flags().GetString(flagNodeCLIHome)
-			startingIPAddress, _ := cmd.Flags().GetString(flagStartingIPAddress)
-			numValidators, _ := cmd.Flags().GetInt(flagNumValidators)
-			algo, _ := cmd.Flags().GetString(flags.FlagKeyAlgorithm)
-
-			return InitTestnet(
-				clientCtx, cmd, config, mbm, genBalIterator, outputDir, chainID, minGasPrices,
-				nodeDirPrefix, nodeDaemonHome, nodeCLIHome, startingIPAddress, keyringBackend, algo, numValidators,
-			)
+			args := initArgs{}
+			args.outputDir, _ = cmd.Flags().GetString(flagOutputDir)
+			args.keyringBackend, _ = cmd.Flags().GetString(flags.FlagKeyringBackend)
+			args.chainID, _ = cmd.Flags().GetString(flags.FlagChainID)
+			args.minGasPrices, _ = cmd.Flags().GetString(server.FlagMinGasPrices)
+			args.nodeDirPrefix, _ = cmd.Flags().GetString(flagNodeDirPrefix)
+			args.nodeDaemonHome, _ = cmd.Flags().GetString(flagNodeDaemonHome)
+			args.startingIPAddress, _ = cmd.Flags().GetString(flagStartingIPAddress)
+			args.numValidators, _ = cmd.Flags().GetInt(flagNumValidators)
+			args.algo, _ = cmd.Flags().GetString(flags.FlagKeyAlgorithm)
+			return initTestnet(clientCtx, cmd, config, mbm, genBalIterator, args)
 		},
 	}
 
-	cmd.Flags().Int(flagNumValidators, 4, "Number of validators to initialize the testnet with")
-	cmd.Flags().StringP(flagOutputDir, "o", "./mytestnet", "Directory to store initialization data for the testnet")
+	addTestnetFlagsToCmd(cmd)
 	cmd.Flags().String(flagNodeDirPrefix, "node", "Prefix the directory name for each node with (node results in node0, node1, ...)")
 	cmd.Flags().String(flagNodeDaemonHome, "iris", "Home directory of the node's daemon configuration")
-	cmd.Flags().String(flagNodeCLIHome, "iriscli", "Home directory of the node's cli configuration")
 	cmd.Flags().String(flagStartingIPAddress, "192.168.0.1", "Starting IP address (192.168.0.1 results in persistent peers list ID0@192.168.0.1:46656, ID1@192.168.0.2:46656, ...)")
-	cmd.Flags().String(flags.FlagChainID, "", "genesis file chain-id, if left blank will be randomly created")
-	cmd.Flags().String(server.FlagMinGasPrices, fmt.Sprintf("0.000006%s", sdk.DefaultBondDenom), "Minimum gas prices to accept for transactions; All fees in a tx must meet this minimum (e.g. 0.01photino,0.001stake)")
 	cmd.Flags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
-	cmd.Flags().String(flags.FlagKeyAlgorithm, string(hd.Secp256k1Type), "Key signing algorithm to generate keys for")
-
 	return cmd
 }
 
 const nodeDirPerm = 0755
 
-// Initialize the testnet
-func InitTestnet(
+// initTestnet the testnet
+func initTestnet(
 	clientCtx client.Context,
 	cmd *cobra.Command,
 	nodeConfig *tmconfig.Config,
 	mbm module.BasicManager,
 	genBalIterator banktypes.GenesisBalancesIterator,
-	outputDir,
-	chainID,
-	minGasPrices,
-	nodeDirPrefix,
-	nodeDaemonHome,
-	nodeCLIHome,
-	startingIPAddress,
-	keyringBackend,
-	algoStr string,
-	numValidators int,
+	args initArgs,
 ) error {
-	if chainID == "" {
-		chainID = "chain-" + tmrand.Str(6)
+	if args.chainID == "" {
+		args.chainID = "chain-" + tmrand.Str(6)
 	}
 
-	nodeIDs := make([]string, numValidators)
-	valPubKeys := make([]cryptotypes.PubKey, numValidators)
+	nodeIDs := make([]string, args.numValidators)
+	valPubKeys := make([]cryptotypes.PubKey, args.numValidators)
 
 	simappConfig := srvconfig.DefaultConfig()
-	simappConfig.MinGasPrices = minGasPrices
+	simappConfig.MinGasPrices = args.minGasPrices
 	simappConfig.API.Enable = true
 	simappConfig.Telemetry.Enabled = true
 	simappConfig.Telemetry.PrometheusRetentionTime = 60
 	simappConfig.Telemetry.EnableHostnameLabel = false
-	simappConfig.Telemetry.GlobalLabels = [][]string{{"chain_id", chainID}}
+	simappConfig.Telemetry.GlobalLabels = [][]string{{"chain_id", args.chainID}}
 
 	var (
 		genAccounts []authtypes.GenesisAccount
@@ -139,56 +139,50 @@ func InitTestnet(
 
 	inBuf := bufio.NewReader(cmd.InOrStdin())
 	// generate private keys, node IDs, and initial transactions
-	for i := 0; i < numValidators; i++ {
-		nodeDirName := fmt.Sprintf("%s%d", nodeDirPrefix, i)
-		nodeDir := filepath.Join(outputDir, nodeDirName, nodeDaemonHome)
-		clientDir := filepath.Join(outputDir, nodeDirName, nodeCLIHome)
-		gentxsDir := filepath.Join(outputDir, "gentxs")
+	for i := 0; i < args.numValidators; i++ {
+		nodeDirName := fmt.Sprintf("%s%d", args.nodeDirPrefix, i)
+		nodeDir := filepath.Join(args.outputDir, nodeDirName, args.nodeDaemonHome)
+		gentxsDir := filepath.Join(args.outputDir, "gentxs")
 
 		nodeConfig.SetRoot(nodeDir)
+		nodeConfig.Moniker = nodeDirName
 		nodeConfig.RPC.ListenAddress = "tcp://0.0.0.0:26657"
+		nodeConfig.Mode = tmconfig.ModeValidator
 
 		if err := os.MkdirAll(filepath.Join(nodeDir, "config"), nodeDirPerm); err != nil {
-			_ = os.RemoveAll(outputDir)
+			_ = os.RemoveAll(args.outputDir)
 			return err
 		}
 
-		if err := os.MkdirAll(clientDir, nodeDirPerm); err != nil {
-			_ = os.RemoveAll(outputDir)
-			return err
-		}
-
-		nodeConfig.Moniker = nodeDirName
-
-		ip, err := getIP(i, startingIPAddress)
+		ip, err := getIP(i, args.startingIPAddress)
 		if err != nil {
-			_ = os.RemoveAll(outputDir)
+			_ = os.RemoveAll(args.outputDir)
 			return err
 		}
 
 		nodeIDs[i], valPubKeys[i], err = genutil.InitializeNodeValidatorFiles(nodeConfig)
 		if err != nil {
-			_ = os.RemoveAll(outputDir)
+			_ = os.RemoveAll(args.outputDir)
 			return err
 		}
 
 		memo := fmt.Sprintf("%s@%s:26656", nodeIDs[i], ip)
 		genFiles = append(genFiles, nodeConfig.GenesisFile())
 
-		kb, err := keyring.New(sdk.KeyringServiceName(), keyringBackend, clientDir, inBuf,clientCtx.Codec)
+		kb, err := keyring.New(sdk.KeyringServiceName(), args.keyringBackend, nodeDir, inBuf, clientCtx.Codec)
 		if err != nil {
 			return err
 		}
 
 		keyringAlgos, _ := kb.SupportedAlgorithms()
-		algo, err := keyring.NewSigningAlgoFromString(algoStr, keyringAlgos)
+		algo, err := keyring.NewSigningAlgoFromString(args.algo, keyringAlgos)
 		if err != nil {
 			return err
 		}
 
 		addr, secret, err := server.GenerateSaveCoinKey(kb, nodeDirName, true, algo)
 		if err != nil {
-			_ = os.RemoveAll(outputDir)
+			_ = os.RemoveAll(args.outputDir)
 			return err
 		}
 
@@ -200,7 +194,7 @@ func InitTestnet(
 		}
 
 		// save private key seed words
-		if err := writeFile(fmt.Sprintf("%v.json", "key_seed"), clientDir, cliPrint); err != nil {
+		if err := writeFile(fmt.Sprintf("%v.json", "key_seed"), nodeDir, cliPrint); err != nil {
 			return err
 		}
 
@@ -236,7 +230,7 @@ func InitTestnet(
 
 		txFactory := tx.Factory{}
 		txFactory = txFactory.
-			WithChainID(chainID).
+			WithChainID(args.chainID).
 			WithMemo(memo).
 			WithKeybase(kb).
 			WithTxConfig(clientCtx.TxConfig)
@@ -257,19 +251,19 @@ func InitTestnet(
 		srvconfig.WriteConfigFile(filepath.Join(nodeDir, "config/app.toml"), simappConfig)
 	}
 
-	if err := initGenFiles(clientCtx, mbm, chainID, genAccounts, genBalances, genFiles, numValidators); err != nil {
+	if err := initGenFiles(clientCtx, mbm, args.chainID, genAccounts, genBalances, genFiles, args.numValidators); err != nil {
 		return err
 	}
 
 	err := collectGenFiles(
-		clientCtx, nodeConfig, chainID, nodeIDs, valPubKeys, numValidators,
-		outputDir, nodeDirPrefix, nodeDaemonHome, genBalIterator,
+		clientCtx, nodeConfig, args.chainID, nodeIDs, valPubKeys, args.numValidators,
+		args.outputDir, args.nodeDirPrefix, args.nodeDaemonHome, genBalIterator,
 	)
 	if err != nil {
 		return err
 	}
 
-	cmd.PrintErrf("Successfully initialized %d node directories\n", numValidators)
+	cmd.PrintErrf("Successfully initialized %d node directories\n", args.numValidators)
 	return nil
 }
 
@@ -310,6 +304,9 @@ func initGenFiles(
 	clientCtx.Codec.MustUnmarshalJSON(appGenState[banktypes.ModuleName], &bankGenState)
 
 	bankGenState.Balances = genBalances
+	for _, bal := range bankGenState.Balances {
+		bankGenState.Supply = bankGenState.Supply.Add(bal.Coins...)
+	}
 	appGenState[banktypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&bankGenState)
 
 	appGenStateJSON, err := json.MarshalIndent(appGenState, "", "  ")
