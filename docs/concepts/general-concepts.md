@@ -101,7 +101,7 @@ Additionally, validators are expected to be active members of the community. The
 ## Validator Risks
 
 - **Unavailability**: Validators are expected to keep signing votes for making new blocks. If a validator's signature has not been included in more than 30% of the last 34,560 blocks (which amounts to approximately 48 hours, assuming an average block-generating time of 5 seconds), this validator will get jailed and removed from current validatorset for 10 minutes, and their bonded tokens will get slashed by 0.03%.
-- **Double Sign**: If the protocol detects that a validator voted multiple different opinions about the same block (same height/round), or voted for different blocks at the same height/round, this validator will get jailed and removed from current validatorset for 2 days. Their bonded tokens will get slashed by 1%.
+- **Double Sign**: If the protocol detects that a validator voted multiple different opinions about the same block (same height/round), or voted for different blocks at the same height/round, this validator will get jailed and removed from current validatorset forever. Their bonded tokens will get slashed by 1%.
 - **Censorship**: If the protocol detects that a proposer included invalid transactions in a block, this validator will get jailed and removed from current validatorset for 2 days.
 
 All metrics mentioned can be adjusted by `parameter-change` proposals.
