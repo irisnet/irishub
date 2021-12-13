@@ -83,7 +83,7 @@ build-linux: go.sum
 
 build-linux-amd64: go.sum
 	LEDGER_ENABLED=false GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iris-linux-amd64 ./cmd/iris
-	tar -czvf iris-linux-amd64.tar.gz build/iris
+	tar -czvf build/iris-linux-amd64.tar.gz build/iris-linux-amd64
 
 build-contract-tests-hooks:
 ifeq ($(OS),Windows_NT)
