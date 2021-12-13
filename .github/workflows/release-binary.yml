@@ -11,7 +11,6 @@ jobs:
       - name: build binary for linux amd64
         run: |
           make build-linux-amd64
-          tar -czvf iris-linux-amd64.tar.gz build/iris
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
