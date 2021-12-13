@@ -15,6 +15,7 @@ jobs:
           sed "s/make build/make build-linux-amd64/g" Dockerfile | tee Dockerfile.linux-amd64
           docker build -t build:linux-amd64 -f Dockerfile.linux-amd64 .
           docker run -itd --name iris-linux-amd64 build:linux-amd64 tail -f /dev/null
+          mkdir -p build/
           docker cp iris-linux-amd64:/usr/local/bin/iris-linux-amd64 build/
           tar -czvf build/iris-linux-amd64.tar.gz build/iris-linux-amd64
       - name: Create Release
