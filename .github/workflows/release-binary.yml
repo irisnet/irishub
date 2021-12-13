@@ -5,10 +5,10 @@ on:
       - "v*"
     
 jobs:
-  build:
+  uploadAssets:
     runs-on: ubuntu-20.04
     env:
-      TAG: ${{ github.ref }}
+      TAG: ${{ env.GITHUB_REF_NAME }}
     steps:
       - name: Checkout source code
         uses: actions/checkout@v1
