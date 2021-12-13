@@ -10,11 +10,14 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v1
+      # - name: install golang 1.16.9
+      #   run: |
+      #     wget https://dl.google.com/go/go1.16.9.linux-amd64.tar.gz
+      #     tar -xvf go1.16.9.linux-amd64.tar.gz
+      #     mv go /usr/local/bin/
       - name: build binary for linux amd64
         run: |
-          git status
-          go version
-          docker version
+          which go
           make build-linux-amd64
       - name: Create Release
         id: create_release
