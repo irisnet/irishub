@@ -10,14 +10,21 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v1
-      - name: build binary for linux amd64
+      - name: build binary by using docker
         run: |
-          sed "s/make build/make build-linux-amd64/g" Dockerfile | tee Dockerfile.linux-amd64
-          docker build -t build:linux-amd64 -f Dockerfile.linux-amd64 .
-          docker run -itd --name iris-linux-amd64 build:linux-amd64 tail -f /dev/null
+          sed "s/make build/make build-all-binary/g" Dockerfile | tee Dockerfile.all-binary
+          docker build -t build:all-binary -f Dockerfile.all-binary .
+          docker run -itd --name iris-all-binary build:all-binary tail -f /dev/null
           mkdir -p build/
-          docker cp iris-linux-amd64:/usr/local/bin/iris-linux-amd64 build/
+      - name: tar linux amd64 binary
+        run: |
+          docker cp iris-all-binary:/usr/local/bin/iris-linux-amd64 build/
           tar -czvf build/iris-linux-amd64.tar.gz build/iris-linux-amd64
+      - name: tar linux arm64 binary
+        run: |
+          docker cp iris-all-binary:/usr/local/bin/iris-linux-arm64 build/
+          tar -czvf build/iris-linux-arm64.tar.gz build/iris-linux-arm64
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -28,7 +35,7 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-      - name: Upload Release Asset
+      - name: Upload Linux AMD64 Release Asset
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1
         env:
@@ -37,4 +44,14 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
           asset_path: build/iris-linux-amd64.tar.gz
           asset_name: iris-linux-amd64.tar.gz
+          asset_content_type: application/gzip
+      - name: Upload Linux ARM64 Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: build/iris-linux-arm64.tar.gz
+          asset_name: iris-linux-arm64.tar.gz
           asset_content_type: application/gzip
