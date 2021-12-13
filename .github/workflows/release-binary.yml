@@ -12,8 +12,10 @@ jobs:
         uses: actions/checkout@v1
       - name: build binary for linux amd64
         run: |
-          go version
-          make build-linux-amd64
+          sed "s/make build/make build-linux-amd64/g" Dockerfile | tee Dockerfile.linux-amd64
+          docker build -t build:linux-amd64 -f Dockerfile.linux-amd64 .
+          docker run -it build:linux-amd64 -n iris-linux-amd64
+          docker cp iris-linux-amd64:/usr/local/bin/iris-linux-amd64.tar.gz build/
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
