@@ -35,8 +35,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${GITHUB_REF_NAME}
+          release_name: Release ${GITHUB_REF_NAME}
           draft: false
           prerelease: false
 
@@ -47,8 +47,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: build/iris-linux-amd64-${{ github.ref }}.tar.gz
-          asset_name: iris-linux-amd64.tar-${{ github.ref }}.gz
+          asset_path: build/iris-linux-amd64-${GITHUB_REF_NAME}.tar.gz
+          asset_name: iris-linux-amd64.tar-${GITHUB_REF_NAME}.gz
           asset_content_type: application/gzip
       - name: Upload Linux ARM64 Release Asset
         id: upload-linux-arm64 
@@ -57,8 +57,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: build/iris-linux-arm64-${{ github.ref }}.tar.gz
-          asset_name: iris-linux-arm64-${{ github.ref }}.tar.gz
+          asset_path: build/iris-linux-arm64-${GITHUB_REF_NAME}.tar.gz
+          asset_name: iris-linux-arm64-${GITHUB_REF_NAME}.tar.gz
           asset_content_type: application/gzip
       - name: Upload Windows AMD64 Release Asset
         id: upload-windows-amd64
@@ -67,6 +67,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: build/iris-windows-amd64-${{ github.ref }}.exe
-          asset_name: iris-windows-amd64-${{ github.ref }}.exe
+          asset_path: build/iris-windows-amd64-${GITHUB_REF_NAME}.exe
+          asset_name: iris-windows-amd64-${GITHUB_REF_NAME}.exe
           asset_content_type: application/octet-stream
