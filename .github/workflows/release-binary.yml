@@ -7,8 +7,6 @@ on:
 jobs:
   uploadAssets:
     runs-on: ubuntu-20.04
-    env:
-      TAG: ${{ env.GITHUB_REF_NAME }}
     steps:
       - name: Checkout source code
         uses: actions/checkout@v1
@@ -21,15 +19,15 @@ jobs:
       - name: tar linux amd64 binary
         run: |
           docker cp iris-all-binary:/usr/local/bin/iris-linux-amd64 build/
-          tar -czvf build/iris-linux-amd64-$TAG.tar.gz build/iris-linux-amd64
+          tar -czvf build/iris-linux-amd64-${GITHUB_REF_NAME}.tar.gz build/iris-linux-amd64
       - name: tar linux arm64 binary
         run: |
           docker cp iris-all-binary:/usr/local/bin/iris-linux-arm64 build/
-          tar -czvf build/iris-linux-arm64-$TAG.tar.gz build/iris-linux-arm64
+          tar -czvf build/iris-linux-arm64-${GITHUB_REF_NAME}.tar.gz build/iris-linux-arm64
       - name: get windows amd64 binary
         run: |
           docker cp iris-all-binary:/usr/local/bin/iris-windows-amd64.exe build/
-          mv build/iris-windows-amd64.exe build/iris-windows-amd64-$TAG.exe
+          mv build/iris-windows-amd64.exe build/iris-windows-amd64-${GITHUB_REF_NAME}.exe
 
       - name: Create Release
         id: create_release
