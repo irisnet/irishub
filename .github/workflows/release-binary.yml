@@ -14,6 +14,7 @@ jobs:
         run: |
           git status
           go version
+          docker version
           make build-linux-amd64
       - name: Create Release
         id: create_release
