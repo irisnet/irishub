@@ -84,6 +84,7 @@ build-linux: go.sum
 build-all-binary: go.sum
 	LEDGER_ENABLED=false GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iris-linux-amd64 ./cmd/iris
 	LEDGER_ENABLED=false GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o build/iris-linux-arm64 ./cmd/iris
+	LEDGER_ENABLED=false GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o build/iris-windows-amd64.exe ./cmd/iris
 
 build-contract-tests-hooks:
 ifeq ($(OS),Windows_NT)
