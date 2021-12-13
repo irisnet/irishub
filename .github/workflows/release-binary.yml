@@ -10,6 +10,7 @@ jobs:
     steps:
       - name: build binary for linux amd64
         run: |
+          git status 
           make build-linux-amd64
       - name: Create Release
         id: create_release
