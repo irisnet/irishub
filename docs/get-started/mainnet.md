@@ -39,6 +39,8 @@ Next, your node will process all chain upgrades. Between each upgrade, you must 
 You may see some connection errors, it does not matter, the P2P network is trying to find available connections
 
 Try to add some of the [Community Peers](https://github.com/irisnet/mainnet/blob/master/config/community-peers.md) to `persistent_peers` in the config.toml
+
+If you want to quickly start the node and join IRIS Hub without historical data, you can consider using the [state_sync](./state-sync.md) function.
 :::
 
 ## Upgrade to Validator Node
