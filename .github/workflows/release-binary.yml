@@ -48,8 +48,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: build/iris-linux-amd64-${{ github.event.release.tag_name }}.tar.gz
-          asset_name: iris-linux-amd64.tar-${{ github.event.release.tag_name }}.gz
+          asset_path: build/iris-linux-amd64-${{ github.ref_name }}.tar.gz
+          asset_name: iris-linux-amd64.tar-${{ github.ref_name }}.gz
           asset_content_type: application/gzip
       # - name: Upload Linux ARM64 Release Asset
       #   id: upload-linux-arm64 
