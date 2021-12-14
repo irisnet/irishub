@@ -1,8 +1,8 @@
 name: Release Binary
 on:
-  push:
-    tags:
-      - "v*"
+  release: 
+    types:
+      - created
     
 jobs:
   uploadAssets:
