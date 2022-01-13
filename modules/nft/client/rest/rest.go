@@ -28,6 +28,10 @@ type issueDenomReq struct {
 	Symbol           string       `json:"symbol"`
 	MintRestricted   bool         `json:"mint_restricted"`
 	UpdateRestricted bool         `json:"update_restricted"`
+	Description      string       `json:"description"`
+	Uri              string       `json:"uri"`
+	UriHash          string       `json:"uri_hash"`
+	Data             string       `json:"data"`
 }
 
 type mintNFTReq struct {
@@ -38,6 +42,7 @@ type mintNFTReq struct {
 	ID        string       `json:"id"`
 	Name      string       `json:"name"`
 	URI       string       `json:"uri"`
+	UriHash   string       `json:"uri_hash"`
 	Data      string       `json:"data"`
 }
 
@@ -46,6 +51,7 @@ type editNFTReq struct {
 	Owner   string       `json:"owner"`
 	Name    string       `json:"name"`
 	URI     string       `json:"uri"`
+	UriHash string       `json:"uri_hash"`
 	Data    string       `json:"data"`
 }
 
@@ -55,6 +61,7 @@ type transferNFTReq struct {
 	Recipient string       `json:"recipient"`
 	Name      string       `json:"name"`
 	URI       string       `json:"uri"`
+	UriHash   string       `json:"uri_hash"`
 	Data      string       `json:"data"`
 }
 

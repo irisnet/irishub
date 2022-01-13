@@ -29,7 +29,10 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.IssueDenom(ctx, msg.Id, msg.Name, msg.Schema, msg.Symbol, sender, msg.MintRestricted, msg.UpdateRestricted); err != nil {
+	if err := m.Keeper.IssueDenom(ctx, msg.Id, msg.Name, msg.Schema, msg.Symbol, sender,
+		msg.MintRestricted, msg.UpdateRestricted,
+		msg.Description, msg.Uri, msg.UriHash, msg.Data,
+	); err != nil {
 		return nil, err
 	}
 
@@ -75,6 +78,7 @@ func (m msgServer) MintNFT(goCtx context.Context, msg *types.MsgMintNFT) (*types
 	if err := m.Keeper.MintNFT(ctx, msg.DenomId, msg.Id,
 		msg.Name,
 		msg.URI,
+		msg.UriHash,
 		msg.Data,
 		recipient,
 	); err != nil {
@@ -109,6 +113,7 @@ func (m msgServer) EditNFT(goCtx context.Context, msg *types.MsgEditNFT) (*types
 	if err := m.Keeper.EditNFT(ctx, msg.DenomId, msg.Id,
 		msg.Name,
 		msg.URI,
+		msg.UriHash,
 		msg.Data,
 		sender,
 	); err != nil {
@@ -148,6 +153,7 @@ func (m msgServer) TransferNFT(goCtx context.Context, msg *types.MsgTransferNFT)
 	if err := m.Keeper.TransferOwner(ctx, msg.DenomId, msg.Id,
 		msg.Name,
 		msg.URI,
+		msg.UriHash,
 		msg.Data,
 		sender,
 		recipient,

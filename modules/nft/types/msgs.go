@@ -25,15 +25,22 @@ var (
 )
 
 // NewMsgIssueDenom is a constructor function for MsgSetName
-func NewMsgIssueDenom(denomID, denomName, schema, sender, symbol string, mintRestricted, updateRestricted bool) *MsgIssueDenom {
+func NewMsgIssueDenom(denomID, denomName, schema, sender, symbol string,
+	mintRestricted, updateRestricted bool,
+	description, uri, uriHash, data string,
+) *MsgIssueDenom {
 	return &MsgIssueDenom{
-		Sender:           sender,
 		Id:               denomID,
 		Name:             denomName,
 		Schema:           schema,
+		Sender:           sender,
 		Symbol:           symbol,
 		MintRestricted:   mintRestricted,
 		UpdateRestricted: updateRestricted,
+		Description:      description,
+		Uri:              uri,
+		UriHash:          uriHash,
+		Data:             data,
 	}
 }
 
@@ -72,13 +79,14 @@ func (msg MsgIssueDenom) GetSigners() []sdk.AccAddress {
 
 // NewMsgTransferNFT is a constructor function for MsgSetName
 func NewMsgTransferNFT(
-	tokenID, denomID, tokenName, tokenURI, tokenData, sender, recipient string,
+	tokenID, denomID, tokenName, tokenURI, tokenURIHash, tokenData, sender, recipient string,
 ) *MsgTransferNFT {
 	return &MsgTransferNFT{
 		Id:        tokenID,
 		DenomId:   denomID,
 		Name:      tokenName,
 		URI:       tokenURI,
+		UriHash:   tokenURIHash,
 		Data:      tokenData,
 		Sender:    sender,
 		Recipient: recipient,
@@ -124,13 +132,14 @@ func (msg MsgTransferNFT) GetSigners() []sdk.AccAddress {
 
 // NewMsgEditNFT is a constructor function for MsgSetName
 func NewMsgEditNFT(
-	tokenID, denomID, tokenName, tokenURI, tokenData, sender string,
+	tokenID, denomID, tokenName, tokenURI, tokenURIHash, tokenData, sender string,
 ) *MsgEditNFT {
 	return &MsgEditNFT{
 		Id:      tokenID,
 		DenomId: denomID,
 		Name:    tokenName,
 		URI:     tokenURI,
+		UriHash: tokenURIHash,
 		Data:    tokenData,
 		Sender:  sender,
 	}
@@ -175,13 +184,14 @@ func (msg MsgEditNFT) GetSigners() []sdk.AccAddress {
 
 // NewMsgMintNFT is a constructor function for MsgMintNFT
 func NewMsgMintNFT(
-	tokenID, denomID, tokenName, tokenURI, tokenData, sender, recipient string,
+	tokenID, denomID, tokenName, tokenURI, tokenURIHash, tokenData, sender, recipient string,
 ) *MsgMintNFT {
 	return &MsgMintNFT{
 		Id:        tokenID,
 		DenomId:   denomID,
 		Name:      tokenName,
 		URI:       tokenURI,
+		UriHash:   tokenURIHash,
 		Data:      tokenData,
 		Sender:    sender,
 		Recipient: recipient,

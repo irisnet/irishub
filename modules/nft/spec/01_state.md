@@ -11,6 +11,7 @@ type NFT interface {
     GetName() string            // return the name of BaseNFT
     GetOwner() sdk.AccAddress   // gets owner account of the NFT
     GetURI() string             // tokenData field: URI to retrieve the of chain tokenData of the NFT
+    GetURIHash() string
     GetData() string            // return the Data of BaseNFT
 }
 ```

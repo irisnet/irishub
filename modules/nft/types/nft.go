@@ -9,13 +9,14 @@ import (
 var _ exported.NFT = BaseNFT{}
 
 // NewBaseNFT creates a new NFT instance
-func NewBaseNFT(id, name string, owner sdk.AccAddress, uri, data string) BaseNFT {
+func NewBaseNFT(id, name string, owner sdk.AccAddress, uri, uriHash, data string) BaseNFT {
 	return BaseNFT{
-		Id:    id,
-		Name:  name,
-		Owner: owner.String(),
-		URI:   uri,
-		Data:  data,
+		Id:      id,
+		Name:    name,
+		Owner:   owner.String(),
+		URI:     uri,
+		UriHash: uriHash,
+		Data:    data,
 	}
 }
 
@@ -38,6 +39,11 @@ func (bnft BaseNFT) GetOwner() sdk.AccAddress {
 // GetURI return the URI of BaseNFT
 func (bnft BaseNFT) GetURI() string {
 	return bnft.URI
+}
+
+// GetURIHash return the UriHash of BaseNFT
+func (bnft BaseNFT) GetURIHash() string {
+	return bnft.UriHash
 }
 
 // GetData return the Data of BaseNFT

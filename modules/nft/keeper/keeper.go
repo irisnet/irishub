@@ -6,6 +6,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -14,12 +15,12 @@ import (
 
 // Keeper maintains the link to data storage and exposes getter/setter methods for the various parts of the state machine
 type Keeper struct {
-	storeKey sdk.StoreKey // Unexposed key to access store from sdk.Context
+	storeKey storetypes.StoreKey // Unexposed key to access store from sdk.Context
 	cdc      codec.Codec
 }
 
 // NewKeeper creates a new instance of the NFT Keeper
-func NewKeeper(cdc codec.Codec, storeKey sdk.StoreKey) Keeper {
+func NewKeeper(cdc codec.Codec, storeKey storetypes.StoreKey) Keeper {
 	return Keeper{
 		storeKey: storeKey,
 		cdc:      cdc,
@@ -36,14 +37,27 @@ func (k Keeper) IssueDenom(ctx sdk.Context,
 	id, name, schema, symbol string,
 	creator sdk.AccAddress,
 	mintRestricted, updateRestricted bool,
+	description, uri, uriHash, data string,
 ) error {
-	return k.SetDenom(ctx, types.NewDenom(id, name, schema, symbol, creator, mintRestricted, updateRestricted))
+	return k.SetDenom(ctx, types.Denom{
+		Id:               id,
+		Name:             name,
+		Schema:           schema,
+		Creator:          creator.String(),
+		Symbol:           symbol,
+		MintRestricted:   mintRestricted,
+		UpdateRestricted: updateRestricted,
+		Description:      description,
+		Uri:              uri,
+		UriHash:          uriHash,
+		Data:             data,
+	})
 }
 
 // MintNFT mints an NFT and manages the NFT's existence within Collections and Owners
 func (k Keeper) MintNFT(
 	ctx sdk.Context, denomID, tokenID, tokenNm,
-	tokenURI, tokenData string, owner sdk.AccAddress,
+	tokenURI, uriHash, tokenData string, owner sdk.AccAddress,
 ) error {
 	if k.HasNFT(ctx, denomID, tokenID) {
 		return sdkerrors.Wrapf(types.ErrNFTAlreadyExists, "NFT %s already exists in collection %s", tokenID, denomID)
@@ -56,6 +70,7 @@ func (k Keeper) MintNFT(
 			tokenNm,
 			owner,
 			tokenURI,
+			uriHash,
 			tokenData,
 		),
 	)
@@ -68,7 +83,7 @@ func (k Keeper) MintNFT(
 // EditNFT updates an already existing NFT
 func (k Keeper) EditNFT(
 	ctx sdk.Context, denomID, tokenID, tokenNm,
-	tokenURI, tokenData string, owner sdk.AccAddress,
+	tokenURI, tokenURIHash, tokenData string, owner sdk.AccAddress,
 ) error {
 	denom, found := k.GetDenom(ctx, denomID)
 	if !found {
@@ -94,6 +109,10 @@ func (k Keeper) EditNFT(
 		nft.URI = tokenURI
 	}
 
+	if types.Modified(tokenURIHash) {
+		nft.UriHash = tokenURIHash
+	}
+
 	if types.Modified(tokenData) {
 		nft.Data = tokenData
 	}
@@ -105,7 +124,7 @@ func (k Keeper) EditNFT(
 
 // TransferOwner transfers the ownership of the given NFT to the new owner
 func (k Keeper) TransferOwner(
-	ctx sdk.Context, denomID, tokenID, tokenNm, tokenURI,
+	ctx sdk.Context, denomID, tokenID, tokenNm, tokenURI, tokenURIHash,
 	tokenData string, srcOwner, dstOwner sdk.AccAddress,
 ) error {
 	denom, found := k.GetDenom(ctx, denomID)
@@ -129,6 +148,9 @@ func (k Keeper) TransferOwner(
 	}
 	if types.Modified(tokenURI) {
 		nft.URI = tokenURI
+	}
+	if types.Modified(tokenURIHash) {
+		nft.UriHash = tokenURIHash
 	}
 	if types.Modified(tokenData) {
 		nft.Data = tokenData

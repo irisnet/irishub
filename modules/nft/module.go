@@ -20,7 +20,6 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
 	"github.com/irisnet/irismod/modules/nft/client/cli"
-	"github.com/irisnet/irismod/modules/nft/client/rest"
 	"github.com/irisnet/irismod/modules/nft/keeper"
 	"github.com/irisnet/irismod/modules/nft/simulation"
 	"github.com/irisnet/irismod/modules/nft/types"
@@ -62,7 +61,6 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 
 // RegisterRESTRoutes registers the REST routes for the NFT module.
 func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	rest.RegisterHandlers(clientCtx, rtr, types.RouterKey)
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the NFT module.

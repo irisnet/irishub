@@ -57,8 +57,10 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	from := val.Address
 	tokenName := "Kitty Token"
-	tokenURI := "uri"
-	tokenData := "data"
+	uri := "uri"
+	uriHash := "uriHash"
+	description := "description"
+	data := "data"
 	tokenID := "kitty"
 	//owner     := "owner"
 	denomName := "name"
@@ -73,6 +75,10 @@ func (s *IntegrationTestSuite) TestNft() {
 		fmt.Sprintf("--%s=%s", nftcli.FlagDenomName, denomName),
 		fmt.Sprintf("--%s=%s", nftcli.FlagSchema, schema),
 		fmt.Sprintf("--%s=%s", nftcli.FlagSymbol, symbol),
+		fmt.Sprintf("--%s=%s", nftcli.FlagURI, uri),
+		fmt.Sprintf("--%s=%s", nftcli.FlagURIHash, uriHash),
+		fmt.Sprintf("--%s=%s", nftcli.FlagDescription, description),
+		fmt.Sprintf("--%s=%s", nftcli.FlagData, data),
 		fmt.Sprintf("--%s=%t", nftcli.FlagMintRestricted, mintRestricted),
 		fmt.Sprintf("--%s=%t", nftcli.FlagUpdateRestricted, updateRestricted),
 
@@ -101,6 +107,10 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(denomName, denomItem.Name)
 	s.Require().Equal(schema, denomItem.Schema)
 	s.Require().Equal(symbol, denomItem.Symbol)
+	s.Require().Equal(uri, denomItem.Uri)
+	s.Require().Equal(uriHash, denomItem.UriHash)
+	s.Require().Equal(description, denomItem.Description)
+	s.Require().Equal(data, denomItem.Data)
 	s.Require().Equal(mintRestricted, denomItem.MintRestricted)
 	s.Require().Equal(updateRestricted, denomItem.UpdateRestricted)
 
@@ -115,9 +125,10 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	//------test GetCmdMintNFT()-------------
 	args = []string{
-		fmt.Sprintf("--%s=%s", nftcli.FlagTokenData, tokenData),
+		fmt.Sprintf("--%s=%s", nftcli.FlagData, data),
 		fmt.Sprintf("--%s=%s", nftcli.FlagRecipient, from.String()),
-		fmt.Sprintf("--%s=%s", nftcli.FlagTokenURI, tokenURI),
+		fmt.Sprintf("--%s=%s", nftcli.FlagURI, uri),
+		fmt.Sprintf("--%s=%s", nftcli.FlagURIHash, uriHash),
 		fmt.Sprintf("--%s=%s", nftcli.FlagTokenName, tokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
@@ -149,8 +160,9 @@ func (s *IntegrationTestSuite) TestNft() {
 	nftItem := respType.(*nfttypes.BaseNFT)
 	s.Require().Equal(tokenID, nftItem.Id)
 	s.Require().Equal(tokenName, nftItem.Name)
-	s.Require().Equal(tokenURI, nftItem.URI)
-	s.Require().Equal(tokenData, nftItem.Data)
+	s.Require().Equal(uri, nftItem.URI)
+	s.Require().Equal(uriHash, nftItem.UriHash)
+	s.Require().Equal(data, nftItem.Data)
 	s.Require().Equal(from.String(), nftItem.Owner)
 
 	//------test GetCmdQueryOwner()-------------
@@ -174,10 +186,12 @@ func (s *IntegrationTestSuite) TestNft() {
 	//------test GetCmdEditNFT()-------------
 	newTokenDate := "newdata"
 	newTokenURI := "newuri"
+	newTokenURIHash := "newuriHash"
 	newTokenName := "new Kitty Token"
 	args = []string{
-		fmt.Sprintf("--%s=%s", nftcli.FlagTokenData, newTokenDate),
-		fmt.Sprintf("--%s=%s", nftcli.FlagTokenURI, newTokenURI),
+		fmt.Sprintf("--%s=%s", nftcli.FlagData, newTokenDate),
+		fmt.Sprintf("--%s=%s", nftcli.FlagURI, newTokenURI),
+		fmt.Sprintf("--%s=%s", nftcli.FlagURIHash, newTokenURIHash),
 		fmt.Sprintf("--%s=%s", nftcli.FlagTokenName, newTokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
@@ -200,14 +214,16 @@ func (s *IntegrationTestSuite) TestNft() {
 	newNftItem := respType.(*nfttypes.BaseNFT)
 	s.Require().Equal(newTokenName, newNftItem.Name)
 	s.Require().Equal(newTokenURI, newNftItem.URI)
+	s.Require().Equal(newTokenURIHash, newNftItem.UriHash)
 	s.Require().Equal(newTokenDate, newNftItem.Data)
 
 	//------test GetCmdTransferNFT()-------------
 	recipient := sdk.AccAddress(crypto.AddressHash([]byte("dgsbl")))
 
 	args = []string{
-		fmt.Sprintf("--%s=%s", nftcli.FlagTokenData, tokenData),
-		fmt.Sprintf("--%s=%s", nftcli.FlagTokenURI, tokenURI),
+		fmt.Sprintf("--%s=%s", nftcli.FlagData, data),
+		fmt.Sprintf("--%s=%s", nftcli.FlagURI, uri),
+		fmt.Sprintf("--%s=%s", nftcli.FlagURIHash, uriHash),
 		fmt.Sprintf("--%s=%s", nftcli.FlagTokenName, tokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
@@ -230,16 +246,17 @@ func (s *IntegrationTestSuite) TestNft() {
 	nftItem = respType.(*nfttypes.BaseNFT)
 	s.Require().Equal(tokenID, nftItem.Id)
 	s.Require().Equal(tokenName, nftItem.Name)
-	s.Require().Equal(tokenURI, nftItem.URI)
-	s.Require().Equal(tokenData, nftItem.Data)
+	s.Require().Equal(uri, nftItem.URI)
+	s.Require().Equal(uriHash, nftItem.UriHash)
+	s.Require().Equal(data, nftItem.Data)
 	s.Require().Equal(recipient.String(), nftItem.Owner)
 
 	//------test GetCmdBurnNFT()-------------
 	newTokenID := "dgsbl"
 	args = []string{
-		fmt.Sprintf("--%s=%s", nftcli.FlagTokenData, newTokenDate),
+		fmt.Sprintf("--%s=%s", nftcli.FlagData, newTokenDate),
 		fmt.Sprintf("--%s=%s", nftcli.FlagRecipient, from.String()),
-		fmt.Sprintf("--%s=%s", nftcli.FlagTokenURI, newTokenURI),
+		fmt.Sprintf("--%s=%s", nftcli.FlagURI, newTokenURI),
 		fmt.Sprintf("--%s=%s", nftcli.FlagTokenName, newTokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),

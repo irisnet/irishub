@@ -15,6 +15,7 @@ message BaseNFT {
     string uri = 3 [ (gogoproto.customname) = "URI" ];
     string data = 4;
     string owner = 5;
+    string uri_hash = 6;
 }
 
 // Denom defines a type of NFT
@@ -28,6 +29,10 @@ message Denom {
     string symbol = 5;
     bool mint_restricted = 6 ;
     bool update_restricted = 7 ;
+    string description = 8;
+    string uri = 9;
+    string uri_hash = 10;
+    string data = 11;
 }
 
 // IDCollection defines a type of collection with specified ID

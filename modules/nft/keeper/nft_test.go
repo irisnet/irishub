@@ -6,7 +6,7 @@ import (
 
 func (suite *KeeperSuite) TestGetNFT() {
 	// MintNFT shouldn't fail when collection does not exist
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address)
+	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	// GetNFT should get the NFT
@@ -17,7 +17,7 @@ func (suite *KeeperSuite) TestGetNFT() {
 	suite.Equal(receivedNFT.GetURI(), tokenURI)
 
 	// MintNFT shouldn't fail when collection exists
-	err = suite.keeper.MintNFT(suite.ctx, denomID, tokenID2, tokenNm2, tokenURI, tokenData, address)
+	err = suite.keeper.MintNFT(suite.ctx, denomID, tokenID2, tokenNm2, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	// GetNFT should get the NFT when collection exists
@@ -32,16 +32,16 @@ func (suite *KeeperSuite) TestGetNFT() {
 }
 
 func (suite *KeeperSuite) TestGetNFTs() {
-	err := suite.keeper.MintNFT(suite.ctx, denomID2, tokenID, tokenNm, tokenURI, tokenData, address)
+	err := suite.keeper.MintNFT(suite.ctx, denomID2, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
-	err = suite.keeper.MintNFT(suite.ctx, denomID2, tokenID2, tokenNm2, tokenURI, tokenData, address)
+	err = suite.keeper.MintNFT(suite.ctx, denomID2, tokenID2, tokenNm2, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
-	err = suite.keeper.MintNFT(suite.ctx, denomID2, tokenID3, tokenNm3, tokenURI, tokenData, address)
+	err = suite.keeper.MintNFT(suite.ctx, denomID2, tokenID3, tokenNm3, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
-	err = suite.keeper.MintNFT(suite.ctx, denomID, tokenID3, tokenNm3, tokenURI, tokenData, address)
+	err = suite.keeper.MintNFT(suite.ctx, denomID, tokenID3, tokenNm3, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	nfts := suite.keeper.GetNFTs(suite.ctx, denomID2)
@@ -49,7 +49,7 @@ func (suite *KeeperSuite) TestGetNFTs() {
 }
 
 func (suite *KeeperSuite) TestAuthorize() {
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address)
+	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	_, err = suite.keeper.Authorize(suite.ctx, denomID, tokenID, address2)
@@ -65,7 +65,7 @@ func (suite *KeeperSuite) TestHasNFT() {
 	suite.False(isNFT)
 
 	// MintNFT shouldn't fail when collection does not exist
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address)
+	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	// IsNFT should return true
