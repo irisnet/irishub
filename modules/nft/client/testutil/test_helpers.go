@@ -13,7 +13,7 @@ import (
 	nftcli "github.com/irisnet/irismod/modules/nft/client/cli"
 )
 
-// MsgRedelegateExec creates a redelegate message.
+// IssueDenomExec creates a redelegate message.
 func IssueDenomExec(clientCtx client.Context, from string, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denom,

@@ -57,8 +57,10 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	from := val.Address
 	tokenName := "Kitty Token"
-	tokenURI := "uri"
-	tokenData := "data"
+	uri := "uri"
+	uriHash := "uriHash"
+	description := "description"
+	data := "data"
 	tokenID := "kitty"
 	//owner     := "owner"
 	denomName := "name"
@@ -74,6 +76,10 @@ func (s *IntegrationTestSuite) TestNft() {
 		fmt.Sprintf("--%s=%s", nftcli.FlagDenomName, denomName),
 		fmt.Sprintf("--%s=%s", nftcli.FlagSymbol, symbol),
 		fmt.Sprintf("--%s=%s", nftcli.FlagSchema, schema),
+		fmt.Sprintf("--%s=%s", nftcli.FlagURI, uri),
+		fmt.Sprintf("--%s=%s", nftcli.FlagURIHash, uriHash),
+		fmt.Sprintf("--%s=%s", nftcli.FlagDescription, description),
+		fmt.Sprintf("--%s=%s", nftcli.FlagData, data),
 		fmt.Sprintf("--%s=%t", nftcli.FlagMintRestricted, mintRestricted),
 		fmt.Sprintf("--%s=%t", nftcli.FlagUpdateRestricted, updateRestricted),
 
@@ -103,6 +109,10 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(denomName, denomItem.Denom.Name)
 	s.Require().Equal(schema, denomItem.Denom.Schema)
 	s.Require().Equal(symbol, denomItem.Denom.Symbol)
+	s.Require().Equal(uri, denomItem.Denom.Uri)
+	s.Require().Equal(uriHash, denomItem.Denom.UriHash)
+	s.Require().Equal(description, denomItem.Denom.Description)
+	s.Require().Equal(data, denomItem.Denom.Data)
 	s.Require().Equal(mintRestricted, denomItem.Denom.MintRestricted)
 	s.Require().Equal(updateRestricted, denomItem.Denom.UpdateRestricted)
 
@@ -118,9 +128,10 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	//------test GetCmdMintNFT()-------------
 	args = []string{
-		fmt.Sprintf("--%s=%s", nftcli.FlagTokenData, tokenData),
+		fmt.Sprintf("--%s=%s", nftcli.FlagData, data),
 		fmt.Sprintf("--%s=%s", nftcli.FlagRecipient, from.String()),
-		fmt.Sprintf("--%s=%s", nftcli.FlagTokenURI, tokenURI),
+		fmt.Sprintf("--%s=%s", nftcli.FlagURI, uri),
+		fmt.Sprintf("--%s=%s", nftcli.FlagURIHash, uriHash),
 		fmt.Sprintf("--%s=%s", nftcli.FlagTokenName, tokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
@@ -154,8 +165,9 @@ func (s *IntegrationTestSuite) TestNft() {
 	nftItem := respType.(*nfttypes.QueryNFTResponse)
 	s.Require().Equal(tokenID, nftItem.NFT.Id)
 	s.Require().Equal(tokenName, nftItem.NFT.Name)
-	s.Require().Equal(tokenURI, nftItem.NFT.URI)
-	s.Require().Equal(tokenData, nftItem.NFT.Data)
+	s.Require().Equal(uri, nftItem.NFT.URI)
+	s.Require().Equal(uriHash, nftItem.NFT.UriHash)
+	s.Require().Equal(data, nftItem.NFT.Data)
 	s.Require().Equal(from.String(), nftItem.NFT.Owner)
 
 	//------test GetCmdQueryOwner()-------------

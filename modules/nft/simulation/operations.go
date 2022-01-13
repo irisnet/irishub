@@ -125,6 +125,7 @@ func SimulateMsgTransferNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 			denom,
 			"",
 			"",
+			"",
 			simtypes.RandStringOfLength(r, 10), // tokenData
 			ownerAddr.String(),                 // sender
 			recipientAccount.Address.String(),  // recipient
@@ -184,6 +185,7 @@ func SimulateMsgEditNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 			denom,
 			"",
 			simtypes.RandStringOfLength(r, 45), // tokenURI
+			simtypes.RandStringOfLength(r, 32), // tokenURI
 			simtypes.RandStringOfLength(r, 10), // tokenData
 			ownerAddr.String(),
 		)
@@ -239,6 +241,7 @@ func SimulateMsgMintNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 			getRandomDenom(ctx, k, r),                           // denom
 			"",
 			simtypes.RandStringOfLength(r, 45), // tokenURI
+			simtypes.RandStringOfLength(r, 32), // uriHash
 			simtypes.RandStringOfLength(r, 10), // tokenData
 			randomSender.Address.String(),      // sender
 			randomRecipient.Address.String(),   // recipient
@@ -405,6 +408,10 @@ func SimulateMsgIssueDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 		sender, _ := simtypes.RandomAcc(r, accs)
 		mintRestricted := genRandomBool(r)
 		updateRestricted := genRandomBool(r)
+		description := simtypes.RandStringOfLength(r, 10)
+		uri := simtypes.RandStringOfLength(r, 10)
+		uriHash := simtypes.RandStringOfLength(r, 32)
+		data := simtypes.RandStringOfLength(r, 20)
 
 		if err := types.ValidateDenomID(denomId); err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferDenom, "invalid denom"), nil, nil
@@ -423,6 +430,8 @@ func SimulateMsgIssueDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 			symbol,
 			mintRestricted,
 			updateRestricted,
+			description,
+			uri, uriHash, data,
 		)
 		account := ak.GetAccount(ctx, sender.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())

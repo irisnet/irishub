@@ -40,7 +40,10 @@ func issueDenomHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.NewMsgIssueDenom(req.ID, req.Name, req.Schema, req.Owner, req.Symbol, req.MintRestricted, req.UpdateRestricted)
+		msg := types.NewMsgIssueDenom(req.ID, req.Name, req.Schema, req.Owner, req.Symbol,
+			req.MintRestricted, req.UpdateRestricted,
+			req.Description, req.Uri, req.UriHash, req.Data,
+		)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -70,6 +73,7 @@ func mintNFTHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			req.DenomID,
 			req.Name,
 			req.URI,
+			req.UriHash,
 			req.Data,
 			req.Owner,
 			req.Recipient,
@@ -101,6 +105,7 @@ func editNFTHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			vars[RestParamDenomID],
 			req.Name,
 			req.URI,
+			req.UriHash,
 			req.Data, req.Owner,
 		)
 		if err := msg.ValidateBasic(); err != nil {
@@ -134,6 +139,7 @@ func transferNFTHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			vars[RestParamDenomID],
 			req.Name,
 			req.URI,
+			req.UriHash,
 			req.Data,
 			req.Owner,
 			req.Recipient,

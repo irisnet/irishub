@@ -16,6 +16,7 @@ var (
 	address   = CreateTestAddrs(1)[0]
 	address2  = CreateTestAddrs(2)[1]
 	tokenURI  = "https://google.com/token-1.json"
+	uriHash   = "uriHash"
 	tokenData = "https://google.com/token-1.json"
 )
 

@@ -10,5 +10,6 @@ type NFT interface {
 	GetName() string
 	GetOwner() sdk.AccAddress
 	GetURI() string
+	GetURIHash() string
 	GetData() string
 }

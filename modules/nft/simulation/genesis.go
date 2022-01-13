@@ -48,6 +48,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 				simtypes.RandStringOfLength(simState.Rand, 10),
 				acc.Address,
 				simtypes.RandStringOfLength(simState.Rand, 45), // tokenURI
+				simtypes.RandStringOfLength(simState.Rand, 32), // tokenURIHash
 				simtypes.RandStringOfLength(simState.Rand, 10),
 			)
 

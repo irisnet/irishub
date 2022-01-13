@@ -22,6 +22,7 @@ func (k Keeper) SetCollection(ctx sdk.Context, collection types.Collection) erro
 			nft.GetID(),
 			nft.GetName(),
 			nft.GetURI(),
+			nft.GetURIHash(),
 			nft.GetData(),
 			nft.GetOwner(),
 		); err != nil {
