@@ -39,6 +39,8 @@ iris start
 您可能会看到一些连接错误，这没关系，P2P网络正在尝试查找可用的连接
 
 可以添加几个[社区公开节点](https://github.com/irisnet/mainnet/blob/master/config/community-peers.md) 到`config.toml`中的`persistent_peers`。
+
+如果您在不需要历史数据的情况下要快速启动节点并加入 IRIS Hub，可以考虑使用 [state_sync](./state-sync.md) 功能快速启动节点。
 :::
 
 ## 升级为验证人节点
