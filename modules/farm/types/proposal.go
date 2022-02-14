@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
@@ -59,5 +60,10 @@ func (cfp CommunityPoolCreateFarmProposal) String() string {
 	return fmt.Sprintf(`Community Pool Create Farm Proposal:
   Title:       %s
   Description: %s
-`, cfp.Title, cfp.Description)
+  PoolName: %s
+  PoolDescription: %s
+  LpTokenDenom: %s
+  RewardsPerBlock: %s
+  TotalRewards: %s
+`, cfp.Title, cfp.Description, cfp.PoolName, cfp.PoolDescription, cfp.LpTokenDenom, sdk.Coins(cfp.RewardsPerBlock), sdk.Coins(cfp.TotalRewards))
 }
