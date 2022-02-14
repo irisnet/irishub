@@ -7,7 +7,7 @@ import (
 	"github.com/irisnet/irismod/modules/farm/types"
 )
 
-// ParseCommunityPoolCreateFarmProposalWithDeposit reads and parses a CommunityPoolSpendProposalWithDeposit from a file.
+// ParseCommunityPoolCreateFarmProposalWithDeposit reads and parses a CommunityPoolCreateFarmProposalWithDeposit from a file.
 func ParseCommunityPoolCreateFarmProposalWithDeposit(cdc codec.JSONCodec, proposalFile string) (types.CommunityPoolCreateFarmProposalWithDeposit, error) {
 	proposal := types.CommunityPoolCreateFarmProposalWithDeposit{}
 

@@ -8,6 +8,7 @@ import (
 
 const (
 	ProposalTypeCreateFarmPool string = "CommunityPoolCreateFarm"
+	FarPoolPrefix              string = "SYS-"
 )
 
 // Implements Proposal Interface
@@ -18,12 +19,39 @@ func init() {
 	govtypes.RegisterProposalTypeCodec(&CommunityPoolCreateFarmProposal{}, "irismod/CommunityPoolCreateFarmProposal")
 }
 
+func GenSysPoolName(name string) string {
+	return fmt.Sprintf(name, FarPoolPrefix)
+}
+
 func (cfp *CommunityPoolCreateFarmProposal) GetTitle() string       { return cfp.Title }
 func (cfp *CommunityPoolCreateFarmProposal) GetDescription() string { return cfp.Description }
 func (cfp *CommunityPoolCreateFarmProposal) ProposalRoute() string  { return RouterKey }
 func (cfp *CommunityPoolCreateFarmProposal) ProposalType() string   { return ProposalTypeCreateFarmPool }
 func (cfp *CommunityPoolCreateFarmProposal) ValidateBasic() error {
-	//TODO
+	if err := ValidatePoolName(FarPoolPrefix + cfp.PoolName); err != nil {
+		return err
+	}
+
+	if err := ValidateDescription(cfp.PoolDescription); err != nil {
+		return err
+	}
+
+	if err := ValidateLpTokenDenom(cfp.LpTokenDenom); err != nil {
+		return err
+	}
+
+	if err := ValidateCoins("RewardsPerBlock", cfp.RewardsPerBlock...); err != nil {
+		return err
+	}
+
+	if err := ValidateCoins("TotalRewards", cfp.TotalRewards...); err != nil {
+		return err
+	}
+
+	if err := ValidateReward(cfp.RewardsPerBlock, cfp.TotalRewards); err != nil {
+		return err
+	}
+
 	return govtypes.ValidateAbstract(cfp)
 }
 

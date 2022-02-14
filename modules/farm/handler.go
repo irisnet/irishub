@@ -42,11 +42,11 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 	}
 }
 
-func NewCommunityPoolCreateFarmProposalHandler(k keeper.Keeper) govtypes.Handler {
+func NewCommunityPoolCreateFarmProposalHandler(k keeper.Keeper, dk types.DistrKeeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
 		case *types.CommunityPoolCreateFarmProposal:
-			return keeper.HandleCommunityPoolCreateFarmProposal(ctx, k, c)
+			return keeper.HandleCommunityPoolCreateFarmProposal(ctx, k, dk, c)
 
 		default:
 			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized farm proposal content type: %T", c)

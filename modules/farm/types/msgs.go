@@ -1,6 +1,8 @@
 package types
 
 import (
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -44,6 +46,10 @@ func (msg MsgCreatePool) Type() string { return TypeMsgCreatePool }
 func (msg MsgCreatePool) ValidateBasic() error {
 	if err := ValidatePoolName(msg.Name); err != nil {
 		return err
+	}
+
+	if strings.HasPrefix(msg.Name, FarPoolPrefix) {
+		return sdkerrors.Wrapf(ErrInvalidPoolName, "cannot create farm pool starting with %s", FarPoolPrefix)
 	}
 
 	if err := ValidateDescription(msg.Description); err != nil {

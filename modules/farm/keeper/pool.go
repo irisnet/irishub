@@ -30,40 +30,7 @@ func (k Keeper) CreatePool(
 		creator, k.feeCollectorName, sdk.NewCoins(k.CreatePoolFee(ctx))); err != nil {
 		return err
 	}
-
-	pool := types.FarmPool{
-		Name:           name,
-		Creator:        creator.String(),
-		Description:    description,
-		StartHeight:    startHeight,
-		Editable:       editable,
-		TotalLptLocked: sdk.NewCoin(lpTokenDenom, sdk.ZeroInt()),
-		Rules:          []types.RewardRule{},
-	}
-
-	//save farm rule
-	for _, total := range totalReward {
-		rewardRule := types.RewardRule{
-			Reward:          total.Denom,
-			TotalReward:     total.Amount,
-			RemainingReward: total.Amount,
-			RewardPerBlock:  rewardPerBlock.AmountOf(total.Denom),
-			RewardPerShare:  sdk.ZeroDec(),
-		}
-		k.SetRewardRule(ctx, name, rewardRule)
-		pool.Rules = append(pool.Rules, rewardRule)
-	}
-
-	endHeight, err := pool.ExpiredHeight()
-	if err != nil {
-		return err
-	}
-	//save farm pool
-	pool.EndHeight = endHeight
-	k.SetPool(ctx, pool)
-	// put to expired farm pool queue
-	k.EnqueueActivePool(ctx, name, pool.EndHeight)
-	return nil
+	return k.createPool(ctx, name, creator, description, startHeight, editable, lpTokenDenom, totalReward, rewardPerBlock)
 }
 
 // Destroy destroy an exist farm pool
@@ -193,6 +160,51 @@ func (k Keeper) AdjustPool(
 	k.SetPool(ctx, pool)
 	// put to expired farm pool queue at new height
 	k.EnqueueActivePool(ctx, pool.Name, pool.EndHeight)
+	return nil
+}
+
+func (k Keeper) createPool(
+	ctx sdk.Context,
+	name string,
+	creator sdk.AccAddress,
+	description string,
+	startHeight int64,
+	editable bool,
+	lpTokenDenom string,
+	totalReward sdk.Coins,
+	rewardPerBlock sdk.Coins,
+) error {
+	pool := types.FarmPool{
+		Name:           name,
+		Creator:        creator.String(),
+		Description:    description,
+		StartHeight:    startHeight,
+		Editable:       editable,
+		TotalLptLocked: sdk.NewCoin(lpTokenDenom, sdk.ZeroInt()),
+		Rules:          []types.RewardRule{},
+	}
+
+	for _, total := range totalReward {
+		rewardRule := types.RewardRule{
+			Reward:          total.Denom,
+			TotalReward:     total.Amount,
+			RemainingReward: total.Amount,
+			RewardPerBlock:  rewardPerBlock.AmountOf(total.Denom),
+			RewardPerShare:  sdk.ZeroDec(),
+		}
+		k.SetRewardRule(ctx, name, rewardRule)
+		pool.Rules = append(pool.Rules, rewardRule)
+	}
+
+	endHeight, err := pool.ExpiredHeight()
+	if err != nil {
+		return err
+	}
+
+	pool.EndHeight = endHeight
+	k.SetPool(ctx, pool)
+
+	k.EnqueueActivePool(ctx, name, pool.EndHeight)
 	return nil
 }
 
