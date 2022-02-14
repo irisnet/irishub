@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/irisnet/irismod/modules/farm/types"
 )
@@ -267,5 +269,82 @@ func GetCmdHarvest() *cobra.Command {
 		},
 	}
 	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+// GetCmdSubmitProposal implements the command to submit a community-pool-create-farm proposal
+func GetCmdSubmitProposal() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "community-pool-create-farm [proposal-file]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Submit a community pool create farm proposal",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Submit a community community pool create farm proposal with an initial deposit.
+The proposal details must be supplied via a JSON file.
+
+Example:
+$ %s tx gov submit-proposal community-pool-create-farm <path/to/proposal.json> --from=<key_or_address>
+
+Where proposal.json contains:
+
+{
+  "title": "Community Pool Create Farm",
+  "description": "Pay me some Atoms!",
+  "pool_name": "ATOM-IRIS",
+  "pool_description": "1000stake",
+  "lp_token_denom": "lpt-1",
+  "rewards_per_block": "10000000uiris"
+  "total_rewards": "1000000000000uiris"
+  "deposit": "10000000000uiris"
+}
+`,
+				version.AppName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			proposal, err := ParseCommunityPoolCreateFarmProposalWithDeposit(clientCtx.Codec, args[0])
+			if err != nil {
+				return err
+			}
+
+			rewardsPerBlock, err := sdk.ParseCoinsNormalized(proposal.RewardsPerBlock)
+			if err != nil {
+				return err
+			}
+
+			totalRewards, err := sdk.ParseCoinsNormalized(proposal.TotalRewards)
+			if err != nil {
+				return err
+			}
+
+			deposit, err := sdk.ParseCoinsNormalized(proposal.Deposit)
+			if err != nil {
+				return err
+			}
+
+			from := clientCtx.GetFromAddress()
+			content := &types.CommunityPoolCreateFarmProposal{
+				Title:           proposal.Title,
+				Description:     proposal.Description,
+				PoolName:        proposal.PoolName,
+				PoolDescription: proposal.PoolDescription,
+				LpTokenDenom:    proposal.LpTokenDenom,
+				RewardsPerBlock: rewardsPerBlock,
+				TotalRewards:    totalRewards,
+			}
+
+			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
+			if err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
 	return cmd
 }

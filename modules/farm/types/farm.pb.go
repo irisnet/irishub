@@ -189,60 +189,166 @@ func (m *Params) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Params proto.InternalMessageInfo
 
+// CommunityPoolCreateFarmProposal is a gov Content type for creating a farm pool with community pool
+type CommunityPoolCreateFarmProposal struct {
+	Title           string       `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Description     string       `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	PoolName        string       `protobuf:"bytes,3,opt,name=pool_name,json=poolName,proto3" json:"pool_name,omitempty"`
+	PoolDescription string       `protobuf:"bytes,4,opt,name=pool_description,json=poolDescription,proto3" json:"pool_description,omitempty"`
+	LpTokenDenom    string       `protobuf:"bytes,5,opt,name=lp_token_denom,json=lpTokenDenom,proto3" json:"lp_token_denom,omitempty"`
+	RewardsPerBlock []types.Coin `protobuf:"bytes,6,rep,name=rewards_per_block,json=rewardsPerBlock,proto3" json:"rewards_per_block"`
+	TotalRewards    []types.Coin `protobuf:"bytes,7,rep,name=total_rewards,json=totalRewards,proto3" json:"total_rewards"`
+}
+
+func (m *CommunityPoolCreateFarmProposal) Reset()      { *m = CommunityPoolCreateFarmProposal{} }
+func (*CommunityPoolCreateFarmProposal) ProtoMessage() {}
+func (*CommunityPoolCreateFarmProposal) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a85c74c264ccc821, []int{4}
+}
+func (m *CommunityPoolCreateFarmProposal) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CommunityPoolCreateFarmProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CommunityPoolCreateFarmProposal.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *CommunityPoolCreateFarmProposal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CommunityPoolCreateFarmProposal.Merge(m, src)
+}
+func (m *CommunityPoolCreateFarmProposal) XXX_Size() int {
+	return m.Size()
+}
+func (m *CommunityPoolCreateFarmProposal) XXX_DiscardUnknown() {
+	xxx_messageInfo_CommunityPoolCreateFarmProposal.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CommunityPoolCreateFarmProposal proto.InternalMessageInfo
+
+// CommunityPoolCreateFarmProposalWithDeposit defines a CommunityPoolCreateFarmProposal
+// with a deposit
+type CommunityPoolCreateFarmProposalWithDeposit struct {
+	Title           string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Description     string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	PoolName        string `protobuf:"bytes,3,opt,name=pool_name,json=poolName,proto3" json:"pool_name,omitempty"`
+	PoolDescription string `protobuf:"bytes,4,opt,name=pool_description,json=poolDescription,proto3" json:"pool_description,omitempty"`
+	LpTokenDenom    string `protobuf:"bytes,5,opt,name=lp_token_denom,json=lpTokenDenom,proto3" json:"lp_token_denom,omitempty"`
+	RewardsPerBlock string `protobuf:"bytes,6,opt,name=rewards_per_block,json=rewardsPerBlock,proto3" json:"rewards_per_block,omitempty"`
+	TotalRewards    string `protobuf:"bytes,7,opt,name=total_rewards,json=totalRewards,proto3" json:"total_rewards,omitempty"`
+	Deposit         string `protobuf:"bytes,8,opt,name=deposit,proto3" json:"deposit,omitempty"`
+}
+
+func (m *CommunityPoolCreateFarmProposalWithDeposit) Reset() {
+	*m = CommunityPoolCreateFarmProposalWithDeposit{}
+}
+func (m *CommunityPoolCreateFarmProposalWithDeposit) String() string {
+	return proto.CompactTextString(m)
+}
+func (*CommunityPoolCreateFarmProposalWithDeposit) ProtoMessage() {}
+func (*CommunityPoolCreateFarmProposalWithDeposit) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a85c74c264ccc821, []int{5}
+}
+func (m *CommunityPoolCreateFarmProposalWithDeposit) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CommunityPoolCreateFarmProposalWithDeposit) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CommunityPoolCreateFarmProposalWithDeposit.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *CommunityPoolCreateFarmProposalWithDeposit) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CommunityPoolCreateFarmProposalWithDeposit.Merge(m, src)
+}
+func (m *CommunityPoolCreateFarmProposalWithDeposit) XXX_Size() int {
+	return m.Size()
+}
+func (m *CommunityPoolCreateFarmProposalWithDeposit) XXX_DiscardUnknown() {
+	xxx_messageInfo_CommunityPoolCreateFarmProposalWithDeposit.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CommunityPoolCreateFarmProposalWithDeposit proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*FarmPool)(nil), "irismod.farm.FarmPool")
 	proto.RegisterType((*RewardRule)(nil), "irismod.farm.RewardRule")
 	proto.RegisterType((*FarmInfo)(nil), "irismod.farm.FarmInfo")
 	proto.RegisterType((*Params)(nil), "irismod.farm.Params")
+	proto.RegisterType((*CommunityPoolCreateFarmProposal)(nil), "irismod.farm.CommunityPoolCreateFarmProposal")
+	proto.RegisterType((*CommunityPoolCreateFarmProposalWithDeposit)(nil), "irismod.farm.CommunityPoolCreateFarmProposalWithDeposit")
 }
 
 func init() { proto.RegisterFile("farm/farm.proto", fileDescriptor_a85c74c264ccc821) }
 
 var fileDescriptor_a85c74c264ccc821 = []byte{
-	// 673 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0xbf, 0x6e, 0x13, 0x4f,
-	0x10, 0xf6, 0xfd, 0xec, 0x38, 0xf6, 0x3a, 0xff, 0xb4, 0x3f, 0x88, 0x2e, 0x41, 0x9c, 0x4d, 0x0a,
-	0x70, 0x93, 0x3b, 0x12, 0x68, 0xa0, 0x74, 0xa2, 0x88, 0x88, 0x08, 0x85, 0xa3, 0x01, 0x9a, 0xd3,
-	0xde, 0xed, 0xc4, 0x5e, 0xe5, 0xee, 0xf6, 0xb4, 0xbb, 0x81, 0xf0, 0x0e, 0x14, 0x3c, 0x02, 0x0d,
-	0x0d, 0x15, 0x8f, 0x91, 0x32, 0x25, 0xa2, 0x08, 0x90, 0x34, 0xbc, 0x04, 0x12, 0xda, 0x3f, 0x0e,
-	0x16, 0x05, 0x4a, 0x22, 0x1a, 0x7b, 0x77, 0x66, 0xee, 0x9b, 0xd9, 0x6f, 0xe6, 0x1b, 0x34, 0xbf,
-	0x47, 0x44, 0x11, 0xe9, 0x9f, 0xb0, 0x12, 0x5c, 0x71, 0x3c, 0xc3, 0x04, 0x93, 0x05, 0xa7, 0xa1,
-	0xb6, 0x2d, 0x07, 0x19, 0x97, 0x05, 0x97, 0x51, 0x4a, 0x24, 0x44, 0xaf, 0xd6, 0x52, 0x50, 0x64,
-	0x2d, 0xca, 0x38, 0x2b, 0x6d, 0xf4, 0xf2, 0xb5, 0x21, 0x1f, 0x72, 0x73, 0x8c, 0xf4, 0xc9, 0x5a,
-	0x57, 0x3e, 0xd4, 0x51, 0x6b, 0x8b, 0x88, 0x62, 0x97, 0xf3, 0x1c, 0x63, 0xd4, 0x28, 0x49, 0x01,
-	0xbe, 0xd7, 0xf3, 0xfa, 0xed, 0xd8, 0x9c, 0xb1, 0x8f, 0xa6, 0x33, 0x01, 0x44, 0x71, 0xe1, 0xff,
-	0x67, 0xcc, 0xe3, 0x2b, 0xee, 0xa1, 0x0e, 0x05, 0x99, 0x09, 0x56, 0x29, 0xc6, 0x4b, 0xbf, 0x6e,
-	0xbc, 0x93, 0x26, 0x7c, 0x0b, 0xcd, 0x48, 0x45, 0x84, 0x4a, 0x46, 0xc0, 0x86, 0x23, 0xe5, 0x37,
-	0x7a, 0x5e, 0xbf, 0x1e, 0x77, 0x8c, 0xed, 0x91, 0x31, 0xe1, 0x9b, 0x08, 0x41, 0x49, 0xc7, 0x01,
-	0x53, 0x26, 0xa0, 0x0d, 0x25, 0x75, 0xee, 0x07, 0x68, 0x29, 0x27, 0x72, 0x0c, 0x90, 0x50, 0x26,
-	0x95, 0x48, 0x04, 0xbc, 0x26, 0x82, 0x4a, 0xbf, 0x69, 0xa2, 0x17, 0x75, 0x80, 0x0d, 0xdf, 0xd4,
-	0xee, 0xd8, 0x7a, 0xf1, 0x32, 0x6a, 0x01, 0x65, 0x8a, 0xa4, 0x39, 0xf8, 0xd3, 0x3d, 0xaf, 0xdf,
-	0x8a, 0xcf, 0xef, 0x58, 0xa1, 0x05, 0xc5, 0x15, 0xc9, 0x93, 0xbc, 0x52, 0x49, 0xce, 0xb3, 0x7d,
-	0xa0, 0x7e, 0xab, 0xe7, 0xf5, 0x3b, 0xeb, 0x4b, 0xa1, 0xa5, 0x31, 0xd4, 0x34, 0x86, 0x8e, 0xc6,
-	0x70, 0x83, 0xb3, 0x72, 0x10, 0x1d, 0x9d, 0x74, 0x6b, 0x5f, 0x4e, 0xba, 0x77, 0x86, 0x4c, 0x8d,
-	0x0e, 0xd2, 0x30, 0xe3, 0x45, 0xe4, 0x38, 0xb7, 0x7f, 0xab, 0x92, 0xee, 0x47, 0xea, 0x4d, 0x05,
-	0xd2, 0x7c, 0x10, 0xcf, 0x99, 0x1c, 0x3b, 0x95, 0xda, 0x31, 0x19, 0xf0, 0x7d, 0x34, 0x25, 0x0e,
-	0x72, 0x90, 0x7e, 0xbb, 0x57, 0xef, 0x77, 0xd6, 0xfd, 0x70, 0xb2, 0x7f, 0xa1, 0xad, 0x3b, 0x3e,
-	0xc8, 0x61, 0xd0, 0xd0, 0x99, 0x62, 0x1b, 0xfc, 0xb0, 0xf1, 0xe3, 0x7d, 0xd7, 0x5b, 0x79, 0x5b,
-	0x47, 0xe8, 0x77, 0x04, 0x5e, 0x44, 0x4d, 0xcb, 0x82, 0xeb, 0x95, 0xbb, 0xe1, 0xa7, 0x68, 0xc6,
-	0x3e, 0xcc, 0x79, 0x4d, 0xcb, 0x06, 0xa1, 0xab, 0xfc, 0xf6, 0x05, 0x2a, 0xdf, 0x2e, 0x55, 0xdc,
-	0x31, 0x18, 0x36, 0x1d, 0x7e, 0x81, 0x16, 0x04, 0x14, 0x84, 0x95, 0xac, 0x1c, 0x8e, 0x61, 0xeb,
-	0x57, 0x82, 0x9d, 0x3f, 0xc7, 0x71, 0xd0, 0xcf, 0x35, 0xb4, 0x3e, 0x25, 0x15, 0x88, 0x24, 0xd5,
-	0x8d, 0x30, 0x33, 0x72, 0x79, 0xe8, 0x39, 0x8b, 0xb3, 0x0b, 0x62, 0xa0, 0x51, 0xfe, 0x40, 0x96,
-	0x23, 0x22, 0xc0, 0x0c, 0xd7, 0xe5, 0x90, 0x37, 0x21, 0x9b, 0x40, 0x7e, 0xa6, 0x51, 0x5c, 0x3b,
-	0x7e, 0x7a, 0x56, 0x36, 0xdb, 0xe5, 0x1e, 0xc7, 0x37, 0x50, 0xbb, 0xe2, 0x3c, 0x4f, 0x26, 0xb4,
-	0xd3, 0xd2, 0x86, 0x27, 0x4e, 0x3f, 0x84, 0x52, 0x01, 0x52, 0x8e, 0xf5, 0xe3, 0xae, 0x78, 0x0b,
-	0x35, 0xdd, 0xe8, 0x5d, 0x8d, 0x4e, 0xf7, 0x35, 0xce, 0x51, 0xc7, 0xbd, 0x95, 0x42, 0xaa, 0x45,
-	0x56, 0xff, 0xfb, 0x1c, 0xdf, 0xd5, 0x79, 0x3e, 0x7e, 0xed, 0xf6, 0x2f, 0x38, 0xc7, 0x32, 0x46,
-	0x16, 0x7f, 0x13, 0x52, 0xe5, 0xde, 0xff, 0xc9, 0x43, 0xcd, 0x5d, 0x22, 0x48, 0x21, 0xb1, 0x40,
-	0xf3, 0x66, 0x23, 0x40, 0x62, 0x48, 0xd8, 0x03, 0xcb, 0xc1, 0xbf, 0x95, 0xd2, 0xac, 0x4d, 0xa1,
-	0xb7, 0xd4, 0x16, 0x00, 0x5e, 0x47, 0xd7, 0x0b, 0x72, 0xe8, 0xa6, 0x31, 0xc9, 0x88, 0x82, 0x21,
-	0x17, 0x0c, 0x2c, 0xc5, 0xb3, 0xf1, 0xff, 0x05, 0x39, 0xb4, 0x23, 0xb6, 0x71, 0xee, 0x1a, 0x3c,
-	0x3e, 0xfa, 0x1e, 0xd4, 0x8e, 0x4e, 0x03, 0xef, 0xf8, 0x34, 0xf0, 0xbe, 0x9d, 0x06, 0xde, 0xbb,
-	0xb3, 0xa0, 0x76, 0x7c, 0x16, 0xd4, 0x3e, 0x9f, 0x05, 0xb5, 0x97, 0xab, 0x13, 0x95, 0x68, 0x59,
-	0x96, 0xa0, 0x22, 0x27, 0xcf, 0xa8, 0xe0, 0x54, 0x2b, 0xd1, 0xac, 0x5e, 0x5b, 0x54, 0xda, 0x34,
-	0xdb, 0xf3, 0xde, 0xaf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x5b, 0xb5, 0x4d, 0x02, 0x94, 0x05, 0x00,
-	0x00,
+	// 864 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x56, 0x4f, 0x6f, 0xdc, 0x44,
+	0x14, 0x5f, 0xc7, 0xc9, 0x66, 0x77, 0x76, 0x93, 0x0d, 0x43, 0xa9, 0xdc, 0x20, 0xec, 0x25, 0x20,
+	0x58, 0x2a, 0xd5, 0xa6, 0x81, 0x0b, 0x39, 0x6e, 0x56, 0x11, 0x55, 0x2b, 0x14, 0x0c, 0x12, 0x7f,
+	0x2e, 0xd6, 0xd8, 0x7e, 0xd9, 0x1d, 0xc5, 0xf6, 0x58, 0x33, 0x13, 0x68, 0xbf, 0x01, 0x07, 0x0e,
+	0x1c, 0x7b, 0xdc, 0x0b, 0x17, 0x4e, 0x7c, 0x0b, 0x72, 0xec, 0x11, 0x71, 0x28, 0x90, 0x70, 0xe0,
+	0x4b, 0x20, 0xa1, 0xf9, 0xb3, 0x8b, 0xd9, 0x22, 0x9a, 0x56, 0x5c, 0xb8, 0x24, 0xf3, 0xfe, 0xf8,
+	0xf7, 0xec, 0xdf, 0xfb, 0xbd, 0x37, 0x8b, 0x06, 0x27, 0x84, 0x97, 0x91, 0xfa, 0x13, 0xd6, 0x9c,
+	0x49, 0x86, 0xfb, 0x94, 0x53, 0x51, 0xb2, 0x3c, 0x54, 0xbe, 0x5d, 0x3f, 0x63, 0xa2, 0x64, 0x22,
+	0x4a, 0x89, 0x80, 0xe8, 0x8b, 0xdb, 0x29, 0x48, 0x72, 0x3b, 0xca, 0x18, 0xad, 0x4c, 0xf6, 0xee,
+	0xb5, 0x29, 0x9b, 0x32, 0x7d, 0x8c, 0xd4, 0xc9, 0x78, 0xf7, 0xbe, 0x75, 0x51, 0xe7, 0x88, 0xf0,
+	0xf2, 0x98, 0xb1, 0x02, 0x63, 0xb4, 0x5e, 0x91, 0x12, 0x3c, 0x67, 0xe8, 0x8c, 0xba, 0xb1, 0x3e,
+	0x63, 0x0f, 0x6d, 0x66, 0x1c, 0x88, 0x64, 0xdc, 0x5b, 0xd3, 0xee, 0x85, 0x89, 0x87, 0xa8, 0x97,
+	0x83, 0xc8, 0x38, 0xad, 0x25, 0x65, 0x95, 0xe7, 0xea, 0x68, 0xd3, 0x85, 0x5f, 0x45, 0x7d, 0x21,
+	0x09, 0x97, 0xc9, 0x0c, 0xe8, 0x74, 0x26, 0xbd, 0xf5, 0xa1, 0x33, 0x72, 0xe3, 0x9e, 0xf6, 0xbd,
+	0xaf, 0x5d, 0xf8, 0x15, 0x84, 0xa0, 0xca, 0x17, 0x09, 0x1b, 0x3a, 0xa1, 0x0b, 0x55, 0x6e, 0xc3,
+	0xef, 0xa1, 0x1b, 0x05, 0x11, 0x0b, 0x80, 0x24, 0xa7, 0x42, 0xf2, 0x84, 0xc3, 0x97, 0x84, 0xe7,
+	0xc2, 0x6b, 0xeb, 0xec, 0xeb, 0x2a, 0xc1, 0xa4, 0x4f, 0x54, 0x38, 0x36, 0x51, 0xbc, 0x8b, 0x3a,
+	0x90, 0x53, 0x49, 0xd2, 0x02, 0xbc, 0xcd, 0xa1, 0x33, 0xea, 0xc4, 0x4b, 0x1b, 0x4b, 0xb4, 0x23,
+	0x99, 0x24, 0x45, 0x52, 0xd4, 0x32, 0x29, 0x58, 0x76, 0x0a, 0xb9, 0xd7, 0x19, 0x3a, 0xa3, 0xde,
+	0xfe, 0x8d, 0xd0, 0xd0, 0x18, 0x2a, 0x1a, 0x43, 0x4b, 0x63, 0x78, 0xc8, 0x68, 0x35, 0x8e, 0xce,
+	0x1f, 0x07, 0xad, 0x9f, 0x1e, 0x07, 0x6f, 0x4e, 0xa9, 0x9c, 0x9d, 0xa5, 0x61, 0xc6, 0xca, 0xc8,
+	0x72, 0x6e, 0xfe, 0xdd, 0x12, 0xf9, 0x69, 0x24, 0x1f, 0xd4, 0x20, 0xf4, 0x03, 0xf1, 0xb6, 0xae,
+	0x71, 0xaf, 0x96, 0xf7, 0x74, 0x05, 0xfc, 0x2e, 0xda, 0xe0, 0x67, 0x05, 0x08, 0xaf, 0x3b, 0x74,
+	0x47, 0xbd, 0x7d, 0x2f, 0x6c, 0xf6, 0x2f, 0x34, 0xef, 0x1d, 0x9f, 0x15, 0x30, 0x5e, 0x57, 0x95,
+	0x62, 0x93, 0x7c, 0xb0, 0xfe, 0xfb, 0x3c, 0x70, 0xf6, 0xbe, 0x76, 0x11, 0xfa, 0x2b, 0x03, 0x5f,
+	0x47, 0x6d, 0xc3, 0x82, 0xed, 0x95, 0xb5, 0xf0, 0x87, 0xa8, 0x6f, 0x3e, 0xcc, 0x46, 0x75, 0xcb,
+	0xc6, 0xa1, 0x7d, 0xf3, 0x37, 0xae, 0xf0, 0xe6, 0x77, 0x2a, 0x19, 0xf7, 0x34, 0x86, 0x29, 0x87,
+	0x3f, 0x43, 0x3b, 0x1c, 0x4a, 0x42, 0x2b, 0x5a, 0x4d, 0x17, 0xb0, 0xee, 0x73, 0xc1, 0x0e, 0x96,
+	0x38, 0x16, 0xfa, 0x53, 0x05, 0xad, 0x4e, 0x49, 0x0d, 0x3c, 0x49, 0x55, 0x23, 0xb4, 0x46, 0x9e,
+	0x1d, 0x7a, 0xdb, 0xe0, 0x1c, 0x03, 0x1f, 0x2b, 0x94, 0x15, 0x64, 0x31, 0x23, 0x1c, 0xb4, 0xb8,
+	0x9e, 0x0d, 0x79, 0x02, 0x59, 0x03, 0xf9, 0x23, 0x85, 0x62, 0xdb, 0xf1, 0x87, 0x63, 0xc6, 0xe6,
+	0x4e, 0x75, 0xc2, 0xf0, 0xcb, 0xa8, 0x5b, 0x33, 0x56, 0x24, 0x8d, 0xd9, 0xe9, 0x28, 0xc7, 0x07,
+	0x76, 0x7e, 0x48, 0x9e, 0x73, 0x10, 0x62, 0x31, 0x3f, 0xd6, 0xc4, 0x47, 0xa8, 0x6d, 0xa5, 0xf7,
+	0x7c, 0x74, 0xda, 0xa7, 0x71, 0x81, 0x7a, 0xf6, 0x5b, 0x73, 0x48, 0xd5, 0x90, 0xb9, 0xff, 0xae,
+	0xe3, 0xb7, 0x55, 0x9d, 0xef, 0x7e, 0x0e, 0x46, 0x57, 0xd4, 0xb1, 0x88, 0x91, 0xc1, 0x9f, 0x40,
+	0x2a, 0xed, 0xf7, 0x7f, 0xef, 0xa0, 0xf6, 0x31, 0xe1, 0xa4, 0x14, 0x98, 0xa3, 0x81, 0xde, 0x08,
+	0x90, 0x68, 0x12, 0x4e, 0xc0, 0x70, 0xf0, 0xdf, 0x8e, 0xd2, 0x96, 0x29, 0xa1, 0xb6, 0xd4, 0x11,
+	0x00, 0xde, 0x47, 0x2f, 0x95, 0xe4, 0xbe, 0x55, 0x63, 0x92, 0x11, 0x09, 0x53, 0xc6, 0x29, 0x18,
+	0x8a, 0xb7, 0xe2, 0x17, 0x4b, 0x72, 0xdf, 0x48, 0xec, 0x70, 0x19, 0xda, 0xfb, 0x6d, 0x0d, 0x05,
+	0x87, 0xac, 0x2c, 0xcf, 0x2a, 0x2a, 0x1f, 0x28, 0xa0, 0x43, 0x0d, 0xa9, 0x97, 0x1f, 0x67, 0x35,
+	0x13, 0xa4, 0xc0, 0xd7, 0xd0, 0x86, 0xa4, 0xb2, 0x58, 0x74, 0xd1, 0x18, 0xab, 0x8b, 0x6e, 0xed,
+	0xc9, 0x45, 0xf7, 0x37, 0x05, 0xb8, 0x2b, 0x0a, 0x78, 0x0b, 0xed, 0xe8, 0x60, 0x13, 0x43, 0xab,
+	0x3c, 0x1e, 0x28, 0xff, 0xa4, 0x81, 0xf3, 0x3a, 0xda, 0x2e, 0xea, 0x44, 0xb2, 0x53, 0xa8, 0x92,
+	0x1c, 0x2a, 0x56, 0x1a, 0xd1, 0xc6, 0xfd, 0xa2, 0xfe, 0x58, 0x39, 0x27, 0xca, 0x87, 0xef, 0xa2,
+	0x17, 0xec, 0x0a, 0x6c, 0xcc, 0x4d, 0xfb, 0x69, 0x6d, 0x37, 0x4b, 0x65, 0x60, 0x9f, 0x5c, 0x4e,
+	0xca, 0x04, 0x6d, 0x35, 0x37, 0x86, 0xf0, 0x36, 0xaf, 0x06, 0xd4, 0x6f, 0xec, 0x08, 0x71, 0xd0,
+	0x79, 0x38, 0x0f, 0x5a, 0x5a, 0x19, 0x3f, 0xac, 0xa1, 0x9b, 0x4f, 0xa1, 0xf9, 0x13, 0x2a, 0x67,
+	0x13, 0xa8, 0x99, 0xa0, 0xf2, 0x7f, 0xc2, 0xf8, 0xcd, 0x7f, 0x66, 0x5c, 0x23, 0xae, 0x12, 0xfa,
+	0xda, 0x93, 0x84, 0x6a, 0xc0, 0x26, 0x5f, 0x6a, 0x2b, 0xe4, 0x86, 0x01, 0x7d, 0xef, 0x74, 0xe3,
+	0x85, 0x79, 0xd0, 0xf9, 0x6a, 0x1e, 0xb4, 0x1e, 0xce, 0x03, 0x67, 0x7c, 0xf7, 0xfc, 0x57, 0xbf,
+	0x75, 0x7e, 0xe1, 0x3b, 0x8f, 0x2e, 0x7c, 0xe7, 0x97, 0x0b, 0xdf, 0xf9, 0xe6, 0xd2, 0x6f, 0x3d,
+	0xba, 0xf4, 0x5b, 0x3f, 0x5e, 0xfa, 0xad, 0xcf, 0x6f, 0x35, 0x46, 0x47, 0xdd, 0x23, 0x15, 0xc8,
+	0xc8, 0xde, 0x27, 0x51, 0xc9, 0x72, 0x75, 0x75, 0xe8, 0xdf, 0x0a, 0x66, 0x8a, 0xd2, 0xb6, 0xbe,
+	0xee, 0xdf, 0xf9, 0x33, 0x00, 0x00, 0xff, 0xff, 0x5e, 0x12, 0x01, 0x62, 0x45, 0x08, 0x00, 0x00,
 }
 
 func (this *FarmPool) Equal(that interface{}) bool {
@@ -367,6 +473,58 @@ func (this *FarmInfo) Equal(that interface{}) bool {
 	}
 	for i := range this.RewardDebt {
 		if !this.RewardDebt[i].Equal(&that1.RewardDebt[i]) {
+			return false
+		}
+	}
+	return true
+}
+func (this *CommunityPoolCreateFarmProposal) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*CommunityPoolCreateFarmProposal)
+	if !ok {
+		that2, ok := that.(CommunityPoolCreateFarmProposal)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Title != that1.Title {
+		return false
+	}
+	if this.Description != that1.Description {
+		return false
+	}
+	if this.PoolName != that1.PoolName {
+		return false
+	}
+	if this.PoolDescription != that1.PoolDescription {
+		return false
+	}
+	if this.LpTokenDenom != that1.LpTokenDenom {
+		return false
+	}
+	if len(this.RewardsPerBlock) != len(that1.RewardsPerBlock) {
+		return false
+	}
+	for i := range this.RewardsPerBlock {
+		if !this.RewardsPerBlock[i].Equal(&that1.RewardsPerBlock[i]) {
+			return false
+		}
+	}
+	if len(this.TotalRewards) != len(that1.TotalRewards) {
+		return false
+	}
+	for i := range this.TotalRewards {
+		if !this.TotalRewards[i].Equal(&that1.TotalRewards[i]) {
 			return false
 		}
 	}
@@ -634,6 +792,171 @@ func (m *Params) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *CommunityPoolCreateFarmProposal) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CommunityPoolCreateFarmProposal) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CommunityPoolCreateFarmProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.TotalRewards) > 0 {
+		for iNdEx := len(m.TotalRewards) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.TotalRewards[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintFarm(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
+	if len(m.RewardsPerBlock) > 0 {
+		for iNdEx := len(m.RewardsPerBlock) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.RewardsPerBlock[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintFarm(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x32
+		}
+	}
+	if len(m.LpTokenDenom) > 0 {
+		i -= len(m.LpTokenDenom)
+		copy(dAtA[i:], m.LpTokenDenom)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.LpTokenDenom)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.PoolDescription) > 0 {
+		i -= len(m.PoolDescription)
+		copy(dAtA[i:], m.PoolDescription)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.PoolDescription)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.PoolName) > 0 {
+		i -= len(m.PoolName)
+		copy(dAtA[i:], m.PoolName)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.PoolName)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Title) > 0 {
+		i -= len(m.Title)
+		copy(dAtA[i:], m.Title)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.Title)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *CommunityPoolCreateFarmProposalWithDeposit) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CommunityPoolCreateFarmProposalWithDeposit) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CommunityPoolCreateFarmProposalWithDeposit) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Deposit) > 0 {
+		i -= len(m.Deposit)
+		copy(dAtA[i:], m.Deposit)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.Deposit)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if len(m.TotalRewards) > 0 {
+		i -= len(m.TotalRewards)
+		copy(dAtA[i:], m.TotalRewards)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.TotalRewards)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.RewardsPerBlock) > 0 {
+		i -= len(m.RewardsPerBlock)
+		copy(dAtA[i:], m.RewardsPerBlock)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.RewardsPerBlock)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.LpTokenDenom) > 0 {
+		i -= len(m.LpTokenDenom)
+		copy(dAtA[i:], m.LpTokenDenom)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.LpTokenDenom)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.PoolDescription) > 0 {
+		i -= len(m.PoolDescription)
+		copy(dAtA[i:], m.PoolDescription)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.PoolDescription)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.PoolName) > 0 {
+		i -= len(m.PoolName)
+		copy(dAtA[i:], m.PoolName)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.PoolName)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Title) > 0 {
+		i -= len(m.Title)
+		copy(dAtA[i:], m.Title)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.Title)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintFarm(dAtA []byte, offset int, v uint64) int {
 	offset -= sovFarm(v)
 	base := offset
@@ -742,6 +1065,88 @@ func (m *Params) Size() (n int) {
 	n += 1 + l + sovFarm(uint64(l))
 	if m.MaxRewardCategories != 0 {
 		n += 1 + sovFarm(uint64(m.MaxRewardCategories))
+	}
+	return n
+}
+
+func (m *CommunityPoolCreateFarmProposal) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Title)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
+	}
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
+	}
+	l = len(m.PoolName)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
+	}
+	l = len(m.PoolDescription)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
+	}
+	l = len(m.LpTokenDenom)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
+	}
+	if len(m.RewardsPerBlock) > 0 {
+		for _, e := range m.RewardsPerBlock {
+			l = e.Size()
+			n += 1 + l + sovFarm(uint64(l))
+		}
+	}
+	if len(m.TotalRewards) > 0 {
+		for _, e := range m.TotalRewards {
+			l = e.Size()
+			n += 1 + l + sovFarm(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *CommunityPoolCreateFarmProposalWithDeposit) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Title)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
+	}
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
+	}
+	l = len(m.PoolName)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
+	}
+	l = len(m.PoolDescription)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
+	}
+	l = len(m.LpTokenDenom)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
+	}
+	l = len(m.RewardsPerBlock)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
+	}
+	l = len(m.TotalRewards)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
+	}
+	l = len(m.Deposit)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
 	}
 	return n
 }
@@ -1523,6 +1928,590 @@ func (m *Params) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipFarm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CommunityPoolCreateFarmProposal) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowFarm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CommunityPoolCreateFarmProposal: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CommunityPoolCreateFarmProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Title", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Title = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PoolName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolDescription", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PoolDescription = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LpTokenDenom", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LpTokenDenom = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RewardsPerBlock", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RewardsPerBlock = append(m.RewardsPerBlock, types.Coin{})
+			if err := m.RewardsPerBlock[len(m.RewardsPerBlock)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TotalRewards", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TotalRewards = append(m.TotalRewards, types.Coin{})
+			if err := m.TotalRewards[len(m.TotalRewards)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipFarm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CommunityPoolCreateFarmProposalWithDeposit) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowFarm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CommunityPoolCreateFarmProposalWithDeposit: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CommunityPoolCreateFarmProposalWithDeposit: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Title", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Title = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PoolName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolDescription", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PoolDescription = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LpTokenDenom", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LpTokenDenom = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RewardsPerBlock", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RewardsPerBlock = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TotalRewards", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TotalRewards = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Deposit", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Deposit = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipFarm(dAtA[iNdEx:])
