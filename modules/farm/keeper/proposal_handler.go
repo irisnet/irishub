@@ -34,6 +34,6 @@ func HandleCommunityPoolCreateFarmProposal(ctx sdk.Context,
 	if err != nil {
 		return err
 	}
-
-	return k.createPool(ctx, poolName, moduleAddress, p.PoolDescription, ctx.BlockHeight(), false, p.LpTokenDenom, p.TotalRewards, p.RewardsPerBlock)
+	creator := dk.GetDistributionAccount(ctx)
+	return k.createPool(ctx, poolName, creator.GetAddress(), p.PoolDescription, ctx.BlockHeight(), false, p.LpTokenDenom, p.TotalRewards, p.RewardsPerBlock)
 }

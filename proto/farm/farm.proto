@@ -80,8 +80,8 @@ message CommunityPoolCreateFarmProposal {
   string pool_name = 3;
   string pool_description = 4;
   string lp_token_denom = 5;
-  repeated cosmos.base.v1beta1.Coin rewards_per_block = 6 [(gogoproto.nullable) = false];;
-  repeated cosmos.base.v1beta1.Coin total_rewards = 7 [(gogoproto.nullable) = false];;
+  repeated cosmos.base.v1beta1.Coin rewards_per_block = 6 [(gogoproto.nullable) = false];
+  repeated cosmos.base.v1beta1.Coin total_rewards = 7 [(gogoproto.nullable) = false];
 }
 
 // CommunityPoolCreateFarmProposalWithDeposit defines a CommunityPoolCreateFarmProposal

@@ -25,4 +25,5 @@ type AccountKeeper interface {
 // DistrKeeper defines the expected distribution keeper (noalias)
 type DistrKeeper interface {
 	DistributeFromFeePool(ctx sdk.Context, amount sdk.Coins, receiveAddr sdk.AccAddress) error
+	GetDistributionAccount(ctx sdk.Context) authtypes.ModuleAccountI
 }
