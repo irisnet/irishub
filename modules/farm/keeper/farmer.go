@@ -223,19 +223,23 @@ func (k Keeper) Refund(ctx sdk.Context, pool types.FarmPool) (sdk.Coins, error) 
 		k.SetRewardRule(ctx, pool.Id, r)
 	}
 
-	if refundTotal.IsAllPositive() {
-		//refund the total remaining reward to creator
-		if err := k.bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, refundTotal); err != nil {
-			return nil, err
-		}
+	if !refundTotal.IsAllPositive() {
+		return nil, sdkerrors.Wrapf(
+			types.ErrInvalidRefund,
+			"pool [%s] has no remaining reward",
+			pool.Id,
+		)
+	}
 
-		// if the creator of the pool is the distribution module account,should add the reward to the distribution module account
-		distrModuleAcc := k.dk.GetDistributionAccount(ctx)
-		if distrModuleAcc.GetAddress().Equals(creator) {
-			feelPool := k.dk.GetFeePool(ctx)
-			feelPool.CommunityPool = feelPool.CommunityPool.Add(sdk.NewDecCoinsFromCoins(sdk.NewCoins(refundTotal...)...)...)
-			k.dk.SetFeePool(ctx, feelPool)
-		}
+	// if the creator of the pool is the distribution module account,should add the reward to the distribution module account
+	distrModuleAddr := k.ak.GetModuleAddress(k.communityPoolName)
+	if distrModuleAddr.Equals(creator) {
+		return refundTotal, k.refundToFeePool(ctx, refundTotal)
+	}
+
+	//refund the total remaining reward to creator
+	if err := k.bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, refundTotal); err != nil {
+		return nil, err
 	}
 	return refundTotal, nil
 }

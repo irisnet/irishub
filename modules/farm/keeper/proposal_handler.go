@@ -21,14 +21,13 @@ func HandleCommunityPoolCreateFarmProposal(ctx sdk.Context,
 		)
 	}
 
-	moduleAddress := k.ak.GetModuleAddress(types.ModuleName)
 	// Check if the community pool has enough coins to create the farm pool
-	err := k.dk.DistributeFromFeePool(ctx, p.TotalRewards, moduleAddress)
+	err := k.distributeFromFeePool(ctx, p.TotalRewards)
 	if err != nil {
 		return err
 	}
-	creator := k.dk.GetDistributionAccount(ctx)
-	pool, err := k.createPool(ctx, creator.GetAddress(), p.PoolDescription, ctx.BlockHeight(), false, p.LptDenom, p.TotalRewards, p.RewardsPerBlock)
+	creator := k.ak.GetModuleAddress(k.communityPoolName)
+	pool, err := k.createPool(ctx, creator, p.PoolDescription, ctx.BlockHeight(), false, p.LptDenom, p.TotalRewards, p.RewardsPerBlock)
 	if err != nil {
 		return err
 	}
@@ -44,5 +43,40 @@ func HandleCommunityPoolCreateFarmProposal(ctx sdk.Context,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 		),
 	})
+	return nil
+}
+
+// distributeFromFeePool distributes funds from the distribution module account to
+// farm module address while updating the community pool
+func (k Keeper) distributeFromFeePool(ctx sdk.Context, amount sdk.Coins) error {
+	feePool := k.dk.GetFeePool(ctx)
+
+	// NOTE the community pool isn't a module account, however its coins
+	// are held in the distribution module account. Thus the community pool
+	// must be reduced separately from the SendCoinsFromModuleToAccount call
+	newPool, negative := feePool.CommunityPool.SafeSub(sdk.NewDecCoinsFromCoins(amount...))
+	if negative {
+		return types.ErrBadDistribution
+	}
+
+	feePool.CommunityPool = newPool
+	err := k.bk.SendCoinsFromModuleToModule(ctx, k.communityPoolName, types.ModuleName, amount)
+	if err != nil {
+		return err
+	}
+
+	k.dk.SetFeePool(ctx, feePool)
+	return nil
+}
+
+// refundToFeePool return the remaining funds of the farm pool to CommunityPool
+func (k Keeper) refundToFeePool(ctx sdk.Context, refundTotal sdk.Coins) error {
+	//refund the total remaining reward to creator
+	if err := k.bk.SendCoinsFromModuleToModule(ctx, types.ModuleName, k.communityPoolName, refundTotal); err != nil {
+		return err
+	}
+	feelPool := k.dk.GetFeePool(ctx)
+	feelPool.CommunityPool = feelPool.CommunityPool.Add(sdk.NewDecCoinsFromCoins(sdk.NewCoins(refundTotal...)...)...)
+	k.dk.SetFeePool(ctx, feelPool)
 	return nil
 }

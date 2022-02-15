@@ -20,4 +20,6 @@ var (
 	ErrInvalidAppend      = sdkerrors.Register(ModuleName, 13, "cannot add new token as a reward")
 	ErrInvalidRewardRule  = sdkerrors.Register(ModuleName, 14, "invalid reward rule")
 	ErrAllEmpty           = sdkerrors.Register(ModuleName, 15, "shouldn't all be empty")
+	ErrBadDistribution    = sdkerrors.Register(ModuleName, 16, "community pool does not have sufficient coins to distribute")
+	ErrInvalidRefund      = sdkerrors.Register(ModuleName, 17, "invalid refund amount")
 )

@@ -14,14 +14,14 @@ import (
 
 // Keeper of the farm store
 type Keeper struct {
-	cdc              codec.Codec
-	storeKey         sdk.StoreKey
-	paramSpace       paramstypes.Subspace
-	validateLPToken  types.ValidateLPToken
-	bk               types.BankKeeper
-	ak               types.AccountKeeper
-	dk               types.DistrKeeper
-	feeCollectorName string // name of the fee collector
+	cdc                                 codec.Codec
+	storeKey                            sdk.StoreKey
+	paramSpace                          paramstypes.Subspace
+	validateLPToken                     types.ValidateLPToken
+	bk                                  types.BankKeeper
+	ak                                  types.AccountKeeper
+	dk                                  types.DistrKeeper
+	feeCollectorName, communityPoolName string // name of the fee collector
 }
 
 func NewKeeper(
@@ -32,7 +32,7 @@ func NewKeeper(
 	dk types.DistrKeeper,
 	validateLPToken types.ValidateLPToken,
 	paramSpace paramstypes.Subspace,
-	feeCollectorName string,
+	feeCollectorName, communityPoolName string,
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !paramSpace.HasKeyTable() {
@@ -49,14 +49,15 @@ func NewKeeper(
 	}
 
 	return Keeper{
-		storeKey:         storeKey,
-		cdc:              cdc,
-		bk:               bk,
-		ak:               ak,
-		dk:               dk,
-		validateLPToken:  validateLPToken,
-		paramSpace:       paramSpace,
-		feeCollectorName: feeCollectorName,
+		storeKey:          storeKey,
+		cdc:               cdc,
+		bk:                bk,
+		ak:                ak,
+		dk:                dk,
+		validateLPToken:   validateLPToken,
+		paramSpace:        paramSpace,
+		feeCollectorName:  feeCollectorName,
+		communityPoolName: communityPoolName,
 	}
 }
 
