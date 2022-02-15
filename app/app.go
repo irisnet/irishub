@@ -527,6 +527,7 @@ func NewIrisApp(
 		app.coinswapKeeper.ValidatePool,
 		app.GetSubspace(farmtypes.ModuleName),
 		authtypes.FeeCollectorName,
+		distrtypes.ModuleName,
 	)
 
 	govRouter := govtypes.NewRouter()

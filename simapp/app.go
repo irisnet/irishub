@@ -486,6 +486,7 @@ func NewSimApp(
 		app.CoinswapKeeper.ValidatePool,
 		app.GetSubspace(farmtypes.ModuleName),
 		authtypes.FeeCollectorName,
+		distrtypes.ModuleName,
 	)
 
 	// register the proposal types
