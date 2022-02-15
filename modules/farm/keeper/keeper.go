@@ -20,6 +20,7 @@ type Keeper struct {
 	validateLPToken  types.ValidateLPToken
 	bk               types.BankKeeper
 	ak               types.AccountKeeper
+	dk               types.DistrKeeper
 	feeCollectorName string // name of the fee collector
 }
 
@@ -28,6 +29,7 @@ func NewKeeper(
 	storeKey sdk.StoreKey,
 	bk types.BankKeeper,
 	ak types.AccountKeeper,
+	dk types.DistrKeeper,
 	validateLPToken types.ValidateLPToken,
 	paramSpace paramstypes.Subspace,
 	feeCollectorName string,
@@ -51,6 +53,7 @@ func NewKeeper(
 		cdc:              cdc,
 		bk:               bk,
 		ak:               ak,
+		dk:               dk,
 		validateLPToken:  validateLPToken,
 		paramSpace:       paramSpace,
 		feeCollectorName: feeCollectorName,

@@ -228,6 +228,14 @@ func (k Keeper) Refund(ctx sdk.Context, pool types.FarmPool) (sdk.Coins, error) 
 		if err := k.bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, refundTotal); err != nil {
 			return nil, err
 		}
+
+		// if the creator of the pool is the distribution module account,should add the reward to the distribution module account
+		distrModuleAcc := k.dk.GetDistributionAccount(ctx)
+		if distrModuleAcc.GetAddress().Equals(creator) {
+			feelPool := k.dk.GetFeePool(ctx)
+			feelPool.CommunityPool = feelPool.CommunityPool.Add(sdk.NewDecCoinsFromCoins(sdk.NewCoins(refundTotal...)...)...)
+			k.dk.SetFeePool(ctx, feelPool)
+		}
 	}
 	return refundTotal, nil
 }

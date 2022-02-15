@@ -438,6 +438,7 @@ func NewSimApp(
 		keys[farmtypes.StoreKey],
 		app.BankKeeper,
 		app.AccountKeeper,
+		app.DistrKeeper,
 		func(ctx sdk.Context, lpTokenDenom string) error { return nil },
 		app.GetSubspace(farmtypes.ModuleName),
 		authtypes.FeeCollectorName,

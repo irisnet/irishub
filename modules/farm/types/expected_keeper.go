@@ -3,6 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
 // BankKeeper defines the expected bank keeper (noalias)
@@ -26,4 +27,6 @@ type AccountKeeper interface {
 type DistrKeeper interface {
 	DistributeFromFeePool(ctx sdk.Context, amount sdk.Coins, receiveAddr sdk.AccAddress) error
 	GetDistributionAccount(ctx sdk.Context) authtypes.ModuleAccountI
+	GetFeePool(ctx sdk.Context) (feePool distrtypes.FeePool)
+	SetFeePool(ctx sdk.Context, feePool distrtypes.FeePool)
 }

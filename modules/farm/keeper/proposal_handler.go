@@ -10,7 +10,6 @@ import (
 // HandleCommunityPoolCreateFarmProposal is a handler for executing a passed community spend proposal
 func HandleCommunityPoolCreateFarmProposal(ctx sdk.Context,
 	k Keeper,
-	dk types.DistrKeeper,
 	p *types.CommunityPoolCreateFarmProposal) error {
 
 	//check valid lp token denom
@@ -24,14 +23,26 @@ func HandleCommunityPoolCreateFarmProposal(ctx sdk.Context,
 
 	moduleAddress := k.ak.GetModuleAddress(types.ModuleName)
 	// Check if the community pool has enough coins to create the farm pool
-	err := dk.DistributeFromFeePool(ctx, p.TotalRewards, moduleAddress)
+	err := k.dk.DistributeFromFeePool(ctx, p.TotalRewards, moduleAddress)
 	if err != nil {
 		return err
 	}
-	creator := dk.GetDistributionAccount(ctx)
-	_, err = k.createPool(ctx, creator.GetAddress(), p.PoolDescription, ctx.BlockHeight(), false, p.LptDenom, p.TotalRewards, p.RewardsPerBlock)
+	creator := k.dk.GetDistributionAccount(ctx)
+	pool, err := k.createPool(ctx, creator.GetAddress(), p.PoolDescription, ctx.BlockHeight(), false, p.LptDenom, p.TotalRewards, p.RewardsPerBlock)
 	if err != nil {
 		return err
 	}
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeCreatePool,
+			sdk.NewAttribute(types.AttributeValuePoolId, pool.Id),
+			sdk.NewAttribute(types.AttributeValueAmount, sdk.NewCoins(p.TotalRewards...).String()),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
 	return nil
 }
