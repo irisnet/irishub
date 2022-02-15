@@ -273,7 +273,7 @@ type IrisApp struct {
 	serviceKeeper     servicekeeper.Keeper
 	oracleKeeper      oraclekeeper.Keeper
 	randomKeeper      randomkeeper.Keeper
-	farmkeeper        farmkeeper.Keeper
+	farmKeeper        farmkeeper.Keeper
 	tibcKeeper        *tibckeeper.Keeper
 	nftTransferKeeper tibcnfttransferkeeper.Keeper
 
@@ -435,19 +435,6 @@ func NewIrisApp(
 		appCodec, keys[tibchost.StoreKey], app.GetSubspace(tibchost.ModuleName), app.stakingKeeper,
 	)
 
-	govRouter := govtypes.NewRouter()
-	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
-		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
-		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper)).
-		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.upgradeKeeper)).
-		AddRoute(ibchost.RouterKey, ibcclient.NewClientProposalHandler(app.ibcKeeper.ClientKeeper)).
-		AddRoute(tibcclienttypes.RouterKey, tibcclient.NewClientProposalHandler(app.tibcKeeper.ClientKeeper)).
-		AddRoute(tibcroutingtypes.RouterKey, tibcrouting.NewSetRoutingProposalHandler(app.tibcKeeper.RoutingKeeper)).
-		AddRoute(farmtypes.RouterKey, farm.NewCommunityPoolCreateFarmProposalHandler(app.farmkeeper))
-	app.govKeeper = govkeeper.NewKeeper(
-		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.accountKeeper, app.bankKeeper,
-		&stakingKeeper, govRouter,
-	)
 	app.nftKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey])
 	app.nftTransferKeeper = tibcnfttransferkeeper.NewKeeper(
 		appCodec, keys[tibcnfttypes.StoreKey], app.GetSubspace(tibcnfttypes.ModuleName),
@@ -532,7 +519,7 @@ func NewIrisApp(
 		app.serviceKeeper,
 	)
 
-	app.farmkeeper = farmkeeper.NewKeeper(appCodec,
+	app.farmKeeper = farmkeeper.NewKeeper(appCodec,
 		keys[farmtypes.StoreKey],
 		app.bankKeeper,
 		app.accountKeeper,
@@ -540,6 +527,20 @@ func NewIrisApp(
 		app.coinswapKeeper.ValidatePool,
 		app.GetSubspace(farmtypes.ModuleName),
 		authtypes.FeeCollectorName,
+	)
+
+	govRouter := govtypes.NewRouter()
+	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
+		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
+		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper)).
+		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.upgradeKeeper)).
+		AddRoute(ibchost.RouterKey, ibcclient.NewClientProposalHandler(app.ibcKeeper.ClientKeeper)).
+		AddRoute(tibcclienttypes.RouterKey, tibcclient.NewClientProposalHandler(app.tibcKeeper.ClientKeeper)).
+		AddRoute(tibcroutingtypes.RouterKey, tibcrouting.NewSetRoutingProposalHandler(app.tibcKeeper.RoutingKeeper)).
+		AddRoute(farmtypes.RouterKey, farm.NewCommunityPoolCreateFarmProposalHandler(app.farmKeeper))
+	app.govKeeper = govkeeper.NewKeeper(
+		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.accountKeeper, app.bankKeeper,
+		&stakingKeeper, govRouter,
 	)
 
 	/****  Module Options ****/
@@ -582,7 +583,7 @@ func NewIrisApp(
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
 		oracle.NewAppModule(appCodec, app.oracleKeeper, app.accountKeeper, app.bankKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
-		farm.NewAppModule(appCodec, app.farmkeeper, app.accountKeeper, app.bankKeeper),
+		farm.NewAppModule(appCodec, app.farmKeeper, app.accountKeeper, app.bankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -645,7 +646,7 @@ func NewIrisApp(
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
 		oracle.NewAppModule(appCodec, app.oracleKeeper, app.accountKeeper, app.bankKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
-		farm.NewAppModule(appCodec, app.farmkeeper, app.accountKeeper, app.bankKeeper),
+		farm.NewAppModule(appCodec, app.farmKeeper, app.accountKeeper, app.bankKeeper),
 		tibc.NewAppModule(app.tibcKeeper),
 	)
 
