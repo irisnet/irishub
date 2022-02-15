@@ -35,9 +35,9 @@ func SetDefaultGenesisState(state GenesisState) {
 // expected invariants holds.
 func ValidateGenesis(data GenesisState) error {
 	for _, pool := range data.Pools {
-		if err := ValidatePoolName(pool.Name); err != nil {
-			return err
-		}
+		// if err := ValidatepoolId(pool.Name); err != nil {
+		// 	return err
+		// }
 
 		if err := ValidateDescription(pool.Description); err != nil {
 			return err
@@ -75,9 +75,9 @@ func ValidateGenesis(data GenesisState) error {
 	}
 
 	for _, info := range data.FarmInfos {
-		if err := ValidatePoolName(info.PoolName); err != nil {
-			return err
-		}
+		// if err := ValidatepoolId(info.poolId); err != nil {
+		// 	return err
+		// }
 
 		if err := ValidateAddress(info.Address); err != nil {
 			return err

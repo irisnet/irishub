@@ -1,8 +1,6 @@
 package types
 
 import (
-	"strings"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -44,14 +42,6 @@ func (msg MsgCreatePool) Type() string { return TypeMsgCreatePool }
 
 // ValidateBasic implements Msg
 func (msg MsgCreatePool) ValidateBasic() error {
-	if err := ValidatePoolName(msg.Name); err != nil {
-		return err
-	}
-
-	if strings.HasPrefix(msg.Name, FarPoolPrefix) {
-		return sdkerrors.Wrapf(ErrInvalidPoolName, "cannot create farm pool starting with %s", FarPoolPrefix)
-	}
-
 	if err := ValidateDescription(msg.Description); err != nil {
 		return err
 	}
@@ -98,10 +88,7 @@ func (msg MsgDestroyPool) Type() string { return TypeMsgDestroyPool }
 
 // ValidateBasic implements Msg
 func (msg MsgDestroyPool) ValidateBasic() error {
-	if err := ValidateAddress(msg.Creator); err != nil {
-		return err
-	}
-	return ValidatePoolName(msg.PoolName)
+	return ValidateAddress(msg.Creator)
 }
 
 // GetSignBytes implements Msg
@@ -147,7 +134,7 @@ func (msg MsgAdjustPool) ValidateBasic() error {
 			return err
 		}
 	}
-	return ValidatePoolName(msg.PoolName)
+	return nil
 }
 
 // GetSignBytes implements Msg
@@ -181,7 +168,7 @@ func (msg MsgStake) ValidateBasic() error {
 	if err := ValidateCoins("Amount", msg.Amount); err != nil {
 		return err
 	}
-	return ValidatePoolName(msg.PoolName)
+	return nil
 }
 
 // GetSignBytes implements Msg
@@ -215,7 +202,7 @@ func (msg MsgUnstake) ValidateBasic() error {
 	if err := ValidateCoins("Amount", msg.Amount); err != nil {
 		return err
 	}
-	return ValidatePoolName(msg.PoolName)
+	return nil
 }
 
 // GetSignBytes implements Msg
@@ -246,7 +233,7 @@ func (msg MsgHarvest) ValidateBasic() error {
 		return err
 	}
 
-	return ValidatePoolName(msg.PoolName)
+	return nil
 }
 
 // GetSignBytes implements Msg

@@ -12,19 +12,13 @@ func HandleCommunityPoolCreateFarmProposal(ctx sdk.Context,
 	k Keeper,
 	dk types.DistrKeeper,
 	p *types.CommunityPoolCreateFarmProposal) error {
-	// Check if farm pool exists
-	poolName := types.GenSysPoolName(p.PoolName)
-	_, has := k.GetPool(ctx, poolName)
-	if has {
-		return sdkerrors.Wrapf(types.ErrPoolExist, p.PoolName)
-	}
 
 	//check valid lp token denom
-	if err := k.validateLPToken(ctx, p.LpTokenDenom); err != nil {
+	if err := k.validateLPToken(ctx, p.LptDenom); err != nil {
 		return sdkerrors.Wrapf(
 			types.ErrInvalidLPToken,
 			"The lp token denom[%s] is not exist",
-			p.LpTokenDenom,
+			p.LptDenom,
 		)
 	}
 
@@ -35,5 +29,9 @@ func HandleCommunityPoolCreateFarmProposal(ctx sdk.Context,
 		return err
 	}
 	creator := dk.GetDistributionAccount(ctx)
-	return k.createPool(ctx, poolName, creator.GetAddress(), p.PoolDescription, ctx.BlockHeight(), false, p.LpTokenDenom, p.TotalRewards, p.RewardsPerBlock)
+	_, err = k.createPool(ctx, creator.GetAddress(), p.PoolDescription, ctx.BlockHeight(), false, p.LptDenom, p.TotalRewards, p.RewardsPerBlock)
+	if err != nil {
+		return err
+	}
+	return nil
 }

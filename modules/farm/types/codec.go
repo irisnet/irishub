@@ -51,15 +51,15 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
 
-// MustUnMarshalPoolName return the poolName protobuf code
-func MustMarshalPoolName(cdc codec.Codec, poolName string) []byte {
-	poolNameWrap := gogotypes.StringValue{Value: poolName}
-	return cdc.MustMarshal(&poolNameWrap)
+// MustMarshalPoolId return the poolId protobuf code
+func MustMarshalPoolId(cdc codec.Codec, poolId string) []byte {
+	poolIdWrap := gogotypes.StringValue{Value: poolId}
+	return cdc.MustMarshal(&poolIdWrap)
 }
 
-// MustUnMarshalPoolName return the poolName
-func MustUnMarshalPoolName(cdc codec.Codec, poolName []byte) string {
-	var poolNameWrap gogotypes.StringValue
-	cdc.MustUnmarshal(poolName, &poolNameWrap)
-	return poolNameWrap.Value
+// MustUnMarshalPoolId return the poolId
+func MustUnMarshalPoolId(cdc codec.Codec, poolId []byte) string {
+	var poolIdWrap gogotypes.StringValue
+	cdc.MustUnmarshal(poolId, &poolIdWrap)
+	return poolIdWrap.Value
 }

@@ -143,13 +143,7 @@ func SimulateMsgCreatePool(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreatePool, "Insufficient funds"), nil, nil
 		}
 
-		name := GenFarmPoolName(r)
-		if _, exist := k.GetPool(ctx, name); exist {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreatePool, "farm pool is exist"), nil, nil
-		}
-
 		msg := &types.MsgCreatePool{
-			Name:           name,
 			Description:    GenDescription(r),
 			LptDenom:       lpTokenDenom.Denom,
 			StartHeight:    startHeight,
@@ -223,7 +217,7 @@ func SimulateMsgAdjustPool(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "insufficient funds"), nil, nil
 		}
 
-		rules := k.GetRewardRules(ctx, farmPool.Name)
+		rules := k.GetRewardRules(ctx, farmPool.Id)
 		rewardPerBlock := GenRewardPerBlock(r, spendable[r.Intn(len(spendable))])
 		if rewardPerBlock.Amount.IsZero() {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAdjustPool, "insufficient funds"), nil, nil
@@ -245,7 +239,7 @@ func SimulateMsgAdjustPool(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 		}
 
 		msg := &types.MsgAdjustPool{
-			PoolName:         farmPool.Name,
+			PoolId:           farmPool.Id,
 			AdditionalReward: amount,
 			RewardPerBlock:   sdk.Coins{sdk.NewCoin(rewardPerBlock.Denom, rewardPerBlock.Amount)},
 			Creator:          farmPool.Creator,
@@ -319,9 +313,9 @@ func SimulateMsgStake(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeep
 		}
 
 		msg := &types.MsgStake{
-			PoolName: farmPool.Name,
-			Amount:   amount,
-			Sender:   account.GetAddress().String(),
+			PoolId: farmPool.Id,
+			Amount: amount,
+			Sender: account.GetAddress().String(),
 		}
 
 		fees, err := simtypes.RandomFees(r, ctx, balance)
@@ -368,7 +362,7 @@ func SimulateMsgUnStake(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUnstake, "farmer not found in pool"), nil, nil
 		}
 
-		farmPool, exist := k.GetPool(ctx, farmInfo.PoolName)
+		farmPool, exist := k.GetPool(ctx, farmInfo.PoolId)
 		if !exist {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUnstake, "farm pool is not exist"), nil, nil
 		}
@@ -389,9 +383,9 @@ func SimulateMsgUnStake(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 
 		amount := farmInfo.Locked
 		msg := &types.MsgUnstake{
-			PoolName: farmPool.Name,
-			Amount:   sdk.NewCoin(farmPool.TotalLptLocked.Denom, amount),
-			Sender:   account.GetAddress().String(),
+			PoolId: farmPool.Id,
+			Amount: sdk.NewCoin(farmPool.TotalLptLocked.Denom, amount),
+			Sender: account.GetAddress().String(),
 		}
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
@@ -436,7 +430,7 @@ func SimulateMsgHarvest(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUnstake, "farmer not found in pool"), nil, nil
 		}
 
-		farmPool, exist := k.GetPool(ctx, farmInfo.PoolName)
+		farmPool, exist := k.GetPool(ctx, farmInfo.PoolId)
 		if !exist {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUnstake, "farm pool is not exist"), nil, nil
 		}
@@ -446,8 +440,8 @@ func SimulateMsgHarvest(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 		}
 
 		msg := &types.MsgHarvest{
-			PoolName: farmPool.Name,
-			Sender:   account.GetAddress().String(),
+			PoolId: farmPool.Id,
+			Sender: account.GetAddress().String(),
 		}
 
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
@@ -509,8 +503,8 @@ func SimulateMsgDestroyPool(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 		}
 
 		msg := &types.MsgDestroyPool{
-			PoolName: farmPool.Name,
-			Creator:  simAccount.Address.String(),
+			PoolId:  farmPool.Id,
+			Creator: simAccount.Address.String(),
 		}
 
 		account := ak.GetAccount(ctx, simAccount.Address)
@@ -603,11 +597,6 @@ func GenUnStake(r *rand.Rand, pool types.FarmPool, info types.FarmInfo) sdk.Coin
 	return sdk.NewCoin(pool.TotalLptLocked.Denom, simtypes.RandomAmount(r, info.Locked))
 }
 
-// GenFarmPoolName randomized farmPoolName
-func GenFarmPoolName(r *rand.Rand) string {
-	return simtypes.RandStringOfLength(r, 10)
-}
-
 // GenDestructible randomized editable
 func GenDestructible(r *rand.Rand) bool {
 	return r.Int()%2 == 0
@@ -618,7 +607,7 @@ func GenDescription(r *rand.Rand) string {
 	return simtypes.RandStringOfLength(r, 100)
 }
 
-// genRandomFarmPool randomized farmPoolName
+// genRandomFarmPool randomized farmpoolId
 func genRandomFarmPool(ctx sdk.Context, k keeper.Keeper, r *rand.Rand) (types.FarmPool, bool) {
 	var pools []types.FarmPool
 	k.IteratorAllPools(ctx, func(pool types.FarmPool) {

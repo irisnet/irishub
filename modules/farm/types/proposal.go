@@ -20,7 +20,7 @@ func init() {
 	govtypes.RegisterProposalTypeCodec(&CommunityPoolCreateFarmProposal{}, "irismod/CommunityPoolCreateFarmProposal")
 }
 
-func GenSysPoolName(name string) string {
+func GenSyspoolId(name string) string {
 	return fmt.Sprintf(name, FarPoolPrefix)
 }
 
@@ -29,15 +29,11 @@ func (cfp *CommunityPoolCreateFarmProposal) GetDescription() string { return cfp
 func (cfp *CommunityPoolCreateFarmProposal) ProposalRoute() string  { return RouterKey }
 func (cfp *CommunityPoolCreateFarmProposal) ProposalType() string   { return ProposalTypeCreateFarmPool }
 func (cfp *CommunityPoolCreateFarmProposal) ValidateBasic() error {
-	if err := ValidatePoolName(FarPoolPrefix + cfp.PoolName); err != nil {
-		return err
-	}
-
 	if err := ValidateDescription(cfp.PoolDescription); err != nil {
 		return err
 	}
 
-	if err := ValidateLpTokenDenom(cfp.LpTokenDenom); err != nil {
+	if err := ValidateLpTokenDenom(cfp.LptDenom); err != nil {
 		return err
 	}
 
@@ -60,10 +56,9 @@ func (cfp CommunityPoolCreateFarmProposal) String() string {
 	return fmt.Sprintf(`Community Pool Create Farm Proposal:
   Title:       %s
   Description: %s
-  PoolName: %s
   PoolDescription: %s
   LpTokenDenom: %s
   RewardsPerBlock: %s
   TotalRewards: %s
-`, cfp.Title, cfp.Description, cfp.PoolName, cfp.PoolDescription, cfp.LpTokenDenom, sdk.Coins(cfp.RewardsPerBlock), sdk.Coins(cfp.TotalRewards))
+`, cfp.Title, cfp.Description, cfp.PoolDescription, cfp.LptDenom, sdk.Coins(cfp.RewardsPerBlock), sdk.Coins(cfp.TotalRewards))
 }

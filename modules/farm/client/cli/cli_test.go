@@ -60,7 +60,6 @@ func (s *IntegrationTestSuite) TestFarm() {
 	lpTokenDenom := s.cfg.BondDenom
 	totalReward := sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(1000)))
 	editable := true
-	farmPool := "iris-atom"
 
 	globalFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
@@ -84,7 +83,6 @@ func (s *IntegrationTestSuite) TestFarm() {
 	bz, err := testutil.CreateFarmPoolExec(
 		clientCtx,
 		creator.String(),
-		farmPool,
 		args...,
 	)
 	s.Require().NoError(err)
@@ -92,9 +90,10 @@ func (s *IntegrationTestSuite) TestFarm() {
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
+	poolId := gjson.Get(txResp.RawLog, "0.events.2.attributes.1.value").String()
 	respType = proto.Message(&farmtypes.QueryFarmPoolResponse{})
 	expectedContents := farmtypes.FarmPoolEntry{
-		Name:            farmPool,
+		Id:              poolId,
 		Creator:         creator.String(),
 		Description:     description,
 		StartHeight:     startHeight,
@@ -107,7 +106,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 		RewardPerBlock:  rewardPerBlock,
 	}
 
-	bz, err = testutil.QueryFarmPoolExec(val.ClientCtx, farmPool)
+	bz, err = testutil.QueryFarmPoolExec(val.ClientCtx, poolId)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	result := respType.(*farmtypes.QueryFarmPoolResponse)
@@ -123,7 +122,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 	bz, err = testutil.AppendRewardExec(
 		clientCtx,
 		creator.String(),
-		farmPool,
+		poolId,
 		args...,
 	)
 	s.Require().NoError(err)
@@ -138,7 +137,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 	bz, err = testutil.StakeExec(
 		clientCtx,
 		creator.String(),
-		farmPool,
+		poolId,
 		lpToken.String(),
 		globalFlags...,
 	)
@@ -150,7 +149,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 	bz, err = testutil.UnstakeExec(
 		clientCtx,
 		creator.String(),
-		farmPool,
+		poolId,
 		unstakeLPToken.String(),
 		globalFlags...,
 	)
@@ -163,7 +162,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 	bz, err = testutil.HarvestExec(
 		clientCtx,
 		creator.String(),
-		farmPool,
+		poolId,
 		globalFlags...,
 	)
 	s.Require().NoError(err)
@@ -173,10 +172,10 @@ func (s *IntegrationTestSuite) TestFarm() {
 	s.Require().Equal(rewardPerBlock.String(), rewardGot)
 
 	queryFarmerArgs := []string{
-		fmt.Sprintf("--%s=%s", farmcli.FlagFarmPool, farmPool),
+		fmt.Sprintf("--%s=%s", farmcli.FlagFarmPool, poolId),
 	}
 	expectFarmer := farmtypes.LockedInfo{
-		PoolName:      farmPool,
+		PoolId:        poolId,
 		Locked:        lpToken.Sub(unstakeLPToken),
 		PendingReward: sdk.Coins{},
 	}
@@ -191,7 +190,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 	bz, err = testutil.DestroyExec(
 		clientCtx,
 		creator.String(),
-		farmPool,
+		poolId,
 		globalFlags...,
 	)
 	s.Require().NoError(err)

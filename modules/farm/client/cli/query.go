@@ -67,7 +67,7 @@ func GetCmdQueryFarmPools() *cobra.Command {
 func GetCmdQueryFarmPool() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "pool",
-		Example: fmt.Sprintf("$ %s query farm pool <Farm Pool Name>", version.AppName),
+		Example: fmt.Sprintf("$ %s query farm pool <Farm Pool ID>", version.AppName),
 		Short:   "Query a farm pool",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -78,7 +78,7 @@ func GetCmdQueryFarmPool() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.FarmPool(context.Background(), &types.QueryFarmPoolRequest{
-				Name: args[0],
+				Id: args[0],
 			})
 			if err != nil {
 				return err
@@ -94,7 +94,7 @@ func GetCmdQueryFarmPool() *cobra.Command {
 func GetCmdQueryFarmer() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "farmer",
-		Example: fmt.Sprintf("$ %s query farm farmer <Farmer Address> --pool-name <Farm Pool Name>", version.AppName),
+		Example: fmt.Sprintf("$ %s query farm farmer <Farmer Address> --pool-id <Farm Pool Id>", version.AppName),
 		Short:   "Query farmer reward",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -103,14 +103,14 @@ func GetCmdQueryFarmer() *cobra.Command {
 				return err
 			}
 
-			poolName, err := cmd.Flags().GetString(FlagFarmPool)
+			poolId, err := cmd.Flags().GetString(FlagFarmPool)
 			if err != nil {
 				return err
 			}
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.Farmer(context.Background(), &types.QueryFarmerRequest{
-				Farmer:   args[0],
-				PoolName: poolName,
+				Farmer: args[0],
+				PoolId: poolId,
 			})
 			if err != nil {
 				return err

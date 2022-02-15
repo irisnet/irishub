@@ -26,7 +26,7 @@ Parameters are stored in a global GlobalParams KVStore.
 
 ```go
 type FarmPool struct {
-    Name                   string                                  
+    Id                     string                                  
     Creator                string                                  
     Description            string                                  
     StartHeight            int64                                  
@@ -46,7 +46,7 @@ type RewardRule struct {
 }
 ```
 
-- `Name`: the name of the farm pool, globally unique.
+- `Id`: the id of the farm pool, globally unique.
 - `Creator`: the creator of farm pool, but also the provider of rewards and fees.
 - `Description`: detailed description of farm pool.
 - `StartHeight`: the starting height of the farm pool activity, but the user's reward is not calculated from this height, but calculated from the moment the user staking.
@@ -81,14 +81,14 @@ type RewardRule struct {
 
 ```go
 type FarmInfo struct {
-    PoolName   string
+    PoolId   string
     Address    string
     Locked     sdk.Int
     RewardDebt sdks.Coins
 }
 ```
 
-- `PoolName`: the name of farm pool.
+- `PoolId`: the id of farm pool.
 - `Address`: the address of farmer.
 - `Locked`: the total amount of user staked
 - `RewardDebt`: user's total debt.
