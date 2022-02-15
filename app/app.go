@@ -122,6 +122,7 @@ import (
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
 
 	"github.com/irisnet/irismod/modules/farm"
+	farmclient "github.com/irisnet/irismod/modules/farm/client"
 	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
 	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 
@@ -168,6 +169,7 @@ var (
 			tibcclient.UpgradeClientProposalHandler,
 			tibcclient.RegisterRelayerProposalHandler,
 			tibcrouting.SetRoutingRulesProposalHandler,
+			farmclient.ProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -440,7 +442,8 @@ func NewIrisApp(
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.upgradeKeeper)).
 		AddRoute(ibchost.RouterKey, ibcclient.NewClientProposalHandler(app.ibcKeeper.ClientKeeper)).
 		AddRoute(tibcclienttypes.RouterKey, tibcclient.NewClientProposalHandler(app.tibcKeeper.ClientKeeper)).
-		AddRoute(tibcroutingtypes.RouterKey, tibcrouting.NewSetRoutingProposalHandler(app.tibcKeeper.RoutingKeeper))
+		AddRoute(tibcroutingtypes.RouterKey, tibcrouting.NewSetRoutingProposalHandler(app.tibcKeeper.RoutingKeeper)).
+		AddRoute(farmtypes.RouterKey, farm.NewCommunityPoolCreateFarmProposalHandler(app.farmkeeper))
 	app.govKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.accountKeeper, app.bankKeeper,
 		&stakingKeeper, govRouter,
