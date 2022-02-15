@@ -37,15 +37,15 @@ func (cfp *CommunityPoolCreateFarmProposal) ValidateBasic() error {
 		return err
 	}
 
-	if err := ValidateCoins("RewardsPerBlock", cfp.RewardsPerBlock...); err != nil {
+	if err := ValidateCoins("RewardsPerBlock", cfp.RewardPerBlock...); err != nil {
 		return err
 	}
 
-	if err := ValidateCoins("TotalRewards", cfp.TotalRewards...); err != nil {
+	if err := ValidateCoins("TotalRewards", cfp.TotalReward...); err != nil {
 		return err
 	}
 
-	if err := ValidateReward(cfp.RewardsPerBlock, cfp.TotalRewards); err != nil {
+	if err := ValidateReward(cfp.RewardPerBlock, cfp.TotalReward); err != nil {
 		return err
 	}
 
@@ -58,7 +58,7 @@ func (cfp CommunityPoolCreateFarmProposal) String() string {
   Description: %s
   PoolDescription: %s
   LpTokenDenom: %s
-  RewardsPerBlock: %s
-  TotalRewards: %s
-`, cfp.Title, cfp.Description, cfp.PoolDescription, cfp.LptDenom, sdk.Coins(cfp.RewardsPerBlock), sdk.Coins(cfp.TotalRewards))
+  RewardPerBlock: %s
+  TotalReward: %s
+`, cfp.Title, cfp.Description, cfp.PoolDescription, cfp.LptDenom, sdk.Coins(cfp.RewardPerBlock), sdk.Coins(cfp.TotalReward))
 }

@@ -79,8 +79,8 @@ message CommunityPoolCreateFarmProposal {
   string description = 2;
   string pool_description = 3;
   string lpt_denom = 4;
-  repeated cosmos.base.v1beta1.Coin rewards_per_block = 5 [(gogoproto.nullable) = false];
-  repeated cosmos.base.v1beta1.Coin total_rewards = 6 [(gogoproto.nullable) = false];
+  repeated cosmos.base.v1beta1.Coin reward_per_block = 5 [(gogoproto.nullable) = false];
+  repeated cosmos.base.v1beta1.Coin total_reward = 6 [(gogoproto.nullable) = false];
 }
 
 // CommunityPoolCreateFarmProposalWithDeposit defines a CommunityPoolCreateFarmProposal
@@ -93,7 +93,7 @@ message CommunityPoolCreateFarmProposalWithDeposit {
   string description = 2;
   string pool_description = 3;
   string lpt_denom = 4;
-  string rewards_per_block = 5;
-  string total_rewards = 6;
+  string reward_per_block = 5;
+  string total_reward = 6;
   string deposit     = 7;
 }

@@ -22,12 +22,12 @@ func HandleCommunityPoolCreateFarmProposal(ctx sdk.Context,
 	}
 
 	// Check if the community pool has enough coins to create the farm pool
-	err := k.distributeFromFeePool(ctx, p.TotalRewards)
+	err := k.distributeFromFeePool(ctx, p.TotalReward)
 	if err != nil {
 		return err
 	}
 	creator := k.ak.GetModuleAddress(k.communityPoolName)
-	pool, err := k.createPool(ctx, creator, p.PoolDescription, ctx.BlockHeight(), false, p.LptDenom, p.TotalRewards, p.RewardsPerBlock)
+	pool, err := k.createPool(ctx, creator, p.PoolDescription, ctx.BlockHeight(), false, p.LptDenom, p.TotalReward, p.RewardPerBlock)
 	if err != nil {
 		return err
 	}
@@ -36,7 +36,7 @@ func HandleCommunityPoolCreateFarmProposal(ctx sdk.Context,
 		sdk.NewEvent(
 			types.EventTypeCreatePool,
 			sdk.NewAttribute(types.AttributeValuePoolId, pool.Id),
-			sdk.NewAttribute(types.AttributeValueAmount, sdk.NewCoins(p.TotalRewards...).String()),
+			sdk.NewAttribute(types.AttributeValueAmount, sdk.NewCoins(p.TotalReward...).String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

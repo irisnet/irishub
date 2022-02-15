@@ -442,6 +442,7 @@ func NewSimApp(
 		func(ctx sdk.Context, lpTokenDenom string) error { return nil },
 		app.GetSubspace(farmtypes.ModuleName),
 		authtypes.FeeCollectorName,
+		distrtypes.ModuleName,
 	)
 
 	app.RandomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey], app.BankKeeper, app.ServiceKeeper)

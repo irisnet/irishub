@@ -287,11 +287,11 @@ Where proposal.json contains:
 
 {
   "title": "Community Pool Create Farm",
-  "description": "Pay me some Atoms!",
-  "pool_description": "1000stake",
+  "description": "Create a farm pool with community pool funds",
+  "pool_description": "Create a farm pool with community pool funds",
   "lpt_denom": "lpt-1",
-  "rewards_per_block": "10000000uiris"
-  "total_rewards": "1000000000000uiris"
+  "reward_per_block": "10000000uiris"
+  "total_reward": "1000000000000uiris"
   "deposit": "10000000000uiris"
 }
 `,
@@ -308,12 +308,12 @@ Where proposal.json contains:
 				return err
 			}
 
-			rewardsPerBlock, err := sdk.ParseCoinsNormalized(proposal.RewardsPerBlock)
+			rewardPerBlock, err := sdk.ParseCoinsNormalized(proposal.RewardPerBlock)
 			if err != nil {
 				return err
 			}
 
-			totalRewards, err := sdk.ParseCoinsNormalized(proposal.TotalRewards)
+			totalReward, err := sdk.ParseCoinsNormalized(proposal.TotalReward)
 			if err != nil {
 				return err
 			}
@@ -329,8 +329,8 @@ Where proposal.json contains:
 				Description:     proposal.Description,
 				PoolDescription: proposal.PoolDescription,
 				LptDenom:        proposal.LptDenom,
-				RewardsPerBlock: rewardsPerBlock,
-				TotalRewards:    totalRewards,
+				RewardPerBlock:  rewardPerBlock,
+				TotalReward:     totalReward,
 			}
 
 			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
