@@ -118,6 +118,10 @@ import (
 	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
 
+	"github.com/irisnet/irismod/modules/farm"
+	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
+	farmtypes "github.com/irisnet/irismod/modules/farm/types"
+
 	tibcnfttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer"
 	tibcnfttransferkeeper "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/keeper"
 	tibcnfttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/types"
@@ -178,6 +182,7 @@ var (
 		service.AppModuleBasic{},
 		oracle.AppModuleBasic{},
 		random.AppModuleBasic{},
+		farm.AppModuleBasic{},
 		tibc.AppModuleBasic{},
 		tibcnfttransfer.AppModuleBasic{},
 	)
@@ -198,6 +203,8 @@ var (
 		servicetypes.RequestAccName:    nil,
 		servicetypes.FeeCollectorName:  {authtypes.Burner},
 		tibcnfttypes.ModuleName:        nil,
+		farmtypes.ModuleName:           nil,
+		farmtypes.RewardCollector:      nil,
 	}
 )
 
@@ -254,6 +261,7 @@ type SimApp struct {
 	OracleKeeper   oracleKeeper.Keeper
 	RandomKeeper   randomkeeper.Keeper
 
+	FarmKeeper        farmkeeper.Keeper
 	TIBCKeeper        *tibckeeper.Keeper // TIBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	NftTransferKeeper tibcnfttransferkeeper.Keeper
 
@@ -301,7 +309,7 @@ func NewSimApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey, recordtypes.StoreKey,
 		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
-		tibchost.StoreKey, tibcnfttypes.StoreKey,
+		tibchost.StoreKey, tibcnfttypes.StoreKey, farmtypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -393,9 +401,10 @@ func NewSimApp(
 	)
 	app.NFTKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey])
 	// Create Transfer Keepers
+
 	app.NftTransferKeeper = tibcnfttransferkeeper.NewKeeper(
 		appCodec, keys[tibcnfttypes.StoreKey], app.GetSubspace(tibcnfttypes.ModuleName),
-		app.AccountKeeper, app.NFTKeeper,
+		app.AccountKeeper, nftkeeper.NewLegacyKeeper(app.NFTKeeper),
 		app.TIBCKeeper.PacketKeeper, app.TIBCKeeper.ClientKeeper,
 	)
 	nfttransferModule := tibcnfttransfer.NewAppModule(app.NftTransferKeeper)
@@ -441,7 +450,6 @@ func NewSimApp(
 	)
 	app.RecordKeeper = recordkeeper.NewKeeper(appCodec, keys[recordtypes.StoreKey])
 
-
 	app.HTLCKeeper = htlckeeper.NewKeeper(
 		appCodec, keys[htlctypes.StoreKey],
 		app.GetSubspace(htlctypes.ModuleName),
@@ -481,6 +489,16 @@ func NewSimApp(
 		keys[randomtypes.StoreKey],
 		app.BankKeeper,
 		app.ServiceKeeper,
+	)
+
+	app.FarmKeeper = farmkeeper.NewKeeper(appCodec,
+		keys[farmtypes.StoreKey],
+		app.BankKeeper,
+		app.AccountKeeper,
+		app.DistrKeeper,
+		app.CoinswapKeeper.ValidatePool,
+		app.GetSubspace(farmtypes.ModuleName),
+		authtypes.FeeCollectorName,
 	)
 
 	/****  Module Options ****/
@@ -523,6 +541,7 @@ func NewSimApp(
 		oracle.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper),
 		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
 		tibc.NewAppModule(app.TIBCKeeper),
+		farm.NewAppModule(appCodec, app.FarmKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -532,11 +551,11 @@ func NewSimApp(
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName,
 		slashingtypes.ModuleName, evidencetypes.ModuleName, stakingtypes.ModuleName,
-		ibchost.ModuleName, htlctypes.ModuleName, randomtypes.ModuleName, tibchost.ModuleName,
+		ibchost.ModuleName, htlctypes.ModuleName, randomtypes.ModuleName, tibchost.ModuleName, farmtypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
-		servicetypes.ModuleName, tibchost.ModuleName,
+		servicetypes.ModuleName, tibchost.ModuleName, farmtypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -549,7 +568,7 @@ func NewSimApp(
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName, feegrant.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
 		guardiantypes.ModuleName, tokentypes.ModuleName, nfttypes.ModuleName, htlctypes.ModuleName, recordtypes.ModuleName,
-		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName, tibchost.ModuleName,
+		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName, tibchost.ModuleName, farmtypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -588,6 +607,7 @@ func NewSimApp(
 		oracle.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper),
 		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
 		tibc.NewAppModule(app.TIBCKeeper),
+		farm.NewAppModule(appCodec, app.FarmKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -820,6 +840,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(coinswaptypes.ModuleName)
 	paramsKeeper.Subspace(servicetypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
+	paramsKeeper.Subspace(farmtypes.ModuleName)
 	paramsKeeper.Subspace(tibchost.ModuleName)
 
 	return paramsKeeper
