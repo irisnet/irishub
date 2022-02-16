@@ -27,7 +27,7 @@ const (
 )
 
 var (
-	FarmPoolKey       = []byte{0x01} // key for farm pool
+	FarmPoolKey       = []byte{0x06} // key for farm pool
 	FarmPoolRuleKey   = []byte{0x02} // key for farm pool reward rule
 	FarmerKey         = []byte{0x03} // key for farmer
 	ActiveFarmPoolKey = []byte{0x04} // key for active farm pool
