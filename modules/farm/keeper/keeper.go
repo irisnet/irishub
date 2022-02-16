@@ -120,3 +120,17 @@ func (k Keeper) IteratorRewardRules(ctx sdk.Context, poolId string, fun func(r t
 		fun(r)
 	}
 }
+
+func (k Keeper) GetSequence(ctx sdk.Context) uint64 {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(types.KeyFarmPoolSeq())
+	if bz == nil {
+		return 0
+	}
+	return sdk.BigEndianToUint64(bz)
+}
+
+func (k Keeper) SetSequence(ctx sdk.Context, seq uint64) {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(types.KeyFarmPoolSeq(), sdk.Uint64ToBigEndian(seq))
+}

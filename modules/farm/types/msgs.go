@@ -115,6 +115,10 @@ func (msg MsgAdjustPool) Type() string { return TypeMsgAdjustPool }
 
 // ValidateBasic implements Msg
 func (msg MsgAdjustPool) ValidateBasic() error {
+	if _, err := ValidatepPoolId(msg.PoolId); err != nil {
+		return err
+	}
+
 	if err := ValidateAddress(msg.Creator); err != nil {
 		return err
 	}
@@ -161,6 +165,10 @@ func (msg MsgStake) Type() string { return TypeMsgStake }
 
 // ValidateBasic implements Msg
 func (msg MsgStake) ValidateBasic() error {
+	if _, err := ValidatepPoolId(msg.PoolId); err != nil {
+		return err
+	}
+
 	if err := ValidateAddress(msg.Sender); err != nil {
 		return err
 	}
@@ -195,6 +203,10 @@ func (msg MsgUnstake) Type() string { return TypeMsgUnstake }
 
 // ValidateBasic implements Msg
 func (msg MsgUnstake) ValidateBasic() error {
+	if _, err := ValidatepPoolId(msg.PoolId); err != nil {
+		return err
+	}
+
 	if err := ValidateAddress(msg.Sender); err != nil {
 		return err
 	}
@@ -229,6 +241,10 @@ func (msg MsgHarvest) Type() string { return TypeMsgHarvest }
 
 // ValidateBasic implements Msg
 func (msg MsgHarvest) ValidateBasic() error {
+	if _, err := ValidatepPoolId(msg.PoolId); err != nil {
+		return err
+	}
+
 	if err := ValidateAddress(msg.Sender); err != nil {
 		return err
 	}

@@ -29,6 +29,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		}
 		k.SetFarmInfo(ctx, farmInfo)
 	}
+	k.SetSequence(ctx, data.Sequence)
 	k.SetParams(ctx, data.Params)
 }
 
@@ -47,5 +48,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		Params:    types.Params{CreatePoolFee: k.CreatePoolFee(ctx)},
 		Pools:     pools,
 		FarmInfos: farmInfos,
+		Sequence:  k.GetSequence(ctx),
 	}
 }

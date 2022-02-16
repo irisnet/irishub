@@ -286,21 +286,7 @@ func (k Keeper) updatePool(
 }
 
 func (k Keeper) genPoolId(ctx sdk.Context) string {
-	seq := k.getNextPoolSeq(ctx)
-	k.setPoolSeq(ctx, seq)
+	seq := k.GetSequence(ctx) + 1
+	k.SetSequence(ctx, seq)
 	return fmt.Sprintf("%s-%d", types.PrefixFarmPool, seq)
-}
-
-func (k Keeper) getNextPoolSeq(ctx sdk.Context) uint64 {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.KeyFarmPoolSeq())
-	if bz == nil {
-		return 1
-	}
-	return sdk.BigEndianToUint64(bz) + 1
-}
-
-func (k Keeper) setPoolSeq(ctx sdk.Context, seq uint64) {
-	store := ctx.KVStore(k.storeKey)
-	store.Set(types.KeyFarmPoolSeq(), sdk.Uint64ToBigEndian(seq))
 }
