@@ -11,7 +11,7 @@ const (
 	FlagLPTokenDenom     = "lp-token-denom"
 	FlagTotalReward      = "total-reward"
 	FlagEditable         = "editable"
-	FlagFarmPool         = "pool-name"
+	FlagFarmPool         = "pool-id"
 	FlagAdditionalReward = "additional-reward"
 )
 
@@ -33,5 +33,5 @@ func init() {
 	FsAdjustFarmPool.String(FlagAdditionalReward, "", "Bonuses added to the farm pool")
 	FsAdjustFarmPool.String(FlagRewardPerBlock, "", "The reward per block,ex: 1iris,1atom")
 
-	FsQueryFarmPool.String(FlagFarmPool, "", "The farm pool name")
+	FsQueryFarmPool.String(FlagFarmPool, "", "The farm pool id")
 }

@@ -13,7 +13,7 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 	k.IteratorExpiredPool(ctx, ctx.BlockHeight(), func(pool types.FarmPool) {
 		logger.Info(
 			"The farm pool has expired, refund to creator",
-			"poolName", pool.Name,
+			"poolId", pool.Id,
 			"endHeight", pool.EndHeight,
 			"lastHeightDistrRewards", pool.LastHeightDistrRewards,
 			"totalLptLocked", pool.TotalLptLocked,
@@ -21,7 +21,7 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 		)
 		if _, err := k.Refund(ctx, pool); err != nil {
 			logger.Error("The farm pool refund failed",
-				"poolName", pool.Name,
+				"poolId", pool.Id,
 				"creator", pool.Creator,
 				"errMsg", err.Error(),
 			)

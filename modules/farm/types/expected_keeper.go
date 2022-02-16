@@ -3,6 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
 // BankKeeper defines the expected bank keeper (noalias)
@@ -20,4 +21,10 @@ type ValidateLPToken func(ctx sdk.Context, lpTokenDenom string) error
 type AccountKeeper interface {
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
 	GetModuleAddress(name string) sdk.AccAddress
+}
+
+// DistrKeeper defines the expected distribution keeper (noalias)
+type DistrKeeper interface {
+	GetFeePool(ctx sdk.Context) (feePool distrtypes.FeePool)
+	SetFeePool(ctx sdk.Context, feePool distrtypes.FeePool)
 }

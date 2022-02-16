@@ -16,10 +16,8 @@ import (
 // CreateFarmPoolExec creates a redelegate message.
 func CreateFarmPoolExec(clientCtx client.Context,
 	creator string,
-	poolName string,
 	extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		poolName,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
 	args = append(args, extraArgs...)
@@ -36,9 +34,9 @@ func QueryFarmPoolsExec(clientCtx client.Context, extraArgs ...string) (testutil
 	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdQueryFarmPools(), args)
 }
 
-func QueryFarmPoolExec(clientCtx client.Context, poolName string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryFarmPoolExec(clientCtx client.Context, poolId string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		poolName,
+		poolId,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
@@ -49,10 +47,10 @@ func QueryFarmPoolExec(clientCtx client.Context, poolName string, extraArgs ...s
 // AppendRewardExec creates a redelegate message.
 func AppendRewardExec(clientCtx client.Context,
 	creator,
-	poolName string,
+	poolId string,
 	extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		poolName,
+		poolId,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
 	args = append(args, extraArgs...)
@@ -63,11 +61,11 @@ func AppendRewardExec(clientCtx client.Context,
 // StakeExec creates a redelegate message.
 func StakeExec(clientCtx client.Context,
 	creator,
-	poolName,
+	poolId,
 	lpToken string,
 	extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		poolName,
+		poolId,
 		lpToken,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
@@ -79,11 +77,11 @@ func StakeExec(clientCtx client.Context,
 // UnstakeExec creates a redelegate message.
 func UnstakeExec(clientCtx client.Context,
 	creator,
-	poolName,
+	poolId,
 	lpToken string,
 	extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		poolName,
+		poolId,
 		lpToken,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
@@ -95,10 +93,10 @@ func UnstakeExec(clientCtx client.Context,
 // HarvestExec creates a redelegate message.
 func HarvestExec(clientCtx client.Context,
 	creator,
-	poolName string,
+	poolId string,
 	extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		poolName,
+		poolId,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
 	args = append(args, extraArgs...)
@@ -109,10 +107,10 @@ func HarvestExec(clientCtx client.Context,
 // DestroyExec creates a redelegate message.
 func DestroyExec(clientCtx client.Context,
 	creator,
-	poolName string,
+	poolId string,
 	extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		poolName,
+		poolId,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
 	args = append(args, extraArgs...)

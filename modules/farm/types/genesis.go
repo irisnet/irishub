@@ -16,9 +16,9 @@ var (
 )
 
 // NewGenesisState constructs a new GenesisState instance
-func NewGenesisState(params Params, pools []FarmPool, farmInfos []FarmInfo) *GenesisState {
+func NewGenesisState(params Params, pools []FarmPool, farmInfos []FarmInfo, sequence uint64) *GenesisState {
 	return &GenesisState{
-		params, pools, farmInfos,
+		params, pools, farmInfos, sequence,
 	}
 }
 
@@ -34,9 +34,15 @@ func SetDefaultGenesisState(state GenesisState) {
 // ValidateGenesis validates the provided farm genesis state to ensure the
 // expected invariants holds.
 func ValidateGenesis(data GenesisState) error {
+	var maxSeq uint64
 	for _, pool := range data.Pools {
-		if err := ValidatePoolName(pool.Name); err != nil {
+		seq, err := ValidatepPoolId(pool.Id)
+		if err != nil {
 			return err
+		}
+
+		if seq > maxSeq {
+			maxSeq = seq
 		}
 
 		if err := ValidateDescription(pool.Description); err != nil {
@@ -73,9 +79,12 @@ func ValidateGenesis(data GenesisState) error {
 			}
 		}
 	}
+	if data.Sequence < maxSeq {
+		return fmt.Errorf("sequence must be equeal or greater than maxSeq, but got %d, %d", data.Sequence, maxSeq)
+	}
 
 	for _, info := range data.FarmInfos {
-		if err := ValidatePoolName(info.PoolName); err != nil {
+		if _, err := ValidatepPoolId(info.PoolId); err != nil {
 			return err
 		}
 

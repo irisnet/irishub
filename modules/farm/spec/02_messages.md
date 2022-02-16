@@ -41,7 +41,7 @@ The farm pool can be destroyed by creator via a `MsgDestroyPool` message.
 
 ```go
 type MsgDestroyPool struct {
-    PoolName string
+    PoolId string
     Creator  string
 }
 ```
@@ -62,7 +62,7 @@ Creators can use `MsgAdjustPool` to add reward to the pool before the end of the
 
 ```go
 type MsgAdjustPool struct {
-    PoolName string
+    PoolId string
     AdditionalReward sdk.Coins
     RewardPerBlock   sdk.Coins
     Creator  string
@@ -84,7 +84,7 @@ Any user can retrieve the staking `lpToken` through `MsgStake` and trigger the r
 
 ```go
 type MsgStake struct {
-    PoolName string
+    PoolId string
     Amount   sdk.Coin
     Sender   string
 }
@@ -105,7 +105,7 @@ Any user can retrieve their staked `lpToken` through `MsgUnstake`.
 
 ```go
 type MsgUnstake struct {
-    PoolName string
+    PoolId string
     Amount   sdk.Coin
     Sender   string
 }
@@ -125,7 +125,7 @@ Any user can get back the rewards through `MsgHarvest`. The only difference from
 
 ```go
 type MsgHarvest struct {
-    PoolName string
+    PoolId string
     Sender   string
 }
 ```

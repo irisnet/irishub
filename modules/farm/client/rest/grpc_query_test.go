@@ -6,6 +6,7 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
+	"github.com/tidwall/gjson"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
@@ -61,7 +62,6 @@ func (s *IntegrationTestSuite) TestRest() {
 	lpTokenDenom := s.cfg.BondDenom
 	totalReward := sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(1000)))
 	editable := true
-	farmPool := "iris-atom"
 
 	globalFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
@@ -84,7 +84,6 @@ func (s *IntegrationTestSuite) TestRest() {
 
 	bz, err := testutil.CreateFarmPoolExec(clientCtx,
 		creator.String(),
-		farmPool,
 		args...,
 	)
 	s.Require().NoError(err)
@@ -92,8 +91,9 @@ func (s *IntegrationTestSuite) TestRest() {
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
+	poolId := gjson.Get(txResp.RawLog, "0.events.2.attributes.1.value").String()
 	expectedContents := farmtypes.FarmPoolEntry{
-		Name:            farmPool,
+		Id:              poolId,
 		Description:     description,
 		Creator:         creator.String(),
 		StartHeight:     startHeight,
@@ -122,7 +122,7 @@ func (s *IntegrationTestSuite) TestRest() {
 	lpToken := sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(100))
 	bz, err = testutil.StakeExec(clientCtx,
 		creator.String(),
-		farmPool,
+		poolId,
 		lpToken.String(),
 		globalFlags...,
 	)
@@ -132,7 +132,7 @@ func (s *IntegrationTestSuite) TestRest() {
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	expectFarmer := farmtypes.LockedInfo{
-		PoolName:      farmPool,
+		PoolId:        poolId,
 		Locked:        lpToken,
 		PendingReward: sdk.Coins{},
 	}

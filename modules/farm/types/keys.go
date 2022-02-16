@@ -21,6 +21,9 @@ const (
 
 	// RewardCollector is the root string for the reward distribution account address
 	RewardCollector = "reward_collector"
+
+	// Prefix for farm pool_id
+	PrefixFarmPool = "farm"
 )
 
 var (
@@ -29,33 +32,38 @@ var (
 	FarmerKey         = []byte{0x03} // key for farmer
 	ActiveFarmPoolKey = []byte{0x04} // key for active farm pool
 	// Separator for string key
-	Delimiter = []byte{0x00}
+	Delimiter   = []byte{0x00}
+	FarmPoolSeq = []byte{0x05}
 )
 
-func KeyFarmPool(poolName string) []byte {
-	return append(FarmPoolKey, []byte(poolName)...)
+func KeyFarmPool(poolId string) []byte {
+	return append(FarmPoolKey, []byte(poolId)...)
 }
 
-func KeyRewardRule(poolName, reward string) []byte {
-	key := append(FarmPoolRuleKey, []byte(poolName)...)
+func KeyRewardRule(poolId, reward string) []byte {
+	key := append(FarmPoolRuleKey, []byte(poolId)...)
 	return append(append(key, Delimiter...), []byte(reward)...)
 }
 
-func PrefixRewardRule(poolName string) []byte {
-	key := append(FarmPoolRuleKey, []byte(poolName)...)
+func PrefixRewardRule(poolId string) []byte {
+	key := append(FarmPoolRuleKey, []byte(poolId)...)
 	return append(key, Delimiter...)
 }
 
-func KeyFarmInfo(address, poolName string) []byte {
-	return append(append(FarmerKey, []byte(address)...), []byte(poolName)...)
+func KeyFarmInfo(address, poolId string) []byte {
+	return append(append(FarmerKey, []byte(address)...), []byte(poolId)...)
+}
+
+func KeyFarmPoolSeq() []byte {
+	return append(FarmPoolSeq, []byte("seq")...)
 }
 
 func PrefixFarmInfo(address string) []byte {
 	return append(FarmerKey, []byte(address)...)
 }
 
-func KeyActiveFarmPool(height int64, poolName string) []byte {
-	return append(append(ActiveFarmPoolKey, sdk.Uint64ToBigEndian(uint64(height))...), []byte(poolName)...)
+func KeyActiveFarmPool(height int64, poolId string) []byte {
+	return append(append(ActiveFarmPoolKey, sdk.Uint64ToBigEndian(uint64(height))...), []byte(poolId)...)
 }
 
 func PrefixActiveFarmPool(height int64) []byte {

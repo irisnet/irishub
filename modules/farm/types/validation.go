@@ -1,30 +1,26 @@
 package types
 
 import (
-	"regexp"
+	"strconv"
+	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
-	// MaxNameLength length of the service name
-	MaxPoolNameLength = 70
 	// MaxDescriptionLength length of the service and author description
 	MaxDescriptionLength = 280
 )
 
-var (
-	// the pool name only accepts alphanumeric characters, _ and -, beginning with alpha character
-	regexpPoolName = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_-]*$`)
-)
-
-// ValidatePoolName validates the pool name
-func ValidatePoolName(poolName string) error {
-	if !regexpPoolName.MatchString(poolName) || len(poolName) > MaxPoolNameLength {
-		return sdkerrors.Wrap(ErrInvalidPoolName, poolName)
+// ValidatepPoolId validates the pool id
+func ValidatepPoolId(poolId string) (uint64, error) {
+	seqStr := strings.TrimPrefix(poolId, PrefixFarmPool+"-")
+	seq, err := strconv.ParseUint(seqStr, 10, 64)
+	if err != nil || seq == 0 {
+		return 0, ErrInvalidPoolId
 	}
-	return nil
+	return seq, nil
 }
 
 // ValidateDescription validates the pool name

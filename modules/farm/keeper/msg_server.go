@@ -45,11 +45,6 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 		)
 	}
 
-	//check pool exist
-	if _, exist := m.Keeper.GetPool(ctx, msg.Name); exist {
-		return nil, sdkerrors.Wrapf(types.ErrPoolExist, msg.Name)
-	}
-
 	//check valid lp token denom
 	if err := m.Keeper.validateLPToken(ctx, msg.LptDenom); err != nil {
 		return nil, sdkerrors.Wrapf(
@@ -58,9 +53,8 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 			msg.LptDenom,
 		)
 	}
-	if err = m.Keeper.CreatePool(
+	pool, err := m.Keeper.CreatePool(
 		ctx,
-		msg.Name,
 		msg.Description,
 		msg.LptDenom,
 		msg.StartHeight,
@@ -68,7 +62,8 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 		msg.TotalReward.Sort(),
 		msg.Editable,
 		creator,
-	); err != nil {
+	)
+	if err != nil {
 		return nil, err
 	}
 
@@ -76,7 +71,7 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 		sdk.NewEvent(
 			types.EventTypeCreatePool,
 			sdk.NewAttribute(types.AttributeValueCreator, msg.Creator),
-			sdk.NewAttribute(types.AttributeValuePoolName, msg.Name),
+			sdk.NewAttribute(types.AttributeValuePoolId, pool.Id),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -95,7 +90,7 @@ func (m msgServer) DestroyPool(goCtx context.Context, msg *types.MsgDestroyPool)
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	refundCoin, err := m.Keeper.DestroyPool(ctx, msg.PoolName, creator)
+	refundCoin, err := m.Keeper.DestroyPool(ctx, msg.PoolId, creator)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +98,7 @@ func (m msgServer) DestroyPool(goCtx context.Context, msg *types.MsgDestroyPool)
 		sdk.NewEvent(
 			types.EventTypeDestroyPool,
 			sdk.NewAttribute(types.AttributeValueCreator, msg.Creator),
-			sdk.NewAttribute(types.AttributeValuePoolName, msg.PoolName),
+			sdk.NewAttribute(types.AttributeValuePoolId, msg.PoolId),
 			sdk.NewAttribute(types.AttributeValueAmount, refundCoin.String()),
 		),
 		sdk.NewEvent(
@@ -124,7 +119,7 @@ func (m msgServer) AdjustPool(goCtx context.Context, msg *types.MsgAdjustPool) (
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if err = m.Keeper.AdjustPool(
 		ctx,
-		msg.PoolName,
+		msg.PoolId,
 		msg.AdditionalReward,
 		msg.RewardPerBlock,
 		creator,
@@ -135,7 +130,7 @@ func (m msgServer) AdjustPool(goCtx context.Context, msg *types.MsgAdjustPool) (
 		sdk.NewEvent(
 			types.EventTypeAppendReward,
 			sdk.NewAttribute(types.AttributeValueCreator, msg.Creator),
-			sdk.NewAttribute(types.AttributeValuePoolName, msg.PoolName),
+			sdk.NewAttribute(types.AttributeValuePoolId, msg.PoolId),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -153,7 +148,7 @@ func (m msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.Msg
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	reward, err := m.Keeper.Stake(ctx, msg.PoolName, msg.Amount, sender)
+	reward, err := m.Keeper.Stake(ctx, msg.PoolId, msg.Amount, sender)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +156,7 @@ func (m msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.Msg
 		sdk.NewEvent(
 			types.EventTypeStake,
 			sdk.NewAttribute(types.AttributeValueCreator, msg.Sender),
-			sdk.NewAttribute(types.AttributeValuePoolName, msg.PoolName),
+			sdk.NewAttribute(types.AttributeValuePoolId, msg.PoolId),
 			sdk.NewAttribute(types.AttributeValueAmount, msg.Amount.String()),
 			sdk.NewAttribute(types.AttributeValueReward, reward.String()),
 		),
@@ -181,7 +176,7 @@ func (m msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	reward, err := m.Keeper.Unstake(ctx, msg.PoolName, msg.Amount, sender)
+	reward, err := m.Keeper.Unstake(ctx, msg.PoolId, msg.Amount, sender)
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +184,7 @@ func (m msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types
 		sdk.NewEvent(
 			types.EventTypeUnstake,
 			sdk.NewAttribute(types.AttributeValueCreator, msg.Sender),
-			sdk.NewAttribute(types.AttributeValuePoolName, msg.PoolName),
+			sdk.NewAttribute(types.AttributeValuePoolId, msg.PoolId),
 			sdk.NewAttribute(types.AttributeValueAmount, msg.Amount.String()),
 			sdk.NewAttribute(types.AttributeValueReward, reward.String()),
 		),
@@ -209,7 +204,7 @@ func (m msgServer) Harvest(goCtx context.Context, msg *types.MsgHarvest) (*types
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	reward, err := m.Keeper.Harvest(ctx, msg.PoolName, sender)
+	reward, err := m.Keeper.Harvest(ctx, msg.PoolId, sender)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +212,7 @@ func (m msgServer) Harvest(goCtx context.Context, msg *types.MsgHarvest) (*types
 		sdk.NewEvent(
 			types.EventTypeHarvest,
 			sdk.NewAttribute(types.AttributeValueCreator, msg.Sender),
-			sdk.NewAttribute(types.AttributeValuePoolName, msg.PoolName),
+			sdk.NewAttribute(types.AttributeValuePoolId, msg.PoolId),
 			sdk.NewAttribute(types.AttributeValueReward, reward.String()),
 		),
 		sdk.NewEvent(

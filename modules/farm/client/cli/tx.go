@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/irisnet/irismod/modules/farm/types"
 )
@@ -40,8 +42,7 @@ func GetCmdCreateFarmPool() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create",
 		Short:   "Create a new farm pool",
-		Example: fmt.Sprintf("$ %s tx farm create <Farm Pool Name> [flags]", version.AppName),
-		Args:    cobra.ExactArgs(1),
+		Example: fmt.Sprintf("$ %s tx farm create [flags]", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -69,7 +70,6 @@ func GetCmdCreateFarmPool() *cobra.Command {
 			}
 
 			msg := types.MsgCreatePool{
-				Name:           args[0],
 				Description:    description,
 				LptDenom:       lpTokenDenom,
 				StartHeight:    startHeight,
@@ -111,7 +111,7 @@ func GetCmdDestroyFarmPool() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "destroy",
 		Short:   "Destroy a new farm pool",
-		Example: fmt.Sprintf("$ %s tx farm destroy <Farm Pool Name> [flags]", version.AppName),
+		Example: fmt.Sprintf("$ %s tx farm destroy <Farm Pool ID> [flags]", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -119,8 +119,8 @@ func GetCmdDestroyFarmPool() *cobra.Command {
 				return err
 			}
 			msg := types.MsgDestroyPool{
-				PoolName: args[0],
-				Creator:  clientCtx.GetFromAddress().String(),
+				PoolId:  args[0],
+				Creator: clientCtx.GetFromAddress().String(),
 			}
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -137,7 +137,7 @@ func GetCmdAdjustPool() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "adjust",
 		Short:   "Adjust farm pool parameters",
-		Example: fmt.Sprintf("$ %s tx farm adjust <pool-name> [flags]", version.AppName),
+		Example: fmt.Sprintf("$ %s tx farm adjust <pool-id> [flags]", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -161,7 +161,7 @@ func GetCmdAdjustPool() *cobra.Command {
 				}
 			}
 			msg := types.MsgAdjustPool{
-				PoolName:         args[0],
+				PoolId:           args[0],
 				AdditionalReward: additionalReward,
 				RewardPerBlock:   rewardPerBlock,
 				Creator:          clientCtx.GetFromAddress().String(),
@@ -182,7 +182,7 @@ func GetCmdStake() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "stake",
 		Short:   "Stake some lp token to farm pool",
-		Example: fmt.Sprintf("$ %s tx farm stake <Farm Pool Name> <lp token> [flags]", version.AppName),
+		Example: fmt.Sprintf("$ %s tx farm stake <Farm Pool ID> <lp token> [flags]", version.AppName),
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -196,9 +196,9 @@ func GetCmdStake() *cobra.Command {
 			}
 
 			msg := types.MsgStake{
-				PoolName: args[0],
-				Amount:   amount,
-				Sender:   clientCtx.GetFromAddress().String(),
+				PoolId: args[0],
+				Amount: amount,
+				Sender: clientCtx.GetFromAddress().String(),
 			}
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -215,7 +215,7 @@ func GetCmdUnstake() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "unstake",
 		Short:   "Unstake some lp token from farm pool",
-		Example: fmt.Sprintf("$ %s tx farm unstake <Farm Pool Name> <lp token> [flags]", version.AppName),
+		Example: fmt.Sprintf("$ %s tx farm unstake <Farm Pool ID> <lp token> [flags]", version.AppName),
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -229,9 +229,9 @@ func GetCmdUnstake() *cobra.Command {
 			}
 
 			msg := types.MsgUnstake{
-				PoolName: args[0],
-				Amount:   amount,
-				Sender:   clientCtx.GetFromAddress().String(),
+				PoolId: args[0],
+				Amount: amount,
+				Sender: clientCtx.GetFromAddress().String(),
 			}
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -248,7 +248,7 @@ func GetCmdHarvest() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "harvest",
 		Short:   "withdraw some reward from the farm pool",
-		Example: fmt.Sprintf("$ %s tx farm harvest <Farm Pool Name>", version.AppName),
+		Example: fmt.Sprintf("$ %s tx farm harvest <Farm Pool ID>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -257,8 +257,8 @@ func GetCmdHarvest() *cobra.Command {
 			}
 
 			msg := types.MsgHarvest{
-				PoolName: args[0],
-				Sender:   clientCtx.GetFromAddress().String(),
+				PoolId: args[0],
+				Sender: clientCtx.GetFromAddress().String(),
 			}
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -267,5 +267,80 @@ func GetCmdHarvest() *cobra.Command {
 		},
 	}
 	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+// GetCmdSubmitProposal implements the command to submit a community-pool-create-farm proposal
+func GetCmdSubmitProposal() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "community-pool-create-farm [proposal-file]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Submit a community pool create farm proposal",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Submit a community community pool create farm proposal with an initial deposit.
+The proposal details must be supplied via a JSON file.
+
+Example:
+$ %s tx gov submit-proposal community-pool-create-farm <path/to/proposal.json> --from=<key_or_address>
+
+Where proposal.json contains:
+
+{
+  "title": "Community Pool Create Farm",
+  "description": "Create a farm pool with community pool funds",
+  "pool_description": "Create a farm pool with community pool funds",
+  "lpt_denom": "lpt-1",
+  "reward_per_block": "10000000uiris"
+  "total_reward": "1000000000000uiris"
+  "deposit": "10000000000uiris"
+}
+`,
+				version.AppName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			proposal, err := ParseCommunityPoolCreateFarmProposalWithDeposit(clientCtx.Codec, args[0])
+			if err != nil {
+				return err
+			}
+
+			rewardPerBlock, err := sdk.ParseCoinsNormalized(proposal.RewardPerBlock)
+			if err != nil {
+				return err
+			}
+
+			totalReward, err := sdk.ParseCoinsNormalized(proposal.TotalReward)
+			if err != nil {
+				return err
+			}
+
+			deposit, err := sdk.ParseCoinsNormalized(proposal.Deposit)
+			if err != nil {
+				return err
+			}
+
+			from := clientCtx.GetFromAddress()
+			content := &types.CommunityPoolCreateFarmProposal{
+				Title:           proposal.Title,
+				Description:     proposal.Description,
+				PoolDescription: proposal.PoolDescription,
+				LptDenom:        proposal.LptDenom,
+				RewardPerBlock:  rewardPerBlock,
+				TotalReward:     totalReward,
+			}
+
+			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
+			if err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
 	return cmd
 }

@@ -12,8 +12,8 @@ const (
 
 	AttributeValueCategory = ModuleName
 
-	AttributeValuePoolName = "pool_name"
-	AttributeValueCreator  = "creator"
-	AttributeValueAmount   = "amount"
-	AttributeValueReward   = "reward"
+	AttributeValuePoolId  = "pool_id"
+	AttributeValueCreator = "creator"
+	AttributeValueAmount  = "amount"
+	AttributeValueReward  = "reward"
 )

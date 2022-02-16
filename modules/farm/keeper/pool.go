@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -10,67 +12,33 @@ import (
 // CreatePool creates an new farm pool
 func (k Keeper) CreatePool(
 	ctx sdk.Context,
-	name string,
 	description string,
-	lpTokenDenom string,
+	lptDenom string,
 	startHeight int64,
 	rewardPerBlock sdk.Coins,
 	totalReward sdk.Coins,
 	editable bool,
 	creator sdk.AccAddress,
-) error {
+) (*types.FarmPool, error) {
 	//Escrow total reward
 	if err := k.bk.SendCoinsFromAccountToModule(ctx,
 		creator, types.ModuleName, totalReward); err != nil {
-		return err
+		return nil, err
 	}
 
 	//send CreatePoolFee to feeCollectorName
 	if err := k.bk.SendCoinsFromAccountToModule(ctx,
 		creator, k.feeCollectorName, sdk.NewCoins(k.CreatePoolFee(ctx))); err != nil {
-		return err
+		return nil, err
 	}
-
-	pool := types.FarmPool{
-		Name:           name,
-		Creator:        creator.String(),
-		Description:    description,
-		StartHeight:    startHeight,
-		Editable:       editable,
-		TotalLptLocked: sdk.NewCoin(lpTokenDenom, sdk.ZeroInt()),
-		Rules:          []types.RewardRule{},
-	}
-
-	//save farm rule
-	for _, total := range totalReward {
-		rewardRule := types.RewardRule{
-			Reward:          total.Denom,
-			TotalReward:     total.Amount,
-			RemainingReward: total.Amount,
-			RewardPerBlock:  rewardPerBlock.AmountOf(total.Denom),
-			RewardPerShare:  sdk.ZeroDec(),
-		}
-		k.SetRewardRule(ctx, name, rewardRule)
-		pool.Rules = append(pool.Rules, rewardRule)
-	}
-
-	endHeight, err := pool.ExpiredHeight()
-	if err != nil {
-		return err
-	}
-	//save farm pool
-	pool.EndHeight = endHeight
-	k.SetPool(ctx, pool)
-	// put to expired farm pool queue
-	k.EnqueueActivePool(ctx, name, pool.EndHeight)
-	return nil
+	return k.createPool(ctx, creator, description, startHeight, editable, lptDenom, totalReward, rewardPerBlock)
 }
 
 // Destroy destroy an exist farm pool
-func (k Keeper) DestroyPool(ctx sdk.Context, poolName string, creator sdk.AccAddress) (sdk.Coins, error) {
-	pool, exist := k.GetPool(ctx, poolName)
+func (k Keeper) DestroyPool(ctx sdk.Context, poolId string, creator sdk.AccAddress) (sdk.Coins, error) {
+	pool, exist := k.GetPool(ctx, poolId)
 	if !exist {
-		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, poolName)
+		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, poolId)
 	}
 
 	if creator.String() != pool.Creator {
@@ -79,13 +47,13 @@ func (k Keeper) DestroyPool(ctx sdk.Context, poolName string, creator sdk.AccAdd
 
 	if !pool.Editable {
 		return nil, sdkerrors.Wrapf(
-			types.ErrInvalidOperate, "pool [%s] is not editable", poolName)
+			types.ErrInvalidOperate, "pool [%s] is not editable", poolId)
 	}
 
 	if k.Expired(ctx, pool) {
 		return nil, sdkerrors.Wrapf(types.ErrPoolExpired,
 			"pool [%s] has expired at height [%d], current [%d]",
-			poolName,
+			poolId,
 			pool.EndHeight,
 			ctx.BlockHeight(),
 		)
@@ -96,20 +64,20 @@ func (k Keeper) DestroyPool(ctx sdk.Context, poolName string, creator sdk.AccAdd
 // AdjustPool adjusts farm pool parameters
 func (k Keeper) AdjustPool(
 	ctx sdk.Context,
-	poolName string,
+	poolId string,
 	reward sdk.Coins,
 	rewardPerBlock sdk.Coins,
 	creator sdk.AccAddress,
 ) (err error) {
-	pool, exist := k.GetPool(ctx, poolName)
+	pool, exist := k.GetPool(ctx, poolId)
 	//check if the liquidity pool exists
 	if !exist {
-		return sdkerrors.Wrapf(types.ErrPoolNotFound, poolName)
+		return sdkerrors.Wrapf(types.ErrPoolNotFound, poolId)
 	}
 
 	if !pool.Editable {
 		return sdkerrors.Wrapf(
-			types.ErrInvalidOperate, "pool [%s] is not editable", poolName)
+			types.ErrInvalidOperate, "pool [%s] is not editable", poolId)
 	}
 
 	//check permissions
@@ -121,7 +89,7 @@ func (k Keeper) AdjustPool(
 	if k.Expired(ctx, pool) {
 		return sdkerrors.Wrapf(types.ErrPoolExpired,
 			"pool [%s] has expired at height[%d], current [%d]",
-			poolName,
+			poolId,
 			pool.EndHeight,
 			ctx.BlockHeight(),
 		)
@@ -169,7 +137,7 @@ func (k Keeper) AdjustPool(
 	if rewardPerBlock != nil {
 		pool.Rules = types.RewardRules(rules).UpdateWith(rewardPerBlock)
 	}
-	k.SetRewardRules(ctx, pool.Name, pool.Rules)
+	k.SetRewardRules(ctx, pool.Id, pool.Rules)
 
 	//expiredHeight = [(srcEndHeight-curHeight)*srcRewardPerBlock +appendReward]/RewardPerBlock + curHeight
 	rewardsPerBlock := types.RewardRules(pool.Rules).RewardsPerBlock()
@@ -188,12 +156,56 @@ func (k Keeper) AdjustPool(
 		return nil
 	}
 	// remove from Expired Pool at old height
-	k.DequeueActivePool(ctx, pool.Name, pool.EndHeight)
+	k.DequeueActivePool(ctx, pool.Id, pool.EndHeight)
 	pool.EndHeight = expiredHeight
 	k.SetPool(ctx, pool)
 	// put to expired farm pool queue at new height
-	k.EnqueueActivePool(ctx, pool.Name, pool.EndHeight)
+	k.EnqueueActivePool(ctx, pool.Id, pool.EndHeight)
 	return nil
+}
+
+func (k Keeper) createPool(
+	ctx sdk.Context,
+	creator sdk.AccAddress,
+	description string,
+	startHeight int64,
+	editable bool,
+	lptDenom string,
+	totalReward sdk.Coins,
+	rewardPerBlock sdk.Coins,
+) (*types.FarmPool, error) {
+	pool := types.FarmPool{
+		Id:             k.genPoolId(ctx),
+		Creator:        creator.String(),
+		Description:    description,
+		StartHeight:    startHeight,
+		Editable:       editable,
+		TotalLptLocked: sdk.NewCoin(lptDenom, sdk.ZeroInt()),
+		Rules:          []types.RewardRule{},
+	}
+
+	for _, total := range totalReward {
+		rewardRule := types.RewardRule{
+			Reward:          total.Denom,
+			TotalReward:     total.Amount,
+			RemainingReward: total.Amount,
+			RewardPerBlock:  rewardPerBlock.AmountOf(total.Denom),
+			RewardPerShare:  sdk.ZeroDec(),
+		}
+		k.SetRewardRule(ctx, pool.Id, rewardRule)
+		pool.Rules = append(pool.Rules, rewardRule)
+	}
+
+	endHeight, err := pool.ExpiredHeight()
+	if err != nil {
+		return nil, err
+	}
+
+	pool.EndHeight = endHeight
+	k.SetPool(ctx, pool)
+
+	k.EnqueueActivePool(ctx, pool.Id, pool.EndHeight)
+	return &pool, nil
 }
 
 // updatePool is responsible for updating the status information of the farm pool, including the total accumulated bonus from the last time the bonus was distributed to the present, the current remaining bonus in the farm pool, and the ratio of the current liquidity token to the bonus.
@@ -216,9 +228,9 @@ func (k Keeper) updatePool(
 		)
 	}
 
-	rules := k.GetRewardRules(ctx, pool.Name)
+	rules := k.GetRewardRules(ctx, pool.Id)
 	if len(rules) == 0 {
-		return pool, nil, sdkerrors.Wrapf(types.ErrPoolNotFound, pool.Name)
+		return pool, nil, sdkerrors.Wrapf(types.ErrPoolNotFound, pool.Id)
 	}
 	var rewardTotal sdk.Coins
 	//when there are multiple farm operations in the same block, the value needs to be updated once
@@ -231,14 +243,14 @@ func (k Keeper) updatePool(
 			if rules[i].RemainingReward.LT(rewardCollected) {
 				k.Logger(ctx).Error(
 					"The remaining amount is not enough to pay the bonus",
-					"poolName", pool.Name,
+					"poolId", pool.Id,
 					"remainingReward", rules[i].RemainingReward.String(),
 					"rewardCollected", rewardCollected.String(),
 				)
 				return pool, nil, sdkerrors.Wrapf(
 					sdkerrors.ErrInsufficientFunds,
 					"the remaining reward of the pool [%s] is [%s], but got [%s]",
-					pool.Name, sdk.NewCoin(rules[i].Reward, rules[i].RemainingReward).String(), coinCollected,
+					pool.Id, sdk.NewCoin(rules[i].Reward, rules[i].RemainingReward).String(), coinCollected,
 				)
 			}
 			newRewardPerShare := sdk.NewDecFromInt(rewardCollected).QuoInt(pool.TotalLptLocked.Amount)
@@ -246,7 +258,7 @@ func (k Keeper) updatePool(
 			rules[i].RemainingReward = rules[i].RemainingReward.Sub(rewardCollected)
 
 			rewardTotal = rewardTotal.Add(coinCollected)
-			k.SetRewardRule(ctx, pool.Name, rules[i])
+			k.SetRewardRule(ctx, pool.Id, rules[i])
 		}
 	}
 
@@ -271,4 +283,10 @@ func (k Keeper) updatePool(
 	pool.Rules = rules
 	k.SetPool(ctx, pool)
 	return pool, rewardTotal, nil
+}
+
+func (k Keeper) genPoolId(ctx sdk.Context) string {
+	seq := k.GetSequence(ctx) + 1
+	k.SetSequence(ctx, seq)
+	return fmt.Sprintf("%s-%d", types.PrefixFarmPool, seq)
 }

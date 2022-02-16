@@ -15,7 +15,7 @@ service Query {
   }
 
   rpc FarmPool(QueryFarmPoolRequest) returns (QueryFarmPoolResponse) {
-    option (google.api.http).get = "/irismod/farm/pool/{name}";
+    option (google.api.http).get = "/irismod/farm/pool/{id}";
   }
 
   rpc Farmer(QueryFarmerRequest) returns (QueryFarmerResponse) {
@@ -33,7 +33,7 @@ message QueryFarmPoolsRequest {
 }
 
 message FarmPoolEntry {
-  string name = 1;
+  string id = 1;
   string creator = 2;
   string description = 3;
   int64 start_height = 4;
@@ -63,12 +63,12 @@ message QueryFarmPoolsResponse {
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message QueryFarmPoolRequest { string name = 1; }
+message QueryFarmPoolRequest { string id = 1; }
 message QueryFarmPoolResponse { FarmPoolEntry pool = 1; }
 
 message QueryFarmerRequest {
   string farmer = 1;
-  string pool_name = 2;
+  string pool_id = 2;
 }
 
 message QueryFarmerResponse {
@@ -83,7 +83,7 @@ message QueryParamsResponse {
 }
 
 message LockedInfo {
-  string pool_name = 1;
+  string pool_id = 1;
   cosmos.base.v1beta1.Coin locked = 2 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.nullable) = false

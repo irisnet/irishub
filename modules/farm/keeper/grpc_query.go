@@ -27,14 +27,14 @@ func (k Keeper) FarmPools(goctx context.Context, request *types.QueryFarmPoolsRe
 		var totalReward sdk.Coins
 		var remainingReward sdk.Coins
 		var rewardPerBlock sdk.Coins
-		k.IteratorRewardRules(ctx, pool.Name, func(r types.RewardRule) {
+		k.IteratorRewardRules(ctx, pool.Id, func(r types.RewardRule) {
 			totalReward = totalReward.Add(sdk.NewCoin(r.Reward, r.TotalReward))
 			remainingReward = remainingReward.Add(sdk.NewCoin(r.Reward, r.RemainingReward))
 			rewardPerBlock = rewardPerBlock.Add(sdk.NewCoin(r.Reward, r.RewardPerBlock))
 		})
 
 		list = append(list, &types.FarmPoolEntry{
-			Name:            pool.Name,
+			Id:              pool.Id,
 			Creator:         pool.Creator,
 			Description:     pool.Description,
 			StartHeight:     pool.StartHeight,
@@ -63,27 +63,27 @@ func (k Keeper) FarmPool(goctx context.Context,
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
 
-	if len(request.Name) == 0 {
+	if len(request.Id) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "pool name can not be empty")
 	}
 	ctx := sdk.UnwrapSDKContext(goctx)
 
-	pool, exist := k.GetPool(ctx, request.Name)
+	pool, exist := k.GetPool(ctx, request.Id)
 	if !exist {
-		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, request.Name)
+		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, request.Id)
 	}
 
 	var totalReward sdk.Coins
 	var remainingReward sdk.Coins
 	var rewardPerBlock sdk.Coins
-	k.IteratorRewardRules(ctx, pool.Name, func(r types.RewardRule) {
+	k.IteratorRewardRules(ctx, pool.Id, func(r types.RewardRule) {
 		totalReward = totalReward.Add(sdk.NewCoin(r.Reward, r.TotalReward))
 		remainingReward = remainingReward.Add(sdk.NewCoin(r.Reward, r.RemainingReward))
 		rewardPerBlock = rewardPerBlock.Add(sdk.NewCoin(r.Reward, r.RewardPerBlock))
 	})
 
 	poolEntry := &types.FarmPoolEntry{
-		Name:            pool.Name,
+		Id:              pool.Id,
 		Creator:         pool.Creator,
 		Description:     pool.Description,
 		StartHeight:     pool.StartHeight,
@@ -105,12 +105,12 @@ func (k Keeper) Farmer(goctx context.Context, request *types.QueryFarmerRequest)
 
 	ctx := sdk.UnwrapSDKContext(goctx)
 	cacheCtx, _ := ctx.CacheContext()
-	if len(request.PoolName) == 0 {
+	if len(request.PoolId) == 0 {
 		k.IteratorFarmInfo(cacheCtx, request.Farmer, func(farmInfo types.FarmInfo) {
 			farmInfos = append(farmInfos, farmInfo)
 		})
 	} else {
-		farmInfo, existed := k.GetFarmInfo(cacheCtx, request.PoolName, request.Farmer)
+		farmInfo, existed := k.GetFarmInfo(cacheCtx, request.PoolId, request.Farmer)
 		if existed {
 			farmInfos = append(farmInfos, farmInfo)
 		}
@@ -120,16 +120,16 @@ func (k Keeper) Farmer(goctx context.Context, request *types.QueryFarmerRequest)
 	}
 
 	for _, farmer := range farmInfos {
-		pool, exist := k.GetPool(cacheCtx, farmer.PoolName)
+		pool, exist := k.GetPool(cacheCtx, farmer.PoolId)
 		if !exist {
-			return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, farmer.PoolName)
+			return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, farmer.PoolId)
 		}
 
 		//The farm pool has not started, no reward
 		if pool.StartHeight > ctx.BlockHeight() {
 			list = append(list, &types.LockedInfo{
-				PoolName: farmer.PoolName,
-				Locked:   sdk.NewCoin(pool.TotalLptLocked.Denom, farmer.Locked),
+				PoolId: farmer.PoolId,
+				Locked: sdk.NewCoin(pool.TotalLptLocked.Denom, farmer.Locked),
 			})
 			continue
 		}
@@ -140,12 +140,12 @@ func (k Keeper) Farmer(goctx context.Context, request *types.QueryFarmerRequest)
 				return nil, err
 			}
 		} else {
-			pool.Rules = k.GetRewardRules(ctx, pool.Name)
+			pool.Rules = k.GetRewardRules(ctx, pool.Id)
 		}
 
 		rewards, _ := pool.CaclRewards(farmer, sdk.ZeroInt())
 		list = append(list, &types.LockedInfo{
-			PoolName:      farmer.PoolName,
+			PoolId:        farmer.PoolId,
 			Locked:        sdk.NewCoin(pool.TotalLptLocked.Denom, farmer.Locked),
 			PendingReward: rewards,
 		})
