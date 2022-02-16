@@ -79,7 +79,7 @@ func ValidateGenesis(data GenesisState) error {
 			}
 		}
 	}
-	if data.Sequence >= maxSeq {
+	if data.Sequence < maxSeq {
 		return fmt.Errorf("sequence must be equeal or greater than maxSeq, but got %d, %d", data.Sequence, maxSeq)
 	}
 
