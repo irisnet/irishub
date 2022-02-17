@@ -103,3 +103,9 @@ iris tx staking create-validator \
 - 验证人安全
   - [哨兵节点 (DDOS 防护)](../concepts/sentry-nodes.md)
   - [密钥管理](../tools/kms.md)
+
+## 水龙头
+
+前往 Stakely 开发上线的水龙头申请 IRISnet 主网通证。
+
+具体申请方法请参见页面提示：https://stakely.io/faucet/irisnet-iris
