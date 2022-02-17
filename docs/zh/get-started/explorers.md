@@ -11,3 +11,4 @@ order: 6
 - [Hubble](https://hubble.figment.network/iris/chains/irishub)
 - [Mintscan](https://irishub.mintscan.io/)
 - [LOOK](https://iris.ping.pub/#/validator)
+- [ATOMScan](https://atomscan.com/iris-network)
