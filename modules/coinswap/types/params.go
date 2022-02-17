@@ -11,14 +11,18 @@ import (
 
 // Parameter store keys
 var (
-	KeyFee           = []byte("Fee")           // fee key
-	KeyStandardDenom = []byte("StandardDenom") // standard token denom key
+	KeyFee             = []byte("Fee")             // fee key
+	KeyPoolCreationFee = []byte("PoolCreationFee") // fee key
+	KeyTaxRate         = []byte("TaxRate")         // fee key
+	KeyStandardDenom   = []byte("StandardDenom")   // standard token denom key
 )
 
 // NewParams is the coinswap params constructor
-func NewParams(fee sdk.Dec) Params {
+func NewParams(fee, taxRate sdk.Dec, poolCreationFee sdk.Coin) Params {
 	return Params{
-		Fee: fee,
+		Fee:             fee,
+		TaxRate:         taxRate,
+		PoolCreationFee: poolCreationFee,
 	}
 }
 
@@ -31,6 +35,8 @@ func ParamKeyTable() paramtypes.KeyTable {
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(KeyFee, &p.Fee, validateFee),
+		paramtypes.NewParamSetPair(KeyPoolCreationFee, &p.PoolCreationFee, validatePoolCreationFee),
+		paramtypes.NewParamSetPair(KeyTaxRate, &p.TaxRate, validateTaxRate),
 	}
 }
 
@@ -38,7 +44,9 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 func DefaultParams() Params {
 	fee := sdk.NewDecWithPrec(3, 3)
 	return Params{
-		Fee: fee,
+		Fee:             fee,
+		PoolCreationFee: sdk.NewInt64Coin(sdk.DefaultBondDenom, 5000),
+		TaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
 	}
 }
 
@@ -66,5 +74,29 @@ func validateFee(i interface{}) error {
 		return fmt.Errorf("fee must be positive and less than 1: %s", v.String())
 	}
 
+	return nil
+}
+
+func validatePoolCreationFee(i interface{}) error {
+	v, ok := i.(sdk.Coin)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if !v.IsPositive() {
+		return fmt.Errorf("poolCreationFee must be positive: %s", v.String())
+	}
+	return nil
+}
+
+func validateTaxRate(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if !v.GT(sdk.ZeroDec()) || !v.LT(sdk.OneDec()) {
+		return fmt.Errorf("fee must be positive and less than 1: %s", v.String())
+	}
 	return nil
 }

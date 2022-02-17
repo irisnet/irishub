@@ -11,5 +11,7 @@ Params is a module-wide configuration structure that stores system parameters an
 ```go
 type Params struct {
     Fee sdk.Dec
+    PoolCreationFee types.Coin
+    TaxRate         sdk.Dec
 }
 ```

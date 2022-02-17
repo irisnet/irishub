@@ -11,7 +11,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/irisnet/irismod/modules/coinswap/legacy/v150"
+	v150 "github.com/irisnet/irismod/modules/coinswap/migrations/v150"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	"github.com/irisnet/irismod/simapp"
 )

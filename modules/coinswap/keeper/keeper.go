@@ -18,12 +18,13 @@ import (
 
 // Keeper of the coinswap store
 type Keeper struct {
-	cdc          codec.BinaryCodec
-	storeKey     sdk.StoreKey
-	bk           types.BankKeeper
-	ak           types.AccountKeeper
-	paramSpace   paramstypes.Subspace
-	blockedAddrs map[string]bool
+	cdc              codec.BinaryCodec
+	storeKey         sdk.StoreKey
+	bk               types.BankKeeper
+	ak               types.AccountKeeper
+	paramSpace       paramstypes.Subspace
+	feeCollectorName string
+	blockedAddrs     map[string]bool
 }
 
 // NewKeeper returns a coinswap keeper. It handles:
@@ -37,6 +38,7 @@ func NewKeeper(
 	bk types.BankKeeper,
 	ak types.AccountKeeper,
 	blockedAddrs map[string]bool,
+	feeCollectorName string,
 ) Keeper {
 	// ensure coinswap module account is set
 	if addr := ak.GetModuleAddress(types.ModuleName); addr == nil {
@@ -49,12 +51,13 @@ func NewKeeper(
 	}
 
 	return Keeper{
-		storeKey:     key,
-		bk:           bk,
-		ak:           ak,
-		cdc:          cdc,
-		paramSpace:   paramSpace,
-		blockedAddrs: blockedAddrs,
+		storeKey:         key,
+		bk:               bk,
+		ak:               ak,
+		cdc:              cdc,
+		paramSpace:       paramSpace,
+		blockedAddrs:     blockedAddrs,
+		feeCollectorName: feeCollectorName,
 	}
 }
 
@@ -112,9 +115,19 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.C
 	poolId := types.GetPoolId(msg.MaxToken.Denom)
 	pool, exists := k.GetPool(ctx, poolId)
 
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
 	// calculate amount of UNI to be minted for sender
 	// and coin amount to be deposited
 	if !exists {
+		// deduct the user's fee for creating a Liquidity pool
+		if err := k.DeductPoolCreationFee(ctx, sender); err != nil {
+			return sdk.Coin{}, err
+		}
+
 		mintLiquidityAmt = msg.ExactStandardAmt
 		if mintLiquidityAmt.LT(msg.MinLiquidity) {
 			return sdk.Coin{}, sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("liquidity amount not met, user expected: no less than %s, actual: %s", msg.MinLiquidity.String(), mintLiquidityAmt.String()))
@@ -141,11 +154,6 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.C
 		if depositAmt.GT(msg.MaxToken.Amount) {
 			return sdk.Coin{}, sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("token amount not met, user expected: no more than %s, actual: %s", msg.MaxToken.String(), depositToken.String()))
 		}
-	}
-
-	sender, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
-		return sdk.Coin{}, err
 	}
 
 	reservePoolAddress, err := sdk.AccAddressFromBech32(pool.EscrowAddress)

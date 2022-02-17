@@ -174,7 +174,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	coins := balances.Balances
 	fmt.Println(coins)
 	s.Require().Equal("99999000", coins.AmountOf(symbol).String())
-	s.Require().Equal("399985965", coins.AmountOf(sdk.DefaultBondDenom).String())
+	s.Require().Equal("399980965", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("1000", coins.AmountOf(lptDenom).String())
 
 	queryPoolResponse := proto.Message(&coinswaptypes.QueryLiquidityPoolResponse{})
@@ -245,7 +245,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	coins = balances.Balances
 	fmt.Println(coins)
 	s.Require().Equal("99996999", coins.AmountOf(symbol).String())
-	s.Require().Equal("399983955", coins.AmountOf(sdk.DefaultBondDenom).String())
+	s.Require().Equal("399978955", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
 
 	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
@@ -315,7 +315,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	coins = balances.Balances
 	fmt.Println(coins)
 	s.Require().Equal("99995999", coins.AmountOf(symbol).String())
-	s.Require().Equal("399984693", coins.AmountOf(sdk.DefaultBondDenom).String())
+	s.Require().Equal("399979693", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
 
 	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
@@ -385,7 +385,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	coins = balances.Balances
 	fmt.Println(coins)
 	s.Require().Equal("99996999", coins.AmountOf(symbol).String())
-	s.Require().Equal("399983930", coins.AmountOf(sdk.DefaultBondDenom).String())
+	s.Require().Equal("399978930", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("3000", coins.AmountOf(lptDenom).String())
 
 	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
@@ -450,7 +450,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	coins = balances.Balances
 	fmt.Println(coins)
 	s.Require().Equal("99998999", coins.AmountOf(symbol).String())
-	s.Require().Equal("399985923", coins.AmountOf(sdk.DefaultBondDenom).String())
+	s.Require().Equal("399980923", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("1000", coins.AmountOf(lptDenom).String())
 
 	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)
@@ -515,7 +515,7 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	coins = balances.Balances
 	fmt.Println(coins)
 	s.Require().Equal("100000000", coins.AmountOf(symbol).String())
-	s.Require().Equal("399986915", coins.AmountOf(sdk.DefaultBondDenom).String())
+	s.Require().Equal("399981915", coins.AmountOf(sdk.DefaultBondDenom).String())
 	s.Require().Equal("0", coins.AmountOf(lptDenom).String())
 
 	url = fmt.Sprintf("%s/irismod/coinswap/pools/%s", baseURL, lptDenom)

@@ -417,6 +417,7 @@ func NewSimApp(
 		app.BankKeeper,
 		app.AccountKeeper,
 		app.ModuleAccountAddrs(),
+		authtypes.FeeCollectorName,
 	)
 
 	app.ServiceKeeper = servicekeeper.NewKeeper(

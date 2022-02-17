@@ -105,7 +105,7 @@ func (suite *TestSuite) TestSwap() {
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 99999100),
-		sdk.NewInt64Coin(denomStandard, 99998888),
+		sdk.NewInt64Coin(denomStandard, 99993888),
 		sdk.NewInt64Coin(lptDenom, 1000),
 	)
 	suite.Equal(expCoins.Sort().String(), senderBalances.Sort().String())
@@ -124,7 +124,7 @@ func (suite *TestSuite) TestSwap() {
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 99999200),
-		sdk.NewInt64Coin(denomStandard, 99998748),
+		sdk.NewInt64Coin(denomStandard, 99993748),
 		sdk.NewInt64Coin(lptDenom, 1000),
 	)
 	suite.Equal(expCoins.Sort().String(), senderBalances.Sort().String())
@@ -150,7 +150,7 @@ func (suite *TestSuite) TestSwap() {
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 99999554),
-		sdk.NewInt64Coin(denomStandard, 99997748),
+		sdk.NewInt64Coin(denomStandard, 99992748),
 		sdk.NewInt64Coin(lptDenom, 1000),
 	)
 	suite.Equal(expCoins.Sort().String(), senderBalances.Sort().String())
@@ -169,7 +169,7 @@ func (suite *TestSuite) TestSwap() {
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 99999690),
-		sdk.NewInt64Coin(denomStandard, 99996748),
+		sdk.NewInt64Coin(denomStandard, 99991748),
 		sdk.NewInt64Coin(lptDenom, 1000),
 	)
 	suite.Equal(expCoins.Sort().String(), senderBalances.Sort().String())
@@ -218,7 +218,7 @@ func (suite *TestSuite) TestDoubleSwap() {
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 99998873),
 		sdk.NewInt64Coin(denomETH, 100),
-		sdk.NewInt64Coin(denomStandard, 99999000),
+		sdk.NewInt64Coin(denomStandard, 99994000),
 		sdk.NewInt64Coin(lptDenom, 1000),
 	)
 	suite.Equal(expCoins.Sort().String(), sender1Balances.Sort().String())
@@ -245,7 +245,7 @@ func (suite *TestSuite) TestDoubleSwap() {
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 99998661),
 		sdk.NewInt64Coin(denomETH, 200),
-		sdk.NewInt64Coin(denomStandard, 99999000),
+		sdk.NewInt64Coin(denomStandard, 99994000),
 		sdk.NewInt64Coin(lptDenom, 1000),
 	)
 	suite.Equal(expCoins.Sort().String(), sender1Balances.Sort().String())
@@ -279,7 +279,7 @@ func (suite *TestSuite) TestDoubleSwap() {
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 643),
 		sdk.NewInt64Coin(denomETH, 99998000),
-		sdk.NewInt64Coin(denomStandard, 99999000),
+		sdk.NewInt64Coin(denomStandard, 99994000),
 		sdk.NewInt64Coin(poolETH.LptDenom, 1000),
 	)
 	suite.Equal(expCoins.Sort().String(), sender2Balances.Sort().String())
@@ -305,7 +305,7 @@ func (suite *TestSuite) TestDoubleSwap() {
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 726),
 		sdk.NewInt64Coin(denomETH, 99997000),
-		sdk.NewInt64Coin(denomStandard, 99999000),
+		sdk.NewInt64Coin(denomStandard, 99994000),
 		sdk.NewInt64Coin(poolETH.LptDenom, 1000),
 	)
 	suite.Equal(expCoins.Sort().String(), sender2Balances.Sort().String())
@@ -351,9 +351,10 @@ func createReservePool(suite *TestSuite, denom string) (sdk.AccAddress, sdk.AccA
 	)
 	suite.Equal(expCoins.Sort().String(), reservePoolBalances.Sort().String())
 
+	params := suite.app.CoinswapKeeper.GetParams(suite.ctx)
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denom, 99999000),
-		sdk.NewInt64Coin(denomStandard, 99999000),
+		sdk.NewInt64Coin(denomStandard, 99999000).Sub(params.PoolCreationFee),
 		sdk.NewInt64Coin(pool.LptDenom, 1000),
 	)
 	suite.Equal(expCoins.Sort().String(), senderBlances.Sort().String())

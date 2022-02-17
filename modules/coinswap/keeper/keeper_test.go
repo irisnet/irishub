@@ -64,7 +64,6 @@ func (suite *TestSuite) TestParams() {
 		params types.Params
 	}{
 		{types.DefaultParams()},
-		{types.NewParams(sdk.NewDecWithPrec(5, 10))},
 	}
 	for _, tc := range cases {
 		suite.app.CoinswapKeeper.SetParams(suite.ctx, tc.params)
@@ -140,7 +139,7 @@ func (suite *TestSuite) TestLiquidity() {
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 2999999900),
-		sdk.NewCoin(denomStandard, sdk.NewIntWithDecimal(2, 19)),
+		sdk.NewCoin(denomStandard, sdk.NewIntWithDecimal(2, 19).Sub(sdk.NewIntFromUint64(5000))),
 		sdk.NewCoin(lptDenom, sdk.NewIntWithDecimal(1, 19)),
 	)
 	suite.Equal(expCoins.Sort().String(), sender1Balances.Sort().String())
@@ -194,7 +193,7 @@ func (suite *TestSuite) TestLiquidity() {
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 3000000000),
-		sdk.NewCoin(denomStandard, sdk.NewIntWithDecimal(3, 19)),
+		sdk.NewCoin(denomStandard, sdk.NewIntWithDecimal(3, 19).Sub(sdk.NewIntFromUint64(5000))),
 	)
 	suite.Equal(expCoins.Sort().String(), sender1Balances.Sort().String())
 
@@ -223,7 +222,7 @@ func (suite *TestSuite) TestLiquidity() {
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 3000000000),
-		sdk.NewCoin(denomStandard, sdk.NewIntWithDecimal(3, 19)),
+		sdk.NewCoin(denomStandard, sdk.NewIntWithDecimal(3, 19).Sub(sdk.NewIntFromUint64(5000))),
 	)
 	suite.Equal(expCoins.Sort().String(), sender1Balances.Sort().String())
 	suite.Equal("", reservePoolBalances.String())

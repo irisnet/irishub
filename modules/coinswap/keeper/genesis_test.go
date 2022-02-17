@@ -5,8 +5,6 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/irisnet/irismod/modules/coinswap/types"
 )
 
@@ -16,9 +14,7 @@ func TestGenesisSuite(t *testing.T) {
 
 func (suite *TestSuite) TestInitGenesisAndExportGenesis() {
 	expGenesis := types.GenesisState{
-		Params: types.Params{
-			Fee: sdk.NewDecWithPrec(4, 3),
-		},
+		Params:        types.DefaultParams(),
 		StandardDenom: denomStandard,
 		Pool: []types.Pool{{
 			Id:                types.GetPoolId(denomETH),

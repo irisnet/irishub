@@ -6,6 +6,8 @@ order: 4
 
 The coinswap module contains the following parameters:
 
-| Key  | Type         | Example |
-| :--- | :----------- | :------ |
-| Fee  | string (dec) | "0.3"   |
+| Key             | Type         | Example    |
+| :-------------- | :----------- | :--------- |
+| Fee             | string (dec) | "0.003"    |
+| PoolCreationFee | sdk.Coin     | "5000iris" |
+| TaxRate         | string (dec) | "0.4"      |
