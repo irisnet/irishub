@@ -105,3 +105,9 @@ Read more:
 - Validator Security
   - [Sentry Nodes (DDOS Protection)](../concepts/sentry-nodes.md)
   - [Key Management](../tools/kms.md)
+
+## Faucet
+
+Request IRISnet mainnet tokens from the Faucet powered by Stakely.
+
+For the usage, please refer to the guideline on the Faucet page: https://stakely.io/faucet/irisnet-iris
