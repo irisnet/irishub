@@ -47,7 +47,3 @@ Usage: in [nyancat-faucet channel](https://discord.gg/Z6PXeTb5Mt), type "$faucet
 ## Community
 
 Welcome to discuss in our [nyancat testnet channel](https://discord.gg/9cSt7MX2fn) 
-
-## Explorer
-
-<https://nyancat.iobscan.io/>
