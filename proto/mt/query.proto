@@ -17,7 +17,7 @@ service Query {
 
     // Supply queries the total supply of a given denom or owner
     rpc MTSupply(QueryMtsRequest) returns (QueryMtsResponse) {
-        option (google.api.http).get = "/irismod/mt/collections/{denom_id}/supply";
+        option (google.api.http).get = "/irismod/mt/mt_supply/{denom_id}/mt_id";
     }
 
     // Owner queries the MTs of the specified owner
@@ -42,7 +42,7 @@ service Query {
 
     // MT queries the MT for the given denom and token ID
     rpc MT(QueryMTRequest) returns (QueryMTResponse) {
-        option (google.api.http).get = "/irismod/mt/mts/{denom_id}/{token_id}";
+        option (google.api.http).get = "/irismod/mt/mts/{denom_id}/{mt_id}";
     }
 }
 
