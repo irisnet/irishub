@@ -11,7 +11,7 @@ message MT {
   option (gogoproto.equal) = true;
 
   string id = 1;
-  uint64 amount = 2;
+  uint64 supply = 2;
   string data = 3;
   string owner = 4;
 }
