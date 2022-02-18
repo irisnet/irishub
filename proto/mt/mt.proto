@@ -1,0 +1,50 @@
+syntax = "proto3";
+package irismod.mt;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/mt/types";
+option (gogoproto.goproto_getters_all) = false;
+
+// MT defines a multi token standard
+message MT {
+  option (gogoproto.equal) = true;
+
+  string id = 1;
+  uint64 supply = 2;
+  string data = 3;
+  string owner = 4;
+}
+
+// Denom defines a type of MT
+message Denom {
+  option (gogoproto.equal) = true;
+
+  string id = 1;
+  string name = 2;
+  string creator = 3;
+  string data = 4;
+}
+
+// IDCollection defines a type of collection with specified ID
+message IDCollection {
+  option (gogoproto.equal) = true;
+
+  string mt_id = 1;
+  string amount = 2;
+}
+
+// Owner defines a type of owner
+message Owner {
+  option (gogoproto.equal) = true;
+
+  repeated IDCollection id_collections = 1;
+}
+
+// Collection defines a type of collection
+message Collection {
+  option (gogoproto.equal) = true;
+
+  Denom denom = 1 [(gogoproto.nullable) = false];
+  repeated MT mts = 2 [(gogoproto.nullable) = false];
+}
