@@ -106,17 +106,55 @@ func (m *Denom) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Denom proto.InternalMessageInfo
 
+type Balance struct {
+	MtId   string `protobuf:"bytes,1,opt,name=mt_id,json=mtId,proto3" json:"mt_id,omitempty"`
+	Amount uint64 `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+}
+
+func (m *Balance) Reset()         { *m = Balance{} }
+func (m *Balance) String() string { return proto.CompactTextString(m) }
+func (*Balance) ProtoMessage()    {}
+func (*Balance) Descriptor() ([]byte, []int) {
+	return fileDescriptor_862c3429ff751bfb, []int{2}
+}
+func (m *Balance) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Balance) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Balance.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Balance) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Balance.Merge(m, src)
+}
+func (m *Balance) XXX_Size() int {
+	return m.Size()
+}
+func (m *Balance) XXX_DiscardUnknown() {
+	xxx_messageInfo_Balance.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Balance proto.InternalMessageInfo
+
 // IDCollection defines a type of collection with specified ID
 type IDCollection struct {
-	MtId   string `protobuf:"bytes,1,opt,name=mt_id,json=mtId,proto3" json:"mt_id,omitempty"`
-	Amount string `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount,omitempty"`
+	DenomId  string     `protobuf:"bytes,1,opt,name=denom_id,json=denomId,proto3" json:"denom_id,omitempty" yaml:"denom_id"`
+	Balances []*Balance `protobuf:"bytes,2,rep,name=Balances,proto3" json:"Balances,omitempty"`
 }
 
 func (m *IDCollection) Reset()         { *m = IDCollection{} }
 func (m *IDCollection) String() string { return proto.CompactTextString(m) }
 func (*IDCollection) ProtoMessage()    {}
 func (*IDCollection) Descriptor() ([]byte, []int) {
-	return fileDescriptor_862c3429ff751bfb, []int{2}
+	return fileDescriptor_862c3429ff751bfb, []int{3}
 }
 func (m *IDCollection) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -147,14 +185,15 @@ var xxx_messageInfo_IDCollection proto.InternalMessageInfo
 
 // Owner defines a type of owner
 type Owner struct {
-	IdCollections []*IDCollection `protobuf:"bytes,1,rep,name=id_collections,json=idCollections,proto3" json:"id_collections,omitempty"`
+	Address       string          `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	IdCollections []*IDCollection `protobuf:"bytes,2,rep,name=id_collections,json=idCollections,proto3" json:"id_collections,omitempty"`
 }
 
 func (m *Owner) Reset()         { *m = Owner{} }
 func (m *Owner) String() string { return proto.CompactTextString(m) }
 func (*Owner) ProtoMessage()    {}
 func (*Owner) Descriptor() ([]byte, []int) {
-	return fileDescriptor_862c3429ff751bfb, []int{3}
+	return fileDescriptor_862c3429ff751bfb, []int{4}
 }
 func (m *Owner) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -193,7 +232,7 @@ func (m *Collection) Reset()         { *m = Collection{} }
 func (m *Collection) String() string { return proto.CompactTextString(m) }
 func (*Collection) ProtoMessage()    {}
 func (*Collection) Descriptor() ([]byte, []int) {
-	return fileDescriptor_862c3429ff751bfb, []int{4}
+	return fileDescriptor_862c3429ff751bfb, []int{5}
 }
 func (m *Collection) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -225,6 +264,7 @@ var xxx_messageInfo_Collection proto.InternalMessageInfo
 func init() {
 	proto.RegisterType((*MT)(nil), "irismod.mt.MT")
 	proto.RegisterType((*Denom)(nil), "irismod.mt.Denom")
+	proto.RegisterType((*Balance)(nil), "irismod.mt.Balance")
 	proto.RegisterType((*IDCollection)(nil), "irismod.mt.IDCollection")
 	proto.RegisterType((*Owner)(nil), "irismod.mt.Owner")
 	proto.RegisterType((*Collection)(nil), "irismod.mt.Collection")
@@ -233,31 +273,35 @@ func init() {
 func init() { proto.RegisterFile("mt/mt.proto", fileDescriptor_862c3429ff751bfb) }
 
 var fileDescriptor_862c3429ff751bfb = []byte{
-	// 381 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x92, 0xc1, 0xca, 0xd3, 0x40,
-	0x14, 0x85, 0x33, 0xe9, 0xe4, 0x97, 0xde, 0xd6, 0x82, 0x63, 0x91, 0xc1, 0x45, 0x1a, 0xba, 0x90,
-	0x80, 0x98, 0x40, 0xdd, 0xb9, 0x11, 0x6b, 0x37, 0x5d, 0x54, 0x21, 0x74, 0x25, 0x42, 0x49, 0x33,
-	0x43, 0x1d, 0xc8, 0x64, 0x42, 0x32, 0x41, 0xfa, 0x16, 0x3e, 0x82, 0x8f, 0xd3, 0x65, 0x97, 0xae,
-	0x44, 0xdb, 0x8d, 0x8f, 0x21, 0x99, 0x8c, 0x6d, 0xc0, 0xdd, 0x3d, 0xe1, 0xe4, 0xfb, 0x6e, 0x2e,
-	0x81, 0x91, 0xd4, 0xb1, 0xd4, 0x51, 0x59, 0x29, 0xad, 0x08, 0x88, 0x4a, 0xd4, 0x52, 0xb1, 0x48,
-	0xea, 0xe7, 0xd3, 0x83, 0x3a, 0x28, 0xf3, 0x38, 0x6e, 0xa7, 0xae, 0x31, 0xff, 0x0c, 0xee, 0x66,
-	0x4b, 0x26, 0xe0, 0x0a, 0x46, 0x51, 0x80, 0xc2, 0x61, 0xe2, 0x0a, 0x46, 0x9e, 0xc1, 0x43, 0xdd,
-	0x94, 0x65, 0x7e, 0xa4, 0x6e, 0x80, 0x42, 0x9c, 0xd8, 0x44, 0x08, 0x60, 0x96, 0xea, 0x94, 0x0e,
-	0x02, 0x14, 0x8e, 0x13, 0x33, 0x93, 0x29, 0x78, 0xea, 0x6b, 0xc1, 0x2b, 0x8a, 0xcd, 0xeb, 0x5d,
-	0x78, 0x83, 0xff, 0x7c, 0x9f, 0xa1, 0xf9, 0x0e, 0xbc, 0x15, 0x2f, 0x94, 0xfc, 0x4f, 0x40, 0x00,
-	0x17, 0xa9, 0xe4, 0x06, 0x3f, 0x4c, 0xcc, 0x4c, 0x28, 0x3c, 0xca, 0x2a, 0x9e, 0x6a, 0x55, 0x19,
-	0xfe, 0x30, 0xf9, 0x17, 0x6f, 0x5a, 0x7c, 0xd7, 0x5a, 0xc1, 0x3b, 0x18, 0xaf, 0x57, 0xef, 0x55,
-	0x9e, 0xf3, 0x4c, 0x0b, 0x55, 0x90, 0xa7, 0xe0, 0x49, 0xbd, 0xbb, 0xa9, 0xb0, 0xd4, 0x6b, 0xf3,
-	0x35, 0xa9, 0x54, 0x4d, 0xa1, 0xad, 0xce, 0x26, 0x8b, 0xf8, 0x00, 0xde, 0xc7, 0x76, 0x65, 0xf2,
-	0x16, 0x26, 0x82, 0xed, 0xb2, 0x1b, 0xac, 0xa6, 0x28, 0x18, 0x84, 0xa3, 0x05, 0x8d, 0xee, 0x57,
-	0x8c, 0xfa, 0xb6, 0xe4, 0xb1, 0x60, 0xf7, 0x54, 0x5b, 0x9e, 0x00, 0xe8, 0x2d, 0xf4, 0x0a, 0x3c,
-	0xd6, 0x5e, 0xc0, 0x2c, 0x34, 0x5a, 0x3c, 0xe9, 0xb3, 0xcc, 0x69, 0x96, 0xf8, 0xf4, 0x73, 0xe6,
-	0x24, 0x5d, 0x8b, 0xbc, 0x80, 0x81, 0xd4, 0x35, 0x75, 0x8d, 0x78, 0xd2, 0x2f, 0x6f, 0xb6, 0xb6,
-	0xd9, 0x16, 0x3a, 0xd5, 0x72, 0x7d, 0xfa, 0xed, 0x3b, 0xa7, 0x8b, 0x8f, 0xce, 0x17, 0x1f, 0xfd,
-	0xba, 0xf8, 0xe8, 0xdb, 0xd5, 0x77, 0xce, 0x57, 0xdf, 0xf9, 0x71, 0xf5, 0x9d, 0x4f, 0x2f, 0x0f,
-	0x42, 0x7f, 0x69, 0xf6, 0x51, 0xa6, 0x64, 0xdc, 0x82, 0x0a, 0xae, 0x63, 0x0b, 0x8c, 0xa5, 0x62,
-	0x4d, 0xce, 0xeb, 0x58, 0xea, 0x58, 0x1f, 0x4b, 0x5e, 0xef, 0x1f, 0xcc, 0xef, 0xf0, 0xfa, 0x6f,
-	0x00, 0x00, 0x00, 0xff, 0xff, 0x46, 0xbd, 0xd6, 0xb5, 0x3f, 0x02, 0x00, 0x00,
+	// 442 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x92, 0xc1, 0x6a, 0xdb, 0x30,
+	0x1c, 0xc6, 0x6d, 0xc7, 0x6e, 0x9a, 0x7f, 0xba, 0x8c, 0x29, 0x65, 0x98, 0x1d, 0x9c, 0x90, 0xc3,
+	0x08, 0x8c, 0x59, 0xd0, 0xdd, 0xca, 0x60, 0x90, 0xf5, 0x92, 0x43, 0x19, 0x88, 0x9e, 0xc6, 0x20,
+	0xa8, 0x96, 0x48, 0x05, 0x96, 0x65, 0x6c, 0x99, 0x91, 0xb7, 0xd8, 0x23, 0xec, 0x71, 0x72, 0xec,
+	0x71, 0xa7, 0xb2, 0x25, 0x97, 0x9d, 0xf7, 0x04, 0xc3, 0xb2, 0xec, 0x18, 0x7a, 0xfb, 0x7f, 0xd1,
+	0xa7, 0xef, 0xf7, 0xfd, 0x15, 0xc3, 0x58, 0x6a, 0x2c, 0x75, 0x9c, 0x17, 0x4a, 0x2b, 0x04, 0xa2,
+	0x10, 0xa5, 0x54, 0x2c, 0x96, 0xfa, 0xcd, 0xe5, 0x56, 0x6d, 0x95, 0xf9, 0x19, 0xd7, 0x53, 0xe3,
+	0x58, 0x7c, 0x03, 0xef, 0xf6, 0x0e, 0x4d, 0xc0, 0x13, 0x2c, 0x74, 0xe7, 0xee, 0x72, 0x44, 0x3c,
+	0xc1, 0xd0, 0x6b, 0x38, 0x2b, 0xab, 0x3c, 0x4f, 0x77, 0xa1, 0x37, 0x77, 0x97, 0x3e, 0xb1, 0x0a,
+	0x21, 0xf0, 0x19, 0xd5, 0x34, 0x1c, 0xcc, 0xdd, 0xe5, 0x05, 0x31, 0x33, 0xba, 0x84, 0x40, 0x7d,
+	0xcf, 0x78, 0x11, 0xfa, 0xe6, 0x7a, 0x23, 0xae, 0xfd, 0xbf, 0x3f, 0x67, 0xee, 0x62, 0x03, 0xc1,
+	0x0d, 0xcf, 0x94, 0x7c, 0x06, 0x40, 0xe0, 0x67, 0x54, 0x72, 0x13, 0x3f, 0x22, 0x66, 0x46, 0x21,
+	0x0c, 0x93, 0x82, 0x53, 0xad, 0x0a, 0x93, 0x3f, 0x22, 0xad, 0xec, 0xb0, 0xfe, 0x09, 0x6b, 0x01,
+	0x1f, 0x61, 0xb8, 0xa2, 0x29, 0xcd, 0x12, 0x8e, 0xa6, 0x10, 0x48, 0xbd, 0xe9, 0x28, 0xbe, 0xd4,
+	0x6b, 0xb3, 0x08, 0x95, 0xaa, 0xca, 0x74, 0xbb, 0x48, 0xa3, 0xec, 0xed, 0x0a, 0x2e, 0xd6, 0x37,
+	0x9f, 0x55, 0x9a, 0xf2, 0x44, 0x0b, 0x95, 0xa1, 0x18, 0xce, 0x59, 0x5d, 0xb7, 0x4b, 0x59, 0x4d,
+	0xff, 0x3d, 0xcd, 0x5e, 0xee, 0xa8, 0x4c, 0xaf, 0x17, 0xed, 0xc9, 0x82, 0x0c, 0xcd, 0xb8, 0x66,
+	0x08, 0xc3, 0xb9, 0xa5, 0x97, 0xa1, 0x37, 0x1f, 0x2c, 0xc7, 0x57, 0xd3, 0xf8, 0xf4, 0xe2, 0xb1,
+	0x3d, 0x23, 0x9d, 0xc9, 0x62, 0x1f, 0x20, 0xf8, 0x52, 0x3f, 0x52, 0xbd, 0x31, 0x65, 0xac, 0xe0,
+	0x65, 0x69, 0x4b, 0xb7, 0x12, 0x7d, 0x82, 0x89, 0x60, 0x9b, 0xa4, 0xab, 0xd6, 0xe6, 0x87, 0xfd,
+	0xfc, 0x7e, 0x77, 0xf2, 0x42, 0xb0, 0x93, 0x6a, 0x49, 0x02, 0xa0, 0xb7, 0xde, 0x7b, 0x08, 0x4c,
+	0x73, 0x03, 0x1b, 0x5f, 0xbd, 0xea, 0x67, 0x99, 0xbf, 0x69, 0xe5, 0xef, 0x9f, 0x66, 0x0e, 0x69,
+	0x5c, 0xe8, 0x2d, 0x0c, 0xa4, 0x6e, 0xc1, 0x93, 0xbe, 0xf9, 0xf6, 0xce, 0x3a, 0x6b, 0x43, 0x83,
+	0x5a, 0xad, 0xf7, 0x7f, 0x22, 0x67, 0x7f, 0x88, 0xdc, 0xc7, 0x43, 0xe4, 0xfe, 0x3e, 0x44, 0xee,
+	0x8f, 0x63, 0xe4, 0x3c, 0x1e, 0x23, 0xe7, 0xd7, 0x31, 0x72, 0xbe, 0xbe, 0xdb, 0x0a, 0xfd, 0x50,
+	0xdd, 0xc7, 0x89, 0x92, 0xb8, 0x0e, 0xca, 0xb8, 0xc6, 0x36, 0x10, 0x4b, 0xc5, 0xaa, 0x94, 0x97,
+	0x58, 0x6a, 0xac, 0x77, 0x39, 0x2f, 0xef, 0xcf, 0xcc, 0xa7, 0xf9, 0xe1, 0x7f, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0x0a, 0x28, 0x07, 0x51, 0xcb, 0x02, 0x00, 0x00,
 }
 
 func (this *MT) Equal(that interface{}) bool {
@@ -326,6 +370,33 @@ func (this *Denom) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *Balance) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*Balance)
+	if !ok {
+		that2, ok := that.(Balance)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.MtId != that1.MtId {
+		return false
+	}
+	if this.Amount != that1.Amount {
+		return false
+	}
+	return true
+}
 func (this *IDCollection) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -345,11 +416,16 @@ func (this *IDCollection) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if this.MtId != that1.MtId {
+	if this.DenomId != that1.DenomId {
 		return false
 	}
-	if this.Amount != that1.Amount {
+	if len(this.Balances) != len(that1.Balances) {
 		return false
+	}
+	for i := range this.Balances {
+		if !this.Balances[i].Equal(that1.Balances[i]) {
+			return false
+		}
 	}
 	return true
 }
@@ -370,6 +446,9 @@ func (this *Owner) Equal(that interface{}) bool {
 	if that1 == nil {
 		return this == nil
 	} else if this == nil {
+		return false
+	}
+	if this.Address != that1.Address {
 		return false
 	}
 	if len(this.IdCollections) != len(that1.IdCollections) {
@@ -514,6 +593,41 @@ func (m *Denom) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *Balance) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Balance) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Balance) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Amount != 0 {
+		i = encodeVarintMt(dAtA, i, uint64(m.Amount))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.MtId) > 0 {
+		i -= len(m.MtId)
+		copy(dAtA[i:], m.MtId)
+		i = encodeVarintMt(dAtA, i, uint64(len(m.MtId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *IDCollection) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -534,17 +648,24 @@ func (m *IDCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Amount) > 0 {
-		i -= len(m.Amount)
-		copy(dAtA[i:], m.Amount)
-		i = encodeVarintMt(dAtA, i, uint64(len(m.Amount)))
-		i--
-		dAtA[i] = 0x12
+	if len(m.Balances) > 0 {
+		for iNdEx := len(m.Balances) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Balances[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintMt(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
 	}
-	if len(m.MtId) > 0 {
-		i -= len(m.MtId)
-		copy(dAtA[i:], m.MtId)
-		i = encodeVarintMt(dAtA, i, uint64(len(m.MtId)))
+	if len(m.DenomId) > 0 {
+		i -= len(m.DenomId)
+		copy(dAtA[i:], m.DenomId)
+		i = encodeVarintMt(dAtA, i, uint64(len(m.DenomId)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -582,8 +703,15 @@ func (m *Owner) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintMt(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0xa
+			dAtA[i] = 0x12
 		}
+	}
+	if len(m.Address) > 0 {
+		i -= len(m.Address)
+		copy(dAtA[i:], m.Address)
+		i = encodeVarintMt(dAtA, i, uint64(len(m.Address)))
+		i--
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -695,7 +823,7 @@ func (m *Denom) Size() (n int) {
 	return n
 }
 
-func (m *IDCollection) Size() (n int) {
+func (m *Balance) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -705,9 +833,27 @@ func (m *IDCollection) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovMt(uint64(l))
 	}
-	l = len(m.Amount)
+	if m.Amount != 0 {
+		n += 1 + sovMt(uint64(m.Amount))
+	}
+	return n
+}
+
+func (m *IDCollection) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.DenomId)
 	if l > 0 {
 		n += 1 + l + sovMt(uint64(l))
+	}
+	if len(m.Balances) > 0 {
+		for _, e := range m.Balances {
+			l = e.Size()
+			n += 1 + l + sovMt(uint64(l))
+		}
 	}
 	return n
 }
@@ -718,6 +864,10 @@ func (m *Owner) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = len(m.Address)
+	if l > 0 {
+		n += 1 + l + sovMt(uint64(l))
+	}
 	if len(m.IdCollections) > 0 {
 		for _, e := range m.IdCollections {
 			l = e.Size()
@@ -1097,7 +1247,7 @@ func (m *Denom) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *IDCollection) Unmarshal(dAtA []byte) error {
+func (m *Balance) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1120,10 +1270,10 @@ func (m *IDCollection) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: IDCollection: wiretype end group for non-group")
+			return fmt.Errorf("proto: Balance: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: IDCollection: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Balance: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1159,8 +1309,77 @@ func (m *IDCollection) Unmarshal(dAtA []byte) error {
 			m.MtId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			m.Amount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMt
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Amount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMt(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthMt
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *IDCollection) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMt
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: IDCollection: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: IDCollection: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DenomId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1188,7 +1407,41 @@ func (m *IDCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Amount = string(dAtA[iNdEx:postIndex])
+			m.DenomId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Balances", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMt
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMt
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMt
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Balances = append(m.Balances, &Balance{})
+			if err := m.Balances[len(m.Balances)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1241,6 +1494,38 @@ func (m *Owner) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMt
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthMt
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMt
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Address = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field IdCollections", wireType)
 			}
