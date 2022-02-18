@@ -1,12 +1,12 @@
 syntax = "proto3";
-package irismod.nft;
+package irismod.mt;
 
 import "gogoproto/gogo.proto";
-import "nft/nft.proto";
+import "mt/mt.proto";
 
-option go_package = "github.com/irisnet/irismod/modules/nft/types";
+option go_package = "github.com/irisnet/irismod/modules/mt/types";
 
-// GenesisState defines the NFT module's genesis state
+// GenesisState defines the MT module's genesis state
 message GenesisState {
     repeated Collection collections = 1 [ (gogoproto.nullable) = false ];
 }
