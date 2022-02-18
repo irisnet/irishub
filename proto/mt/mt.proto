@@ -12,7 +12,7 @@ message MT {
 
   string id = 1;
   uint64 supply = 2;
-  string data = 3;
+  bytes data = 3;
   string owner = 4;
 }
 
@@ -23,7 +23,7 @@ message Denom {
   string id = 1;
   string name = 2;
   string creator = 3;
-  string data = 4;
+  bytes data = 4;
 }
 
 // IDCollection defines a type of collection with specified ID
