@@ -34,7 +34,7 @@ message MsgIssueDenom {
     string id = 1;
     string name = 2;
     string creator = 3;
-    string data = 4;
+    bytes data = 4;
 }
 
 // MsgIssueDenomResponse defines the Msg/IssueDenom response type.
@@ -60,7 +60,7 @@ message MsgEditMT {
 
     string id = 1;
     string denom_id = 2;
-    string data = 3;
+    bytes data = 3;
 }
 
 // MsgEditMTResponse defines the Msg/EditMT response type.
@@ -73,7 +73,7 @@ message MsgMintMT {
     string id = 1;
     string denom_id = 2;
     string name = 3;
-    string data = 4;
+    bytes data = 4;
     string sender = 5;
     string recipient = 6;
 }
