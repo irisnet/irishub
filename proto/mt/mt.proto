@@ -26,19 +26,27 @@ message Denom {
   bytes data = 4;
 }
 
+message Balance {
+  option (gogoproto.equal) = true;
+
+  string mt_id = 1;
+  uint64 amount = 2;
+}
+
 // IDCollection defines a type of collection with specified ID
 message IDCollection {
   option (gogoproto.equal) = true;
 
-  string mt_id = 1;
-  string amount = 2;
+  string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+  repeated Balance Balances = 2;
 }
 
 // Owner defines a type of owner
 message Owner {
   option (gogoproto.equal) = true;
 
-  repeated IDCollection id_collections = 1;
+  string address = 1;
+  repeated IDCollection id_collections = 2;
 }
 
 // Collection defines a type of collection
