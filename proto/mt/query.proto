@@ -65,7 +65,7 @@ message QueryDenomsRequest {
 
 // QueryDenomsResponse is the response type for the Query/Denoms RPC method
 message QueryDenomsResponse {
-    repeated Denom denoms = 1;
+    repeated Denom denoms = 1 [(gogoproto.nullable) = false];
 
     cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
@@ -98,7 +98,7 @@ message QueryMTsRequest {
 
 // QueryMTsResponse is the response type for the Query/MTs RPC method
 message QueryMTsResponse {
-    repeated MT mts = 1;
+    repeated MT mts = 1 [(gogoproto.nullable) = false];
 
     cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
@@ -124,6 +124,6 @@ message QueryBalancesRequest {
 
 // QueryBalancesResponse is the response type for the Query/Balances RPC method
 message QueryBalancesResponse {
-    repeated Balance balance = 1;
+    repeated Balance balance = 1 [(gogoproto.nullable) = false];
     cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

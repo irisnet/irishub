@@ -39,5 +39,5 @@ message Collection {
   option (gogoproto.equal) = true;
 
   Denom denom = 1;
-  repeated MT mts = 2;
+  repeated MT mts = 2 [(gogoproto.nullable) = false];
 }
