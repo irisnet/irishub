@@ -12,7 +12,7 @@ var (
 	denomID   = "denom"
 	denom     = "denom"
 	id        = "id1"
-	nftName   = "report"
+	mtName   = "report"
 	address   = CreateTestAddrs(1)[0]
 	address2  = CreateTestAddrs(2)[1]
 	tokenURI  = "https://google.com/token-1.json"

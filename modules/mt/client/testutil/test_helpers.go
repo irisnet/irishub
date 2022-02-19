@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 
-	nftcli "github.com/irisnet/irismod/modules/nft/client/cli"
+	mtcli "github.com/irisnet/irismod/modules/mt/client/cli"
 )
 
 // IssueDenomExec creates a redelegate message.
@@ -21,10 +21,10 @@ func IssueDenomExec(clientCtx client.Context, from string, denom string, extraAr
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdIssueDenom(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdIssueDenom(), args)
 }
 
-func BurnNFTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func BurnMTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
 		tokenID,
@@ -32,10 +32,10 @@ func BurnNFTExec(clientCtx client.Context, from string, denomID string, tokenID 
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdBurnNFT(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdBurnMT(), args)
 }
 
-func MintNFTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func MintMTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
 		tokenID,
@@ -43,10 +43,10 @@ func MintNFTExec(clientCtx client.Context, from string, denomID string, tokenID 
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdMintNFT(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdMintMT(), args)
 }
 
-func EditNFTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func EditMTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
 		tokenID,
@@ -54,10 +54,10 @@ func EditNFTExec(clientCtx client.Context, from string, denomID string, tokenID 
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdEditNFT(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdEditMT(), args)
 }
 
-func TransferNFTExec(clientCtx client.Context, from string, recipient string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func TransferMTExec(clientCtx client.Context, from string, recipient string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		recipient,
 		denomID,
@@ -66,7 +66,7 @@ func TransferNFTExec(clientCtx client.Context, from string, recipient string, de
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdTransferNFT(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdTransferMT(), args)
 }
 
 func QueryDenomExec(clientCtx client.Context, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
@@ -76,7 +76,7 @@ func QueryDenomExec(clientCtx client.Context, denomID string, extraArgs ...strin
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryDenom(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryDenom(), args)
 }
 
 func QueryCollectionExec(clientCtx client.Context, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
@@ -86,7 +86,7 @@ func QueryCollectionExec(clientCtx client.Context, denomID string, extraArgs ...
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryCollection(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryCollection(), args)
 }
 
 func QueryDenomsExec(clientCtx client.Context, extraArgs ...string) (testutil.BufferWriter, error) {
@@ -95,7 +95,7 @@ func QueryDenomsExec(clientCtx client.Context, extraArgs ...string) (testutil.Bu
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryDenoms(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryDenoms(), args)
 }
 
 func QuerySupplyExec(clientCtx client.Context, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
@@ -105,7 +105,7 @@ func QuerySupplyExec(clientCtx client.Context, denom string, extraArgs ...string
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQuerySupply(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQuerySupply(), args)
 }
 
 func QueryOwnerExec(clientCtx client.Context, address string, extraArgs ...string) (testutil.BufferWriter, error) {
@@ -115,10 +115,10 @@ func QueryOwnerExec(clientCtx client.Context, address string, extraArgs ...strin
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryOwner(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryOwner(), args)
 }
 
-func QueryNFTExec(clientCtx client.Context, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryMTExec(clientCtx client.Context, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
 		tokenID,
@@ -126,7 +126,7 @@ func QueryNFTExec(clientCtx client.Context, denomID string, tokenID string, extr
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryNFT(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryMT(), args)
 }
 
 func TransferDenomExec(clientCtx client.Context, from string, recipient string, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
@@ -137,5 +137,5 @@ func TransferDenomExec(clientCtx client.Context, from string, recipient string, 
 	}
 
 	args = append(args, extraArgs...)
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdTransferDenom(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdTransferDenom(), args)
 }

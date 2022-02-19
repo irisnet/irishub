@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 )
 
-// RegisterHandlers registers the NFT REST routes.
+// RegisterHandlers registers the MT REST routes.
 func RegisterHandlers(cliCtx client.Context, r *mux.Router, queryRoute string) {
 	registerQueryRoutes(cliCtx, r, queryRoute)
 	registerTxRoutes(cliCtx, r, queryRoute)
@@ -34,7 +34,7 @@ type issueDenomReq struct {
 	Data             string       `json:"data"`
 }
 
-type mintNFTReq struct {
+type mintMTReq struct {
 	BaseReq   rest.BaseReq `json:"base_req"`
 	Owner     string       `json:"owner"`
 	Recipient string       `json:"recipient"`
@@ -46,7 +46,7 @@ type mintNFTReq struct {
 	Data      string       `json:"data"`
 }
 
-type editNFTReq struct {
+type editMTReq struct {
 	BaseReq rest.BaseReq `json:"base_req"`
 	Owner   string       `json:"owner"`
 	Name    string       `json:"name"`
@@ -55,7 +55,7 @@ type editNFTReq struct {
 	Data    string       `json:"data"`
 }
 
-type transferNFTReq struct {
+type transferMTReq struct {
 	BaseReq   rest.BaseReq `json:"base_req"`
 	Owner     string       `json:"owner"`
 	Recipient string       `json:"recipient"`
@@ -65,7 +65,7 @@ type transferNFTReq struct {
 	Data      string       `json:"data"`
 }
 
-type burnNFTReq struct {
+type burnMTReq struct {
 	BaseReq rest.BaseReq `json:"base_req"`
 	Owner   string       `json:"owner"`
 }

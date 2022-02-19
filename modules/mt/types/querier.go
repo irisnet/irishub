@@ -6,14 +6,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// query endpoints supported by the NFT Querier
+// query endpoints supported by the MT Querier
 const (
 	QuerySupply     = "supply"
 	QueryOwner      = "owner"
 	QueryCollection = "collection"
 	QueryDenoms     = "denoms"
 	QueryDenom      = "denom"
-	QueryNFT        = "nft"
+	QueryMT        = "mt"
 )
 
 // QuerySupplyParams defines the params for queries:
@@ -73,15 +73,15 @@ func NewQueryDenomParams(id string) QueryDenomParams {
 	}
 }
 
-// QueryNFTParams params for query 'custom/nfts/nft'
-type QueryNFTParams struct {
+// QueryMTParams params for query 'custom/mts/mt'
+type QueryMTParams struct {
 	Denom   string
 	TokenID string
 }
 
-// NewQueryNFTParams creates a new instance of QueryNFTParams
-func NewQueryNFTParams(denom, id string) QueryNFTParams {
-	return QueryNFTParams{
+// NewQueryMTParams creates a new instance of QueryMTParams
+func NewQueryMTParams(denom, id string) QueryMTParams {
+	return QueryMTParams{
 		Denom:   denom,
 		TokenID: id,
 	}

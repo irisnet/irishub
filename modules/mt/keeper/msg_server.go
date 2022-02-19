@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/mt/types"
 )
 
 type msgServer struct {
@@ -15,7 +15,7 @@ type msgServer struct {
 
 var _ types.MsgServer = msgServer{}
 
-// NewMsgServerImpl returns an implementation of the NFT MsgServer interface
+// NewMsgServerImpl returns an implementation of the MT MsgServer interface
 // for the provided Keeper.
 func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
@@ -29,10 +29,7 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.IssueDenom(ctx, msg.Id, msg.Name, msg.Schema, msg.Symbol, sender,
-		msg.MintRestricted, msg.UpdateRestricted,
-		msg.Description, msg.Uri, msg.UriHash, msg.Data,
-	); err != nil {
+	if err := m.Keeper.IssueDenom(ctx, msg.Id, msg.Name, sender, msg.Data); err != nil {
 		return nil, err
 	}
 
@@ -53,7 +50,7 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 	return &types.MsgIssueDenomResponse{}, nil
 }
 
-func (m msgServer) MintNFT(goCtx context.Context, msg *types.MsgMintNFT) (*types.MsgMintNFTResponse, error) {
+func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.MsgMintMTResponse, error) {
 	recipient, err := sdk.AccAddressFromBech32(msg.Recipient)
 	if err != nil {
 		return nil, err
@@ -68,29 +65,23 @@ func (m msgServer) MintNFT(goCtx context.Context, msg *types.MsgMintNFT) (*types
 
 	denom, found := m.Keeper.GetDenom(ctx, msg.DenomId)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", msg.DenomId)
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s ", msg.DenomId)
 	}
 
-	if denom.MintRestricted && denom.Creator != sender.String() {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to mint NFT of denom %s", denom.Creator, msg.DenomId)
+	if denom.Owner != sender.String() {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to mint MT of denom %s", sender, msg.DenomId)
 	}
 
-	if err := m.Keeper.MintNFT(ctx, msg.DenomId, msg.Id,
-		msg.Name,
-		msg.URI,
-		msg.UriHash,
-		msg.Data,
-		recipient,
-	); err != nil {
+	if err := m.Keeper.MintMT(ctx, msg.DenomId, msg.Id, msg.Amount, msg.Data, recipient); err != nil {
 		return nil, err
 	}
 
+	// TODO update events
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeMintNFT,
+			types.EventTypeMintMT,
 			sdk.NewAttribute(types.AttributeKeyTokenID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
-			sdk.NewAttribute(types.AttributeKeyTokenURI, msg.URI),
 			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
 		),
 		sdk.NewEvent(
@@ -100,32 +91,25 @@ func (m msgServer) MintNFT(goCtx context.Context, msg *types.MsgMintNFT) (*types
 		),
 	})
 
-	return &types.MsgMintNFTResponse{}, nil
+	return &types.MsgMintMTResponse{}, nil
 }
 
-func (m msgServer) EditNFT(goCtx context.Context, msg *types.MsgEditNFT) (*types.MsgEditNFTResponse, error) {
+func (m msgServer) EditMT(goCtx context.Context, msg *types.MsgEditMT) (*types.MsgEditMTResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.EditNFT(ctx, msg.DenomId, msg.Id,
-		msg.Name,
-		msg.URI,
-		msg.UriHash,
-		msg.Data,
-		sender,
-	); err != nil {
+	if err := m.Keeper.EditMT(ctx, msg.DenomId, msg.Id, msg.Data, sender); err != nil {
 		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeEditNFT,
+			types.EventTypeEditMT,
 			sdk.NewAttribute(types.AttributeKeyTokenID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
-			sdk.NewAttribute(types.AttributeKeyTokenURI, msg.URI),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Sender),
 		),
 		sdk.NewEvent(
@@ -135,10 +119,10 @@ func (m msgServer) EditNFT(goCtx context.Context, msg *types.MsgEditNFT) (*types
 		),
 	})
 
-	return &types.MsgEditNFTResponse{}, nil
+	return &types.MsgEditMTResponse{}, nil
 }
 
-func (m msgServer) TransferNFT(goCtx context.Context, msg *types.MsgTransferNFT) (*types.MsgTransferNFTResponse, error) {
+func (m msgServer) TransferMT(goCtx context.Context, msg *types.MsgTransferMT) (*types.MsgTransferMTResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
@@ -151,10 +135,6 @@ func (m msgServer) TransferNFT(goCtx context.Context, msg *types.MsgTransferNFT)
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if err := m.Keeper.TransferOwner(ctx, msg.DenomId, msg.Id,
-		msg.Name,
-		msg.URI,
-		msg.UriHash,
-		msg.Data,
 		sender,
 		recipient,
 	); err != nil {
@@ -176,23 +156,23 @@ func (m msgServer) TransferNFT(goCtx context.Context, msg *types.MsgTransferNFT)
 		),
 	})
 
-	return &types.MsgTransferNFTResponse{}, nil
+	return &types.MsgTransferMTResponse{}, nil
 }
 
-func (m msgServer) BurnNFT(goCtx context.Context, msg *types.MsgBurnNFT) (*types.MsgBurnNFTResponse, error) {
+func (m msgServer) BurnMT(goCtx context.Context, msg *types.MsgBurnMT) (*types.MsgBurnMTResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.BurnNFT(ctx, msg.DenomId, msg.Id, sender); err != nil {
+	if err := m.Keeper.BurnMT(ctx, msg.DenomId, msg.Id, sender); err != nil {
 		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeBurnNFT,
+			types.EventTypeBurnMT,
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
 			sdk.NewAttribute(types.AttributeKeyTokenID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Sender),
@@ -204,7 +184,7 @@ func (m msgServer) BurnNFT(goCtx context.Context, msg *types.MsgBurnNFT) (*types
 		),
 	})
 
-	return &types.MsgBurnNFTResponse{}, nil
+	return &types.MsgBurnMTResponse{}, nil
 }
 
 func (m msgServer) TransferDenom(goCtx context.Context, msg *types.MsgTransferDenom) (*types.MsgTransferDenomResponse, error) {

@@ -15,9 +15,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 
-	nftcli "github.com/irisnet/irismod/modules/nft/client/cli"
-	nfttestutil "github.com/irisnet/irismod/modules/nft/client/testutil"
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
+	mtcli "github.com/irisnet/irismod/modules/mt/client/cli"
+	mttestutil "github.com/irisnet/irismod/modules/mt/client/testutil"
+	mttypes "github.com/irisnet/irismod/modules/mt/types"
 	"github.com/irisnet/irismod/simapp"
 )
 
@@ -73,15 +73,15 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	//------test GetCmdIssueDenom()-------------
 	args := []string{
-		fmt.Sprintf("--%s=%s", nftcli.FlagDenomName, denomName),
-		fmt.Sprintf("--%s=%s", nftcli.FlagSymbol, symbol),
-		fmt.Sprintf("--%s=%s", nftcli.FlagSchema, schema),
-		fmt.Sprintf("--%s=%s", nftcli.FlagURI, uri),
-		fmt.Sprintf("--%s=%s", nftcli.FlagURIHash, uriHash),
-		fmt.Sprintf("--%s=%s", nftcli.FlagDescription, description),
-		fmt.Sprintf("--%s=%s", nftcli.FlagData, data),
-		fmt.Sprintf("--%s=%t", nftcli.FlagMintRestricted, mintRestricted),
-		fmt.Sprintf("--%s=%t", nftcli.FlagUpdateRestricted, updateRestricted),
+		fmt.Sprintf("--%s=%s", mtcli.FlagDenomName, denomName),
+		fmt.Sprintf("--%s=%s", mtcli.FlagSymbol, symbol),
+		fmt.Sprintf("--%s=%s", mtcli.FlagSchema, schema),
+		fmt.Sprintf("--%s=%s", mtcli.FlagURI, uri),
+		fmt.Sprintf("--%s=%s", mtcli.FlagURIHash, uriHash),
+		fmt.Sprintf("--%s=%s", mtcli.FlagDescription, description),
+		fmt.Sprintf("--%s=%s", mtcli.FlagData, data),
+		fmt.Sprintf("--%s=%t", mtcli.FlagMintRestricted, mintRestricted),
+		fmt.Sprintf("--%s=%t", mtcli.FlagUpdateRestricted, updateRestricted),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
@@ -91,7 +91,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	respType := proto.Message(&sdk.TxResponse{})
 	expectedCode := uint32(0)
 
-	bz, err := nfttestutil.IssueDenomExec(val.ClientCtx, from.String(), denom, args...)
+	bz, err := mttestutil.IssueDenomExec(val.ClientCtx, from.String(), denom, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp := respType.(*sdk.TxResponse)
@@ -100,12 +100,12 @@ func (s *IntegrationTestSuite) TestNft() {
 	denomID := gjson.Get(txResp.RawLog, "0.events.0.attributes.0.value").String()
 
 	//------test GetCmdQueryDenom()-------------
-	url := fmt.Sprintf("%s/irismod/nft/denoms/%s", baseURL, denomID)
+	url := fmt.Sprintf("%s/irismod/mt/denoms/%s", baseURL, denomID)
 	resp, err := rest.GetRequest(url)
-	respType = proto.Message(&nfttypes.QueryDenomResponse{})
+	respType = proto.Message(&mttypes.QueryDenomResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
-	denomItem := respType.(*nfttypes.QueryDenomResponse)
+	denomItem := respType.(*mttypes.QueryDenomResponse)
 	s.Require().Equal(denomName, denomItem.Denom.Name)
 	s.Require().Equal(schema, denomItem.Denom.Schema)
 	s.Require().Equal(symbol, denomItem.Denom.Symbol)
@@ -117,22 +117,22 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(updateRestricted, denomItem.Denom.UpdateRestricted)
 
 	//------test GetCmdQueryDenoms()-------------
-	url = fmt.Sprintf("%s/irismod/nft/denoms", baseURL)
+	url = fmt.Sprintf("%s/irismod/mt/denoms", baseURL)
 	resp, err = rest.GetRequest(url)
-	respType = proto.Message(&nfttypes.QueryDenomsResponse{})
+	respType = proto.Message(&mttypes.QueryDenomsResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
-	denomsResp := respType.(*nfttypes.QueryDenomsResponse)
+	denomsResp := respType.(*mttypes.QueryDenomsResponse)
 	s.Require().Equal(1, len(denomsResp.Denoms))
 	s.Require().Equal(denomID, denomsResp.Denoms[0].Id)
 
-	//------test GetCmdMintNFT()-------------
+	//------test GetCmdMintMT()-------------
 	args = []string{
-		fmt.Sprintf("--%s=%s", nftcli.FlagData, data),
-		fmt.Sprintf("--%s=%s", nftcli.FlagRecipient, from.String()),
-		fmt.Sprintf("--%s=%s", nftcli.FlagURI, uri),
-		fmt.Sprintf("--%s=%s", nftcli.FlagURIHash, uriHash),
-		fmt.Sprintf("--%s=%s", nftcli.FlagTokenName, tokenName),
+		fmt.Sprintf("--%s=%s", mtcli.FlagData, data),
+		fmt.Sprintf("--%s=%s", mtcli.FlagRecipient, from.String()),
+		fmt.Sprintf("--%s=%s", mtcli.FlagURI, uri),
+		fmt.Sprintf("--%s=%s", mtcli.FlagURIHash, uriHash),
+		fmt.Sprintf("--%s=%s", mtcli.FlagTokenName, tokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
@@ -141,54 +141,54 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	respType = proto.Message(&sdk.TxResponse{})
 
-	bz, err = nfttestutil.MintNFTExec(val.ClientCtx, from.String(), denomID, tokenID, args...)
+	bz, err = mttestutil.MintMTExec(val.ClientCtx, from.String(), denomID, tokenID, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	//------test GetCmdQuerySupply()-------------
-	url = fmt.Sprintf("%s/irismod/nft/collections/%s/supply", baseURL, denomID)
+	url = fmt.Sprintf("%s/irismod/mt/collections/%s/supply", baseURL, denomID)
 	resp, err = rest.GetRequest(url)
-	respType = proto.Message(&nfttypes.QuerySupplyResponse{})
+	respType = proto.Message(&mttypes.QuerySupplyResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
-	supplyResp := respType.(*nfttypes.QuerySupplyResponse)
+	supplyResp := respType.(*mttypes.QuerySupplyResponse)
 	s.Require().Equal(uint64(1), supplyResp.Amount)
 
-	//------test GetCmdQueryNFT()-------------
-	url = fmt.Sprintf("%s/irismod/nft/nfts/%s/%s", baseURL, denomID, tokenID)
+	//------test GetCmdQueryMT()-------------
+	url = fmt.Sprintf("%s/irismod/mt/mts/%s/%s", baseURL, denomID, tokenID)
 	resp, err = rest.GetRequest(url)
-	respType = proto.Message(&nfttypes.QueryNFTResponse{})
+	respType = proto.Message(&mttypes.QueryMTResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
-	nftItem := respType.(*nfttypes.QueryNFTResponse)
-	s.Require().Equal(tokenID, nftItem.NFT.Id)
-	s.Require().Equal(tokenName, nftItem.NFT.Name)
-	s.Require().Equal(uri, nftItem.NFT.URI)
-	s.Require().Equal(uriHash, nftItem.NFT.UriHash)
-	s.Require().Equal(data, nftItem.NFT.Data)
-	s.Require().Equal(from.String(), nftItem.NFT.Owner)
+	mtItem := respType.(*mttypes.QueryMTResponse)
+	s.Require().Equal(tokenID, mtItem.MT.Id)
+	s.Require().Equal(tokenName, mtItem.MT.Name)
+	s.Require().Equal(uri, mtItem.MT.URI)
+	s.Require().Equal(uriHash, mtItem.MT.UriHash)
+	s.Require().Equal(data, mtItem.MT.Data)
+	s.Require().Equal(from.String(), mtItem.MT.Owner)
 
 	//------test GetCmdQueryOwner()-------------
-	url = fmt.Sprintf("%s/irismod/nft/nfts?owner=%s", baseURL, from.String())
+	url = fmt.Sprintf("%s/irismod/mt/mts?owner=%s", baseURL, from.String())
 	resp, err = rest.GetRequest(url)
-	respType = proto.Message(&nfttypes.QueryOwnerResponse{})
+	respType = proto.Message(&mttypes.QueryOwnerResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
-	ownerResp := respType.(*nfttypes.QueryOwnerResponse)
+	ownerResp := respType.(*mttypes.QueryOwnerResponse)
 	s.Require().Equal(from.String(), ownerResp.Owner.Address)
 	s.Require().Equal(denom, ownerResp.Owner.IDCollections[0].DenomId)
 	s.Require().Equal(tokenID, ownerResp.Owner.IDCollections[0].TokenIds[0])
 
 	//------test GetCmdQueryCollection()-------------
-	url = fmt.Sprintf("%s/irismod/nft/collections/%s", baseURL, denomID)
+	url = fmt.Sprintf("%s/irismod/mt/collections/%s", baseURL, denomID)
 	resp, err = rest.GetRequest(url)
-	respType = proto.Message(&nfttypes.QueryCollectionResponse{})
+	respType = proto.Message(&mttypes.QueryCollectionResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
-	collectionResp := respType.(*nfttypes.QueryCollectionResponse)
-	s.Require().Equal(1, len(collectionResp.Collection.NFTs))
+	collectionResp := respType.(*mttypes.QueryCollectionResponse)
+	s.Require().Equal(1, len(collectionResp.Collection.MTs))
 
 	//------test GetCmdTransferDenom()-------------
 	args = []string{
@@ -199,17 +199,17 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	respType = proto.Message(&sdk.TxResponse{})
 
-	bz, err = nfttestutil.TransferDenomExec(val.ClientCtx, from.String(), recipient.String(), denomID, args...)
+	bz, err = mttestutil.TransferDenomExec(val.ClientCtx, from.String(), recipient.String(), denomID, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-	respType = proto.Message(&nfttypes.Denom{})
-	bz, err = nfttestutil.QueryDenomExec(val.ClientCtx, denomID)
+	respType = proto.Message(&mttypes.Denom{})
+	bz, err = mttestutil.QueryDenomExec(val.ClientCtx, denomID)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	denomItem2 := respType.(*nfttypes.Denom)
+	denomItem2 := respType.(*mttypes.Denom)
 	s.Require().Equal(recipient.String(), denomItem2.Creator)
 	s.Require().Equal(denomName, denomItem2.Name)
 	s.Require().Equal(schema, denomItem2.Schema)

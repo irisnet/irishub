@@ -13,14 +13,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/mt/types"
 )
 
 // NewTxCmd returns the transaction commands for this module
 func NewTxCmd() *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "NFT transactions subcommands",
+		Short:                      "MT transactions subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -28,10 +28,10 @@ func NewTxCmd() *cobra.Command {
 
 	txCmd.AddCommand(
 		GetCmdIssueDenom(),
-		GetCmdMintNFT(),
-		GetCmdEditNFT(),
-		GetCmdTransferNFT(),
-		GetCmdBurnNFT(),
+		GetCmdMintMT(),
+		GetCmdEditMT(),
+		GetCmdTransferMT(),
+		GetCmdBurnMT(),
 		GetCmdTransferDenom(),
 	)
 
@@ -44,7 +44,7 @@ func GetCmdIssueDenom() *cobra.Command {
 		Use:  "issue [denom-id]",
 		Long: "Issue a new denom.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft issue <denom-id> "+
+			"$ %s tx mt issue <denom-id> "+
 				"--from=<key-name> "+
 				"--name=<denom-name> "+
 				"--symbol=<denom-symbol> "+
@@ -134,13 +134,13 @@ func GetCmdIssueDenom() *cobra.Command {
 	return cmd
 }
 
-// GetCmdMintNFT is the CLI command for a MintNFT transaction
-func GetCmdMintNFT() *cobra.Command {
+// GetCmdMintMT is the CLI command for a MintMT transaction
+func GetCmdMintMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "mint [denom-id] [nft-id]",
-		Long: "Mint an NFT and set the owner to the recipient.",
+		Use:  "mint [denom-id] [mt-id]",
+		Long: "Mint an MT and set the owner to the recipient.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft mint <denom-id> <nft-id> "+
+			"$ %s tx mt mint <denom-id> <mt-id> "+
 				"--uri=<uri> "+
 				"--uri-hash=<uri-hash> "+
 				"--recipient=<recipient> "+
@@ -189,7 +189,7 @@ func GetCmdMintNFT() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgMintNFT(
+			msg := types.NewMsgMintMT(
 				args[1],
 				args[0],
 				tokenName,
@@ -205,19 +205,19 @@ func GetCmdMintNFT() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
-	cmd.Flags().AddFlagSet(FsMintNFT)
+	cmd.Flags().AddFlagSet(FsMintMT)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
 }
 
-// GetCmdEditNFT is the CLI command for sending an MsgEditNFT transaction
-func GetCmdEditNFT() *cobra.Command {
+// GetCmdEditMT is the CLI command for sending an MsgEditMT transaction
+func GetCmdEditMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "edit [denom-id] [nft-id]",
-		Long: "Edit the token data of an NFT.",
+		Use:  "edit [denom-id] [mt-id]",
+		Long: "Edit the token data of an MT.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft edit <denom-id> <nft-id> "+
+			"$ %s tx mt edit <denom-id> <mt-id> "+
 				"--uri=<uri> "+
 				"--uri-hash=<uri-hash> "+
 				"--from=<key-name> "+
@@ -248,7 +248,7 @@ func GetCmdEditNFT() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			msg := types.NewMsgEditNFT(
+			msg := types.NewMsgEditMT(
 				args[1],
 				args[0],
 				tokenName,
@@ -263,19 +263,19 @@ func GetCmdEditNFT() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
-	cmd.Flags().AddFlagSet(FsEditNFT)
+	cmd.Flags().AddFlagSet(FsEditMT)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
 }
 
-// GetCmdTransferNFT is the CLI command for sending a TransferNFT transaction
-func GetCmdTransferNFT() *cobra.Command {
+// GetCmdTransferMT is the CLI command for sending a TransferMT transaction
+func GetCmdTransferMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "transfer [recipient] [denom-id] [nft-id]",
-		Long: "Transfer an NFT to a recipient.",
+		Use:  "transfer [recipient] [denom-id] [mt-id]",
+		Long: "Transfer an MT to a recipient.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft transfer <recipient> <denom-id> <nft-id> "+
+			"$ %s tx mt transfer <recipient> <denom-id> <mt-id> "+
 				"--uri=<uri> "+
 				"--uri-hash=<uri-hash> "+
 				"--from=<key-name> "+
@@ -310,7 +310,7 @@ func GetCmdTransferNFT() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			msg := types.NewMsgTransferNFT(
+			msg := types.NewMsgTransferMT(
 				args[2],
 				args[1],
 				tokenName,
@@ -326,19 +326,19 @@ func GetCmdTransferNFT() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
-	cmd.Flags().AddFlagSet(FsTransferNFT)
+	cmd.Flags().AddFlagSet(FsTransferMT)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
 }
 
-// GetCmdBurnNFT is the CLI command for sending a BurnNFT transaction
-func GetCmdBurnNFT() *cobra.Command {
+// GetCmdBurnMT is the CLI command for sending a BurnMT transaction
+func GetCmdBurnMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "burn [denom-id] [nft-id]",
-		Long: "Burn an NFT.",
+		Use:  "burn [denom-id] [mt-id]",
+		Long: "Burn an MT.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft burn <denom-id> <nft-id> "+
+			"$ %s tx mt burn <denom-id> <mt-id> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
@@ -351,7 +351,7 @@ func GetCmdBurnNFT() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgBurnNFT(
+			msg := types.NewMsgBurnMT(
 				clientCtx.GetFromAddress().String(),
 				args[1],
 				args[0],
@@ -373,7 +373,7 @@ func GetCmdTransferDenom() *cobra.Command {
 		Use:  "transfer-denom [recipient] [denom-id]",
 		Long: "Transfer an Denom to a recipient.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft transfer-denom <recipient> <denom-id> "+
+			"$ %s tx mt transfer-denom <recipient> <denom-id> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",

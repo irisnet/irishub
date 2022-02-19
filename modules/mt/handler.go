@@ -1,11 +1,11 @@
-package nft
+package mt
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irismod/modules/nft/keeper"
-	"github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/mt/keeper"
+	"github.com/irisnet/irismod/modules/mt/types"
 )
 
 // NewHandler routes the messages to the handlers
@@ -20,20 +20,20 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			res, err := msgServer.IssueDenom(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case *types.MsgMintNFT:
-			res, err := msgServer.MintNFT(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgMintMT:
+			res, err := msgServer.MintMT(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case *types.MsgTransferNFT:
-			res, err := msgServer.TransferNFT(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgTransferMT:
+			res, err := msgServer.TransferMT(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case *types.MsgEditNFT:
-			res, err := msgServer.EditNFT(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgEditMT:
+			res, err := msgServer.EditMT(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case *types.MsgBurnNFT:
-			res, err := msgServer.BurnNFT(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgBurnMT:
+			res, err := msgServer.BurnMT(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgTransferDenom:
@@ -41,7 +41,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized nft message type: %T", msg)
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized mt message type: %T", msg)
 		}
 	}
 }

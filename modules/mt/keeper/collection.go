@@ -1,30 +1,21 @@
 package keeper
 
 import (
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/types/query"
-
-	"github.com/irisnet/irismod/modules/nft/exported"
-	"github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/mt/types"
 )
 
-// SetCollection saves all NFTs and returns an error if there already exists
+// SetCollection saves all Mts and returns an error if there already exists
 func (k Keeper) SetCollection(ctx sdk.Context, collection types.Collection) error {
-	for _, nft := range collection.NFTs {
-		if err := k.MintNFT(
+	for _, mt := range collection.Mts {
+		if err := k.MintMT(
 			ctx,
 			collection.Denom.Id,
-			nft.GetID(),
-			nft.GetName(),
-			nft.GetURI(),
-			nft.GetURIHash(),
-			nft.GetData(),
-			nft.GetOwner(),
+			mt.GetID(),
+			mt.GetSupply(),
+			mt.GetData(),
+			mt.GetOwner(),
 		); err != nil {
 			return err
 		}
@@ -36,44 +27,44 @@ func (k Keeper) SetCollection(ctx sdk.Context, collection types.Collection) erro
 func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection, error) {
 	denom, found := k.GetDenom(ctx, denomID)
 	if !found {
-		return types.Collection{}, sdkerrors.Wrapf(types.ErrInvalidDenom, "denomID %s not existed ", denomID)
+		return types.Collection{}, sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s ", denomID)
 	}
 
-	nfts := k.GetNFTs(ctx, denomID)
-	return types.NewCollection(denom, nfts), nil
+	mts := k.GetMTs(ctx, denomID)
+	return types.NewCollection(denom, mts), nil
 }
 
 // GetPaginateCollection returns the collection by the specified denom ID
-func (k Keeper) GetPaginateCollection(ctx sdk.Context, request *types.QueryCollectionRequest, denomID string) (types.Collection, *query.PageResponse, error) {
-	denom, found := k.GetDenom(ctx, denomID)
-	if !found {
-		return types.Collection{}, nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "denomID %s not existed ", denomID)
-	}
-	var nfts []exported.NFT
-	store := ctx.KVStore(k.storeKey)
-	nftStore := prefix.NewStore(store, types.KeyNFT(denomID, ""))
-	pageRes, err := query.Paginate(nftStore, request.Pagination, func(key []byte, value []byte) error {
-		var baseNFT types.BaseNFT
-		k.cdc.MustUnmarshal(value, &baseNFT)
-		nfts = append(nfts, baseNFT)
-		return nil
-	})
-	if err != nil {
-		return types.Collection{}, nil, status.Errorf(codes.InvalidArgument, "paginate: %v", err)
-	}
-	return types.NewCollection(denom, nfts), pageRes, nil
-}
+//func (k Keeper) GetPaginateCollection(ctx sdk.Context, request *types.QueryCollectionRequest, denomID string) (types.Collection, *query.PageResponse, error) {
+//	denom, found := k.GetDenom(ctx, denomID)
+//	if !found {
+//		return types.Collection{}, nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s ", denomID)
+//	}
+//	var mts []exported.MT
+//	store := ctx.KVStore(k.storeKey)
+//	mtStore := prefix.NewStore(store, types.KeyMT(denomID, ""))
+//	pageRes, err := query.Paginate(mtStore, request.Pagination, func(key []byte, value []byte) error {
+//		var baseMT types.MT
+//		k.cdc.MustUnmarshal(value, &baseMT)
+//		mts = append(mts, baseMT)
+//		return nil
+//	})
+//	if err != nil {
+//		return types.Collection{}, nil, status.Errorf(codes.InvalidArgument, "paginate: %v", err)
+//	}
+//	return types.NewCollection(denom, mts), pageRes, nil
+//}
 
 // GetCollections returns all the collections
 func (k Keeper) GetCollections(ctx sdk.Context) (cs []types.Collection) {
 	for _, denom := range k.GetDenoms(ctx) {
-		nfts := k.GetNFTs(ctx, denom.Id)
-		cs = append(cs, types.NewCollection(denom, nfts))
+		mts := k.GetMTs(ctx, denom.Id)
+		cs = append(cs, types.NewCollection(denom, mts))
 	}
 	return cs
 }
 
-// GetTotalSupply returns the number of NFTs by the specified denom ID
+// GetTotalSupply returns the number of Mts by the specified denom ID
 func (k Keeper) GetTotalSupply(ctx sdk.Context, denomID string) uint64 {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.KeyCollection(denomID))
@@ -83,7 +74,7 @@ func (k Keeper) GetTotalSupply(ctx sdk.Context, denomID string) uint64 {
 	return types.MustUnMarshalSupply(k.cdc, bz)
 }
 
-// GetTotalSupplyOfOwner returns the amount of NFTs by the specified conditions
+// GetTotalSupplyOfOwner returns the amount of Mts by the specified conditions
 func (k Keeper) GetTotalSupplyOfOwner(ctx sdk.Context, id string, owner sdk.AccAddress) (supply uint64) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.KeyOwner(owner, id, ""))

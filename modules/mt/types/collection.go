@@ -1,29 +1,29 @@
 package types
 
 import (
-	"github.com/irisnet/irismod/modules/nft/exported"
+	"github.com/irisnet/irismod/modules/mt/exported"
 )
 
-// NewCollection creates a new NFT Collection
-func NewCollection(denom Denom, nfts []exported.NFT) (c Collection) {
-	c.Denom = denom
-	for _, nft := range nfts {
-		c = c.AddNFT(nft.(BaseNFT))
+// NewCollection creates a new MT Collection
+func NewCollection(denom Denom, mts []exported.MT) (c Collection) {
+	c.Denom = &denom
+	for _, mt := range mts {
+		c = c.AddMT(mt.(MT))
 	}
 	return c
 }
 
-// AddNFT adds an NFT to the collection
-func (c Collection) AddNFT(nft BaseNFT) Collection {
-	c.NFTs = append(c.NFTs, nft)
+// AddMT adds an MT to the collection
+func (c Collection) AddMT(mt MT) Collection {
+	c.Mts = append(c.Mts, mt)
 	return c
 }
 
 func (c Collection) Supply() int {
-	return len(c.NFTs)
+	return len(c.Mts)
 }
 
-// NewCollection creates a new NFT Collection
+// NewCollection creates a new MT Collection
 func NewCollections(c ...Collection) []Collection {
 	return append([]Collection{}, c...)
 }

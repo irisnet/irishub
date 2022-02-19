@@ -1,12 +1,12 @@
 package types
 
-// NFT module event types
+// MT module event types
 var (
 	EventTypeIssueDenom    = "issue_denom"
-	EventTypeTransfer      = "transfer_nft"
-	EventTypeEditNFT       = "edit_nft"
-	EventTypeMintNFT       = "mint_nft"
-	EventTypeBurnNFT       = "burn_nft"
+	EventTypeTransfer      = "transfer_mt"
+	EventTypeEditMT       = "edit_mt"
+	EventTypeMintMT       = "mint_mt"
+	EventTypeBurnMT       = "burn_mt"
 	EventTypeTransferDenom = "transfer_denom"
 
 	AttributeValueCategory = ModuleName

@@ -49,10 +49,10 @@ func ValidateDenomID(denomID string) error {
 // ValidateTokenID verify that the tokenID is legal
 func ValidateTokenID(tokenID string) error {
 	if len(tokenID) < MinDenomLen || len(tokenID) > MaxDenomLen {
-		return sdkerrors.Wrapf(ErrInvalidTokenID, "the length of nft id(%s) only accepts value [%d, %d]", tokenID, MinDenomLen, MaxDenomLen)
+		return sdkerrors.Wrapf(ErrInvalidTokenID, "the length of mt id(%s) only accepts value [%d, %d]", tokenID, MinDenomLen, MaxDenomLen)
 	}
 	if !IsBeginWithAlpha(tokenID) || !IsAlphaNumeric(tokenID) {
-		return sdkerrors.Wrapf(ErrInvalidTokenID, "nft id(%s) only accepts alphanumeric characters, and begin with an english letter", tokenID)
+		return sdkerrors.Wrapf(ErrInvalidTokenID, "mt id(%s) only accepts alphanumeric characters, and begin with an english letter", tokenID)
 	}
 	return nil
 }
@@ -60,7 +60,7 @@ func ValidateTokenID(tokenID string) error {
 // ValidateTokenURI verify that the tokenURI is legal
 func ValidateTokenURI(tokenURI string) error {
 	if len(tokenURI) > MaxTokenURILen {
-		return sdkerrors.Wrapf(ErrInvalidTokenURI, "the length of nft uri(%s) only accepts value [0, %d]", tokenURI, MaxTokenURILen)
+		return sdkerrors.Wrapf(ErrInvalidTokenURI, "the length of mt uri(%s) only accepts value [0, %d]", tokenURI, MaxTokenURILen)
 	}
 	return nil
 }

@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 
-	"github.com/irisnet/irismod/modules/nft/exported"
+	"github.com/irisnet/irismod/modules/mt/exported"
 )
 
 var (
@@ -27,31 +27,31 @@ func init() {
 
 // RegisterLegacyAminoCodec concrete types on codec
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgIssueDenom{}, "irismod/nft/MsgIssueDenom", nil)
-	cdc.RegisterConcrete(&MsgTransferNFT{}, "irismod/nft/MsgTransferNFT", nil)
-	cdc.RegisterConcrete(&MsgEditNFT{}, "irismod/nft/MsgEditNFT", nil)
-	cdc.RegisterConcrete(&MsgMintNFT{}, "irismod/nft/MsgMintNFT", nil)
-	cdc.RegisterConcrete(&MsgBurnNFT{}, "irismod/nft/MsgBurnNFT", nil)
-	cdc.RegisterConcrete(&MsgTransferDenom{}, "irismod/nft/MsgTransferDenom", nil)
+	cdc.RegisterConcrete(&MsgIssueDenom{}, "irismod/mt/MsgIssueDenom", nil)
+	cdc.RegisterConcrete(&MsgTransferMT{}, "irismod/mt/MsgTransferMT", nil)
+	cdc.RegisterConcrete(&MsgEditMT{}, "irismod/mt/MsgEditMT", nil)
+	cdc.RegisterConcrete(&MsgMintMT{}, "irismod/mt/MsgMintMT", nil)
+	cdc.RegisterConcrete(&MsgBurnMT{}, "irismod/mt/MsgBurnMT", nil)
+	cdc.RegisterConcrete(&MsgTransferDenom{}, "irismod/mt/MsgTransferDenom", nil)
 
-	cdc.RegisterInterface((*exported.NFT)(nil), nil)
-	cdc.RegisterConcrete(&BaseNFT{}, "irismod/nft/BaseNFT", nil)
+	cdc.RegisterInterface((*exported.MT)(nil), nil)
+	cdc.RegisterConcrete(&MT{}, "irismod/mt/MT", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),
 		&MsgIssueDenom{},
-		&MsgTransferNFT{},
-		&MsgEditNFT{},
-		&MsgMintNFT{},
-		&MsgBurnNFT{},
+		&MsgTransferMT{},
+		&MsgEditMT{},
+		&MsgMintMT{},
+		&MsgBurnMT{},
 		&MsgTransferDenom{},
 	)
 
 	registry.RegisterImplementations(
-		(*exported.NFT)(nil),
-		&BaseNFT{},
+		(*exported.MT)(nil),
+		&MT{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

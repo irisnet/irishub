@@ -1,20 +1,20 @@
-package nft
+package mt
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/nft/keeper"
-	"github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/mt/keeper"
+	"github.com/irisnet/irismod/modules/mt/types"
 )
 
-// InitGenesis stores the NFT genesis.
+// InitGenesis stores the MT genesis.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	if err := types.ValidateGenesis(data); err != nil {
 		panic(err.Error())
 	}
 
 	for _, c := range data.Collections {
-		if err := k.SetDenom(ctx, c.Denom); err != nil {
+		if err := k.SetDenom(ctx, *c.Denom); err != nil {
 			panic(err)
 		}
 		if err := k.SetCollection(ctx, c); err != nil {
