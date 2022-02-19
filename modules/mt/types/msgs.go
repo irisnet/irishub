@@ -160,14 +160,12 @@ func (msg MsgEditMT) GetSigners() []sdk.AccAddress {
 
 // NewMsgMintMT is a constructor function for MsgMintMT
 func NewMsgMintMT(
-	tokenID, denomID, tokenName, tokenURI, tokenURIHash, tokenData, sender, recipient string,
+	tokenID, denomID string, amount uint64, tokenData []byte, sender, recipient string,
 ) *MsgMintMT {
 	return &MsgMintMT{
 		Id:        tokenID,
 		DenomId:   denomID,
-		Name:      tokenName,
-		URI:       tokenURI,
-		UriHash:   tokenURIHash,
+		Amount: amount,
 		Data:      tokenData,
 		Sender:    sender,
 		Recipient: recipient,
@@ -216,11 +214,12 @@ func (msg MsgMintMT) GetSigners() []sdk.AccAddress {
 }
 
 // NewMsgBurnMT is a constructor function for MsgBurnMT
-func NewMsgBurnMT(sender, tokenID, denomID string) *MsgBurnMT {
+func NewMsgBurnMT(sender, tokenID, denomID string, amount uint64) *MsgBurnMT {
 	return &MsgBurnMT{
 		Sender:  sender,
 		Id:      tokenID,
 		DenomId: denomID,
+		Amount: amount,
 	}
 }
 

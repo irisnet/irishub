@@ -39,19 +39,17 @@ func RandomizedGenState(simState *module.SimulationState) {
 		if simState.Rand.Intn(100) < 10 {
 			baseMT := types.NewMT(
 				RandnMTID(simState.Rand, types.MinDenomLen, types.MaxDenomLen), // id
-				simtypes.RandStringOfLength(simState.Rand, 10),
+				10,
 				acc.Address,
-				simtypes.RandStringOfLength(simState.Rand, 45), // tokenURI
-				simtypes.RandStringOfLength(simState.Rand, 32), // tokenURIHash
-				simtypes.RandStringOfLength(simState.Rand, 10),
+				[]byte("test"), // TODO refactor
 			)
 
 			// 50% doggos and 50% kitties
 			if simState.Rand.Intn(100) < 50 {
-				collections[0].Denom.Creator = baseMT.Owner
+				collections[0].Denom.Owner = baseMT.Owner
 				collections[0] = collections[0].AddMT(baseMT)
 			} else {
-				collections[1].Denom.Creator = baseMT.Owner
+				collections[1].Denom.Owner = baseMT.Owner
 				collections[1] = collections[1].AddMT(baseMT)
 			}
 		}

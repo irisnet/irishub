@@ -6,7 +6,7 @@ import (
 
 // NewCollection creates a new MT Collection
 func NewCollection(denom Denom, mts []exported.MT) (c Collection) {
-	c.Denom = denom
+	c.Denom = &denom
 	for _, mt := range mts {
 		c = c.AddMT(mt.(MT))
 	}

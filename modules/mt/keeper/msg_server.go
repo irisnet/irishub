@@ -72,19 +72,16 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to mint MT of denom %s", sender, msg.DenomId)
 	}
 
-	if err := m.Keeper.MintMT(ctx, msg.DenomId, msg.Id, msg.
-		msg.Data,
-		recipient,
-	); err != nil {
+	if err := m.Keeper.MintMT(ctx, msg.DenomId, msg.Id, msg.Amount, msg.Data, recipient); err != nil {
 		return nil, err
 	}
 
+	// TODO update events
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeMintMT,
 			sdk.NewAttribute(types.AttributeKeyTokenID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
-			sdk.NewAttribute(types.AttributeKeyTokenURI, msg.URI),
 			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
 		),
 		sdk.NewEvent(
@@ -104,13 +101,7 @@ func (m msgServer) EditMT(goCtx context.Context, msg *types.MsgEditMT) (*types.M
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.EditMT(ctx, msg.DenomId, msg.Id,
-		msg.Name,
-		msg.URI,
-		msg.UriHash,
-		msg.Data,
-		sender,
-	); err != nil {
+	if err := m.Keeper.EditMT(ctx, msg.DenomId, msg.Id, msg.Data, sender); err != nil {
 		return nil, err
 	}
 
@@ -119,7 +110,6 @@ func (m msgServer) EditMT(goCtx context.Context, msg *types.MsgEditMT) (*types.M
 			types.EventTypeEditMT,
 			sdk.NewAttribute(types.AttributeKeyTokenID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
-			sdk.NewAttribute(types.AttributeKeyTokenURI, msg.URI),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Sender),
 		),
 		sdk.NewEvent(
@@ -145,10 +135,6 @@ func (m msgServer) TransferMT(goCtx context.Context, msg *types.MsgTransferMT) (
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if err := m.Keeper.TransferOwner(ctx, msg.DenomId, msg.Id,
-		msg.Name,
-		msg.URI,
-		msg.UriHash,
-		msg.Data,
 		sender,
 		recipient,
 	); err != nil {

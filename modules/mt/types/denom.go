@@ -11,7 +11,7 @@ func NewDenom(
 	return Denom{
 		Id:      id,
 		Name:    name,
-		Creator: creator.String(),
+		Owner: 	 creator.String(),
 		Data:    data,
 	}
 }

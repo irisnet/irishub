@@ -71,22 +71,21 @@ func (k Keeper) MintMT(
 
 // EditMT updates an existing MT
 func (k Keeper) EditMT(
-	ctx sdk.Context, denomID, tokenID, tokenNm,
-	tokenURI, tokenURIHash, tokenData string, owner sdk.AccAddress,
+	ctx sdk.Context, denomID, tokenID string, tokenData []byte, owner sdk.AccAddress,
 ) error {
 	_, found := k.GetDenom(ctx, denomID)
 	if !found {
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
 	}
 
-	// just the owner of MT can edit
+	// TODO only the owner of Denom can edit
 	mt, err := k.Authorize(ctx, denomID, tokenID, owner)
 	if err != nil {
 		return err
 	}
 
-	if types.Modified(tokenData) {
-		mt.Data = []byte(tokenData)
+	if types.Modified(string(tokenData)) {
+		mt.Data = tokenData
 	}
 
 	k.setMT(ctx, denomID, mt)

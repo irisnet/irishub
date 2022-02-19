@@ -19,16 +19,12 @@ func ValidateGenesis(data GenesisState) error {
 			return err
 		}
 
-		for _, mt := range c.MTs {
+		for _, mt := range c.Mts {
 			if mt.GetOwner().Empty() {
 				return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing owner")
 			}
 
 			if err := ValidateTokenID(mt.GetID()); err != nil {
-				return err
-			}
-
-			if err := ValidateTokenURI(mt.GetURI()); err != nil {
 				return err
 			}
 		}

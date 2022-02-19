@@ -123,10 +123,6 @@ func SimulateMsgTransferMT(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 		msg := types.NewMsgTransferMT(
 			mtID,
 			denom,
-			"",
-			"",
-			"",
-			simtypes.RandStringOfLength(r, 10), // tokenData
 			ownerAddr.String(),                 // sender
 			recipientAccount.Address.String(),  // recipient
 		)
@@ -183,9 +179,6 @@ func SimulateMsgEditMT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 		msg := types.NewMsgEditMT(
 			mtID,
 			denom,
-			"",
-			simtypes.RandStringOfLength(r, 45), // tokenURI
-			simtypes.RandStringOfLength(r, 32), // tokenURI
 			simtypes.RandStringOfLength(r, 10), // tokenData
 			ownerAddr.String(),
 		)
@@ -236,13 +229,12 @@ func SimulateMsgMintMT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 		randomSender, _ := simtypes.RandomAcc(r, accs)
 		randomRecipient, _ := simtypes.RandomAcc(r, accs)
 
+		// TODO refactor
 		msg := types.NewMsgMintMT(
 			RandnMTID(r, types.MinDenomLen, types.MaxDenomLen), // mt ID
 			getRandomDenom(ctx, k, r),                           // denom
-			"",
-			simtypes.RandStringOfLength(r, 45), // tokenURI
-			simtypes.RandStringOfLength(r, 32), // uriHash
-			simtypes.RandStringOfLength(r, 10), // tokenData
+			1,
+			[]byte(simtypes.RandStringOfLength(r, 10)), // tokenData
 			randomSender.Address.String(),      // sender
 			randomRecipient.Address.String(),   // recipient
 		)
@@ -296,7 +288,8 @@ func SimulateMsgBurnMT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeBurnMT, err.Error()), nil, err
 		}
 
-		msg := types.NewMsgBurnMT(ownerAddr.String(), mtID, denom)
+		// TODO
+		msg := types.NewMsgBurnMT(ownerAddr.String(), mtID, denom, 1)
 
 		account := ak.GetAccount(ctx, ownerAddr)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
@@ -348,7 +341,7 @@ func SimulateMsgTransferDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferDenom, err.Error()), nil, err
 		}
 
-		creator, err := sdk.AccAddressFromBech32(denom.Creator)
+		creator, err := sdk.AccAddressFromBech32(denom.Owner)
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferDenom, err.Error()), nil, err
 		}
@@ -361,7 +354,7 @@ func SimulateMsgTransferDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.
 		recipient, _ := simtypes.RandomAcc(r, accs)
 		msg := types.NewMsgTransferDenom(
 			denomId,
-			denom.Creator,
+			denom.Owner,
 			recipient.Address.String(),
 		)
 
@@ -404,13 +397,7 @@ func SimulateMsgIssueDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 
 		denomId := strings.ToLower(simtypes.RandStringOfLength(r, 10))
 		denomName := strings.ToLower(simtypes.RandStringOfLength(r, 10))
-		symbol := simtypes.RandStringOfLength(r, 5)
 		sender, _ := simtypes.RandomAcc(r, accs)
-		mintRestricted := genRandomBool(r)
-		updateRestricted := genRandomBool(r)
-		description := simtypes.RandStringOfLength(r, 10)
-		uri := simtypes.RandStringOfLength(r, 10)
-		uriHash := simtypes.RandStringOfLength(r, 32)
 		data := simtypes.RandStringOfLength(r, 20)
 
 		if err := types.ValidateDenomID(denomId); err != nil {
@@ -425,13 +412,7 @@ func SimulateMsgIssueDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 		msg := types.NewMsgIssueDenom(
 			denomId,
 			denomName,
-			"Schema",
-			sender.Address.String(),
-			symbol,
-			mintRestricted,
-			updateRestricted,
-			description,
-			uri, uriHash, data,
+			[]byte(data),
 		)
 		account := ak.GetAccount(ctx, sender.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
@@ -464,38 +445,40 @@ func SimulateMsgIssueDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 }
 
 func getRandomMTFromOwner(ctx sdk.Context, k keeper.Keeper, r *rand.Rand) (address sdk.AccAddress, denomID, tokenID string) {
-	owners := k.GetOwners(ctx)
-
-	ownersLen := len(owners)
-	if ownersLen == 0 {
-		return nil, "", ""
-	}
-
-	// get random owner
-	i := r.Intn(ownersLen)
-	owner := owners[i]
-
-	idCollectionsLen := len(owner.IDCollections)
-	if idCollectionsLen == 0 {
-		return nil, "", ""
-	}
-
-	// get random collection from owner's balance
-	i = r.Intn(idCollectionsLen)
-	idCollection := owner.IDCollections[i] // mts IDs
-	denomID = idCollection.DenomId
-
-	idsLen := len(idCollection.TokenIds)
-	if idsLen == 0 {
-		return nil, "", ""
-	}
-
-	// get random mt from collection
-	i = r.Intn(idsLen)
-	tokenID = idCollection.TokenIds[i]
-
-	ownerAddress, _ := sdk.AccAddressFromBech32(owner.Address)
-	return ownerAddress, denomID, tokenID
+	//owners := k.GetOwners(ctx)
+	//
+	//ownersLen := len(owners)
+	//if ownersLen == 0 {
+	//	return nil, "", ""
+	//}
+	//
+	//// get random owner
+	//i := r.Intn(ownersLen)
+	//owner := owners[i]
+	//
+	//idCollectionsLen := len(owner.IDCollections)
+	//if idCollectionsLen == 0 {
+	//	return nil, "", ""
+	//}
+	//
+	//// get random collection from owner's balance
+	//i = r.Intn(idCollectionsLen)
+	//idCollection := owner.IDCollections[i] // mts IDs
+	//denomID = idCollection.DenomId
+	//
+	//idsLen := len(idCollection.TokenIds)
+	//if idsLen == 0 {
+	//	return nil, "", ""
+	//}
+	//
+	//// get random mt from collection
+	//i = r.Intn(idsLen)
+	//tokenID = idCollection.TokenIds[i]
+	//
+	//ownerAddress, _ := sdk.AccAddressFromBech32(owner.Address)
+	//return ownerAddress, denomID, tokenID
+	//TODO
+	return nil, "", ""
 }
 
 func getRandomDenom(ctx sdk.Context, k keeper.Keeper, r *rand.Rand) string {
