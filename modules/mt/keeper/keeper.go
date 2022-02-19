@@ -35,14 +35,16 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 // IssueDenom issues a denom according to the given params
 func (k Keeper) IssueDenom(ctx sdk.Context,
 	name string, sednder sdk.AccAddress, data []byte,
-) error {
+) (types.Denom, error) {
 
-	return k.SetDenom(ctx, types.Denom{
+	denom := types.Denom{
 		Id:    k.genDenomID(ctx),
 		Name:  name,
 		Owner: sednder.String(),
 		Data:  data,
-	})
+	}
+
+	return denom, k.SetDenom(ctx, denom)
 }
 
 // MintMT mints an MT and manages the MT's existence within Collections and Owners

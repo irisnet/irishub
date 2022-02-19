@@ -29,14 +29,15 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.IssueDenom(ctx, msg.Id, msg.Name, sender, msg.Data); err != nil {
+	denom, err := m.Keeper.IssueDenom(ctx, msg.Name, sender, msg.Data)
+	if err != nil {
 		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeIssueDenom,
-			sdk.NewAttribute(types.AttributeKeyDenomID, msg.Id),
+			sdk.NewAttribute(types.AttributeKeyDenomID, denom.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomName, msg.Name),
 			sdk.NewAttribute(types.AttributeKeyCreator, msg.Sender),
 		),
