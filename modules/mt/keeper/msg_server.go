@@ -29,10 +29,7 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.IssueDenom(ctx, msg.Id, msg.Name, msg.Schema, msg.Symbol, sender,
-		msg.MintRestricted, msg.UpdateRestricted,
-		msg.Description, msg.Uri, msg.UriHash, msg.Data,
-	); err != nil {
+	if err := m.Keeper.IssueDenom(ctx, msg.Id, msg.Name, sender, msg.Data); err != nil {
 		return nil, err
 	}
 
@@ -68,17 +65,14 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 
 	denom, found := m.Keeper.GetDenom(ctx, msg.DenomId)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", msg.DenomId)
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s ", msg.DenomId)
 	}
 
-	if denom.MintRestricted && denom.Creator != sender.String() {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to mint MT of denom %s", denom.Creator, msg.DenomId)
+	if denom.Owner != sender.String() {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to mint MT of denom %s", sender, msg.DenomId)
 	}
 
-	if err := m.Keeper.MintMT(ctx, msg.DenomId, msg.Id,
-		msg.Name,
-		msg.URI,
-		msg.UriHash,
+	if err := m.Keeper.MintMT(ctx, msg.DenomId, msg.Id, msg
 		msg.Data,
 		recipient,
 	); err != nil {

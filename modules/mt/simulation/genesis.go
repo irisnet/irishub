@@ -24,9 +24,6 @@ func RandomizedGenState(simState *module.SimulationState) {
 			types.Denom{
 				Id:      doggos,
 				Name:    doggos,
-				Schema:  "",
-				Creator: "",
-				Symbol:  "dog",
 			},
 			types.MTs{},
 		),
@@ -34,9 +31,6 @@ func RandomizedGenState(simState *module.SimulationState) {
 			types.Denom{
 				Id:      kitties,
 				Name:    kitties,
-				Schema:  "",
-				Creator: "",
-				Symbol:  "kit",
 			},
 			types.MTs{}),
 	)

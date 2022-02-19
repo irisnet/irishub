@@ -34,7 +34,7 @@ func (k Keeper) SetCollection(ctx sdk.Context, collection types.Collection) erro
 func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection, error) {
 	denom, found := k.GetDenom(ctx, denomID)
 	if !found {
-		return types.Collection{}, sdkerrors.Wrapf(types.ErrInvalidDenom, "denomID %s not existed ", denomID)
+		return types.Collection{}, sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s ", denomID)
 	}
 
 	mts := k.GetMTs(ctx, denomID)
@@ -45,7 +45,7 @@ func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection
 func (k Keeper) GetPaginateCollection(ctx sdk.Context, request *types.QueryCollectionRequest, denomID string) (types.Collection, *query.PageResponse, error) {
 	denom, found := k.GetDenom(ctx, denomID)
 	if !found {
-		return types.Collection{}, nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "denomID %s not existed ", denomID)
+		return types.Collection{}, nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s ", denomID)
 	}
 	var mts []exported.MT
 	store := ctx.KVStore(k.storeKey)

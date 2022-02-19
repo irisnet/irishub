@@ -105,14 +105,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	denomItem := respType.(*mttypes.Denom)
 	s.Require().Equal(denomName, denomItem.Name)
-	s.Require().Equal(schema, denomItem.Schema)
-	s.Require().Equal(symbol, denomItem.Symbol)
-	s.Require().Equal(uri, denomItem.Uri)
-	s.Require().Equal(uriHash, denomItem.UriHash)
-	s.Require().Equal(description, denomItem.Description)
 	s.Require().Equal(data, denomItem.Data)
-	s.Require().Equal(mintRestricted, denomItem.MintRestricted)
-	s.Require().Equal(updateRestricted, denomItem.UpdateRestricted)
 
 	//------test GetCmdQueryDenoms()-------------
 	respType = proto.Message(&mttypes.QueryDenomsResponse{})
@@ -159,29 +152,8 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	mtItem := respType.(*mttypes.MT)
 	s.Require().Equal(tokenID, mtItem.Id)
-	s.Require().Equal(tokenName, mtItem.Name)
-	s.Require().Equal(uri, mtItem.URI)
-	s.Require().Equal(uriHash, mtItem.UriHash)
 	s.Require().Equal(data, mtItem.Data)
 	s.Require().Equal(from.String(), mtItem.Owner)
-
-	//------test GetCmdQueryOwner()-------------
-	respType = proto.Message(&mttypes.QueryOwnerResponse{})
-	bz, err = mttestutil.QueryOwnerExec(val.ClientCtx, from.String())
-	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	ownerResp := respType.(*mttypes.QueryOwnerResponse)
-	s.Require().Equal(from.String(), ownerResp.Owner.Address)
-	s.Require().Equal(denom, ownerResp.Owner.IDCollections[0].DenomId)
-	s.Require().Equal(tokenID, ownerResp.Owner.IDCollections[0].TokenIds[0])
-
-	//------test GetCmdQueryCollection()-------------
-	respType = proto.Message(&mttypes.QueryCollectionResponse{})
-	bz, err = mttestutil.QueryCollectionExec(val.ClientCtx, denomID)
-	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	collectionItem := respType.(*mttypes.QueryCollectionResponse)
-	s.Require().Equal(1, len(collectionItem.Collection.MTs))
 
 	//------test GetCmdEditMT()-------------
 	newTokenDate := "newdata"
@@ -212,9 +184,6 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	newNftItem := respType.(*mttypes.MT)
-	s.Require().Equal(newTokenName, newNftItem.Name)
-	s.Require().Equal(newTokenURI, newNftItem.URI)
-	s.Require().Equal(newTokenURIHash, newNftItem.UriHash)
 	s.Require().Equal(newTokenDate, newNftItem.Data)
 
 	//------test GetCmdTransferMT()-------------
@@ -245,9 +214,6 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	mtItem = respType.(*mttypes.MT)
 	s.Require().Equal(tokenID, mtItem.Id)
-	s.Require().Equal(tokenName, mtItem.Name)
-	s.Require().Equal(uri, mtItem.URI)
-	s.Require().Equal(uriHash, mtItem.UriHash)
 	s.Require().Equal(data, mtItem.Data)
 	s.Require().Equal(recipient.String(), mtItem.Owner)
 
@@ -318,10 +284,6 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	denomItem2 := respType.(*mttypes.Denom)
-	s.Require().Equal(val2.Address.String(), denomItem2.Creator)
+	s.Require().Equal(val2.Address.String(), denomItem2.Owner)
 	s.Require().Equal(denomName, denomItem2.Name)
-	s.Require().Equal(schema, denomItem2.Schema)
-	s.Require().Equal(symbol, denomItem2.Symbol)
-	s.Require().Equal(mintRestricted, denomItem2.MintRestricted)
-	s.Require().Equal(updateRestricted, denomItem2.UpdateRestricted)
 }

@@ -34,12 +34,12 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 // IssueDenom issues a denom according to the given params
 func (k Keeper) IssueDenom(ctx sdk.Context,
-	id, name string, creator sdk.AccAddress, data []byte,
+	id, name string, sednder sdk.AccAddress, data []byte,
 ) error {
 	return k.SetDenom(ctx, types.Denom{
 		Id:               id,
 		Name:             name,
-		Creator:          creator.String(),
+		Owner:            sednder.String(),
 		Data:             data,
 	})
 }
@@ -143,11 +143,11 @@ func (k Keeper) TransferDenomOwner(
 	}
 
 	// authorize
-	if srcOwner.String() != denom.Creator {
+	if srcOwner.String() != denom.Owner {
 		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to transfer denom %s", srcOwner.String(), denomID)
 	}
 
-	denom.Creator = dstOwner.String()
+	denom.Owner = dstOwner.String()
 
 	err := k.UpdateDenom(ctx, denom)
 	if err != nil {
