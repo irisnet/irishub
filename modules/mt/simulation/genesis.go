@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/mt/types"
 )
 
 const (
@@ -17,7 +17,7 @@ const (
 	doggos  = "doggos"
 )
 
-// RandomizedGenState generates a random GenesisState for nft
+// RandomizedGenState generates a random GenesisState for mt
 func RandomizedGenState(simState *module.SimulationState) {
 	collections := types.NewCollections(
 		types.NewCollection(
@@ -28,7 +28,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 				Creator: "",
 				Symbol:  "dog",
 			},
-			types.NFTs{},
+			types.MTs{},
 		),
 		types.NewCollection(
 			types.Denom{
@@ -38,13 +38,13 @@ func RandomizedGenState(simState *module.SimulationState) {
 				Creator: "",
 				Symbol:  "kit",
 			},
-			types.NFTs{}),
+			types.MTs{}),
 	)
 	for _, acc := range simState.Accounts {
-		// 10% of accounts own an NFT
+		// 10% of accounts own an MT
 		if simState.Rand.Intn(100) < 10 {
-			baseNFT := types.NewBaseNFT(
-				RandnNFTID(simState.Rand, types.MinDenomLen, types.MaxDenomLen), // id
+			baseMT := types.NewMT(
+				RandnMTID(simState.Rand, types.MinDenomLen, types.MaxDenomLen), // id
 				simtypes.RandStringOfLength(simState.Rand, 10),
 				acc.Address,
 				simtypes.RandStringOfLength(simState.Rand, 45), // tokenURI
@@ -54,27 +54,27 @@ func RandomizedGenState(simState *module.SimulationState) {
 
 			// 50% doggos and 50% kitties
 			if simState.Rand.Intn(100) < 50 {
-				collections[0].Denom.Creator = baseNFT.Owner
-				collections[0] = collections[0].AddNFT(baseNFT)
+				collections[0].Denom.Creator = baseMT.Owner
+				collections[0] = collections[0].AddMT(baseMT)
 			} else {
-				collections[1].Denom.Creator = baseNFT.Owner
-				collections[1] = collections[1].AddNFT(baseNFT)
+				collections[1].Denom.Creator = baseMT.Owner
+				collections[1] = collections[1].AddMT(baseMT)
 			}
 		}
 	}
 
-	nftGenesis := types.NewGenesisState(collections)
+	mtGenesis := types.NewGenesisState(collections)
 
-	bz, err := json.MarshalIndent(nftGenesis, "", " ")
+	bz, err := json.MarshalIndent(mtGenesis, "", " ")
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Selected randomly generated %s parameters:\n%s\n", types.ModuleName, bz)
 
-	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(nftGenesis)
+	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(mtGenesis)
 }
 
-func RandnNFTID(r *rand.Rand, min, max int) string {
+func RandnMTID(r *rand.Rand, min, max int) string {
 	n := simtypes.RandIntBetween(r, min, max)
 	id := simtypes.RandStringOfLength(r, n)
 	return strings.ToLower(id)

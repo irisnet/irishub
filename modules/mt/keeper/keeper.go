@@ -10,7 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/mt/types"
 )
 
 // Keeper maintains the link to data storage and exposes getter/setter methods for the various parts of the state machine
@@ -19,7 +19,7 @@ type Keeper struct {
 	cdc      codec.Codec
 }
 
-// NewKeeper creates a new instance of the NFT Keeper
+// NewKeeper creates a new instance of the MT Keeper
 func NewKeeper(cdc codec.Codec, storeKey storetypes.StoreKey) Keeper {
 	return Keeper{
 		storeKey: storeKey,
@@ -34,44 +34,31 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 // IssueDenom issues a denom according to the given params
 func (k Keeper) IssueDenom(ctx sdk.Context,
-	id, name, schema, symbol string,
-	creator sdk.AccAddress,
-	mintRestricted, updateRestricted bool,
-	description, uri, uriHash, data string,
+	id, name string, creator sdk.AccAddress, data []byte,
 ) error {
 	return k.SetDenom(ctx, types.Denom{
 		Id:               id,
 		Name:             name,
-		Schema:           schema,
 		Creator:          creator.String(),
-		Symbol:           symbol,
-		MintRestricted:   mintRestricted,
-		UpdateRestricted: updateRestricted,
-		Description:      description,
-		Uri:              uri,
-		UriHash:          uriHash,
 		Data:             data,
 	})
 }
 
-// MintNFT mints an NFT and manages the NFT's existence within Collections and Owners
-func (k Keeper) MintNFT(
-	ctx sdk.Context, denomID, tokenID, tokenNm,
-	tokenURI, uriHash, tokenData string, owner sdk.AccAddress,
+// MintMT mints an MT and manages the MT's existence within Collections and Owners
+func (k Keeper) MintMT(
+	ctx sdk.Context, denomID, tokenID string, supply uint64, data []byte, owner sdk.AccAddress,
 ) error {
-	if k.HasNFT(ctx, denomID, tokenID) {
-		return sdkerrors.Wrapf(types.ErrNFTAlreadyExists, "NFT %s already exists in collection %s", tokenID, denomID)
+	if k.HasMT(ctx, denomID, tokenID) {
+		return sdkerrors.Wrapf(types.ErrMTAlreadyExists, "MT %s already exists in collection %s", tokenID, denomID)
 	}
 
-	k.setNFT(
+	k.setMT(
 		ctx, denomID,
-		types.NewBaseNFT(
+		types.NewMT(
 			tokenID,
-			tokenNm,
+			supply,
 			owner,
-			tokenURI,
-			uriHash,
-			tokenData,
+			data,
 		),
 	)
 	k.setOwner(ctx, denomID, tokenID, owner)
@@ -80,99 +67,66 @@ func (k Keeper) MintNFT(
 	return nil
 }
 
-// EditNFT updates an already existing NFT
-func (k Keeper) EditNFT(
+// EditMT updates an existing MT
+func (k Keeper) EditMT(
 	ctx sdk.Context, denomID, tokenID, tokenNm,
 	tokenURI, tokenURIHash, tokenData string, owner sdk.AccAddress,
 ) error {
-	denom, found := k.GetDenom(ctx, denomID)
+	_, found := k.GetDenom(ctx, denomID)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", denomID)
+		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
 	}
 
-	if denom.UpdateRestricted {
-		// if true , nobody can update the NFT under this denom
-		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "nobody can update the NFT under this denom %s", denom.Id)
-	}
-
-	// just the owner of NFT can edit
-	nft, err := k.Authorize(ctx, denomID, tokenID, owner)
+	// just the owner of MT can edit
+	mt, err := k.Authorize(ctx, denomID, tokenID, owner)
 	if err != nil {
 		return err
 	}
 
-	if types.Modified(tokenNm) {
-		nft.Name = tokenNm
-	}
-
-	if types.Modified(tokenURI) {
-		nft.URI = tokenURI
-	}
-
-	if types.Modified(tokenURIHash) {
-		nft.UriHash = tokenURIHash
-	}
-
 	if types.Modified(tokenData) {
-		nft.Data = tokenData
+		mt.Data = []byte(tokenData)
 	}
 
-	k.setNFT(ctx, denomID, nft)
+	k.setMT(ctx, denomID, mt)
 
 	return nil
 }
 
-// TransferOwner transfers the ownership of the given NFT to the new owner
+// TODO add amount
+// TransferOwner transfers the ownership of the given MT to the new owner
 func (k Keeper) TransferOwner(
-	ctx sdk.Context, denomID, tokenID, tokenNm, tokenURI, tokenURIHash,
-	tokenData string, srcOwner, dstOwner sdk.AccAddress,
+	ctx sdk.Context, denomID, tokenID string, srcOwner, dstOwner sdk.AccAddress,
 ) error {
-	denom, found := k.GetDenom(ctx, denomID)
+	_, found := k.GetDenom(ctx, denomID)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", denomID)
+		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
 	}
 
-	nft, err := k.Authorize(ctx, denomID, tokenID, srcOwner)
+	mt, err := k.Authorize(ctx, denomID, tokenID, srcOwner)
 	if err != nil {
 		return err
 	}
 
-	nft.Owner = dstOwner.String()
+	mt.Owner = dstOwner.String()
 
-	if denom.UpdateRestricted && (types.Modified(tokenNm) || types.Modified(tokenURI) || types.Modified(tokenData)) {
-		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "It is restricted to update NFT under this denom %s", denom.Id)
-	}
-
-	if types.Modified(tokenNm) {
-		nft.Name = tokenNm
-	}
-	if types.Modified(tokenURI) {
-		nft.URI = tokenURI
-	}
-	if types.Modified(tokenURIHash) {
-		nft.UriHash = tokenURIHash
-	}
-	if types.Modified(tokenData) {
-		nft.Data = tokenData
-	}
-
-	k.setNFT(ctx, denomID, nft)
+	k.setMT(ctx, denomID, mt)
 	k.swapOwner(ctx, denomID, tokenID, srcOwner, dstOwner)
 	return nil
 }
 
-// BurnNFT deletes a specified NFT
-func (k Keeper) BurnNFT(ctx sdk.Context, denomID, tokenID string, owner sdk.AccAddress) error {
+// TODO add amount
+// BurnMT deletes a specified MT
+func (k Keeper) BurnMT(ctx sdk.Context, denomID, tokenID string, owner sdk.AccAddress) error {
 	if !k.HasDenomID(ctx, denomID) {
-		return sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", denomID)
+		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
 	}
 
-	nft, err := k.Authorize(ctx, denomID, tokenID, owner)
+	mt, err := k.Authorize(ctx, denomID, tokenID, owner)
 	if err != nil {
 		return err
 	}
 
-	k.deleteNFT(ctx, denomID, nft)
+	k.deleteMT(ctx, denomID, mt)
 	k.deleteOwner(ctx, denomID, tokenID, owner)
 	k.decreaseSupply(ctx, denomID)
 
@@ -185,7 +139,7 @@ func (k Keeper) TransferDenomOwner(
 ) error {
 	denom, found := k.GetDenom(ctx, denomID)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", denomID)
+		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
 	}
 
 	// authorize

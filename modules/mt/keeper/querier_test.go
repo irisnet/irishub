@@ -5,9 +5,9 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/irisnet/irismod/modules/nft/exported"
-	keep "github.com/irisnet/irismod/modules/nft/keeper"
-	"github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/mt/exported"
+	keep "github.com/irisnet/irismod/modules/mt/keeper"
+	"github.com/irisnet/irismod/modules/mt/types"
 )
 
 func (suite *KeeperSuite) TestNewQuerier() {
@@ -21,8 +21,8 @@ func (suite *KeeperSuite) TestNewQuerier() {
 }
 
 func (suite *KeeperSuite) TestQuerySupply() {
-	// MintNFT shouldn't fail when collection does not exist
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
+	// MintMT shouldn't fail when collection does not exist
+	err := suite.keeper.MintMT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
@@ -32,7 +32,7 @@ func (suite *KeeperSuite) TestQuerySupply() {
 		Data: []byte{},
 	}
 
-	query.Path = "/custom/nft/supply"
+	query.Path = "/custom/mt/supply"
 	query.Data = []byte("?")
 
 	res, err := querier(suite.ctx, []string{"supply"}, query)
@@ -62,8 +62,8 @@ func (suite *KeeperSuite) TestQuerySupply() {
 }
 
 func (suite *KeeperSuite) TestQueryCollection() {
-	// MintNFT shouldn't fail when collection does not exist
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
+	// MintMT shouldn't fail when collection does not exist
+	err := suite.keeper.MintMT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
@@ -73,7 +73,7 @@ func (suite *KeeperSuite) TestQueryCollection() {
 		Data: []byte{},
 	}
 
-	query.Path = "/custom/nft/collection"
+	query.Path = "/custom/mt/collection"
 
 	query.Data = []byte("?")
 	res, err := querier(suite.ctx, []string{"collection"}, query)
@@ -99,20 +99,20 @@ func (suite *KeeperSuite) TestQueryCollection() {
 
 	var collection types.Collection
 	types.ModuleCdc.MustUnmarshalJSON(res, &collection)
-	suite.Len(collection.NFTs, 1)
+	suite.Len(collection.MTs, 1)
 }
 
 func (suite *KeeperSuite) TestQueryOwner() {
-	// MintNFT shouldn't fail when collection does not exist
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
+	// MintMT shouldn't fail when collection does not exist
+	err := suite.keeper.MintMT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
-	err = suite.keeper.MintNFT(suite.ctx, denomID2, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
+	err = suite.keeper.MintMT(suite.ctx, denomID2, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
 	query := abci.RequestQuery{
-		Path: "/custom/nft/owner",
+		Path: "/custom/mt/owner",
 		Data: []byte{},
 	}
 
@@ -141,9 +141,9 @@ func (suite *KeeperSuite) TestQueryOwner() {
 	suite.EqualValues(out.String(), owner.String())
 }
 
-func (suite *KeeperSuite) TestQueryNFT() {
-	// MintNFT shouldn't fail when collection does not exist
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
+func (suite *KeeperSuite) TestQueryMT() {
+	// MintMT shouldn't fail when collection does not exist
+	err := suite.keeper.MintMT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
@@ -152,33 +152,33 @@ func (suite *KeeperSuite) TestQueryNFT() {
 		Path: "",
 		Data: []byte{},
 	}
-	query.Path = "/custom/nft/nft"
+	query.Path = "/custom/mt/mt"
 	var res []byte
 
 	query.Data = []byte("?")
-	res, err = querier(suite.ctx, []string{"nft"}, query)
+	res, err = querier(suite.ctx, []string{"mt"}, query)
 	suite.Error(err)
 	suite.Nil(res)
 
-	params := types.NewQueryNFTParams(denomID2, tokenID2)
+	params := types.NewQueryMTParams(denomID2, tokenID2)
 	bz, err2 := suite.legacyAmino.MarshalJSON(params)
 	suite.Nil(err2)
 
 	query.Data = bz
-	res, err = querier(suite.ctx, []string{"nft"}, query)
+	res, err = querier(suite.ctx, []string{"mt"}, query)
 	suite.Error(err)
 	suite.Nil(res)
 
-	params = types.NewQueryNFTParams(denomID, tokenID)
+	params = types.NewQueryMTParams(denomID, tokenID)
 	bz, err2 = suite.legacyAmino.MarshalJSON(params)
 	suite.Nil(err2)
 
 	query.Data = bz
-	res, err = querier(suite.ctx, []string{"nft"}, query)
+	res, err = querier(suite.ctx, []string{"mt"}, query)
 	suite.NoError(err)
 	suite.NotNil(res)
 
-	var out exported.NFT
+	var out exported.MT
 	suite.legacyAmino.MustUnmarshalJSON(res, &out)
 
 	suite.Equal(out.GetID(), tokenID)
@@ -187,11 +187,11 @@ func (suite *KeeperSuite) TestQueryNFT() {
 }
 
 func (suite *KeeperSuite) TestQueryDenoms() {
-	// MintNFT shouldn't fail when collection does not exist
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
+	// MintMT shouldn't fail when collection does not exist
+	err := suite.keeper.MintMT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
-	err = suite.keeper.MintNFT(suite.ctx, denomID2, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
+	err = suite.keeper.MintMT(suite.ctx, denomID2, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
@@ -201,7 +201,7 @@ func (suite *KeeperSuite) TestQueryDenoms() {
 		Data: []byte{},
 	}
 	var res []byte
-	query.Path = "/custom/nft/denoms"
+	query.Path = "/custom/mt/denoms"
 
 	res, err = querier(suite.ctx, []string{"denoms"}, query)
 	suite.NoError(err)

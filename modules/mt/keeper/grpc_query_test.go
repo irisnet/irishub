@@ -3,11 +3,11 @@ package keeper_test
 import (
 	gocontext "context"
 
-	"github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/mt/types"
 )
 
 func (suite *KeeperSuite) TestSupply() {
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
+	err := suite.keeper.MintMT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	response, err := suite.queryClient.Supply(gocontext.Background(), &types.QuerySupplyRequest{
@@ -20,7 +20,7 @@ func (suite *KeeperSuite) TestSupply() {
 }
 
 func (suite *KeeperSuite) TestOwner() {
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
+	err := suite.keeper.MintMT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	response, err := suite.queryClient.Owner(gocontext.Background(), &types.QueryOwnerRequest{
@@ -34,7 +34,7 @@ func (suite *KeeperSuite) TestOwner() {
 }
 
 func (suite *KeeperSuite) TestCollection() {
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
+	err := suite.keeper.MintMT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	response, err := suite.queryClient.Collection(gocontext.Background(), &types.QueryCollectionRequest{
@@ -43,12 +43,12 @@ func (suite *KeeperSuite) TestCollection() {
 
 	suite.NoError(err)
 	suite.NotNil(response.Collection)
-	suite.Len(response.Collection.NFTs, 1)
-	suite.Equal(response.Collection.NFTs[0].Id, tokenID)
+	suite.Len(response.Collection.MTs, 1)
+	suite.Equal(response.Collection.MTs[0].Id, tokenID)
 }
 
 func (suite *KeeperSuite) TestDenom() {
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
+	err := suite.keeper.MintMT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	response, err := suite.queryClient.Denom(gocontext.Background(), &types.QueryDenomRequest{
@@ -61,7 +61,7 @@ func (suite *KeeperSuite) TestDenom() {
 }
 
 func (suite *KeeperSuite) TestDenoms() {
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
+	err := suite.keeper.MintMT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
 	response, err := suite.queryClient.Denoms(gocontext.Background(), &types.QueryDenomsRequest{})
@@ -71,16 +71,16 @@ func (suite *KeeperSuite) TestDenoms() {
 	suite.Equal(response.Denoms[0].Id, denomID)
 }
 
-func (suite *KeeperSuite) TestNFT() {
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
+func (suite *KeeperSuite) TestMT() {
+	err := suite.keeper.MintMT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenURIHash, tokenData, address)
 	suite.NoError(err)
 
-	response, err := suite.queryClient.NFT(gocontext.Background(), &types.QueryNFTRequest{
+	response, err := suite.queryClient.MT(gocontext.Background(), &types.QueryMTRequest{
 		DenomId: denomID,
 		TokenId: tokenID,
 	})
 
 	suite.NoError(err)
-	suite.NotEmpty(response.NFT)
-	suite.Equal(response.NFT.Id, tokenID)
+	suite.NotEmpty(response.MT)
+	suite.Equal(response.MT.Id, tokenID)
 }

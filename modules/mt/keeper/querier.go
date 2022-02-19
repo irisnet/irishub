@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/mt/types"
 )
 
 // NewQuerier is the module level router for state queries
@@ -26,8 +26,8 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 			return queryDenom(ctx, req, k, legacyQuerierCdc)
 		case types.QueryDenoms:
 			return queryDenoms(ctx, req, k, legacyQuerierCdc)
-		case types.QueryNFT:
-			return queryNFT(ctx, req, k, legacyQuerierCdc)
+		case types.QueryMT:
+			return queryMT(ctx, req, k, legacyQuerierCdc)
 		default:
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 		}
@@ -120,19 +120,19 @@ func queryDenoms(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerier
 	return bz, nil
 }
 
-func queryNFT(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
-	var params types.QueryNFTParams
+func queryMT(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+	var params types.QueryMTParams
 
 	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
-	nft, err := k.GetNFT(ctx, params.Denom, params.TokenID)
+	mt, err := k.GetMT(ctx, params.Denom, params.TokenID)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrUnknownNFT, "invalid NFT %s from collection %s", params.TokenID, params.Denom)
+		return nil, sdkerrors.Wrapf(types.ErrUnknownMT, "invalid MT %s from collection %s", params.TokenID, params.Denom)
 	}
 
-	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, nft)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, mt)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}

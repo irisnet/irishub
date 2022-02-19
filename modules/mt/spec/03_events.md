@@ -1,6 +1,6 @@
 # Events
 
-The nft module emits the following events:
+The mt module emits the following events:
 
 ## Handlers
 
@@ -8,61 +8,61 @@ The nft module emits the following events:
 
 | Type        | Attribute Key | Attribute Value  |
 |:------------|:--------------|:-----------------|
-| issue_denom | denom_id      | {nftDenomID}     |
-| issue_denom | denom_name    | {nftDenomName}   |
+| issue_denom | denom_id      | {mtDenomID}     |
+| issue_denom | denom_name    | {mtDenomName}   |
 | issue_denom | creator       | {creatorAddress} |
-| message     | module        | nft              |
+| message     | module        | mt              |
 | message     | sender        | {senderAddress}  |
 
-### MsgTransferNFT
+### MsgTransferMT
 
 | Type         | Attribute Key | Attribute Value    |
 |:-------------|:--------------|:-------------------|
-| transfer_nft | token_id      | {tokenID}          |
-| transfer_nft | denom_id      | {nftDenomID}       |
-| transfer_nft | sender        | {senderAddress}    |
-| transfer_nft | recipient     | {recipientAddress} |
-| message      | module        | nft                |
+| transfer_mt | token_id      | {tokenID}          |
+| transfer_mt | denom_id      | {mtDenomID}       |
+| transfer_mt | sender        | {senderAddress}    |
+| transfer_mt | recipient     | {recipientAddress} |
+| message      | module        | mt                |
 | message      | sender        | {senderAddress}    |
 
-### MsgEditNFT
+### MsgEditMT
 
 | Type     | Attribute Key | Attribute Value |
 |:---------|:--------------|:----------------|
-| edit_nft | token_id      | {tokenID}       |
-| edit_nft | denom_id      | {nftDenomID}    |
-| edit_nft | token_uri     | {tokenURI}      |
-| edit_nft | owner         | {ownerAddress}  |
-| message  | module        | nft             |
+| edit_mt | token_id      | {tokenID}       |
+| edit_mt | denom_id      | {mtDenomID}    |
+| edit_mt | token_uri     | {tokenURI}      |
+| edit_mt | owner         | {ownerAddress}  |
+| message  | module        | mt             |
 | message  | sender        | {senderAddress} |
 
-### MsgMintNFT
+### MsgMintMT
 
 | Type     | Attribute Key | Attribute Value    |
 |:---------|:--------------|:-------------------|
-| mint_nft | token_id      | {tokenID}          |
-| mint_nft | denom_id      | {nftDenomID}       |
-| mint_nft | token_uri     | {tokenURI}         |
-| mint_nft | recipient     | {recipientAddress} |
-| message  | module        | nft                |
+| mint_mt | token_id      | {tokenID}          |
+| mint_mt | denom_id      | {mtDenomID}       |
+| mint_mt | token_uri     | {tokenURI}         |
+| mint_mt | recipient     | {recipientAddress} |
+| message  | module        | mt                |
 | message  | sender        | {senderAddress}    |
 
-### MsgBurnNFTs
+### MsgBurnMTs
 
 | Type     | Attribute Key | Attribute Value |
 |:---------|:--------------|:----------------|
-| burn_nft | denom_id      | {nftDenomID}    |
-| burn_nft | token_id      | {tokenID}       |
-| burn_nft | owner         | {ownerAddress}  |
-| message  | module        | nft             |
+| burn_mt | denom_id      | {mtDenomID}    |
+| burn_mt | token_id      | {tokenID}       |
+| burn_mt | owner         | {ownerAddress}  |
+| message  | module        | mt             |
 | message  | sender        | {senderAddress} |
 
 ### MsgTransferDenom
 
 | Type           | Attribute Key | Attribute Value    |
 |:---------------|:--------------|:-------------------|
-| transfer_denom | denom_id      | {nftDenomID}       |
+| transfer_denom | denom_id      | {mtDenomID}       |
 | transfer_denom | sender        | {senderAddress}    |
 | transfer_denom | recipient     | {recipientAddress} |
-| message        | module        | nft                |
+| message        | module        | mt                |
 | message        | sender        | {senderAddress}    |

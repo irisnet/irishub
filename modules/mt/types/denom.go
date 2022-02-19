@@ -6,21 +6,12 @@ import (
 
 // NewDenom return a new denom
 func NewDenom(
-	id, name, schema, symbol, description, uri, uriHash, data string,
-	creator sdk.AccAddress,
-	mintRestricted, updateRestricted bool,
+	id, name string, data []byte, creator sdk.AccAddress,
 ) Denom {
 	return Denom{
-		Id:               id,
-		Name:             name,
-		Schema:           schema,
-		Creator:          creator.String(),
-		Symbol:           symbol,
-		MintRestricted:   mintRestricted,
-		UpdateRestricted: updateRestricted,
-		Description:      description,
-		Uri:              uri,
-		UriHash:          uriHash,
-		Data:             data,
+		Id:      id,
+		Name:    name,
+		Creator: creator.String(),
+		Data:    data,
 	}
 }

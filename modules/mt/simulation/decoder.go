@@ -7,18 +7,18 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/mt/types"
 )
 
 // DecodeStore unmarshals the KVPair's Value to the corresponding gov type
 func NewDecodeStore(cdc codec.Codec) func(kvA, kvB kv.Pair) string {
 	return func(kvA, kvB kv.Pair) string {
 		switch {
-		case bytes.Equal(kvA.Key[:1], types.PrefixNFT):
-			var nftA, nftB types.BaseNFT
-			cdc.MustUnmarshal(kvA.Value, &nftA)
-			cdc.MustUnmarshal(kvB.Value, &nftB)
-			return fmt.Sprintf("%v\n%v", nftA, nftB)
+		case bytes.Equal(kvA.Key[:1], types.PrefixMT):
+			var mtA, mtB types.MT
+			cdc.MustUnmarshal(kvA.Value, &mtA)
+			cdc.MustUnmarshal(kvB.Value, &mtB)
+			return fmt.Sprintf("%v\n%v", mtA, mtB)
 		case bytes.Equal(kvA.Key[:1], types.PrefixOwners):
 			idA := types.MustUnMarshalTokenID(cdc, kvA.Value)
 			idB := types.MustUnMarshalTokenID(cdc, kvB.Value)

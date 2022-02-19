@@ -59,7 +59,7 @@ func (idcs IDCollections) String() string {
 	return buf.String()
 }
 
-// Owner of non fungible tokens
+// Owner of multi tokens
 //type Owner struct {
 //	Address       sdk.AccAddress `json:"address" yaml:"address"`
 //	IDCollections IDCollections  `json:"id_collections" yaml:"id_collections"`

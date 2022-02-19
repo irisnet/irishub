@@ -9,24 +9,24 @@ import (
 
 const (
 	// ModuleName is the name of the module
-	ModuleName = "nft"
+	ModuleName = "mt"
 
-	// StoreKey is the default store key for NFT
+	// StoreKey is the default store key for MT
 	StoreKey = ModuleName
 
-	// QuerierRoute is the querier route for the NFT store.
+	// QuerierRoute is the querier route for the MT store.
 	QuerierRoute = ModuleName
 
-	// RouterKey is the message route for the NFT module
+	// RouterKey is the message route for the MT module
 	RouterKey = ModuleName
 )
 
 var (
-	PrefixNFT        = []byte{0x01}
+	PrefixMT        = []byte{0x01}
 	PrefixOwners     = []byte{0x02} // key for a owner
-	PrefixCollection = []byte{0x03} // key for balance of NFTs held by the denom
-	PrefixDenom      = []byte{0x04} // key for denom of the nft
-	PrefixDenomName  = []byte{0x05} // key for denom name of the nft
+	PrefixCollection = []byte{0x03} // key for balance of MTs held by the denom
+	PrefixDenom      = []byte{0x04} // key for denom of the mt
+	PrefixDenomName  = []byte{0x05} // key for denom name of the mt
 
 	delimiter = []byte("/")
 )
@@ -75,9 +75,9 @@ func KeyOwner(address sdk.AccAddress, denomID, tokenID string) []byte {
 	return key
 }
 
-// KeyNFT gets the key of nft stored by an denom and id
-func KeyNFT(denomID, tokenID string) []byte {
-	key := append(PrefixNFT, delimiter...)
+// KeyMT gets the key of mt stored by an denom and id
+func KeyMT(denomID, tokenID string) []byte {
+	key := append(PrefixMT, delimiter...)
 	if len(denomID) > 0 {
 		key = append(key, []byte(denomID)...)
 		key = append(key, delimiter...)
