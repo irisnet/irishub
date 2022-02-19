@@ -8,10 +8,10 @@ import (
 // constant used to indicate that some field should not be updated
 const (
 	TypeMsgIssueDenom    = "issue_denom"
-	TypeMsgTransferMT   = "transfer_mt"
-	TypeMsgEditMT       = "edit_mt"
-	TypeMsgMintMT       = "mint_mt"
-	TypeMsgBurnMT       = "burn_mt"
+	TypeMsgTransferMT    = "transfer_mt"
+	TypeMsgEditMT        = "edit_mt"
+	TypeMsgMintMT        = "mint_mt"
+	TypeMsgBurnMT        = "burn_mt"
 	TypeMsgTransferDenom = "transfer_denom"
 )
 
@@ -25,12 +25,11 @@ var (
 )
 
 // NewMsgIssueDenom is a constructor function for MsgSetName
-func NewMsgIssueDenom(denomID, denomName string, data []byte,
-) *MsgIssueDenom {
+func NewMsgIssueDenom(name string, data []byte, sender string) *MsgIssueDenom {
 	return &MsgIssueDenom{
-		Id:               denomID,
-		Name:             denomName,
-		Data:             data,
+		Name:   name,
+		Data:   data,
+		Sender: sender,
 	}
 }
 
@@ -42,14 +41,10 @@ func (msg MsgIssueDenom) Type() string { return TypeMsgIssueDenom }
 
 // ValidateBasic Implements Msg.
 func (msg MsgIssueDenom) ValidateBasic() error {
-	if err := ValidateDenomID(msg.Id); err != nil {
-		return err
-	}
-
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
-	return ValidateKeywords(msg.Id)
+	return nil
 }
 
 // GetSignBytes Implements Msg.
@@ -70,11 +65,12 @@ func (msg MsgIssueDenom) GetSigners() []sdk.AccAddress {
 // TODO add amount
 // NewMsgTransferMT is a constructor function for MsgSetName
 func NewMsgTransferMT(
-	tokenID, denomID, sender, recipient string,
+	tokenID, denomID, sender, recipient string, amount uint64,
 ) *MsgTransferMT {
 	return &MsgTransferMT{
 		Id:        tokenID,
 		DenomId:   denomID,
+		Amount:    amount,
 		Sender:    sender,
 		Recipient: recipient,
 	}
@@ -160,13 +156,13 @@ func (msg MsgEditMT) GetSigners() []sdk.AccAddress {
 
 // NewMsgMintMT is a constructor function for MsgMintMT
 func NewMsgMintMT(
-	tokenID, denomID string, amount uint64, tokenData []byte, sender, recipient string,
+	tokenID, denomID string, amount uint64, tokenData, sender, recipient string,
 ) *MsgMintMT {
 	return &MsgMintMT{
 		Id:        tokenID,
 		DenomId:   denomID,
-		Amount: amount,
-		Data:      tokenData,
+		Amount:    amount,
+		Data:      []byte(tokenData),
 		Sender:    sender,
 		Recipient: recipient,
 	}
@@ -216,7 +212,7 @@ func NewMsgBurnMT(sender, tokenID, denomID string, amount uint64) *MsgBurnMT {
 		Sender:  sender,
 		Id:      tokenID,
 		DenomId: denomID,
-		Amount: amount,
+		Amount:  amount,
 	}
 }
 

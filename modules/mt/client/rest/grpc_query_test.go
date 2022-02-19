@@ -73,7 +73,7 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	//------test GetCmdIssueDenom()-------------
 	args := []string{
-		fmt.Sprintf("--%s=%s", mtcli.FlagDenomName, denomName),
+		fmt.Sprintf("--%s=%s", mtcli.FlagName, denomName),
 		fmt.Sprintf("--%s=%s", mtcli.FlagSymbol, symbol),
 		fmt.Sprintf("--%s=%s", mtcli.FlagSchema, schema),
 		fmt.Sprintf("--%s=%s", mtcli.FlagURI, uri),
