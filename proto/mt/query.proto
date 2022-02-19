@@ -12,27 +12,7 @@ option go_package = "github.com/irisnet/irismod/modules/mt/types";
 service Query {
     // Supply queries the total supply of a given denom or owner
     rpc Supply(QuerySupplyRequest) returns (QuerySupplyResponse) {
-        option (google.api.http).get = "/irismod/mt/collections/{denom_id}/supply";
-    }
-
-    // Supply queries the total supply of a given denom or owner
-    rpc MTSupply(QueryMtsRequest) returns (QueryMtsResponse) {
-        option (google.api.http).get = "/irismod/mt/mt_supply/{denom_id}/mt_id";
-    }
-
-    // Owner queries the MTs of the specified owner
-    rpc Owner(QueryOwnerRequest) returns (QueryOwnerResponse) {
-        option (google.api.http).get = "/irismod/mt/mts";
-    }
-
-    // Collection queries the MTs of the specified denom
-    rpc Collection(QueryCollectionRequest) returns (QueryCollectionResponse) {
-        option (google.api.http).get = "/irismod/mt/collections/{denom_id}";
-    }
-
-    // Denom queries the definition of a given denom
-    rpc Denom(QueryDenomRequest) returns (QueryDenomResponse) {
-        option (google.api.http).get = "/irismod/mt/denoms/{denom_id}";
+        option (google.api.http).get = "/irismod/mt/denoms/supply";
     }
 
     // Denoms queries all the denoms
@@ -40,9 +20,29 @@ service Query {
         option (google.api.http).get = "/irismod/mt/denoms";
     }
 
-    // MT queries the MT for the given denom and token ID
+    // Denom queries the definition of a given denom ID
+    rpc Denom(QueryDenomRequest) returns (QueryDenomResponse) {
+        option (google.api.http).get = "/irismod/mt/denoms/{denom_id}";
+    }
+
+    // MTSupply queries the total supply of given denom and mt ID
+    rpc MTSupply(QueryMTSupplyRequest) returns (QueryMTSupplyResponse) {
+        option (google.api.http).get = "/irismod/mt/mts/{denom_id}/{mt_id}/supply";
+    }
+
+    // MTs queries all the MTs of a given denom ID
+    rpc MTs(QueryMTsRequest) returns (QueryMTsResponse) {
+        option (google.api.http).get = "/irismod/mt/mts/{denom_id}";
+    }
+
+    // MT queries the MT of the given denom and mt ID
     rpc MT(QueryMTRequest) returns (QueryMTResponse) {
         option (google.api.http).get = "/irismod/mt/mts/{denom_id}/{mt_id}";
+    }
+
+    // Balances queries the MT balances of a specified owner
+    rpc Balances(QueryBalancesRequest) returns (QueryBalancesResponse) {
+        option (google.api.http).get = "/irismod/mt/mts/{owner}/balances";
     }
 }
 
@@ -57,38 +57,16 @@ message QuerySupplyResponse {
     uint64 amount = 1;
 }
 
-message QueryMtsRequest {
-    string denom_id = 1;
-    string mt_id = 2;
-}
-
-message QueryMtsResponse {
-    uint64 amount = 1;
-}
-
-// QueryOwnerRequest is the request type for the Query/Owner RPC method
-message QueryOwnerRequest {
-    string denom_id = 1;
+// QueryDenomsRequest is the request type for the Query/Denoms RPC method
+message QueryDenomsRequest {
     // pagination defines an optional pagination for the request.
-    cosmos.base.query.v1beta1.PageRequest pagination = 2;
+    cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-// QueryOwnerResponse is the response type for the Query/Owner RPC method
-message QueryOwnerResponse {
-    Owner owner = 1;
-    cosmos.base.query.v1beta1.PageResponse pagination = 2;
-}
+// QueryDenomsResponse is the response type for the Query/Denoms RPC method
+message QueryDenomsResponse {
+    repeated Denom denoms = 1;
 
-// QueryCollectionRequest is the request type for the Query/Collection RPC method
-message QueryCollectionRequest {
-    string denom_id = 1;
-    // pagination defines an optional pagination for the request.
-    cosmos.base.query.v1beta1.PageRequest pagination = 2;
-}
-
-// QueryCollectionResponse is the response type for the Query/Collection RPC method
-message QueryCollectionResponse {
-    Collection collection = 1;
     cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
@@ -102,15 +80,25 @@ message QueryDenomResponse {
     Denom denom = 1;
 }
 
-// QueryDenomsRequest is the request type for the Query/Denoms RPC method
-message QueryDenomsRequest {
-    // pagination defines an optional pagination for the request.
-    cosmos.base.query.v1beta1.PageRequest pagination = 1;
+message QueryMTSupplyRequest {
+    string denom_id = 1;
+    string mt_id = 2;
 }
 
-// QueryDenomsResponse is the response type for the Query/Denoms RPC method
-message QueryDenomsResponse {
-    repeated Denom denoms = 1 [ (gogoproto.nullable) = false ];
+message QueryMTSupplyResponse {
+    uint64 amount = 1;
+}
+
+// QueryMTsRequest is the request type for the Query/MTs RPC method
+message QueryMTsRequest {
+    string denom_id = 1;
+    // pagination defines an optional pagination for the request.
+    cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryMTsResponse is the response type for the Query/MTs RPC method
+message QueryMTsResponse {
+    repeated MT mts = 1;
 
     cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
@@ -123,5 +111,19 @@ message QueryMTRequest {
 
 // QueryMTResponse is the response type for the Query/MT RPC method
 message QueryMTResponse {
-    MT mt = 1 [ (gogoproto.customname) = "MT" ];
+    MT mt = 1;
+}
+
+// QueryBalancesRequest is the request type for the Query/Balances RPC method
+message QueryBalancesRequest {
+    string owner = 1;
+    string denom_id = 2;
+    // pagination defines an optional pagination for the request.
+    cosmos.base.query.v1beta1.PageRequest pagination = 3;
+}
+
+// QueryBalancesResponse is the response type for the Query/Balances RPC method
+message QueryBalancesResponse {
+    repeated Balance balance = 1;
+    cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
