@@ -31,9 +31,9 @@ service Msg {
 message MsgIssueDenom {
     option (gogoproto.equal) = true;
 
-    string name = 2;
-    bytes data = 3;
-    string sender = 4;
+    string name = 1;
+    bytes data = 2;
+    string sender = 3;
 }
 
 // MsgIssueDenomResponse defines the Msg/IssueDenom response type.
