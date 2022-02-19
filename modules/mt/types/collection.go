@@ -15,12 +15,12 @@ func NewCollection(denom Denom, mts []exported.MT) (c Collection) {
 
 // AddMT adds an MT to the collection
 func (c Collection) AddMT(mt MT) Collection {
-	c.MTs = append(c.MTs, mt)
+	c.Mts = append(c.Mts, mt)
 	return c
 }
 
 func (c Collection) Supply() int {
-	return len(c.MTs)
+	return len(c.Mts)
 }
 
 // NewCollection creates a new MT Collection
