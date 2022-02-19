@@ -63,12 +63,12 @@ func (k Keeper) MintMT(ctx sdk.Context,
 
 		k.setMT(
 			ctx, denomID,
-			types.NewMT(
-				tokenID,
-				amout+mt.GetSupply(),
-				owner,
-				data,
-			),
+			types.MT{
+				Id:     mt.GetID(),
+				Supply: amout + mt.GetSupply(),
+				Data:   owner,
+				Owner:  mt.GetOwner().String(),
+			},
 		)
 	} else {
 		k.setMT(
