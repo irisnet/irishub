@@ -87,15 +87,20 @@ func (k Keeper) MintMT(ctx sdk.Context,
 }
 
 // EditMT updates an existing MT
-func (k Keeper) EditMT(
-	ctx sdk.Context, denomID, tokenID string, tokenData []byte, owner sdk.AccAddress,
+func (k Keeper) EditMT(ctx sdk.Context,
+	denomID, tokenID string,
+	tokenData []byte,
+	owner sdk.AccAddress,
 ) error {
-	_, found := k.GetDenom(ctx, denomID)
+	denom, found := k.GetDenom(ctx, denomID)
 	if !found {
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
 	}
 
-	// TODO only the owner of Denom can edit
+	if denom.Owner != owner.String() {
+		return sdkerrors.Wrapf(types.ErrUnauthorized, "Denom is owned by %s", denom.Owner)
+	}
+
 	mt, err := k.Authorize(ctx, denomID, tokenID, owner)
 	if err != nil {
 		return err
