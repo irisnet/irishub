@@ -14,7 +14,7 @@ service Msg {
     // MintMT defines a method for mint a new mt
     rpc MintMT(MsgMintMT) returns (MsgMintMTResponse);
 
-    // RefundHTLC defines a method for editing a mt.
+    // EditMT defines a method for editing a mt.
     rpc EditMT(MsgEditMT) returns (MsgEditMTResponse);
 
     // TransferMT defines a method for transferring a mt.
@@ -33,8 +33,8 @@ message MsgIssueDenom {
 
     string id = 1;
     string name = 2;
-    string creator = 3;
-    bytes data = 4;
+    bytes data = 3;
+    string sender = 4;
 }
 
 // MsgIssueDenomResponse defines the Msg/IssueDenom response type.
@@ -61,6 +61,7 @@ message MsgEditMT {
     string id = 1;
     string denom_id = 2;
     bytes data = 3;
+    string sender = 4;
 }
 
 // MsgEditMTResponse defines the Msg/EditMT response type.
@@ -72,10 +73,9 @@ message MsgMintMT {
 
     string id = 1;
     string denom_id = 2;
-    string name = 3;
-    bytes data = 4;
-    string sender = 5;
-    string recipient = 6;
+    bytes data = 3;
+    string sender = 4;
+    string recipient = 5;
 }
 
 // MsgMintMTResponse defines the Msg/MintMT response type.
@@ -87,8 +87,8 @@ message MsgBurnMT {
 
     string id = 1;
     string denom_id = 2;
-    string sender = 3;
-    uint64 amount = 4;
+    uint64 amount = 3;
+    string sender = 4;
 }
 
 // MsgBurnMTResponse defines the Msg/BurnMT response type.
