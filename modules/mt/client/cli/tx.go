@@ -2,7 +2,7 @@ package cli
 
 import (
 	"fmt"
-	"io/ioutil"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -28,11 +28,11 @@ func NewTxCmd() *cobra.Command {
 
 	txCmd.AddCommand(
 		GetCmdIssueDenom(),
+		GetCmdTransferDenom(),
 		GetCmdMintMT(),
 		GetCmdEditMT(),
 		GetCmdTransferMT(),
 		GetCmdBurnMT(),
-		GetCmdTransferDenom(),
 	)
 
 	return txCmd
@@ -41,20 +41,13 @@ func NewTxCmd() *cobra.Command {
 // GetCmdIssueDenom is the CLI command for an IssueDenom transaction
 func GetCmdIssueDenom() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "issue [denom-id]",
+		Use:  "issue",
 		Long: "Issue a new denom.",
 		Example: fmt.Sprintf(
-			"$ %s tx mt issue <denom-id> "+
-				"--from=<key-name> "+
+			"$ %s tx mt issue "+
 				"--name=<denom-name> "+
-				"--symbol=<denom-symbol> "+
-				"--mint-restricted=<mint-restricted> "+
-				"--update-restricted=<update-restricted> "+
-				"--schema=<schema-content or path to schema.json> "+
-				"--description=<description> "+
-				"--uri=<uri> "+
-				"--uri-hash=<uri-hash> "+
 				"--data=<data> "+
+				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
 			version.AppName,
@@ -66,35 +59,9 @@ func GetCmdIssueDenom() *cobra.Command {
 				return err
 			}
 
-			denomName, err := cmd.Flags().GetString(FlagDenomName)
-			if err != nil {
-				return err
-			}
-			schema, err := cmd.Flags().GetString(FlagSchema)
-			if err != nil {
-				return err
-			}
-			symbol, err := cmd.Flags().GetString(FlagSymbol)
-			if err != nil {
-				return err
-			}
-			mintRestricted, err := cmd.Flags().GetBool(FlagMintRestricted)
-			if err != nil {
-				return err
-			}
-			updateRestricted, err := cmd.Flags().GetBool(FlagUpdateRestricted)
-			if err != nil {
-				return err
-			}
-			uri, err := cmd.Flags().GetString(FlagURI)
-			if err != nil {
-				return err
-			}
-			uriHash, err := cmd.Flags().GetString(FlagURIHash)
-			if err != nil {
-				return err
-			}
-			description, err := cmd.Flags().GetString(FlagDescription)
+			var sender = clientCtx.GetFromAddress().String()
+
+			name, err := cmd.Flags().GetString(FlagName)
 			if err != nil {
 				return err
 			}
@@ -102,23 +69,11 @@ func GetCmdIssueDenom() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			optionsContent, err := ioutil.ReadFile(schema)
-			if err == nil {
-				schema = string(optionsContent)
-			}
 
 			msg := types.NewMsgIssueDenom(
-				args[0],
-				denomName,
-				schema,
-				clientCtx.GetFromAddress().String(),
-				symbol,
-				mintRestricted,
-				updateRestricted,
-				description,
-				uri,
-				uriHash,
-				data,
+				name,
+				[]byte(data),
+				sender,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -127,8 +82,54 @@ func GetCmdIssueDenom() *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsIssueDenom)
-	_ = cmd.MarkFlagRequired(FlagMintRestricted)
-	_ = cmd.MarkFlagRequired(FlagUpdateRestricted)
+	_ = cmd.MarkFlagRequired(FlagName)
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdTransferDenom is the CLI command for sending a TransferDenom transaction
+func GetCmdTransferDenom() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "transfer-denom <from_key_or_address> <recipient> <denom-id>",
+		Long: "Transfer a denom to a recipient.",
+		Example: fmt.Sprintf(
+			"$ %s tx mt transfer-denom <from_key_or_address> <recipient> <denom-id> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			sender, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+
+			recipient, err := sdk.AccAddressFromBech32(args[1])
+			if err != nil {
+				return err
+			}
+
+			denomID := args[2]
+
+			msg := types.NewMsgTransferDenom(
+				denomID,
+				sender.String(),
+				recipient.String(),
+			)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+	cmd.Flags().AddFlagSet(FsTransferDenom)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
@@ -137,12 +138,13 @@ func GetCmdIssueDenom() *cobra.Command {
 // GetCmdMintMT is the CLI command for a MintMT transaction
 func GetCmdMintMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "mint [denom-id] [mt-id]",
-		Long: "Mint an MT and set the owner to the recipient.",
+		Use:  "mint <denom-id>",
+		Long: "Issue or mint MT",
 		Example: fmt.Sprintf(
-			"$ %s tx mt mint <denom-id> <mt-id> "+
-				"--uri=<uri> "+
-				"--uri-hash=<uri-hash> "+
+			"$ %s tx mt mint <denom-id> "+
+				"--mt-id=<mt-id> "+
+				"--amount=<amount> "+
+				"--data=<data> "+
 				"--recipient=<recipient> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
@@ -152,6 +154,28 @@ func GetCmdMintMT() *cobra.Command {
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			denomID := args[0]
+
+			mtID, err := cmd.Flags().GetString(FlagMTID)
+			if err != nil {
+				return err
+			}
+
+			amountStr, err := cmd.Flags().GetString(FlagAmount)
+			if err != nil {
+				return err
+			}
+
+			amount, err := strconv.ParseUint(amountStr, 10, 64)
+			if err != nil {
+				return err
+			}
+
+			metadata, err := cmd.Flags().GetString(FlagData)
 			if err != nil {
 				return err
 			}
@@ -172,30 +196,11 @@ func GetCmdMintMT() *cobra.Command {
 				recipient = sender
 			}
 
-			tokenName, err := cmd.Flags().GetString(FlagTokenName)
-			if err != nil {
-				return err
-			}
-			tokenURI, err := cmd.Flags().GetString(FlagURI)
-			if err != nil {
-				return err
-			}
-			tokenURIHash, err := cmd.Flags().GetString(FlagURIHash)
-			if err != nil {
-				return err
-			}
-			tokenData, err := cmd.Flags().GetString(FlagData)
-			if err != nil {
-				return err
-			}
-
 			msg := types.NewMsgMintMT(
-				args[1],
-				args[0],
-				tokenName,
-				tokenURI,
-				tokenURIHash,
-				tokenData,
+				mtID,
+				denomID,
+				amount,
+				metadata,
 				sender,
 				recipient,
 			)
@@ -214,12 +219,11 @@ func GetCmdMintMT() *cobra.Command {
 // GetCmdEditMT is the CLI command for sending an MsgEditMT transaction
 func GetCmdEditMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "edit [denom-id] [mt-id]",
-		Long: "Edit the token data of an MT.",
+		Use:  "edit <denom-id> <mt-id>",
+		Long: "Edit the metadata of an MT.",
 		Example: fmt.Sprintf(
 			"$ %s tx mt edit <denom-id> <mt-id> "+
-				"--uri=<uri> "+
-				"--uri-hash=<uri-hash> "+
+				"--data=<data> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
@@ -232,34 +236,24 @@ func GetCmdEditMT() *cobra.Command {
 				return err
 			}
 
-			tokenName, err := cmd.Flags().GetString(FlagTokenName)
+			denomID := args[0]
+			mtID := args[1]
+			metadata, err := cmd.Flags().GetString(FlagData)
 			if err != nil {
 				return err
 			}
-			tokenURI, err := cmd.Flags().GetString(FlagURI)
-			if err != nil {
-				return err
-			}
-			tokenURIHash, err := cmd.Flags().GetString(FlagURIHash)
-			if err != nil {
-				return err
-			}
-			tokenData, err := cmd.Flags().GetString(FlagData)
-			if err != nil {
-				return err
-			}
+
 			msg := types.NewMsgEditMT(
-				args[1],
-				args[0],
-				tokenName,
-				tokenURI,
-				tokenURIHash,
-				tokenData,
+				mtID,
+				denomID,
+				metadata,
 				clientCtx.GetFromAddress().String(),
 			)
+
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
@@ -272,13 +266,10 @@ func GetCmdEditMT() *cobra.Command {
 // GetCmdTransferMT is the CLI command for sending a TransferMT transaction
 func GetCmdTransferMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "transfer [recipient] [denom-id] [mt-id]",
+		Use:  "transfer <from_key_or_address> <recipient> <denom-id> <mt-id> <amount>",
 		Long: "Transfer an MT to a recipient.",
 		Example: fmt.Sprintf(
-			"$ %s tx mt transfer <recipient> <denom-id> <mt-id> "+
-				"--uri=<uri> "+
-				"--uri-hash=<uri-hash> "+
-				"--from=<key-name> "+
+			"$ %s tx mt transfer <from_key_or_address> <recipient> <denom-id> <mt-id> <amount> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
 			version.AppName,
@@ -290,35 +281,30 @@ func GetCmdTransferMT() *cobra.Command {
 				return err
 			}
 
-			if _, err := sdk.AccAddressFromBech32(args[0]); err != nil {
+			sender, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
 				return err
 			}
 
-			tokenName, err := cmd.Flags().GetString(FlagTokenName)
+			recipient, err := sdk.AccAddressFromBech32(args[1])
 			if err != nil {
 				return err
 			}
-			tokenURI, err := cmd.Flags().GetString(FlagURI)
+
+			denomID := args[2]
+			mtID := args[3]
+			amountStr := args[4]
+			amount, err := strconv.ParseUint(amountStr, 10, 64)
 			if err != nil {
 				return err
 			}
-			tokenURIHash, err := cmd.Flags().GetString(FlagURIHash)
-			if err != nil {
-				return err
-			}
-			tokenData, err := cmd.Flags().GetString(FlagData)
-			if err != nil {
-				return err
-			}
+
 			msg := types.NewMsgTransferMT(
-				args[2],
-				args[1],
-				tokenName,
-				tokenURI,
-				tokenURIHash,
-				tokenData,
-				clientCtx.GetFromAddress().String(),
-				args[0],
+				mtID,
+				denomID,
+				sender.String(),
+				recipient.String(),
+				amount,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -335,10 +321,10 @@ func GetCmdTransferMT() *cobra.Command {
 // GetCmdBurnMT is the CLI command for sending a BurnMT transaction
 func GetCmdBurnMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "burn [denom-id] [mt-id]",
-		Long: "Burn an MT.",
+		Use:  "burn <denom-id> <mt-id> <amount>",
+		Long: "Burn amounts of an MT.",
 		Example: fmt.Sprintf(
-			"$ %s tx mt burn <denom-id> <mt-id> "+
+			"$ %s tx mt burn <denom-id> <mt-id> <amount> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
@@ -347,14 +333,23 @@ func GetCmdBurnMT() *cobra.Command {
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			denomID := args[0]
+			mtID := args[1]
+			amountStr := args[2]
+			amount, err := strconv.ParseUint(amountStr, 10, 64)
 			if err != nil {
 				return err
 			}
 
 			msg := types.NewMsgBurnMT(
 				clientCtx.GetFromAddress().String(),
-				args[1],
-				args[0],
+				mtID,
+				denomID,
+				amount,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -362,46 +357,6 @@ func GetCmdBurnMT() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
-	flags.AddTxFlagsToCmd(cmd)
-
-	return cmd
-}
-
-// GetCmdTransferDenom is the CLI command for sending a TransferDenom transaction
-func GetCmdTransferDenom() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:  "transfer-denom [recipient] [denom-id]",
-		Long: "Transfer an Denom to a recipient.",
-		Example: fmt.Sprintf(
-			"$ %s tx mt transfer-denom <recipient> <denom-id> "+
-				"--from=<key-name> "+
-				"--chain-id=<chain-id> "+
-				"--fees=<fee>",
-			version.AppName,
-		),
-		Args: cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			if _, err := sdk.AccAddressFromBech32(args[0]); err != nil {
-				return err
-			}
-
-			msg := types.NewMsgTransferDenom(
-				args[1],
-				clientCtx.GetFromAddress().String(),
-				args[0],
-			)
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
-		},
-	}
-	cmd.Flags().AddFlagSet(FsTransferDenom)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
