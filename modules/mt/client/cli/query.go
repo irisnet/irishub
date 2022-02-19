@@ -25,9 +25,7 @@ func GetQueryCmd() *cobra.Command {
 	queryCmd.AddCommand(
 		GetCmdQueryDenom(),
 		GetCmdQueryDenoms(),
-		GetCmdQueryCollection(),
 		GetCmdQuerySupply(),
-		GetCmdQueryOwner(),
 		GetCmdQueryMT(),
 	)
 
@@ -73,86 +71,6 @@ func GetCmdQuerySupply() *cobra.Command {
 	}
 	cmd.Flags().AddFlagSet(FsQuerySupply)
 	flags.AddQueryFlagsToCmd(cmd)
-
-	return cmd
-}
-
-// GetCmdQueryOwner queries all the MTs owned by an account
-func GetCmdQueryOwner() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "owner [address]",
-		Long:    "Get the MTs owned by an account address.",
-		Example: fmt.Sprintf("$ %s query mt owner <address> --denom-id=<denom-id>", version.AppName),
-		Args:    cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			if _, err := sdk.AccAddressFromBech32(args[0]); err != nil {
-				return err
-			}
-			pageReq, err := client.ReadPageRequest(cmd.Flags())
-			if err != nil {
-				return err
-			}
-			denomID, err := cmd.Flags().GetString(FlagDenomID)
-			if err != nil {
-				return err
-			}
-			queryClient := types.NewQueryClient(clientCtx)
-			resp, err := queryClient.Owner(context.Background(), &types.QueryOwnerRequest{
-				DenomId:    denomID,
-				Owner:      args[0],
-				Pagination: pageReq,
-			})
-			if err != nil {
-				return err
-			}
-			return clientCtx.PrintProto(resp)
-		},
-	}
-	cmd.Flags().AddFlagSet(FsQueryOwner)
-	flags.AddQueryFlagsToCmd(cmd)
-	flags.AddPaginationFlagsToCmd(cmd, "mts")
-
-	return cmd
-}
-
-// GetCmdQueryCollection queries all the MTs from a collection
-func GetCmdQueryCollection() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "collection [denom-id]",
-		Long:    "Get all the MTs from a given collection.",
-		Example: fmt.Sprintf("$ %s query mt collection <denom-id>", version.AppName),
-		Args:    cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			pageReq, err := client.ReadPageRequest(cmd.Flags())
-			if err != nil {
-				return err
-			}
-			queryClient := types.NewQueryClient(clientCtx)
-			resp, err := queryClient.Collection(
-				context.Background(),
-				&types.QueryCollectionRequest{
-					DenomId:    args[0],
-					Pagination: pageReq,
-				},
-			)
-			if err != nil {
-				return err
-			}
-			return clientCtx.PrintProto(resp)
-		},
-	}
-	flags.AddQueryFlagsToCmd(cmd)
-	flags.AddPaginationFlagsToCmd(cmd, "mts")
 
 	return cmd
 }
@@ -235,12 +153,12 @@ func GetCmdQueryMT() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.MT(context.Background(), &types.QueryMTRequest{
 				DenomId: args[0],
-				TokenId: args[1],
+				MtId: args[1],
 			})
 			if err != nil {
 				return err
 			}
-			return clientCtx.PrintProto(resp.MT)
+			return clientCtx.PrintProto(resp.Mt)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

@@ -28,11 +28,11 @@ func NewTxCmd() *cobra.Command {
 
 	txCmd.AddCommand(
 		GetCmdIssueDenom(),
+		GetCmdTransferDenom(),
 		GetCmdMintMT(),
 		GetCmdEditMT(),
 		GetCmdTransferMT(),
 		GetCmdBurnMT(),
-		GetCmdTransferDenom(),
 	)
 
 	return txCmd
@@ -44,17 +44,10 @@ func GetCmdIssueDenom() *cobra.Command {
 		Use:  "issue [denom-id]",
 		Long: "Issue a new denom.",
 		Example: fmt.Sprintf(
-			"$ %s tx mt issue <denom-id> "+
-				"--from=<key-name> "+
+			"$ %s tx mt issue "+
 				"--name=<denom-name> "+
-				"--symbol=<denom-symbol> "+
-				"--mint-restricted=<mint-restricted> "+
-				"--update-restricted=<update-restricted> "+
-				"--schema=<schema-content or path to schema.json> "+
-				"--description=<description> "+
-				"--uri=<uri> "+
-				"--uri-hash=<uri-hash> "+
 				"--data=<data> "+
+				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
 			version.AppName,
@@ -66,35 +59,7 @@ func GetCmdIssueDenom() *cobra.Command {
 				return err
 			}
 
-			denomName, err := cmd.Flags().GetString(FlagDenomName)
-			if err != nil {
-				return err
-			}
-			schema, err := cmd.Flags().GetString(FlagSchema)
-			if err != nil {
-				return err
-			}
-			symbol, err := cmd.Flags().GetString(FlagSymbol)
-			if err != nil {
-				return err
-			}
-			mintRestricted, err := cmd.Flags().GetBool(FlagMintRestricted)
-			if err != nil {
-				return err
-			}
-			updateRestricted, err := cmd.Flags().GetBool(FlagUpdateRestricted)
-			if err != nil {
-				return err
-			}
-			uri, err := cmd.Flags().GetString(FlagURI)
-			if err != nil {
-				return err
-			}
-			uriHash, err := cmd.Flags().GetString(FlagURIHash)
-			if err != nil {
-				return err
-			}
-			description, err := cmd.Flags().GetString(FlagDescription)
+			name, err := cmd.Flags().GetString(FlagDenomName)
 			if err != nil {
 				return err
 			}
@@ -102,14 +67,9 @@ func GetCmdIssueDenom() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			optionsContent, err := ioutil.ReadFile(schema)
-			if err == nil {
-				schema = string(optionsContent)
-			}
 
 			msg := types.NewMsgIssueDenom(
-				args[0],
-				denomName,
+				name,
 				schema,
 				clientCtx.GetFromAddress().String(),
 				symbol,
