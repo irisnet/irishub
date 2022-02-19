@@ -20,10 +20,10 @@ import (
 // Simulation operation weights constants
 const (
 	OpWeightMsgIssueDenom    = "op_weight_msg_issue_denom"
-	OpWeightMsgMintMT       = "op_weight_msg_mint_mt"
-	OpWeightMsgEditMT       = "op_weight_msg_edit_mt_tokenData"
-	OpWeightMsgTransferMT   = "op_weight_msg_transfer_mt"
-	OpWeightMsgBurnMT       = "op_weight_msg_transfer_burn_mt"
+	OpWeightMsgMintMT        = "op_weight_msg_mint_mt"
+	OpWeightMsgEditMT        = "op_weight_msg_edit_mt_tokenData"
+	OpWeightMsgTransferMT    = "op_weight_msg_transfer_mt"
+	OpWeightMsgBurnMT        = "op_weight_msg_transfer_burn_mt"
 	OpWeightMsgTransferDenom = "op_weight_msg_transfer_denom"
 )
 
@@ -123,8 +123,9 @@ func SimulateMsgTransferMT(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 		msg := types.NewMsgTransferMT(
 			mtID,
 			denom,
-			ownerAddr.String(),                 // sender
-			recipientAccount.Address.String(),  // recipient
+			ownerAddr.String(),                // sender
+			recipientAccount.Address.String(), // recipient
+			1,                                 // TODO
 		)
 		account := ak.GetAccount(ctx, ownerAddr)
 
@@ -232,9 +233,9 @@ func SimulateMsgMintMT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 		// TODO refactor
 		msg := types.NewMsgMintMT(
 			RandnMTID(r, types.MinDenomLen, types.MaxDenomLen), // mt ID
-			getRandomDenom(ctx, k, r),                           // denom
+			getRandomDenom(ctx, k, r),                          // denom
 			1,
-			[]byte(simtypes.RandStringOfLength(r, 10)), // tokenData
+			simtypes.RandStringOfLength(r, 10), // tokenData
 			randomSender.Address.String(),      // sender
 			randomRecipient.Address.String(),   // recipient
 		)
@@ -410,9 +411,9 @@ func SimulateMsgIssueDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 		}
 
 		msg := types.NewMsgIssueDenom(
-			denomId,
 			denomName,
 			[]byte(data),
+			sender.Address.String(),
 		)
 		account := ak.GetAccount(ctx, sender.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
