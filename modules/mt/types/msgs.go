@@ -46,7 +46,7 @@ func (msg MsgIssueDenom) ValidateBasic() error {
 		return err
 	}
 
-	if _, err := sdk.AccAddressFromBech32(msg.Creator); err != nil {
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return ValidateKeywords(msg.Id)
@@ -60,7 +60,7 @@ func (msg MsgIssueDenom) GetSignBytes() []byte {
 
 // GetSigners Implements Msg.
 func (msg MsgIssueDenom) GetSigners() []sdk.AccAddress {
-	from, err := sdk.AccAddressFromBech32(msg.Creator)
+	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		panic(err)
 	}
@@ -190,9 +190,6 @@ func (msg MsgMintMT) ValidateBasic() error {
 		return err
 	}
 	if err := ValidateKeywords(msg.DenomId); err != nil {
-		return err
-	}
-	if err := ValidateTokenURI(msg.URI); err != nil {
 		return err
 	}
 	return ValidateTokenID(msg.Id)
