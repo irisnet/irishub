@@ -3,12 +3,12 @@ package cli
 import (
 	"context"
 	"fmt"
+	"github.com/irisnet/irismod/modules/nft/client/cli"
 
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 
 	"github.com/irisnet/irismod/modules/mt/types"
@@ -23,145 +23,22 @@ func GetQueryCmd() *cobra.Command {
 	}
 
 	queryCmd.AddCommand(
-		GetCmdQueryDenom(),
 		GetCmdQueryDenoms(),
-		GetCmdQueryCollection(),
-		GetCmdQuerySupply(),
-		GetCmdQueryOwner(),
+		GetCmdQueryDenom(),
+		GetCmdQueryMTSupply(),
+		GetCmdQueryMTs(),
 		GetCmdQueryMT(),
+		GetCmdQueryBalances(),
 	)
 
 	return queryCmd
-}
-
-// GetCmdQuerySupply queries the supply of a mt collection
-func GetCmdQuerySupply() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "supply [denom-id]",
-		Long:    "total supply of a collection or owner of MTs.",
-		Example: fmt.Sprintf("$ %s query mt supply <denom-id>", version.AppName),
-		Args:    cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			var owner sdk.AccAddress
-			ownerStr, err := cmd.Flags().GetString(FlagOwner)
-			if err != nil {
-				return err
-			}
-
-			if len(ownerStr) > 0 {
-				owner, err = sdk.AccAddressFromBech32(ownerStr)
-				if err != nil {
-					return err
-				}
-			}
-
-			queryClient := types.NewQueryClient(clientCtx)
-			resp, err := queryClient.Supply(context.Background(), &types.QuerySupplyRequest{
-				DenomId: args[0],
-				Owner:   owner.String(),
-			})
-			if err != nil {
-				return err
-			}
-			return clientCtx.PrintProto(resp)
-		},
-	}
-	cmd.Flags().AddFlagSet(FsQuerySupply)
-	flags.AddQueryFlagsToCmd(cmd)
-
-	return cmd
-}
-
-// GetCmdQueryOwner queries all the MTs owned by an account
-func GetCmdQueryOwner() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "owner [address]",
-		Long:    "Get the MTs owned by an account address.",
-		Example: fmt.Sprintf("$ %s query mt owner <address> --denom-id=<denom-id>", version.AppName),
-		Args:    cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			if _, err := sdk.AccAddressFromBech32(args[0]); err != nil {
-				return err
-			}
-			pageReq, err := client.ReadPageRequest(cmd.Flags())
-			if err != nil {
-				return err
-			}
-			denomID, err := cmd.Flags().GetString(FlagDenomID)
-			if err != nil {
-				return err
-			}
-			queryClient := types.NewQueryClient(clientCtx)
-			resp, err := queryClient.Owner(context.Background(), &types.QueryOwnerRequest{
-				DenomId:    denomID,
-				Owner:      args[0],
-				Pagination: pageReq,
-			})
-			if err != nil {
-				return err
-			}
-			return clientCtx.PrintProto(resp)
-		},
-	}
-	cmd.Flags().AddFlagSet(FsQueryOwner)
-	flags.AddQueryFlagsToCmd(cmd)
-	flags.AddPaginationFlagsToCmd(cmd, "mts")
-
-	return cmd
-}
-
-// GetCmdQueryCollection queries all the MTs from a collection
-func GetCmdQueryCollection() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "collection [denom-id]",
-		Long:    "Get all the MTs from a given collection.",
-		Example: fmt.Sprintf("$ %s query mt collection <denom-id>", version.AppName),
-		Args:    cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			pageReq, err := client.ReadPageRequest(cmd.Flags())
-			if err != nil {
-				return err
-			}
-			queryClient := types.NewQueryClient(clientCtx)
-			resp, err := queryClient.Collection(
-				context.Background(),
-				&types.QueryCollectionRequest{
-					DenomId:    args[0],
-					Pagination: pageReq,
-				},
-			)
-			if err != nil {
-				return err
-			}
-			return clientCtx.PrintProto(resp)
-		},
-	}
-	flags.AddQueryFlagsToCmd(cmd)
-	flags.AddPaginationFlagsToCmd(cmd, "mts")
-
-	return cmd
 }
 
 // GetCmdQueryDenoms queries all denoms
 func GetCmdQueryDenoms() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "denoms",
-		Long:    "Query all denominations of all collections of MTs.",
+		Long:    "Query all denoms.",
 		Example: fmt.Sprintf("$ %s query mt denoms", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -189,8 +66,8 @@ func GetCmdQueryDenoms() *cobra.Command {
 // GetCmdQueryDenom queries the specified denom
 func GetCmdQueryDenom() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "denom [denom-id]",
-		Long:    "Query the denom by the specified denom id.",
+		Use:     "denom <denom-id>",
+		Long:    "Query denom by ID.",
 		Example: fmt.Sprintf("$ %s query mt denom <denom-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -215,11 +92,75 @@ func GetCmdQueryDenom() *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryMT queries a single MTs from a collection
+// GetCmdQueryMTSupply queries the total supply of given denom and mt ID
+func GetCmdQueryMTSupply() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "supply <denom-id> <mt-id>",
+		Long:    "Query total supply of an MT.",
+		Example: fmt.Sprintf("$ %s query mt supply <denom-id> <mt-id>", version.AppName),
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			resp, err := queryClient.MTSupply(context.Background(), &types.QueryMTSupplyRequest{
+				DenomId: args[0],
+				MtId: args[1],
+			})
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(resp)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdQueryMTs queries all MTs of a denom
+func GetCmdQueryMTs() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "tokens <denom-id>",
+		Long:    "Query all MTs of a denom.",
+		Example: fmt.Sprintf("$ %s query mt tokens <denom-id>", version.AppName),
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			resp, err := queryClient.MTs(context.Background(), &types.QueryMTsRequest{
+				DenomId: args[0],
+				Pagination: pageReq,
+			})
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(resp)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	flags.AddPaginationFlagsToCmd(cmd, "all tokens")
+
+	return cmd
+}
+
+// GetCmdQueryMT queries MT by ID
 func GetCmdQueryMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "token [denom-id] [mt-id]",
-		Long:    "Query a single MT from a collection.",
+		Use:     "token <denom-id> <mt-id>",
+		Long:    "Query MT by ID.",
 		Example: fmt.Sprintf("$ %s query mt token <denom-id> <mt-id>", version.AppName),
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -228,21 +169,59 @@ func GetCmdQueryMT() *cobra.Command {
 				return err
 			}
 
-			if err := types.ValidateTokenID(args[1]); err != nil {
-				return err
-			}
-
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.MT(context.Background(), &types.QueryMTRequest{
 				DenomId: args[0],
-				TokenId: args[1],
+				MtId: args[1],
 			})
 			if err != nil {
 				return err
 			}
-			return clientCtx.PrintProto(resp.MT)
+			return clientCtx.PrintProto(resp.Mt)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdQueryBalances queries the MT balances of a specified owner
+func GetCmdQueryBalances() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "balances <owner>",
+		Long:    "Query balances of an owner.",
+		Example: fmt.Sprintf("$ %s query mt balances <owner>", version.AppName),
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			denomID, err := cmd.Flags().GetString(cli.FlagDenomID)
+			if err != nil {
+				return err
+			}
+
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			resp, err := queryClient.Balances(context.Background(), &types.QueryBalancesRequest {
+				Owner: args[0],
+				DenomId: denomID,
+				Pagination: pageReq,
+			})
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(resp)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsQueryMTSupply)
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
