@@ -127,7 +127,6 @@ func (k Keeper) TransferOwner(ctx sdk.Context,
 	}
 
 	srcOwnerAmount := k.getOwner(ctx, denomID, tokenID, srcOwner)
-
 	if srcOwnerAmount < amount {
 		return sdkerrors.Wrapf(types.ErrInvalidCollection, "Lack of mt: %", srcOwnerAmount)
 	}
@@ -136,9 +135,11 @@ func (k Keeper) TransferOwner(ctx sdk.Context,
 	return nil
 }
 
-// TODO add amount
 // BurnMT deletes a specified MT
-func (k Keeper) BurnMT(ctx sdk.Context, denomID, tokenID string, owner sdk.AccAddress) error {
+func (k Keeper) BurnMT(ctx sdk.Context,
+	denomID, tokenID string,
+	amount uint64,
+	owner sdk.AccAddress) error {
 	if !k.HasDenomID(ctx, denomID) {
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
 	}
@@ -148,9 +149,18 @@ func (k Keeper) BurnMT(ctx sdk.Context, denomID, tokenID string, owner sdk.AccAd
 		return err
 	}
 
-	k.deleteMT(ctx, denomID, mt)
-	k.deleteOwner(ctx, denomID, tokenID, owner)
-	k.decreaseSupply(ctx, denomID)
+	srcOwnerAmount := k.getOwner(ctx, denomID, tokenID, owner)
+	if srcOwnerAmount < amount {
+		return sdkerrors.Wrapf(types.ErrInvalidCollection, "Lack of mt: %", srcOwnerAmount)
+	}
+
+	k.deleteOwner(ctx, denomID, tokenID, amount, owner)
+	k.setMT(ctx, denomID, types.MT{
+		Id:     mt.Id,
+		Supply: mt.Supply - amount,
+		Data:   mt.Data,
+		Owner:  mt.Owner,
+	})
 
 	return nil
 }

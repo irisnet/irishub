@@ -168,7 +168,7 @@ func (m msgServer) BurnMT(goCtx context.Context, msg *types.MsgBurnMT) (*types.M
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.BurnMT(ctx, msg.DenomId, msg.Id, sender); err != nil {
+	if err := m.Keeper.BurnMT(ctx, msg.DenomId, msg.Id, msg.Amount, sender); err != nil {
 		return nil, err
 	}
 
