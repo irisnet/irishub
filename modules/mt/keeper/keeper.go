@@ -38,10 +38,10 @@ func (k Keeper) IssueDenom(ctx sdk.Context,
 ) error {
 
 	return k.SetDenom(ctx, types.Denom{
-		Id:               k.genDenomID(ctx),
-		Name:             name,
-		Owner:            sednder.String(),
-		Data:             data,
+		Id:    k.genDenomID(ctx),
+		Name:  name,
+		Owner: sednder.String(),
+		Data:  data,
 	})
 }
 
