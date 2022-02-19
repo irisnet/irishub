@@ -1,11 +1,24 @@
 package keeper
 
 import (
+	"crypto/sha256"
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/mt/types"
 )
+
+const denomIdPrefix = "mt-denom-%d"
+
+// genDenomID generate a denom ID by auto increment sequence
+func (k Keeper) genDenomID(ctx sdk.Context) string {
+	sequence := k.getDenomSequence(ctx)
+	denomID := fmt.Sprintf(denomIdPrefix, sequence)
+	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(denomID)))
+	k.setDenomSequence(ctx, sequence+1)
+	return hash
+}
 
 // HasDenomID returns whether the specified denom ID exists
 func (k Keeper) HasDenomID(ctx sdk.Context, id string) bool {
@@ -63,4 +76,21 @@ func (k Keeper) UpdateDenom(ctx sdk.Context, denom types.Denom) error {
 	bz := k.cdc.MustMarshal(&denom)
 	store.Set(types.KeyDenomID(denom.Id), bz)
 	return nil
+}
+
+// getDenomSequence gets the next denom sequence from the store.
+func (k Keeper) getDenomSequence(ctx sdk.Context) uint64 {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get([]byte(types.KeyNextDenomSequence))
+	if bz == nil {
+		return 1
+	}
+	return sdk.BigEndianToUint64(bz)
+}
+
+// setDenomSequence sets the next denom sequence to the store.
+func (k Keeper) setDenomSequence(ctx sdk.Context, sequence uint64) {
+	store := ctx.KVStore(k.storeKey)
+	bz := sdk.Uint64ToBigEndian(sequence)
+	store.Set([]byte(types.KeyNextDenomSequence), bz)
 }
