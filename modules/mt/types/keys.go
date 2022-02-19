@@ -19,10 +19,13 @@ const (
 
 	// RouterKey is the message route for the MT module
 	RouterKey = ModuleName
+
+	// KeyNextDenomSequence is the key used to store the next denom sequence in the keeper
+	KeyNextDenomSequence = "nextDenomSequence"
 )
 
 var (
-	PrefixMT        = []byte{0x01}
+	PrefixMT         = []byte{0x01}
 	PrefixOwners     = []byte{0x02} // key for a owner
 	PrefixCollection = []byte{0x03} // key for balance of MTs held by the denom
 	PrefixDenom      = []byte{0x04} // key for denom of the mt
