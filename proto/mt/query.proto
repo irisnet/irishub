@@ -119,7 +119,7 @@ message QueryBalancesRequest {
     string owner = 1;
     string denom_id = 2;
     // pagination defines an optional pagination for the request.
-    cosmos.base.query.v1beta1.PageRequest pagination = 2;
+    cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
 // QueryBalancesResponse is the response type for the Query/Balances RPC method
