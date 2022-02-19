@@ -37,34 +37,51 @@ func (k Keeper) IssueDenom(ctx sdk.Context,
 	id, name string, sednder sdk.AccAddress, data []byte,
 ) error {
 	return k.SetDenom(ctx, types.Denom{
-		Id:               id,
-		Name:             name,
-		Owner:            sednder.String(),
-		Data:             data,
+		Id:    id,
+		Name:  name,
+		Owner: sednder.String(),
+		Data:  data,
 	})
 }
 
 // MintMT mints an MT and manages the MT's existence within Collections and Owners
-func (k Keeper) MintMT(
-	ctx sdk.Context, denomID, tokenID string, amout uint64, data []byte, owner sdk.AccAddress,
+func (k Keeper) MintMT(ctx sdk.Context,
+	denomID, tokenID string,
+	amout uint64,
+	data []byte,
+	owner sdk.AccAddress,
 ) error {
 
-	// TODO create if not exists, mint if exists
 	if k.HasMT(ctx, denomID, tokenID) {
-		return sdkerrors.Wrapf(types.ErrMTAlreadyExists, "MT %s already exists in collection %s", tokenID, denomID)
-	}
+		mt, err := k.GetMT(ctx, denomID, tokenID)
+		if err != nil {
+			return err
+		}
 
-	k.setMT(
-		ctx, denomID,
-		types.NewMT(
-			tokenID,
-			amout,
-			owner,
-			data,
-		),
-	)
-	k.setOwner(ctx, denomID, tokenID, owner)
-	k.increaseSupply(ctx, denomID)
+		k.setMT(
+			ctx, denomID,
+			types.NewMT(
+				tokenID,
+				amout+mt.GetSupply(),
+				owner,
+				data,
+			),
+		)
+	} else {
+		k.setMT(
+			ctx, denomID,
+			types.NewMT(
+				tokenID,
+				amout,
+				owner,
+				data,
+			),
+		)
+
+		k.setOwner(ctx, denomID, tokenID, amout, owner)
+		// todo 确定是否还需要 collection
+		k.increaseSupply(ctx, denomID)
+	}
 
 	return nil
 }
