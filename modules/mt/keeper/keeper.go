@@ -115,25 +115,24 @@ func (k Keeper) EditMT(ctx sdk.Context,
 	return nil
 }
 
-// TODO add amount
 // TransferOwner transfers the ownership of the given MT to the new owner
-func (k Keeper) TransferOwner(
-	ctx sdk.Context, denomID, tokenID string, srcOwner, dstOwner sdk.AccAddress,
+func (k Keeper) TransferOwner(ctx sdk.Context,
+	denomID, tokenID string,
+	amount uint64,
+	srcOwner, dstOwner sdk.AccAddress,
 ) error {
 	_, found := k.GetDenom(ctx, denomID)
 	if !found {
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
 	}
 
-	mt, err := k.Authorize(ctx, denomID, tokenID, srcOwner)
-	if err != nil {
-		return err
+	srcOwnerAmount := k.getOwner(ctx, denomID, tokenID, srcOwner)
+
+	if srcOwnerAmount < amount {
+		return sdkerrors.Wrapf(types.ErrInvalidCollection, "Lack of mt: %", srcOwnerAmount)
 	}
 
-	mt.Owner = dstOwner.String()
-
-	k.setMT(ctx, denomID, mt)
-	k.swapOwner(ctx, denomID, tokenID, srcOwner, dstOwner)
+	k.swapOwner(ctx, denomID, tokenID, amount, srcOwner, dstOwner)
 	return nil
 }
 

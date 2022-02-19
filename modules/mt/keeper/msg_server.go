@@ -139,10 +139,7 @@ func (m msgServer) TransferMT(goCtx context.Context, msg *types.MsgTransferMT) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.TransferOwner(ctx, msg.DenomId, msg.Id,
-		sender,
-		recipient,
-	); err != nil {
+	if err := m.Keeper.TransferOwner(ctx, msg.DenomId, msg.Id, msg.Amount, sender, recipient); err != nil {
 		return nil, err
 	}
 

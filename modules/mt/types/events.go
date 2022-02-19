@@ -17,6 +17,7 @@ var (
 	AttributeKeyOwner     = "owner"
 	AttributeKeyTokenID   = "token_id"
 	AttributeKeySupply    = "supply"
+	AttributeKeyAmount    = "amount"
 	AttributeKeyDenomID   = "denom_id"
 	AttributeKeyDenomName = "denom_name"
 )
