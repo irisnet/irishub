@@ -72,7 +72,7 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to mint MT of denom %s", sender, msg.DenomId)
 	}
 
-	if err := m.Keeper.MintMT(ctx, msg.DenomId, msg.Id, msg
+	if err := m.Keeper.MintMT(ctx, msg.DenomId, msg.Id, msg.
 		msg.Data,
 		recipient,
 	); err != nil {

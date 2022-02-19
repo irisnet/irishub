@@ -1,15 +1,8 @@
 package keeper
 
 import (
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/types/query"
-
-	"github.com/irisnet/irismod/modules/mt/exported"
 	"github.com/irisnet/irismod/modules/mt/types"
 )
 
@@ -42,25 +35,25 @@ func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection
 }
 
 // GetPaginateCollection returns the collection by the specified denom ID
-func (k Keeper) GetPaginateCollection(ctx sdk.Context, request *types.QueryCollectionRequest, denomID string) (types.Collection, *query.PageResponse, error) {
-	denom, found := k.GetDenom(ctx, denomID)
-	if !found {
-		return types.Collection{}, nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s ", denomID)
-	}
-	var mts []exported.MT
-	store := ctx.KVStore(k.storeKey)
-	mtStore := prefix.NewStore(store, types.KeyMT(denomID, ""))
-	pageRes, err := query.Paginate(mtStore, request.Pagination, func(key []byte, value []byte) error {
-		var baseMT types.MT
-		k.cdc.MustUnmarshal(value, &baseMT)
-		mts = append(mts, baseMT)
-		return nil
-	})
-	if err != nil {
-		return types.Collection{}, nil, status.Errorf(codes.InvalidArgument, "paginate: %v", err)
-	}
-	return types.NewCollection(denom, mts), pageRes, nil
-}
+//func (k Keeper) GetPaginateCollection(ctx sdk.Context, request *types.QueryCollectionRequest, denomID string) (types.Collection, *query.PageResponse, error) {
+//	denom, found := k.GetDenom(ctx, denomID)
+//	if !found {
+//		return types.Collection{}, nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s ", denomID)
+//	}
+//	var mts []exported.MT
+//	store := ctx.KVStore(k.storeKey)
+//	mtStore := prefix.NewStore(store, types.KeyMT(denomID, ""))
+//	pageRes, err := query.Paginate(mtStore, request.Pagination, func(key []byte, value []byte) error {
+//		var baseMT types.MT
+//		k.cdc.MustUnmarshal(value, &baseMT)
+//		mts = append(mts, baseMT)
+//		return nil
+//	})
+//	if err != nil {
+//		return types.Collection{}, nil, status.Errorf(codes.InvalidArgument, "paginate: %v", err)
+//	}
+//	return types.NewCollection(denom, mts), pageRes, nil
+//}
 
 // GetCollections returns all the collections
 func (k Keeper) GetCollections(ctx sdk.Context) (cs []types.Collection) {

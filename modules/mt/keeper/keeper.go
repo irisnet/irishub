@@ -46,8 +46,10 @@ func (k Keeper) IssueDenom(ctx sdk.Context,
 
 // MintMT mints an MT and manages the MT's existence within Collections and Owners
 func (k Keeper) MintMT(
-	ctx sdk.Context, denomID, tokenID string, supply uint64, data []byte, owner sdk.AccAddress,
+	ctx sdk.Context, denomID, tokenID string, amout uint64, data []byte, owner sdk.AccAddress,
 ) error {
+
+	// TODO create if not exists, mint if exists
 	if k.HasMT(ctx, denomID, tokenID) {
 		return sdkerrors.Wrapf(types.ErrMTAlreadyExists, "MT %s already exists in collection %s", tokenID, denomID)
 	}
@@ -56,7 +58,7 @@ func (k Keeper) MintMT(
 		ctx, denomID,
 		types.NewMT(
 			tokenID,
-			supply,
+			amout,
 			owner,
 			data,
 		),
