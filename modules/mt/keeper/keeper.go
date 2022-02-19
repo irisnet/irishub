@@ -34,10 +34,11 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 // IssueDenom issues a denom according to the given params
 func (k Keeper) IssueDenom(ctx sdk.Context,
-	id, name string, sednder sdk.AccAddress, data []byte,
+	name string, sednder sdk.AccAddress, data []byte,
 ) error {
+
 	return k.SetDenom(ctx, types.Denom{
-		Id:               id,
+		Id:               k.genDenomID(ctx),
 		Name:             name,
 		Owner:            sednder.String(),
 		Data:             data,

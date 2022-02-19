@@ -19,6 +19,9 @@ const (
 
 	// RouterKey is the message route for the MT module
 	RouterKey = ModuleName
+
+	// KeyNextDenomSequence is the key used to store the next denom sequence in the keeper
+	KeyNextDenomSequence = "nextDenomSequence"
 )
 
 var (
