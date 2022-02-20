@@ -79,16 +79,6 @@ func QueryDenomExec(clientCtx client.Context, denomID string, extraArgs ...strin
 	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryDenom(), args)
 }
 
-func QueryCollectionExec(clientCtx client.Context, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
-	args := []string{
-		denomID,
-		fmt.Sprintf("--%s=json", cli.OutputFlag),
-	}
-	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryCollection(), args)
-}
-
 func QueryDenomsExec(clientCtx client.Context, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -96,26 +86,6 @@ func QueryDenomsExec(clientCtx client.Context, extraArgs ...string) (testutil.Bu
 	args = append(args, extraArgs...)
 
 	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryDenoms(), args)
-}
-
-func QuerySupplyExec(clientCtx client.Context, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
-	args := []string{
-		denom,
-		fmt.Sprintf("--%s=json", cli.OutputFlag),
-	}
-	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQuerySupply(), args)
-}
-
-func QueryOwnerExec(clientCtx client.Context, address string, extraArgs ...string) (testutil.BufferWriter, error) {
-	args := []string{
-		address,
-		fmt.Sprintf("--%s=json", cli.OutputFlag),
-	}
-	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryOwner(), args)
 }
 
 func QueryMTExec(clientCtx client.Context, denomID string, mtID string, extraArgs ...string) (testutil.BufferWriter, error) {

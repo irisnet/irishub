@@ -56,31 +56,16 @@ func (s *IntegrationTestSuite) TestNft() {
 	// ---------------------------------------------------------------------------
 
 	from := val.Address
-	tokenName := "Kitty Token"
-	uri := "uri"
-	uriHash := "uriHash"
-	description := "description"
 	data := "data"
 	mtID := "kitty"
 	//owner     := "owner"
 	denomName := "name"
 	denom := "denom"
-	schema := "schema"
-	symbol := "symbol"
-	mintRestricted := true
-	updateRestricted := false
 
 	//------test GetCmdIssueDenom()-------------
 	args := []string{
 		fmt.Sprintf("--%s=%s", mtcli.FlagName, denomName),
-		fmt.Sprintf("--%s=%s", mtcli.FlagSchema, schema),
-		fmt.Sprintf("--%s=%s", mtcli.FlagSymbol, symbol),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURI, uri),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURIHash, uriHash),
-		fmt.Sprintf("--%s=%s", mtcli.FlagDescription, description),
 		fmt.Sprintf("--%s=%s", mtcli.FlagData, data),
-		fmt.Sprintf("--%s=%t", mtcli.FlagMintRestricted, mintRestricted),
-		fmt.Sprintf("--%s=%t", mtcli.FlagUpdateRestricted, updateRestricted),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
@@ -120,9 +105,6 @@ func (s *IntegrationTestSuite) TestNft() {
 	args = []string{
 		fmt.Sprintf("--%s=%s", mtcli.FlagData, data),
 		fmt.Sprintf("--%s=%s", mtcli.FlagRecipient, from.String()),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURI, uri),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURIHash, uriHash),
-		fmt.Sprintf("--%s=%s", mtcli.FlagTokenName, tokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
@@ -153,18 +135,11 @@ func (s *IntegrationTestSuite) TestNft() {
 	mtItem := respType.(*mttypes.MT)
 	s.Require().Equal(mtID, mtItem.Id)
 	s.Require().Equal(data, mtItem.Data)
-	s.Require().Equal(from.String(), mtItem.Owner)
 
 	//------test GetCmdEditMT()-------------
 	newTokenDate := "newdata"
-	newTokenURI := "newuri"
-	newTokenURIHash := "newuriHash"
-	newTokenName := "new Kitty Token"
 	args = []string{
 		fmt.Sprintf("--%s=%s", mtcli.FlagData, newTokenDate),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURI, newTokenURI),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURIHash, newTokenURIHash),
-		fmt.Sprintf("--%s=%s", mtcli.FlagTokenName, newTokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
@@ -191,9 +166,6 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	args = []string{
 		fmt.Sprintf("--%s=%s", mtcli.FlagData, data),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURI, uri),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURIHash, uriHash),
-		fmt.Sprintf("--%s=%s", mtcli.FlagTokenName, tokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
@@ -215,15 +187,12 @@ func (s *IntegrationTestSuite) TestNft() {
 	mtItem = respType.(*mttypes.MT)
 	s.Require().Equal(mtID, mtItem.Id)
 	s.Require().Equal(data, mtItem.Data)
-	s.Require().Equal(recipient.String(), mtItem.Owner)
 
 	//------test GetCmdBurnMT()-------------
 	newMTID := "dgsbl"
 	args = []string{
 		fmt.Sprintf("--%s=%s", mtcli.FlagData, newTokenDate),
 		fmt.Sprintf("--%s=%s", mtcli.FlagRecipient, from.String()),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURI, newTokenURI),
-		fmt.Sprintf("--%s=%s", mtcli.FlagTokenName, newTokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),

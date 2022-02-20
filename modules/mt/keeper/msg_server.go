@@ -73,7 +73,7 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 	if len(mtID) > 0 {
 
 		if !m.Keeper.HasMT(ctx, msg.DenomId, mtID) {
-			return nil, sdkerrors.Wrapf(types.ErrInvalidMTID, "MT not found: %d", mtID)
+			return nil, sdkerrors.Wrapf(types.ErrMTNotFound, "MT not found: %d", mtID)
 		}
 		m.Keeper.MintMT(ctx, msg.DenomId, mtID, msg.Amount, msg.Data, recipient)
 	} else {
