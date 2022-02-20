@@ -61,7 +61,7 @@ func (k Keeper) IssueMT(ctx sdk.Context,
 	k.setMT(ctx, denomID, mt)
 
 	// mint amounts to the recipient
-	k.setOwner(ctx, denomID, mt.GetID(), amount, recipient)
+	k.addBalance(ctx, denomID, mt.GetID(), amount, recipient)
 
 	// increase total supply
 	k.increaseSupply(ctx, denomID)
@@ -78,7 +78,7 @@ func (k Keeper) MintMT(ctx sdk.Context,
 ) {
 
 	// mint amounts to the recipient
-	k.setOwner(ctx, denomID, mtID, amount, recipient)
+	k.addBalance(ctx, denomID, mtID, amount, recipient)
 
 	// increase total supply
 	k.increaseSupply(ctx, denomID)
@@ -116,12 +116,12 @@ func (k Keeper) TransferOwner(ctx sdk.Context,
 	srcOwner, dstOwner sdk.AccAddress,
 ) error {
 
-	srcOwnerAmount := k.getOwner(ctx, denomID, tokenID, srcOwner)
+	srcOwnerAmount := k.getBalance(ctx, denomID, tokenID, srcOwner)
 	if srcOwnerAmount < amount {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Insufficient balance: %d", srcOwnerAmount)
 	}
 
-	k.swapOwner(ctx, denomID, tokenID, amount, srcOwner, dstOwner)
+	k.transfer(ctx, denomID, tokenID, amount, srcOwner, dstOwner)
 	return nil
 }
 
@@ -132,13 +132,13 @@ func (k Keeper) BurnMT(ctx sdk.Context,
 	owner sdk.AccAddress) error {
 
 	// TODO what happens if denom of mt not exists?
-	srcOwnerAmount := k.getOwner(ctx, denomID, mtID, owner)
+	srcOwnerAmount := k.getBalance(ctx, denomID, mtID, owner)
 	if srcOwnerAmount < amount {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Insufficient balance: %d", srcOwnerAmount)
 	}
 
 	// sub balance
-	k.deleteOwner(ctx, denomID, mtID, amount, owner)
+	k.subBalance(ctx, denomID, mtID, amount, owner)
 
 	// TODO sub total supply
 	return nil

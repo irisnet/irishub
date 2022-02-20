@@ -72,7 +72,7 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 
 	mtID := strings.TrimSpace(msg.Id)
 
-	// if user input an MT ID, then mint amounts to the MT, else issue a new MT
+	// if user inputs an MT ID, then mint amounts to the MT, else issue a new MT
 	if len(mtID) > 0 {
 
 		if !m.Keeper.HasMT(ctx, msg.DenomId, mtID) {
