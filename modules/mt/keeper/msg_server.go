@@ -55,9 +55,13 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 		return nil, err
 	}
 
-	recipient, err := sdk.AccAddressFromBech32(msg.Recipient)
-	if err != nil {
-		return nil, err
+	// recipient default to the sender
+	recipient := sender
+	if len(strings.TrimSpace(msg.Recipient)) > 0 {
+		recipient, err = sdk.AccAddressFromBech32(msg.Recipient)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)

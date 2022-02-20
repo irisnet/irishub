@@ -211,8 +211,11 @@ func (msg MsgMintMT) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
-	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receipt address (%s)", err)
+
+	if len(strings.TrimSpace(msg.Recipient)) > 0 {
+		if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receipt address (%s)", err)
+		}
 	}
 
 	return nil
