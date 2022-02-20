@@ -16,7 +16,7 @@ const (
 	// MaximumInitSupply is maximum limitation for the token initial supply，100 billion
 	MaximumInitSupply = uint64(100000000000)
 	// MaximumScale is the maximum limitation for token decimals
-	MaximumScale = uint32(9)
+	MaximumScale = uint32(18)
 	// MinimumSymbolLen is the minimum limitation for the length of the token's symbol
 	MinimumSymbolLen = 3
 	// MaximumSymbolLen is the maximum limitation for the length of the token's symbol
