@@ -127,7 +127,7 @@ func GetCmdQueryMTs() *cobra.Command {
 		Use:     "tokens <denom-id>",
 		Long:    "Query all MTs of a denom.",
 		Example: fmt.Sprintf("$ %s query mt tokens <denom-id>", version.AppName),
-		Args:    cobra.ExactArgs(2),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -191,7 +191,7 @@ func GetCmdQueryBalances() *cobra.Command {
 		Use:     "balances <owner>",
 		Long:    "Query balances of an owner.",
 		Example: fmt.Sprintf("$ %s query mt balances <owner>", version.AppName),
-		Args:    cobra.ExactArgs(2),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {

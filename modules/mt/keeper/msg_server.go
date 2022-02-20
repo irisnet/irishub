@@ -85,7 +85,7 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 		mtID = mt.Id
 	}
 
-	mt, err := m.Keeper.GetMT(ctx, msg.DenomId, msg.Id)
+	mt, err := m.Keeper.GetMT(ctx, msg.DenomId, mtID)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeMintMT,
-			sdk.NewAttribute(types.AttributeKeyMTID, msg.Id),
+			sdk.NewAttribute(types.AttributeKeyMTID, mtID),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
 			sdk.NewAttribute(types.AttributeKeySupply, strconv.FormatUint(mt.GetSupply(), 10)),
 		),

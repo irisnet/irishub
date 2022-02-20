@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"encoding/binary"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
@@ -87,6 +86,8 @@ func (k Keeper) MTs(c context.Context, request *types.QueryMTsRequest) (*types.Q
 	pageRes, err := query.Paginate(mtStore, request.Pagination, func(key []byte, value []byte) error {
 		var mt types.MT
 		k.cdc.MustUnmarshal(value, &mt)
+
+		mt.Supply = k.GetMTSupply(ctx, denomID, mt.GetID())
 		mts = append(mts, mt)
 		return nil
 	})
@@ -145,7 +146,7 @@ func (k Keeper) Balances(c context.Context, request *types.QueryBalancesRequest)
 	pageRes, err := query.Paginate(mtStore, request.Pagination, func(key []byte, value []byte) error {
 		bal := types.Balance{
 			MtId:   string(key),
-			Amount: binary.BigEndian.Uint64(value),
+			Amount: types.MustUnMarshalAmount(k.cdc, value),
 		}
 		bals = append(bals, bal)
 		return nil

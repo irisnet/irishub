@@ -3,14 +3,12 @@ package types
 // DONTCOVER
 
 import (
-	gogotypes "github.com/gogo/protobuf/types"
-	"strconv"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
+	gogotypes "github.com/gogo/protobuf/types"
 
 	"github.com/irisnet/irismod/modules/mt/exported"
 )
@@ -85,12 +83,12 @@ func MustUnMarshalMTID(cdc codec.Codec, value []byte) string {
 }
 
 func MustMarshalAmount(cdc codec.Codec, amount uint64) []byte {
-	mtIDWrap := gogotypes.StringValue{Value: strconv.FormatUint(amount, 10)}
-	return cdc.MustMarshal(&mtIDWrap)
+	amountWrap := gogotypes.UInt64Value{Value: amount}
+	return cdc.MustMarshal(&amountWrap)
 }
 
-func MustUnMarshalAmount(cdc codec.Codec, value []byte) string {
-	var amount gogotypes.StringValue
+func MustUnMarshalAmount(cdc codec.Codec, value []byte) uint64 {
+	var amount gogotypes.UInt64Value
 	cdc.MustUnmarshal(value, &amount)
 	return amount.Value
 }
