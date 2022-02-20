@@ -59,12 +59,7 @@ func (k Keeper) IssueMT(ctx sdk.Context,
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
 	}
 
-	mt := types.NewMT(
-		k.genMTID(ctx),
-		amount,
-		recipient,
-		data,
-	)
+	mt := types.NewMT(k.genMTID(ctx), amount, data)
 
 	// store MT
 	k.setMT(ctx, denomID, mt)
@@ -106,29 +101,25 @@ func (k Keeper) MintMT(ctx sdk.Context,
 
 // EditMT updates an existing MT
 func (k Keeper) EditMT(ctx sdk.Context,
-	denomID, tokenID string,
-	tokenData []byte,
-	owner sdk.AccAddress,
+	denomID, mtID string,
+	metadata []byte,
+	sender sdk.AccAddress,
 ) error {
-	denom, found := k.GetDenom(ctx, denomID)
-	if !found {
-		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
+
+	// authorize
+	if err := k.Authorize(ctx, denomID, sender); err != nil {
+		return err
 	}
 
-	if denom.Owner != owner.String() {
-		return sdkerrors.Wrapf(types.ErrUnauthorized, "Denom is owned by %s", denom.Owner)
-	}
-
-	mt, err := k.Authorize(ctx, denomID, tokenID, owner)
+	mt, err := k.GetMT(ctx, denomID, mtID)
 	if err != nil {
 		return err
 	}
 
-	if types.Modified(string(tokenData)) {
-		mt.Data = tokenData
+	if types.Modified(string(metadata)) {
+		newMT := types.NewMT(mt.GetID(), mt.GetSupply(), metadata)
+		k.setMT(ctx, denomID, newMT)
 	}
-
-	k.setMT(ctx, denomID, mt)
 
 	return nil
 }
@@ -139,47 +130,32 @@ func (k Keeper) TransferOwner(ctx sdk.Context,
 	amount uint64,
 	srcOwner, dstOwner sdk.AccAddress,
 ) error {
-	_, found := k.GetDenom(ctx, denomID)
-	if !found {
-		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
-	}
 
 	srcOwnerAmount := k.getOwner(ctx, denomID, tokenID, srcOwner)
 	if srcOwnerAmount < amount {
-		return sdkerrors.Wrapf(types.ErrInvalidCollection, "Lack of mt: %", srcOwnerAmount)
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Insufficient balance: %d", srcOwnerAmount)
 	}
 
 	k.swapOwner(ctx, denomID, tokenID, amount, srcOwner, dstOwner)
 	return nil
 }
 
-// BurnMT deletes a specified MT
+// BurnMT burn amounts of MT from a owner
 func (k Keeper) BurnMT(ctx sdk.Context,
-	denomID, tokenID string,
+	denomID, mtID string,
 	amount uint64,
 	owner sdk.AccAddress) error {
-	if !k.HasDenomID(ctx, denomID) {
-		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
-	}
 
-	mt, err := k.Authorize(ctx, denomID, tokenID, owner)
-	if err != nil {
-		return err
-	}
-
-	srcOwnerAmount := k.getOwner(ctx, denomID, tokenID, owner)
+	// TODO what happens if denom of mt not exists?
+	srcOwnerAmount := k.getOwner(ctx, denomID, mtID, owner)
 	if srcOwnerAmount < amount {
-		return sdkerrors.Wrapf(types.ErrInvalidCollection, "Lack of mt: %", srcOwnerAmount)
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Insufficient balance: %d", srcOwnerAmount)
 	}
 
-	k.deleteOwner(ctx, denomID, tokenID, amount, owner)
-	k.setMT(ctx, denomID, types.MT{
-		Id:     mt.Id,
-		Supply: mt.Supply - amount,
-		Data:   mt.Data,
-		Owner:  mt.Owner,
-	})
+	// sub balance
+	k.deleteOwner(ctx, denomID, mtID, amount, owner)
 
+	// TODO sub total supply
 	return nil
 }
 
@@ -187,16 +163,13 @@ func (k Keeper) BurnMT(ctx sdk.Context,
 func (k Keeper) TransferDenomOwner(
 	ctx sdk.Context, denomID string, srcOwner, dstOwner sdk.AccAddress,
 ) error {
-	denom, found := k.GetDenom(ctx, denomID)
-	if !found {
-		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
-	}
 
 	// authorize
-	if srcOwner.String() != denom.Owner {
-		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to transfer denom %s", srcOwner.String(), denomID)
+	if err := k.Authorize(ctx, denomID, srcOwner); err != nil {
+		return err
 	}
 
+	denom, _ := k.GetDenom(ctx, denomID)
 	denom.Owner = dstOwner.String()
 
 	err := k.UpdateDenom(ctx, denom)

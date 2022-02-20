@@ -17,9 +17,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		if err := k.SetDenom(ctx, *c.Denom); err != nil {
 			panic(err)
 		}
-		if err := k.SetCollection(ctx, c); err != nil {
-			panic(err)
-		}
+		// TODO
+		//if err := k.SetCollection(ctx, c); err != nil {
+		//	panic(err)
+		//}
 	}
 }
 

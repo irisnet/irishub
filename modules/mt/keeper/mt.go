@@ -27,7 +27,7 @@ func (k Keeper) GetMT(ctx sdk.Context, denomID, tokenID string) (mt exported.MT,
 
 	bz := store.Get(types.KeyMT(denomID, tokenID))
 	if bz == nil {
-		return nil, sdkerrors.Wrapf(types.ErrUnknownCollection, "not found MT: %s", denomID)
+		return nil, sdkerrors.Wrapf(types.ErrUnknownCollection, "MT not found: %s", tokenID)
 	}
 
 	var baseMT types.MT
@@ -51,19 +51,18 @@ func (k Keeper) GetMTs(ctx sdk.Context, denom string) (mts []exported.MT) {
 	return mts
 }
 
-// Authorize checks if the sender is the owner of the given MT
-// Return the MT if true, an error otherwise
-func (k Keeper) Authorize(ctx sdk.Context, denomID, tokenID string, owner sdk.AccAddress) (types.MT, error) {
-	mt, err := k.GetMT(ctx, denomID, tokenID)
-	if err != nil {
-		return types.MT{}, err
+// Authorize checks if the sender is the owner of the given denom
+func (k Keeper) Authorize(ctx sdk.Context, denomID string, owner sdk.AccAddress) error {
+	denom, found := k.GetDenom(ctx, denomID)
+	if !found {
+		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
 	}
 
-	if !owner.Equals(mt.GetOwner()) {
-		return types.MT{}, sdkerrors.Wrap(types.ErrUnauthorized, owner.String())
+	if owner.String() != denom.Owner {
+		return sdkerrors.Wrap(types.ErrUnauthorized, owner.String())
 	}
 
-	return mt.(types.MT), nil
+	return nil
 }
 
 // HasMT checks if the specified MT exists

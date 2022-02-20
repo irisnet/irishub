@@ -34,26 +34,6 @@ func RandomizedGenState(simState *module.SimulationState) {
 			},
 			types.MTs{}),
 	)
-	for _, acc := range simState.Accounts {
-		// 10% of accounts own an MT
-		if simState.Rand.Intn(100) < 10 {
-			baseMT := types.NewMT(
-				RandnMTID(simState.Rand, types.MinDenomLen, types.MaxDenomLen), // id
-				10,
-				acc.Address,
-				[]byte("test"), // TODO refactor
-			)
-
-			// 50% doggos and 50% kitties
-			if simState.Rand.Intn(100) < 50 {
-				collections[0].Denom.Owner = baseMT.Owner
-				collections[0] = collections[0].AddMT(baseMT)
-			} else {
-				collections[1].Denom.Owner = baseMT.Owner
-				collections[1] = collections[1].AddMT(baseMT)
-			}
-		}
-	}
 
 	mtGenesis := types.NewGenesisState(collections)
 

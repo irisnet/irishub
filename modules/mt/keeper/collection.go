@@ -6,23 +6,6 @@ import (
 	"github.com/irisnet/irismod/modules/mt/types"
 )
 
-// SetCollection saves all Mts and returns an error if there already exists
-func (k Keeper) SetCollection(ctx sdk.Context, collection types.Collection) error {
-	for _, mt := range collection.Mts {
-		if err := k.MintMT(
-			ctx,
-			collection.Denom.Id,
-			mt.GetID(),
-			mt.GetSupply(),
-			mt.GetData(),
-			mt.GetOwner(),
-		); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // GetCollection returns the collection by the specified denom ID
 func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection, error) {
 	denom, found := k.GetDenom(ctx, denomID)
