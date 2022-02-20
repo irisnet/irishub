@@ -34,8 +34,8 @@ func (k Keeper) getBalance(ctx sdk.Context,
 
 	store := ctx.KVStore(k.storeKey)
 
-	ownerMt := store.Get(types.KeyBalance(addr, denomID, mtID))
-	return binary.BigEndian.Uint64(ownerMt)
+	amount := store.Get(types.KeyBalance(addr, denomID, mtID))
+	return binary.BigEndian.Uint64(amount)
 }
 
 func (k Keeper) transfer(ctx sdk.Context,
