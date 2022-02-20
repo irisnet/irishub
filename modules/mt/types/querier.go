@@ -13,7 +13,7 @@ const (
 	QueryCollection = "collection"
 	QueryDenoms     = "denoms"
 	QueryDenom      = "denom"
-	QueryMT        = "mt"
+	QueryMT         = "mt"
 )
 
 // QuerySupplyParams defines the params for queries:
@@ -75,14 +75,14 @@ func NewQueryDenomParams(id string) QueryDenomParams {
 
 // QueryMTParams params for query 'custom/mts/mt'
 type QueryMTParams struct {
-	Denom   string
-	MTID string
+	Denom string
+	MTID  string
 }
 
 // NewQueryMTParams creates a new instance of QueryMTParams
 func NewQueryMTParams(denom, id string) QueryMTParams {
 	return QueryMTParams{
-		Denom:   denom,
-		MTID: id,
+		Denom: denom,
+		MTID:  id,
 	}
 }
