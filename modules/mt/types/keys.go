@@ -22,6 +22,9 @@ const (
 
 	// KeyNextDenomSequence is the key used to store the next denom sequence in the keeper
 	KeyNextDenomSequence = "nextDenomSequence"
+
+	// KeyNextMTSequence is the key used to store the next MT sequence in the keeper
+	KeyNextMTSequence = "nextMTSequence"
 )
 
 var (

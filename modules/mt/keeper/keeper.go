@@ -47,44 +47,59 @@ func (k Keeper) IssueDenom(ctx sdk.Context,
 	return denom, k.SetDenom(ctx, denom)
 }
 
-// MintMT mints an MT and manages the MT's existence within Collections and Owners
-func (k Keeper) MintMT(ctx sdk.Context,
-	denomID, tokenID string,
-	amout uint64,
+// IssueMT issues a new MT
+func (k Keeper) IssueMT(ctx sdk.Context,
+	denomID string,
+	amount uint64,
 	data []byte,
-	owner sdk.AccAddress,
+	recipient sdk.AccAddress,
 ) error {
 
-	if k.HasMT(ctx, denomID, tokenID) {
-		mt, err := k.GetMT(ctx, denomID, tokenID)
-		if err != nil {
-			return err
-		}
-
-		k.setMT(
-			ctx, denomID,
-			types.MT{
-				Id:     mt.GetID(),
-				Supply: amout + mt.GetSupply(),
-				Data:   owner,
-				Owner:  mt.GetOwner().String(),
-			},
-		)
-	} else {
-		k.setMT(
-			ctx, denomID,
-			types.NewMT(
-				tokenID,
-				amout,
-				owner,
-				data,
-			),
-		)
-
-		k.setOwner(ctx, denomID, tokenID, amout, owner)
-		// todo 确定是否还需要 collection
-		k.increaseSupply(ctx, denomID)
+	if !k.HasDenomID(ctx, denomID) {
+		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
 	}
+
+	mt := types.NewMT(
+		k.genMTID(ctx),
+		amount,
+		recipient,
+		data,
+	)
+
+	// store MT
+	k.setMT(ctx, denomID, mt)
+
+	// mint amounts to the recipient
+	k.setOwner(ctx, denomID, mt.GetID(), amount, recipient)
+
+	// increase total supply
+	k.increaseSupply(ctx, denomID)
+
+	return nil
+}
+
+// MintMT mints amounts of an existing MT
+func (k Keeper) MintMT(ctx sdk.Context,
+	denomID, mtID string,
+	amount uint64,
+	data []byte,
+	recipient sdk.AccAddress,
+) error {
+
+	if !k.HasDenomID(ctx, denomID) {
+		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
+	}
+
+	mt, err := k.GetMT(ctx, denomID, mtID)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrInvalidTokenID, "MT not found: %s", mtID)
+	}
+
+	// mint amounts to the recipient
+	k.setOwner(ctx, denomID, mt.GetID(), amount, recipient)
+
+	// increase total supply
+	k.increaseSupply(ctx, denomID)
 
 	return nil
 }

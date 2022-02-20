@@ -1,12 +1,25 @@
 package keeper
 
 import (
+	"crypto/sha256"
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/mt/exported"
 	"github.com/irisnet/irismod/modules/mt/types"
 )
+
+const mtIdPrefix = "mt-%d"
+
+// genMTID generate an MT ID by auto increment sequence
+func (k Keeper) genMTID(ctx sdk.Context) string {
+	sequence := k.getMTSequence(ctx)
+	mtID := fmt.Sprintf(mtIdPrefix, sequence)
+	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(mtID)))
+	k.setMTSequence(ctx, sequence+1)
+	return hash
+}
 
 // GetMT gets the the specified MT
 func (k Keeper) GetMT(ctx sdk.Context, denomID, tokenID string) (mt exported.MT, err error) {
@@ -70,4 +83,21 @@ func (k Keeper) setMT(ctx sdk.Context, denomID string, mt types.MT) {
 func (k Keeper) deleteMT(ctx sdk.Context, denomID string, mt exported.MT) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.KeyMT(denomID, mt.GetID()))
+}
+
+// getMTSequence gets the next MT sequence from the store.
+func (k Keeper) getMTSequence(ctx sdk.Context) uint64 {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get([]byte(types.KeyNextMTSequence))
+	if bz == nil {
+		return 1
+	}
+	return sdk.BigEndianToUint64(bz)
+}
+
+// setMTSequence sets the next MT sequence to the store.
+func (k Keeper) setMTSequence(ctx sdk.Context, sequence uint64) {
+	store := ctx.KVStore(k.storeKey)
+	bz := sdk.Uint64ToBigEndian(sequence)
+	store.Set([]byte(types.KeyNextMTSequence), bz)
 }
