@@ -13,6 +13,6 @@ var (
 	ErrEmptyTokenData    = sdkerrors.Register(ModuleName, 7, "mt data can't be empty")
 	ErrUnauthorized      = sdkerrors.Register(ModuleName, 8, "unauthorized address")
 	ErrInvalidDenom      = sdkerrors.Register(ModuleName, 9, "invalid denom")
-	ErrInvalidTokenID    = sdkerrors.Register(ModuleName, 10, "invalid mt id")
+	ErrInvalidMTID    = sdkerrors.Register(ModuleName, 10, "invalid mt id")
 	ErrInvalidTokenURI   = sdkerrors.Register(ModuleName, 11, "invalid mt uri")
 )

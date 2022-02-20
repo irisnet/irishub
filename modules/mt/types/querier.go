@@ -76,13 +76,13 @@ func NewQueryDenomParams(id string) QueryDenomParams {
 // QueryMTParams params for query 'custom/mts/mt'
 type QueryMTParams struct {
 	Denom   string
-	TokenID string
+	MTID string
 }
 
 // NewQueryMTParams creates a new instance of QueryMTParams
 func NewQueryMTParams(denom, id string) QueryMTParams {
 	return QueryMTParams{
 		Denom:   denom,
-		TokenID: id,
+		MTID: id,
 	}
 }

@@ -24,10 +24,10 @@ func IssueDenomExec(clientCtx client.Context, from string, denom string, extraAr
 	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdIssueDenom(), args)
 }
 
-func BurnMTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func BurnMTExec(clientCtx client.Context, from string, denomID string, mtID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
-		tokenID,
+		mtID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
@@ -35,10 +35,10 @@ func BurnMTExec(clientCtx client.Context, from string, denomID string, tokenID s
 	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdBurnMT(), args)
 }
 
-func MintMTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func MintMTExec(clientCtx client.Context, from string, denomID string, mtID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
-		tokenID,
+		mtID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
@@ -46,10 +46,10 @@ func MintMTExec(clientCtx client.Context, from string, denomID string, tokenID s
 	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdMintMT(), args)
 }
 
-func EditMTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func EditMTExec(clientCtx client.Context, from string, denomID string, mtID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
-		tokenID,
+		mtID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
@@ -57,11 +57,11 @@ func EditMTExec(clientCtx client.Context, from string, denomID string, tokenID s
 	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdEditMT(), args)
 }
 
-func TransferMTExec(clientCtx client.Context, from string, recipient string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func TransferMTExec(clientCtx client.Context, from string, recipient string, denomID string, mtID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		recipient,
 		denomID,
-		tokenID,
+		mtID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
@@ -118,10 +118,10 @@ func QueryOwnerExec(clientCtx client.Context, address string, extraArgs ...strin
 	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryOwner(), args)
 }
 
-func QueryMTExec(clientCtx client.Context, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryMTExec(clientCtx client.Context, denomID string, mtID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
-		tokenID,
+		mtID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)

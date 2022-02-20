@@ -65,10 +65,10 @@ func (msg MsgIssueDenom) GetSigners() []sdk.AccAddress {
 // TODO add amount
 // NewMsgTransferMT is a constructor function for MsgSetName
 func NewMsgTransferMT(
-	tokenID, denomID, sender, recipient string, amount uint64,
+	mtID, denomID, sender, recipient string, amount uint64,
 ) *MsgTransferMT {
 	return &MsgTransferMT{
-		Id:        tokenID,
+		Id:        mtID,
 		DenomId:   denomID,
 		Amount:    amount,
 		Sender:    sender,
@@ -95,7 +95,7 @@ func (msg MsgTransferMT) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
-	return ValidateTokenID(msg.Id)
+	return ValidateMTID(msg.Id)
 }
 
 // GetSignBytes Implements Msg.
@@ -115,10 +115,10 @@ func (msg MsgTransferMT) GetSigners() []sdk.AccAddress {
 
 // NewMsgEditMT is a constructor function for MsgSetName
 func NewMsgEditMT(
-	tokenID, denomID, tokenData, sender string,
+	mtID, denomID, tokenData, sender string,
 ) *MsgEditMT {
 	return &MsgEditMT{
-		Id:      tokenID,
+		Id:      mtID,
 		DenomId: denomID,
 		Data:    []byte(tokenData),
 	}
@@ -136,7 +136,7 @@ func (msg MsgEditMT) ValidateBasic() error {
 		return err
 	}
 
-	return ValidateTokenID(msg.Id)
+	return ValidateMTID(msg.Id)
 }
 
 // GetSignBytes Implements Msg.
@@ -156,10 +156,10 @@ func (msg MsgEditMT) GetSigners() []sdk.AccAddress {
 
 // NewMsgMintMT is a constructor function for MsgMintMT
 func NewMsgMintMT(
-	tokenID, denomID string, amount uint64, tokenData, sender, recipient string,
+	mtID, denomID string, amount uint64, tokenData, sender, recipient string,
 ) *MsgMintMT {
 	return &MsgMintMT{
-		Id:        tokenID,
+		Id:        mtID,
 		DenomId:   denomID,
 		Amount:    amount,
 		Data:      []byte(tokenData),
@@ -188,7 +188,7 @@ func (msg MsgMintMT) ValidateBasic() error {
 	if err := ValidateKeywords(msg.DenomId); err != nil {
 		return err
 	}
-	return ValidateTokenID(msg.Id)
+	return ValidateMTID(msg.Id)
 }
 
 // GetSignBytes Implements Msg.
@@ -207,10 +207,10 @@ func (msg MsgMintMT) GetSigners() []sdk.AccAddress {
 }
 
 // NewMsgBurnMT is a constructor function for MsgBurnMT
-func NewMsgBurnMT(sender, tokenID, denomID string, amount uint64) *MsgBurnMT {
+func NewMsgBurnMT(sender, mtID, denomID string, amount uint64) *MsgBurnMT {
 	return &MsgBurnMT{
 		Sender:  sender,
-		Id:      tokenID,
+		Id:      mtID,
 		DenomId: denomID,
 		Amount:  amount,
 	}
@@ -230,7 +230,7 @@ func (msg MsgBurnMT) ValidateBasic() error {
 	if err := ValidateDenomID(msg.DenomId); err != nil {
 		return err
 	}
-	return ValidateTokenID(msg.Id)
+	return ValidateMTID(msg.Id)
 }
 
 // GetSignBytes Implements Msg.

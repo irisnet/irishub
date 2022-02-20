@@ -46,13 +46,13 @@ func ValidateDenomID(denomID string) error {
 	return nil
 }
 
-// ValidateTokenID verify that the tokenID is legal
-func ValidateTokenID(tokenID string) error {
-	if len(tokenID) < MinDenomLen || len(tokenID) > MaxDenomLen {
-		return sdkerrors.Wrapf(ErrInvalidTokenID, "the length of mt id(%s) only accepts value [%d, %d]", tokenID, MinDenomLen, MaxDenomLen)
+// ValidateMTID verify that the mtID is legal
+func ValidateMTID(mtID string) error {
+	if len(mtID) < MinDenomLen || len(mtID) > MaxDenomLen {
+		return sdkerrors.Wrapf(ErrInvalidMTID, "the length of mt id(%s) only accepts value [%d, %d]", mtID, MinDenomLen, MaxDenomLen)
 	}
-	if !IsBeginWithAlpha(tokenID) || !IsAlphaNumeric(tokenID) {
-		return sdkerrors.Wrapf(ErrInvalidTokenID, "mt id(%s) only accepts alphanumeric characters, and begin with an english letter", tokenID)
+	if !IsBeginWithAlpha(mtID) || !IsAlphaNumeric(mtID) {
+		return sdkerrors.Wrapf(ErrInvalidMTID, "mt id(%s) only accepts alphanumeric characters, and begin with an english letter", mtID)
 	}
 	return nil
 }

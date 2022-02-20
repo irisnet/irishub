@@ -111,17 +111,17 @@ func (k Keeper) EditMT(ctx sdk.Context,
 
 // TransferOwner transfers the ownership of the given MT to the new owner
 func (k Keeper) TransferOwner(ctx sdk.Context,
-	denomID, tokenID string,
+	denomID, mtID string,
 	amount uint64,
 	srcOwner, dstOwner sdk.AccAddress,
 ) error {
 
-	srcOwnerAmount := k.getBalance(ctx, denomID, tokenID, srcOwner)
+	srcOwnerAmount := k.getBalance(ctx, denomID, mtID, srcOwner)
 	if srcOwnerAmount < amount {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Insufficient balance: %d", srcOwnerAmount)
 	}
 
-	k.transfer(ctx, denomID, tokenID, amount, srcOwner, dstOwner)
+	k.transfer(ctx, denomID, mtID, amount, srcOwner, dstOwner)
 	return nil
 }
 
