@@ -136,6 +136,7 @@ func NewMsgEditMT(
 		Id:      mtID,
 		DenomId: denomID,
 		Data:    []byte(tokenData),
+		Sender:  sender,
 	}
 }
 
