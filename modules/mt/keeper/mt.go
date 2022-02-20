@@ -27,7 +27,7 @@ func (k Keeper) GetMT(ctx sdk.Context, denomID, mtID string) (mt exported.MT, er
 
 	bz := store.Get(types.KeyMT(denomID, mtID))
 	if bz == nil {
-		return nil, sdkerrors.Wrapf(types.ErrMTNotFound, "MT not found: %s", mtID)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrNotFound, "mt not found (%s)", mtID)
 	}
 
 	var baseMT types.MT
@@ -61,7 +61,7 @@ func (k Keeper) GetMTs(ctx sdk.Context, denomID string) (mts []exported.MT) {
 func (k Keeper) Authorize(ctx sdk.Context, denomID string, owner sdk.AccAddress) error {
 	denom, found := k.GetDenom(ctx, denomID)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrDenomNotFound, "Denom not found: %s", denomID)
+		return sdkerrors.Wrapf(sdkerrors.ErrNotFound, "denom not found (%s)", denomID)
 	}
 
 	if owner.String() != denom.Owner {
