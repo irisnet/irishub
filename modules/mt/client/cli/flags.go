@@ -16,9 +16,9 @@ var (
 	FsIssueDenom    = flag.NewFlagSet("", flag.ContinueOnError)
 	FsTransferDenom = flag.NewFlagSet("", flag.ContinueOnError)
 
-	FsMintMT        = flag.NewFlagSet("", flag.ContinueOnError)
-	FsEditMT        = flag.NewFlagSet("", flag.ContinueOnError)
-	FsTransferMT    = flag.NewFlagSet("", flag.ContinueOnError)
+	FsMintMT     = flag.NewFlagSet("", flag.ContinueOnError)
+	FsEditMT     = flag.NewFlagSet("", flag.ContinueOnError)
+	FsTransferMT = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
