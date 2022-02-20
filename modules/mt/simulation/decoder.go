@@ -20,8 +20,8 @@ func NewDecodeStore(cdc codec.Codec) func(kvA, kvB kv.Pair) string {
 			cdc.MustUnmarshal(kvB.Value, &mtB)
 			return fmt.Sprintf("%v\n%v", mtA, mtB)
 		case bytes.Equal(kvA.Key[:1], types.PrefixBalance):
-			idA := types.MustUnMarshalTokenID(cdc, kvA.Value)
-			idB := types.MustUnMarshalTokenID(cdc, kvB.Value)
+			idA := types.MustUnMarshalMTID(cdc, kvA.Value)
+			idB := types.MustUnMarshalMTID(cdc, kvB.Value)
 			return fmt.Sprintf("%v\n%v", idA, idB)
 		case bytes.Equal(kvA.Key[:1], types.PrefixDenom):
 			var denomA, denomB types.Denom

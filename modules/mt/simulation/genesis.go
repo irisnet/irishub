@@ -22,15 +22,15 @@ func RandomizedGenState(simState *module.SimulationState) {
 	collections := types.NewCollections(
 		types.NewCollection(
 			types.Denom{
-				Id:      doggos,
-				Name:    doggos,
+				Id:   doggos,
+				Name: doggos,
 			},
 			types.MTs{},
 		),
 		types.NewCollection(
 			types.Denom{
-				Id:      kitties,
-				Name:    kitties,
+				Id:   kitties,
+				Name: kitties,
 			},
 			types.MTs{}),
 	)

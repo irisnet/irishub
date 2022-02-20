@@ -16,7 +16,7 @@ func ValidateGenesis(data GenesisState) error {
 		}
 
 		for _, mt := range c.Mts {
-			if err := ValidateTokenID(mt.GetID()); err != nil {
+			if err := ValidateMTID(mt.GetID()); err != nil {
 				return err
 			}
 		}

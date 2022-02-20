@@ -56,31 +56,16 @@ func (s *IntegrationTestSuite) TestNft() {
 	// ---------------------------------------------------------------------------
 
 	from := val.Address
-	tokenName := "Kitty Token"
-	uri := "uri"
-	uriHash := "uriHash"
-	description := "description"
 	data := "data"
-	tokenID := "kitty"
+	mtID := "kitty"
 	//owner     := "owner"
 	denomName := "name"
 	denom := "denom"
-	schema := "schema"
-	symbol := "symbol"
-	mintRestricted := true
-	updateRestricted := false
 
 	//------test GetCmdIssueDenom()-------------
 	args := []string{
 		fmt.Sprintf("--%s=%s", mtcli.FlagName, denomName),
-		fmt.Sprintf("--%s=%s", mtcli.FlagSchema, schema),
-		fmt.Sprintf("--%s=%s", mtcli.FlagSymbol, symbol),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURI, uri),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURIHash, uriHash),
-		fmt.Sprintf("--%s=%s", mtcli.FlagDescription, description),
 		fmt.Sprintf("--%s=%s", mtcli.FlagData, data),
-		fmt.Sprintf("--%s=%t", mtcli.FlagMintRestricted, mintRestricted),
-		fmt.Sprintf("--%s=%t", mtcli.FlagUpdateRestricted, updateRestricted),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
@@ -120,9 +105,6 @@ func (s *IntegrationTestSuite) TestNft() {
 	args = []string{
 		fmt.Sprintf("--%s=%s", mtcli.FlagData, data),
 		fmt.Sprintf("--%s=%s", mtcli.FlagRecipient, from.String()),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURI, uri),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURIHash, uriHash),
-		fmt.Sprintf("--%s=%s", mtcli.FlagTokenName, tokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
@@ -131,7 +113,7 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	respType = proto.Message(&sdk.TxResponse{})
 
-	bz, err = mttestutil.MintMTExec(val.ClientCtx, from.String(), denomID, tokenID, args...)
+	bz, err = mttestutil.MintMTExec(val.ClientCtx, from.String(), denomID, mtID, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
@@ -147,24 +129,17 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	//------test GetCmdQueryMT()-------------
 	respType = proto.Message(&mttypes.MT{})
-	bz, err = mttestutil.QueryMTExec(val.ClientCtx, denomID, tokenID)
+	bz, err = mttestutil.QueryMTExec(val.ClientCtx, denomID, mtID)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	mtItem := respType.(*mttypes.MT)
-	s.Require().Equal(tokenID, mtItem.Id)
+	s.Require().Equal(mtID, mtItem.Id)
 	s.Require().Equal(data, mtItem.Data)
-	s.Require().Equal(from.String(), mtItem.Owner)
 
 	//------test GetCmdEditMT()-------------
 	newTokenDate := "newdata"
-	newTokenURI := "newuri"
-	newTokenURIHash := "newuriHash"
-	newTokenName := "new Kitty Token"
 	args = []string{
 		fmt.Sprintf("--%s=%s", mtcli.FlagData, newTokenDate),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURI, newTokenURI),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURIHash, newTokenURIHash),
-		fmt.Sprintf("--%s=%s", mtcli.FlagTokenName, newTokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
@@ -173,14 +148,14 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	respType = proto.Message(&sdk.TxResponse{})
 
-	bz, err = mttestutil.EditMTExec(val.ClientCtx, from.String(), denomID, tokenID, args...)
+	bz, err = mttestutil.EditMTExec(val.ClientCtx, from.String(), denomID, mtID, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	respType = proto.Message(&mttypes.MT{})
-	bz, err = mttestutil.QueryMTExec(val.ClientCtx, denomID, tokenID)
+	bz, err = mttestutil.QueryMTExec(val.ClientCtx, denomID, mtID)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	newNftItem := respType.(*mttypes.MT)
@@ -191,9 +166,6 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	args = []string{
 		fmt.Sprintf("--%s=%s", mtcli.FlagData, data),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURI, uri),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURIHash, uriHash),
-		fmt.Sprintf("--%s=%s", mtcli.FlagTokenName, tokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
@@ -202,28 +174,25 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	respType = proto.Message(&sdk.TxResponse{})
 
-	bz, err = mttestutil.TransferMTExec(val.ClientCtx, from.String(), recipient.String(), denomID, tokenID, args...)
+	bz, err = mttestutil.TransferMTExec(val.ClientCtx, from.String(), recipient.String(), denomID, mtID, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	respType = proto.Message(&mttypes.MT{})
-	bz, err = mttestutil.QueryMTExec(val.ClientCtx, denomID, tokenID)
+	bz, err = mttestutil.QueryMTExec(val.ClientCtx, denomID, mtID)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	mtItem = respType.(*mttypes.MT)
-	s.Require().Equal(tokenID, mtItem.Id)
+	s.Require().Equal(mtID, mtItem.Id)
 	s.Require().Equal(data, mtItem.Data)
-	s.Require().Equal(recipient.String(), mtItem.Owner)
 
 	//------test GetCmdBurnMT()-------------
-	newTokenID := "dgsbl"
+	newMTID := "dgsbl"
 	args = []string{
 		fmt.Sprintf("--%s=%s", mtcli.FlagData, newTokenDate),
 		fmt.Sprintf("--%s=%s", mtcli.FlagRecipient, from.String()),
-		fmt.Sprintf("--%s=%s", mtcli.FlagURI, newTokenURI),
-		fmt.Sprintf("--%s=%s", mtcli.FlagTokenName, newTokenName),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
@@ -232,7 +201,7 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	respType = proto.Message(&sdk.TxResponse{})
 
-	bz, err = mttestutil.MintMTExec(val.ClientCtx, from.String(), denomID, newTokenID, args...)
+	bz, err = mttestutil.MintMTExec(val.ClientCtx, from.String(), denomID, newMTID, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
@@ -251,7 +220,7 @@ func (s *IntegrationTestSuite) TestNft() {
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
 	}
 	respType = proto.Message(&sdk.TxResponse{})
-	bz, err = mttestutil.BurnMTExec(val.ClientCtx, from.String(), denomID, newTokenID, args...)
+	bz, err = mttestutil.BurnMTExec(val.ClientCtx, from.String(), denomID, newMTID, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(val2.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)

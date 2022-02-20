@@ -108,7 +108,7 @@ func GetCmdQueryMTSupply() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.MTSupply(context.Background(), &types.QueryMTSupplyRequest{
 				DenomId: args[0],
-				MtId: args[1],
+				MtId:    args[1],
 			})
 			if err != nil {
 				return err
@@ -141,7 +141,7 @@ func GetCmdQueryMTs() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.MTs(context.Background(), &types.QueryMTsRequest{
-				DenomId: args[0],
+				DenomId:    args[0],
 				Pagination: pageReq,
 			})
 			if err != nil {
@@ -172,7 +172,7 @@ func GetCmdQueryMT() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.MT(context.Background(), &types.QueryMTRequest{
 				DenomId: args[0],
-				MtId: args[1],
+				MtId:    args[1],
 			})
 			if err != nil {
 				return err
@@ -209,9 +209,9 @@ func GetCmdQueryBalances() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
-			resp, err := queryClient.Balances(context.Background(), &types.QueryBalancesRequest {
-				Owner: args[0],
-				DenomId: denomID,
+			resp, err := queryClient.Balances(context.Background(), &types.QueryBalancesRequest{
+				Owner:      args[0],
+				DenomId:    denomID,
 				Pagination: pageReq,
 			})
 			if err != nil {

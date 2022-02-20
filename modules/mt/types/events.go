@@ -15,7 +15,7 @@ var (
 	AttributeKeyCreator   = "creator"
 	AttributeKeyRecipient = "recipient"
 	AttributeKeyOwner     = "owner"
-	AttributeKeyTokenID   = "token_id"
+	AttributeKeyMTID      = "mt_id"
 	AttributeKeySupply    = "supply"
 	AttributeKeyAmount    = "amount"
 	AttributeKeyDenomID   = "denom_id"

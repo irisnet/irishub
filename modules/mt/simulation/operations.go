@@ -412,7 +412,7 @@ func SimulateMsgIssueDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 
 		msg := types.NewMsgIssueDenom(
 			denomName,
-			[]byte(data),
+			data,
 			sender.Address.String(),
 		)
 		account := ak.GetAccount(ctx, sender.Address)
@@ -445,7 +445,7 @@ func SimulateMsgIssueDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 	}
 }
 
-func getRandomMTFromOwner(ctx sdk.Context, k keeper.Keeper, r *rand.Rand) (address sdk.AccAddress, denomID, tokenID string) {
+func getRandomMTFromOwner(ctx sdk.Context, k keeper.Keeper, r *rand.Rand) (address sdk.AccAddress, denomID, mtID string) {
 	//owners := k.GetOwners(ctx)
 	//
 	//ownersLen := len(owners)
@@ -474,10 +474,10 @@ func getRandomMTFromOwner(ctx sdk.Context, k keeper.Keeper, r *rand.Rand) (addre
 	//
 	//// get random mt from collection
 	//i = r.Intn(idsLen)
-	//tokenID = idCollection.TokenIds[i]
+	//mtID = idCollection.TokenIds[i]
 	//
 	//ownerAddress, _ := sdk.AccAddressFromBech32(owner.Address)
-	//return ownerAddress, denomID, tokenID
+	//return ownerAddress, denomID, mtID
 	//TODO
 	return nil, "", ""
 }

@@ -30,13 +30,13 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	denom := m.Keeper.IssueDenom(ctx, msg.Name, sender, msg.Data)
+	denom := m.Keeper.IssueDenom(ctx, strings.Trim(msg.Name), sender, msg.Data)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeIssueDenom,
 			sdk.NewAttribute(types.AttributeKeyDenomID, denom.Id),
-			sdk.NewAttribute(types.AttributeKeyDenomName, msg.Name),
+			sdk.NewAttribute(types.AttributeKeyDenomName, denom.Name),
 			sdk.NewAttribute(types.AttributeKeyCreator, msg.Sender),
 		),
 		sdk.NewEvent(
@@ -73,7 +73,7 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 	if len(mtID) > 0 {
 
 		if !m.Keeper.HasMT(ctx, msg.DenomId, mtID) {
-			return nil, sdkerrors.Wrapf(types.ErrInvalidTokenID, "MT not found: %d", mtID)
+			return nil, sdkerrors.Wrapf(types.ErrMTNotFound, "MT not found: %d", mtID)
 		}
 		m.Keeper.MintMT(ctx, msg.DenomId, mtID, msg.Amount, msg.Data, recipient)
 	} else {
@@ -89,7 +89,7 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeMintMT,
-			sdk.NewAttribute(types.AttributeKeyTokenID, msg.Id),
+			sdk.NewAttribute(types.AttributeKeyMTID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
 			sdk.NewAttribute(types.AttributeKeySupply, strconv.FormatUint(mt.GetSupply(), 10)),
 		),
@@ -123,7 +123,7 @@ func (m msgServer) EditMT(goCtx context.Context, msg *types.MsgEditMT) (*types.M
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeEditMT,
-			sdk.NewAttribute(types.AttributeKeyTokenID, msg.Id),
+			sdk.NewAttribute(types.AttributeKeyMTID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Sender),
 		),
@@ -156,7 +156,7 @@ func (m msgServer) TransferMT(goCtx context.Context, msg *types.MsgTransferMT) (
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeTransfer,
-			sdk.NewAttribute(types.AttributeKeyTokenID, msg.Id),
+			sdk.NewAttribute(types.AttributeKeyMTID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
 			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
 			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
@@ -186,7 +186,7 @@ func (m msgServer) BurnMT(goCtx context.Context, msg *types.MsgBurnMT) (*types.M
 		sdk.NewEvent(
 			types.EventTypeBurnMT,
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
-			sdk.NewAttribute(types.AttributeKeyTokenID, msg.Id),
+			sdk.NewAttribute(types.AttributeKeyMTID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Sender),
 		),
 		sdk.NewEvent(

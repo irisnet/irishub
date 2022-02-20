@@ -71,22 +71,22 @@ func MustUnMarshalSupply(cdc codec.Codec, value []byte) uint64 {
 	return supplyWrap.Value
 }
 
-// return the tokenID protobuf code
-func MustMarshalTokenID(cdc codec.Codec, tokenID string) []byte {
-	tokenIDWrap := gogotypes.StringValue{Value: tokenID}
-	return cdc.MustMarshal(&tokenIDWrap)
+// return the mtID protobuf code
+func MustMarshalMTID(cdc codec.Codec, mtID string) []byte {
+	mtIDWrap := gogotypes.StringValue{Value: mtID}
+	return cdc.MustMarshal(&mtIDWrap)
 }
 
-// return th tokenID
-func MustUnMarshalTokenID(cdc codec.Codec, value []byte) string {
-	var tokenIDWrap gogotypes.StringValue
-	cdc.MustUnmarshal(value, &tokenIDWrap)
-	return tokenIDWrap.Value
+// return th mtID
+func MustUnMarshalMTID(cdc codec.Codec, value []byte) string {
+	var mtIDWrap gogotypes.StringValue
+	cdc.MustUnmarshal(value, &mtIDWrap)
+	return mtIDWrap.Value
 }
 
 func MustMarshalAmount(cdc codec.Codec, amount uint64) []byte {
-	tokenIDWrap := gogotypes.StringValue{Value: strconv.FormatUint(amount, 10)}
-	return cdc.MustMarshal(&tokenIDWrap)
+	mtIDWrap := gogotypes.StringValue{Value: strconv.FormatUint(amount, 10)}
+	return cdc.MustMarshal(&mtIDWrap)
 }
 
 func MustUnMarshalAmount(cdc codec.Codec, value []byte) string {
