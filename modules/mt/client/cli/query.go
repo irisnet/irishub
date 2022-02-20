@@ -3,8 +3,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"github.com/irisnet/irismod/modules/nft/client/cli"
-
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -66,7 +64,7 @@ func GetCmdQueryDenoms() *cobra.Command {
 // GetCmdQueryDenom queries the specified denom
 func GetCmdQueryDenom() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "denom <denom-id>",
+		Use:     "denom [denom-id]",
 		Long:    "Query denom by ID.",
 		Example: fmt.Sprintf("$ %s query mt denom <denom-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
@@ -95,7 +93,7 @@ func GetCmdQueryDenom() *cobra.Command {
 // GetCmdQueryMTSupply queries the total supply of given denom and mt ID
 func GetCmdQueryMTSupply() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "supply <denom-id> <mt-id>",
+		Use:     "supply [denom-id] [mt-id]",
 		Long:    "Query total supply of an MT.",
 		Example: fmt.Sprintf("$ %s query mt supply <denom-id> <mt-id>", version.AppName),
 		Args:    cobra.ExactArgs(2),
@@ -124,7 +122,7 @@ func GetCmdQueryMTSupply() *cobra.Command {
 // GetCmdQueryMTs queries all MTs of a denom
 func GetCmdQueryMTs() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "tokens <denom-id>",
+		Use:     "tokens [denom-id]",
 		Long:    "Query all MTs of a denom.",
 		Example: fmt.Sprintf("$ %s query mt tokens <denom-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
@@ -159,7 +157,7 @@ func GetCmdQueryMTs() *cobra.Command {
 // GetCmdQueryMT queries MT by ID
 func GetCmdQueryMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "token <denom-id> <mt-id>",
+		Use:     "token [denom-id] [mt-id]",
 		Long:    "Query MT by ID.",
 		Example: fmt.Sprintf("$ %s query mt token <denom-id> <mt-id>", version.AppName),
 		Args:    cobra.ExactArgs(2),
@@ -188,17 +186,12 @@ func GetCmdQueryMT() *cobra.Command {
 // GetCmdQueryBalances queries the MT balances of a specified owner
 func GetCmdQueryBalances() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "balances <owner>",
+		Use:     "balances [owner] [denom-id]",
 		Long:    "Query balances of an owner.",
-		Example: fmt.Sprintf("$ %s query mt balances <owner>", version.AppName),
-		Args:    cobra.ExactArgs(1),
+		Example: fmt.Sprintf("$ %s query mt balances <owner> <denom-id>", version.AppName),
+		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			denomID, err := cmd.Flags().GetString(cli.FlagDenomID)
 			if err != nil {
 				return err
 			}
@@ -211,7 +204,7 @@ func GetCmdQueryBalances() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.Balances(context.Background(), &types.QueryBalancesRequest{
 				Owner:      args[0],
-				DenomId:    denomID,
+				DenomId:    args[1],
 				Pagination: pageReq,
 			})
 			if err != nil {
@@ -221,7 +214,6 @@ func GetCmdQueryBalances() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FsQueryMTSupply)
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
