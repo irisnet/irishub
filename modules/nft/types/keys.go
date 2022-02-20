@@ -36,7 +36,7 @@ func SplitKeyOwner(key []byte) (address sdk.AccAddress, denomID, tokenID string,
 	key = key[len(PrefixOwners)+len(delimiter):]
 	keys := bytes.Split(key, delimiter)
 	if len(keys) != 3 {
-		return address, denomID, tokenID, errors.New("wrong KeyOwner")
+		return address, denomID, tokenID, errors.New("wrong KeyBalance")
 	}
 
 	address, _ = sdk.AccAddressFromBech32(string(keys[0]))
@@ -48,7 +48,7 @@ func SplitKeyOwner(key []byte) (address sdk.AccAddress, denomID, tokenID string,
 func SplitKeyDenom(key []byte) (denomID, tokenID string, err error) {
 	keys := bytes.Split(key, delimiter)
 	if len(keys) != 2 {
-		return denomID, tokenID, errors.New("wrong KeyOwner")
+		return denomID, tokenID, errors.New("wrong KeyBalance")
 	}
 
 	denomID = string(keys[0])
@@ -56,7 +56,7 @@ func SplitKeyDenom(key []byte) (denomID, tokenID string, err error) {
 	return
 }
 
-// KeyOwner gets the key of a collection owned by an account address
+// KeyBalance gets the key of a collection owned by an account address
 func KeyOwner(address sdk.AccAddress, denomID, tokenID string) []byte {
 	key := append(PrefixOwners, delimiter...)
 	if address != nil {
@@ -95,7 +95,7 @@ func KeyCollection(denomID string) []byte {
 	return append(key, []byte(denomID)...)
 }
 
-// KeyDenomID gets the storeKey by the denom id
+// KeyDenom gets the storeKey by the denom id
 func KeyDenomID(id string) []byte {
 	key := append(PrefixDenom, delimiter...)
 	return append(key, []byte(id)...)

@@ -2,10 +2,11 @@ package keeper
 
 import (
 	"context"
+	"strconv"
+	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-
 	"github.com/irisnet/irismod/modules/mt/types"
 )
 
@@ -29,10 +30,7 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	denom, err := m.Keeper.IssueDenom(ctx, msg.Name, sender, msg.Data)
-	if err != nil {
-		return nil, err
-	}
+	denom := m.Keeper.IssueDenom(ctx, msg.Name, sender, msg.Data)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
@@ -52,38 +50,48 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 }
 
 func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.MsgMintMTResponse, error) {
-	recipient, err := sdk.AccAddressFromBech32(msg.Recipient)
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
 	}
 
-	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	recipient, err := sdk.AccAddressFromBech32(msg.Recipient)
 	if err != nil {
 		return nil, err
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	denom, found := m.Keeper.GetDenom(ctx, msg.DenomId)
-	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s ", msg.DenomId)
-	}
-
-	if denom.Owner != sender.String() {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to mint MT of denom %s", sender, msg.DenomId)
-	}
-
-	if err := m.Keeper.MintMT(ctx, msg.DenomId, msg.Id, msg.Amount, msg.Data, recipient); err != nil {
+	// only denom owner can issue/mint MTs
+	if err := m.Keeper.Authorize(ctx, msg.DenomId, sender); err != nil {
 		return nil, err
 	}
 
-	// TODO update events
+	mtID := strings.TrimSpace(msg.Id)
+
+	// if user inputs an MT ID, then mint amounts to the MT, else issue a new MT
+	if len(mtID) > 0 {
+
+		if !m.Keeper.HasMT(ctx, msg.DenomId, mtID) {
+			return nil, sdkerrors.Wrapf(types.ErrInvalidTokenID, "MT not found: %d", mtID)
+		}
+		m.Keeper.MintMT(ctx, msg.DenomId, mtID, msg.Amount, msg.Data, recipient)
+	} else {
+		mt := m.Keeper.IssueMT(ctx, msg.DenomId, msg.Amount, msg.Data, recipient)
+		mtID = mt.Id
+	}
+
+	mt, err := m.Keeper.GetMT(ctx, msg.DenomId, msg.Id)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeMintMT,
 			sdk.NewAttribute(types.AttributeKeyTokenID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
-			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
+			sdk.NewAttribute(types.AttributeKeySupply, strconv.FormatUint(mt.GetSupply(), 10)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -102,6 +110,12 @@ func (m msgServer) EditMT(goCtx context.Context, msg *types.MsgEditMT) (*types.M
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// only denom owner can edit MTs
+	if err := m.Keeper.Authorize(ctx, msg.DenomId, sender); err != nil {
+		return nil, err
+	}
+
 	if err := m.Keeper.EditMT(ctx, msg.DenomId, msg.Id, msg.Data, sender); err != nil {
 		return nil, err
 	}
@@ -135,10 +149,7 @@ func (m msgServer) TransferMT(goCtx context.Context, msg *types.MsgTransferMT) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.TransferOwner(ctx, msg.DenomId, msg.Id,
-		sender,
-		recipient,
-	); err != nil {
+	if err := m.Keeper.TransferOwner(ctx, msg.DenomId, msg.Id, msg.Amount, sender, recipient); err != nil {
 		return nil, err
 	}
 
@@ -167,7 +178,7 @@ func (m msgServer) BurnMT(goCtx context.Context, msg *types.MsgBurnMT) (*types.M
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.BurnMT(ctx, msg.DenomId, msg.Id, sender); err != nil {
+	if err := m.Keeper.BurnMT(ctx, msg.DenomId, msg.Id, msg.Amount, sender); err != nil {
 		return nil, err
 	}
 

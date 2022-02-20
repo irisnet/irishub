@@ -23,7 +23,6 @@ message MT {
   string id = 1;
   uint64 supply = 2;
   bytes data = 3;
-  string owner = 4;
 }
 
 // Balance defines multi token balance for owners

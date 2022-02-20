@@ -4,6 +4,7 @@ package types
 
 import (
 	gogotypes "github.com/gogo/protobuf/types"
+	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -81,4 +82,15 @@ func MustUnMarshalTokenID(cdc codec.Codec, value []byte) string {
 	var tokenIDWrap gogotypes.StringValue
 	cdc.MustUnmarshal(value, &tokenIDWrap)
 	return tokenIDWrap.Value
+}
+
+func MustMarshalAmount(cdc codec.Codec, amount uint64) []byte {
+	tokenIDWrap := gogotypes.StringValue{Value: strconv.FormatUint(amount, 10)}
+	return cdc.MustMarshal(&tokenIDWrap)
+}
+
+func MustUnMarshalAmount(cdc codec.Codec, value []byte) string {
+	var amount gogotypes.StringValue
+	cdc.MustUnmarshal(value, &amount)
+	return amount.Value
 }

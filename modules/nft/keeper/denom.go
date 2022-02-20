@@ -7,7 +7,7 @@ import (
 	"github.com/irisnet/irismod/modules/nft/types"
 )
 
-// HasDenomID returns whether the specified denom ID exists
+// HasDenom returns whether the specified denom ID exists
 func (k Keeper) HasDenomID(ctx sdk.Context, id string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.KeyDenomID(id))

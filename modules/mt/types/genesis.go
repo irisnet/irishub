@@ -1,9 +1,5 @@
 package types
 
-import (
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-)
-
 // NewGenesisState creates a new genesis state.
 func NewGenesisState(collections []Collection) *GenesisState {
 	return &GenesisState{
@@ -20,10 +16,6 @@ func ValidateGenesis(data GenesisState) error {
 		}
 
 		for _, mt := range c.Mts {
-			if mt.GetOwner().Empty() {
-				return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing owner")
-			}
-
 			if err := ValidateTokenID(mt.GetID()); err != nil {
 				return err
 			}
