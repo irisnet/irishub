@@ -412,7 +412,7 @@ func SimulateMsgIssueDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 
 		msg := types.NewMsgIssueDenom(
 			denomName,
-			[]byte(data),
+			data,
 			sender.Address.String(),
 		)
 		account := ak.GetAccount(ctx, sender.Address)

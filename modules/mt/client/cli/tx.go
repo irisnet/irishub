@@ -72,7 +72,7 @@ func GetCmdIssueDenom() *cobra.Command {
 
 			msg := types.NewMsgIssueDenom(
 				name,
-				[]byte(data),
+				data,
 				sender,
 			)
 			if err := msg.ValidateBasic(); err != nil {

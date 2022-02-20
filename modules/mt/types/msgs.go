@@ -3,32 +3,35 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"strings"
 )
 
 // constant used to indicate that some field should not be updated
 const (
 	TypeMsgIssueDenom    = "issue_denom"
-	TypeMsgTransferMT    = "transfer_mt"
-	TypeMsgEditMT        = "edit_mt"
-	TypeMsgMintMT        = "mint_mt"
-	TypeMsgBurnMT        = "burn_mt"
 	TypeMsgTransferDenom = "transfer_denom"
+
+	TypeMsgMintMT     = "mint_mt"
+	TypeMsgTransferMT = "transfer_mt"
+	TypeMsgEditMT     = "edit_mt"
+	TypeMsgBurnMT     = "burn_mt"
 )
 
 var (
 	_ sdk.Msg = &MsgIssueDenom{}
+	_ sdk.Msg = &MsgTransferDenom{}
+
+	_ sdk.Msg = &MsgMintMT{}
 	_ sdk.Msg = &MsgTransferMT{}
 	_ sdk.Msg = &MsgEditMT{}
-	_ sdk.Msg = &MsgMintMT{}
 	_ sdk.Msg = &MsgBurnMT{}
-	_ sdk.Msg = &MsgTransferDenom{}
 )
 
-// NewMsgIssueDenom is a constructor function for MsgSetName
-func NewMsgIssueDenom(name string, data []byte, sender string) *MsgIssueDenom {
+// NewMsgIssueDenom is a constructor function for MsgIssueDenom
+func NewMsgIssueDenom(name, data, sender string) *MsgIssueDenom {
 	return &MsgIssueDenom{
 		Name:   name,
-		Data:   data,
+		Data:   []byte(data),
 		Sender: sender,
 	}
 }
@@ -41,6 +44,11 @@ func (msg MsgIssueDenom) Type() string { return TypeMsgIssueDenom }
 
 // ValidateBasic Implements Msg.
 func (msg MsgIssueDenom) ValidateBasic() error {
+
+	if len(strings.TrimSpace(msg.Name)) <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "name is required")
+	}
+
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
@@ -62,8 +70,7 @@ func (msg MsgIssueDenom) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
-// TODO add amount
-// NewMsgTransferMT is a constructor function for MsgSetName
+// NewMsgTransferMT is a constructor function for MsgTransferMT
 func NewMsgTransferMT(
 	mtID, denomID, sender, recipient string, amount uint64,
 ) *MsgTransferMT {
@@ -84,8 +91,16 @@ func (msg MsgTransferMT) Type() string { return TypeMsgTransferMT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgTransferMT) ValidateBasic() error {
-	if err := ValidateDenomID(msg.DenomId); err != nil {
-		return err
+	if len(strings.TrimSpace(msg.Id)) <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "mt id is required")
+	}
+
+	if len(strings.TrimSpace(msg.DenomId)) <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
+	}
+
+	if msg.Amount <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "amount is required")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
@@ -95,7 +110,7 @@ func (msg MsgTransferMT) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
-	return ValidateMTID(msg.Id)
+	return nil
 }
 
 // GetSignBytes Implements Msg.
@@ -113,7 +128,7 @@ func (msg MsgTransferMT) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
-// NewMsgEditMT is a constructor function for MsgSetName
+// NewMsgEditMT is a constructor function for MsgEditMT
 func NewMsgEditMT(
 	mtID, denomID, tokenData, sender string,
 ) *MsgEditMT {
@@ -132,11 +147,19 @@ func (msg MsgEditMT) Type() string { return TypeMsgEditMT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgEditMT) ValidateBasic() error {
-	if err := ValidateDenomID(msg.DenomId); err != nil {
-		return err
+	if len(strings.TrimSpace(msg.Id)) <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "mt id is required")
 	}
 
-	return ValidateMTID(msg.Id)
+	if len(strings.TrimSpace(msg.DenomId)) <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
+	}
+
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+	}
+
+	return nil
 }
 
 // GetSignBytes Implements Msg.
@@ -176,19 +199,23 @@ func (msg MsgMintMT) Type() string { return TypeMsgMintMT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgMintMT) ValidateBasic() error {
+
+	if len(strings.TrimSpace(msg.DenomId)) <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
+	}
+
+	if msg.Amount <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "amount is required")
+	}
+
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receipt address (%s)", err)
 	}
-	if err := ValidateDenomID(msg.DenomId); err != nil {
-		return err
-	}
-	if err := ValidateKeywords(msg.DenomId); err != nil {
-		return err
-	}
-	return ValidateMTID(msg.Id)
+
+	return nil
 }
 
 // GetSignBytes Implements Msg.
@@ -224,13 +251,23 @@ func (msg MsgBurnMT) Type() string { return TypeMsgBurnMT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgBurnMT) ValidateBasic() error {
+	if len(strings.TrimSpace(msg.Id)) <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "mt id is required")
+	}
+
+	if len(strings.TrimSpace(msg.DenomId)) <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
+	}
+
+	if msg.Amount <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "amount is required")
+	}
+
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
-	if err := ValidateDenomID(msg.DenomId); err != nil {
-		return err
-	}
-	return ValidateMTID(msg.Id)
+
+	return nil
 }
 
 // GetSignBytes Implements Msg.
@@ -248,7 +285,7 @@ func (msg MsgBurnMT) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
-// NewMsgTransferDenom is a constructor function for msgTransferDenom
+// NewMsgTransferDenom is a constructor function for MsgTransferDenom
 func NewMsgTransferDenom(denomId, sender, recipient string) *MsgTransferDenom {
 	return &MsgTransferDenom{
 		Id:        denomId,
@@ -265,15 +302,18 @@ func (msg MsgTransferDenom) Type() string { return TypeMsgTransferDenom }
 
 // ValidateBasic Implements Msg.
 func (msg MsgTransferDenom) ValidateBasic() error {
+	if len(strings.TrimSpace(msg.Id)) <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
+	}
+
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
+
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
-	if err := ValidateDenomID(msg.Id); err != nil {
-		return err
-	}
+
 	return nil
 }
 
