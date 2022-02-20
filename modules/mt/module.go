@@ -126,7 +126,7 @@ func (AppModule) QuerierRoute() string { return types.RouterKey }
 
 // LegacyQuerierHandler returns the MT module sdk.Querier.
 func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return keeper.NewQuerier(am.keeper, legacyQuerierCdc)
+	return nil
 }
 
 // InitGenesis performs genesis initialization for the MT module. It returns

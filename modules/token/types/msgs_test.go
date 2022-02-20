@@ -26,18 +26,18 @@ func TestMsgIssueAsset(t *testing.T) {
 		*MsgIssueToken
 		expectPass bool
 	}{
-		{"basic good", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network", 9, 1, 1, true, addr), true},
-		{"symbol empty", NewMsgIssueToken("", "satoshi", "Bitcoin Network", 9, 1, 1, true, addr), false},
-		{"symbol error", NewMsgIssueToken("b&stake", "satoshi", "Bitcoin Network", 9, 1, 1, true, addr), false},
-		{"symbol first letter is num", NewMsgIssueToken("4stake", "satoshi", "Bitcoin Network", 9, 1, 1, true, addr), false},
-		{"symbol too long", NewMsgIssueToken("stake123456789012345678901234567890123456789012345678901234567890", "satoshi", "Bitcoin Network", 9, 1, 1, true, addr), false},
-		{"symbol too short", NewMsgIssueToken("ht", "satoshi", "Bitcoin Network", 9, 1, 1, true, addr), false},
-		{"name empty", NewMsgIssueToken("stake", "satoshi", "", 9, 1, 1, true, addr), false},
-		{"name too long", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 9, 1, 1, true, addr), false},
-		{"initial supply is zero", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network", 9, 0, 1, true, addr), true},
-		{"max supply is zero", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network", 9, 1, 0, true, addr), true},
-		{"init supply bigger than max supply", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network", 9, 2, 1, true, addr), false},
-		{"decimal error", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network", 10, 1, 1, true, addr), false},
+		{"basic good", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), true},
+		{"symbol empty", NewMsgIssueToken("", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"symbol error", NewMsgIssueToken("b&stake", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"symbol first letter is num", NewMsgIssueToken("4stake", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"symbol too long", NewMsgIssueToken("stake123456789012345678901234567890123456789012345678901234567890", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"symbol too short", NewMsgIssueToken("ht", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"name empty", NewMsgIssueToken("stake", "satoshi", "", 18, 1, 1, true, addr), false},
+		{"name too long", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 18, 1, 1, true, addr), false},
+		{"initial supply is zero", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network", 18, 0, 1, true, addr), true},
+		{"max supply is zero", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network", 18, 1, 0, true, addr), true},
+		{"init supply bigger than max supply", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network", 18, 2, 1, true, addr), false},
+		{"decimal error", NewMsgIssueToken("stake", "satoshi", "Bitcoin Network", 19, 1, 1, true, addr), false},
 	}
 
 	for _, tc := range tests {

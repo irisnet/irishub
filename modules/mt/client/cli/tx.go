@@ -52,7 +52,7 @@ func GetCmdIssueDenom() *cobra.Command {
 				"--fees=<fee>",
 			version.AppName,
 		),
-		Args: cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -91,7 +91,7 @@ func GetCmdIssueDenom() *cobra.Command {
 // GetCmdTransferDenom is the CLI command for sending a TransferDenom transaction
 func GetCmdTransferDenom() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "transfer-denom <from_key_or_address> <recipient> <denom-id>",
+		Use:  "transfer-denom [from_key_or_address] [recipient] [denom-id]",
 		Long: "Transfer a denom to a recipient.",
 		Example: fmt.Sprintf(
 			"$ %s tx mt transfer-denom <from_key_or_address> <recipient> <denom-id> "+
@@ -99,14 +99,10 @@ func GetCmdTransferDenom() *cobra.Command {
 				"--fees=<fee>",
 			version.AppName,
 		),
-		Args: cobra.ExactArgs(2),
+		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cmd.Flags().Set(flags.FlagFrom, args[0])
 			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			sender, err := sdk.AccAddressFromBech32(args[0])
 			if err != nil {
 				return err
 			}
@@ -120,7 +116,7 @@ func GetCmdTransferDenom() *cobra.Command {
 
 			msg := types.NewMsgTransferDenom(
 				denomID,
-				sender.String(),
+				clientCtx.GetFromAddress().String(),
 				recipient.String(),
 			)
 			if err := msg.ValidateBasic(); err != nil {
@@ -138,7 +134,7 @@ func GetCmdTransferDenom() *cobra.Command {
 // GetCmdMintMT is the CLI command for a MintMT transaction
 func GetCmdMintMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "mint <denom-id>",
+		Use:  "mint [denom-id]",
 		Long: "Issue or mint MT",
 		Example: fmt.Sprintf(
 			"$ %s tx mt mint <denom-id> "+
@@ -151,7 +147,7 @@ func GetCmdMintMT() *cobra.Command {
 				"--fees=<fee>",
 			version.AppName,
 		),
-		Args: cobra.ExactArgs(2),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -219,7 +215,7 @@ func GetCmdMintMT() *cobra.Command {
 // GetCmdEditMT is the CLI command for sending an MsgEditMT transaction
 func GetCmdEditMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "edit <denom-id> <mt-id>",
+		Use:  "edit [denom-id] [mt-id]",
 		Long: "Edit the metadata of an MT.",
 		Example: fmt.Sprintf(
 			"$ %s tx mt edit <denom-id> <mt-id> "+
@@ -266,7 +262,7 @@ func GetCmdEditMT() *cobra.Command {
 // GetCmdTransferMT is the CLI command for sending a TransferMT transaction
 func GetCmdTransferMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "transfer <from_key_or_address> <recipient> <denom-id> <mt-id> <amount>",
+		Use:  "transfer [from_key_or_address] [recipient] [denom-id] [mt-id] [amount]",
 		Long: "Transfer an MT to a recipient.",
 		Example: fmt.Sprintf(
 			"$ %s tx mt transfer <from_key_or_address> <recipient> <denom-id> <mt-id> <amount> "+
@@ -274,14 +270,10 @@ func GetCmdTransferMT() *cobra.Command {
 				"--fees=<fee>",
 			version.AppName,
 		),
-		Args: cobra.ExactArgs(3),
+		Args: cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cmd.Flags().Set(flags.FlagFrom, args[0])
 			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			sender, err := sdk.AccAddressFromBech32(args[0])
 			if err != nil {
 				return err
 			}
@@ -302,7 +294,7 @@ func GetCmdTransferMT() *cobra.Command {
 			msg := types.NewMsgTransferMT(
 				mtID,
 				denomID,
-				sender.String(),
+				clientCtx.GetFromAddress().String(),
 				recipient.String(),
 				amount,
 			)
@@ -321,7 +313,7 @@ func GetCmdTransferMT() *cobra.Command {
 // GetCmdBurnMT is the CLI command for sending a BurnMT transaction
 func GetCmdBurnMT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "burn <denom-id> <mt-id> <amount>",
+		Use:  "burn [denom-id] [mt-id] [amount]",
 		Long: "Burn amounts of an MT.",
 		Example: fmt.Sprintf(
 			"$ %s tx mt burn <denom-id> <mt-id> <amount> "+
@@ -330,7 +322,7 @@ func GetCmdBurnMT() *cobra.Command {
 				"--fees=<fee>",
 			version.AppName,
 		),
-		Args: cobra.ExactArgs(2),
+		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {

@@ -1,19 +1,16 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/irisnet/irismod/modules/mt/exported"
 )
 
 var _ exported.MT = MT{}
 
 // NewMT creates a new MT instance
-func NewMT(id string, supply uint64, owner sdk.AccAddress, data []byte) MT {
+func NewMT(id string, supply uint64, data []byte) MT {
 	return MT{
 		Id:     id,
 		Supply: supply,
-		Owner:  owner.String(),
 		Data:   data,
 	}
 }
@@ -26,12 +23,6 @@ func (mt MT) GetID() string {
 // GetID return the supply of MT
 func (mt MT) GetSupply() uint64 {
 	return mt.Supply
-}
-
-// GetOwner return the owner of MT
-func (mt MT) GetOwner() sdk.AccAddress {
-	owner, _ := sdk.AccAddressFromBech32(mt.Owner)
-	return owner
 }
 
 // GetData return the Data of MT

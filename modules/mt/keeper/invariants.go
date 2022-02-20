@@ -25,7 +25,7 @@ func AllInvariants(k Keeper) sdk.Invariant {
 // SupplyInvariant checks that the total amount of MTs on collections matches the total amount owned by addresses
 func SupplyInvariant(k Keeper) sdk.Invariant {
 	return func(ctx sdk.Context) (string, bool) {
-		ownersCollectionsSupply := make(map[string]uint64)
+		//ownersCollectionsSupply := make(map[string]uint64)
 		var msg string
 		count := 0
 
@@ -36,17 +36,17 @@ func SupplyInvariant(k Keeper) sdk.Invariant {
 		//	}
 		//}
 
-		for denom, supply := range ownersCollectionsSupply {
-			if supply != k.GetTotalSupply(ctx, denom) {
-				count++
-				msg += fmt.Sprintf(
-					"total %s MTs supply invariance:\n"+
-						"\ttotal %s MTs supply: %d\n"+
-						"\tsum of %s MTs by owner: %d\n",
-					denom, denom, supply, denom, ownersCollectionsSupply[denom],
-				)
-			}
-		}
+		//for denom, supply := range ownersCollectionsSupply {
+		//	if supply != k.GetDenomSupply(ctx, denom) {
+		//		count++
+		//		msg += fmt.Sprintf(
+		//			"total %s MTs supply invariance:\n"+
+		//				"\ttotal %s MTs supply: %d\n"+
+		//				"\tsum of %s MTs by owner: %d\n",
+		//			denom, denom, supply, denom, ownersCollectionsSupply[denom],
+		//		)
+		//	}
+		//}
 		broken := count != 0
 
 		return sdk.FormatInvariant(
