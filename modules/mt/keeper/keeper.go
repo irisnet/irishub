@@ -55,7 +55,7 @@ func (k Keeper) IssueMT(ctx sdk.Context,
 	recipient sdk.AccAddress,
 ) error {
 
-	if !k.HasDenomID(ctx, denomID) {
+	if !k.HasDenom(ctx, denomID) {
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
 	}
 
@@ -81,7 +81,7 @@ func (k Keeper) MintMT(ctx sdk.Context,
 	recipient sdk.AccAddress,
 ) error {
 
-	if !k.HasDenomID(ctx, denomID) {
+	if !k.HasDenom(ctx, denomID) {
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denomID)
 	}
 

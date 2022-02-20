@@ -20,15 +20,15 @@ func (k Keeper) genDenomID(ctx sdk.Context) string {
 	return hash
 }
 
-// HasDenomID returns whether the specified denom ID exists
-func (k Keeper) HasDenomID(ctx sdk.Context, id string) bool {
+// HasDenom returns whether the specified denom ID exists
+func (k Keeper) HasDenom(ctx sdk.Context, id string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.KeyDenomID(id))
 }
 
 // SetDenom is responsible for saving the definition of denom
 func (k Keeper) SetDenom(ctx sdk.Context, denom types.Denom) error {
-	if k.HasDenomID(ctx, denom.Id) {
+	if k.HasDenom(ctx, denom.Id) {
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom already exists: %s", denom.Id)
 	}
 
@@ -68,7 +68,7 @@ func (k Keeper) GetDenoms(ctx sdk.Context) (denoms []types.Denom) {
 
 // UpdateDenom is responsible for updating the definition of denom
 func (k Keeper) UpdateDenom(ctx sdk.Context, denom types.Denom) error {
-	if !k.HasDenomID(ctx, denom.Id) {
+	if !k.HasDenom(ctx, denom.Id) {
 		return sdkerrors.Wrapf(types.ErrInvalidDenom, "Denom not found: %s", denom.Id)
 	}
 
