@@ -232,7 +232,7 @@ func SimulateMsgMintMT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 
 		// TODO refactor
 		msg := types.NewMsgMintMT(
-			RandnMTID(r, types.MinDenomLen, types.MaxDenomLen), // mt ID
+			RandnMTID(r, 1, 32), // mt ID
 			getRandomDenom(ctx, k, r),                          // denom
 			1,
 			simtypes.RandStringOfLength(r, 10), // tokenData
@@ -400,10 +400,6 @@ func SimulateMsgIssueDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 		denomName := strings.ToLower(simtypes.RandStringOfLength(r, 10))
 		sender, _ := simtypes.RandomAcc(r, accs)
 		data := simtypes.RandStringOfLength(r, 20)
-
-		if err := types.ValidateDenomID(denomId); err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferDenom, "invalid denom"), nil, nil
-		}
 
 		denom, _ := k.GetDenom(ctx, denomId)
 		if denom.Size() != 0 {
