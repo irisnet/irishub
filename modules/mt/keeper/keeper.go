@@ -35,7 +35,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 // IssueDenom issues a denom according to the given params
 func (k Keeper) IssueDenom(ctx sdk.Context,
 	name string, sednder sdk.AccAddress, data []byte,
-) (types.Denom, error) {
+) types.Denom {
 
 	denom := types.Denom{
 		Id:    k.genDenomID(ctx),
@@ -44,7 +44,10 @@ func (k Keeper) IssueDenom(ctx sdk.Context,
 		Data:  data,
 	}
 
-	return denom, k.SetDenom(ctx, denom)
+	// store denom
+	k.SetDenom(ctx, denom)
+
+	return denom
 }
 
 // IssueMT issues a new MT
@@ -60,11 +63,14 @@ func (k Keeper) IssueMT(ctx sdk.Context,
 	// store MT
 	k.setMT(ctx, denomID, mt)
 
+	// increase denom supply
+	k.increaseDenomSupply(ctx, denomID)
+
+	// increase MT supply
+	k.increaseMTSupply(ctx, denomID, mt.GetID(), amount)
+
 	// mint amounts to the recipient
 	k.addBalance(ctx, denomID, mt.GetID(), amount, recipient)
-
-	// increase total supply
-	k.increaseSupply(ctx, denomID)
 
 	return mt
 }
@@ -77,11 +83,11 @@ func (k Keeper) MintMT(ctx sdk.Context,
 	recipient sdk.AccAddress,
 ) {
 
+	// increase MT supply
+	k.increaseMTSupply(ctx, denomID, mtID, amount)
+
 	// mint amounts to the recipient
 	k.addBalance(ctx, denomID, mtID, amount, recipient)
-
-	// increase total supply
-	k.increaseSupply(ctx, denomID)
 }
 
 // EditMT updates an existing MT
@@ -90,12 +96,6 @@ func (k Keeper) EditMT(ctx sdk.Context,
 	metadata []byte,
 	sender sdk.AccAddress,
 ) error {
-
-	// authorize
-	if err := k.Authorize(ctx, denomID, sender); err != nil {
-		return err
-	}
-
 	mt, err := k.GetMT(ctx, denomID, mtID)
 	if err != nil {
 		return err

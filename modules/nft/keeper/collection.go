@@ -73,7 +73,7 @@ func (k Keeper) GetCollections(ctx sdk.Context) (cs []types.Collection) {
 	return cs
 }
 
-// GetTotalSupply returns the number of NFTs by the specified denom ID
+// GetDenomSupply returns the number of NFTs by the specified denom ID
 func (k Keeper) GetTotalSupply(ctx sdk.Context, denomID string) uint64 {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.KeyCollection(denomID))

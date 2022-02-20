@@ -22,29 +22,35 @@ func (k Keeper) genMTID(ctx sdk.Context) string {
 }
 
 // GetMT gets the the specified MT
-func (k Keeper) GetMT(ctx sdk.Context, denomID, tokenID string) (mt exported.MT, err error) {
+func (k Keeper) GetMT(ctx sdk.Context, denomID, mtID string) (mt exported.MT, err error) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := store.Get(types.KeyMT(denomID, tokenID))
+	bz := store.Get(types.KeyMT(denomID, mtID))
 	if bz == nil {
-		return nil, sdkerrors.Wrapf(types.ErrUnknownCollection, "MT not found: %s", tokenID)
+		return nil, sdkerrors.Wrapf(types.ErrUnknownCollection, "MT not found: %s", mtID)
 	}
 
 	var baseMT types.MT
 	k.cdc.MustUnmarshal(bz, &baseMT)
 
+	// get mt supply
+	baseMT.Supply = k.GetMTSupply(ctx, denomID, mtID)
+
 	return baseMT, nil
 }
 
 // GetMTs returns all MTs by the specified denom ID
-func (k Keeper) GetMTs(ctx sdk.Context, denom string) (mts []exported.MT) {
+func (k Keeper) GetMTs(ctx sdk.Context, denomID string) (mts []exported.MT) {
 	store := ctx.KVStore(k.storeKey)
 
-	iterator := sdk.KVStorePrefixIterator(store, types.KeyMT(denom, ""))
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyMT(denomID, ""))
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var baseMT types.MT
 		k.cdc.MustUnmarshal(iterator.Value(), &baseMT)
+
+		// get mt supply
+		baseMT.Supply = k.GetMTSupply(ctx, denomID, baseMT.GetID())
 		mts = append(mts, baseMT)
 	}
 
@@ -66,22 +72,17 @@ func (k Keeper) Authorize(ctx sdk.Context, denomID string, owner sdk.AccAddress)
 }
 
 // HasMT checks if the specified MT exists
-func (k Keeper) HasMT(ctx sdk.Context, denomID, tokenID string) bool {
+func (k Keeper) HasMT(ctx sdk.Context, denomID, mtID string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(types.KeyMT(denomID, tokenID))
+	return store.Has(types.KeyMT(denomID, mtID))
 }
 
+// setMT set the MT to store
 func (k Keeper) setMT(ctx sdk.Context, denomID string, mt types.MT) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshal(&mt)
 	store.Set(types.KeyMT(denomID, mt.GetID()), bz)
-}
-
-// deleteMT deletes an existing MT from store
-func (k Keeper) deleteMT(ctx sdk.Context, denomID string, mt exported.MT) {
-	store := ctx.KVStore(k.storeKey)
-	store.Delete(types.KeyMT(denomID, mt.GetID()))
 }
 
 // getMTSequence gets the next MT sequence from the store.

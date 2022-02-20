@@ -30,10 +30,7 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	denom, err := m.Keeper.IssueDenom(ctx, msg.Name, sender, msg.Data)
-	if err != nil {
-		return nil, err
-	}
+	denom := m.Keeper.IssueDenom(ctx, msg.Name, sender, msg.Data)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
@@ -113,6 +110,12 @@ func (m msgServer) EditMT(goCtx context.Context, msg *types.MsgEditMT) (*types.M
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// only denom owner can edit MTs
+	if err := m.Keeper.Authorize(ctx, msg.DenomId, sender); err != nil {
+		return nil, err
+	}
+
 	if err := m.Keeper.EditMT(ctx, msg.DenomId, msg.Id, msg.Data, sender); err != nil {
 		return nil, err
 	}

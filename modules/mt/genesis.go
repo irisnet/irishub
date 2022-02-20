@@ -14,9 +14,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	}
 
 	for _, c := range data.Collections {
-		if err := k.SetDenom(ctx, *c.Denom); err != nil {
-			panic(err)
-		}
+		k.SetDenom(ctx, *c.Denom)
 		// TODO
 		//if err := k.SetCollection(ctx, c); err != nil {
 		//	panic(err)
@@ -26,7 +24,8 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 
 // ExportGenesis returns a GenesisState for a given context and keeper.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	return types.NewGenesisState(k.GetCollections(ctx))
+	//return types.NewGenesisState(k.GetCollections(ctx))
+	return nil
 }
 
 // DefaultGenesisState returns a default genesis state
