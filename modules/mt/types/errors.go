@@ -7,5 +7,4 @@ import (
 var (
 	ErrDenomNotFound = sdkerrors.Register(ModuleName, 1, "denom not found")
 	ErrMTNotFound    = sdkerrors.Register(ModuleName, 2, "mt not found")
-	ErrUnauthorized  = sdkerrors.Register(ModuleName, 3, "unauthorized address")
 )

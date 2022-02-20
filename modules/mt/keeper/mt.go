@@ -65,7 +65,7 @@ func (k Keeper) Authorize(ctx sdk.Context, denomID string, owner sdk.AccAddress)
 	}
 
 	if owner.String() != denom.Owner {
-		return sdkerrors.Wrap(types.ErrUnauthorized, owner.String())
+		return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, owner.String())
 	}
 
 	return nil
