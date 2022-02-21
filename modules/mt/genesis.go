@@ -2,7 +2,7 @@ package mt
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/irisnet/irismod/modules/mt/keeper"
 	"github.com/irisnet/irismod/modules/mt/types"
 )
@@ -13,12 +13,39 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		panic(err.Error())
 	}
 
+	// ---------- init infos ---------- //
+
+	// set denom sequence
+	k.SetDenomSequence(ctx, uint64(len(data.Collections)+1))
+
+	var mtSequence uint64 = 1
 	for _, c := range data.Collections {
+		// store denom
 		k.SetDenom(ctx, *c.Denom)
-		// TODO
-		//if err := k.SetCollection(ctx, c); err != nil {
-		//	panic(err)
-		//}
+
+		for _, m := range c.Mts {
+			// store mt
+			k.SetMT(ctx, c.Denom.Id, m)
+			mtSequence++
+		}
+	}
+
+	// set mt sequence
+	k.SetMTSequence(ctx, mtSequence)
+
+	// ---------- init balances ---------- //
+
+	for _, o := range data.Owners {
+		addr, err := sdk.AccAddressFromBech32(o.Address)
+		if err != nil {
+			panic(sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", addr))
+		}
+
+		for _, d := range o.Denoms {
+			for _, b := range d.Balances {
+				k.AddBalance(ctx, d.DenomId, b.MtId, b.Amount, addr)
+			}
+		}
 	}
 }
 
@@ -30,5 +57,5 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 // DefaultGenesisState returns a default genesis state
 func DefaultGenesisState() *types.GenesisState {
-	return types.NewGenesisState([]types.Collection{})
+	return types.NewGenesisState([]types.Collection{}, []types.Owner{})
 }

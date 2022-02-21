@@ -5,7 +5,8 @@ import (
 	"github.com/irisnet/irismod/modules/mt/types"
 )
 
-func (k Keeper) addBalance(ctx sdk.Context,
+// AddBalance adds amounts to an account
+func (k Keeper) AddBalance(ctx sdk.Context,
 	denomID, mtID string,
 	amount uint64,
 	addr sdk.AccAddress) {
@@ -52,7 +53,7 @@ func (k Keeper) transfer(ctx sdk.Context,
 
 	k.subBalance(ctx, denomID, mtID, amount, from)
 
-	k.addBalance(ctx, denomID, mtID, amount, to)
+	k.AddBalance(ctx, denomID, mtID, amount, to)
 }
 
 // GetDenomSupply returns the number of Mts by the specified denom ID

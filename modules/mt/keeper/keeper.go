@@ -61,7 +61,7 @@ func (k Keeper) IssueMT(ctx sdk.Context,
 	mt := types.NewMT(k.genMTID(ctx), amount, data)
 
 	// store MT
-	k.setMT(ctx, denomID, mt)
+	k.SetMT(ctx, denomID, mt)
 
 	// increase denom supply
 	k.increaseDenomSupply(ctx, denomID)
@@ -70,7 +70,7 @@ func (k Keeper) IssueMT(ctx sdk.Context,
 	k.increaseMTSupply(ctx, denomID, mt.GetID(), amount)
 
 	// mint amounts to the recipient
-	k.addBalance(ctx, denomID, mt.GetID(), amount, recipient)
+	k.AddBalance(ctx, denomID, mt.GetID(), amount, recipient)
 
 	return mt
 }
@@ -86,7 +86,7 @@ func (k Keeper) MintMT(ctx sdk.Context,
 	k.increaseMTSupply(ctx, denomID, mtID, amount)
 
 	// mint amounts to the recipient
-	k.addBalance(ctx, denomID, mtID, amount, recipient)
+	k.AddBalance(ctx, denomID, mtID, amount, recipient)
 }
 
 // EditMT updates an existing MT
@@ -102,7 +102,7 @@ func (k Keeper) EditMT(ctx sdk.Context,
 
 	if types.Modified(string(metadata)) {
 		newMT := types.NewMT(mt.GetID(), mt.GetSupply(), metadata)
-		k.setMT(ctx, denomID, newMT)
+		k.SetMT(ctx, denomID, newMT)
 	}
 
 	return nil

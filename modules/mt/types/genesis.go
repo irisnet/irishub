@@ -6,9 +6,10 @@ import (
 )
 
 // NewGenesisState creates a new genesis state.
-func NewGenesisState(collections []Collection) *GenesisState {
+func NewGenesisState(collections []Collection, owners []Owner) *GenesisState {
 	return &GenesisState{
 		Collections: collections,
+		Owners:      owners,
 	}
 }
 

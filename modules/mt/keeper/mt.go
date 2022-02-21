@@ -14,10 +14,10 @@ const mtIdPrefix = "mt-%d"
 
 // genMTID generate an MT ID by auto increment sequence
 func (k Keeper) genMTID(ctx sdk.Context) string {
-	sequence := k.getMTSequence(ctx)
+	sequence := k.GetMTSequence(ctx)
 	mtID := fmt.Sprintf(mtIdPrefix, sequence)
 	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(mtID)))
-	k.setMTSequence(ctx, sequence+1)
+	k.SetMTSequence(ctx, sequence+1)
 	return hash
 }
 
@@ -77,16 +77,16 @@ func (k Keeper) HasMT(ctx sdk.Context, denomID, mtID string) bool {
 	return store.Has(types.KeyMT(denomID, mtID))
 }
 
-// setMT set the MT to store
-func (k Keeper) setMT(ctx sdk.Context, denomID string, mt types.MT) {
+// SetMT set the MT to store
+func (k Keeper) SetMT(ctx sdk.Context, denomID string, mt types.MT) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshal(&mt)
 	store.Set(types.KeyMT(denomID, mt.GetID()), bz)
 }
 
-// getMTSequence gets the next MT sequence from the store.
-func (k Keeper) getMTSequence(ctx sdk.Context) uint64 {
+// GetMTSequence gets the next MT sequence from the store.
+func (k Keeper) GetMTSequence(ctx sdk.Context) uint64 {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get([]byte(types.KeyNextMTSequence))
 	if bz == nil {
@@ -95,8 +95,8 @@ func (k Keeper) getMTSequence(ctx sdk.Context) uint64 {
 	return sdk.BigEndianToUint64(bz)
 }
 
-// setMTSequence sets the next MT sequence to the store.
-func (k Keeper) setMTSequence(ctx sdk.Context, sequence uint64) {
+// SetMTSequence sets the next MT sequence to the store.
+func (k Keeper) SetMTSequence(ctx sdk.Context, sequence uint64) {
 	store := ctx.KVStore(k.storeKey)
 	bz := sdk.Uint64ToBigEndian(sequence)
 	store.Set([]byte(types.KeyNextMTSequence), bz)

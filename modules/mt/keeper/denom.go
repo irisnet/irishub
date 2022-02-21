@@ -13,10 +13,10 @@ const denomIdPrefix = "mt-denom-%d"
 
 // genDenomID generate a denom ID by auto increment sequence
 func (k Keeper) genDenomID(ctx sdk.Context) string {
-	sequence := k.getDenomSequence(ctx)
+	sequence := k.GetDenomSequence(ctx)
 	denomID := fmt.Sprintf(denomIdPrefix, sequence)
 	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(denomID)))
-	k.setDenomSequence(ctx, sequence+1)
+	k.SetDenomSequence(ctx, sequence+1)
 	return hash
 }
 
@@ -72,8 +72,8 @@ func (k Keeper) UpdateDenom(ctx sdk.Context, denom types.Denom) error {
 	return nil
 }
 
-// getDenomSequence gets the next denom sequence from the store.
-func (k Keeper) getDenomSequence(ctx sdk.Context) uint64 {
+// GetDenomSequence gets the next denom sequence from the store.
+func (k Keeper) GetDenomSequence(ctx sdk.Context) uint64 {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get([]byte(types.KeyNextDenomSequence))
 	if bz == nil {
@@ -82,8 +82,8 @@ func (k Keeper) getDenomSequence(ctx sdk.Context) uint64 {
 	return sdk.BigEndianToUint64(bz)
 }
 
-// setDenomSequence sets the next denom sequence to the store.
-func (k Keeper) setDenomSequence(ctx sdk.Context, sequence uint64) {
+// SetDenomSequence sets the next denom sequence to the store.
+func (k Keeper) SetDenomSequence(ctx sdk.Context, sequence uint64) {
 	store := ctx.KVStore(k.storeKey)
 	bz := sdk.Uint64ToBigEndian(sequence)
 	store.Set([]byte(types.KeyNextDenomSequence), bz)
