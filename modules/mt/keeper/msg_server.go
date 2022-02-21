@@ -75,11 +75,10 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 
 	// if user inputs an MT ID, then mint amounts to the MT, else issue a new MT
 	if len(mtID) > 0 {
-
 		if !m.Keeper.HasMT(ctx, msg.DenomId, mtID) {
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrNotFound, "mt not found (%s)", mtID)
 		}
-		m.Keeper.MintMT(ctx, msg.DenomId, mtID, msg.Amount, msg.Data, recipient)
+		m.Keeper.MintMT(ctx, msg.DenomId, mtID, msg.Amount, recipient)
 	} else {
 		mt := m.Keeper.IssueMT(ctx, msg.DenomId, msg.Amount, msg.Data, recipient)
 		mtID = mt.Id
