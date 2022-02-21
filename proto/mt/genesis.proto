@@ -28,6 +28,7 @@ message Owner {
   repeated DenomBalance denoms = 2 [(gogoproto.nullable) = false];
 }
 
+// DenomBalance defines a type of denom balances owned by an account
 message DenomBalance {
   option (gogoproto.equal) = true;
 
