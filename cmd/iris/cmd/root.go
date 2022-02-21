@@ -53,6 +53,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		Use:   "iris",
 		Short: "IRIS Hub app command",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			initClientCtx = client.ReadHomeFlag(initClientCtx, cmd)
 			initClientCtx, err := config.ReadFromClientConfig(initClientCtx)
 			if err != nil {
 				return err
