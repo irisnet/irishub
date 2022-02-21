@@ -209,6 +209,10 @@ func (msg MsgMintMT) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "amount is required")
 	}
 
+	if len(strings.TrimSpace(msg.Id)) > 0 && len(msg.Data) > 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "metadata can not be accepted while minting, use 'edit mt' instead")
+	}
+
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
