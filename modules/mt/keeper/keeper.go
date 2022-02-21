@@ -115,12 +115,12 @@ func (k Keeper) TransferOwner(ctx sdk.Context,
 	srcOwner, dstOwner sdk.AccAddress,
 ) error {
 
-	srcOwnerAmount := k.getBalance(ctx, denomID, mtID, srcOwner)
+	srcOwnerAmount := k.GetBalance(ctx, denomID, mtID, srcOwner)
 	if srcOwnerAmount < amount {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient balance: %d", srcOwnerAmount)
 	}
 
-	k.transfer(ctx, denomID, mtID, amount, srcOwner, dstOwner)
+	k.Transfer(ctx, denomID, mtID, amount, srcOwner, dstOwner)
 	return nil
 }
 
@@ -130,13 +130,13 @@ func (k Keeper) BurnMT(ctx sdk.Context,
 	amount uint64,
 	owner sdk.AccAddress) error {
 
-	srcOwnerAmount := k.getBalance(ctx, denomID, mtID, owner)
+	srcOwnerAmount := k.GetBalance(ctx, denomID, mtID, owner)
 	if srcOwnerAmount < amount {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient balance: %d", srcOwnerAmount)
 	}
 
 	// sub balance
-	k.subBalance(ctx, denomID, mtID, amount, owner)
+	k.SubBalance(ctx, denomID, mtID, amount, owner)
 
 	// sub total supply
 	k.decreaseMTSupply(ctx, denomID, mtID, amount)
@@ -163,4 +163,18 @@ func (k Keeper) TransferDenomOwner(
 	}
 
 	return nil
+}
+
+func (k Keeper) ExportGenesisState(ctx sdk.Context) *types.GenesisState {
+
+	var collections []types.Collection
+	denoms := k.GetDenoms(ctx)
+	for _, d := range denoms {
+		mts := k.GetMTs(ctx, d.Id)
+		collections = append(collections, types.NewCollection(d, mts))
+	}
+
+	owners := k.getBalances(ctx)
+
+	return types.NewGenesisState(collections, owners)
 }
