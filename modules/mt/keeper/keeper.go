@@ -79,7 +79,6 @@ func (k Keeper) IssueMT(ctx sdk.Context,
 func (k Keeper) MintMT(ctx sdk.Context,
 	denomID, mtID string,
 	amount uint64,
-	data []byte,
 	recipient sdk.AccAddress,
 ) {
 
