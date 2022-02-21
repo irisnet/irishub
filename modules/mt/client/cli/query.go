@@ -215,7 +215,6 @@ func GetCmdQueryBalances() *cobra.Command {
 	}
 
 	flags.AddQueryFlagsToCmd(cmd)
-	flags.AddPaginationFlagsToCmd(cmd, "all balances")
 
 	return cmd
 }
