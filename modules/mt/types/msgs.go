@@ -210,7 +210,7 @@ func (msg MsgMintMT) ValidateBasic() error {
 	}
 
 	if len(strings.TrimSpace(msg.Id)) > 0 && len(msg.Data) > 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "metadata can not be modified while minting, use 'edit mt' instead")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "metadata can not be accepted while minting, use 'edit mt' instead")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
