@@ -10,3 +10,11 @@ option go_package = "github.com/irisnet/irismod/modules/mt/types";
 message GenesisState {
     repeated Collection collections = 1 [(gogoproto.nullable) = false];
 }
+
+// Collection defines a type of collection
+message Collection {
+  option (gogoproto.equal) = true;
+
+  Denom denom = 1;
+  repeated MT mts = 2 [(gogoproto.nullable) = false];
+}

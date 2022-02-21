@@ -32,11 +32,3 @@ message Balance {
   string mt_id = 1;
   uint64 amount = 2;
 }
-
-// Collection defines a type of collection
-message Collection {
-  option (gogoproto.equal) = true;
-
-  Denom denom = 1;
-  repeated MT mts = 2 [(gogoproto.nullable) = false];
-}
