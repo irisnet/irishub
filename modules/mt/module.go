@@ -114,9 +114,7 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 }
 
 // RegisterInvariants registers the MT module invariants.
-func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
-	keeper.RegisterInvariants(ir, am.keeper)
-}
+func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
 
 // Route returns the message routing key for the MT module.
 func (am AppModule) Route() sdk.Route {
