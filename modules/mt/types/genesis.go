@@ -13,7 +13,7 @@ func NewGenesisState(collections []Collection, owners []Owner) *GenesisState {
 	}
 }
 
-// ValidateGenesis performs basic validation of mts data returning an
+// ValidateGenesis performs basic validation of mts genesis data returning an
 // error for any failed validation criteria.
 func ValidateGenesis(data GenesisState) error {
 
