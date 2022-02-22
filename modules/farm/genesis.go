@@ -45,7 +45,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		farmInfos = append(farmInfos, farmInfo)
 	})
 	return &types.GenesisState{
-		Params:    types.Params{CreatePoolFee: k.CreatePoolFee(ctx)},
+		Params:    k.GetParams(ctx),
 		Pools:     pools,
 		FarmInfos: farmInfos,
 		Sequence:  k.GetSequence(ctx),

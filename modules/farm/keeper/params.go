@@ -14,13 +14,19 @@ func ParamKeyTable() paramstypes.KeyTable {
 
 // CreatePoolFee returns the create pool fee
 func (k Keeper) CreatePoolFee(ctx sdk.Context) (fee sdk.Coin) {
-	k.paramSpace.Get(ctx, types.KeyCreatePoolFee, &fee)
+	k.paramSpace.Get(ctx, types.KeyPoolCreationFee, &fee)
 	return
 }
 
 // MaxRewardCategories returns the maxRewardCategories
 func (k Keeper) MaxRewardCategories(ctx sdk.Context) (maxRewardCategories uint32) {
 	k.paramSpace.Get(ctx, types.KeyMaxRewardCategories, &maxRewardCategories)
+	return
+}
+
+// MaxRewardCategories returns the maxRewardCategories
+func (k Keeper) TaxRate(ctx sdk.Context) (taxRate sdk.Dec) {
+	k.paramSpace.Get(ctx, types.KeyTaxRate, &taxRate)
 	return
 }
 
@@ -35,5 +41,6 @@ func (k Keeper) GetParams(ctx sdk.Context) types.Params {
 	return types.NewParams(
 		k.CreatePoolFee(ctx),
 		k.MaxRewardCategories(ctx),
+		k.TaxRate(ctx),
 	)
 }

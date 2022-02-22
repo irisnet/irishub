@@ -62,11 +62,15 @@ message FarmInfo {
 }
 
 message Params {
-  cosmos.base.v1beta1.Coin create_pool_fee = 1 [
+  cosmos.base.v1beta1.Coin pool_creation_fee = 1 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.nullable) = false
   ];
   uint32 max_reward_categories = 2;
+  string tax_rate = 3 [ 
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false 
+  ];
 }
 
 
