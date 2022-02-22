@@ -37,7 +37,7 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 			types.EventTypeIssueDenom,
 			sdk.NewAttribute(types.AttributeKeyDenomID, denom.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomName, denom.Name),
-			sdk.NewAttribute(types.AttributeKeyCreator, msg.Sender),
+			sdk.NewAttribute(types.AttributeKeyOwner, msg.Sender),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -95,7 +95,9 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 			types.EventTypeMintMT,
 			sdk.NewAttribute(types.AttributeKeyMTID, mtID),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
+			sdk.NewAttribute(types.AttributeKeyAmount, strconv.FormatUint(msg.Amount, 10)),
 			sdk.NewAttribute(types.AttributeKeySupply, strconv.FormatUint(mt.GetSupply(), 10)),
+			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -130,7 +132,6 @@ func (m msgServer) EditMT(goCtx context.Context, msg *types.MsgEditMT) (*types.M
 			types.EventTypeEditMT,
 			sdk.NewAttribute(types.AttributeKeyMTID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
-			sdk.NewAttribute(types.AttributeKeyOwner, msg.Sender),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -164,7 +165,7 @@ func (m msgServer) TransferMT(goCtx context.Context, msg *types.MsgTransferMT) (
 			types.EventTypeTransfer,
 			sdk.NewAttribute(types.AttributeKeyMTID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
-			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
+			sdk.NewAttribute(types.AttributeKeyAmount, strconv.FormatUint(msg.Amount, 10)),
 			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
 		),
 		sdk.NewEvent(
@@ -192,9 +193,9 @@ func (m msgServer) BurnMT(goCtx context.Context, msg *types.MsgBurnMT) (*types.M
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeBurnMT,
-			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
 			sdk.NewAttribute(types.AttributeKeyMTID, msg.Id),
-			sdk.NewAttribute(types.AttributeKeyOwner, msg.Sender),
+			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
+			sdk.NewAttribute(types.AttributeKeyAmount, strconv.FormatUint(msg.Amount, 10)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -227,7 +228,6 @@ func (m msgServer) TransferDenom(goCtx context.Context, msg *types.MsgTransferDe
 		sdk.NewEvent(
 			types.EventTypeTransferDenom,
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.Id),
-			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
 			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
 		),
 		sdk.NewEvent(
