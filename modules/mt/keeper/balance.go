@@ -79,11 +79,11 @@ func (k Keeper) getBalances(ctx sdk.Context) []types.Owner {
 		ownerMap[address][denomID][mtID] = amount
 	}
 
-	owners := []types.Owner{}
+	var owners []types.Owner
 	for addr, denomMap := range ownerMap {
-		denomBalances := []types.DenomBalance{}
+		var denomBalances []types.DenomBalance
 		for denomID, mtMap := range denomMap {
-			balances := []types.Balance{}
+			var balances []types.Balance
 			for mtID, amount := range mtMap {
 				balance := types.NewBalance(mtID, amount)
 				balances = append(balances, balance)
