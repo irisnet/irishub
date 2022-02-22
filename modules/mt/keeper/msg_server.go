@@ -22,7 +22,7 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
 
-// IssueDenom issue a new denom.
+// IssueDenom issues a new denom.
 func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (*types.MsgIssueDenomResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -37,7 +37,7 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 			types.EventTypeIssueDenom,
 			sdk.NewAttribute(types.AttributeKeyDenomID, denom.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomName, denom.Name),
-			sdk.NewAttribute(types.AttributeKeyCreator, msg.Sender),
+			sdk.NewAttribute(types.AttributeKeyOwner, msg.Sender),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -49,6 +49,7 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 	return &types.MsgIssueDenomResponse{}, nil
 }
 
+// MintMT issues a new MT or mints amounts to an MT
 func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.MsgMintMTResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -94,7 +95,9 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 			types.EventTypeMintMT,
 			sdk.NewAttribute(types.AttributeKeyMTID, mtID),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
+			sdk.NewAttribute(types.AttributeKeyAmount, strconv.FormatUint(msg.Amount, 10)),
 			sdk.NewAttribute(types.AttributeKeySupply, strconv.FormatUint(mt.GetSupply(), 10)),
+			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -106,6 +109,7 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 	return &types.MsgMintMTResponse{}, nil
 }
 
+// EditMT edits an MT
 func (m msgServer) EditMT(goCtx context.Context, msg *types.MsgEditMT) (*types.MsgEditMTResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -128,7 +132,6 @@ func (m msgServer) EditMT(goCtx context.Context, msg *types.MsgEditMT) (*types.M
 			types.EventTypeEditMT,
 			sdk.NewAttribute(types.AttributeKeyMTID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
-			sdk.NewAttribute(types.AttributeKeyOwner, msg.Sender),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -140,6 +143,7 @@ func (m msgServer) EditMT(goCtx context.Context, msg *types.MsgEditMT) (*types.M
 	return &types.MsgEditMTResponse{}, nil
 }
 
+// TransferMT transfers amounts of an MT
 func (m msgServer) TransferMT(goCtx context.Context, msg *types.MsgTransferMT) (*types.MsgTransferMTResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -161,7 +165,7 @@ func (m msgServer) TransferMT(goCtx context.Context, msg *types.MsgTransferMT) (
 			types.EventTypeTransfer,
 			sdk.NewAttribute(types.AttributeKeyMTID, msg.Id),
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
-			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
+			sdk.NewAttribute(types.AttributeKeyAmount, strconv.FormatUint(msg.Amount, 10)),
 			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
 		),
 		sdk.NewEvent(
@@ -174,6 +178,7 @@ func (m msgServer) TransferMT(goCtx context.Context, msg *types.MsgTransferMT) (
 	return &types.MsgTransferMTResponse{}, nil
 }
 
+// BurnMT burns MTs of an owner
 func (m msgServer) BurnMT(goCtx context.Context, msg *types.MsgBurnMT) (*types.MsgBurnMTResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -188,9 +193,9 @@ func (m msgServer) BurnMT(goCtx context.Context, msg *types.MsgBurnMT) (*types.M
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeBurnMT,
-			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
 			sdk.NewAttribute(types.AttributeKeyMTID, msg.Id),
-			sdk.NewAttribute(types.AttributeKeyOwner, msg.Sender),
+			sdk.NewAttribute(types.AttributeKeyDenomID, msg.DenomId),
+			sdk.NewAttribute(types.AttributeKeyAmount, strconv.FormatUint(msg.Amount, 10)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -202,6 +207,7 @@ func (m msgServer) BurnMT(goCtx context.Context, msg *types.MsgBurnMT) (*types.M
 	return &types.MsgBurnMTResponse{}, nil
 }
 
+// TransferDenom transfers denom
 func (m msgServer) TransferDenom(goCtx context.Context, msg *types.MsgTransferDenom) (*types.MsgTransferDenomResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -222,7 +228,6 @@ func (m msgServer) TransferDenom(goCtx context.Context, msg *types.MsgTransferDe
 		sdk.NewEvent(
 			types.EventTypeTransferDenom,
 			sdk.NewAttribute(types.AttributeKeyDenomID, msg.Id),
-			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
 			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
 		),
 		sdk.NewEvent(
