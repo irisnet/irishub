@@ -1,0 +1,34 @@
+syntax = "proto3";
+package irismod.mt;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/mt/types";
+option (gogoproto.goproto_getters_all) = false;
+
+// Denom defines a class of MTs
+message Denom {
+  option (gogoproto.equal) = true;
+
+  string id = 1;
+  string name = 2;
+  bytes data = 3;
+  string owner = 4;
+}
+
+// MT defines a multi token
+message MT {
+  option (gogoproto.equal) = true;
+
+  string id = 1;
+  uint64 supply = 2;
+  bytes data = 3;
+}
+
+// Balance defines multi token balance for owners
+message Balance {
+  option (gogoproto.equal) = true;
+
+  string mt_id = 1;
+  uint64 amount = 2;
+}
