@@ -91,7 +91,7 @@ func (s *IntegrationTestSuite) TestRest() {
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-	poolId := gjson.Get(txResp.RawLog, "0.events.2.attributes.1.value").String()
+	poolId := gjson.Get(txResp.RawLog, "0.events.3.attributes.1.value").String()
 	expectedContents := farmtypes.FarmPoolEntry{
 		Id:              poolId,
 		Description:     description,

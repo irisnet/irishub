@@ -90,7 +90,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-	poolId := gjson.Get(txResp.RawLog, "0.events.2.attributes.1.value").String()
+	poolId := gjson.Get(txResp.RawLog, "0.events.3.attributes.1.value").String()
 	respType = proto.Message(&farmtypes.QueryFarmPoolResponse{})
 	expectedContents := farmtypes.FarmPoolEntry{
 		Id:              poolId,

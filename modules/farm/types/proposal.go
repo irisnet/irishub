@@ -9,7 +9,6 @@ import (
 
 const (
 	ProposalTypeCreateFarmPool string = "CommunityPoolCreateFarm"
-	FarPoolPrefix              string = "SYS-"
 )
 
 // Implements Proposal Interface
@@ -18,10 +17,6 @@ var _ govtypes.Content = &CommunityPoolCreateFarmProposal{}
 func init() {
 	govtypes.RegisterProposalType(ProposalTypeCreateFarmPool)
 	govtypes.RegisterProposalTypeCodec(&CommunityPoolCreateFarmProposal{}, "irismod/CommunityPoolCreateFarmProposal")
-}
-
-func GenSyspoolId(name string) string {
-	return fmt.Sprintf(name, FarPoolPrefix)
 }
 
 func (cfp *CommunityPoolCreateFarmProposal) GetTitle() string       { return cfp.Title }
