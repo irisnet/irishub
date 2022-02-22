@@ -493,6 +493,7 @@ func NewIrisApp(
 		app.bankKeeper,
 		app.accountKeeper,
 		app.ModuleAccountAddrs(),
+		authtypes.FeeCollectorName,
 	)
 
 	app.serviceKeeper = servicekeeper.NewKeeper(
