@@ -31,7 +31,6 @@ func ValidateGenesis(data GenesisState) error {
 		}
 	}
 
-	denomCount1 := len(data.Collections)
 	mtCount1 := len(mtMap1)
 
 	// --------------------------
@@ -44,6 +43,10 @@ func ValidateGenesis(data GenesisState) error {
 	for _, o := range data.Owners {
 		for _, d := range o.Denoms {
 			denomMap2[d.DenomId] = true
+
+			if _, ok := denomMap1[d.DenomId]; !ok {
+				return sdkerrors.Wrapf(sdkerrors.ErrPanic, "unknown mt denom, (%s)", d.DenomId)
+			}
 			for _, b := range d.Balances {
 				mtMap2[d.DenomId+b.MtId] = mtMap2[d.DenomId+b.MtId] + b.Amount
 
@@ -51,12 +54,7 @@ func ValidateGenesis(data GenesisState) error {
 		}
 	}
 
-	denomCount2 := len(denomMap2)
 	mtCount2 := len(mtMap2)
-
-	if denomCount1 != denomCount2 {
-		return sdkerrors.Wrapf(sdkerrors.ErrPanic, "mt denom count mismatch, (%d, %d)", denomCount1, denomCount2)
-	}
 
 	if mtCount1 != mtCount2 {
 		return sdkerrors.Wrapf(sdkerrors.ErrPanic, "mt count mismatch, (%d, %d)", mtCount1, mtCount2)
