@@ -25,33 +25,17 @@ func AllInvariants(k Keeper) sdk.Invariant {
 // SupplyInvariant checks that the total amount of MTs on collections matches the total amount owned by addresses
 func SupplyInvariant(k Keeper) sdk.Invariant {
 	return func(ctx sdk.Context) (string, bool) {
-		//ownersCollectionsSupply := make(map[string]uint64)
-		var msg string
-		count := 0
-
-		// TODO add invariant check
-		//for _, owner := range k.GetOwners(ctx) {
-		//	for _, idCollection := range owner.IDCollections {
-		//		ownersCollectionsSupply[idCollection.DenomId] += uint64(idCollection.Supply())
-		//	}
-		//}
-
-		//for denom, supply := range ownersCollectionsSupply {
-		//	if supply != k.GetDenomSupply(ctx, denom) {
-		//		count++
-		//		msg += fmt.Sprintf(
-		//			"total %s MTs supply invariance:\n"+
-		//				"\ttotal %s MTs supply: %d\n"+
-		//				"\tsum of %s MTs by owner: %d\n",
-		//			denom, denom, supply, denom, ownersCollectionsSupply[denom],
-		//		)
-		//	}
-		//}
-		broken := count != 0
+		err := types.ValidateGenesis(*k.ExportGenesisState(ctx))
+		if err != nil {
+			return sdk.FormatInvariant(
+				types.ModuleName, "supply",
+				fmt.Sprintf("MT supply invariants check failed, %s", err.Error()),
+			), true
+		}
 
 		return sdk.FormatInvariant(
 			types.ModuleName, "supply",
-			fmt.Sprintf("%d MT supply invariants found\n%s", count, msg),
-		), broken
+			fmt.Sprintf("MT supply invariants check passed"),
+		), false
 	}
 }
