@@ -35,7 +35,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 			types.MTs{}),
 	)
 
-	mtGenesis := types.NewGenesisState(collections)
+	mtGenesis := types.NewGenesisState(collections, []types.Owner{})
 
 	bz, err := json.MarshalIndent(mtGenesis, "", " ")
 	if err != nil {

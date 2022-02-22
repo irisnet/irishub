@@ -30,21 +30,21 @@ var (
 	PrefixBalance = []byte{0x03}
 	PrefixSupply  = []byte{0x04}
 
-	delimiter = []byte("/")
+	Delimiter = []byte("/")
 )
 
 // KeyDenom gets the storeKey by the denom
 func KeyDenom(id string) []byte {
-	key := append(PrefixDenom, delimiter...)
+	key := append(PrefixDenom, Delimiter...)
 	return append(key, []byte(id)...)
 }
 
 // KeyMT gets the key of MT stored by an denom and MT
 func KeyMT(denomID, mtID string) []byte {
-	key := append(PrefixMT, delimiter...)
+	key := append(PrefixMT, Delimiter...)
 	if len(denomID) > 0 {
 		key = append(key, []byte(denomID)...)
-		key = append(key, delimiter...)
+		key = append(key, Delimiter...)
 	}
 
 	if len(denomID) > 0 && len(mtID) > 0 {
@@ -55,15 +55,15 @@ func KeyMT(denomID, mtID string) []byte {
 
 // KeyBalance gets the key of a balance owned by an account address
 func KeyBalance(address sdk.AccAddress, denomID, mtID string) []byte {
-	key := append(PrefixBalance, delimiter...)
+	key := append(PrefixBalance, Delimiter...)
 	if address != nil {
 		key = append(key, []byte(address.String())...)
-		key = append(key, delimiter...)
+		key = append(key, Delimiter...)
 	}
 
 	if address != nil && len(denomID) > 0 {
 		key = append(key, []byte(denomID)...)
-		key = append(key, delimiter...)
+		key = append(key, Delimiter...)
 	}
 
 	if address != nil && len(denomID) > 0 && len(mtID) > 0 {
@@ -74,11 +74,11 @@ func KeyBalance(address sdk.AccAddress, denomID, mtID string) []byte {
 
 // KeySupply gets the key of supply of a denom or MT
 func KeySupply(denomID, mtID string) []byte {
-	key := append(PrefixSupply, delimiter...)
+	key := append(PrefixSupply, Delimiter...)
 
 	if len(denomID) > 0 {
 		key = append(key, []byte(denomID)...)
-		key = append(key, delimiter...)
+		key = append(key, Delimiter...)
 	}
 
 	if len(denomID) > 0 && len(mtID) > 0 {
