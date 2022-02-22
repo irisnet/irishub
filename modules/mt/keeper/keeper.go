@@ -64,10 +64,10 @@ func (k Keeper) IssueMT(ctx sdk.Context,
 	k.SetMT(ctx, denomID, mt)
 
 	// increase denom supply
-	k.increaseDenomSupply(ctx, denomID)
+	k.IncreaseDenomSupply(ctx, denomID)
 
 	// increase MT supply
-	k.increaseMTSupply(ctx, denomID, mt.GetID(), amount)
+	k.IncreaseMTSupply(ctx, denomID, mt.GetID(), amount)
 
 	// mint amounts to the recipient
 	k.AddBalance(ctx, denomID, mt.GetID(), amount, recipient)
@@ -83,7 +83,7 @@ func (k Keeper) MintMT(ctx sdk.Context,
 ) {
 
 	// increase MT supply
-	k.increaseMTSupply(ctx, denomID, mtID, amount)
+	k.IncreaseMTSupply(ctx, denomID, mtID, amount)
 
 	// mint amounts to the recipient
 	k.AddBalance(ctx, denomID, mtID, amount, recipient)

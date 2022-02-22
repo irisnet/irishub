@@ -130,8 +130,8 @@ func (k Keeper) GetMTSupply(ctx sdk.Context, denomID, mtID string) uint64 {
 	return types.MustUnMarshalSupply(k.cdc, bz)
 }
 
-// increaseDenomSupply increase total supply (count of MTs) of a denom
-func (k Keeper) increaseDenomSupply(ctx sdk.Context, denomID string) {
+// IncreaseDenomSupply increase total supply (count of MTs) of a denom
+func (k Keeper) IncreaseDenomSupply(ctx sdk.Context, denomID string) {
 	supply := k.GetDenomSupply(ctx, denomID)
 	supply++
 
@@ -140,8 +140,8 @@ func (k Keeper) increaseDenomSupply(ctx sdk.Context, denomID string) {
 	store.Set(types.KeySupply(denomID, ""), bz)
 }
 
-// increaseMTSupply increase total supply of an MT
-func (k Keeper) increaseMTSupply(ctx sdk.Context, denomID, mtID string, amount uint64) {
+// IncreaseMTSupply increase total supply of an MT
+func (k Keeper) IncreaseMTSupply(ctx sdk.Context, denomID, mtID string, amount uint64) {
 	supply := k.GetMTSupply(ctx, denomID, mtID)
 	supply += amount
 

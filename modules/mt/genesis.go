@@ -24,6 +24,8 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		k.SetDenom(ctx, *c.Denom)
 
 		for _, m := range c.Mts {
+			// increase denom supply
+			k.IncreaseDenomSupply(ctx, c.Denom.Id)
 			// store mt
 			k.SetMT(ctx, c.Denom.Id, m)
 			mtSequence++
@@ -43,6 +45,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 
 		for _, d := range o.Denoms {
 			for _, b := range d.Balances {
+				// increase supply
+				k.IncreaseMTSupply(ctx, d.DenomId, b.MtId, b.Amount)
+				// add balance to account
 				k.AddBalance(ctx, d.DenomId, b.MtId, b.Amount, addr)
 			}
 		}
