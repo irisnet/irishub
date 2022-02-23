@@ -26,6 +26,7 @@ func NewTxCmd() *cobra.Command {
 	}
 	txCmd.AddCommand(
 		GetCmdCreateFarmPool(),
+		GetCreatePoolWithCommunityPool(),
 		GetCmdDestroyFarmPool(),
 		GetCmdAdjustPool(),
 		GetCmdStake(),
