@@ -10,7 +10,7 @@ const (
 	TypeMsgCreatePool = "create_pool"
 
 	// TypeMsgCreatePool is the type for MsgCreatePoolWithCommunityPool
-	TypeMsgCreateProposal = "create_proposal"
+	TypeMsgCreateProposal = "create_pool_with_community_pool"
 
 	// TypeMsgDestroyPool is the type for MsgDestroyPool
 	TypeMsgDestroyPool = "destroy_pool"

@@ -79,6 +79,7 @@ message EscrowInfo {
   string proposer = 1;
   repeated cosmos.base.v1beta1.Coin fund_applied = 2 [(gogoproto.nullable) = false];
   repeated cosmos.base.v1beta1.Coin fund_self_bond = 3 [(gogoproto.nullable) = false];
+  uint64 proposal_id = 4; 
 }
 
 

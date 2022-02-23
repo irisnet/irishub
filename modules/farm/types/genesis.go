@@ -15,9 +15,9 @@ var (
 )
 
 // NewGenesisState constructs a new GenesisState instance
-func NewGenesisState(params Params, pools []FarmPool, farmInfos []FarmInfo, sequence uint64) *GenesisState {
+func NewGenesisState(params Params, pools []FarmPool, farmInfos []FarmInfo, sequence uint64, escrow []EscrowInfo) *GenesisState {
 	return &GenesisState{
-		params, pools, farmInfos, sequence,
+		params, pools, farmInfos, sequence, escrow,
 	}
 }
 

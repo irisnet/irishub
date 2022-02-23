@@ -34,9 +34,9 @@ func (k Keeper) HandleCreateFarmProposal(ctx sdk.Context, p *types.CommunityPool
 	return nil
 }
 
-// distributeFromFeePool distributes funds from the distribution module account to
+// escrowFromFeePool distributes funds from the distribution module account to
 // farm module address while updating the community pool
-func (k Keeper) distributeFromFeePool(ctx sdk.Context, amount sdk.Coins) error {
+func (k Keeper) escrowFromFeePool(ctx sdk.Context, amount sdk.Coins) error {
 	feePool := k.dk.GetFeePool(ctx)
 
 	// NOTE the community pool isn't a module account, however its coins
@@ -87,13 +87,13 @@ func (k Keeper) refundEscrow(ctx sdk.Context, proposalID uint64, info types.Escr
 	k.deleteEscrowInfo(ctx, proposalID)
 }
 
-func (k Keeper) setEscrowInfo(ctx sdk.Context, proposalId uint64, info types.EscrowInfo) {
+func (k Keeper) SetEscrowInfo(ctx sdk.Context, info types.EscrowInfo) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&info)
-	store.Set(types.KeyEscrowInfo(proposalId), bz)
+	store.Set(types.KeyEscrowInfo(info.ProposalId), bz)
 }
 
-func (k Keeper) getEscrowInfo(ctx sdk.Context, proposalId uint64) (types.EscrowInfo, bool) {
+func (k Keeper) GetEscrowInfo(ctx sdk.Context, proposalId uint64) (types.EscrowInfo, bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.KeyEscrowInfo(proposalId))
 	if bz == nil {
@@ -102,6 +102,18 @@ func (k Keeper) getEscrowInfo(ctx sdk.Context, proposalId uint64) (types.EscrowI
 	var info types.EscrowInfo
 	k.cdc.MustUnmarshal(bz, &info)
 	return info, true
+}
+
+func (k Keeper) GetAllEscrowInfo(ctx sdk.Context) (infos []types.EscrowInfo) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.EscrowInfoKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var info types.EscrowInfo
+		k.cdc.MustUnmarshal(iterator.Value(), &info)
+		infos = append(infos, info)
+	}
+	return
 }
 
 func (k Keeper) deleteEscrowInfo(ctx sdk.Context, proposalId uint64) {

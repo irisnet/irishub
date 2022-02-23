@@ -11,4 +11,5 @@ message GenesisState {
   repeated FarmPool pools = 2 [ (gogoproto.nullable) = false ];
   repeated FarmInfo farm_infos = 3 [ (gogoproto.nullable) = false ];
   uint64 sequence = 4;
+  repeated EscrowInfo escrow = 5 [ (gogoproto.nullable) = false ];
 }

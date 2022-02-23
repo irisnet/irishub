@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -115,8 +116,8 @@ func (m msgServer) CreatePoolWithCommunityPool(goCtx context.Context,
 		return nil, err
 	}
 
-	//escrow FundApplied  to EscrowCollector
-	if err := m.distributeFromFeePool(ctx, msg.Content.FundApplied); err != nil {
+	//escrow FundApplied to EscrowCollector
+	if err := m.escrowFromFeePool(ctx, msg.Content.FundApplied); err != nil {
 		return nil, err
 	}
 
@@ -133,10 +134,23 @@ func (m msgServer) CreatePoolWithCommunityPool(goCtx context.Context,
 	}
 
 	// add a escrowInfo to the proposal
-	m.setEscrowInfo(ctx, proposal.ProposalId, types.EscrowInfo{
+	m.SetEscrowInfo(ctx, types.EscrowInfo{
 		Proposer:     msg.Proposer,
 		FundApplied:  msg.Content.FundApplied,
 		FundSelfBond: msg.Content.FundSelfBond,
+		ProposalId:   proposal.ProposalId,
+	})
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeCreatePoolWithCommunityPool,
+			sdk.NewAttribute(types.AttributeValueCreator, msg.Proposer),
+			sdk.NewAttribute(types.AttributeValueProposal, fmt.Sprintf("%d", proposal.ProposalId)),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Proposer),
+		),
 	})
 	return &types.MsgCreatePoolWithCommunityPoolResponse{}, nil
 }
