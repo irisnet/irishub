@@ -22,18 +22,21 @@ const (
 	// RewardCollector is the root string for the reward distribution account address
 	RewardCollector = "reward_collector"
 
+	// EscrowCollector is the root string for the reward escrow account address
+	EscrowCollector = "escrow_collector"
+
 	// Prefix for farm pool_id
 	PrefixFarmPool = "farm"
 )
 
 var (
-	FarmPoolKey       = []byte{0x06} // key for farm pool
+	Delimiter         = []byte{0x00} // Separator for string key
 	FarmPoolRuleKey   = []byte{0x02} // key for farm pool reward rule
 	FarmerKey         = []byte{0x03} // key for farmer
 	ActiveFarmPoolKey = []byte{0x04} // key for active farm pool
-	// Separator for string key
-	Delimiter   = []byte{0x00}
-	FarmPoolSeq = []byte{0x05}
+	FarmPoolSeq       = []byte{0x05}
+	FarmPoolKey       = []byte{0x06} // key for farm pool
+	EscrowInfoKey     = []byte{0x07}
 )
 
 func KeyFarmPool(poolId string) []byte {
@@ -68,4 +71,8 @@ func KeyActiveFarmPool(height int64, poolId string) []byte {
 
 func PrefixActiveFarmPool(height int64) []byte {
 	return append(ActiveFarmPoolKey, sdk.Uint64ToBigEndian(uint64(height))...)
+}
+
+func KeyEscrowInfo(proposalId uint64) []byte {
+	return append(EscrowInfoKey, sdk.Uint64ToBigEndian(proposalId)...)
 }

@@ -21,6 +21,7 @@ type Keeper struct {
 	bk                                  types.BankKeeper
 	ak                                  types.AccountKeeper
 	dk                                  types.DistrKeeper
+	gk                                  types.GovKeeper
 	feeCollectorName, communityPoolName string // name of the fee collector
 }
 

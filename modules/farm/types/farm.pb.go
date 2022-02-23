@@ -190,6 +190,45 @@ func (m *Params) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Params proto.InternalMessageInfo
 
+type EscrowInfo struct {
+	Proposer     string       `protobuf:"bytes,1,opt,name=proposer,proto3" json:"proposer,omitempty"`
+	FundApplied  []types.Coin `protobuf:"bytes,2,rep,name=fund_applied,json=fundApplied,proto3" json:"fund_applied"`
+	FundSelfBond []types.Coin `protobuf:"bytes,3,rep,name=fund_self_bond,json=fundSelfBond,proto3" json:"fund_self_bond"`
+}
+
+func (m *EscrowInfo) Reset()         { *m = EscrowInfo{} }
+func (m *EscrowInfo) String() string { return proto.CompactTextString(m) }
+func (*EscrowInfo) ProtoMessage()    {}
+func (*EscrowInfo) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a85c74c264ccc821, []int{4}
+}
+func (m *EscrowInfo) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *EscrowInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_EscrowInfo.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *EscrowInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EscrowInfo.Merge(m, src)
+}
+func (m *EscrowInfo) XXX_Size() int {
+	return m.Size()
+}
+func (m *EscrowInfo) XXX_DiscardUnknown() {
+	xxx_messageInfo_EscrowInfo.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EscrowInfo proto.InternalMessageInfo
+
 // CommunityPoolCreateFarmProposal is a gov Content type for creating a farm pool with community pool
 type CommunityPoolCreateFarmProposal struct {
 	Title           string       `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
@@ -197,13 +236,14 @@ type CommunityPoolCreateFarmProposal struct {
 	PoolDescription string       `protobuf:"bytes,3,opt,name=pool_description,json=poolDescription,proto3" json:"pool_description,omitempty"`
 	LptDenom        string       `protobuf:"bytes,4,opt,name=lpt_denom,json=lptDenom,proto3" json:"lpt_denom,omitempty"`
 	RewardPerBlock  []types.Coin `protobuf:"bytes,5,rep,name=reward_per_block,json=rewardPerBlock,proto3" json:"reward_per_block"`
-	TotalReward     []types.Coin `protobuf:"bytes,6,rep,name=total_reward,json=totalReward,proto3" json:"total_reward"`
+	FundApplied     []types.Coin `protobuf:"bytes,6,rep,name=fund_applied,json=fundApplied,proto3" json:"fund_applied"`
+	FundSelfBond    []types.Coin `protobuf:"bytes,7,rep,name=fund_self_bond,json=fundSelfBond,proto3" json:"fund_self_bond"`
 }
 
 func (m *CommunityPoolCreateFarmProposal) Reset()      { *m = CommunityPoolCreateFarmProposal{} }
 func (*CommunityPoolCreateFarmProposal) ProtoMessage() {}
 func (*CommunityPoolCreateFarmProposal) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a85c74c264ccc821, []int{4}
+	return fileDescriptor_a85c74c264ccc821, []int{5}
 }
 func (m *CommunityPoolCreateFarmProposal) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -232,122 +272,74 @@ func (m *CommunityPoolCreateFarmProposal) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CommunityPoolCreateFarmProposal proto.InternalMessageInfo
 
-// CommunityPoolCreateFarmProposalWithDeposit defines a CommunityPoolCreateFarmProposal
-// with a deposit
-type CommunityPoolCreateFarmProposalWithDeposit struct {
-	Title           string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
-	Description     string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	PoolDescription string `protobuf:"bytes,3,opt,name=pool_description,json=poolDescription,proto3" json:"pool_description,omitempty"`
-	LptDenom        string `protobuf:"bytes,4,opt,name=lpt_denom,json=lptDenom,proto3" json:"lpt_denom,omitempty"`
-	RewardPerBlock  string `protobuf:"bytes,5,opt,name=reward_per_block,json=rewardPerBlock,proto3" json:"reward_per_block,omitempty"`
-	TotalReward     string `protobuf:"bytes,6,opt,name=total_reward,json=totalReward,proto3" json:"total_reward,omitempty"`
-	Deposit         string `protobuf:"bytes,7,opt,name=deposit,proto3" json:"deposit,omitempty"`
-}
-
-func (m *CommunityPoolCreateFarmProposalWithDeposit) Reset() {
-	*m = CommunityPoolCreateFarmProposalWithDeposit{}
-}
-func (m *CommunityPoolCreateFarmProposalWithDeposit) String() string {
-	return proto.CompactTextString(m)
-}
-func (*CommunityPoolCreateFarmProposalWithDeposit) ProtoMessage() {}
-func (*CommunityPoolCreateFarmProposalWithDeposit) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a85c74c264ccc821, []int{5}
-}
-func (m *CommunityPoolCreateFarmProposalWithDeposit) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *CommunityPoolCreateFarmProposalWithDeposit) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_CommunityPoolCreateFarmProposalWithDeposit.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *CommunityPoolCreateFarmProposalWithDeposit) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CommunityPoolCreateFarmProposalWithDeposit.Merge(m, src)
-}
-func (m *CommunityPoolCreateFarmProposalWithDeposit) XXX_Size() int {
-	return m.Size()
-}
-func (m *CommunityPoolCreateFarmProposalWithDeposit) XXX_DiscardUnknown() {
-	xxx_messageInfo_CommunityPoolCreateFarmProposalWithDeposit.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_CommunityPoolCreateFarmProposalWithDeposit proto.InternalMessageInfo
-
 func init() {
 	proto.RegisterType((*FarmPool)(nil), "irismod.farm.FarmPool")
 	proto.RegisterType((*RewardRule)(nil), "irismod.farm.RewardRule")
 	proto.RegisterType((*FarmInfo)(nil), "irismod.farm.FarmInfo")
 	proto.RegisterType((*Params)(nil), "irismod.farm.Params")
+	proto.RegisterType((*EscrowInfo)(nil), "irismod.farm.EscrowInfo")
 	proto.RegisterType((*CommunityPoolCreateFarmProposal)(nil), "irismod.farm.CommunityPoolCreateFarmProposal")
-	proto.RegisterType((*CommunityPoolCreateFarmProposalWithDeposit)(nil), "irismod.farm.CommunityPoolCreateFarmProposalWithDeposit")
 }
 
 func init() { proto.RegisterFile("farm/farm.proto", fileDescriptor_a85c74c264ccc821) }
 
 var fileDescriptor_a85c74c264ccc821 = []byte{
-	// 858 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x56, 0x3d, 0x6f, 0x23, 0x45,
-	0x18, 0xf6, 0xda, 0x89, 0x3f, 0xc6, 0x21, 0x09, 0xc3, 0x71, 0xec, 0x05, 0xb1, 0xeb, 0x4b, 0x01,
-	0x06, 0xe9, 0x76, 0xb9, 0x40, 0x43, 0x4a, 0xc7, 0x8a, 0xb0, 0xb8, 0x22, 0x2c, 0x05, 0x1f, 0xcd,
-	0x6a, 0x76, 0xe7, 0x8d, 0x3d, 0xba, 0xdd, 0x9d, 0xd5, 0xcc, 0xe4, 0xc8, 0xfd, 0x03, 0x0a, 0x0a,
-	0xca, 0x6b, 0x90, 0x42, 0xcb, 0x4f, 0xe0, 0x17, 0xa4, 0xbc, 0x12, 0x51, 0x1c, 0x90, 0x34, 0xfc,
-	0x05, 0x2a, 0xd0, 0x7c, 0xd8, 0x58, 0xce, 0x89, 0xcb, 0x45, 0x48, 0x34, 0xc9, 0xbe, 0x1f, 0xf3,
-	0xbc, 0x33, 0xcf, 0x3c, 0xef, 0x3b, 0x46, 0x5b, 0xc7, 0x44, 0x94, 0xb1, 0xfe, 0x13, 0xd5, 0x82,
-	0x2b, 0x8e, 0x37, 0x98, 0x60, 0xb2, 0xe4, 0x34, 0xd2, 0xbe, 0x9d, 0x20, 0xe7, 0xb2, 0xe4, 0x32,
-	0xce, 0x88, 0x84, 0xf8, 0xd1, 0xfd, 0x0c, 0x14, 0xb9, 0x1f, 0xe7, 0x9c, 0x55, 0x36, 0x7b, 0xe7,
-	0xd6, 0x94, 0x4f, 0xb9, 0xf9, 0x8c, 0xf5, 0x97, 0xf5, 0xee, 0xfe, 0xd0, 0x42, 0xdd, 0x43, 0x22,
-	0xca, 0x23, 0xce, 0x0b, 0xbc, 0x89, 0x9a, 0x8c, 0xfa, 0xde, 0xc0, 0x1b, 0xf6, 0x92, 0x26, 0xa3,
-	0xd8, 0x47, 0x9d, 0x5c, 0x00, 0x51, 0x5c, 0xf8, 0x4d, 0xe3, 0x9c, 0x9b, 0x78, 0x80, 0xfa, 0x14,
-	0x64, 0x2e, 0x58, 0xad, 0x18, 0xaf, 0xfc, 0x96, 0x89, 0x2e, 0xbb, 0xf0, 0x5d, 0xb4, 0x21, 0x15,
-	0x11, 0x2a, 0x9d, 0x01, 0x9b, 0xce, 0x94, 0xbf, 0x36, 0xf0, 0x86, 0xad, 0xa4, 0x6f, 0x7c, 0x1f,
-	0x1b, 0x17, 0x7e, 0x0b, 0x21, 0xa8, 0xe8, 0x3c, 0x61, 0xdd, 0x24, 0xf4, 0xa0, 0xa2, 0x2e, 0xfc,
-	0x11, 0xba, 0x53, 0x10, 0x39, 0x07, 0x48, 0x29, 0x93, 0x4a, 0xa4, 0x02, 0xbe, 0x26, 0x82, 0x4a,
-	0xbf, 0x6d, 0xb2, 0x6f, 0xeb, 0x04, 0x9b, 0x3e, 0xd6, 0xe1, 0xc4, 0x46, 0xf1, 0x0e, 0xea, 0x02,
-	0x65, 0x8a, 0x64, 0x05, 0xf8, 0x9d, 0x81, 0x37, 0xec, 0x26, 0x0b, 0x1b, 0x2b, 0xb4, 0xad, 0xb8,
-	0x22, 0x45, 0x5a, 0xd4, 0x2a, 0x2d, 0x78, 0xfe, 0x10, 0xa8, 0xdf, 0x1d, 0x78, 0xc3, 0xfe, 0xde,
-	0x9d, 0xc8, 0x52, 0x18, 0x69, 0x0a, 0x23, 0x47, 0x61, 0x74, 0xc0, 0x59, 0x35, 0x8a, 0xcf, 0x9f,
-	0x85, 0x8d, 0x5f, 0x9e, 0x85, 0xef, 0x4c, 0x99, 0x9a, 0x9d, 0x64, 0x51, 0xce, 0xcb, 0xd8, 0xf1,
-	0x6d, 0xff, 0xdd, 0x93, 0xf4, 0x61, 0xac, 0x1e, 0xd7, 0x20, 0xcd, 0x82, 0x64, 0xd3, 0xd4, 0x78,
-	0x50, 0xab, 0x07, 0xa6, 0x02, 0xfe, 0x10, 0xad, 0x8b, 0x93, 0x02, 0xa4, 0xdf, 0x1b, 0xb4, 0x86,
-	0xfd, 0x3d, 0x3f, 0x5a, 0xbe, 0xbb, 0xc8, 0xee, 0x3b, 0x39, 0x29, 0x60, 0xb4, 0xa6, 0x2b, 0x25,
-	0x36, 0x79, 0x7f, 0xed, 0x8f, 0xb3, 0xd0, 0xdb, 0xfd, 0xb6, 0x85, 0xd0, 0x3f, 0x19, 0xf8, 0x36,
-	0x6a, 0x5b, 0x16, 0xdc, 0x4d, 0x39, 0x0b, 0x7f, 0x8a, 0x36, 0xec, 0xc1, 0x5c, 0xd4, 0x5c, 0xd9,
-	0x28, 0x72, 0x3b, 0x7f, 0xfb, 0x1a, 0x3b, 0x9f, 0x54, 0x2a, 0xe9, 0x1b, 0x0c, 0x5b, 0x0e, 0x7f,
-	0x89, 0xb6, 0x05, 0x94, 0x84, 0x55, 0xac, 0x9a, 0xce, 0x61, 0x5b, 0x37, 0x82, 0xdd, 0x5a, 0xe0,
-	0x38, 0xe8, 0x2f, 0x34, 0xb4, 0xfe, 0x4a, 0x6b, 0x10, 0x69, 0xa6, 0x2f, 0xc2, 0x68, 0xe4, 0xe5,
-	0xa1, 0x37, 0x2d, 0xce, 0x11, 0x88, 0x91, 0x46, 0x59, 0x41, 0x96, 0x33, 0x22, 0xc0, 0x88, 0xeb,
-	0xe5, 0x90, 0xc7, 0x90, 0x2f, 0x21, 0x7f, 0xa6, 0x51, 0xdc, 0x75, 0xfc, 0xe9, 0xd9, 0x96, 0x99,
-	0x54, 0xc7, 0x1c, 0xbf, 0x81, 0x3a, 0x35, 0xe7, 0x45, 0xba, 0xe8, 0x9b, 0xb6, 0x36, 0x27, 0xa6,
-	0x77, 0x08, 0xa5, 0x02, 0xa4, 0x9c, 0xf7, 0x8e, 0x33, 0xf1, 0x21, 0x6a, 0x3b, 0xd9, 0xdd, 0x8c,
-	0x4a, 0xb7, 0x1a, 0x17, 0xa8, 0xef, 0xce, 0x49, 0x21, 0xd3, 0x0d, 0xd6, 0xfa, 0x77, 0x0d, 0xbf,
-	0xaf, 0xeb, 0xfc, 0xf8, 0x6b, 0x38, 0xbc, 0xa6, 0x86, 0x65, 0x82, 0x2c, 0xfe, 0x18, 0x32, 0xe5,
-	0xce, 0xfe, 0x97, 0x87, 0xda, 0x47, 0x44, 0x90, 0x52, 0xe2, 0x47, 0xe8, 0x55, 0x73, 0x72, 0x33,
-	0x12, 0x18, 0xaf, 0xd2, 0x63, 0x00, 0xc3, 0xc1, 0x7f, 0xdb, 0x48, 0x5b, 0xba, 0xc8, 0x81, 0xab,
-	0x71, 0x08, 0x80, 0xf7, 0xd0, 0xeb, 0x25, 0x39, 0x75, 0x6a, 0x4c, 0x73, 0xa2, 0x60, 0xca, 0x05,
-	0x03, 0x4b, 0xf3, 0x2b, 0xc9, 0x6b, 0x25, 0x39, 0xb5, 0x12, 0x3b, 0x58, 0x84, 0xf0, 0x04, 0x75,
-	0x95, 0x5e, 0x43, 0x14, 0xdc, 0x80, 0x74, 0x2d, 0x85, 0x8e, 0x22, 0xa7, 0x09, 0x51, 0xb0, 0xfb,
-	0x53, 0x13, 0x85, 0x07, 0xbc, 0x2c, 0x4f, 0x2a, 0xa6, 0x1e, 0x1f, 0xcd, 0xf7, 0x06, 0x66, 0x86,
-	0x0a, 0x5e, 0x73, 0x49, 0x0a, 0x7c, 0x0b, 0xad, 0x2b, 0xa6, 0x0a, 0x70, 0x92, 0xb0, 0xc6, 0xea,
-	0xcc, 0x6c, 0x5e, 0x9d, 0x99, 0xef, 0xa2, 0x6d, 0x43, 0xe9, 0xd5, 0xd1, 0x6a, 0x58, 0x18, 0x2f,
-	0xa5, 0xbe, 0x89, 0x7a, 0x7a, 0x7e, 0x51, 0xa8, 0x78, 0x69, 0xfb, 0x26, 0xe9, 0x16, 0xb5, 0x1a,
-	0x6b, 0x1b, 0x4f, 0x9e, 0xd3, 0x5b, 0xeb, 0x2f, 0x92, 0x87, 0x1d, 0x3c, 0xab, 0xcd, 0x34, 0x5a,
-	0x19, 0x2a, 0xed, 0xeb, 0xc1, 0x2c, 0x4f, 0x91, 0xfd, 0xee, 0x93, 0xb3, 0xb0, 0x61, 0xe4, 0xf3,
-	0x7d, 0x13, 0xbd, 0xf7, 0x02, 0xf2, 0x3e, 0x67, 0x6a, 0x36, 0x86, 0x9a, 0x4b, 0xa6, 0xfe, 0x77,
-	0x1e, 0x87, 0xcf, 0xe5, 0x51, 0xe7, 0xac, 0xd2, 0x74, 0xf7, 0x0a, 0x4d, 0x66, 0x53, 0xcb, 0xb3,
-	0xd4, 0x47, 0x1d, 0x6a, 0xcf, 0x65, 0x9e, 0xa4, 0x5e, 0x32, 0x37, 0xf7, 0xbb, 0xdf, 0x9c, 0x85,
-	0x8d, 0x27, 0x67, 0xa1, 0x37, 0xfa, 0xe4, 0xfc, 0xf7, 0xa0, 0x71, 0x7e, 0x11, 0x78, 0x4f, 0x2f,
-	0x02, 0xef, 0xb7, 0x8b, 0xc0, 0xfb, 0xee, 0x32, 0x68, 0x3c, 0xbd, 0x0c, 0x1a, 0x3f, 0x5f, 0x06,
-	0x8d, 0xaf, 0xee, 0x2d, 0x69, 0x55, 0x3f, 0x1f, 0x15, 0xa8, 0xd8, 0x3d, 0x23, 0x71, 0xc9, 0xa9,
-	0x7e, 0x31, 0xcc, 0xcf, 0x03, 0x2b, 0xdb, 0xac, 0x6d, 0x5e, 0xf8, 0x0f, 0xfe, 0x0e, 0x00, 0x00,
-	0xff, 0xff, 0x59, 0x21, 0x91, 0x03, 0x38, 0x08, 0x00, 0x00,
+	// 867 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0x3f, 0x73, 0x1b, 0x45,
+	0x14, 0xd7, 0x59, 0xb6, 0x24, 0x3f, 0x19, 0xdb, 0x2c, 0x21, 0x5c, 0xcc, 0x20, 0x09, 0x17, 0x20,
+	0x8a, 0xdc, 0x11, 0x43, 0x03, 0x1d, 0xb2, 0xe2, 0x41, 0x43, 0x0a, 0x73, 0x69, 0x80, 0xe6, 0x66,
+	0xef, 0xf6, 0x49, 0xde, 0xc9, 0xdd, 0xed, 0xcd, 0xee, 0x2a, 0x71, 0x4a, 0x7a, 0x0a, 0x4a, 0xca,
+	0xd0, 0xf2, 0x0d, 0xf8, 0x06, 0x2e, 0x53, 0x32, 0x14, 0x01, 0xec, 0x86, 0xaf, 0x40, 0x05, 0xb3,
+	0x7f, 0x24, 0x34, 0x0e, 0x43, 0x1c, 0x4f, 0x1a, 0xfb, 0xde, 0xee, 0xdb, 0xdf, 0xdb, 0xf7, 0x7b,
+	0xbf, 0xf7, 0x56, 0xb0, 0x33, 0xa5, 0xb2, 0x8c, 0xcd, 0x9f, 0xa8, 0x96, 0x42, 0x0b, 0xb2, 0xc5,
+	0x25, 0x57, 0xa5, 0x60, 0x91, 0x59, 0xdb, 0xeb, 0xe5, 0x42, 0x95, 0x42, 0xc5, 0x19, 0x55, 0x18,
+	0x3f, 0xbc, 0x93, 0xa1, 0xa6, 0x77, 0xe2, 0x5c, 0xf0, 0xca, 0x79, 0xef, 0xdd, 0x98, 0x89, 0x99,
+	0xb0, 0x9f, 0xb1, 0xf9, 0x72, 0xab, 0xfb, 0x3f, 0x36, 0xa1, 0x73, 0x44, 0x65, 0x79, 0x2c, 0x44,
+	0x41, 0xb6, 0x61, 0x8d, 0xb3, 0x30, 0x18, 0x04, 0xc3, 0xcd, 0x64, 0x8d, 0x33, 0x12, 0x42, 0x3b,
+	0x97, 0x48, 0xb5, 0x90, 0xe1, 0x9a, 0x5d, 0x5c, 0x98, 0x64, 0x00, 0x5d, 0x86, 0x2a, 0x97, 0xbc,
+	0xd6, 0x5c, 0x54, 0x61, 0xd3, 0xee, 0xae, 0x2e, 0x91, 0x77, 0x61, 0x4b, 0x69, 0x2a, 0x75, 0x7a,
+	0x82, 0x7c, 0x76, 0xa2, 0xc3, 0xf5, 0x41, 0x30, 0x6c, 0x26, 0x5d, 0xbb, 0xf6, 0xb9, 0x5d, 0x22,
+	0xef, 0x00, 0x60, 0xc5, 0x16, 0x0e, 0x1b, 0xd6, 0x61, 0x13, 0x2b, 0xe6, 0xb7, 0x3f, 0x81, 0x5b,
+	0x05, 0x55, 0x0b, 0x80, 0x94, 0x71, 0xa5, 0x65, 0x2a, 0xf1, 0x11, 0x95, 0x4c, 0x85, 0x2d, 0xeb,
+	0x7d, 0xd3, 0x38, 0x38, 0xf7, 0xb1, 0xd9, 0x4e, 0xdc, 0x2e, 0xd9, 0x83, 0x0e, 0x32, 0xae, 0x69,
+	0x56, 0x60, 0xd8, 0x1e, 0x04, 0xc3, 0x4e, 0xb2, 0xb4, 0x89, 0x86, 0x5d, 0x2d, 0x34, 0x2d, 0xd2,
+	0xa2, 0xd6, 0x69, 0x21, 0xf2, 0x07, 0xc8, 0xc2, 0xce, 0x20, 0x18, 0x76, 0x0f, 0x6e, 0x45, 0x8e,
+	0xc2, 0xc8, 0x50, 0x18, 0x79, 0x0a, 0xa3, 0x43, 0xc1, 0xab, 0x51, 0x7c, 0xf6, 0xac, 0xdf, 0xf8,
+	0xf5, 0x59, 0xff, 0xfd, 0x19, 0xd7, 0x27, 0xf3, 0x2c, 0xca, 0x45, 0x19, 0x7b, 0xbe, 0xdd, 0xbf,
+	0xdb, 0x8a, 0x3d, 0x88, 0xf5, 0xe3, 0x1a, 0x95, 0x3d, 0x90, 0x6c, 0xdb, 0x18, 0xf7, 0x6a, 0x7d,
+	0xcf, 0x46, 0x20, 0x1f, 0xc3, 0x86, 0x9c, 0x17, 0xa8, 0xc2, 0xcd, 0x41, 0x73, 0xd8, 0x3d, 0x08,
+	0xa3, 0xd5, 0xda, 0x45, 0xee, 0xde, 0xc9, 0xbc, 0xc0, 0xd1, 0xba, 0x89, 0x94, 0x38, 0xe7, 0x4f,
+	0xd7, 0xff, 0x7c, 0xd2, 0x0f, 0xf6, 0xbf, 0x6b, 0x02, 0xfc, 0xeb, 0x41, 0x6e, 0x42, 0xcb, 0xb1,
+	0xe0, 0x2b, 0xe5, 0x2d, 0xf2, 0x25, 0x6c, 0xb9, 0xc4, 0xfc, 0xae, 0x2d, 0xd9, 0x28, 0xf2, 0x37,
+	0x7f, 0xef, 0x0a, 0x37, 0x9f, 0x54, 0x3a, 0xe9, 0x5a, 0x0c, 0x17, 0x8e, 0x7c, 0x0d, 0xbb, 0x12,
+	0x4b, 0xca, 0x2b, 0x5e, 0xcd, 0x16, 0xb0, 0xcd, 0x6b, 0xc1, 0xee, 0x2c, 0x71, 0x3c, 0xf4, 0x57,
+	0x06, 0xda, 0x7c, 0xa5, 0x35, 0xca, 0x34, 0x33, 0x85, 0xb0, 0x1a, 0x79, 0x79, 0xe8, 0x6d, 0x87,
+	0x73, 0x8c, 0x72, 0x64, 0x50, 0x2e, 0x21, 0xab, 0x13, 0x2a, 0xd1, 0x8a, 0xeb, 0xe5, 0x90, 0xc7,
+	0x98, 0xaf, 0x20, 0xdf, 0x37, 0x28, 0xbe, 0x1c, 0x7f, 0x05, 0xae, 0x65, 0x26, 0xd5, 0x54, 0x90,
+	0xb7, 0xa0, 0x5d, 0x0b, 0x51, 0xa4, 0xcb, 0xbe, 0x69, 0x19, 0x73, 0x62, 0x7b, 0x87, 0x32, 0x26,
+	0x51, 0xa9, 0x45, 0xef, 0x78, 0x93, 0x1c, 0x41, 0xcb, 0xcb, 0xee, 0x7a, 0x54, 0xfa, 0xd3, 0xa4,
+	0x80, 0xae, 0xcf, 0x93, 0x61, 0x66, 0x1a, 0xac, 0xf9, 0xff, 0x1a, 0xfe, 0xd0, 0xc4, 0xf9, 0xe9,
+	0xb7, 0xfe, 0xf0, 0x8a, 0x1a, 0x56, 0x09, 0x38, 0xfc, 0x31, 0x66, 0xda, 0xe7, 0xfe, 0x77, 0x00,
+	0xad, 0x63, 0x2a, 0x69, 0xa9, 0xc8, 0x43, 0x78, 0xdd, 0x66, 0x6e, 0x47, 0x02, 0x17, 0x55, 0x3a,
+	0x45, 0xb4, 0x1c, 0xbc, 0xda, 0x46, 0xda, 0x31, 0x41, 0x0e, 0x7d, 0x8c, 0x23, 0x44, 0x72, 0x00,
+	0x6f, 0x96, 0xf4, 0xd4, 0xab, 0x31, 0xcd, 0xa9, 0xc6, 0x99, 0x90, 0x1c, 0x1d, 0xcd, 0xaf, 0x25,
+	0x6f, 0x94, 0xf4, 0xd4, 0x49, 0xec, 0x70, 0xb9, 0x45, 0x26, 0xd0, 0xd1, 0xe6, 0x0c, 0xd5, 0x78,
+	0x0d, 0xd2, 0x8d, 0x14, 0xda, 0x9a, 0x9e, 0x26, 0x54, 0xe3, 0xfe, 0xcf, 0x01, 0xc0, 0x5d, 0x95,
+	0x4b, 0xf1, 0xc8, 0xd6, 0x7f, 0x0f, 0x3a, 0xb5, 0x14, 0xb5, 0x50, 0x28, 0xbd, 0x00, 0x96, 0x36,
+	0x19, 0xc1, 0xd6, 0x74, 0x5e, 0xb1, 0x94, 0xd6, 0x75, 0xc1, 0xd1, 0x34, 0xe4, 0x0b, 0x2a, 0xe4,
+	0x7a, 0xbf, 0x6b, 0x0e, 0x7d, 0xe6, 0xce, 0x90, 0xbb, 0xb0, 0x6d, 0x31, 0x14, 0x16, 0xd3, 0x34,
+	0x13, 0x95, 0x11, 0xcd, 0x95, 0x50, 0x6c, 0xe8, 0xfb, 0x58, 0x4c, 0x47, 0xa2, 0x62, 0xbe, 0x7a,
+	0xdf, 0x36, 0xa1, 0x7f, 0x28, 0xca, 0x72, 0x5e, 0x71, 0xfd, 0xf8, 0x78, 0xc1, 0x2b, 0xda, 0xf9,
+	0x6f, 0x2f, 0x4d, 0x0b, 0x72, 0x03, 0x36, 0x34, 0xd7, 0x05, 0xfa, 0x6c, 0x9c, 0x71, 0x79, 0xde,
+	0xaf, 0x3d, 0x3f, 0xef, 0x3f, 0x80, 0x5d, 0x2b, 0x87, 0xe7, 0x9f, 0x05, 0x5b, 0xc1, 0xf1, 0x8a,
+	0xeb, 0xdb, 0xb0, 0x69, 0x66, 0x2f, 0xc3, 0x4a, 0x94, 0xae, 0xe7, 0x93, 0x4e, 0x51, 0xeb, 0xb1,
+	0xb1, 0xc9, 0xe4, 0x3f, 0xe6, 0xc2, 0xc6, 0xd5, 0x52, 0xbe, 0x3c, 0x08, 0x2e, 0xf3, 0xdf, 0x7a,
+	0x25, 0xfc, 0xb7, 0xaf, 0xc3, 0x7f, 0xe7, 0x87, 0x27, 0xfd, 0x86, 0xa9, 0xc1, 0xe8, 0x8b, 0xb3,
+	0x3f, 0x7a, 0x8d, 0xb3, 0xf3, 0x5e, 0xf0, 0xf4, 0xbc, 0x17, 0xfc, 0x7e, 0xde, 0x0b, 0xbe, 0xbf,
+	0xe8, 0x35, 0x9e, 0x5e, 0xf4, 0x1a, 0xbf, 0x5c, 0xf4, 0x1a, 0xdf, 0xdc, 0x5e, 0x91, 0xa3, 0x79,
+	0x21, 0x2a, 0xd4, 0xb1, 0x7f, 0x29, 0xe2, 0x52, 0x30, 0xf3, 0x28, 0xd8, 0x5f, 0x00, 0x4e, 0x99,
+	0x59, 0xcb, 0x3e, 0xe2, 0x1f, 0xfd, 0x13, 0x00, 0x00, 0xff, 0xff, 0xb0, 0x3b, 0xd7, 0x3f, 0x1b,
+	0x08, 0x00, 0x00,
 }
 
 func (this *FarmPool) Equal(that interface{}) bool {
@@ -477,6 +469,46 @@ func (this *FarmInfo) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *EscrowInfo) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*EscrowInfo)
+	if !ok {
+		that2, ok := that.(EscrowInfo)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Proposer != that1.Proposer {
+		return false
+	}
+	if len(this.FundApplied) != len(that1.FundApplied) {
+		return false
+	}
+	for i := range this.FundApplied {
+		if !this.FundApplied[i].Equal(&that1.FundApplied[i]) {
+			return false
+		}
+	}
+	if len(this.FundSelfBond) != len(that1.FundSelfBond) {
+		return false
+	}
+	for i := range this.FundSelfBond {
+		if !this.FundSelfBond[i].Equal(&that1.FundSelfBond[i]) {
+			return false
+		}
+	}
+	return true
+}
 func (this *CommunityPoolCreateFarmProposal) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -516,11 +548,19 @@ func (this *CommunityPoolCreateFarmProposal) Equal(that interface{}) bool {
 			return false
 		}
 	}
-	if len(this.TotalReward) != len(that1.TotalReward) {
+	if len(this.FundApplied) != len(that1.FundApplied) {
 		return false
 	}
-	for i := range this.TotalReward {
-		if !this.TotalReward[i].Equal(&that1.TotalReward[i]) {
+	for i := range this.FundApplied {
+		if !this.FundApplied[i].Equal(&that1.FundApplied[i]) {
+			return false
+		}
+	}
+	if len(this.FundSelfBond) != len(that1.FundSelfBond) {
+		return false
+	}
+	for i := range this.FundSelfBond {
+		if !this.FundSelfBond[i].Equal(&that1.FundSelfBond[i]) {
 			return false
 		}
 	}
@@ -798,6 +838,64 @@ func (m *Params) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *EscrowInfo) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EscrowInfo) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EscrowInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.FundSelfBond) > 0 {
+		for iNdEx := len(m.FundSelfBond) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.FundSelfBond[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintFarm(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.FundApplied) > 0 {
+		for iNdEx := len(m.FundApplied) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.FundApplied[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintFarm(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Proposer) > 0 {
+		i -= len(m.Proposer)
+		copy(dAtA[i:], m.Proposer)
+		i = encodeVarintFarm(dAtA, i, uint64(len(m.Proposer)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *CommunityPoolCreateFarmProposal) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -818,10 +916,24 @@ func (m *CommunityPoolCreateFarmProposal) MarshalToSizedBuffer(dAtA []byte) (int
 	_ = i
 	var l int
 	_ = l
-	if len(m.TotalReward) > 0 {
-		for iNdEx := len(m.TotalReward) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.FundSelfBond) > 0 {
+		for iNdEx := len(m.FundSelfBond) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.TotalReward[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.FundSelfBond[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintFarm(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
+	if len(m.FundApplied) > 0 {
+		for iNdEx := len(m.FundApplied) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.FundApplied[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -845,78 +957,6 @@ func (m *CommunityPoolCreateFarmProposal) MarshalToSizedBuffer(dAtA []byte) (int
 			i--
 			dAtA[i] = 0x2a
 		}
-	}
-	if len(m.LptDenom) > 0 {
-		i -= len(m.LptDenom)
-		copy(dAtA[i:], m.LptDenom)
-		i = encodeVarintFarm(dAtA, i, uint64(len(m.LptDenom)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.PoolDescription) > 0 {
-		i -= len(m.PoolDescription)
-		copy(dAtA[i:], m.PoolDescription)
-		i = encodeVarintFarm(dAtA, i, uint64(len(m.PoolDescription)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Description) > 0 {
-		i -= len(m.Description)
-		copy(dAtA[i:], m.Description)
-		i = encodeVarintFarm(dAtA, i, uint64(len(m.Description)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Title) > 0 {
-		i -= len(m.Title)
-		copy(dAtA[i:], m.Title)
-		i = encodeVarintFarm(dAtA, i, uint64(len(m.Title)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *CommunityPoolCreateFarmProposalWithDeposit) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *CommunityPoolCreateFarmProposalWithDeposit) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *CommunityPoolCreateFarmProposalWithDeposit) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Deposit) > 0 {
-		i -= len(m.Deposit)
-		copy(dAtA[i:], m.Deposit)
-		i = encodeVarintFarm(dAtA, i, uint64(len(m.Deposit)))
-		i--
-		dAtA[i] = 0x3a
-	}
-	if len(m.TotalReward) > 0 {
-		i -= len(m.TotalReward)
-		copy(dAtA[i:], m.TotalReward)
-		i = encodeVarintFarm(dAtA, i, uint64(len(m.TotalReward)))
-		i--
-		dAtA[i] = 0x32
-	}
-	if len(m.RewardPerBlock) > 0 {
-		i -= len(m.RewardPerBlock)
-		copy(dAtA[i:], m.RewardPerBlock)
-		i = encodeVarintFarm(dAtA, i, uint64(len(m.RewardPerBlock)))
-		i--
-		dAtA[i] = 0x2a
 	}
 	if len(m.LptDenom) > 0 {
 		i -= len(m.LptDenom)
@@ -1063,6 +1103,31 @@ func (m *Params) Size() (n int) {
 	return n
 }
 
+func (m *EscrowInfo) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Proposer)
+	if l > 0 {
+		n += 1 + l + sovFarm(uint64(l))
+	}
+	if len(m.FundApplied) > 0 {
+		for _, e := range m.FundApplied {
+			l = e.Size()
+			n += 1 + l + sovFarm(uint64(l))
+		}
+	}
+	if len(m.FundSelfBond) > 0 {
+		for _, e := range m.FundSelfBond {
+			l = e.Size()
+			n += 1 + l + sovFarm(uint64(l))
+		}
+	}
+	return n
+}
+
 func (m *CommunityPoolCreateFarmProposal) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1091,48 +1156,17 @@ func (m *CommunityPoolCreateFarmProposal) Size() (n int) {
 			n += 1 + l + sovFarm(uint64(l))
 		}
 	}
-	if len(m.TotalReward) > 0 {
-		for _, e := range m.TotalReward {
+	if len(m.FundApplied) > 0 {
+		for _, e := range m.FundApplied {
 			l = e.Size()
 			n += 1 + l + sovFarm(uint64(l))
 		}
 	}
-	return n
-}
-
-func (m *CommunityPoolCreateFarmProposalWithDeposit) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Title)
-	if l > 0 {
-		n += 1 + l + sovFarm(uint64(l))
-	}
-	l = len(m.Description)
-	if l > 0 {
-		n += 1 + l + sovFarm(uint64(l))
-	}
-	l = len(m.PoolDescription)
-	if l > 0 {
-		n += 1 + l + sovFarm(uint64(l))
-	}
-	l = len(m.LptDenom)
-	if l > 0 {
-		n += 1 + l + sovFarm(uint64(l))
-	}
-	l = len(m.RewardPerBlock)
-	if l > 0 {
-		n += 1 + l + sovFarm(uint64(l))
-	}
-	l = len(m.TotalReward)
-	if l > 0 {
-		n += 1 + l + sovFarm(uint64(l))
-	}
-	l = len(m.Deposit)
-	if l > 0 {
-		n += 1 + l + sovFarm(uint64(l))
+	if len(m.FundSelfBond) > 0 {
+		for _, e := range m.FundSelfBond {
+			l = e.Size()
+			n += 1 + l + sovFarm(uint64(l))
+		}
 	}
 	return n
 }
@@ -1969,6 +2003,156 @@ func (m *Params) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *EscrowInfo) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowFarm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EscrowInfo: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EscrowInfo: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Proposer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Proposer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FundApplied", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FundApplied = append(m.FundApplied, types.Coin{})
+			if err := m.FundApplied[len(m.FundApplied)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FundSelfBond", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFarm
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FundSelfBond = append(m.FundSelfBond, types.Coin{})
+			if err := m.FundSelfBond[len(m.FundSelfBond)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipFarm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthFarm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *CommunityPoolCreateFarmProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2162,7 +2346,7 @@ func (m *CommunityPoolCreateFarmProposal) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalReward", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field FundApplied", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2189,258 +2373,16 @@ func (m *CommunityPoolCreateFarmProposal) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TotalReward = append(m.TotalReward, types.Coin{})
-			if err := m.TotalReward[len(m.TotalReward)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.FundApplied = append(m.FundApplied, types.Coin{})
+			if err := m.FundApplied[len(m.FundApplied)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipFarm(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthFarm
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *CommunityPoolCreateFarmProposalWithDeposit) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowFarm
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: CommunityPoolCreateFarmProposalWithDeposit: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: CommunityPoolCreateFarmProposalWithDeposit: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Title", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowFarm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthFarm
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthFarm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Title = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowFarm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthFarm
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthFarm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Description = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PoolDescription", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowFarm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthFarm
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthFarm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.PoolDescription = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LptDenom", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowFarm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthFarm
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthFarm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.LptDenom = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RewardPerBlock", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowFarm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthFarm
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthFarm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.RewardPerBlock = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalReward", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowFarm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthFarm
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthFarm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TotalReward = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Deposit", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field FundSelfBond", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowFarm
@@ -2450,23 +2392,25 @@ func (m *CommunityPoolCreateFarmProposalWithDeposit) Unmarshal(dAtA []byte) erro
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthFarm
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthFarm
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Deposit = string(dAtA[iNdEx:postIndex])
+			m.FundSelfBond = append(m.FundSelfBond, types.Coin{})
+			if err := m.FundSelfBond[len(m.FundSelfBond)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

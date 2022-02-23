@@ -76,11 +76,9 @@ message Params {
 message EscrowInfo {
   option (gogoproto.equal) = true;
 
-  string address = 1;
-  repeated cosmos.base.v1beta1.Coin amount = 4 [
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
-    (gogoproto.nullable) = false
-  ];
+  string proposer = 1;
+  repeated cosmos.base.v1beta1.Coin fund_applied = 2 [(gogoproto.nullable) = false];
+  repeated cosmos.base.v1beta1.Coin fund_self_bond = 3 [(gogoproto.nullable) = false];
 }
 
 
@@ -95,5 +93,5 @@ message CommunityPoolCreateFarmProposal {
   string lpt_denom = 4;
   repeated cosmos.base.v1beta1.Coin reward_per_block = 5 [(gogoproto.nullable) = false];
   repeated cosmos.base.v1beta1.Coin fund_applied = 6 [(gogoproto.nullable) = false];
-  repeated cosmos.base.v1beta1.Coin other_reward = 7 [(gogoproto.nullable) = true];
+  repeated cosmos.base.v1beta1.Coin fund_self_bond = 7 [(gogoproto.nullable) = false];
 }

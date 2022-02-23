@@ -67,3 +67,19 @@ func ValidateReward(rewardPerBlock, totalReward sdk.Coins) error {
 	}
 	return nil
 }
+
+func ValidateFund(rewardPerBlock, fundApplied, fundSelfBond []sdk.Coin) error {
+	if err := ValidateCoins("FundApplied", fundApplied...); err != nil {
+		return err
+	}
+
+	if err := ValidateCoins("FundSelfBond", fundSelfBond...); err != nil {
+		return err
+	}
+
+	total := sdk.NewCoins(fundApplied...).Add(fundSelfBond...)
+	if len(fundApplied)+len(fundSelfBond) != total.Len() {
+		return sdkerrors.Wrapf(ErrInvalidProposal, "the type of The token bond by the user cannot be the same as the one applied for community pool")
+	}
+	return ValidateReward(rewardPerBlock, total)
+}

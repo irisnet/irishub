@@ -82,6 +82,65 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 	return &types.MsgCreatePoolResponse{}, nil
 }
 
+func (m msgServer) CreatePoolWithCommunityPool(goCtx context.Context,
+	msg *types.MsgCreatePoolWithCommunityPool) (*types.MsgCreatePoolWithCommunityPoolResponse, error) {
+	proposer, err := sdk.AccAddressFromBech32(msg.Proposer)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	totalReward := sdk.NewCoins(msg.Content.FundApplied...).Add(msg.Content.FundSelfBond...)
+	maxRewardCategories := m.Keeper.MaxRewardCategories(ctx)
+	if uint32(len(totalReward)) > maxRewardCategories {
+		return nil, sdkerrors.Wrapf(
+			types.ErrInvalidRewardRule,
+			"the max reward category num is [%d], but got [%d]",
+			maxRewardCategories, len(totalReward),
+		)
+	}
+
+	//check valid lp token denom
+	if err := m.Keeper.validateLPToken(ctx, msg.Content.LptDenom); err != nil {
+		return nil, sdkerrors.Wrapf(
+			types.ErrInvalidLPToken,
+			"The lp token denom[%s] is not exist",
+			msg.Content.LptDenom,
+		)
+	}
+
+	//escrow FundSelfBond to EscrowCollector
+	if err := m.bk.SendCoinsFromAccountToModule(ctx,
+		proposer, types.EscrowCollector, msg.Content.FundSelfBond); err != nil {
+		return nil, err
+	}
+
+	//escrow FundApplied  to EscrowCollector
+	if err := m.distributeFromFeePool(ctx, msg.Content.FundApplied); err != nil {
+		return nil, err
+	}
+
+	//create new proposal given a content
+	proposal, err := m.gk.SubmitProposal(ctx, &msg.Content)
+	if err != nil {
+		return nil, err
+	}
+
+	// adds a deposit of a specific depositor on a specific proposal
+	_, err = m.gk.AddDeposit(ctx, proposal.ProposalId, proposer, msg.InitialDeposit)
+	if err != nil {
+		return nil, err
+	}
+
+	// add a escrowInfo to the proposal
+	m.setEscrowInfo(ctx, proposal.ProposalId, types.EscrowInfo{
+		Proposer:     msg.Proposer,
+		FundApplied:  msg.Content.FundApplied,
+		FundSelfBond: msg.Content.FundSelfBond,
+	})
+	return &types.MsgCreatePoolWithCommunityPoolResponse{}, nil
+}
+
 func (m msgServer) DestroyPool(goCtx context.Context, msg *types.MsgDestroyPool) (*types.MsgDestroyPoolResponse, error) {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {

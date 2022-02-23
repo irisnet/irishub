@@ -9,6 +9,9 @@ const (
 	// TypeMsgCreatePool is the type for MsgCreatePool
 	TypeMsgCreatePool = "create_pool"
 
+	// TypeMsgCreatePool is the type for MsgCreatePoolWithCommunityPool
+	TypeMsgCreateProposal = "create_proposal"
+
 	// TypeMsgDestroyPool is the type for MsgDestroyPool
 	TypeMsgDestroyPool = "destroy_pool"
 
@@ -27,6 +30,7 @@ const (
 
 var (
 	_ sdk.Msg = &MsgCreatePool{}
+	_ sdk.Msg = &MsgCreatePoolWithCommunityPool{}
 	_ sdk.Msg = &MsgDestroyPool{}
 	_ sdk.Msg = &MsgAdjustPool{}
 	_ sdk.Msg = &MsgStake{}
@@ -73,6 +77,42 @@ func (msg MsgCreatePool) GetSignBytes() []byte {
 // GetSigners implements Msg
 func (msg MsgCreatePool) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
+}
+
+// -----------------------------------------------------------------------------
+// Route implements Msg
+func (msg MsgCreatePoolWithCommunityPool) Route() string { return RouterKey }
+
+// Type implements Msg
+func (msg MsgCreatePoolWithCommunityPool) Type() string { return TypeMsgCreateProposal }
+
+// ValidateBasic implements Msg
+func (msg MsgCreatePoolWithCommunityPool) ValidateBasic() error {
+	if !msg.InitialDeposit.IsValid() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.InitialDeposit.String())
+	}
+	if msg.InitialDeposit.IsAnyNegative() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.InitialDeposit.String())
+	}
+	if err := ValidateAddress(msg.Proposer); err != nil {
+		return err
+	}
+	return msg.Content.ValidateBasic()
+}
+
+// GetSignBytes implements Msg
+func (msg MsgCreatePoolWithCommunityPool) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(&msg)
+	return sdk.MustSortJSON(bz)
+}
+
+// GetSigners implements Msg
+func (msg MsgCreatePoolWithCommunityPool) GetSigners() []sdk.AccAddress {
+	from, err := sdk.AccAddressFromBech32(msg.Proposer)
 	if err != nil {
 		panic(err)
 	}

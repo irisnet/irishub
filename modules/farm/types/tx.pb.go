@@ -73,6 +73,45 @@ func (m *MsgCreatePool) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreatePool proto.InternalMessageInfo
 
+type MsgCreatePoolWithCommunityPool struct {
+	Content        CommunityPoolCreateFarmProposal          `protobuf:"bytes,1,opt,name=content,proto3" json:"content"`
+	InitialDeposit github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=initial_deposit,json=initialDeposit,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"initial_deposit" yaml:"initial_deposit"`
+	Proposer       string                                   `protobuf:"bytes,3,opt,name=proposer,proto3" json:"proposer,omitempty"`
+}
+
+func (m *MsgCreatePoolWithCommunityPool) Reset()         { *m = MsgCreatePoolWithCommunityPool{} }
+func (m *MsgCreatePoolWithCommunityPool) String() string { return proto.CompactTextString(m) }
+func (*MsgCreatePoolWithCommunityPool) ProtoMessage()    {}
+func (*MsgCreatePoolWithCommunityPool) Descriptor() ([]byte, []int) {
+	return fileDescriptor_6b714bf6ff5a5095, []int{1}
+}
+func (m *MsgCreatePoolWithCommunityPool) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreatePoolWithCommunityPool) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreatePoolWithCommunityPool.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreatePoolWithCommunityPool) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreatePoolWithCommunityPool.Merge(m, src)
+}
+func (m *MsgCreatePoolWithCommunityPool) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreatePoolWithCommunityPool) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreatePoolWithCommunityPool.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreatePoolWithCommunityPool proto.InternalMessageInfo
+
 type MsgDestroyPool struct {
 	PoolId  string `protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 	Creator string `protobuf:"bytes,2,opt,name=creator,proto3" json:"creator,omitempty"`
@@ -82,7 +121,7 @@ func (m *MsgDestroyPool) Reset()         { *m = MsgDestroyPool{} }
 func (m *MsgDestroyPool) String() string { return proto.CompactTextString(m) }
 func (*MsgDestroyPool) ProtoMessage()    {}
 func (*MsgDestroyPool) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6b714bf6ff5a5095, []int{1}
+	return fileDescriptor_6b714bf6ff5a5095, []int{2}
 }
 func (m *MsgDestroyPool) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -122,7 +161,7 @@ func (m *MsgAdjustPool) Reset()         { *m = MsgAdjustPool{} }
 func (m *MsgAdjustPool) String() string { return proto.CompactTextString(m) }
 func (*MsgAdjustPool) ProtoMessage()    {}
 func (*MsgAdjustPool) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6b714bf6ff5a5095, []int{2}
+	return fileDescriptor_6b714bf6ff5a5095, []int{3}
 }
 func (m *MsgAdjustPool) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -161,7 +200,7 @@ func (m *MsgStake) Reset()         { *m = MsgStake{} }
 func (m *MsgStake) String() string { return proto.CompactTextString(m) }
 func (*MsgStake) ProtoMessage()    {}
 func (*MsgStake) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6b714bf6ff5a5095, []int{3}
+	return fileDescriptor_6b714bf6ff5a5095, []int{4}
 }
 func (m *MsgStake) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -200,7 +239,7 @@ func (m *MsgUnstake) Reset()         { *m = MsgUnstake{} }
 func (m *MsgUnstake) String() string { return proto.CompactTextString(m) }
 func (*MsgUnstake) ProtoMessage()    {}
 func (*MsgUnstake) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6b714bf6ff5a5095, []int{4}
+	return fileDescriptor_6b714bf6ff5a5095, []int{5}
 }
 func (m *MsgUnstake) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -238,7 +277,7 @@ func (m *MsgHarvest) Reset()         { *m = MsgHarvest{} }
 func (m *MsgHarvest) String() string { return proto.CompactTextString(m) }
 func (*MsgHarvest) ProtoMessage()    {}
 func (*MsgHarvest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6b714bf6ff5a5095, []int{5}
+	return fileDescriptor_6b714bf6ff5a5095, []int{6}
 }
 func (m *MsgHarvest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -274,7 +313,7 @@ func (m *MsgCreatePoolResponse) Reset()         { *m = MsgCreatePoolResponse{} }
 func (m *MsgCreatePoolResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgCreatePoolResponse) ProtoMessage()    {}
 func (*MsgCreatePoolResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6b714bf6ff5a5095, []int{6}
+	return fileDescriptor_6b714bf6ff5a5095, []int{7}
 }
 func (m *MsgCreatePoolResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -303,6 +342,44 @@ func (m *MsgCreatePoolResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreatePoolResponse proto.InternalMessageInfo
 
+type MsgCreatePoolWithCommunityPoolResponse struct {
+}
+
+func (m *MsgCreatePoolWithCommunityPoolResponse) Reset() {
+	*m = MsgCreatePoolWithCommunityPoolResponse{}
+}
+func (m *MsgCreatePoolWithCommunityPoolResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgCreatePoolWithCommunityPoolResponse) ProtoMessage()    {}
+func (*MsgCreatePoolWithCommunityPoolResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_6b714bf6ff5a5095, []int{8}
+}
+func (m *MsgCreatePoolWithCommunityPoolResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreatePoolWithCommunityPoolResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreatePoolWithCommunityPoolResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreatePoolWithCommunityPoolResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreatePoolWithCommunityPoolResponse.Merge(m, src)
+}
+func (m *MsgCreatePoolWithCommunityPoolResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreatePoolWithCommunityPoolResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreatePoolWithCommunityPoolResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreatePoolWithCommunityPoolResponse proto.InternalMessageInfo
+
 type MsgDestroyPoolResponse struct {
 }
 
@@ -310,7 +387,7 @@ func (m *MsgDestroyPoolResponse) Reset()         { *m = MsgDestroyPoolResponse{}
 func (m *MsgDestroyPoolResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDestroyPoolResponse) ProtoMessage()    {}
 func (*MsgDestroyPoolResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6b714bf6ff5a5095, []int{7}
+	return fileDescriptor_6b714bf6ff5a5095, []int{9}
 }
 func (m *MsgDestroyPoolResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -346,7 +423,7 @@ func (m *MsgAdjustPoolResponse) Reset()         { *m = MsgAdjustPoolResponse{} }
 func (m *MsgAdjustPoolResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgAdjustPoolResponse) ProtoMessage()    {}
 func (*MsgAdjustPoolResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6b714bf6ff5a5095, []int{8}
+	return fileDescriptor_6b714bf6ff5a5095, []int{10}
 }
 func (m *MsgAdjustPoolResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -383,7 +460,7 @@ func (m *MsgStakeResponse) Reset()         { *m = MsgStakeResponse{} }
 func (m *MsgStakeResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgStakeResponse) ProtoMessage()    {}
 func (*MsgStakeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6b714bf6ff5a5095, []int{9}
+	return fileDescriptor_6b714bf6ff5a5095, []int{11}
 }
 func (m *MsgStakeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -420,7 +497,7 @@ func (m *MsgUnstakeResponse) Reset()         { *m = MsgUnstakeResponse{} }
 func (m *MsgUnstakeResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUnstakeResponse) ProtoMessage()    {}
 func (*MsgUnstakeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6b714bf6ff5a5095, []int{10}
+	return fileDescriptor_6b714bf6ff5a5095, []int{12}
 }
 func (m *MsgUnstakeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -457,7 +534,7 @@ func (m *MsgHarvestResponse) Reset()         { *m = MsgHarvestResponse{} }
 func (m *MsgHarvestResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgHarvestResponse) ProtoMessage()    {}
 func (*MsgHarvestResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6b714bf6ff5a5095, []int{11}
+	return fileDescriptor_6b714bf6ff5a5095, []int{13}
 }
 func (m *MsgHarvestResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -488,12 +565,14 @@ var xxx_messageInfo_MsgHarvestResponse proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*MsgCreatePool)(nil), "irismod.farm.MsgCreatePool")
+	proto.RegisterType((*MsgCreatePoolWithCommunityPool)(nil), "irismod.farm.MsgCreatePoolWithCommunityPool")
 	proto.RegisterType((*MsgDestroyPool)(nil), "irismod.farm.MsgDestroyPool")
 	proto.RegisterType((*MsgAdjustPool)(nil), "irismod.farm.MsgAdjustPool")
 	proto.RegisterType((*MsgStake)(nil), "irismod.farm.MsgStake")
 	proto.RegisterType((*MsgUnstake)(nil), "irismod.farm.MsgUnstake")
 	proto.RegisterType((*MsgHarvest)(nil), "irismod.farm.MsgHarvest")
 	proto.RegisterType((*MsgCreatePoolResponse)(nil), "irismod.farm.MsgCreatePoolResponse")
+	proto.RegisterType((*MsgCreatePoolWithCommunityPoolResponse)(nil), "irismod.farm.MsgCreatePoolWithCommunityPoolResponse")
 	proto.RegisterType((*MsgDestroyPoolResponse)(nil), "irismod.farm.MsgDestroyPoolResponse")
 	proto.RegisterType((*MsgAdjustPoolResponse)(nil), "irismod.farm.MsgAdjustPoolResponse")
 	proto.RegisterType((*MsgStakeResponse)(nil), "irismod.farm.MsgStakeResponse")
@@ -504,52 +583,61 @@ func init() {
 func init() { proto.RegisterFile("farm/tx.proto", fileDescriptor_6b714bf6ff5a5095) }
 
 var fileDescriptor_6b714bf6ff5a5095 = []byte{
-	// 710 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0x4d, 0x6e, 0xd3, 0x40,
-	0x14, 0x8e, 0xe3, 0x36, 0x49, 0x5f, 0xda, 0xaa, 0x58, 0xd0, 0x1a, 0x17, 0x39, 0x21, 0x20, 0x91,
-	0x4d, 0x6d, 0x5a, 0x76, 0x6c, 0x10, 0x6d, 0x91, 0x5a, 0xa1, 0x54, 0xc5, 0x88, 0x0d, 0x9b, 0xc8,
-	0xf6, 0x0c, 0xae, 0xa9, 0xed, 0xb1, 0x66, 0x26, 0xfd, 0xb9, 0x05, 0x0b, 0x0e, 0xc0, 0x06, 0x21,
-	0x71, 0x03, 0x4e, 0x40, 0x97, 0x5d, 0x22, 0x16, 0x05, 0xda, 0x0d, 0xc7, 0x40, 0x1e, 0x3b, 0x89,
-	0x4b, 0xdc, 0x88, 0x45, 0x0b, 0xac, 0xec, 0xf7, 0xbe, 0x99, 0xef, 0x7d, 0xf3, 0x7e, 0xc6, 0x86,
-	0x99, 0x57, 0x36, 0x0d, 0x4d, 0x7e, 0x60, 0xc4, 0x94, 0x70, 0xa2, 0x4c, 0xfb, 0xd4, 0x67, 0x21,
-	0x41, 0x46, 0xe2, 0xd6, 0x74, 0x97, 0xb0, 0x90, 0x30, 0xd3, 0xb1, 0x19, 0x36, 0xf7, 0x96, 0x1d,
-	0xcc, 0xed, 0x65, 0xd3, 0x25, 0x7e, 0x94, 0xae, 0xd6, 0xae, 0x7b, 0xc4, 0x23, 0xe2, 0xd5, 0x4c,
-	0xde, 0x52, 0x6f, 0xeb, 0xad, 0x0c, 0x33, 0x1d, 0xe6, 0xad, 0x51, 0x6c, 0x73, 0xbc, 0x4d, 0x48,
-	0xa0, 0x34, 0xa1, 0x8e, 0x30, 0x73, 0xa9, 0x1f, 0x73, 0x9f, 0x44, 0xaa, 0xd4, 0x94, 0xda, 0x53,
-	0x56, 0xde, 0xa5, 0x2c, 0xc2, 0x54, 0x10, 0xf3, 0x2e, 0xc2, 0x11, 0x09, 0xd5, 0xb2, 0xc0, 0x6b,
-	0x41, 0xcc, 0xd7, 0x13, 0x5b, 0xb9, 0x0d, 0xd3, 0x8c, 0xdb, 0x94, 0x77, 0x77, 0xb0, 0xef, 0xed,
-	0x70, 0x55, 0x6e, 0x4a, 0x6d, 0xd9, 0xaa, 0x0b, 0xdf, 0x86, 0x70, 0x29, 0x3d, 0x98, 0xa3, 0x78,
-	0xdf, 0xa6, 0xa8, 0x1b, 0x63, 0xda, 0x75, 0x02, 0xe2, 0xee, 0xaa, 0x13, 0x4d, 0xb9, 0x5d, 0x5f,
-	0xb9, 0x69, 0xa4, 0x87, 0x30, 0x92, 0x43, 0x18, 0xd9, 0x21, 0x8c, 0x35, 0xe2, 0x47, 0xab, 0xf7,
-	0x8f, 0x4e, 0x1a, 0xa5, 0x8f, 0xdf, 0x1a, 0x6d, 0xcf, 0xe7, 0x3b, 0x3d, 0xc7, 0x70, 0x49, 0x68,
-	0x66, 0x27, 0x4e, 0x1f, 0x4b, 0x0c, 0xed, 0x9a, 0xfc, 0x30, 0xc6, 0x4c, 0x6c, 0x60, 0xd6, 0x6c,
-	0x1a, 0x64, 0x1b, 0xd3, 0xd5, 0x24, 0x84, 0x12, 0xc1, 0x34, 0x27, 0xdc, 0x0e, 0xba, 0xa9, 0x5f,
-	0x9d, 0xbc, 0xfc, 0x90, 0x75, 0x11, 0xc0, 0x12, 0xfc, 0x8a, 0x06, 0x35, 0x8c, 0x7c, 0x6e, 0x3b,
-	0x01, 0x56, 0x2b, 0x4d, 0xa9, 0x5d, 0xb3, 0x06, 0xb6, 0xa2, 0x42, 0xd5, 0x4d, 0x52, 0x4e, 0xa8,
-	0x5a, 0x15, 0x09, 0xec, 0x9b, 0x0f, 0x27, 0x7e, 0xbe, 0x6b, 0x48, 0xad, 0x4d, 0x98, 0xed, 0x30,
-	0x6f, 0x1d, 0x33, 0x4e, 0xc9, 0xa1, 0x28, 0xcb, 0x02, 0x54, 0x63, 0x42, 0x82, 0xae, 0x8f, 0xb2,
-	0x92, 0x54, 0x12, 0x73, 0x13, 0xe5, 0xa9, 0xca, 0x45, 0x54, 0x9f, 0xca, 0xa2, 0xc2, 0x8f, 0xd1,
-	0xeb, 0x1e, 0xe3, 0xe3, 0xa9, 0x0e, 0xe0, 0x9a, 0x8d, 0x90, 0x9f, 0x14, 0x79, 0x98, 0xa6, 0xf2,
-	0xe5, 0xa7, 0x69, 0x6e, 0x18, 0x25, 0xcb, 0x55, 0x51, 0x4b, 0xc8, 0x57, 0xdf, 0x12, 0xb9, 0xdc,
-	0x4d, 0x14, 0xe5, 0xee, 0xbd, 0x04, 0xb5, 0x0e, 0xf3, 0x9e, 0x73, 0x7b, 0x17, 0x5f, 0x9c, 0x36,
-	0x07, 0x2a, 0x76, 0x48, 0x7a, 0x11, 0x17, 0x05, 0x18, 0x2b, 0xd9, 0x4c, 0x24, 0x7f, 0x3d, 0x69,
-	0xdc, 0xfb, 0x43, 0xc9, 0x56, 0xc6, 0xac, 0xcc, 0x43, 0x85, 0xe1, 0x08, 0x61, 0x2a, 0x06, 0x6a,
-	0xca, 0xca, 0xac, 0x4c, 0xe7, 0x07, 0x09, 0xa0, 0xc3, 0xbc, 0x17, 0x11, 0xfb, 0xdf, 0x95, 0xae,
-	0x09, 0xa1, 0x1b, 0x36, 0xdd, 0xc3, 0x8c, 0x5f, 0x2c, 0x74, 0x48, 0x52, 0x2e, 0x20, 0x59, 0x80,
-	0x1b, 0xe7, 0xee, 0x2c, 0x0b, 0xb3, 0x98, 0x44, 0x0c, 0xb7, 0x54, 0x98, 0x3f, 0x3f, 0x36, 0x03,
-	0x24, 0xdd, 0x32, 0x1c, 0x82, 0x01, 0xb0, 0x0f, 0x73, 0xfd, 0x0a, 0xf7, 0x7d, 0x8a, 0x0b, 0x95,
-	0xab, 0x6b, 0xfe, 0x8c, 0xba, 0x75, 0x08, 0xca, 0xb0, 0x64, 0xff, 0x22, 0x74, 0x56, 0x84, 0xbf,
-	0x1a, 0x7a, 0xe5, 0xb3, 0x0c, 0x72, 0x87, 0x79, 0xca, 0x16, 0x40, 0xee, 0x9b, 0xb3, 0x68, 0xe4,
-	0x3f, 0x65, 0xc6, 0xb9, 0xe2, 0x6a, 0x77, 0xc6, 0x80, 0x03, 0xf1, 0xcf, 0xa0, 0x9e, 0xbf, 0x2d,
-	0x6f, 0x8d, 0xec, 0xc9, 0xa1, 0xda, 0xdd, 0x71, 0xe8, 0x80, 0x72, 0x0b, 0x20, 0x77, 0x69, 0x8e,
-	0x4a, 0x1c, 0x82, 0x05, 0x12, 0x47, 0x3b, 0x4d, 0x79, 0x04, 0x93, 0xe9, 0x45, 0x32, 0x3f, 0xb2,
-	0x5a, 0xf8, 0x35, 0xbd, 0xd8, 0x3f, 0x20, 0x78, 0x02, 0xd5, 0xfe, 0x84, 0xab, 0x23, 0x4b, 0x33,
-	0x44, 0x6b, 0x5e, 0x84, 0xe4, 0x69, 0xfa, 0xf3, 0x37, 0x4a, 0x93, 0x21, 0x05, 0x34, 0xbf, 0xb5,
-	0xcb, 0xea, 0xd3, 0xa3, 0x1f, 0x7a, 0xe9, 0xe8, 0x54, 0x97, 0x8e, 0x4f, 0x75, 0xe9, 0xfb, 0xa9,
-	0x2e, 0xbd, 0x39, 0xd3, 0x4b, 0xc7, 0x67, 0x7a, 0xe9, 0xcb, 0x99, 0x5e, 0x7a, 0xb9, 0x94, 0xeb,
-	0x8c, 0x84, 0x29, 0xc2, 0xdc, 0xcc, 0x18, 0xcd, 0x90, 0xa0, 0x5e, 0x80, 0x99, 0x99, 0xfe, 0xcd,
-	0x24, 0x4d, 0xe2, 0x54, 0xc4, 0xdf, 0xc8, 0x83, 0x5f, 0x01, 0x00, 0x00, 0xff, 0xff, 0xf5, 0x41,
-	0x30, 0xd3, 0xe2, 0x08, 0x00, 0x00,
+	// 857 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0xcd, 0x6e, 0xeb, 0x44,
+	0x14, 0x8e, 0x93, 0xdc, 0x24, 0x3d, 0xe9, 0xbd, 0xb7, 0x58, 0x90, 0x6b, 0x5c, 0xe4, 0x84, 0x80,
+	0x20, 0x0b, 0x6a, 0x73, 0x0b, 0xab, 0x6e, 0x10, 0x49, 0x41, 0x2d, 0x28, 0x55, 0x31, 0x42, 0x48,
+	0x6c, 0xa2, 0x89, 0x3d, 0x38, 0x43, 0x6d, 0x8f, 0x35, 0x33, 0x69, 0x9b, 0x25, 0x2f, 0x80, 0x58,
+	0xf0, 0x00, 0x08, 0x09, 0x21, 0xf1, 0x06, 0xbc, 0x41, 0x25, 0x36, 0x5d, 0x22, 0x16, 0x05, 0xda,
+	0x0d, 0x6b, 0x9e, 0x00, 0x79, 0xec, 0x38, 0x4e, 0x93, 0x06, 0x2a, 0xb5, 0x70, 0x37, 0x89, 0xcf,
+	0xcf, 0x7c, 0xe7, 0xcc, 0x77, 0x7e, 0x6c, 0x78, 0xf8, 0x39, 0x62, 0x81, 0x25, 0x4e, 0xcd, 0x88,
+	0x51, 0x41, 0xd5, 0x75, 0xc2, 0x08, 0x0f, 0xa8, 0x6b, 0xc6, 0x6a, 0xdd, 0x70, 0x28, 0x0f, 0x28,
+	0xb7, 0x86, 0x88, 0x63, 0xeb, 0xf8, 0xe9, 0x10, 0x0b, 0xf4, 0xd4, 0x72, 0x28, 0x09, 0x13, 0x6f,
+	0xfd, 0x79, 0x8f, 0x7a, 0x54, 0x3e, 0x5a, 0xf1, 0x53, 0xaa, 0x7d, 0x2c, 0x21, 0xe3, 0x9f, 0x44,
+	0xd1, 0xfe, 0xa6, 0x04, 0x0f, 0xfb, 0xdc, 0xeb, 0x31, 0x8c, 0x04, 0x3e, 0xa4, 0xd4, 0x57, 0x5b,
+	0x50, 0x77, 0x31, 0x77, 0x18, 0x89, 0x04, 0xa1, 0xa1, 0xa6, 0xb4, 0x94, 0xce, 0x9a, 0x9d, 0x57,
+	0xa9, 0x9b, 0xb0, 0xe6, 0x47, 0x62, 0xe0, 0xe2, 0x90, 0x06, 0x5a, 0x51, 0xda, 0x6b, 0x7e, 0x24,
+	0x76, 0x63, 0x59, 0x7d, 0x19, 0xd6, 0xb9, 0x40, 0x4c, 0x0c, 0x46, 0x98, 0x78, 0x23, 0xa1, 0x95,
+	0x5a, 0x4a, 0xa7, 0x64, 0xd7, 0xa5, 0x6e, 0x4f, 0xaa, 0xd4, 0x31, 0x6c, 0x30, 0x7c, 0x82, 0x98,
+	0x3b, 0x88, 0x30, 0x1b, 0x0c, 0x7d, 0xea, 0x1c, 0x69, 0xe5, 0x56, 0xa9, 0x53, 0xdf, 0x7e, 0xd1,
+	0x4c, 0x6e, 0x65, 0xc6, 0xb7, 0x32, 0xd3, 0x5b, 0x99, 0x3d, 0x4a, 0xc2, 0xee, 0x9b, 0x67, 0x17,
+	0xcd, 0xc2, 0x8f, 0xbf, 0x35, 0x3b, 0x1e, 0x11, 0xa3, 0xf1, 0xd0, 0x74, 0x68, 0x60, 0xa5, 0x14,
+	0x24, 0x7f, 0x5b, 0xdc, 0x3d, 0xb2, 0xc4, 0x24, 0xc2, 0x5c, 0x1e, 0xe0, 0xf6, 0xa3, 0x24, 0xc8,
+	0x21, 0x66, 0xdd, 0x38, 0x84, 0x1a, 0xc2, 0xba, 0xa0, 0x02, 0xf9, 0x83, 0x44, 0xaf, 0x3d, 0xb8,
+	0xfb, 0x90, 0x75, 0x19, 0xc0, 0x96, 0xf8, 0xaa, 0x0e, 0x35, 0xec, 0x12, 0x81, 0x86, 0x3e, 0xd6,
+	0x2a, 0x2d, 0xa5, 0x53, 0xb3, 0x33, 0x59, 0xd5, 0xa0, 0xea, 0xc4, 0x94, 0x53, 0xa6, 0x55, 0x25,
+	0x81, 0x53, 0x71, 0xa7, 0xfc, 0xe7, 0xb7, 0x4d, 0xa5, 0xfd, 0x5d, 0x11, 0x8c, 0xb9, 0xb2, 0x7c,
+	0x4a, 0xc4, 0xa8, 0x47, 0x83, 0x60, 0x1c, 0x12, 0x31, 0x91, 0x75, 0xea, 0x43, 0xd5, 0xa1, 0xa1,
+	0xc0, 0xa1, 0x90, 0x35, 0xaa, 0x6f, 0x6f, 0x99, 0xf9, 0x06, 0x31, 0xe7, 0xbc, 0x13, 0xa0, 0xf7,
+	0x11, 0x0b, 0x0e, 0x19, 0x8d, 0x28, 0x47, 0x7e, 0xb7, 0x1c, 0xdf, 0xce, 0x9e, 0x62, 0xa8, 0x5f,
+	0x29, 0xf0, 0x98, 0x84, 0x44, 0x10, 0xe4, 0x0f, 0x5c, 0x1c, 0x51, 0x4e, 0x84, 0x56, 0xfc, 0x27,
+	0x86, 0x3e, 0x88, 0x31, 0xfe, 0xba, 0x68, 0x36, 0x26, 0x28, 0xf0, 0x77, 0xda, 0xd7, 0xce, 0xb7,
+	0x6f, 0x57, 0xae, 0xf4, 0xf4, 0x6e, 0x72, 0x38, 0xa6, 0x2f, 0x92, 0xb9, 0x62, 0x26, 0x9b, 0x68,
+	0xcd, 0xce, 0xe4, 0x94, 0xa4, 0x7d, 0x78, 0xd4, 0xe7, 0xde, 0x2e, 0xe6, 0x82, 0xd1, 0x84, 0x93,
+	0x27, 0x50, 0x8d, 0x28, 0xf5, 0x07, 0xc4, 0x4d, 0xfb, 0xb6, 0x12, 0x8b, 0xfb, 0x6e, 0x9e, 0xef,
+	0xe2, 0x32, 0xbe, 0x7f, 0x2a, 0xca, 0x31, 0x78, 0xd7, 0xfd, 0x62, 0xcc, 0xc5, 0x6a, 0xa8, 0x53,
+	0x78, 0x0e, 0xb9, 0x2e, 0x89, 0x27, 0x61, 0xd6, 0x4b, 0xc5, 0xbb, 0xef, 0xa5, 0x8d, 0x59, 0x94,
+	0xb4, 0xa1, 0x96, 0xcd, 0x4d, 0xe9, 0xfe, 0xe7, 0x26, 0xc7, 0x5d, 0x79, 0x19, 0x77, 0xdf, 0x2b,
+	0x50, 0xeb, 0x73, 0xef, 0x63, 0x81, 0x8e, 0xf0, 0xcd, 0xb4, 0x0d, 0xa1, 0x82, 0x02, 0x3a, 0x0e,
+	0x85, 0x2c, 0xc0, 0xca, 0x94, 0xad, 0x38, 0xe5, 0x5f, 0x2f, 0x9a, 0xaf, 0xff, 0xcb, 0x94, 0xed,
+	0x14, 0x59, 0x6d, 0x40, 0x85, 0xe3, 0xd0, 0xcd, 0x1a, 0x26, 0x95, 0xd2, 0x3c, 0x7f, 0x50, 0x00,
+	0xfa, 0xdc, 0xfb, 0x24, 0xe4, 0xcf, 0x7a, 0xa6, 0x3d, 0x99, 0xe8, 0x1e, 0x62, 0xc7, 0x98, 0x8b,
+	0x9b, 0x13, 0x9d, 0x81, 0x14, 0x97, 0x80, 0x3c, 0x81, 0x17, 0xe6, 0x36, 0x88, 0x8d, 0x79, 0x44,
+	0x43, 0x8e, 0xdb, 0x1d, 0x78, 0x6d, 0xf5, 0x6a, 0xc9, 0x3c, 0x35, 0x68, 0xcc, 0x0f, 0x58, 0x66,
+	0x49, 0xc0, 0x67, 0xe3, 0x92, 0x19, 0x4e, 0x60, 0x63, 0xda, 0x0b, 0x53, 0x9d, 0xea, 0x40, 0xe5,
+	0xfe, 0xc6, 0x24, 0x85, 0x6e, 0x4f, 0x40, 0x9d, 0x15, 0xf7, 0xff, 0x08, 0x9d, 0x96, 0xeb, 0x3f,
+	0x0d, 0xbd, 0xfd, 0x73, 0x19, 0x4a, 0x7d, 0xee, 0xa9, 0x07, 0x00, 0xb9, 0x57, 0xf8, 0xe6, 0xfc,
+	0x9b, 0x60, 0xae, 0xda, 0xfa, 0x2b, 0x2b, 0x8c, 0x59, 0xf2, 0x5f, 0x2a, 0xb0, 0xb9, 0xea, 0xe5,
+	0xf3, 0xc6, 0x0a, 0x90, 0x05, 0x6f, 0xfd, 0xed, 0xdb, 0x78, 0x67, 0x39, 0x7c, 0x04, 0xf5, 0xfc,
+	0x6e, 0x7f, 0x69, 0x01, 0x24, 0x67, 0xd5, 0x5f, 0x5d, 0x65, 0xcd, 0x20, 0x0f, 0x00, 0x72, 0x2b,
+	0x7e, 0x91, 0xa6, 0x99, 0x71, 0x09, 0x4d, 0x8b, 0xdd, 0xae, 0xbe, 0x03, 0x0f, 0x92, 0xb5, 0xd7,
+	0x58, 0xf0, 0x96, 0x7a, 0xdd, 0x58, 0xae, 0xcf, 0x00, 0xde, 0x83, 0xea, 0x74, 0x1f, 0x69, 0x0b,
+	0xae, 0xa9, 0x45, 0x6f, 0xdd, 0x64, 0xc9, 0xc3, 0x4c, 0xb7, 0xc5, 0x22, 0x4c, 0x6a, 0x59, 0x02,
+	0x73, 0xad, 0x65, 0xbb, 0x1f, 0x9e, 0xfd, 0x61, 0x14, 0xce, 0x2e, 0x0d, 0xe5, 0xfc, 0xd2, 0x50,
+	0x7e, 0xbf, 0x34, 0x94, 0xaf, 0xaf, 0x8c, 0xc2, 0xf9, 0x95, 0x51, 0xf8, 0xe5, 0xca, 0x28, 0x7c,
+	0xb6, 0x95, 0xeb, 0xce, 0x18, 0x29, 0xc4, 0xc2, 0x4a, 0x11, 0xad, 0x80, 0xba, 0x63, 0x1f, 0x73,
+	0x2b, 0xf9, 0x62, 0x8d, 0x1b, 0x75, 0x58, 0x91, 0x1f, 0x98, 0x6f, 0xfd, 0x1d, 0x00, 0x00, 0xff,
+	0xff, 0x05, 0x4a, 0xcb, 0x2d, 0xc6, 0x0a, 0x00, 0x00,
 }
 
 func (this *MsgCreatePool) Equal(that interface{}) bool {
@@ -600,6 +688,41 @@ func (this *MsgCreatePool) Equal(that interface{}) bool {
 		return false
 	}
 	if this.Creator != that1.Creator {
+		return false
+	}
+	return true
+}
+func (this *MsgCreatePoolWithCommunityPool) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*MsgCreatePoolWithCommunityPool)
+	if !ok {
+		that2, ok := that.(MsgCreatePoolWithCommunityPool)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.Content.Equal(&that1.Content) {
+		return false
+	}
+	if len(this.InitialDeposit) != len(that1.InitialDeposit) {
+		return false
+	}
+	for i := range this.InitialDeposit {
+		if !this.InitialDeposit[i].Equal(&that1.InitialDeposit[i]) {
+			return false
+		}
+	}
+	if this.Proposer != that1.Proposer {
 		return false
 	}
 	return true
@@ -776,6 +899,8 @@ const _ = grpc.SupportPackageIsVersion4
 type MsgClient interface {
 	// CreatePool defines a method for creating a new farm pool
 	CreatePool(ctx context.Context, in *MsgCreatePool, opts ...grpc.CallOption) (*MsgCreatePoolResponse, error)
+	// CreatePoolWithCommunityPool defines a method for creating a new farm pool
+	CreatePoolWithCommunityPool(ctx context.Context, in *MsgCreatePoolWithCommunityPool, opts ...grpc.CallOption) (*MsgCreatePoolWithCommunityPoolResponse, error)
 	// DestroyPool defines a method for destroying a existed farm pool
 	DestroyPool(ctx context.Context, in *MsgDestroyPool, opts ...grpc.CallOption) (*MsgDestroyPoolResponse, error)
 	// AdjustPool defines a method for adjusting the farm pool params
@@ -800,6 +925,15 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 func (c *msgClient) CreatePool(ctx context.Context, in *MsgCreatePool, opts ...grpc.CallOption) (*MsgCreatePoolResponse, error) {
 	out := new(MsgCreatePoolResponse)
 	err := c.cc.Invoke(ctx, "/irismod.farm.Msg/CreatePool", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) CreatePoolWithCommunityPool(ctx context.Context, in *MsgCreatePoolWithCommunityPool, opts ...grpc.CallOption) (*MsgCreatePoolWithCommunityPoolResponse, error) {
+	out := new(MsgCreatePoolWithCommunityPoolResponse)
+	err := c.cc.Invoke(ctx, "/irismod.farm.Msg/CreatePoolWithCommunityPool", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -855,6 +989,8 @@ func (c *msgClient) Harvest(ctx context.Context, in *MsgHarvest, opts ...grpc.Ca
 type MsgServer interface {
 	// CreatePool defines a method for creating a new farm pool
 	CreatePool(context.Context, *MsgCreatePool) (*MsgCreatePoolResponse, error)
+	// CreatePoolWithCommunityPool defines a method for creating a new farm pool
+	CreatePoolWithCommunityPool(context.Context, *MsgCreatePoolWithCommunityPool) (*MsgCreatePoolWithCommunityPoolResponse, error)
 	// DestroyPool defines a method for destroying a existed farm pool
 	DestroyPool(context.Context, *MsgDestroyPool) (*MsgDestroyPoolResponse, error)
 	// AdjustPool defines a method for adjusting the farm pool params
@@ -874,6 +1010,9 @@ type UnimplementedMsgServer struct {
 
 func (*UnimplementedMsgServer) CreatePool(ctx context.Context, req *MsgCreatePool) (*MsgCreatePoolResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePool not implemented")
+}
+func (*UnimplementedMsgServer) CreatePoolWithCommunityPool(ctx context.Context, req *MsgCreatePoolWithCommunityPool) (*MsgCreatePoolWithCommunityPoolResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePoolWithCommunityPool not implemented")
 }
 func (*UnimplementedMsgServer) DestroyPool(ctx context.Context, req *MsgDestroyPool) (*MsgDestroyPoolResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DestroyPool not implemented")
@@ -909,6 +1048,24 @@ func _Msg_CreatePool_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).CreatePool(ctx, req.(*MsgCreatePool))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_CreatePoolWithCommunityPool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreatePoolWithCommunityPool)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreatePoolWithCommunityPool(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/irismod.farm.Msg/CreatePoolWithCommunityPool",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreatePoolWithCommunityPool(ctx, req.(*MsgCreatePoolWithCommunityPool))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1010,6 +1167,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreatePool",
 			Handler:    _Msg_CreatePool_Handler,
+		},
+		{
+			MethodName: "CreatePoolWithCommunityPool",
+			Handler:    _Msg_CreatePoolWithCommunityPool_Handler,
 		},
 		{
 			MethodName: "DestroyPool",
@@ -1120,6 +1281,60 @@ func (m *MsgCreatePool) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0xa
 	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgCreatePoolWithCommunityPool) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreatePoolWithCommunityPool) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreatePoolWithCommunityPool) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Proposer) > 0 {
+		i -= len(m.Proposer)
+		copy(dAtA[i:], m.Proposer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Proposer)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.InitialDeposit) > 0 {
+		for iNdEx := len(m.InitialDeposit) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.InitialDeposit[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	{
+		size, err := m.Content.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -1379,6 +1594,29 @@ func (m *MsgCreatePoolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgCreatePoolWithCommunityPoolResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreatePoolWithCommunityPoolResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreatePoolWithCommunityPoolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func (m *MsgDestroyPoolResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1586,6 +1824,27 @@ func (m *MsgCreatePool) Size() (n int) {
 	return n
 }
 
+func (m *MsgCreatePoolWithCommunityPool) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.Content.Size()
+	n += 1 + l + sovTx(uint64(l))
+	if len(m.InitialDeposit) > 0 {
+		for _, e := range m.InitialDeposit {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	l = len(m.Proposer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
 func (m *MsgDestroyPool) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1688,6 +1947,15 @@ func (m *MsgHarvest) Size() (n int) {
 }
 
 func (m *MsgCreatePoolResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgCreatePoolWithCommunityPoolResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1996,6 +2264,155 @@ func (m *MsgCreatePool) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreatePoolWithCommunityPool) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreatePoolWithCommunityPool: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreatePoolWithCommunityPool: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Content", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Content.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field InitialDeposit", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.InitialDeposit = append(m.InitialDeposit, types.Coin{})
+			if err := m.InitialDeposit[len(m.InitialDeposit)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Proposer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Proposer = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2749,6 +3166,56 @@ func (m *MsgCreatePoolResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgCreatePoolResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreatePoolWithCommunityPoolResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreatePoolWithCommunityPoolResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreatePoolWithCommunityPoolResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

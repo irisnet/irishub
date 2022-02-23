@@ -20,6 +20,9 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgCreatePool:
 			res, err := msgServer.CreatePool(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgCreatePoolWithCommunityPool:
+			res, err := msgServer.CreatePoolWithCommunityPool(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgDestroyPool:
 			res, err := msgServer.DestroyPool(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
@@ -46,7 +49,7 @@ func NewCommunityPoolCreateFarmProposalHandler(k keeper.Keeper) govtypes.Handler
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
 		case *types.CommunityPoolCreateFarmProposal:
-			return keeper.HandleCommunityPoolCreateFarmProposal(ctx, k, c)
+			return k.HandleCreateFarmProposal(ctx, c)
 
 		default:
 			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized farm proposal content type: %T", c)
