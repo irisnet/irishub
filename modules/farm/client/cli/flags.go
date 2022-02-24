@@ -40,7 +40,7 @@ func init() {
 	FsCreatePoolWithCommunityPool.String(FlagProposalDescription, "", "The simple description of a proposal")
 	FsCreatePoolWithCommunityPool.String(FlagProposalTitle, "", "The simple title of a proposal")
 	FsCreatePoolWithCommunityPool.String(FlagProposaldeposit, "", "The initial deposit of a proposal")
-	FsCreatePoolWithCommunityPool.String(FlagFundApplied, "", "The fund applied for the community pool")
+	FsCreatePoolWithCommunityPool.String(FlagFundApplied, "", "The fund applied from the community pool")
 	FsCreatePoolWithCommunityPool.String(FlagFundSelfBond, "", "The fund self bond")
 	FsCreatePoolWithCommunityPool.String(FlagRewardPerBlock, "", "The reward per block,ex: 1iris,1atom")
 	FsCreatePoolWithCommunityPool.String(FlagLPTokenDenom, "", "The token accepted by farm pool")
