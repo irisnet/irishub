@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/require"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -98,6 +99,28 @@ func Setup(isCheckTx bool) *SimApp {
 func SetupWithGenesisHTLC(htlcGenesis *htlctypes.GenesisState) *SimApp {
 	app, genesisState := setup(true, 5)
 	genesisState[htlctypes.ModuleName] = app.AppCodec().MustMarshalJSON(htlcGenesis)
+
+	// init chain must be called to stop deliverState from being nil
+	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
+	if err != nil {
+		panic(err)
+	}
+
+	// Initialize the chain
+	app.InitChain(
+		abci.RequestInitChain{
+			Validators:      []abci.ValidatorUpdate{},
+			ConsensusParams: DefaultConsensusParams,
+			AppStateBytes:   stateBytes,
+		},
+	)
+
+	return app
+}
+
+func SetupWithModuleGenesis(module string, o proto.Message) *SimApp {
+	app, genesisState := setup(true, 5)
+	genesisState[module] = app.AppCodec().MustMarshalJSON(o)
 
 	// init chain must be called to stop deliverState from being nil
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
