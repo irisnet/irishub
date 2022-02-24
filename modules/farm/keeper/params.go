@@ -31,9 +31,8 @@ func (k Keeper) TaxRate(ctx sdk.Context) (taxRate sdk.Dec) {
 }
 
 // SetParams sets the params to the store
-func (k Keeper) SetParams(ctx sdk.Context, params types.Params) (fee sdk.Coin) {
+func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
-	return
 }
 
 // GetParams gets all parameteras as types.Params
