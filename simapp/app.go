@@ -205,6 +205,7 @@ var (
 		tibcnfttypes.ModuleName:        nil,
 		farmtypes.ModuleName:           nil,
 		farmtypes.RewardCollector:      nil,
+		farmtypes.EscrowCollector:      nil,
 	}
 )
 
@@ -484,6 +485,7 @@ func NewSimApp(
 		app.BankKeeper,
 		app.AccountKeeper,
 		app.DistrKeeper,
+		&app.GovKeeper,
 		app.CoinswapKeeper.ValidatePool,
 		app.GetSubspace(farmtypes.ModuleName),
 		authtypes.FeeCollectorName,
@@ -500,10 +502,12 @@ func NewSimApp(
 		AddRoute(tibcroutingtypes.RouterKey, tibcrouting.NewSetRoutingProposalHandler(app.TIBCKeeper.RoutingKeeper)).
 		AddRoute(farmtypes.RouterKey, farm.NewCommunityPoolCreateFarmProposalHandler(app.FarmKeeper))
 
+	govHooks := govtypes.NewMultiGovHooks(farmkeeper.NewGovHook(app.FarmKeeper))
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
 		&stakingKeeper, govRouter,
 	)
+	app.GovKeeper.SetHooks(govHooks)
 
 	/****  Module Options ****/
 
