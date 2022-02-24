@@ -85,6 +85,13 @@ func (k Keeper) refundEscrow(ctx sdk.Context, proposalID uint64, info types.Escr
 		return
 	}
 	k.deleteEscrowInfo(ctx, proposalID)
+	k.Logger(ctx).Info("execute refundEscrow",
+		"proposalID", proposalID,
+		"proposer", info.Proposer,
+		"fundSelfBond", info.FundSelfBond,
+		"communityPool", k.communityPoolName,
+		"fundApplied", info.FundApplied,
+	)
 }
 
 func (k Keeper) SetEscrowInfo(ctx sdk.Context, info types.EscrowInfo) {
