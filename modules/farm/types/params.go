@@ -69,7 +69,7 @@ func validateTaxRate(i interface{}) error {
 	}
 
 	if !v.GT(sdk.ZeroDec()) || !v.LT(sdk.OneDec()) {
-		return fmt.Errorf("fee must be positive and less than 1: %s", v.String())
+		return fmt.Errorf("tax rate must be positive and less than 1: %s", v.String())
 	}
 	return nil
 }
