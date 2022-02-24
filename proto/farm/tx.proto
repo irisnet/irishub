@@ -3,6 +3,7 @@ package irismod.farm;
 
 import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
+import "farm/farm.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/farm/types";
 option (gogoproto.goproto_getters_all) = false;
@@ -11,6 +12,9 @@ option (gogoproto.goproto_getters_all) = false;
 service Msg {
   // CreatePool defines a method for creating a new farm pool
   rpc CreatePool(MsgCreatePool) returns (MsgCreatePoolResponse);
+
+  // CreatePoolWithCommunityPool defines a method for creating a new farm pool
+  rpc CreatePoolWithCommunityPool(MsgCreatePoolWithCommunityPool) returns (MsgCreatePoolWithCommunityPoolResponse);
 
   // DestroyPool defines a method for destroying a existed farm pool
   rpc DestroyPool(MsgDestroyPool) returns (MsgDestroyPoolResponse);
@@ -45,6 +49,18 @@ message MsgCreatePool {
   ];
   bool editable = 6;
   string creator = 7;
+}
+
+message MsgCreatePoolWithCommunityPool {
+  option (gogoproto.equal) = true;
+
+  CommunityPoolCreateFarmProposal content = 1 [(gogoproto.nullable) = false];
+  repeated cosmos.base.v1beta1.Coin initial_deposit = 2 [
+    (gogoproto.nullable)     = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.moretags)     = "yaml:\"initial_deposit\""
+  ];
+  string proposer = 3;
 }
 
 message MsgDestroyPool {
@@ -99,6 +115,7 @@ message MsgHarvest {
 }
 
 message MsgCreatePoolResponse {}
+message MsgCreatePoolWithCommunityPoolResponse {}
 message MsgDestroyPoolResponse {}
 message MsgAdjustPoolResponse {}
 message MsgStakeResponse {

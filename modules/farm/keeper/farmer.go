@@ -234,7 +234,7 @@ func (k Keeper) Refund(ctx sdk.Context, pool types.FarmPool) (sdk.Coins, error) 
 	// if the creator of the pool is the distribution module account,should add the reward to the distribution module account
 	distrModuleAddr := k.ak.GetModuleAddress(k.communityPoolName)
 	if distrModuleAddr.Equals(creator) {
-		return refundTotal, k.refundToFeePool(ctx, refundTotal)
+		return refundTotal, k.refundToFeePool(ctx, types.ModuleName, refundTotal)
 	}
 
 	//refund the total remaining reward to creator

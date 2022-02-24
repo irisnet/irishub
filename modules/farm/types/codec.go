@@ -24,6 +24,7 @@ func init() {
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreatePool{}, "irismod/farm/MsgCreatePool", nil)
+	cdc.RegisterConcrete(&MsgCreatePoolWithCommunityPool{}, "irismod/farm/MsgCreatePoolWithCommunityPool", nil)
 	cdc.RegisterConcrete(&MsgDestroyPool{}, "irismod/farm/MsgDestroyPool", nil)
 	cdc.RegisterConcrete(&MsgAdjustPool{}, "irismod/farm/MsgAdjustPool", nil)
 	cdc.RegisterConcrete(&MsgStake{}, "irismod/farm/MsgStake", nil)
@@ -36,6 +37,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),
 		&MsgCreatePool{},
+		&MsgCreatePoolWithCommunityPool{},
 		&MsgDestroyPool{},
 		&MsgAdjustPool{},
 		&MsgStake{},

@@ -22,4 +22,5 @@ var (
 	ErrAllEmpty           = sdkerrors.Register(ModuleName, 15, "shouldn't all be empty")
 	ErrBadDistribution    = sdkerrors.Register(ModuleName, 16, "community pool does not have sufficient coins to distribute")
 	ErrInvalidRefund      = sdkerrors.Register(ModuleName, 17, "invalid refund amount")
+	ErrInvalidProposal    = sdkerrors.Register(ModuleName, 18, "invalid proposal")
 )

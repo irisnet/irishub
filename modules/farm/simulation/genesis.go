@@ -41,7 +41,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 
 	farmPoolGenesis := types.NewGenesisState(
 		types.NewParams(sdk.NewCoin(sdk.DefaultBondDenom, createPoolFee), maxRewardCategoryN, taxRate),
-		nil, nil, 0,
+		nil, nil, 0, nil,
 	)
 
 	bz, err := json.MarshalIndent(&farmPoolGenesis, "", " ")

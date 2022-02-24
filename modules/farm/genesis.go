@@ -29,6 +29,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		}
 		k.SetFarmInfo(ctx, farmInfo)
 	}
+
+	for _, info := range data.Escrow {
+		k.SetEscrowInfo(ctx, info)
+	}
 	k.SetSequence(ctx, data.Sequence)
 	k.SetParams(ctx, data.Params)
 }
@@ -49,5 +53,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		Pools:     pools,
 		FarmInfos: farmInfos,
 		Sequence:  k.GetSequence(ctx),
+		Escrow:    k.GetAllEscrowInfo(ctx),
 	}
 }

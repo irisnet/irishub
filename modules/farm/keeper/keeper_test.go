@@ -52,7 +52,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: 1})
 	suite.app = app
-	suite.keeper = &app.Farmkeeper
+	suite.keeper = &app.FarmKeeper
 	suite.keeper.SetParams(suite.ctx, types.DefaultParams())
 	suite.setTestAddrs()
 }

@@ -21,6 +21,7 @@ type Keeper struct {
 	bk                                  types.BankKeeper
 	ak                                  types.AccountKeeper
 	dk                                  types.DistrKeeper
+	gk                                  types.GovKeeper
 	feeCollectorName, communityPoolName string // name of the fee collector
 }
 
@@ -30,6 +31,7 @@ func NewKeeper(
 	bk types.BankKeeper,
 	ak types.AccountKeeper,
 	dk types.DistrKeeper,
+	gk types.GovKeeper,
 	validateLPToken types.ValidateLPToken,
 	paramSpace paramstypes.Subspace,
 	feeCollectorName, communityPoolName string,
@@ -54,6 +56,7 @@ func NewKeeper(
 		bk:                bk,
 		ak:                ak,
 		dk:                dk,
+		gk:                gk,
 		validateLPToken:   validateLPToken,
 		paramSpace:        paramSpace,
 		feeCollectorName:  feeCollectorName,
