@@ -120,12 +120,12 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	//------test GetCmdQuerySupply()-------------
-	respType = proto.Message(&mttypes.QuerySupplyResponse{})
-	bz, err = mttestutil.QuerySupplyExec(val.ClientCtx, denomID)
-	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	supplyResp := respType.(*mttypes.QuerySupplyResponse)
-	s.Require().Equal(uint64(1), supplyResp.Amount)
+	// respType = proto.Message(&mttypes.QuerySupplyResponse{})
+	// bz, err = mttestutil.QuerySupplyExec(val.ClientCtx, denomID)
+	// s.Require().NoError(err)
+	// s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	// supplyResp := respType.(*mttypes.QuerySupplyResponse)
+	// s.Require().Equal(uint64(1), supplyResp.Amount)
 
 	//------test GetCmdQueryMT()-------------
 	respType = proto.Message(&mttypes.MT{})
@@ -207,18 +207,18 @@ func (s *IntegrationTestSuite) TestNft() {
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-	respType = proto.Message(&mttypes.QuerySupplyResponse{})
-	bz, err = mttestutil.QuerySupplyExec(val.ClientCtx, denomID)
-	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	supplyResp = respType.(*mttypes.QuerySupplyResponse)
-	s.Require().Equal(uint64(2), supplyResp.Amount)
+	// respType = proto.Message(&mttypes.QuerySupplyResponse{})
+	// bz, err = mttestutil.QuerySupplyExec(val.ClientCtx, denomID)
+	// s.Require().NoError(err)
+	// s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	// supplyResp = respType.(*mttypes.QuerySupplyResponse)
+	// s.Require().Equal(uint64(2), supplyResp.Amount)
 
-	args = []string{
-		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
-	}
+	// args = []string{
+	// 	fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+	// 	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+	// 	fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+	// }
 	respType = proto.Message(&sdk.TxResponse{})
 	bz, err = mttestutil.BurnMTExec(val.ClientCtx, from.String(), denomID, newMTID, args...)
 	s.Require().NoError(err)
@@ -226,19 +226,19 @@ func (s *IntegrationTestSuite) TestNft() {
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-	respType = proto.Message(&mttypes.QuerySupplyResponse{})
-	bz, err = mttestutil.QuerySupplyExec(val.ClientCtx, denomID)
-	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	supplyResp = respType.(*mttypes.QuerySupplyResponse)
-	s.Require().Equal(uint64(1), supplyResp.Amount)
+	// respType = proto.Message(&mttypes.QuerySupplyResponse{})
+	// bz, err = mttestutil.QuerySupplyExec(val.ClientCtx, denomID)
+	// s.Require().NoError(err)
+	// s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	// supplyResp = respType.(*mttypes.QuerySupplyResponse)
+	// s.Require().Equal(uint64(1), supplyResp.Amount)
 
-	//------test GetCmdTransferDenom()-------------
-	args = []string{
-		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
-	}
+	// //------test GetCmdTransferDenom()-------------
+	// args = []string{
+	// 	fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+	// 	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+	// 	fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+	// }
 
 	respType = proto.Message(&sdk.TxResponse{})
 

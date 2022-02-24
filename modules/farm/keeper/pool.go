@@ -20,15 +20,13 @@ func (k Keeper) CreatePool(
 	editable bool,
 	creator sdk.AccAddress,
 ) (*types.FarmPool, error) {
+	// deduct the user's fee for creating a farm pool
+	if err := k.DeductPoolCreationFee(ctx, creator); err != nil {
+		return nil, err
+	}
 	//Escrow total reward
 	if err := k.bk.SendCoinsFromAccountToModule(ctx,
 		creator, types.ModuleName, totalReward); err != nil {
-		return nil, err
-	}
-
-	//send CreatePoolFee to feeCollectorName
-	if err := k.bk.SendCoinsFromAccountToModule(ctx,
-		creator, k.feeCollectorName, sdk.NewCoins(k.CreatePoolFee(ctx))); err != nil {
 		return nil, err
 	}
 	return k.createPool(ctx, creator, description, startHeight, editable, lptDenom, totalReward, rewardPerBlock)

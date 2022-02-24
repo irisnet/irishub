@@ -2,15 +2,14 @@ package types
 
 import (
 	"fmt"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
 	defaultGenesisState = GenesisState{
 		Params: Params{
-			CreatePoolFee:       sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000)),
-			MaxRewardCategories: 2,
+			PoolCreationFee:     DefaultPoolCreationFee,
+			TaxRate:             DefaulttTaxRate,
+			MaxRewardCategories: DefaultMaxRewardCategories,
 		},
 	}
 )
@@ -101,5 +100,5 @@ func ValidateGenesis(data GenesisState) error {
 		}
 	}
 
-	return ValidateCoins("CreatePoolFee", data.Params.CreatePoolFee)
+	return ValidateCoins("PoolCreationFee", data.Params.PoolCreationFee)
 }
