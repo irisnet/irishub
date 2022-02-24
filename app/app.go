@@ -755,19 +755,7 @@ func NewIrisApp(
 	app.RegisterUpgradePlan("v1.3",
 		&store.StoreUpgrades{},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			// migrate coinswap params
-			csParams := app.coinswapKeeper.GetParams(ctx)
-			csParams.PoolCreationFee = sdk.NewCoin(nativeToken.MinUnit, sdk.NewIntWithDecimal(5000, int(nativeToken.Scale)))
-			csParams.TaxRate = sdk.NewDecWithPrec(4, 1)
-			app.coinswapKeeper.SetParams(ctx, csParams)
-
-			// migrate farm params
-			farmParams := app.farmKeeper.GetParams(ctx)
-			farmParams.PoolCreationFee = sdk.NewCoin(nativeToken.MinUnit, sdk.NewIntWithDecimal(2000, int(nativeToken.Scale)))
-			farmParams.TaxRate = sdk.NewDecWithPrec(4, 1)
-			app.farmKeeper.SetParams(ctx, farmParams)
-
-			return fromVM, nil
+			return app.mm.RunMigrations(ctx, cfg, fromVM)
 		},
 	)
 
