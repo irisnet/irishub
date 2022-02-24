@@ -122,7 +122,6 @@ import (
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
 
 	"github.com/irisnet/irismod/modules/farm"
-	farmclient "github.com/irisnet/irismod/modules/farm/client"
 	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
 	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 
@@ -169,7 +168,6 @@ var (
 			tibcclient.UpgradeClientProposalHandler,
 			tibcclient.RegisterRelayerProposalHandler,
 			tibcrouting.SetRoutingRulesProposalHandler,
-			farmclient.ProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -212,6 +210,7 @@ var (
 		servicetypes.FeeCollectorName:  {authtypes.Burner},
 		farmtypes.ModuleName:           nil,
 		farmtypes.RewardCollector:      nil,
+		farmtypes.EscrowCollector:      nil,
 		tibcnfttypes.ModuleName:        nil,
 	}
 
@@ -525,6 +524,7 @@ func NewIrisApp(
 		app.bankKeeper,
 		app.accountKeeper,
 		app.distrKeeper,
+		&app.govKeeper,
 		app.coinswapKeeper.ValidatePool,
 		app.GetSubspace(farmtypes.ModuleName),
 		authtypes.FeeCollectorName,
@@ -540,10 +540,13 @@ func NewIrisApp(
 		AddRoute(tibcclienttypes.RouterKey, tibcclient.NewClientProposalHandler(app.tibcKeeper.ClientKeeper)).
 		AddRoute(tibcroutingtypes.RouterKey, tibcrouting.NewSetRoutingProposalHandler(app.tibcKeeper.RoutingKeeper)).
 		AddRoute(farmtypes.RouterKey, farm.NewCommunityPoolCreateFarmProposalHandler(app.farmKeeper))
+
+	govHooks := govtypes.NewMultiGovHooks(farmkeeper.NewGovHook(app.farmKeeper))
 	app.govKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.accountKeeper, app.bankKeeper,
 		&stakingKeeper, govRouter,
 	)
+	app.govKeeper.SetHooks(govHooks)
 
 	/****  Module Options ****/
 	var skipGenesisInvariants = false
@@ -698,7 +701,7 @@ func NewIrisApp(
 			amount := sdk.NewIntWithDecimal(1000, int(nativeToken.Scale))
 			farmtypes.SetDefaultGenesisState(farmtypes.GenesisState{
 				Params: farmtypes.Params{
-					CreatePoolFee:       sdk.NewCoin(nativeToken.MinUnit, amount),
+					PoolCreationFee:     sdk.NewCoin(nativeToken.MinUnit, amount),
 					MaxRewardCategories: 2,
 				}},
 			)
@@ -752,6 +755,18 @@ func NewIrisApp(
 	app.RegisterUpgradePlan("v1.3",
 		&store.StoreUpgrades{},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			// migrate coinswap params
+			csParams := app.coinswapKeeper.GetParams(ctx)
+			csParams.PoolCreationFee = sdk.NewCoin(nativeToken.MinUnit, sdk.NewIntWithDecimal(5000, int(nativeToken.Scale)))
+			csParams.TaxRate = sdk.NewDecWithPrec(4, 1)
+			app.coinswapKeeper.SetParams(ctx, csParams)
+
+			// migrate farm params
+			farmParams := app.farmKeeper.GetParams(ctx)
+			farmParams.PoolCreationFee = sdk.NewCoin(nativeToken.MinUnit, sdk.NewIntWithDecimal(2000, int(nativeToken.Scale)))
+			farmParams.TaxRate = sdk.NewDecWithPrec(4, 1)
+			app.farmKeeper.SetParams(ctx, farmParams)
+
 			return fromVM, nil
 		},
 	)
