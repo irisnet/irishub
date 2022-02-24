@@ -39,6 +39,7 @@ func (h GovHook) AfterProposalVotingPeriodEnded(ctx sdk.Context, proposalID uint
 
 	//when the proposal is passed, the content of the proposal is executed by the gov module, which is not directly processed here
 	if proposal.Status == govtypes.StatusPassed {
+		h.k.deleteEscrowInfo(ctx, proposalID)
 		return
 	}
 
