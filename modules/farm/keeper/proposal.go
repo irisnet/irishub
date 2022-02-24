@@ -69,7 +69,7 @@ func (k Keeper) refundToFeePool(ctx sdk.Context, fromModule string, refundTotal 
 	return nil
 }
 
-func (k Keeper) refundEscrow(ctx sdk.Context, proposalID uint64, info types.EscrowInfo) {
+func (k Keeper) refundEscrow(ctx sdk.Context, info types.EscrowInfo) {
 	proposer, err := sdk.AccAddressFromBech32(info.Proposer)
 	if err != nil {
 		return
@@ -84,9 +84,9 @@ func (k Keeper) refundEscrow(ctx sdk.Context, proposalID uint64, info types.Escr
 	if err := k.refundToFeePool(ctx, types.EscrowCollector, sdk.NewCoins(info.FundApplied...)); err != nil {
 		return
 	}
-	k.deleteEscrowInfo(ctx, proposalID)
+	k.deleteEscrowInfo(ctx, info.ProposalId)
 	k.Logger(ctx).Info("execute refundEscrow",
-		"proposalID", proposalID,
+		"proposalID", info.ProposalId,
 		"proposer", info.Proposer,
 		"fundSelfBond", info.FundSelfBond,
 		"communityPool", k.communityPoolName,

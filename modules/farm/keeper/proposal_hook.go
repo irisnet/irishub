@@ -22,7 +22,7 @@ func (h GovHook) AfterProposalFailedMinDeposit(ctx sdk.Context, proposalID uint6
 		return
 	}
 	//execute refund logic
-	h.k.refundEscrow(ctx, proposalID, info)
+	h.k.refundEscrow(ctx, info)
 }
 
 //AfterProposalVotingPeriodEnded callback when proposal voting is complete
@@ -44,7 +44,7 @@ func (h GovHook) AfterProposalVotingPeriodEnded(ctx sdk.Context, proposalID uint
 	}
 
 	//when the proposal is not passed,execute refund logic
-	h.k.refundEscrow(ctx, proposalID, info)
+	h.k.refundEscrow(ctx, info)
 }
 
 func (h GovHook) AfterProposalSubmission(ctx sdk.Context, proposalID uint64) {}
