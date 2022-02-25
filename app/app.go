@@ -709,7 +709,7 @@ func NewIrisApp(
 				NativeChainName: "irishub-mainnet",
 			})
 
-			clients := migratetibc.LoadClient(app.appCodec)
+			clients := migratetibc.LoadClient(app.appCodec, "v1.2")
 			for _, client := range clients {
 				// init tibc client
 				if err := app.tibcKeeper.ClientKeeper.CreateClient(
@@ -755,6 +755,20 @@ func NewIrisApp(
 	app.RegisterUpgradePlan("v1.3",
 		&store.StoreUpgrades{},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			clients := migratetibc.LoadClient(app.appCodec, "v1.3")
+			for _, client := range clients {
+				// init tibc client
+				if err := app.tibcKeeper.ClientKeeper.CreateClient(
+					ctx,
+					client.ChainName,
+					client.ClientState,
+					client.ConsensusState,
+				); err != nil {
+					panic(err)
+				}
+				// register client relayers
+				app.tibcKeeper.ClientKeeper.RegisterRelayers(ctx, client.ChainName, client.Relayers)
+			}
 			return app.mm.RunMigrations(ctx, cfg, fromVM)
 		},
 	)
