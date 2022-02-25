@@ -3,13 +3,14 @@ package tibc_test
 import (
 	"testing"
 
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
 	migratetibc "github.com/irisnet/irishub/migrate/tibc"
 	"github.com/irisnet/irishub/simapp"
-	"github.com/stretchr/testify/require"
 )
 
 func TestLoadClient(t *testing.T) {
 	app := simapp.Setup(false)
-	clients := migratetibc.LoadClient(app.AppCodec(), "v1.3")
-	require.Equal(t, 1, len(clients))
+	ctx := app.BaseApp.NewContext(false, tmproto.Header{Height: 1})
+	migratetibc.CreateClient(ctx, app.AppCodec(), "v1.3", app.TIBCKeeper.ClientKeeper)
 }
