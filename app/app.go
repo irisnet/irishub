@@ -208,7 +208,7 @@ var (
 		servicetypes.DepositAccName:    {authtypes.Burner},
 		servicetypes.RequestAccName:    nil,
 		servicetypes.FeeCollectorName:  {authtypes.Burner},
-		farmtypes.ModuleName:           nil,
+		farmtypes.ModuleName:           {authtypes.Burner},
 		farmtypes.RewardCollector:      nil,
 		farmtypes.EscrowCollector:      nil,
 		tibcnfttypes.ModuleName:        nil,
