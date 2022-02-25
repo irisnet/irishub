@@ -17,5 +17,5 @@ func NewMigrator(k Keeper) Migrator {
 
 // Migrate1to2 migrates from version 1 to 2.
 func (m Migrator) Migrate1to2(ctx sdk.Context) error {
-	return v152.Migrate(ctx, m.k, m.k.paramSpace)
+	return v152.Migrate(ctx, m.k, m.k.ak, m.k.paramSpace)
 }
