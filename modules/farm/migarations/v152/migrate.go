@@ -2,6 +2,7 @@ package v152
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/irisnet/irismod/modules/farm/types"
@@ -25,7 +26,7 @@ type (
 	}
 )
 
-func Migrate(ctx sdk.Context, k FarmKeeper, paramSpace paramstypes.Subspace) error {
+func Migrate(ctx sdk.Context, k FarmKeeper, ak types.AccountKeeper, paramSpace paramstypes.Subspace) error {
 	params := GetLegacyParams(ctx, paramSpace)
 	newParams := types.Params{
 		MaxRewardCategories: params.MaxRewardCategories,
@@ -33,6 +34,14 @@ func Migrate(ctx sdk.Context, k FarmKeeper, paramSpace paramstypes.Subspace) err
 		TaxRate:             DefaultTaxRate,
 	}
 	k.SetParams(ctx, newParams)
+
+	//Grant burner permissions to the farm module account
+	acc := ak.GetModuleAccount(ctx, types.ModuleName)
+	if !acc.HasPermission(authtypes.Burner) {
+		moduleAcc, _ := acc.(*authtypes.ModuleAccount)
+		moduleAcc.Permissions = append(moduleAcc.Permissions, authtypes.Burner)
+	}
+	ak.SetModuleAccount(ctx, acc)
 	return nil
 }
 

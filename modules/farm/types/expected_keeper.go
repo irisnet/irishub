@@ -23,6 +23,8 @@ type ValidateLPToken func(ctx sdk.Context, lpTokenDenom string) error
 type AccountKeeper interface {
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
 	GetModuleAddress(name string) sdk.AccAddress
+	GetModuleAccount(ctx sdk.Context, moduleName string) authtypes.ModuleAccountI
+	SetModuleAccount(ctx sdk.Context, macc authtypes.ModuleAccountI)
 }
 
 // DistrKeeper defines the expected distribution keeper (noalias)
