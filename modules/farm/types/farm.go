@@ -7,6 +7,10 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+func (pool FarmPool) Started(ctx sdk.Context) bool {
+	return pool.StartHeight <= ctx.BlockHeight()
+}
+
 func (pool FarmPool) ExpiredHeight() (int64, error) {
 	var targetInteval = int64(math.MaxInt64)
 	for _, r := range pool.Rules {
@@ -67,4 +71,11 @@ func (rs RewardRules) RewardsPerBlock() (coins sdk.Coins) {
 		coins = coins.Add(sdk.NewCoin(r.Reward, r.RewardPerBlock))
 	}
 	return coins
+}
+
+func (rs RewardRules) TotalReward() (total sdk.Coins) {
+	for _, r := range rs {
+		total = total.Add(sdk.NewCoin(r.Reward, r.TotalReward))
+	}
+	return total
 }
