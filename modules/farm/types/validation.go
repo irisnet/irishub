@@ -38,7 +38,7 @@ func ValidateLpTokenDenom(denom string) error {
 
 // ValidateCoins validates the coin
 func ValidateCoins(field string, coins ...sdk.Coin) error {
-	if !sdk.NewCoins(coins...).IsAllPositive() {
+	if len(coins) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "The %s should be greater than zero", field)
 	}
 	return sdk.NewCoins(coins...).Validate()
@@ -73,8 +73,8 @@ func ValidateFund(rewardPerBlock, fundApplied, fundSelfBond []sdk.Coin) error {
 		return err
 	}
 
-	if err := ValidateCoins("FundSelfBond", fundSelfBond...); err != nil {
-		return err
+	if err := sdk.NewCoins(fundSelfBond...).Validate(); err != nil {
+		return sdkerrors.Wrapf(err, "The fundSelfBond is invalid coin")
 	}
 
 	total := sdk.NewCoins(fundApplied...).Add(fundSelfBond...)
