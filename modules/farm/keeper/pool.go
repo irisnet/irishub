@@ -105,7 +105,7 @@ func (k Keeper) AdjustPool(
 
 	beginPoint := pool.StartHeight
 	//update pool reward shards if the farm pool has started
-	if pool.Started(ctx) {
+	if ctx.BlockHeight() >= pool.StartHeight {
 		//update pool reward shards
 		pool, _, err = k.updatePool(ctx, pool, sdk.ZeroInt(), false)
 		if err != nil {
@@ -114,21 +114,30 @@ func (k Keeper) AdjustPool(
 		beginPoint = ctx.BlockHeight()
 	}
 
-	//update pool TotalReward、RemainingReward
-	rules = types.RewardRules(pool.Rules)
+	availableReward := sdk.NewCoins()
 	if reward != nil {
 		if err := k.bk.SendCoinsFromAccountToModule(ctx,
 			creator, types.ModuleName, reward); err != nil {
 			return err
 		}
-		for i := range rules {
+		availableReward = availableReward.Add(reward...)
+	}
+
+	rules = types.RewardRules(pool.Rules)
+	remainingHeight := pool.EndHeight - beginPoint
+	for i := range rules {
+		availableReward = availableReward.Add(
+			sdk.NewCoin(
+				rules[i].Reward,
+				rules[i].RewardPerBlock.Mul(sdk.NewInt(remainingHeight)),
+			),
+		)
+		if reward != nil {
 			rules[i].TotalReward = rules[i].TotalReward.Add(reward.AmountOf(rules[i].Reward))
 			rules[i].RemainingReward = rules[i].RemainingReward.Add(reward.AmountOf(rules[i].Reward))
 		}
 	}
 
-	// Calculate remaining available reward
-	availableReward := rules.RemainingReward()
 	pool.Rules = types.RewardRules(rules).UpdateWith(rewardPerBlock)
 	k.SetRewardRules(ctx, pool.Id, pool.Rules)
 

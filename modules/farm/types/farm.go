@@ -36,10 +36,6 @@ func (pool FarmPool) CaclRewards(farmInfo FarmInfo, deltaAmt sdk.Int) (rewards, 
 	return rewards, rewardDebt
 }
 
-func (pool FarmPool) Started(ctx sdk.Context) bool {
-	return pool.StartHeight <= ctx.BlockHeight()
-}
-
 type RewardRules []RewardRule
 
 func (rs RewardRules) Contains(reward sdk.Coins) bool {
@@ -71,11 +67,4 @@ func (rs RewardRules) RewardsPerBlock() (coins sdk.Coins) {
 		coins = coins.Add(sdk.NewCoin(r.Reward, r.RewardPerBlock))
 	}
 	return coins
-}
-
-func (rs RewardRules) RemainingReward() (remaining sdk.Coins) {
-	for _, r := range rs {
-		remaining = remaining.Add(sdk.NewCoin(r.Reward, r.RemainingReward))
-	}
-	return remaining
 }
