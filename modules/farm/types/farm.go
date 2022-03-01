@@ -50,6 +50,9 @@ func (rs RewardRules) Contains(reward sdk.Coins) bool {
 }
 
 func (rs RewardRules) UpdateWith(rewardPerBlock sdk.Coins) RewardRules {
+	if rewardPerBlock == nil {
+		return rs
+	}
 	for i := range rs {
 		rewardAmt := rewardPerBlock.AmountOf(rs[i].Reward)
 		if rewardAmt.IsPositive() {
