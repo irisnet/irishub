@@ -103,9 +103,9 @@ func (k Keeper) AdjustPool(
 		return sdkerrors.Wrapf(types.ErrInvalidAppend, reward.String())
 	}
 
-	beginPoint := pool.StartHeight
+	startHeight := pool.StartHeight
 	if pool.Started(ctx) {
-		beginPoint = ctx.BlockHeight()
+		startHeight = ctx.BlockHeight()
 	}
 
 	//update pool reward shards
@@ -130,7 +130,7 @@ func (k Keeper) AdjustPool(
 	// Calculate remaining available reward
 	availableReward := rules.TotalReward()
 	if pool.Started(ctx) {
-		remainingHeight := pool.EndHeight - beginPoint
+		remainingHeight := pool.EndHeight - startHeight
 		remainingReward := sdk.NewCoins()
 		for i := range rules {
 			remainingReward = remainingReward.Add(
@@ -156,7 +156,7 @@ func (k Keeper) AdjustPool(
 			availableHeight = inteval
 		}
 	}
-	expiredHeight := beginPoint + availableHeight
+	expiredHeight := startHeight + availableHeight
 	//if the expiration height does not change,
 	// there is no need to update the pool and the expired queue
 	if expiredHeight == pool.EndHeight {
