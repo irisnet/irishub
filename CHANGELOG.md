@@ -43,7 +43,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 * (modules/farm) [\#247](https://github.com/irisnet/irismod/pull/247) Add farm proposal
 * (modules/coinswap) [\#249](https://github.com/irisnet/irismod/pull/249) Add liquidity pool creation fee
-* (modules/nft) [\#245](https://github.com/irisnet/irismod/pull/245) improve nft module
+* (modules/nft) [\#245](https://github.com/irisnet/irismod/pull/245) Improve nft module
 * (modules/mt) [\#269](https://github.com/irisnet/irismod/pull/269) Feature: MT Module
 
 ### Improvements
