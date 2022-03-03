@@ -39,6 +39,21 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ### Improvements
 
+## [v1.5.2] - 2021-03-03
+
+* (modules/farm) [\#247](https://github.com/irisnet/irismod/pull/247) Add farm proposal
+* (modules/coinswap) [\#249](https://github.com/irisnet/irismod/pull/249) Add liquidity pool creation fee
+* (modules/nft) [\#245](https://github.com/irisnet/irismod/pull/245) improve nft module
+* (modules/mt) [\#269](https://github.com/irisnet/irismod/pull/269) Feature: MT Module
+
+### Improvements
+
+* (modules/token) [\#252](https://github.com/irisnet/irismod/pull/252)  Precision of extension fee 9->18
+
+## [v1.5.1] - 2022-02-15
+
+* (modules/nft) [\#245](https://github.com/irisnet/irismod/pull/245) improve nft module
+
 ## [v1.5.0] - 2021-11-01
 
 * [\#218](https://github.com/irisnet/irismod/pull/218) Bump cosmos-sdk version to [v0.44.2](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.44.2).
