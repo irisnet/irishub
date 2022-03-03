@@ -112,7 +112,7 @@ func (k Keeper) EditToken(
 		issuedMainUnitAmt := issuedAmt.Quo(sdk.NewIntWithDecimal(1, int(token.Scale)))
 
 		if sdk.NewIntFromUint64(maxSupply).LT(issuedMainUnitAmt) {
-			return sdkerrors.Wrapf(types.ErrInvalidMaxSupply, "max supply must not be less than %d", issuedMainUnitAmt)
+			return sdkerrors.Wrapf(types.ErrInvalidMaxSupply, "max supply must not be less than %s", issuedMainUnitAmt)
 		}
 
 		token.MaxSupply = maxSupply
