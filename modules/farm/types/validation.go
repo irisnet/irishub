@@ -55,6 +55,11 @@ func ValidateReward(rewardPerBlock, totalReward sdk.Coins) error {
 	if len(rewardPerBlock) != len(totalReward) {
 		return sdkerrors.Wrapf(ErrNotMatch, "The length of rewardPerBlock and totalReward must be the same")
 	}
+
+	if !rewardPerBlock.DenomsSubsetOf(totalReward) {
+		return sdkerrors.Wrapf(ErrInvalidRewardRule, "rewardPerBlock and totalReward token types must be the same")
+	}
+
 	for i := range totalReward {
 		if !totalReward[i].IsGTE(rewardPerBlock[i]) {
 			return sdkerrors.Wrapf(ErrNotMatch, "The totalReward should be greater than or equal to rewardPerBlock")
