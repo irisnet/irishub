@@ -24,6 +24,10 @@ func (cfp *CommunityPoolCreateFarmProposal) GetDescription() string { return cfp
 func (cfp *CommunityPoolCreateFarmProposal) ProposalRoute() string  { return RouterKey }
 func (cfp *CommunityPoolCreateFarmProposal) ProposalType() string   { return ProposalTypeCreateFarmPool }
 func (cfp *CommunityPoolCreateFarmProposal) ValidateBasic() error {
+	// Validate gov base proposal
+	if err := govtypes.ValidateAbstract(cfp); err != nil {
+		return err
+	}
 	if err := ValidateDescription(cfp.PoolDescription); err != nil {
 		return err
 	}
@@ -35,11 +39,7 @@ func (cfp *CommunityPoolCreateFarmProposal) ValidateBasic() error {
 	if err := ValidateCoins("RewardsPerBlock", cfp.RewardPerBlock...); err != nil {
 		return err
 	}
-
-	if err := ValidateFund(cfp.RewardPerBlock, cfp.FundApplied, cfp.FundSelfBond); err != nil {
-		return err
-	}
-	return govtypes.ValidateAbstract(cfp)
+	return ValidateFund(cfp.RewardPerBlock, cfp.FundApplied, cfp.FundSelfBond)
 }
 
 func (cfp CommunityPoolCreateFarmProposal) String() string {

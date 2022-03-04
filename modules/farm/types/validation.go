@@ -38,7 +38,7 @@ func ValidateLpTokenDenom(denom string) error {
 
 // ValidateCoins validates the coin
 func ValidateCoins(field string, coins ...sdk.Coin) error {
-	if !sdk.NewCoins(coins...).IsAllPositive() {
+	if len(coins) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "The %s should be greater than zero", field)
 	}
 	return sdk.NewCoins(coins...).Validate()
@@ -55,6 +55,11 @@ func ValidateReward(rewardPerBlock, totalReward sdk.Coins) error {
 	if len(rewardPerBlock) != len(totalReward) {
 		return sdkerrors.Wrapf(ErrNotMatch, "The length of rewardPerBlock and totalReward must be the same")
 	}
+
+	if !rewardPerBlock.DenomsSubsetOf(totalReward) {
+		return sdkerrors.Wrapf(ErrInvalidRewardRule, "rewardPerBlock and totalReward token types must be the same")
+	}
+
 	for i := range totalReward {
 		if !totalReward[i].IsGTE(rewardPerBlock[i]) {
 			return sdkerrors.Wrapf(ErrNotMatch, "The totalReward should be greater than or equal to rewardPerBlock")
@@ -73,8 +78,8 @@ func ValidateFund(rewardPerBlock, fundApplied, fundSelfBond []sdk.Coin) error {
 		return err
 	}
 
-	if err := ValidateCoins("FundSelfBond", fundSelfBond...); err != nil {
-		return err
+	if err := sdk.NewCoins(fundSelfBond...).Validate(); err != nil {
+		return sdkerrors.Wrapf(err, "The fundSelfBond is invalid coin")
 	}
 
 	total := sdk.NewCoins(fundApplied...).Add(fundSelfBond...)

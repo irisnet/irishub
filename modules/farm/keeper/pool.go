@@ -93,51 +93,60 @@ func (k Keeper) AdjustPool(
 		)
 	}
 
+	pool.Rules = k.GetRewardRules(ctx, pool.Id)
+	rules := types.RewardRules(pool.Rules)
+	if rewardPerBlock != nil && !rewardPerBlock.DenomsSubsetOf(rules.RewardsPerBlock()) {
+		return sdkerrors.Wrapf(types.ErrInvalidAppend, "rewardPerBlock: %s", rewardPerBlock.String())
+	}
+
+	if reward != nil && !rules.Contains(reward) {
+		return sdkerrors.Wrapf(types.ErrInvalidAppend, reward.String())
+	}
+
+	startHeight := pool.StartHeight
+	if pool.Started(ctx) {
+		startHeight = ctx.BlockHeight()
+	}
+
 	//update pool reward shards
 	pool, _, err = k.updatePool(ctx, pool, sdk.ZeroInt(), false)
 	if err != nil {
 		return err
 	}
 
-	rules := types.RewardRules(pool.Rules)
-	if rewardPerBlock != nil && !rewardPerBlock.DenomsSubsetOf(rules.RewardsPerBlock()) {
-		return sdkerrors.Wrapf(types.ErrInvalidAppend, "rewardPerBlock: %s", rewardPerBlock.String())
-	}
-
-	availableReward := sdk.NewCoins()
-	remainingHeight := pool.EndHeight - ctx.BlockHeight()
-
+	//update pool TotalReward、RemainingReward
+	rules = types.RewardRules(pool.Rules)
 	if reward != nil {
-		if !rules.Contains(reward) {
-			return sdkerrors.Wrapf(types.ErrInvalidAppend, reward.String())
-		}
-
 		if err := k.bk.SendCoinsFromAccountToModule(ctx,
 			creator, types.ModuleName, reward); err != nil {
 			return err
 		}
-		availableReward = availableReward.Add(reward...)
-	}
-
-	for i := range rules {
-		availableReward = availableReward.Add(
-			sdk.NewCoin(
-				rules[i].Reward,
-				rules[i].RewardPerBlock.Mul(sdk.NewInt(remainingHeight)),
-			),
-		)
-		if reward != nil {
+		for i := range rules {
 			rules[i].TotalReward = rules[i].TotalReward.Add(reward.AmountOf(rules[i].Reward))
 			rules[i].RemainingReward = rules[i].RemainingReward.Add(reward.AmountOf(rules[i].Reward))
 		}
 	}
 
-	if rewardPerBlock != nil {
-		pool.Rules = types.RewardRules(rules).UpdateWith(rewardPerBlock)
+	// Calculate remaining available reward
+	availableReward := rules.TotalReward()
+	if pool.Started(ctx) {
+		remainingHeight := pool.EndHeight - startHeight
+		remainingReward := sdk.NewCoins()
+		for i := range rules {
+			remainingReward = remainingReward.Add(
+				sdk.NewCoin(
+					rules[i].Reward,
+					rules[i].RewardPerBlock.Mul(sdk.NewInt(remainingHeight)),
+				),
+			)
+		}
+		availableReward = remainingReward.Add(reward...)
 	}
+
+	pool.Rules = types.RewardRules(rules).UpdateWith(rewardPerBlock)
 	k.SetRewardRules(ctx, pool.Id, pool.Rules)
 
-	//expiredHeight = [(srcEndHeight-curHeight)*srcRewardPerBlock +appendReward]/RewardPerBlock + curHeight
+	//expiredHeight = [(srcEndHeight-beginPoint)*srcRewardPerBlock +appendReward]/RewardPerBlock + beginPoint
 	rewardsPerBlock := types.RewardRules(pool.Rules).RewardsPerBlock()
 	availableHeight := availableReward[0].Amount.Quo(rewardsPerBlock.AmountOf(availableReward[0].Denom)).Int64()
 	for _, c := range availableReward[1:] {
@@ -147,7 +156,7 @@ func (k Keeper) AdjustPool(
 			availableHeight = inteval
 		}
 	}
-	expiredHeight := ctx.BlockHeight() + availableHeight
+	expiredHeight := startHeight + availableHeight
 	//if the expiration height does not change,
 	// there is no need to update the pool and the expired queue
 	if expiredHeight == pool.EndHeight {
