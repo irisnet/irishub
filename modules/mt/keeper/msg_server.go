@@ -30,8 +30,11 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	denom := m.Keeper.IssueDenom(ctx, strings.TrimSpace(msg.Name), sender, msg.Data)
-
+	denom := m.Keeper.IssueDenom(
+		ctx, m.Keeper.genDenomID(ctx),
+		strings.TrimSpace(msg.Name),
+		sender, msg.Data,
+	)
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeIssueDenom,
