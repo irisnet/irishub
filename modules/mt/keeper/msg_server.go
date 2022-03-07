@@ -84,7 +84,7 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 		}
 		m.Keeper.MintMT(ctx, msg.DenomId, mtID, msg.Amount, recipient)
 	} else {
-		mt := m.Keeper.IssueMT(ctx, msg.DenomId, msg.Amount, msg.Data, recipient)
+		mt := m.Keeper.IssueMT(ctx, msg.DenomId, m.Keeper.genMTID(ctx), msg.Amount, msg.Data, recipient)
 		mtID = mt.Id
 	}
 
