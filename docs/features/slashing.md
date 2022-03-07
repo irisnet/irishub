@@ -29,10 +29,10 @@ In the fixed time window `SignedBlocksWindow`, the ratio of the time of the vali
 
 **parameters:**
 
-* `SignedBlocksWindow` default: 20000
-* `MinSignedPerWindow` default: 0.5
+* `SignedBlocksWindow` default: 34560
+* `MinSignedPerWindow` default: 0.7
 * `DowntimeJailDuration` default: 10Minutes
-* `SlashFractionDowntime` default: 0.01
+* `SlashFractionDowntime` default: 0.0003
 
 ## Double Sign
 
@@ -41,6 +41,6 @@ When executing a block, it receives evidence that a validator has voted for conf
 **parameters:**
 
 * `DowntimeJailDuration` default: 10Minutes
-* `SlashFractionDoubleSign`default: 0.05
+* `SlashFractionDoubleSign`default: 0.01
 
 For related operations of the `Slashing` module, please refer to [cli-slashing](../cli-client/slashing.md)
