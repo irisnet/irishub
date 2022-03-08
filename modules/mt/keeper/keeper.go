@@ -34,11 +34,10 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 // IssueDenom issues a denom according to the given params
 func (k Keeper) IssueDenom(ctx sdk.Context,
-	name string, sednder sdk.AccAddress, data []byte,
+	id, name string, sednder sdk.AccAddress, data []byte,
 ) types.Denom {
-
 	denom := types.Denom{
-		Id:    k.genDenomID(ctx),
+		Id:    id,
 		Name:  name,
 		Owner: sednder.String(),
 		Data:  data,
@@ -52,13 +51,13 @@ func (k Keeper) IssueDenom(ctx sdk.Context,
 
 // IssueMT issues a new MT
 func (k Keeper) IssueMT(ctx sdk.Context,
-	denomID string,
+	denomID, mtID string,
 	amount uint64,
 	data []byte,
 	recipient sdk.AccAddress,
 ) types.MT {
 
-	mt := types.NewMT(k.genMTID(ctx), amount, data)
+	mt := types.NewMT(mtID, amount, data)
 
 	// store MT
 	k.SetMT(ctx, denomID, mt)
