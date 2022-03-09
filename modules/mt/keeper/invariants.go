@@ -35,7 +35,7 @@ func SupplyInvariant(k Keeper) sdk.Invariant {
 
 		return sdk.FormatInvariant(
 			types.ModuleName, "supply",
-			fmt.Sprintf("MT supply invariants check passed"),
+			"MT supply invariants check passed",
 		), false
 	}
 }

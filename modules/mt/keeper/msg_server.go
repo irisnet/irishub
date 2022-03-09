@@ -82,9 +82,15 @@ func (m msgServer) MintMT(goCtx context.Context, msg *types.MsgMintMT) (*types.M
 		if !m.Keeper.HasMT(ctx, msg.DenomId, mtID) {
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrNotFound, "mt not found (%s)", mtID)
 		}
-		m.Keeper.MintMT(ctx, msg.DenomId, mtID, msg.Amount, recipient)
+
+		if err := m.Keeper.MintMT(ctx, msg.DenomId, mtID, msg.Amount, recipient); err != nil {
+			return nil, err
+		}
 	} else {
-		mt := m.Keeper.IssueMT(ctx, msg.DenomId, m.Keeper.genMTID(ctx), msg.Amount, msg.Data, recipient)
+		mt, err := m.Keeper.IssueMT(ctx, msg.DenomId, m.Keeper.genMTID(ctx), msg.Amount, msg.Data, recipient)
+		if err != nil {
+			return nil, err
+		}
 		mtID = mt.Id
 	}
 

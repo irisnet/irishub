@@ -2,7 +2,10 @@ package keeper
 
 import (
 	"bytes"
+	"math"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/irisnet/irismod/modules/mt/types"
 )
 
@@ -10,14 +13,18 @@ import (
 func (k Keeper) AddBalance(ctx sdk.Context,
 	denomID, mtID string,
 	amount uint64,
-	addr sdk.AccAddress) {
+	addr sdk.AccAddress) error {
 
 	balance := k.GetBalance(ctx, denomID, mtID, addr)
+	if math.MaxUint64-balance < amount {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "overflow: max %d, got %d", math.MaxUint64-balance, amount)
+	}
 	balance += amount
 
 	store := ctx.KVStore(k.storeKey)
 	bz := types.MustMarshalAmount(k.cdc, balance)
 	store.Set(types.KeyBalance(addr, denomID, mtID), bz)
+	return nil
 }
 
 // SubBalance subs amounts from an account
@@ -103,11 +110,11 @@ func (k Keeper) getBalances(ctx sdk.Context) []types.Owner {
 func (k Keeper) Transfer(ctx sdk.Context,
 	denomID, mtID string,
 	amount uint64,
-	from, to sdk.AccAddress) {
+	from, to sdk.AccAddress) error {
 
 	k.SubBalance(ctx, denomID, mtID, amount, from)
 
-	k.AddBalance(ctx, denomID, mtID, amount, to)
+	return k.AddBalance(ctx, denomID, mtID, amount, to)
 }
 
 // GetDenomSupply returns the number of Mts by the specified denom ID
@@ -141,13 +148,17 @@ func (k Keeper) IncreaseDenomSupply(ctx sdk.Context, denomID string) {
 }
 
 // IncreaseMTSupply increase total supply of an MT
-func (k Keeper) IncreaseMTSupply(ctx sdk.Context, denomID, mtID string, amount uint64) {
+func (k Keeper) IncreaseMTSupply(ctx sdk.Context, denomID, mtID string, amount uint64) error {
 	supply := k.GetMTSupply(ctx, denomID, mtID)
 	supply += amount
+	if math.MaxUint64-supply < amount {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "overflow: max %d, got %d", math.MaxUint64-supply, amount)
+	}
 
 	store := ctx.KVStore(k.storeKey)
 	bz := types.MustMarshalSupply(k.cdc, supply)
 	store.Set(types.KeySupply(denomID, mtID), bz)
+	return nil
 }
 
 // decreaseMTSupply decrease total supply of an MT
