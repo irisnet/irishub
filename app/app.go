@@ -89,6 +89,9 @@ import (
 	"github.com/irisnet/irismod/modules/htlc"
 	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
+	"github.com/irisnet/irismod/modules/mt"
+	mtkeeper "github.com/irisnet/irismod/modules/mt/keeper"
+	mttypes "github.com/irisnet/irismod/modules/mt/types"
 	"github.com/irisnet/irismod/modules/nft"
 	nftkeeper "github.com/irisnet/irismod/modules/nft/keeper"
 	nfttypes "github.com/irisnet/irismod/modules/nft/types"
@@ -125,6 +128,9 @@ import (
 	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
 	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 
+	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
+	tibcmttransferkeeper "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/keeper"
+	tibcmttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/types"
 	tibcnfttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer"
 	tibcnfttransferkeeper "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/keeper"
 	tibcnfttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/types"
@@ -191,6 +197,8 @@ var (
 		farm.AppModuleBasic{},
 		tibc.AppModuleBasic{},
 		tibcnfttransfer.AppModuleBasic{},
+		tibcmttransfer.AppModuleBasic{},
+		mt.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -208,10 +216,11 @@ var (
 		servicetypes.DepositAccName:    {authtypes.Burner},
 		servicetypes.RequestAccName:    nil,
 		servicetypes.FeeCollectorName:  {authtypes.Burner},
-		farmtypes.ModuleName:           nil,
+		farmtypes.ModuleName:           {authtypes.Burner},
 		farmtypes.RewardCollector:      nil,
 		farmtypes.EscrowCollector:      nil,
 		tibcnfttypes.ModuleName:        nil,
+		tibcmttypes.ModuleName:         nil,
 	}
 
 	nativeToken tokentypes.Token
@@ -267,6 +276,7 @@ type IrisApp struct {
 	tokenKeeper       tokenkeeper.Keeper
 	recordKeeper      recordkeeper.Keeper
 	nftKeeper         nftkeeper.Keeper
+	mtKeeper          mtkeeper.Keeper
 	htlcKeeper        htlckeeper.Keeper
 	coinswapKeeper    coinswapkeeper.Keeper
 	serviceKeeper     servicekeeper.Keeper
@@ -275,6 +285,7 @@ type IrisApp struct {
 	farmKeeper        farmkeeper.Keeper
 	tibcKeeper        *tibckeeper.Keeper
 	nftTransferKeeper tibcnfttransferkeeper.Keeper
+	mtTransferKeeper  tibcmttransferkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -360,7 +371,7 @@ func NewIrisApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey, recordtypes.StoreKey,
 		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
-		farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey,
+		farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey, tibcmttypes.StoreKey, mttypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -440,6 +451,13 @@ func NewIrisApp(
 		app.accountKeeper, nftkeeper.NewLegacyKeeper(app.nftKeeper),
 		app.tibcKeeper.PacketKeeper, app.tibcKeeper.ClientKeeper,
 	)
+
+	app.mtKeeper = mtkeeper.NewKeeper(appCodec, keys[mttypes.StoreKey])
+	app.mtTransferKeeper = tibcmttransferkeeper.NewKeeper(
+		appCodec, keys[tibcnfttypes.StoreKey], app.GetSubspace(tibcnfttypes.ModuleName),
+		app.accountKeeper, app.mtKeeper,
+		app.tibcKeeper.PacketKeeper, app.tibcKeeper.ClientKeeper,
+	)
 	// Create Transfer Keepers
 	app.transferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
@@ -454,8 +472,11 @@ func NewIrisApp(
 	app.ibcKeeper.SetRouter(ibcRouter)
 
 	nfttransferModule := tibcnfttransfer.NewAppModule(app.nftTransferKeeper)
+	mttransferModule := tibcmttransfer.NewAppModule(app.mtTransferKeeper)
+
 	tibcRouter := tibcroutingtypes.NewRouter()
-	tibcRouter.AddRoute(tibcnfttypes.ModuleName, nfttransferModule)
+	tibcRouter.AddRoute(tibcnfttypes.ModuleName, nfttransferModule).
+		AddRoute(tibcmttypes.ModuleName, mttransferModule)
 	app.tibcKeeper.SetRouter(tibcRouter)
 
 	// create evidence keeper with router
@@ -579,10 +600,12 @@ func NewIrisApp(
 		params.NewAppModule(app.paramsKeeper),
 		transferModule,
 		nfttransferModule,
+		mttransferModule,
 		guardian.NewAppModule(appCodec, app.guardianKeeper),
 		token.NewAppModule(appCodec, app.tokenKeeper, app.accountKeeper, app.bankKeeper),
 		record.NewAppModule(appCodec, app.recordKeeper, app.accountKeeper, app.bankKeeper),
 		nft.NewAppModule(appCodec, app.nftKeeper, app.accountKeeper, app.bankKeeper),
+		mt.NewAppModule(appCodec, app.mtKeeper, app.accountKeeper, app.bankKeeper),
 		htlc.NewAppModule(appCodec, app.htlcKeeper, app.accountKeeper, app.bankKeeper),
 		coinswap.NewAppModule(appCodec, app.coinswapKeeper, app.accountKeeper, app.bankKeeper),
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
@@ -616,6 +639,7 @@ func NewIrisApp(
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName, tibchost.ModuleName,
 		guardiantypes.ModuleName, tokentypes.ModuleName, nfttypes.ModuleName, htlctypes.ModuleName, recordtypes.ModuleName,
 		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName, farmtypes.ModuleName,
+		mttypes.ModuleName,
 	)
 
 	cfg := module.NewConfigurator(appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
@@ -642,6 +666,7 @@ func NewIrisApp(
 		ibc.NewAppModule(app.ibcKeeper),
 		transferModule,
 		nfttransferModule,
+		mttransferModule,
 		guardian.NewAppModule(appCodec, app.guardianKeeper),
 		token.NewAppModule(appCodec, app.tokenKeeper, app.accountKeeper, app.bankKeeper),
 		record.NewAppModule(appCodec, app.recordKeeper, app.accountKeeper, app.bankKeeper),
@@ -709,21 +734,13 @@ func NewIrisApp(
 				NativeChainName: "irishub-mainnet",
 			})
 
-			clients := migratetibc.LoadClient(app.appCodec)
-			for _, client := range clients {
-				// init tibc client
-				if err := app.tibcKeeper.ClientKeeper.CreateClient(
-					ctx,
-					client.ChainName,
-					client.ClientState,
-					client.ConsensusState,
-				); err != nil {
-					panic(err)
-				}
-				// register client relayers
-				app.tibcKeeper.ClientKeeper.RegisterRelayers(ctx, client.ChainName, client.Relayers)
+			if err := migratetibc.CreateClient(ctx,
+				app.appCodec,
+				"v1.2",
+				app.tibcKeeper.ClientKeeper,
+			); err != nil {
+				return nil, err
 			}
-
 			fromVM[authtypes.ModuleName] = 1
 			fromVM[banktypes.ModuleName] = 1
 			fromVM[stakingtypes.ModuleName] = 1
@@ -753,8 +770,17 @@ func NewIrisApp(
 	)
 
 	app.RegisterUpgradePlan("v1.3",
-		&store.StoreUpgrades{},
+		&store.StoreUpgrades{
+			Added: []string{tibcmttypes.StoreKey, mttypes.StoreKey},
+		},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			if err := migratetibc.CreateClient(ctx,
+				app.appCodec,
+				"v1.3",
+				app.tibcKeeper.ClientKeeper,
+			); err != nil {
+				return nil, err
+			}
 			return app.mm.RunMigrations(ctx, cfg, fromVM)
 		},
 	)

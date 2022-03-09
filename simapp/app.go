@@ -203,7 +203,7 @@ var (
 		servicetypes.RequestAccName:    nil,
 		servicetypes.FeeCollectorName:  {authtypes.Burner},
 		tibcnfttypes.ModuleName:        nil,
-		farmtypes.ModuleName:           nil,
+		farmtypes.ModuleName:           {authtypes.Burner},
 		farmtypes.RewardCollector:      nil,
 		farmtypes.EscrowCollector:      nil,
 	}

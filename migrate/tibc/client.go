@@ -4,12 +4,18 @@ import (
 	_ "embed"
 	"encoding/json"
 
-	"github.com/bianjieai/tibc-go/modules/tibc/core/exported"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	clientkeeper "github.com/bianjieai/tibc-go/modules/tibc/core/02-client/keeper"
+	"github.com/bianjieai/tibc-go/modules/tibc/core/exported"
 )
 
-//go:embed clients.json
-var clientsByte []byte
+//go:embed v120.json
+var v120 []byte
+
+//go:embed v130.json
+var v130 []byte
 
 type (
 	ClientData struct {
@@ -27,9 +33,40 @@ type (
 	}
 )
 
-func LoadClient(cdc codec.Codec) (clients []Client) {
+func CreateClient(
+	ctx sdk.Context,
+	cdc codec.Codec,
+	upgradePlanVersion string,
+	clientKeeper clientkeeper.Keeper,
+) error {
+	clients := loadClient(cdc, upgradePlanVersion)
+	for _, client := range clients {
+		// init tibc client
+		if err := clientKeeper.CreateClient(
+			ctx,
+			client.ChainName,
+			client.ClientState,
+			client.ConsensusState,
+		); err != nil {
+			return err
+		}
+		// register client relayers
+		clientKeeper.RegisterRelayers(ctx, client.ChainName, client.Relayers)
+	}
+	return nil
+}
+
+func loadClient(cdc codec.Codec, version string) (clients []Client) {
+	var data []byte
+	switch version {
+	case "v1.2":
+		data = v120
+	case "v1.3":
+		data = v130
+	}
+
 	var datas []ClientData
-	if err := json.Unmarshal(clientsByte, &datas); err != nil {
+	if err := json.Unmarshal(data, &datas); err != nil {
 		panic("Unmarshal client.json failed")
 	}
 
