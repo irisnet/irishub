@@ -55,7 +55,7 @@ func (k Keeper) IssueMT(ctx sdk.Context,
 	amount uint64,
 	data []byte,
 	recipient sdk.AccAddress,
-) types.MT {
+) (types.MT, error) {
 
 	mt := types.NewMT(mtID, amount, data)
 
@@ -66,12 +66,16 @@ func (k Keeper) IssueMT(ctx sdk.Context,
 	k.IncreaseDenomSupply(ctx, denomID)
 
 	// increase MT supply
-	k.IncreaseMTSupply(ctx, denomID, mt.GetID(), amount)
+	if err := k.IncreaseMTSupply(ctx, denomID, mt.GetID(), amount); err != nil {
+		return types.MT{}, err
+	}
 
 	// mint amounts to the recipient
-	k.AddBalance(ctx, denomID, mt.GetID(), amount, recipient)
+	if err := k.AddBalance(ctx, denomID, mt.GetID(), amount, recipient); err != nil {
+		return types.MT{}, err
+	}
 
-	return mt
+	return mt, nil
 }
 
 // MintMT mints amounts of an existing MT
@@ -79,13 +83,15 @@ func (k Keeper) MintMT(ctx sdk.Context,
 	denomID, mtID string,
 	amount uint64,
 	recipient sdk.AccAddress,
-) {
+) error {
 
 	// increase MT supply
-	k.IncreaseMTSupply(ctx, denomID, mtID, amount)
+	if err := k.IncreaseMTSupply(ctx, denomID, mtID, amount); err != nil {
+		return err
+	}
 
 	// mint amounts to the recipient
-	k.AddBalance(ctx, denomID, mtID, amount, recipient)
+	return k.AddBalance(ctx, denomID, mtID, amount, recipient)
 }
 
 // EditMT updates an existing MT
@@ -119,8 +125,7 @@ func (k Keeper) TransferOwner(ctx sdk.Context,
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient balance: %d", srcOwnerAmount)
 	}
 
-	k.Transfer(ctx, denomID, mtID, amount, srcOwner, dstOwner)
-	return nil
+	return k.Transfer(ctx, denomID, mtID, amount, srcOwner, dstOwner)
 }
 
 // BurnMT burn amounts of MT from a owner
