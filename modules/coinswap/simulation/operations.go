@@ -131,6 +131,12 @@ func SimulateMsgAddLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 			if !maxToken.Amount.Sub(reservePool.AmountOf(maxToken.GetDenom()).Mul(exactStandardAmt).Quo(standardReserveAmt)).IsPositive() {
 				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAddLiquidity, "insufficient funds"), nil, err
 			}
+
+			params := k.GetParams(ctx)
+			poolCreationFee := params.PoolCreationFee
+			if spendable.AmountOf(poolCreationFee.Denom).LT(poolCreationFee.Amount) {
+				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAddLiquidity, "insufficient funds"), nil, err
+			}
 		}
 
 		deadline := randDeadline(r)
