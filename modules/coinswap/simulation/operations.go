@@ -444,7 +444,7 @@ func SimulateMsgRemoveLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk type
 
 func RandomSpendableToken(r *rand.Rand, spendableCoin sdk.Coins) sdk.Coin {
 	token := spendableCoin[r.Intn(len(spendableCoin))]
-	return sdk.NewCoin(token.Denom, simtypes.RandomAmount(r, token.Amount))
+	return sdk.NewCoin(token.Denom, simtypes.RandomAmount(r, token.Amount.QuoRaw(2)))
 }
 
 func RandomTotalToken(r *rand.Rand, coins sdk.Coins) sdk.Coin {
