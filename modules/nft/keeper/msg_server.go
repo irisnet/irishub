@@ -72,7 +72,7 @@ func (m msgServer) MintNFT(goCtx context.Context, msg *types.MsgMintNFT) (*types
 	}
 
 	if denom.MintRestricted && denom.Creator != sender.String() {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to mint NFT of denom %s", denom.Creator, msg.DenomId)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to mint NFT of denom %s", msg.Sender, msg.DenomId)
 	}
 
 	if err := m.Keeper.MintNFT(ctx, msg.DenomId, msg.Id,

@@ -65,6 +65,9 @@ func (k Keeper) Owner(c context.Context, request *types.QueryOwnerRequest) (*typ
 		}
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
 	for i := 0; i < len(owner.IDCollections); i++ {
 		owner.IDCollections[i].TokenIds = idsMap[owner.IDCollections[i].DenomId]
 	}
