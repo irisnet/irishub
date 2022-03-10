@@ -319,13 +319,13 @@ func SimulateBurnToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 		if !amount.IsPositive() {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBurnToken, "Insufficient funds"), nil, nil
 		}
-		amount2 := r.Int63n(amount.Int64())
-		spendable, hasNeg := spendable.SafeSub(sdk.Coins{sdk.NewCoin(token.GetSymbol(), sdk.NewInt(int64(amount2)))})
+		amount2 := simtypes.RandomAmount(r, amount)
+		spendable, hasNeg := spendable.SafeSub(sdk.Coins{sdk.NewCoin(token.GetSymbol(), amount2)})
 		if hasNeg {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBurnToken, "Insufficient funds"), nil, nil
 		}
 
-		msg := types.NewMsgBurnToken(token.GetSymbol(), token.GetOwner().String(), uint64(amount2))
+		msg := types.NewMsgBurnToken(token.GetSymbol(), token.GetOwner().String(), amount2.Uint64())
 
 		ownerAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {
