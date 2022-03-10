@@ -134,7 +134,12 @@ func SimulateMsgAddLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 
 			params := k.GetParams(ctx)
 			poolCreationFee := params.PoolCreationFee
-			if spendable.AmountOf(poolCreationFee.Denom).LT(poolCreationFee.Amount) {
+
+			spendTotal := poolCreationFee.Amount
+			if strings.EqualFold(poolCreationFee.Denom, standardDenom) {
+				spendTotal = spendTotal.Add(exactStandardAmt)
+			}
+			if spendable.AmountOf(poolCreationFee.Denom).LT(spendTotal) {
 				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAddLiquidity, "insufficient funds"), nil, err
 			}
 		}
