@@ -150,10 +150,10 @@ func (k Keeper) IncreaseDenomSupply(ctx sdk.Context, denomID string) {
 // IncreaseMTSupply increase total supply of an MT
 func (k Keeper) IncreaseMTSupply(ctx sdk.Context, denomID, mtID string, amount uint64) error {
 	supply := k.GetMTSupply(ctx, denomID, mtID)
-	supply += amount
 	if math.MaxUint64-supply < amount {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "overflow: max %d, got %d", math.MaxUint64-supply, amount)
 	}
+	supply += amount
 
 	store := ctx.KVStore(k.storeKey)
 	bz := types.MustMarshalSupply(k.cdc, supply)

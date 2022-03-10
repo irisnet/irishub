@@ -131,6 +131,17 @@ func SimulateMsgAddLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 			if !maxToken.Amount.Sub(reservePool.AmountOf(maxToken.GetDenom()).Mul(exactStandardAmt).Quo(standardReserveAmt)).IsPositive() {
 				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAddLiquidity, "insufficient funds"), nil, err
 			}
+
+			params := k.GetParams(ctx)
+			poolCreationFee := params.PoolCreationFee
+
+			spendTotal := poolCreationFee.Amount
+			if strings.EqualFold(poolCreationFee.Denom, standardDenom) {
+				spendTotal = spendTotal.Add(exactStandardAmt)
+			}
+			if spendable.AmountOf(poolCreationFee.Denom).LT(spendTotal) {
+				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAddLiquidity, "insufficient funds"), nil, err
+			}
 		}
 
 		deadline := randDeadline(r)
@@ -433,7 +444,7 @@ func SimulateMsgRemoveLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk type
 
 func RandomSpendableToken(r *rand.Rand, spendableCoin sdk.Coins) sdk.Coin {
 	token := spendableCoin[r.Intn(len(spendableCoin))]
-	return sdk.NewCoin(token.Denom, simtypes.RandomAmount(r, token.Amount))
+	return sdk.NewCoin(token.Denom, simtypes.RandomAmount(r, token.Amount.QuoRaw(2)))
 }
 
 func RandomTotalToken(r *rand.Rand, coins sdk.Coins) sdk.Coin {
