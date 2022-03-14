@@ -774,6 +774,12 @@ func NewIrisApp(
 			Added: []string{tibcmttypes.StoreKey, mttypes.StoreKey},
 		},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			for moduleName, m := range app.mm.Modules {
+				fromVM[moduleName] = m.ConsensusVersion()
+			}
+			fromVM[farmtypes.ModuleName] = 1
+			fromVM[coinswaptypes.ModuleName] = 2
+
 			if err := migratetibc.CreateClient(ctx,
 				app.appCodec,
 				"v1.3",
