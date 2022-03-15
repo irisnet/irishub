@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 1.3.0
+
+*November 03th, 2021*
+
+### Application
+
+
+
+* [\#2735](https://github.com/irisnet/irishub/pull/2735) Bump up irismod
+* [\#2734](https://github.com/irisnet/irishub/pull/2734) Bump up TIBC-Go
+* [TIBC-Go \#247](https://github.com/bianjieai/tibc-go/pull/103) Implement mt transfer
+* [irismod \#247](https://github.com/irisnet/irismod/pull/247) Add farm proposal
+* [irismod \#249](https://github.com/irisnet/irismod/pull/249) Add liquidity pool creation fee
+* [irismod \#245](https://github.com/irisnet/irismod/pull/245) Improve NFT module
+* [irismod \#269](https://github.com/irisnet/irismod/pull/269) Feature: MT Module
+
 ## 1.2.0
 
 *November 03th, 2021*
