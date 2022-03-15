@@ -4,11 +4,9 @@
 
 ## 1.3.0
 
-*November 03th, 2021*
+*March 19, 2022*
 
 ### Application
-
-
 
 * [\#2735](https://github.com/irisnet/irishub/pull/2735) Bump up irismod
 * [\#2734](https://github.com/irisnet/irishub/pull/2734) Bump up TIBC-Go
