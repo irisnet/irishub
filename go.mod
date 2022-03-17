@@ -3,7 +3,7 @@ module github.com/irisnet/irishub
 go 1.17
 
 require (
-	github.com/bianjieai/tibc-go v0.2.1-0.20220310101517-8c0de7d17085
+	github.com/bianjieai/tibc-go v0.3.0-rc0.0.20220317060554-3b5f49c1625e
 	github.com/cosmos/cosmos-sdk v0.44.2
 	github.com/cosmos/ibc-go v1.1.0
 	github.com/gogo/protobuf v1.3.3
