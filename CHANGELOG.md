@@ -10,7 +10,7 @@
 
 * [\#2735](https://github.com/irisnet/irishub/pull/2735) Bump up irismod
 * [\#2734](https://github.com/irisnet/irishub/pull/2734) Bump up TIBC-Go
-* [TIBC-Go \#247](https://github.com/bianjieai/tibc-go/pull/103) Implement MT (Multi Token) to transfer money through TIBC protocol
+* [TIBC-Go \#247](https://github.com/bianjieai/tibc-go/pull/103) Support cross chain MT transfer via TIBC
 * [irismod \#247](https://github.com/irisnet/irismod/pull/247) Added the Farm Proposal function, allowing users to submit on-chain proposals to apply for a specified amount of IRIS in IRISnet’s community pool as farming rewards.
 * [irismod \#249](https://github.com/irisnet/irismod/pull/249) An added gas fee of 5,000 IRIS, with a tax rate of 40%, for the creation of new liquidity pools.
 * [irismod \#245](https://github.com/irisnet/irismod/pull/245) Compatibilized & expanded the functions of the NFT module to match ERC-721 spec, and to support application requirements in a more flexible manner.
