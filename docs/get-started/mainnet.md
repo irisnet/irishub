@@ -33,7 +33,9 @@ Next, your node will process all chain upgrades. Between each upgrade, you must 
 | Proposal | Start height | Upgrade height | irishub version |
 | -------- | ------------ | -------------- | ----- |
 | genesis  |  9146456     |  9593205  | [v1.0.1](https://github.com/irisnet/irishub/releases/tag/v1.0.1) |
-| [#1](https://irishub.iobscan.io/#/ProposalsDetail/1)  |  9593206     |    | [v1.1.0](https://github.com/irisnet/irishub/releases/tag/v1.1.0),[v1.1.1](https://github.com/irisnet/irishub/releases/tag/v1.1.1)|
+| [#1](https://irishub.iobscan.io/#/ProposalsDetail/1)  |  9593206     |    | [v1.1.0](https://github.com/irisnet/irishub/releases/tag/v1.1.0), [v1.1.1](https://github.com/irisnet/irishub/releases/tag/v1.1.1)|
+| [#8](https://irishub.iobscan.io/#/ProposalsDetail/8)  |  12393048     | 12534300 | [v1.2.0](https://github.com/irisnet/irishub/releases/tag/v1.2.0), [v1.2.1](https://github.com/irisnet/irishub/releases/tag/v1.2.1) |
+| [#11](https://irishub.iobscan.io/#/ProposalsDetail/11)  |  14166918     |  14301916  | [v1.3.0](https://github.com/irisnet/irishub/releases/tag/v1.3.0) |
 
 :::tip
 You may see some connection errors, it does not matter, the P2P network is trying to find available connections
