@@ -38,7 +38,7 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }} 
           asset_path: build/iris-linux-amd64-${{ github.ref_name }}.tar.gz
-          asset_name: iris-linux-amd64.tar-${{ github.ref_name }}.gz
+          asset_name: iris-linux-amd64-${{ github.ref_name }}.tar.gz
           asset_content_type: application/gzip
       - name: Upload Linux ARM64 Release Asset
         id: upload-linux-arm64 
