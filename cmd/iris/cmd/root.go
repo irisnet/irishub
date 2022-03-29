@@ -105,8 +105,14 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	)
 }
 
+// startWithReplayLastBlockFlags implements servertypes.ModuleInitFlags interface.
+func startWithReplayLastBlockFlags(startCmd *cobra.Command) {
+	startCmd.Flags().Bool(app.FlagReplayLastBlock, false, "Replay the last block")
+}
+
 func addModuleInitFlags(rootCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(rootCmd)
+	startWithReplayLastBlockFlags(rootCmd)
 }
 
 func queryCommand() *cobra.Command {
