@@ -81,7 +81,6 @@ import (
 	sdkupgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	ica "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts"
-	icacontrollertypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller/types"
 	icahost "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host"
 	icahostkeeper "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/keeper"
 	icahosttypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
@@ -134,9 +133,6 @@ import (
 	"github.com/irisnet/irishub/address"
 	irisappparams "github.com/irisnet/irishub/app/params"
 	"github.com/irisnet/irishub/lite"
-	migratehtlc "github.com/irisnet/irishub/migrate/htlc"
-	migrateservice "github.com/irisnet/irishub/migrate/service"
-	migratetibc "github.com/irisnet/irishub/migrate/tibc"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
@@ -914,112 +910,8 @@ func NewIrisApp(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-	// Set software upgrade execution logic
-	app.RegisterUpgradePlan(
-		"v1.1", &store.StoreUpgrades{},
-		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			// migrate htlc
-			if err := migratehtlc.Migrate(ctx, appCodec, app.htlcKeeper, app.bankKeeper, keys[htlctypes.StoreKey]); err != nil {
-				panic(err)
-			}
-			// migrate service
-			if err := migrateservice.Migrate(ctx, app.serviceKeeper, app.bankKeeper); err != nil {
-				panic(err)
-			}
-
-			return fromVM, nil
-		},
-	)
-	app.RegisterUpgradePlan(
-		"v1.2", &store.StoreUpgrades{
-			Added: []string{farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey},
-		},
-		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			// init farm params
-			amount := sdk.NewIntWithDecimal(1000, int(nativeToken.Scale))
-			farmtypes.SetDefaultGenesisState(farmtypes.GenesisState{
-				Params: farmtypes.Params{
-					PoolCreationFee:     sdk.NewCoin(nativeToken.MinUnit, amount),
-					MaxRewardCategories: 2,
-				}},
-			)
-			tibcclienttypes.SetDefaultGenesisState(tibcclienttypes.GenesisState{
-				NativeChainName: "irishub-mainnet",
-			})
-
-			if err := migratetibc.CreateClient(ctx,
-				app.appCodec,
-				"v1.2",
-				app.tibcKeeper.ClientKeeper,
-			); err != nil {
-				return nil, err
-			}
-			fromVM[authtypes.ModuleName] = 1
-			fromVM[banktypes.ModuleName] = 1
-			fromVM[stakingtypes.ModuleName] = 1
-			fromVM[govtypes.ModuleName] = 1
-			fromVM[distrtypes.ModuleName] = 1
-			fromVM[slashingtypes.ModuleName] = 1
-			fromVM[coinswaptypes.ModuleName] = 1
-			fromVM[ibchost.ModuleName] = 1
-			fromVM[capabilitytypes.ModuleName] = capability.AppModule{}.ConsensusVersion()
-			fromVM[genutiltypes.ModuleName] = genutil.AppModule{}.ConsensusVersion()
-			fromVM[minttypes.ModuleName] = mint.AppModule{}.ConsensusVersion()
-			fromVM[paramstypes.ModuleName] = params.AppModule{}.ConsensusVersion()
-			fromVM[crisistypes.ModuleName] = crisis.AppModule{}.ConsensusVersion()
-			fromVM[upgradetypes.ModuleName] = crisis.AppModule{}.ConsensusVersion()
-			fromVM[evidencetypes.ModuleName] = evidence.AppModule{}.ConsensusVersion()
-			fromVM[feegrant.ModuleName] = feegrantmodule.AppModule{}.ConsensusVersion()
-			fromVM[guardiantypes.ModuleName] = guardian.AppModule{}.ConsensusVersion()
-			fromVM[tokentypes.ModuleName] = token.AppModule{}.ConsensusVersion()
-			fromVM[recordtypes.ModuleName] = record.AppModule{}.ConsensusVersion()
-			fromVM[nfttypes.ModuleName] = nft.AppModule{}.ConsensusVersion()
-			fromVM[htlctypes.ModuleName] = htlc.AppModule{}.ConsensusVersion()
-			fromVM[servicetypes.ModuleName] = service.AppModule{}.ConsensusVersion()
-			fromVM[oracletypes.ModuleName] = oracle.AppModule{}.ConsensusVersion()
-			fromVM[randomtypes.ModuleName] = random.AppModule{}.ConsensusVersion()
-			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
-		},
-	)
-
-	app.RegisterUpgradePlan("v1.3",
-		&store.StoreUpgrades{
-			Added: []string{tibcmttypes.StoreKey, mttypes.StoreKey},
-		},
-		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			if err := migratetibc.CreateClient(ctx,
-				app.appCodec,
-				"v1.3",
-				app.tibcKeeper.ClientKeeper,
-			); err != nil {
-				return nil, err
-			}
-			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
-		},
-	)
-
-	app.RegisterUpgradePlan("v1.4",
-		&store.StoreUpgrades{
-			Added: []string{icahosttypes.StoreKey, authzkeeper.StoreKey, routertypes.ModuleName},
-		},
-		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			fromVM[icatypes.ModuleName] = icaModule.ConsensusVersion()
-			// create ICS27 Controller submodule params
-			controllerParams := icacontrollertypes.Params{}
-			// create ICS27 Host submodule params
-			hostParams := icahosttypes.Params{
-				HostEnabled:   true,
-				AllowMessages: allowMessages,
-			}
-
-			ctx.Logger().Info("start to init interchainaccount module...")
-			// initialize ICS27 module
-			icaModule.InitModule(ctx, controllerParams, hostParams)
-			ctx.Logger().Info("start to run module migrations...")
-
-			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
-		},
-	)
+	// register upgrade plan
+	app.RegisterUpgradePlans()
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
