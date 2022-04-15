@@ -36,7 +36,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
-	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
 
@@ -291,6 +290,8 @@ type IrisApp struct {
 	scopedTransferKeeper capabilitykeeper.ScopedKeeper
 	scopedIBCMockKeeper  capabilitykeeper.ScopedKeeper
 	scopedICAHostKeeper  capabilitykeeper.ScopedKeeper
+	scopedICAMockKeeper  capabilitykeeper.ScopedKeeper
+
 	// tibc
 	scopedTIBCKeeper     capabilitykeeper.ScopedKeeper
 	scopedTIBCMockKeeper capabilitykeeper.ScopedKeeper
@@ -395,7 +396,8 @@ func NewIrisApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey, recordtypes.StoreKey,
 		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
-		farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey, tibcmttypes.StoreKey, mttypes.StoreKey, authzkeeper.StoreKey, routertypes.StoreKey, icahosttypes.StoreKey,
+		farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey, tibcmttypes.StoreKey,
+		mttypes.StoreKey, authzkeeper.StoreKey, routertypes.StoreKey, icahosttypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -417,10 +419,13 @@ func NewIrisApp(
 	bApp.SetParamStore(app.paramsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramskeeper.ConsensusParamsKeyTable()))
 
 	// add capability keeper and ScopeToModule for ibc module
+	// IBC scoped keeper
 	app.capabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 	scopedIBCKeeper := app.capabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.capabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedICAHostKeeper := app.capabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
+
+	// TIBC scoped keeper
 	scopedTIBCKeeper := app.capabilityKeeper.ScopeToModule(tibchost.ModuleName)
 
 	app.accountKeeper = authkeeper.NewAccountKeeper(
@@ -536,6 +541,7 @@ func NewIrisApp(
 		scopedICAHostKeeper,
 		app.MsgServiceRouter(),
 	)
+
 	icaModule := ica.NewAppModule(nil, &app.icaHostKeeper)
 	icaHostIBCModule := icahost.NewIBCModule(app.icaHostKeeper)
 
@@ -576,8 +582,8 @@ func NewIrisApp(
 	app.mtKeeper = mtkeeper.NewKeeper(appCodec, keys[mttypes.StoreKey])
 	app.mtTransferKeeper = tibcmttransferkeeper.NewKeeper(
 		appCodec,
-		keys[tibcnfttypes.StoreKey],
-		app.GetSubspace(tibcnfttypes.ModuleName),
+		keys[tibcmttypes.StoreKey],
+		app.GetSubspace(tibcmttypes.ModuleName),
 		app.accountKeeper,
 		app.mtKeeper,
 		app.tibcKeeper.PacketKeeper,
@@ -740,60 +746,31 @@ func NewIrisApp(
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
 		// upgrades should be run first
-		upgradetypes.ModuleName,
-		capabilitytypes.ModuleName,
-		crisistypes.ModuleName,
-		govtypes.ModuleName,
-		stakingtypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		ibchost.ModuleName,
-		icatypes.ModuleName,
-		routertypes.ModuleName,
-		authtypes.ModuleName,
-		banktypes.ModuleName,
-		distrtypes.ModuleName,
-		slashingtypes.ModuleName,
-		minttypes.ModuleName,
-		genutiltypes.ModuleName,
-		evidencetypes.ModuleName,
-		authz.ModuleName,
-		feegrant.ModuleName,
-		paramstypes.ModuleName,
-		vestingtypes.ModuleName,
-
-		servicetypes.ModuleName,
-		tibchost.ModuleName,
-		htlctypes.ModuleName,
-		randomtypes.ModuleName,
-		farmtypes.ModuleName,
+		upgradetypes.ModuleName, capabilitytypes.ModuleName,
+		authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
+		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
+		feegrant.ModuleName, ibchost.ModuleName, ibctransfertypes.ModuleName,
+		genutiltypes.ModuleName, evidencetypes.ModuleName, paramstypes.ModuleName,
+		vestingtypes.ModuleName, guardiantypes.ModuleName, tokentypes.ModuleName,
+		nfttypes.ModuleName, mttypes.ModuleName,
+		htlctypes.ModuleName, recordtypes.ModuleName, coinswaptypes.ModuleName, servicetypes.ModuleName,
+		oracletypes.ModuleName, randomtypes.ModuleName, farmtypes.ModuleName,
+		tibchost.ModuleName, tibcnfttypes.ModuleName, tibcmttypes.ModuleName,
+		routertypes.ModuleName, icatypes.ModuleName,
 	)
+	//record token nft MT oracle mt coinswap NFT guardian
 	app.mm.SetOrderEndBlockers(
-		crisistypes.ModuleName,
-		govtypes.ModuleName,
-		stakingtypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		ibchost.ModuleName,
-		icatypes.ModuleName,
-		routertypes.ModuleName,
-		feegrant.ModuleName,
-		authz.ModuleName,
-		capabilitytypes.ModuleName,
-		authtypes.ModuleName,
-		banktypes.ModuleName,
-		distrtypes.ModuleName,
-		slashingtypes.ModuleName,
-		minttypes.ModuleName,
-		genutiltypes.ModuleName,
-		evidencetypes.ModuleName,
-		paramstypes.ModuleName,
-		upgradetypes.ModuleName,
-		vestingtypes.ModuleName,
-
-		servicetypes.ModuleName,
-		tibchost.ModuleName,
-		htlctypes.ModuleName,
-		randomtypes.ModuleName,
-		farmtypes.ModuleName,
+		upgradetypes.ModuleName, capabilitytypes.ModuleName,
+		authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
+		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
+		feegrant.ModuleName, ibchost.ModuleName, ibctransfertypes.ModuleName,
+		genutiltypes.ModuleName, evidencetypes.ModuleName, paramstypes.ModuleName,
+		vestingtypes.ModuleName, guardiantypes.ModuleName, tokentypes.ModuleName,
+		nfttypes.ModuleName, mttypes.ModuleName,
+		htlctypes.ModuleName, recordtypes.ModuleName, coinswaptypes.ModuleName, servicetypes.ModuleName,
+		oracletypes.ModuleName, randomtypes.ModuleName, farmtypes.ModuleName,
+		tibchost.ModuleName, tibcnfttypes.ModuleName, tibcmttypes.ModuleName,
+		routertypes.ModuleName, icatypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -802,39 +779,17 @@ func NewIrisApp(
 	// so that other modules that want to create or claim capabilities afterwards in InitChain
 	// can do so safely.
 	app.mm.SetOrderInitGenesis(
-		capabilitytypes.ModuleName,
-		banktypes.ModuleName,
-		distrtypes.ModuleName,
-		stakingtypes.ModuleName,
-		slashingtypes.ModuleName,
-		govtypes.ModuleName,
-		minttypes.ModuleName,
-		crisistypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		ibchost.ModuleName,
-		icatypes.ModuleName,
-		evidencetypes.ModuleName,
-		feegrant.ModuleName,
-		authz.ModuleName,
-		authtypes.ModuleName,
-		genutiltypes.ModuleName,
-		routertypes.ModuleName,
-		paramstypes.ModuleName,
-		upgradetypes.ModuleName,
-		vestingtypes.ModuleName,
-
-		tibchost.ModuleName,
-		guardiantypes.ModuleName,
-		tokentypes.ModuleName,
-		nfttypes.ModuleName,
-		htlctypes.ModuleName,
-		recordtypes.ModuleName,
-		coinswaptypes.ModuleName,
-		servicetypes.ModuleName,
-		oracletypes.ModuleName,
-		randomtypes.ModuleName,
-		farmtypes.ModuleName,
-		mttypes.ModuleName,
+		upgradetypes.ModuleName, capabilitytypes.ModuleName,
+		authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
+		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
+		feegrant.ModuleName, ibchost.ModuleName, ibctransfertypes.ModuleName,
+		genutiltypes.ModuleName, evidencetypes.ModuleName, paramstypes.ModuleName,
+		vestingtypes.ModuleName, guardiantypes.ModuleName, tokentypes.ModuleName,
+		nfttypes.ModuleName, mttypes.ModuleName,
+		htlctypes.ModuleName, recordtypes.ModuleName, coinswaptypes.ModuleName, servicetypes.ModuleName,
+		oracletypes.ModuleName, randomtypes.ModuleName, farmtypes.ModuleName,
+		tibchost.ModuleName, tibcnfttypes.ModuleName, tibcmttypes.ModuleName,
+		routertypes.ModuleName, icatypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)

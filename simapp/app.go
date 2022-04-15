@@ -6,6 +6,36 @@ import (
 	"os"
 	"path/filepath"
 
+	icacontrollertypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller/types"
+
+	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
+	ibcclientclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/client"
+	"github.com/irisnet/irismod/modules/mt"
+
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
+
+	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
+
+	tibcmttransferkeeper "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/keeper"
+	mtkeeper "github.com/irisnet/irismod/modules/mt/keeper"
+
+	icahost "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host"
+	icahosttypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
+	"github.com/strangelove-ventures/packet-forward-middleware/v2/router"
+	routerkeeper "github.com/strangelove-ventures/packet-forward-middleware/v2/router/keeper"
+
+	icahostkeeper "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/keeper"
+
+	ica "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts"
+
+	icatypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/types"
+	routertypes "github.com/strangelove-ventures/packet-forward-middleware/v2/router/types"
+
+	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
+
+	tibcmttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/types"
+	mttypes "github.com/irisnet/irismod/modules/mt/types"
+
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
@@ -77,6 +107,8 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	icacontroller "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller"
+	icacontrollerkeeper "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller/keeper"
 	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
@@ -152,7 +184,6 @@ var (
 		capability.AppModuleBasic{},
 		staking.AppModuleBasic{},
 		mint.AppModuleBasic{},
-		feegrantmodule.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
 			paramsclient.ProposalHandler,
@@ -163,20 +194,28 @@ var (
 			tibcclient.UpgradeClientProposalHandler,
 			tibcclient.RegisterRelayerProposalHandler,
 			tibcrouting.SetRoutingRulesProposalHandler,
+			ibcclientclient.UpdateClientProposalHandler,
+			ibcclientclient.UpgradeProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
+		authzmodule.AppModuleBasic{},
 		ibc.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		router.AppModuleBasic{},
+		feegrantmodule.AppModuleBasic{},
+		router.AppModuleBasic{},
+		ica.AppModuleBasic{},
 
 		guardian.AppModuleBasic{},
 		token.AppModuleBasic{},
 		record.AppModuleBasic{},
 		nft.AppModuleBasic{},
+		mt.AppModuleBasic{},
 		htlc.AppModuleBasic{},
 		coinswap.AppModuleBasic{},
 		service.AppModuleBasic{},
@@ -185,6 +224,7 @@ var (
 		farm.AppModuleBasic{},
 		tibc.AppModuleBasic{},
 		tibcnfttransfer.AppModuleBasic{},
+		tibcmttransfer.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -195,17 +235,21 @@ var (
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		tokentypes.ModuleName:          {authtypes.Minter, authtypes.Burner},
-		htlctypes.ModuleName:           {authtypes.Minter, authtypes.Burner},
-		coinswaptypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
-		servicetypes.DepositAccName:    {authtypes.Burner},
-		servicetypes.RequestAccName:    nil,
-		servicetypes.FeeCollectorName:  {authtypes.Burner},
-		tibcnfttypes.ModuleName:        nil,
-		farmtypes.ModuleName:           {authtypes.Burner},
-		farmtypes.RewardCollector:      nil,
-		farmtypes.EscrowCollector:      nil,
+
+		ibctransfertypes.ModuleName: {authtypes.Minter, authtypes.Burner},
+		icatypes.ModuleName:         nil,
+
+		tokentypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
+		htlctypes.ModuleName:          {authtypes.Minter, authtypes.Burner},
+		coinswaptypes.ModuleName:      {authtypes.Minter, authtypes.Burner},
+		servicetypes.DepositAccName:   {authtypes.Burner},
+		servicetypes.RequestAccName:   nil,
+		servicetypes.FeeCollectorName: {authtypes.Burner},
+		tibcnfttypes.ModuleName:       nil,
+		farmtypes.ModuleName:          {authtypes.Burner},
+		farmtypes.RewardCollector:     nil,
+		farmtypes.EscrowCollector:     nil,
+		tibcmttypes.ModuleName:        nil,
 	}
 )
 
@@ -231,31 +275,39 @@ type SimApp struct {
 	memKeys map[string]*sdk.MemoryStoreKey
 
 	// keepers
-	FeeGrantKeeper   feegrantkeeper.Keeper
-	AccountKeeper    authkeeper.AccountKeeper
-	BankKeeper       bankkeeper.Keeper
-	CapabilityKeeper *capabilitykeeper.Keeper
-	StakingKeeper    stakingkeeper.Keeper
-	SlashingKeeper   slashingkeeper.Keeper
-	MintKeeper       mintkeeper.Keeper
-	DistrKeeper      distrkeeper.Keeper
-	GovKeeper        govkeeper.Keeper
-	CrisisKeeper     crisiskeeper.Keeper
-	UpgradeKeeper    upgradekeeper.Keeper
-	ParamsKeeper     paramskeeper.Keeper
-	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	EvidenceKeeper   evidencekeeper.Keeper
-	TransferKeeper   ibctransferkeeper.Keeper
+	FeeGrantKeeper      feegrantkeeper.Keeper
+	AccountKeeper       authkeeper.AccountKeeper
+	BankKeeper          bankkeeper.Keeper
+	CapabilityKeeper    *capabilitykeeper.Keeper
+	StakingKeeper       stakingkeeper.Keeper
+	SlashingKeeper      slashingkeeper.Keeper
+	MintKeeper          mintkeeper.Keeper
+	DistrKeeper         distrkeeper.Keeper
+	GovKeeper           govkeeper.Keeper
+	CrisisKeeper        crisiskeeper.Keeper
+	UpgradeKeeper       upgradekeeper.Keeper
+	ParamsKeeper        paramskeeper.Keeper
+	ICAHostKeeper       icahostkeeper.Keeper
+	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	EvidenceKeeper      evidencekeeper.Keeper
+	TransferKeeper      ibctransferkeeper.Keeper
+	AuthzKeeper         authzkeeper.Keeper
+	RouterKeeper        routerkeeper.Keeper
+	ICAControllerKeeper icacontrollerkeeper.Keeper
 
 	// make scoped keepers public for test purposes
-	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
-	ScopedIBCMockKeeper  capabilitykeeper.ScopedKeeper
+	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
+	ScopedTransferKeeper      capabilitykeeper.ScopedKeeper
+	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
+	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
+	ScopedIBCMockKeeper       capabilitykeeper.ScopedKeeper
+	ScopedICAMockKeeper       capabilitykeeper.ScopedKeeper
 
 	GuardianKeeper guardiankeeper.Keeper
 	TokenKeeper    tokenkeeper.Keeper
 	RecordKeeper   recordkeeper.Keeper
 	NFTKeeper      nftkeeper.Keeper
+	MtKeeper       mtkeeper.Keeper
 	HTLCKeeper     htlckeeper.Keeper
 	CoinswapKeeper coinswapkeeper.Keeper
 	ServiceKeeper  servicekeeper.Keeper
@@ -265,10 +317,15 @@ type SimApp struct {
 	FarmKeeper        farmkeeper.Keeper
 	TIBCKeeper        *tibckeeper.Keeper // TIBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	NftTransferKeeper tibcnfttransferkeeper.Keeper
+	MtTransferKeeper  tibcmttransferkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedTIBCKeeper     capabilitykeeper.ScopedKeeper
 	ScopedTIBCMockKeeper capabilitykeeper.ScopedKeeper
+
+	// make IBC modules public for test purposes
+	// these modules are never directly routed to by the IBC Router
+	ICAAuthModule ibcmock.IBCModule
 
 	// the module manager
 	mm *module.Manager
@@ -305,12 +362,14 @@ func NewSimApp(
 
 	keys := sdk.NewKVStoreKeys(
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
-		minttypes.StoreKey, feegrant.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
+		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey, recordtypes.StoreKey,
 		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
-		tibchost.StoreKey, tibcnfttypes.StoreKey, farmtypes.StoreKey,
+		farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey, tibcmttypes.StoreKey,
+		mttypes.StoreKey, authzkeeper.StoreKey, routertypes.StoreKey, icahosttypes.StoreKey,
+		icacontrollertypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -335,12 +394,14 @@ func NewSimApp(
 	app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
-	// NOTE: the IBC mock keeper and application module is used only for testing core IBC. Do
-	// note replicate if you do not need to test core IBC or light clients.
 	scopedIBCMockKeeper := app.CapabilityKeeper.ScopeToModule(ibcmock.ModuleName)
-
 	scopedTIBCKeeper := app.CapabilityKeeper.ScopeToModule(tibchost.ModuleName)
 	scopedTIBCMockKeeper := app.CapabilityKeeper.ScopeToModule(tibcmock.ModuleName)
+	scopedICAControllerKeeper := app.CapabilityKeeper.ScopeToModule(icacontrollertypes.SubModuleName)
+	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
+	// NOTE: the IBC mock keeper and application module is used only for testing core IBC. Do
+	// note replicate if you do not need to test core IBC or light clients.
+	scopedICAMockKeeper := app.CapabilityKeeper.ScopeToModule(ibcmock.ModuleName + icacontrollertypes.SubModuleName)
 
 	// Create TIBC Keeper
 	app.TIBCKeeper = tibckeeper.NewKeeper(
@@ -349,6 +410,10 @@ func NewSimApp(
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
 	)
+
+	// create authz keeper
+	app.AuthzKeeper = authzkeeper.NewKeeper(keys[authzkeeper.StoreKey], appCodec, app.BaseApp.MsgServiceRouter())
+
 	// add keepers
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec,
 		keys[feegrant.StoreKey],
@@ -395,28 +460,81 @@ func NewSimApp(
 		app.AccountKeeper, nftkeeper.NewLegacyKeeper(app.NFTKeeper),
 		app.TIBCKeeper.PacketKeeper, app.TIBCKeeper.ClientKeeper,
 	)
+	app.MtKeeper = mtkeeper.NewKeeper(appCodec, keys[mttypes.StoreKey])
+	app.MtTransferKeeper = tibcmttransferkeeper.NewKeeper(
+		appCodec,
+		keys[tibcnfttypes.StoreKey],
+		app.GetSubspace(tibcnfttypes.ModuleName),
+		app.AccountKeeper,
+		app.MtKeeper,
+		app.TIBCKeeper.PacketKeeper,
+		app.TIBCKeeper.ClientKeeper,
+	)
+
 	nfttransferModule := tibcnfttransfer.NewAppModule(app.NftTransferKeeper)
+	mttransferModule := tibcmttransfer.NewAppModule(app.MtTransferKeeper)
 
 	tibcmockModule := tibcmock.NewAppModule()
 	tibcRouter := tibcroutingtypes.NewRouter()
 	tibcRouter.AddRoute(tibcnfttypes.ModuleName, nfttransferModule)
+	tibcRouter.AddRoute(tibcmttypes.ModuleName, mttransferModule)
 	tibcRouter.AddRoute(tibcmock.ModuleName, tibcmockModule)
 	app.TIBCKeeper.SetRouter(tibcRouter)
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
+		appCodec,
+		keys[ibctransfertypes.StoreKey],
+		app.GetSubspace(ibctransfertypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		scopedTransferKeeper,
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
+	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
 	// NOTE: the IBC mock keeper and application module is used only for testing core IBC. Do
 	// note replicate if you do not need to test core IBC or light clients.
-	mockModule := ibcmock.NewAppModule(scopedIBCMockKeeper, &app.IBCKeeper.PortKeeper)
+	mockModule := ibcmock.NewAppModule(&app.IBCKeeper.PortKeeper)
+	mockIBCModule := ibcmock.NewIBCModule(&mockModule, ibcmock.NewMockIBCApp(ibcmock.ModuleName, scopedIBCMockKeeper))
 
-	// Create static IBC router, add transfer route, then set and seal it
+	app.ICAHostKeeper = icahostkeeper.NewKeeper(
+		appCodec, keys[icahosttypes.StoreKey], app.GetSubspace(icahosttypes.SubModuleName),
+		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
+		app.AccountKeeper, scopedICAHostKeeper, app.MsgServiceRouter(),
+	)
+	app.ICAControllerKeeper = icacontrollerkeeper.NewKeeper(
+		appCodec, keys[icacontrollertypes.StoreKey], app.GetSubspace(icacontrollertypes.SubModuleName),
+		app.IBCKeeper.ChannelKeeper, // may be replaced with middleware such as ics29 fee
+		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
+		scopedICAControllerKeeper, app.MsgServiceRouter(),
+	)
+
+	// initialize ICA module with mock module as the authentication module on the controller side
+	icaAuthModule := ibcmock.NewIBCModule(&mockModule, ibcmock.NewMockIBCApp("", scopedICAMockKeeper))
+	app.ICAAuthModule = icaAuthModule
+
+	icaModule := ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper)
+	icaControllerIBCModule := icacontroller.NewIBCModule(app.ICAControllerKeeper, icaAuthModule)
+	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
+
+	app.RouterKeeper = routerkeeper.NewKeeper(
+		appCodec,
+		keys[routertypes.StoreKey],
+		app.GetSubspace(routertypes.ModuleName),
+		app.TransferKeeper,
+		app.DistrKeeper,
+	)
+
+	routerModule := router.NewAppModule(app.RouterKeeper, transferIBCModule)
+	// Create static IBC router, add app routes, then set and seal it
 	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
-	ibcRouter.AddRoute(ibcmock.ModuleName, mockModule)
+	ibcRouter.AddRoute(icacontrollertypes.SubModuleName, icaControllerIBCModule).
+		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
+		AddRoute(ibcmock.ModuleName+icacontrollertypes.SubModuleName, icaControllerIBCModule). // ica with mock auth module stack route to ica (top level of middleware stack)
+		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
+		AddRoute(ibcmock.ModuleName, mockIBCModule)
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// create evidence keeper with router
@@ -538,7 +656,12 @@ func NewSimApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
+		icaModule,
+		routerModule,
+
 		nfttransferModule,
+		mttransferModule,
+		mt.NewAppModule(appCodec, app.MtKeeper, app.AccountKeeper, app.BankKeeper),
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
 		token.NewAppModule(appCodec, app.TokenKeeper, app.AccountKeeper, app.BankKeeper),
 		record.NewAppModule(appCodec, app.RecordKeeper, app.AccountKeeper, app.BankKeeper),
@@ -557,13 +680,30 @@ func NewSimApp(
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
-		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName,
-		slashingtypes.ModuleName, evidencetypes.ModuleName, stakingtypes.ModuleName,
-		ibchost.ModuleName, htlctypes.ModuleName, randomtypes.ModuleName, tibchost.ModuleName, farmtypes.ModuleName,
+		upgradetypes.ModuleName, capabilitytypes.ModuleName,
+		authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
+		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
+		feegrant.ModuleName, ibchost.ModuleName, ibctransfertypes.ModuleName,
+		genutiltypes.ModuleName, evidencetypes.ModuleName, paramstypes.ModuleName,
+		vestingtypes.ModuleName, guardiantypes.ModuleName, tokentypes.ModuleName,
+		nfttypes.ModuleName, mttypes.ModuleName,
+		htlctypes.ModuleName, recordtypes.ModuleName, coinswaptypes.ModuleName, servicetypes.ModuleName,
+		oracletypes.ModuleName, randomtypes.ModuleName, farmtypes.ModuleName,
+		tibchost.ModuleName, tibcnfttypes.ModuleName, tibcmttypes.ModuleName,
+		routertypes.ModuleName, icatypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
-		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
-		servicetypes.ModuleName, tibchost.ModuleName, farmtypes.ModuleName,
+		upgradetypes.ModuleName, capabilitytypes.ModuleName,
+		authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
+		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
+		feegrant.ModuleName, ibchost.ModuleName, ibctransfertypes.ModuleName,
+		genutiltypes.ModuleName, evidencetypes.ModuleName, paramstypes.ModuleName,
+		vestingtypes.ModuleName, guardiantypes.ModuleName, tokentypes.ModuleName,
+		nfttypes.ModuleName, mttypes.ModuleName,
+		htlctypes.ModuleName, recordtypes.ModuleName, coinswaptypes.ModuleName, servicetypes.ModuleName,
+		oracletypes.ModuleName, randomtypes.ModuleName, farmtypes.ModuleName,
+		tibchost.ModuleName, tibcnfttypes.ModuleName, tibcmttypes.ModuleName,
+		routertypes.ModuleName, icatypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -572,11 +712,17 @@ func NewSimApp(
 	// so that other modules that want to create or claim capabilities afterwards in InitChain
 	// can do so safely.
 	app.mm.SetOrderInitGenesis(
-		capabilitytypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
-		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName, feegrant.ModuleName,
-		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
-		guardiantypes.ModuleName, tokentypes.ModuleName, nfttypes.ModuleName, htlctypes.ModuleName, recordtypes.ModuleName,
-		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName, tibchost.ModuleName, farmtypes.ModuleName,
+		upgradetypes.ModuleName, capabilitytypes.ModuleName,
+		authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
+		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
+		feegrant.ModuleName, ibchost.ModuleName, ibctransfertypes.ModuleName,
+		genutiltypes.ModuleName, evidencetypes.ModuleName, paramstypes.ModuleName,
+		vestingtypes.ModuleName, guardiantypes.ModuleName, tokentypes.ModuleName,
+		nfttypes.ModuleName, mttypes.ModuleName,
+		htlctypes.ModuleName, recordtypes.ModuleName, coinswaptypes.ModuleName, servicetypes.ModuleName,
+		oracletypes.ModuleName, randomtypes.ModuleName, farmtypes.ModuleName,
+		tibchost.ModuleName, tibcnfttypes.ModuleName, tibcmttypes.ModuleName,
+		routertypes.ModuleName, icatypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -597,6 +743,7 @@ func NewSimApp(
 		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
 		mint.NewAppModule(appCodec, app.MintKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
+		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
@@ -605,6 +752,7 @@ func NewSimApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		nfttransferModule,
+		mttransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
 		token.NewAppModule(appCodec, app.TokenKeeper, app.AccountKeeper, app.BankKeeper),
 		record.NewAppModule(appCodec, app.RecordKeeper, app.AccountKeeper, app.BankKeeper),
@@ -842,12 +990,16 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
+	paramsKeeper.Subspace(ibchost.ModuleName)
+	paramsKeeper.Subspace(routertypes.ModuleName).WithKeyTable(routertypes.ParamKeyTable())
+	paramsKeeper.Subspace(icahosttypes.SubModuleName)
+	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
+
 	paramsKeeper.Subspace(tokentypes.ModuleName)
 	paramsKeeper.Subspace(recordtypes.ModuleName)
 	paramsKeeper.Subspace(htlctypes.ModuleName)
 	paramsKeeper.Subspace(coinswaptypes.ModuleName)
 	paramsKeeper.Subspace(servicetypes.ModuleName)
-	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(farmtypes.ModuleName)
 	paramsKeeper.Subspace(tibchost.ModuleName)
 

@@ -59,7 +59,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=iris \
 ifeq ($(WITH_CLEVELDB),yes)
   ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=cleveldb
 endif
-ldflags += $(LDFLAGS)
+#ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
@@ -140,7 +140,7 @@ proto-swagger-gen:
 ### Testing
 
 
-test: test-unit test-build
+test: test-unit
 test-all: test-race test-cover
 
 test-unit:
