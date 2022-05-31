@@ -785,6 +785,13 @@ func NewIrisApp(
 		},
 	)
 
+	app.RegisterUpgradePlan("v1.4",
+		&store.StoreUpgrades{},
+		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVm module.VersionMap) (module.VersionMap, error) {
+			return app.mm.RunMigrations(ctx, cfg, fromVm)
+		},
+	)
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
