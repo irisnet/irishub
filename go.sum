@@ -197,8 +197,8 @@ github.com/bgentry/speakeasy v0.1.0 h1:ByYyxL9InA1OWqxJqqp2A5pYHUrCiAL6K3J+LKSsQ
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
 github.com/bianjieai/ibc-go/v3 v3.0.0-alpha1.0.20220610020018-f9dd1361aeaa h1:v+17aQSNYfOmswvs4QuBjtLF+JfH7PqhklS63+qTSmI=
 github.com/bianjieai/ibc-go/v3 v3.0.0-alpha1.0.20220610020018-f9dd1361aeaa/go.mod h1:xsWQXKbydQ0px9z1tuOhHVKLohTUbRd1G+S0sjKdnX8=
-github.com/bianjieai/tendermint v0.33.1-dev0.0.20220621062719-53e548e96ed3 h1:y/KU/Ddl2TX7SL6KMONLcVAewHeWTOlF/TYroeMwgDA=
-github.com/bianjieai/tendermint v0.33.1-dev0.0.20220621062719-53e548e96ed3/go.mod h1:ShMMLameSJzmB9AYN6ek8+KVtRjkUJQmlHQRnRFRAg8=
+github.com/bianjieai/tendermint v0.33.1-dev0.0.20220621101751-17d06357e822 h1:Lq/7M++PQZE7fZnP1ICU6TdokLlpNRahIPY50IfbzSI=
+github.com/bianjieai/tendermint v0.33.1-dev0.0.20220621101751-17d06357e822/go.mod h1:ShMMLameSJzmB9AYN6ek8+KVtRjkUJQmlHQRnRFRAg8=
 github.com/bianjieai/tibc-go v0.3.1-0.20220621053716-6a7a08d1d646 h1:/OfMhd5kElnHAXfJo7U2NB/hXDU2RctQvktuPFGJ4aw=
 github.com/bianjieai/tibc-go v0.3.1-0.20220621053716-6a7a08d1d646/go.mod h1:DnCsAMr2wC5ZLbTxd/Nn39WZHm6+FczO+TytGxBkWgY=
 github.com/bits-and-blooms/bitset v1.2.0/go.mod h1:gIdJ4wp64HaoK2YrL1Q5/N7Y16edYb8uY+O0FJTyyDA=

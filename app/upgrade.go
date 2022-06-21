@@ -65,11 +65,11 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 		"v1.1", &store.StoreUpgrades{},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			// migrate htlc
-			if err := migratehtlc.Migrate(ctx, app.appCodec, app.htlcKeeper, app.bankKeeper, app.keys[htlctypes.StoreKey]); err != nil {
+			if err := migratehtlc.Migrate(ctx, app.appCodec, app.HTLCKeeper, app.BankKeeper, app.keys[htlctypes.StoreKey]); err != nil {
 				panic(err)
 			}
 			// migrate service
-			if err := migrateservice.Migrate(ctx, app.serviceKeeper, app.bankKeeper); err != nil {
+			if err := migrateservice.Migrate(ctx, app.ServiceKeeper, app.BankKeeper); err != nil {
 				panic(err)
 			}
 
@@ -96,7 +96,7 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 			if err := migratetibc.CreateClient(ctx,
 				app.appCodec,
 				"v1.2",
-				app.tibcKeeper.ClientKeeper,
+				app.TIBCKeeper.ClientKeeper,
 			); err != nil {
 				return nil, err
 			}
@@ -136,7 +136,7 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 			if err := migratetibc.CreateClient(ctx,
 				app.appCodec,
 				"v1.3",
-				app.tibcKeeper.ClientKeeper,
+				app.TIBCKeeper.ClientKeeper,
 			); err != nil {
 				return nil, err
 			}

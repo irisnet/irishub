@@ -3,6 +3,7 @@ module github.com/irisnet/irishub
 go 1.18
 
 require (
+	cosmossdk.io/math v1.0.0-beta.2
 	github.com/bianjieai/tibc-go v0.3.1-0.20220621053716-6a7a08d1d646
 	github.com/cosmos/cosmos-sdk v0.46.0-rc1
 	github.com/cosmos/ibc-go/v3 v3.0.0-alpha1.0.20220607104611-5f1c30745558
@@ -35,7 +36,6 @@ require (
 	cloud.google.com/go/storage v1.14.0 // indirect
 	cosmossdk.io/api v0.1.0-alpha8 // indirect
 	cosmossdk.io/errors v1.0.0-beta.6 // indirect
-	cosmossdk.io/math v1.0.0-beta.2 // indirect
 	filippo.io/edwards25519 v1.0.0-rc.1 // indirect
 	github.com/99designs/keyring v1.1.6 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
@@ -177,6 +177,6 @@ require (
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
-replace github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.33.1-dev0.0.20220621062719-53e548e96ed3
+replace github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.33.1-dev0.0.20220621101751-17d06357e822
 
 replace github.com/cosmos/ibc-go/v3 => github.com/bianjieai/ibc-go/v3 v3.0.0-alpha1.0.20220610020018-f9dd1361aeaa
