@@ -16,7 +16,7 @@ import (
 )
 
 func TestBeginBlocker(t *testing.T) {
-	app, ctx := createTestApp(true)
+	app, ctx := createTestApp(t, true)
 
 	mint.BeginBlocker(ctx, app.MintKeeper)
 	minter := app.MintKeeper.GetMinter(ctx)
@@ -29,8 +29,8 @@ func TestBeginBlocker(t *testing.T) {
 }
 
 // returns context and an app with updated mint keeper
-func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context) {
-	app := simapp.Setup(isCheckTx)
+func createTestApp(t *testing.T, isCheckTx bool) (*simapp.SimApp, sdk.Context) {
+	app := simapp.Setup(t, false)
 
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: 2})
 	app.MintKeeper.SetParamSet(ctx, types.NewParams(
