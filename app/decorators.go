@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
+	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
@@ -38,11 +38,11 @@ func (vtd ValidateTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulat
 			if _, err := vtd.tk.GetToken(ctx, msg.Symbol); err != nil {
 				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "burnt failed, only native tokens can be burnt")
 			}
-		case *govtypes.MsgSubmitProposal:
+		case *govv1.MsgSubmitProposal:
 			if containSwapCoin(msg.InitialDeposit...) {
 				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
 			}
-		case *govtypes.MsgDeposit:
+		case *govv1.MsgDeposit:
 			if containSwapCoin(msg.Amount...) {
 				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
 			}

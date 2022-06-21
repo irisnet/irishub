@@ -9,9 +9,8 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v1
-      - name: Run unit tests
-        uses: cedrickring/golang-action/go1.16@1.7.0
-        env:
-          GO111MODULE: "on"
+      - name: Setup go
+        uses: actions/setup-go@v3
         with:
-          args: make test-unit
+          go-version: '^1.18' # The Go version to download (if necessary) and use.
+      - run: make test-unit
