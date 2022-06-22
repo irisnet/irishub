@@ -33,7 +33,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
-	"github.com/cosmos/cosmos-sdk/x/authz"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -734,7 +733,6 @@ func NewSimApp(
 		crisistypes.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
-		//authz.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		ibctransfertypes.ModuleName,
@@ -772,7 +770,6 @@ func NewSimApp(
 		crisistypes.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
-		//authz.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		ibctransfertypes.ModuleName,
@@ -816,7 +813,6 @@ func NewSimApp(
 		crisistypes.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
-		authz.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		ibctransfertypes.ModuleName,
