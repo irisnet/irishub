@@ -179,6 +179,6 @@ replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alp
 
 replace github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.33.1-dev0.0.20220621101751-17d06357e822
 
-replace github.com/cosmos/ibc-go/v3 => github.com/bianjieai/ibc-go/v3 v3.0.0-alpha1.0.20220610020018-f9dd1361aeaa
+replace github.com/cosmos/ibc-go/v3 => github.com/bianjieai/ibc-go/v3 v3.0.0-alpha1.0.20220622105150-9fdd1ca139b5
 
 replace github.com/zondax/hid => github.com/zondax/hid v0.9.0
