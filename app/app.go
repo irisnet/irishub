@@ -79,6 +79,9 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	sdkupgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	nfttransfer "github.com/cosmos/ibc-go/v3/modules/apps/nft-transfer"
+	ibcnfttransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/nft-transfer/keeper"
+	ibcnfttransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/nft-transfer/types"
 	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
@@ -117,6 +120,7 @@ import (
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
 	"github.com/irisnet/irishub/address"
+	irishubante "github.com/irisnet/irishub/ante"
 	irisappparams "github.com/irisnet/irishub/app/params"
 	"github.com/irisnet/irishub/lite"
 	"github.com/irisnet/irishub/modules/guardian"
@@ -204,6 +208,7 @@ var (
 		tibcnfttransfer.AppModuleBasic{},
 		tibcmttransfer.AppModuleBasic{},
 		mt.AppModuleBasic{},
+		nfttransfer.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -254,44 +259,46 @@ type IrisApp struct {
 	memKeys map[string]*storetypes.MemoryStoreKey
 
 	// keepers
-	FeeGrantKeeper   feegrantkeeper.Keeper
-	AccountKeeper    authkeeper.AccountKeeper
-	BankKeeper       bankkeeper.Keeper
-	CapabilityKeeper *capabilitykeeper.Keeper
-	StakingKeeper    stakingkeeper.Keeper
-	SlashingKeeper   slashingkeeper.Keeper
-	MintKeeper       mintkeeper.Keeper
-	DistrKeeper      distrkeeper.Keeper
-	GovKeeper        govkeeper.Keeper
-	CrisisKeeper     crisiskeeper.Keeper
-	UpgradeKeeper    upgradekeeper.Keeper
-	ParamsKeeper     paramskeeper.Keeper
-	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	EvidenceKeeper   evidencekeeper.Keeper
-	TransferKeeper   ibctransferkeeper.Keeper
+	FeeGrantKeeper       feegrantkeeper.Keeper
+	AccountKeeper        authkeeper.AccountKeeper
+	BankKeeper           bankkeeper.Keeper
+	CapabilityKeeper     *capabilitykeeper.Keeper
+	StakingKeeper        stakingkeeper.Keeper
+	SlashingKeeper       slashingkeeper.Keeper
+	MintKeeper           mintkeeper.Keeper
+	DistrKeeper          distrkeeper.Keeper
+	GovKeeper            govkeeper.Keeper
+	CrisisKeeper         crisiskeeper.Keeper
+	UpgradeKeeper        upgradekeeper.Keeper
+	ParamsKeeper         paramskeeper.Keeper
+	IBCKeeper            *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	EvidenceKeeper       evidencekeeper.Keeper
+	IBCTransferKeeper    ibctransferkeeper.Keeper
+	IBCNFTTransferKeeper ibcnfttransferkeeper.Keeper
 
 	// make scoped keepers public for test purposes
-	scopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	scopedTransferKeeper capabilitykeeper.ScopedKeeper
-	scopedIBCMockKeeper  capabilitykeeper.ScopedKeeper
+	scopedIBCKeeper         capabilitykeeper.ScopedKeeper
+	scopedTransferKeeper    capabilitykeeper.ScopedKeeper
+	scopedIBCMockKeeper     capabilitykeeper.ScopedKeeper
+	scopedNFTTransferKeeper capabilitykeeper.ScopedKeeper
 	// tibc
 	scopedTIBCKeeper     capabilitykeeper.ScopedKeeper
 	scopedTIBCMockKeeper capabilitykeeper.ScopedKeeper
 
-	GuardianKeeper    guardiankeeper.Keeper
-	TokenKeeper       tokenkeeper.Keeper
-	RecordKeeper      recordkeeper.Keeper
-	NFTKeeper         nftkeeper.Keeper
-	MTKeeper          mtkeeper.Keeper
-	HTLCKeeper        htlckeeper.Keeper
-	CoinswapKeeper    coinswapkeeper.Keeper
-	ServiceKeeper     servicekeeper.Keeper
-	OracleKeeper      oraclekeeper.Keeper
-	RandomKeeper      randomkeeper.Keeper
-	FarmKeeper        farmkeeper.Keeper
-	TIBCKeeper        *tibckeeper.Keeper
-	NFTTransferKeeper tibcnfttransferkeeper.Keeper
-	MTTransferKeeper  tibcmttransferkeeper.Keeper
+	GuardianKeeper        guardiankeeper.Keeper
+	TokenKeeper           tokenkeeper.Keeper
+	RecordKeeper          recordkeeper.Keeper
+	NFTKeeper             nftkeeper.Keeper
+	MTKeeper              mtkeeper.Keeper
+	HTLCKeeper            htlckeeper.Keeper
+	CoinswapKeeper        coinswapkeeper.Keeper
+	ServiceKeeper         servicekeeper.Keeper
+	OracleKeeper          oraclekeeper.Keeper
+	RandomKeeper          randomkeeper.Keeper
+	FarmKeeper            farmkeeper.Keeper
+	TIBCKeeper            *tibckeeper.Keeper
+	TIBCNFTTransferKeeper tibcnfttransferkeeper.Keeper
+	TIBCMTTransferKeeper  tibcmttransferkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -378,6 +385,7 @@ func NewIrisApp(
 		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey, recordtypes.StoreKey,
 		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
 		farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey, tibcmttypes.StoreKey, mttypes.StoreKey,
+		ibcnfttransfertypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -409,6 +417,7 @@ func NewIrisApp(
 	app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	scopedNFTTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibcnfttransfertypes.ModuleName)
 
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec,
@@ -512,7 +521,7 @@ func NewIrisApp(
 		app.BankKeeper,
 	)
 
-	app.NFTTransferKeeper = tibcnfttransferkeeper.NewKeeper(
+	app.TIBCNFTTransferKeeper = tibcnfttransferkeeper.NewKeeper(
 		appCodec,
 		keys[tibcnfttypes.StoreKey],
 		app.GetSubspace(tibcnfttypes.ModuleName),
@@ -526,7 +535,7 @@ func NewIrisApp(
 		appCodec, keys[mttypes.StoreKey],
 	)
 
-	app.MTTransferKeeper = tibcmttransferkeeper.NewKeeper(
+	app.TIBCMTTransferKeeper = tibcmttransferkeeper.NewKeeper(
 		appCodec,
 		keys[tibcnfttypes.StoreKey],
 		app.GetSubspace(tibcnfttypes.ModuleName),
@@ -535,7 +544,7 @@ func NewIrisApp(
 		app.TIBCKeeper.ClientKeeper,
 	)
 
-	app.TransferKeeper = ibctransferkeeper.NewKeeper(
+	app.IBCTransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec,
 		keys[ibctransfertypes.StoreKey],
 		app.GetSubspace(ibctransfertypes.ModuleName),
@@ -546,17 +555,26 @@ func NewIrisApp(
 		app.BankKeeper,
 		scopedTransferKeeper,
 	)
-	transferModule := transfer.NewAppModule(app.TransferKeeper)
-	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
+	transferModule := transfer.NewAppModule(app.IBCTransferKeeper)
+	transferIBCModule := transfer.NewIBCModule(app.IBCTransferKeeper)
+
+	app.IBCNFTTransferKeeper = ibcnfttransferkeeper.NewKeeper(
+		appCodec, keys[ibcnfttransfertypes.StoreKey],
+		app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
+		app.AccountKeeper, app.NFTKeeper.NFTkeeper(), scopedNFTTransferKeeper,
+	)
+	ibcnfttransferModule := nfttransfer.NewAppModule(app.IBCNFTTransferKeeper)
+	nfttransferIBCModule := nfttransfer.NewIBCModule(app.IBCNFTTransferKeeper)
 
 	// routerModule := router.NewAppModule(app.RouterKeeper, transferIBCModule)
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
+		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule)
 	app.IBCKeeper.SetRouter(ibcRouter)
 
-	nfttransferModule := tibcnfttransfer.NewAppModule(app.NFTTransferKeeper)
-	mttransferModule := tibcmttransfer.NewAppModule(app.MTTransferKeeper)
+	nfttransferModule := tibcnfttransfer.NewAppModule(app.TIBCNFTTransferKeeper)
+	mttransferModule := tibcmttransfer.NewAppModule(app.TIBCMTTransferKeeper)
 
 	tibcRouter := tibcroutingtypes.NewRouter()
 	tibcRouter.AddRoute(tibcnfttypes.ModuleName, nfttransferModule).
@@ -716,6 +734,7 @@ func NewIrisApp(
 		oracle.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper),
 		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
 		farm.NewAppModule(appCodec, app.FarmKeeper, app.AccountKeeper, app.BankKeeper),
+		ibcnfttransferModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -742,6 +761,7 @@ func NewIrisApp(
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
 		vestingtypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 
 		//self module
 		tokentypes.ModuleName,
@@ -780,6 +800,7 @@ func NewIrisApp(
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
 		vestingtypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 
 		//self module
 		tokentypes.ModuleName,
@@ -824,6 +845,7 @@ func NewIrisApp(
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
 		vestingtypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 
 		//self module
 		tokentypes.ModuleName,
@@ -879,6 +901,7 @@ func NewIrisApp(
 		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
 		farm.NewAppModule(appCodec, app.FarmKeeper, app.AccountKeeper, app.BankKeeper),
 		tibc.NewAppModule(app.TIBCKeeper),
+		ibcnfttransferModule,
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -888,8 +911,8 @@ func NewIrisApp(
 	app.MountTransientStores(tkeys)
 	app.MountMemoryStores(memKeys)
 
-	anteHandler, err := NewAnteHandler(
-		HandlerOptions{
+	anteHandler, err := irishubante.NewAnteHandler(
+		irishubante.HandlerOptions{
 			HandlerOptions: ante.HandlerOptions{
 				AccountKeeper:   app.AccountKeeper,
 				BankKeeper:      app.BankKeeper,
@@ -933,6 +956,7 @@ func NewIrisApp(
 	app.scopedTIBCKeeper = scopedTIBCKeeper
 	app.scopedIBCKeeper = scopedIBCKeeper
 	app.scopedTransferKeeper = scopedTransferKeeper
+	app.scopedNFTTransferKeeper = scopedNFTTransferKeeper
 	return app
 }
 
