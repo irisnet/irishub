@@ -19,7 +19,7 @@ import (
 type TestSuite struct {
 	suite.Suite
 
-	cdc    codec.JSONMarshaler
+	cdc    codec.Codec
 	ctx    sdk.Context
 	keeper keeper.Keeper
 }

@@ -13,12 +13,12 @@ import (
 
 // Keeper of the guardian store
 type Keeper struct {
-	cdc      codec.Marshaler
+	cdc      codec.Codec
 	storeKey sdk.StoreKey
 }
 
 // NewKeeper returns a guardian keeper
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey) Keeper {
+func NewKeeper(cdc codec.Codec, key sdk.StoreKey) Keeper {
 	keeper := Keeper{
 		storeKey: key,
 		cdc:      cdc,
@@ -34,7 +34,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 // Add a super, only a existing super can add a new and the super is not existed
 func (k Keeper) AddSuper(ctx sdk.Context, super types.Super) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&super)
+	bz := k.cdc.MustMarshal(&super)
 	address, _ := sdk.AccAddressFromBech32(super.Address)
 	store.Set(types.GetSuperKey(address), bz)
 }
@@ -49,7 +49,7 @@ func (k Keeper) DeleteSuper(ctx sdk.Context, address sdk.AccAddress) {
 func (k Keeper) GetSuper(ctx sdk.Context, addr sdk.AccAddress) (super types.Super, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	if bz := store.Get(types.GetSuperKey(addr)); bz != nil {
-		k.cdc.MustUnmarshalBinaryBare(bz, &super)
+		k.cdc.MustUnmarshal(bz, &super)
 		return super, true
 	}
 	return super, false
@@ -67,7 +67,7 @@ func (k Keeper) IterateSupers(
 
 	for ; iterator.Valid(); iterator.Next() {
 		var super types.Super
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &super)
+		k.cdc.MustUnmarshal(iterator.Value(), &super)
 
 		if stop := op(super); stop {
 			break

@@ -17,13 +17,21 @@ order: 6
     - [Input](#irismod.coinswap.Input)
     - [Output](#irismod.coinswap.Output)
     - [Params](#irismod.coinswap.Params)
+    - [Pool](#irismod.coinswap.Pool)
   
 - [coinswap/genesis.proto](#coinswap/genesis.proto)
     - [GenesisState](#irismod.coinswap.GenesisState)
   
+- [cosmos/base/query/v1beta1/pagination.proto](#cosmos/base/query/v1beta1/pagination.proto)
+    - [PageRequest](#cosmos.base.query.v1beta1.PageRequest)
+    - [PageResponse](#cosmos.base.query.v1beta1.PageResponse)
+  
 - [coinswap/query.proto](#coinswap/query.proto)
-    - [QueryLiquidityRequest](#irismod.coinswap.QueryLiquidityRequest)
-    - [QueryLiquidityResponse](#irismod.coinswap.QueryLiquidityResponse)
+    - [PoolInfo](#irismod.coinswap.PoolInfo)
+    - [QueryLiquidityPoolRequest](#irismod.coinswap.QueryLiquidityPoolRequest)
+    - [QueryLiquidityPoolResponse](#irismod.coinswap.QueryLiquidityPoolResponse)
+    - [QueryLiquidityPoolsRequest](#irismod.coinswap.QueryLiquidityPoolsRequest)
+    - [QueryLiquidityPoolsResponse](#irismod.coinswap.QueryLiquidityPoolsResponse)
   
     - [Query](#irismod.coinswap.Query)
   
@@ -65,10 +73,6 @@ order: 6
 - [cosmos/bank/v1beta1/genesis.proto](#cosmos/bank/v1beta1/genesis.proto)
     - [Balance](#cosmos.bank.v1beta1.Balance)
     - [GenesisState](#cosmos.bank.v1beta1.GenesisState)
-  
-- [cosmos/base/query/v1beta1/pagination.proto](#cosmos/base/query/v1beta1/pagination.proto)
-    - [PageRequest](#cosmos.base.query.v1beta1.PageRequest)
-    - [PageResponse](#cosmos.base.query.v1beta1.PageResponse)
   
 - [cosmos/bank/v1beta1/query.proto](#cosmos/bank/v1beta1/query.proto)
     - [QueryAllBalancesRequest](#cosmos.bank.v1beta1.QueryAllBalancesRequest)
@@ -487,6 +491,45 @@ order: 6
     - [Period](#cosmos.vesting.v1beta1.Period)
     - [PeriodicVestingAccount](#cosmos.vesting.v1beta1.PeriodicVestingAccount)
   
+- [farm/farm.proto](#farm/farm.proto)
+    - [FarmInfo](#irismod.farm.FarmInfo)
+    - [FarmPool](#irismod.farm.FarmPool)
+    - [Params](#irismod.farm.Params)
+    - [RewardRule](#irismod.farm.RewardRule)
+  
+- [farm/genesis.proto](#farm/genesis.proto)
+    - [GenesisState](#irismod.farm.GenesisState)
+  
+- [farm/query.proto](#farm/query.proto)
+    - [FarmPoolEntry](#irismod.farm.FarmPoolEntry)
+    - [LockedInfo](#irismod.farm.LockedInfo)
+    - [QueryFarmPoolRequest](#irismod.farm.QueryFarmPoolRequest)
+    - [QueryFarmPoolResponse](#irismod.farm.QueryFarmPoolResponse)
+    - [QueryFarmPoolsRequest](#irismod.farm.QueryFarmPoolsRequest)
+    - [QueryFarmPoolsResponse](#irismod.farm.QueryFarmPoolsResponse)
+    - [QueryFarmerRequest](#irismod.farm.QueryFarmerRequest)
+    - [QueryFarmerResponse](#irismod.farm.QueryFarmerResponse)
+    - [QueryParamsRequest](#irismod.farm.QueryParamsRequest)
+    - [QueryParamsResponse](#irismod.farm.QueryParamsResponse)
+  
+    - [Query](#irismod.farm.Query)
+  
+- [farm/tx.proto](#farm/tx.proto)
+    - [MsgAdjustPool](#irismod.farm.MsgAdjustPool)
+    - [MsgAdjustPoolResponse](#irismod.farm.MsgAdjustPoolResponse)
+    - [MsgCreatePool](#irismod.farm.MsgCreatePool)
+    - [MsgCreatePoolResponse](#irismod.farm.MsgCreatePoolResponse)
+    - [MsgDestroyPool](#irismod.farm.MsgDestroyPool)
+    - [MsgDestroyPoolResponse](#irismod.farm.MsgDestroyPoolResponse)
+    - [MsgHarvest](#irismod.farm.MsgHarvest)
+    - [MsgHarvestResponse](#irismod.farm.MsgHarvestResponse)
+    - [MsgStake](#irismod.farm.MsgStake)
+    - [MsgStakeResponse](#irismod.farm.MsgStakeResponse)
+    - [MsgUnstake](#irismod.farm.MsgUnstake)
+    - [MsgUnstakeResponse](#irismod.farm.MsgUnstakeResponse)
+  
+    - [Msg](#irismod.farm.Msg)
+  
 - [guardian/guardian.proto](#guardian/guardian.proto)
     - [Super](#irishub.guardian.Super)
   
@@ -800,6 +843,8 @@ order: 6
     - [MsgIssueDenomResponse](#irismod.nft.MsgIssueDenomResponse)
     - [MsgMintNFT](#irismod.nft.MsgMintNFT)
     - [MsgMintNFTResponse](#irismod.nft.MsgMintNFTResponse)
+    - [MsgTransferDenom](#irismod.nft.MsgTransferDenom)
+    - [MsgTransferDenomResponse](#irismod.nft.MsgTransferDenomResponse)
     - [MsgTransferNFT](#irismod.nft.MsgTransferNFT)
     - [MsgTransferNFTResponse](#irismod.nft.MsgTransferNFTResponse)
   
@@ -1136,6 +1181,25 @@ Params defines token module's parameters
 
 
 
+
+<a name="irismod.coinswap.Pool"></a>
+
+### Pool
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [string](#string) |  |  |
+| `standard_denom` | [string](#string) |  | denom of base coin of the pool |
+| `counterparty_denom` | [string](#string) |  | denom of counterparty coin of the pool |
+| `escrow_address` | [string](#string) |  | escrow account for deposit tokens |
+| `lpt_denom` | [string](#string) |  | denom of the liquidity pool coin |
+
+
+
+
+
  <!-- end messages -->
 
  <!-- end enums -->
@@ -1163,6 +1227,70 @@ GenesisState defines the coinswap module's genesis state
 | ----- | ---- | ----- | ----------- |
 | `params` | [Params](#irismod.coinswap.Params) |  |  |
 | `standard_denom` | [string](#string) |  |  |
+| `pool` | [Pool](#irismod.coinswap.Pool) | repeated |  |
+| `sequence` | [uint64](#uint64) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="cosmos/base/query/v1beta1/pagination.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## cosmos/base/query/v1beta1/pagination.proto
+
+
+
+<a name="cosmos.base.query.v1beta1.PageRequest"></a>
+
+### PageRequest
+PageRequest is to be embedded in gRPC request messages for efficient
+pagination. Ex:
+
+ message SomeRequest {
+         Foo some_parameter = 1;
+         PageRequest pagination = 2;
+ }
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [bytes](#bytes) |  | key is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. |
+| `offset` | [uint64](#uint64) |  | offset is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. |
+| `limit` | [uint64](#uint64) |  | limit is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. |
+| `count_total` | [bool](#bool) |  | count_total is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. |
+
+
+
+
+
+
+<a name="cosmos.base.query.v1beta1.PageResponse"></a>
+
+### PageResponse
+PageResponse is to be embedded in gRPC response messages where the
+corresponding request message has used PageRequest.
+
+ message SomeResponse {
+         repeated Bar results = 1;
+         PageResponse page = 2;
+ }
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `next_key` | [bytes](#bytes) |  | next_key is the key to be passed to PageRequest.key to query the next page most efficiently |
+| `total` | [uint64](#uint64) |  | total is total number of results available if PageRequest.count_total was set, its value is undefined otherwise |
 
 
 
@@ -1185,33 +1313,85 @@ GenesisState defines the coinswap module's genesis state
 
 
 
-<a name="irismod.coinswap.QueryLiquidityRequest"></a>
+<a name="irismod.coinswap.PoolInfo"></a>
 
-### QueryLiquidityRequest
-QueryLiquidityRequest is request type for the Query/Liquidity RPC method
+### PoolInfo
+
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `denom` | [string](#string) |  |  |
+| `id` | [string](#string) |  |  |
+| `escrow_address` | [string](#string) |  | escrow account for deposit tokens |
+| `standard` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  | main token balance |
+| `token` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  | counterparty token balance |
+| `lpt` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  | liquidity token balance |
+| `fee` | [string](#string) |  | liquidity pool fee |
 
 
 
 
 
 
-<a name="irismod.coinswap.QueryLiquidityResponse"></a>
+<a name="irismod.coinswap.QueryLiquidityPoolRequest"></a>
 
-### QueryLiquidityResponse
-QueryLiquidityResponse is response type for the Query/Liquidity RPC method
+### QueryLiquidityPoolRequest
+QueryLiquidityPoolRequest is request type for the Query/LiquidityPool RPC
+method
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `standard` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
-| `token` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
-| `liquidity` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
-| `fee` | [string](#string) |  |  |
+| `lpt_denom` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.coinswap.QueryLiquidityPoolResponse"></a>
+
+### QueryLiquidityPoolResponse
+QueryLiquidityPoolResponse is response type for the Query/LiquidityPool RPC
+method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool` | [PoolInfo](#irismod.coinswap.PoolInfo) |  |  |
+
+
+
+
+
+
+<a name="irismod.coinswap.QueryLiquidityPoolsRequest"></a>
+
+### QueryLiquidityPoolsRequest
+QueryLiquidityPoolsRequest is request type for the Query/LiquidityPools RPC
+method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request. |
+
+
+
+
+
+
+<a name="irismod.coinswap.QueryLiquidityPoolsResponse"></a>
+
+### QueryLiquidityPoolsResponse
+QueryLiquidityPoolsResponse is response type for the Query/LiquidityPools RPC
+method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pools` | [PoolInfo](#irismod.coinswap.PoolInfo) | repeated |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
 
 
 
@@ -1231,7 +1411,8 @@ Query creates service with coinswap as rpc
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `Liquidity` | [QueryLiquidityRequest](#irismod.coinswap.QueryLiquidityRequest) | [QueryLiquidityResponse](#irismod.coinswap.QueryLiquidityResponse) | Liquidity returns the total liquidity available for the provided denomination | GET|/irismod/coinswap/liquidities/{denom}|
+| `LiquidityPool` | [QueryLiquidityPoolRequest](#irismod.coinswap.QueryLiquidityPoolRequest) | [QueryLiquidityPoolResponse](#irismod.coinswap.QueryLiquidityPoolResponse) | LiquidityPool returns the liquidity pool for the provided lpt_denom | GET|/irismod/coinswap/pools/{lpt_denom}|
+| `LiquidityPools` | [QueryLiquidityPoolsRequest](#irismod.coinswap.QueryLiquidityPoolsRequest) | [QueryLiquidityPoolsResponse](#irismod.coinswap.QueryLiquidityPoolsResponse) | LiquidityPools returns all the liquidity pools available | GET|/irismod/coinswap/pools|
 
  <!-- end services -->
 
@@ -1717,68 +1898,6 @@ GenesisState defines the bank module's genesis state.
 | `balances` | [Balance](#cosmos.bank.v1beta1.Balance) | repeated | balances is an array containing the balances of all the accounts. |
 | `supply` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | supply represents the total supply. |
 | `denom_metadata` | [Metadata](#cosmos.bank.v1beta1.Metadata) | repeated | denom_metadata defines the metadata of the differents coins. |
-
-
-
-
-
- <!-- end messages -->
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-<a name="cosmos/base/query/v1beta1/pagination.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## cosmos/base/query/v1beta1/pagination.proto
-
-
-
-<a name="cosmos.base.query.v1beta1.PageRequest"></a>
-
-### PageRequest
-PageRequest is to be embedded in gRPC request messages for efficient
-pagination. Ex:
-
- message SomeRequest {
-         Foo some_parameter = 1;
-         PageRequest pagination = 2;
- }
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `key` | [bytes](#bytes) |  | key is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. |
-| `offset` | [uint64](#uint64) |  | offset is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. |
-| `limit` | [uint64](#uint64) |  | limit is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. |
-| `count_total` | [bool](#bool) |  | count_total is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. |
-
-
-
-
-
-
-<a name="cosmos.base.query.v1beta1.PageResponse"></a>
-
-### PageResponse
-PageResponse is to be embedded in gRPC response messages where the
-corresponding request message has used PageRequest.
-
- message SomeResponse {
-         repeated Bar results = 1;
-         PageResponse page = 2;
- }
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `next_key` | [bytes](#bytes) |  | next_key is the key to be passed to PageRequest.key to query the next page most efficiently |
-| `total` | [uint64](#uint64) |  | total is total number of results available if PageRequest.count_total was set, its value is undefined otherwise |
 
 
 
@@ -2855,6 +2974,7 @@ VersionInfo is the type for the GetNodeInfoResponse message.
 | `build_tags` | [string](#string) |  |  |
 | `go_version` | [string](#string) |  |  |
 | `build_deps` | [Module](#cosmos.base.tendermint.v1beta1.Module) | repeated |  |
+| `cosmos_sdk_version` | [string](#string) |  |  |
 
 
 
@@ -7379,6 +7499,532 @@ periodically vests by unlocking coins during each specified period.
 
 
 
+<a name="farm/farm.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## farm/farm.proto
+
+
+
+<a name="irismod.farm.FarmInfo"></a>
+
+### FarmInfo
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `address` | [string](#string) |  |  |
+| `locked` | [string](#string) |  |  |
+| `reward_debt` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.farm.FarmPool"></a>
+
+### FarmPool
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [string](#string) |  |  |
+| `creator` | [string](#string) |  |  |
+| `description` | [string](#string) |  |  |
+| `start_height` | [int64](#int64) |  |  |
+| `end_height` | [int64](#int64) |  |  |
+| `last_height_distr_rewards` | [int64](#int64) |  |  |
+| `editable` | [bool](#bool) |  |  |
+| `total_lpt_locked` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `rules` | [RewardRule](#irismod.farm.RewardRule) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.farm.Params"></a>
+
+### Params
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `create_pool_fee` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `max_reward_categories` | [uint32](#uint32) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.RewardRule"></a>
+
+### RewardRule
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `reward` | [string](#string) |  |  |
+| `total_reward` | [string](#string) |  |  |
+| `remaining_reward` | [string](#string) |  |  |
+| `reward_per_block` | [string](#string) |  |  |
+| `reward_per_share` | [string](#string) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="farm/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## farm/genesis.proto
+
+
+
+<a name="irismod.farm.GenesisState"></a>
+
+### GenesisState
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#irismod.farm.Params) |  |  |
+| `pools` | [FarmPool](#irismod.farm.FarmPool) | repeated |  |
+| `farm_infos` | [FarmInfo](#irismod.farm.FarmInfo) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="farm/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## farm/query.proto
+
+
+
+<a name="irismod.farm.FarmPoolEntry"></a>
+
+### FarmPoolEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [string](#string) |  |  |
+| `creator` | [string](#string) |  |  |
+| `description` | [string](#string) |  |  |
+| `start_height` | [int64](#int64) |  |  |
+| `end_height` | [int64](#int64) |  |  |
+| `editable` | [bool](#bool) |  |  |
+| `expired` | [bool](#bool) |  |  |
+| `total_lpt_locked` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `total_reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `remaining_reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `reward_per_block` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.farm.LockedInfo"></a>
+
+### LockedInfo
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `locked` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `pending_reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryFarmPoolRequest"></a>
+
+### QueryFarmPoolRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryFarmPoolResponse"></a>
+
+### QueryFarmPoolResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool` | [FarmPoolEntry](#irismod.farm.FarmPoolEntry) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryFarmPoolsRequest"></a>
+
+### QueryFarmPoolsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryFarmPoolsResponse"></a>
+
+### QueryFarmPoolsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pools` | [FarmPoolEntry](#irismod.farm.FarmPoolEntry) | repeated |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryFarmerRequest"></a>
+
+### QueryFarmerRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `farmer` | [string](#string) |  |  |
+| `pool_name` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryFarmerResponse"></a>
+
+### QueryFarmerResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `list` | [LockedInfo](#irismod.farm.LockedInfo) | repeated |  |
+| `height` | [int64](#int64) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+
+
+
+
+
+
+
+<a name="irismod.farm.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#irismod.farm.Params) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="irismod.farm.Query"></a>
+
+### Query
+
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `FarmPools` | [QueryFarmPoolsRequest](#irismod.farm.QueryFarmPoolsRequest) | [QueryFarmPoolsResponse](#irismod.farm.QueryFarmPoolsResponse) |  | GET|/irismod/farm/pools|
+| `FarmPool` | [QueryFarmPoolRequest](#irismod.farm.QueryFarmPoolRequest) | [QueryFarmPoolResponse](#irismod.farm.QueryFarmPoolResponse) |  | GET|/irismod/farm/pool/{name}|
+| `Farmer` | [QueryFarmerRequest](#irismod.farm.QueryFarmerRequest) | [QueryFarmerResponse](#irismod.farm.QueryFarmerResponse) |  | GET|/irismod/farm/farmers/{farmer}|
+| `Params` | [QueryParamsRequest](#irismod.farm.QueryParamsRequest) | [QueryParamsResponse](#irismod.farm.QueryParamsResponse) | Params queries the htlc parameters | GET|/irismod/farm/params|
+
+ <!-- end services -->
+
+
+
+<a name="farm/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## farm/tx.proto
+
+
+
+<a name="irismod.farm.MsgAdjustPool"></a>
+
+### MsgAdjustPool
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `additional_reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `reward_per_block` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `creator` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgAdjustPoolResponse"></a>
+
+### MsgAdjustPoolResponse
+
+
+
+
+
+
+
+<a name="irismod.farm.MsgCreatePool"></a>
+
+### MsgCreatePool
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [string](#string) |  |  |
+| `description` | [string](#string) |  |  |
+| `lpt_denom` | [string](#string) |  |  |
+| `start_height` | [int64](#int64) |  |  |
+| `reward_per_block` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `total_reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `editable` | [bool](#bool) |  |  |
+| `creator` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgCreatePoolResponse"></a>
+
+### MsgCreatePoolResponse
+
+
+
+
+
+
+
+<a name="irismod.farm.MsgDestroyPool"></a>
+
+### MsgDestroyPool
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `creator` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgDestroyPoolResponse"></a>
+
+### MsgDestroyPoolResponse
+
+
+
+
+
+
+
+<a name="irismod.farm.MsgHarvest"></a>
+
+### MsgHarvest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `sender` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgHarvestResponse"></a>
+
+### MsgHarvestResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgStake"></a>
+
+### MsgStake
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `sender` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgStakeResponse"></a>
+
+### MsgStakeResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgUnstake"></a>
+
+### MsgUnstake
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pool_name` | [string](#string) |  |  |
+| `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `sender` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.farm.MsgUnstakeResponse"></a>
+
+### MsgUnstakeResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `reward` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="irismod.farm.Msg"></a>
+
+### Msg
+Msg defines the farm Msg service.
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `CreatePool` | [MsgCreatePool](#irismod.farm.MsgCreatePool) | [MsgCreatePoolResponse](#irismod.farm.MsgCreatePoolResponse) | CreatePool defines a method for creating a new farm pool | |
+| `DestroyPool` | [MsgDestroyPool](#irismod.farm.MsgDestroyPool) | [MsgDestroyPoolResponse](#irismod.farm.MsgDestroyPoolResponse) | DestroyPool defines a method for destroying a existed farm pool | |
+| `AdjustPool` | [MsgAdjustPool](#irismod.farm.MsgAdjustPool) | [MsgAdjustPoolResponse](#irismod.farm.MsgAdjustPoolResponse) | AdjustPool defines a method for adjusting the farm pool params | |
+| `Stake` | [MsgStake](#irismod.farm.MsgStake) | [MsgStakeResponse](#irismod.farm.MsgStakeResponse) | Stake defines a method for staking some lp token to a farm pool | |
+| `Unstake` | [MsgUnstake](#irismod.farm.MsgUnstake) | [MsgUnstakeResponse](#irismod.farm.MsgUnstakeResponse) | Unstake defines a method for unstaking some lp token from a farm pool and withdraw some reward | |
+| `Harvest` | [MsgHarvest](#irismod.farm.MsgHarvest) | [MsgHarvestResponse](#irismod.farm.MsgHarvestResponse) | Harvest defines a method withdraw some reward from a farm pool | |
+
+ <!-- end services -->
+
+
+
 <a name="guardian/guardian.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -11185,6 +11831,9 @@ Denom defines a type of NFT
 | `name` | [string](#string) |  |  |
 | `schema` | [string](#string) |  |  |
 | `creator` | [string](#string) |  |  |
+| `symbol` | [string](#string) |  |  |
+| `mint_restricted` | [bool](#bool) |  |  |
+| `update_restricted` | [bool](#bool) |  |  |
 
 
 
@@ -11558,6 +12207,9 @@ MsgIssueDenom defines an SDK message for creating a new denom.
 | `name` | [string](#string) |  |  |
 | `schema` | [string](#string) |  |  |
 | `sender` | [string](#string) |  |  |
+| `symbol` | [string](#string) |  |  |
+| `mint_restricted` | [bool](#bool) |  |  |
+| `update_restricted` | [bool](#bool) |  |  |
 
 
 
@@ -11605,6 +12257,33 @@ MsgMintNFTResponse defines the Msg/MintNFT response type.
 
 
 
+<a name="irismod.nft.MsgTransferDenom"></a>
+
+### MsgTransferDenom
+MsgTransferDenom defines an SDK message for transferring an denom to recipient.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [string](#string) |  |  |
+| `sender` | [string](#string) |  |  |
+| `recipient` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="irismod.nft.MsgTransferDenomResponse"></a>
+
+### MsgTransferDenomResponse
+MsgTransferDenomResponse defines the Msg/TransferDenom response type.
+
+
+
+
+
+
 <a name="irismod.nft.MsgTransferNFT"></a>
 
 ### MsgTransferNFT
@@ -11645,7 +12324,7 @@ MsgTransferNFTResponse defines the Msg/TransferNFT response type.
 <a name="irismod.nft.Msg"></a>
 
 ### Msg
-Msg defines the htlc Msg service.
+Msg defines the nft Msg service.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -11654,6 +12333,7 @@ Msg defines the htlc Msg service.
 | `EditNFT` | [MsgEditNFT](#irismod.nft.MsgEditNFT) | [MsgEditNFTResponse](#irismod.nft.MsgEditNFTResponse) | RefundHTLC defines a method for editing a nft. | |
 | `TransferNFT` | [MsgTransferNFT](#irismod.nft.MsgTransferNFT) | [MsgTransferNFTResponse](#irismod.nft.MsgTransferNFTResponse) | TransferNFT defines a method for transferring a nft. | |
 | `BurnNFT` | [MsgBurnNFT](#irismod.nft.MsgBurnNFT) | [MsgBurnNFTResponse](#irismod.nft.MsgBurnNFTResponse) | BurnNFT defines a method for burning a nft. | |
+| `TransferDenom` | [MsgTransferDenom](#irismod.nft.MsgTransferDenom) | [MsgTransferDenomResponse](#irismod.nft.MsgTransferDenomResponse) | TransferDenom defines a method for transferring a denom. | |
 
  <!-- end services -->
 

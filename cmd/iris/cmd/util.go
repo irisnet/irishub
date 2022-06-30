@@ -41,6 +41,7 @@ var (
 			registerCmdWithArgs("staking", "unbond", 1).
 			registerCmdWithArgs("distribution", "fund-community-pool", 0).
 			registerCmdWithArgs("gov", "deposit", 1).
+			registerCmdWithArgs("ibc-transfer", "transfer", 3).
 			registerCmdForResponse("bank", "balances", "balances", filedTypeArray).
 			registerCmdForResponse("bank", "total", "supply", filedTypeArray).
 			registerCmdForResponse("gov", "params", "deposit_params.min_deposit", filedTypeArray).
@@ -241,10 +242,21 @@ func (it coinConverter) parseFlags(cmd *cobra.Command, flag *pflag.Flag, cmdNm s
 }
 
 func (it coinConverter) parseArgs(cmd *cobra.Command, args []string) {
+	command, ok := it.cmds[cmd.Name()]
+	if !ok {
+		return
+	}
+
+	if cmd.Parent().Name() != command.parentCmd {
+		return
+	}
+
 	if field, ok := it.getFromArgs(cmd.Name()); ok && len(args) > 0 {
-		if res, err := it.convertCoins(cmd, args[field.index]); err == nil {
-			args[field.index] = res
+		res, err := it.convertCoins(cmd, args[field.index])
+		if err != nil {
+			return
 		}
+		args[field.index] = res
 	}
 }
 

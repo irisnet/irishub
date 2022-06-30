@@ -3,7 +3,7 @@
     "info": {
         "title": "IRIShub - Legacy REST and gRPC Gateway docs",
         "description": "A REST interface for state queries, legacy transactions",
-        "version": "1.1.0"
+        "version": "1.1.1"
     },
     "apis": [
         {
@@ -158,6 +158,14 @@
             "operationIds": {
                 "rename": {
                     "Params": "CoinswapParams"
+                }
+            }
+        },
+        {
+            "url": "./tmp-swagger-gen/farm/query.swagger.json",
+            "operationIds": {
+                "rename": {
+                    "Params": "FarmParams"
                 }
             }
         },

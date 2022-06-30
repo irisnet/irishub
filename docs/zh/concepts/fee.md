@@ -37,4 +37,4 @@ Gas价格 = 交易费 / Gas上限，代表用户为每个单位的资源消耗�
 iris tx bank send <from_address>  <to_address> 1iris --fees=0.3iris --gas=50000 --chain-id=irishub --from=<key-name>
 ```
 
-在这个示例中执行的是转账操作，这里设定的交易费上限`--fee`为0.3iris，Gas上限`--gas`为50000，Gas价格就是 6000iris-nano/Gas。假设执行交易总共需要10000个Gas，那么会有 0.06iris 的交易费被支付给验证人节点；剩余的 0.24iris 会被退还给用户。
+在这个示例中执行的是转账操作，这里设定的交易费上限`--fee`为0.3iris，Gas上限`--gas`为50000，Gas价格就是 0.000006iris/Gas。假设执行交易总共需要10000个Gas，那么会有 0.06iris 的交易费被支付给验证人节点；剩余的 0.24iris 会被退还给用户。

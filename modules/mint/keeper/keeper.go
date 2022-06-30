@@ -14,7 +14,7 @@ import (
 
 // keeper of the mint store
 type Keeper struct {
-	cdc              codec.Marshaler
+	cdc              codec.Codec
 	storeKey         sdk.StoreKey
 	paramSpace       paramtypes.Subspace
 	bankKeeper       types.BankKeeper
@@ -22,7 +22,7 @@ type Keeper struct {
 }
 
 // NewKeeper returns a mint keeper
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey,
+func NewKeeper(cdc codec.Codec, key sdk.StoreKey,
 	paramSpace paramtypes.Subspace, ak types.AccountKeeper, bk types.BankKeeper,
 	feeCollectorName string) Keeper {
 
@@ -55,14 +55,14 @@ func (k Keeper) GetMinter(ctx sdk.Context) (minter types.Minter) {
 	if b == nil {
 		panic("Stored minter should not have been nil")
 	}
-	k.cdc.MustUnmarshalBinaryBare(b, &minter)
+	k.cdc.MustUnmarshal(b, &minter)
 	return
 }
 
 // SetMinter set the minter
 func (k Keeper) SetMinter(ctx sdk.Context, minter types.Minter) {
 	store := ctx.KVStore(k.storeKey)
-	b := k.cdc.MustMarshalBinaryBare(&minter)
+	b := k.cdc.MustMarshal(&minter)
 	store.Set(types.MinterKey, b)
 }
 

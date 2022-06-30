@@ -6,13 +6,19 @@
 
 链上资产用 `ID` 进行标识，借助区块链安全、不可篡改的特性，资产的所有权将得到明确。资产在成员间的交易过程也将被公开地记录，以便于追溯以及争议处理。
 
-资产的元数据（`metadata`）可以直接存储在链上，也可以将其在链外存储源的 `URI` 存储在链上。资产元数据按照特定的 [JSON Schema](https://JSON-Schema.org/) 进行组织。[这里](./nft-metadata.json)是一个元数据 JSON Schema 示例。
+资产的元数据（`metadata`）可以直接存储在链上，也可以将其在链外存储源的 `URI` 存储在链上。资产元数据按照特定的 [JSON Schema](https://JSON-Schema.org/) 进行组织。[这里](https://github.com/irisnet/irishub/blob/master/docs/zh/features/nft-metadata.json)是一个元数据 JSON Schema 示例。
 
 资产在创建前需要发行，用以声明其抽象属性：
 
 - _Denom_：即全局唯一的资产类别名
   
-- _Denom ID_：Demon的全局唯一标识符
+- _Denom ID_：Demon的全局唯一标识符 
+  
+- _Symbol_: 分类的简短名称
+
+- _Mint-restricted_: 表示此分类下是否有发行NFT的限制，true表示只有Denom的拥有者可以在此分类下发行NFT，false表示任何人可以
+
+- _Update-restricted_: 表示此分类下是否有更新NFT的限制，true表示此分类下任何人不得更新NFT，false表示只有此NFT的拥有者可以更新
 
 - _元数据规范_：资产元数据应遵循的 JSON Schema
 
@@ -35,7 +41,17 @@
 `CLI`
 
 ```bash
-iris tx nft issue <denom-id> --from=<key-name> --schema=<schema-content or path/to/schema.json> --chain-id=<chain-id> --fees=<fee>
+iris tx nft issue <denom-id> --from=<key-name> --schema=<schema-content or path/to/schema.json> --symbol=<denom-symbol> --mint-restricted=<mint-restricted>  --update-restricted=<update-restricted> --chain-id=<chain-id> --fees=<fee>
+```
+
+### 转让NFT分类所有权
+
+NFT分类拥有者可以转移NFT分类的所有权
+
+`CLI`
+
+```bash
+iris tx nft transfer-denom <recipient> <denom-id>
 ```
 
 ### 增发

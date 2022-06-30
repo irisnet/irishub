@@ -6,19 +6,25 @@
 
 nft on the chain are identified by `ID`. With the help of the secure and non-tamperable features of the blockchain, the ownership of nft will be clarified. The transaction process of nft among members will also be publicly recorded to facilitate traceability and dispute settlement.
 
-nft metadata (`metadata`) can be stored directly on the chain, or the `URI` of its storage source outside the chain can be stored on the chain. nft metadata is organized according to a specific [JSON Schema](https://JSON-Schema.org/). [Here](./nft-metadata.json) is an example of metadata JSON Schema.
+nft metadata (`metadata`) can be stored directly on the chain, or the `URI` of its storage source outside the chain can be stored on the chain. nft metadata is organized according to a specific [JSON Schema](https://JSON-Schema.org/). [Here](https://github.com/irisnet/irishub/blob/master/docs/features/nft-metadata.json) is an example of metadata JSON Schema.
 
 nft need to be issued before creation to declare their abstract properties:
 
--_Denom_: the globally unique nft category name
+-_Denom_: the globally unique nft classification name
 
--_Denom ID_: the globally unique nft category identifier of Denom
+-_Denom ID_: the globally unique nft classification identifier of Denom
+
+-_Symbol_: the symbol of the token
+
+-_Mint-restricted_: This field indicates whether there are restrictions on the issuance of NFTs under this classification, true means that only Denom owners can issue NFTs under this classification, false means anyone can
+
+-_Update-restricted_: This field indicates whether there are restrictions on updating NFTs under this classification, true means that no one under this classification can update the NFT, false means that only the owner of this NFT can update
 
 -_Metadata Specification_: The JSON Schema that nft metadata should follow
 
 Each specific nft is described by the following elements:
 
--_Denom_: the category of the nft
+-_Denom_: the classification of the nft
 
 -_ID_: The identifier of the nft, which is unique in this nft denom; this ID is generated off-chain
 
@@ -30,12 +36,22 @@ Each specific nft is described by the following elements:
 
 ### issued
 
-Specify the nft Denom (nft category) and metadata JSON Schema to issue nft.
+Specify the nft Denom (nft classification) and metadata JSON Schema to issue nft.
 
 `CLI`
 
 ```bash
-iris tx nft issue <denom-id> --from=<key-name> --name=<denom-name> --schema=<schema-content or path/to/schema.json> --chain-id=<chain-id> --fees=<fee>
+iris tx nft issue <denom-id> --from=<key-name> --name=<denom-name> --schema=<schema-content or path/to/schema.json> --symbol=<denom-symbol> --mint-restricted=<mint-restricted>  --update-restricted=<update-restricted> --chain-id=<chain-id> --fees=<fee>
+```
+
+### transfer denom
+
+The owner of the NFT classification can transfer the ownership of the NFT classification to others.
+
+`CLI`
+
+```bash
+iris tx nft transfer-denom <recipient> <denom-id>
 ```
 
 ### Additional issuance

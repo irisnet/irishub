@@ -1,0 +1,125 @@
+[
+  {
+    "chain_name": "bsnhub-mainnet",
+    "consensus_state": {
+      "@type": "/tibc.lightclients.tendermint.v1.ConsensusState",
+      "timestamp": "2021-11-03T11:09:19.838000955Z",
+      "root": {
+        "hash": "YXBwX2hhc2g="
+      },
+      "next_validators_hash": "9DA3EB65E16CC577BFDFDB69E039D074E4FF593DC1E4053151B902F8D94FF5F2"
+    },
+    "client_state": {
+      "@type": "/tibc.lightclients.tendermint.v1.ClientState",
+      "chain_id": "BSN-net",
+      "trust_level": {
+        "numerator": "1",
+        "denominator": "3"
+      },
+      "trusting_period": "8640000s",
+      "unbonding_period": "8640000s",
+      "max_clock_drift": "10s",
+      "latest_height": {
+        "revision_number": "0",
+        "revision_height": "4945409"
+      },
+      "proof_specs": [
+        {
+          "leaf_spec": {
+            "hash": "SHA256",
+            "prehash_key": "NO_HASH",
+            "prehash_value": "SHA256",
+            "length": "VAR_PROTO",
+            "prefix": "AA=="
+          },
+          "inner_spec": {
+            "child_order": [
+              0,
+              1
+            ],
+            "child_size": 33,
+            "min_prefix_length": 4,
+            "max_prefix_length": 12,
+            "empty_child": null,
+            "hash": "SHA256"
+          },
+          "max_depth": 0,
+          "min_depth": 0
+        },
+        {
+          "leaf_spec": {
+            "hash": "SHA256",
+            "prehash_key": "NO_HASH",
+            "prehash_value": "SHA256",
+            "length": "VAR_PROTO",
+            "prefix": "AA=="
+          },
+          "inner_spec": {
+            "child_order": [
+              0,
+              1
+            ],
+            "child_size": 32,
+            "min_prefix_length": 1,
+            "max_prefix_length": 1,
+            "empty_child": null,
+            "hash": "SHA256"
+          },
+          "max_depth": 0,
+          "min_depth": 0
+        }
+      ],
+      "MerklePrefix": {
+        "key_prefix": "dGliYw=="
+      },
+      "timeDelay": "0"
+    },
+    "relayers": [
+      "iaa1vcghfru68sxgpxcd0yfeqt50h8wunf0w574plw"
+    ]
+  },
+  {
+    "chain_name": "eth-mainnet",
+    "consensus_state": {
+      "@type": "/tibc.lightclients.eth.v1.ConsensusState",
+      "timestamp": "1635938396",
+      "number": {
+        "revision_number": "0",
+        "revision_height": "13543580"
+      },
+      "root": "DMSfdPZ995A7UVNVo0ppGInY5BTPtdBL7u71AG5LGqU="
+    },
+    "client_state": {
+      "@type": "/tibc.lightclients.eth.v1.ClientState",
+      "header": {
+        "parent_hash": "OG3Zhdj4dQfq1tUXMCuJJyk7QHgN2Qc58aRPdhSJF4g=",
+        "uncle_hash": "HcxN6N7HXXqrhbVntszUGtMSRRuUinQT8KFC/UDUk0c=",
+        "coinbase": "gpvYJLAWMmpAHQg7M9CSKTMzqDA=",
+        "root": "DMSfdPZ995A7UVNVo0ppGInY5BTPtdBL7u71AG5LGqU=",
+        "tx_hash": "gMEAlQBXfq+ZnU1jJCDTxpopY5pNr3HnRCNzJ9HDn14=",
+        "receipt_hash": "Bb065SFKYFj9vYEq4khZkmPzGBrKhQymDAAIvQclM3w=",
+        "bloom": "3O0c/1X/3tr3/u//h7H/N1ojN2n+HqMt87X9Gv/r9/3b2//zkP+/19v7X4T+G/m/f//qO3+naeU/cr7/p/3/9B/z1yd8/af57z+enZv2Z++P7/svS+dw+yd+///+/Xu3f4TP0d+nv9a/f35/59vf2vMPm23vbq9+7u3+X3bs9SnZ7/P87Pf/v39L2furP/333fH7Re/51Nr5p/r///oe86felR7w+emn/nVb39kxnVn+73af/+PTffH71x/3r91dTZ22vt32LE97V/m6uc8dTz/qGl8/a7087v/N9t3bfd799Dx7jL0/fbrltuqJ5zeFneu6/+v7Z85La/um8x6/tQ==",
+        "difficulty": "10395717367917827",
+        "height": {
+          "revision_number": "0",
+          "revision_height": "13543580"
+        },
+        "gas_limit": "30000000",
+        "gas_used": "29124537",
+        "time": "1635938396",
+        "extra": "5LiD5b2p56We5LuZ6bG8GwMh",
+        "mix_digest": "Q6yN8uV4+TvlYHBqxA3LQ8oXEpQlyFLZi4ag14itxLQ=",
+        "nonce": "1646353019550373542",
+        "baseFee": "94385040994"
+      },
+      "chain_id": "1",
+      "contract_address": "LOsf8dSJPLoIQJpwnFpaTPkie6k=",
+      "trusting_period": "8640000",
+      "timeDelay": "0",
+      "blockDelay": "7"
+    },
+    "relayers": [
+      "iaa17yh4zxe8t3cmqj2exh6g2ncr8kqvh997yuyu8l"
+    ]
+  }
+]

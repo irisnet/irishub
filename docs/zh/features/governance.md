@@ -12,7 +12,7 @@
 
   一旦抵押数量达到某个特定值（`最小抵押`），提议将被确认，对该提议的投票也将开启。之后，质押的 Iris 持有者可以发送 `TxGovVote` 交易对此提议进行投票。
 
-- 当提议涉及软件升级时，流程请参考 [`Upgrade`](../upgrade.md)
+- 当提议涉及软件升级时，流程请参考 [`Upgrade`](upgrade.md)
 
 ### 提议提交
 
@@ -30,7 +30,7 @@
 
 - `软件升级提议`
 
-  请参考 [`Upgrade`](../upgrade.md)。
+  请参考 [`Upgrade`](upgrade.md)。
 
 其他模块可以通过实现自己的提议类型和处理器来扩展治理模块。这些类型通过治理模块注册和处理（例如 `参数改变提议`）。当一个提议通过时，治理模块将执行相关模块的提议处理器。自定义处理器可以完成任意的状态改变。
 
@@ -113,7 +113,7 @@ _注意: 在 UI 端，我们可以为一些紧急的提议增加一个 `Not Urge
 
 ### 软件升级
 
-关于软件升级的治理过程，参见 [`Upgrade`](../upgrade.md)。
+关于软件升级的治理过程，参见 [`Upgrade`](upgrade.md)。
 
 ## 使用场景
 
@@ -174,4 +174,5 @@ iris tx gov submit-proposal community-pool-spend proposal.json --from=<key-name>
 
 ### 软件升级
 
-软件升级的用法请参考 [`Upgrade`](../upgrade.md)
+软件升级的用法请参考 [`Upgrade`](upgrade.md)
+

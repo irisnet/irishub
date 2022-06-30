@@ -181,19 +181,19 @@ When a request context is successfully created, a `context id` is returned to th
 
 ```bash
 # create a repeated request context, with no callback
-irisc tx service call --service-name=<service name> --data=<request input> --providers=<provider list> --service-fee-cap=1iris --timeout 50 --repeated --frequency=50 --total=100
+iris tx service call --service-name=<service name> --data=<request input> --providers=<provider list> --service-fee-cap=1iris --timeout 50 --repeated --frequency=50 --total=100
 
 # update an existing request context
-irisc tx service update <request-context-id> --frequency=20 --total=200
+iris tx service update <request-context-id> --frequency=20 --total=200
 
 # pause a running request context
-irisc tx service pause <request-context-id>
+iris tx service pause <request-context-id>
 
 # start a paused request context
-irisc tx service start <request-context-id>
+iris tx service start <request-context-id>
 
 # permanently kill a request context
-irisc tx service kill <request-context-id>
+iris tx service kill <request-context-id>
 
 # query a previously created request context by its id
 iris q service request-context <request-context-id>

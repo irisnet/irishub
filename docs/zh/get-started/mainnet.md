@@ -10,6 +10,12 @@ order: 3
 
 ## 运行全节点
 
+### Start node from genesis
+
+:::tip
+必须使用 irishub [v1.0.1](https://github.com/irisnet/irishub/releases/tag/v1.0.1) 初始化你的节点
+:::
+
 ```bash
 # 初始化节点
 iris init <moniker> --chain-id=irishub-1
@@ -22,10 +28,21 @@ curl -o ~/.iris/config/genesis.json https://raw.githubusercontent.com/irisnet/ma
 iris start
 ```
 
+接下来，你的节点将执行所有链升级过程。在每次升级之间，你必须使用特定的版本同步区块。不用担心在升级高度使用旧版本，节点会自动停止。
+
+| 提案 | 起始高度 | 升级高度 | irishub 版本 |
+| -------- | ------------ | -------------- | ----- |
+| genesis  |  9146456     |  9593205  | [v1.0.1](https://github.com/irisnet/irishub/releases/tag/v1.0.1) |
+| [#1](https://irishub.iobscan.io/#/ProposalsDetail/1)  |  9593206     |    | [v1.1.0](https://github.com/irisnet/irishub/releases/tag/v1.1.0), [v1.1.1](https://github.com/irisnet/irishub/releases/tag/v1.1.1) |
+| [#8](https://irishub.iobscan.io/#/ProposalsDetail/8)  |  12393048     | 12534300 | [v1.2.0](https://github.com/irisnet/irishub/releases/tag/v1.2.0), [v1.2.1](https://github.com/irisnet/irishub/releases/tag/v1.2.1) |
+| [#11](https://irishub.iobscan.io/#/ProposalsDetail/11)  |  14166918     |  14301916  | [v1.3.0](https://github.com/irisnet/irishub/releases/tag/v1.3.0) |
+
 :::tip
 您可能会看到一些连接错误，这没关系，P2P网络正在尝试查找可用的连接
 
 可以添加几个[社区公开节点](https://github.com/irisnet/mainnet/blob/master/config/community-peers.md) 到`config.toml`中的`persistent_peers`。
+
+如果您在不需要历史数据的情况下要快速启动节点并加入 IRIS Hub，可以考虑使用 [state_sync](./state-sync.md) 功能快速启动节点。
 :::
 
 ## 升级为验证人节点
@@ -88,3 +105,9 @@ iris tx staking create-validator \
 - 验证人安全
   - [哨兵节点 (DDOS 防护)](../concepts/sentry-nodes.md)
   - [密钥管理](../tools/kms.md)
+
+## 水龙头
+
+前往 Stakely 开发上线的水龙头申请 IRISnet 主网通证。
+
+具体申请方法请参见页面提示：https://stakely.io/faucet/irisnet-iris

@@ -48,7 +48,7 @@ func (s *IntegrationTestSuite) TestMint() {
 	respType := proto.Message(&minttypes.Params{})
 	bz, err := minttestutil.QueryParamsExec(val.ClientCtx)
 	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	params := respType.(*minttypes.Params)
 	s.Require().Equal("stake", params.MintDenom)
 	s.Require().Equal("0.040000000000000000", params.Inflation.String())

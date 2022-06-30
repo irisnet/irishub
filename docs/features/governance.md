@@ -157,7 +157,7 @@ Later, we may add permissioned keys that could only sign txs from certain module
 
 ### Software Upgrade
 
-The governance process for the software upgrade is described in [`Upgrade`](./upgrade.md)
+The governance process for the software upgrade is described in [`Upgrade`](upgrade.md)
 
 ## Usage Scenario
 
@@ -218,4 +218,4 @@ iris tx gov submit-proposal community-pool-spend proposal.json --from=<key-name>
 
 ### Software upgrade
 
-Usage on the software upgrade is introduced in [`Upgrade`](./upgrade.md)
+Usage on the software upgrade is introduced in [`Upgrade`](upgrade.md)

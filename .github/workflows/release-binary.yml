@@ -1,0 +1,62 @@
+name: Release Binary
+on:
+  release: 
+    types:
+      - created
+    
+jobs:
+  uploadAssets:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v1
+      - name: build binary by using docker
+        run: |
+          sed "s/make build/make build-all-binary/g" Dockerfile | tee Dockerfile.all-binary
+          docker build -t build:all-binary -f Dockerfile.all-binary .
+          docker run -itd --name iris-all-binary build:all-binary tail -f /dev/null
+          mkdir -p build/
+      - name: tar linux amd64 binary
+        run: |
+          docker cp iris-all-binary:/usr/local/bin/iris-linux-amd64 build/
+          tar -czvf build/iris-linux-amd64-${GITHUB_REF_NAME}.tar.gz build/iris-linux-amd64
+      - name: tar linux arm64 binary
+        run: |
+          docker cp iris-all-binary:/usr/local/bin/iris-linux-arm64 build/
+          tar -czvf build/iris-linux-arm64-${GITHUB_REF_NAME}.tar.gz build/iris-linux-arm64
+      - name: get windows amd64 binary
+        run: |
+          docker cp iris-all-binary:/usr/local/bin/iris-windows-amd64.exe build/
+          mv build/iris-windows-amd64.exe build/iris-windows-amd64-${GITHUB_REF_NAME}.exe
+          ls build/
+
+      - name: Upload Linux AMD64 Release Asset
+        id: upload-linux-amd64 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }} 
+          asset_path: build/iris-linux-amd64-${{ github.ref_name }}.tar.gz
+          asset_name: iris-linux-amd64-${{ github.ref_name }}.tar.gz
+          asset_content_type: application/gzip
+      - name: Upload Linux ARM64 Release Asset
+        id: upload-linux-arm64 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }} 
+          asset_path: build/iris-linux-arm64-${{ github.ref_name }}.tar.gz
+          asset_name: iris-linux-arm64-${{ github.ref_name }}.tar.gz
+          asset_content_type: application/gzip
+      - name: Upload Windows AMD64 Release Asset
+        id: upload-windows-amd64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }} 
+          asset_path: build/iris-windows-amd64-${{ github.ref_name }}.exe
+          asset_name: iris-windows-amd64-${{ github.ref_name }}.exe
+          asset_content_type: application/octet-stream
