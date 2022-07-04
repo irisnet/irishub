@@ -65,7 +65,7 @@ func (k Keeper) Bindings(c context.Context, req *types.QueryBindingsRequest) (*t
 	var err error
 	if len(req.Owner) == 0 {
 		bindingStore := prefix.NewStore(store, types.GetBindingsSubspace(req.ServiceName))
-		pageRes, err = query.Paginate(bindingStore, req.Pagination, func(key []byte, value []byte) error {
+		pageRes, err = query.Paginate(bindingStore, shapePageRequest(req.Pagination), func(key []byte, value []byte) error {
 			var binding types.ServiceBinding
 			k.cdc.MustUnmarshal(value, &binding)
 			bindings = append(bindings, &binding)
@@ -80,7 +80,7 @@ func (k Keeper) Bindings(c context.Context, req *types.QueryBindingsRequest) (*t
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 		}
 		bindingStore := prefix.NewStore(store, types.GetOwnerBindingsSubspace(owner, req.ServiceName))
-		pageRes, err = query.Paginate(bindingStore, req.Pagination, func(key []byte, value []byte) error {
+		pageRes, err = query.Paginate(bindingStore, shapePageRequest(req.Pagination), func(key []byte, value []byte) error {
 			provider := sdk.AccAddress(key)
 
 			if binding, found := k.GetServiceBinding(ctx, req.ServiceName, provider); found {
@@ -171,7 +171,7 @@ func (k Keeper) Requests(c context.Context, req *types.QueryRequestsRequest) (*t
 	requests := make([]*types.Request, 0)
 	store := ctx.KVStore(k.storeKey)
 	requestStore := prefix.NewStore(store, types.GetActiveRequestSubspace(req.ServiceName, provider))
-	pageRes, err := query.Paginate(requestStore, req.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.Paginate(requestStore, shapePageRequest(req.Pagination), func(key []byte, value []byte) error {
 		var requestID gogotypes.BytesValue
 		k.cdc.MustUnmarshal(value, &requestID)
 		request, _ := k.GetRequest(ctx, requestID.Value)
@@ -202,7 +202,7 @@ func (k Keeper) RequestsByReqCtx(c context.Context, req *types.QueryRequestsByRe
 	requests := make([]*types.Request, 0)
 	store := ctx.KVStore(k.storeKey)
 	requestStore := prefix.NewStore(store, types.GetRequestSubspaceByReqCtx(requestContextId, req.BatchCounter))
-	pageRes, err := query.Paginate(requestStore, req.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.Paginate(requestStore, shapePageRequest(req.Pagination), func(key []byte, value []byte) error {
 		requestID := append(append(requestContextId, sdk.Uint64ToBigEndian(req.BatchCounter)...), key...)
 		request, _ := k.GetRequest(ctx, requestID)
 		requests = append(requests, &request)
@@ -256,7 +256,7 @@ func (k Keeper) Responses(c context.Context, req *types.QueryResponsesRequest) (
 	store := ctx.KVStore(k.storeKey)
 
 	responseStore := prefix.NewStore(store, types.GetResponseSubspaceByReqCtx(requestContextId, req.BatchCounter))
-	pageRes, err := query.Paginate(responseStore, req.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.Paginate(responseStore, shapePageRequest(req.Pagination), func(key []byte, value []byte) error {
 		var response types.Response
 		k.cdc.MustUnmarshal(value, &response)
 		responses = append(responses, &response)

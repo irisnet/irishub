@@ -52,7 +52,7 @@ func (k Keeper) GetPaginateCollection(ctx sdk.Context, request *types.QueryColle
 	var nfts []exported.NFT
 	store := ctx.KVStore(k.storeKey)
 	nftStore := prefix.NewStore(store, types.KeyNFT(denomID, ""))
-	pageRes, err := query.Paginate(nftStore, request.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.Paginate(nftStore, shapePageRequest(request.Pagination), func(key []byte, value []byte) error {
 		var baseNFT types.BaseNFT
 		k.cdc.MustUnmarshal(value, &baseNFT)
 		nfts = append(nfts, baseNFT)
