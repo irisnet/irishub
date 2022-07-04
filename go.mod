@@ -3,7 +3,7 @@ module github.com/irisnet/irismod
 go 1.17
 
 require (
-	github.com/cosmos/cosmos-sdk v0.45.2
+	github.com/cosmos/cosmos-sdk v0.45.1
 	github.com/cosmos/ibc-go v1.1.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
