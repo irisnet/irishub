@@ -39,6 +39,17 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ### Improvements
 
+## [v1.6.0] - 2022-08-08
+
+### Improvements
+
+* [\#290](https://github.com/irisnet/irismod/pull/290) Bump cosmos-sdk version to [v0.45.1](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.45.1).
+
+### Bug Fixes
+
+* [\#300](https://github.com/irisnet/irismod/pull/300) fix: pagination query limitation
+* (modules/mt) [\#288](https://github.com/irisnet/irismod/pull/288), [\#286](https://github.com/irisnet/irismod/pull/286): Some fixes for the MT module
+
 ## [v1.5.2] - 2021-03-03
 
 * (modules/farm) [\#247](https://github.com/irisnet/irismod/pull/247) Add farm proposal
