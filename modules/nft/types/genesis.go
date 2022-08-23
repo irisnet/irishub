@@ -15,7 +15,7 @@ func NewGenesisState(collections []Collection) *GenesisState {
 // error for any failed validation criteria.
 func ValidateGenesis(data GenesisState) error {
 	for _, c := range data.Collections {
-		if err := ValidateDenomID(c.Denom.Name); err != nil {
+		if err := ValidateDenomID(c.Denom.Id); err != nil {
 			return err
 		}
 
