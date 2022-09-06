@@ -42,11 +42,6 @@ module.exports = {
             lang: "en-US",
             title: "IRISnet Documents",
             description: "IRISnet Documents",
-        },
-        "/zh/": {
-            lang: "简体中文",
-            title: "IRISnet 文档",
-            description: "IRISnet 文档",
         }
     },
     themeConfig: {
@@ -57,8 +52,6 @@ module.exports = {
         editLinkText: 'Help us improve this page!',
         locales: {
             "/": {
-                selectText: 'Languages',
-                label: 'English',
                 editLinkText: 'Help us improve this page!',
                 nav: [
                     {
@@ -76,26 +69,6 @@ module.exports = {
                     ["Tools", "tools"],
                     ["Migration", "migration"],
                     ["Resources", "resources"]
-                ])
-            },
-            "/zh/": {
-                selectText: '选择语言',
-                label: '简体中文',
-                editLinkText: '帮助我们完善此文档',
-                nav: [{
-                    text: 'IRISnet 官网',
-                    link: 'https://www.irisnet.org'
-                }],
-                sidebar: sidebar("", [
-                    ["快速开始", "/zh/get-started"],
-                    ["概念", "/zh/concepts"],
-                    ["功能模块", "/zh/features"],
-                    ["守护进程", "/zh/daemon"],
-                    ["命令行客户端", "/zh/cli-client"],
-                    ["服务端点", "/zh/endpoints"],
-                    ["工具", "/zh/tools"],
-                    ["迁移", "/zh/migration"],
-                    ["资源", "/zh/resources"]
                 ])
             }
         },
