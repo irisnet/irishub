@@ -99,8 +99,8 @@ import (
 	"github.com/irisnet/irismod/modules/mt"
 	mtkeeper "github.com/irisnet/irismod/modules/mt/keeper"
 	mttypes "github.com/irisnet/irismod/modules/mt/types"
-	"github.com/irisnet/irismod/modules/nft"
 	nftkeeper "github.com/irisnet/irismod/modules/nft/keeper"
+	nftmodule "github.com/irisnet/irismod/modules/nft/module"
 	nfttypes "github.com/irisnet/irismod/modules/nft/types"
 	"github.com/irisnet/irismod/modules/oracle"
 	oraclekeeper "github.com/irisnet/irismod/modules/oracle/keeper"
@@ -196,7 +196,7 @@ var (
 		guardian.AppModuleBasic{},
 		token.AppModuleBasic{},
 		record.AppModuleBasic{},
-		nft.AppModuleBasic{},
+		nftmodule.AppModuleBasic{},
 		htlc.AppModuleBasic{},
 		coinswap.AppModuleBasic{},
 		service.AppModuleBasic{},
@@ -725,7 +725,7 @@ func NewIrisApp(
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
 		token.NewAppModule(appCodec, app.TokenKeeper, app.AccountKeeper, app.BankKeeper),
 		record.NewAppModule(appCodec, app.RecordKeeper, app.AccountKeeper, app.BankKeeper),
-		nft.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
+		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
 		mt.NewAppModule(appCodec, app.MTKeeper, app.AccountKeeper, app.BankKeeper),
 		htlc.NewAppModule(appCodec, app.HTLCKeeper, app.AccountKeeper, app.BankKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
@@ -889,7 +889,7 @@ func NewIrisApp(
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
 		token.NewAppModule(appCodec, app.TokenKeeper, app.AccountKeeper, app.BankKeeper),
 		record.NewAppModule(appCodec, app.RecordKeeper, app.AccountKeeper, app.BankKeeper),
-		nft.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
+		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
 		htlc.NewAppModule(appCodec, app.HTLCKeeper, app.AccountKeeper, app.BankKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
 		service.NewAppModule(appCodec, app.ServiceKeeper, app.AccountKeeper, app.BankKeeper),

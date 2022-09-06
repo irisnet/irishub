@@ -31,7 +31,7 @@ import (
 	"github.com/irisnet/irismod/modules/htlc"
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	mttypes "github.com/irisnet/irismod/modules/mt/types"
-	"github.com/irisnet/irismod/modules/nft"
+	nftmodule "github.com/irisnet/irismod/modules/nft/module"
 	nfttypes "github.com/irisnet/irismod/modules/nft/types"
 	"github.com/irisnet/irismod/modules/oracle"
 	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
@@ -119,7 +119,7 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 			fromVM[guardiantypes.ModuleName] = guardian.AppModule{}.ConsensusVersion()
 			fromVM[tokentypes.ModuleName] = token.AppModule{}.ConsensusVersion()
 			fromVM[recordtypes.ModuleName] = record.AppModule{}.ConsensusVersion()
-			fromVM[nfttypes.ModuleName] = nft.AppModule{}.ConsensusVersion()
+			fromVM[nfttypes.ModuleName] = nftmodule.AppModule{}.ConsensusVersion()
 			fromVM[htlctypes.ModuleName] = htlc.AppModule{}.ConsensusVersion()
 			fromVM[servicetypes.ModuleName] = service.AppModule{}.ConsensusVersion()
 			fromVM[oracletypes.ModuleName] = oracle.AppModule{}.ConsensusVersion()
@@ -140,6 +140,14 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 			); err != nil {
 				return nil, err
 			}
+			return app.mm.RunMigrations(ctx, cfg, fromVM)
+		},
+	)
+
+	//TODO
+	app.RegisterUpgradeHandler("v1.4",
+		&store.StoreUpgrades{},
+		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			return app.mm.RunMigrations(ctx, cfg, fromVM)
 		},
 	)
