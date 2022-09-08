@@ -6,6 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/capability"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
@@ -19,6 +20,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/cosmos/cosmos-sdk/x/group"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
@@ -60,6 +62,7 @@ import (
 	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
 )
 
+// RegisterUpgradePlan register a handler of upgrade plan
 func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 	app.RegisterUpgradeHandler(
 		"v1.1", &store.StoreUpgrades{},
@@ -146,8 +149,26 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 
 	//TODO
 	app.RegisterUpgradeHandler("v1.4",
-		&store.StoreUpgrades{},
+		&store.StoreUpgrades{
+			Added: []string{authzkeeper.StoreKey, group.StoreKey},
+		},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			// version upgrade:
+			//	nft :    1 -> 2
+			// 	auth:    2 -> 3
+			// 	bank:    2 -> 3
+			//	coinswap 3 -> 4
+			// 	feegrant 1 -> 2
+			// 	gov      2 -> 3
+			// 	staking  2 -> 3
+			// 	upgrade  2 -> 3
+
+			// navtive module:
+			//  authz
+			//  group
+
+			// ibc application:
+			//  27-interchain-accounts
 			return app.mm.RunMigrations(ctx, cfg, fromVM)
 		},
 	)
