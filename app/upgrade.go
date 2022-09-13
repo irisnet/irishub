@@ -27,9 +27,15 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	sdkupgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+
+	ica "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts"
+	icacontrollertypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/controller/types"
+	icahosttypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/types"
 	ibchost "github.com/cosmos/ibc-go/v5/modules/core/24-host"
 
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
+	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 	"github.com/irisnet/irismod/modules/htlc"
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	mttypes "github.com/irisnet/irismod/modules/mt/types"
@@ -46,6 +52,11 @@ import (
 	"github.com/irisnet/irismod/modules/token"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
+	tibcmttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/types"
+	tibcnfttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/types"
+	tibcclienttypes "github.com/bianjieai/tibc-go/modules/tibc/core/02-client/types"
+	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
+
 	migratehtlc "github.com/irisnet/irishub/migrate/htlc"
 	migrateservice "github.com/irisnet/irishub/migrate/service"
 	migratetibc "github.com/irisnet/irishub/migrate/tibc"
@@ -53,13 +64,6 @@ import (
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	"github.com/irisnet/irishub/modules/mint"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
-
-	farmtypes "github.com/irisnet/irismod/modules/farm/types"
-
-	tibcmttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/types"
-	tibcnfttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/types"
-	tibcclienttypes "github.com/bianjieai/tibc-go/modules/tibc/core/02-client/types"
-	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
 )
 
 // RegisterUpgradePlan register a handler of upgrade plan
@@ -163,12 +167,63 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 			// 	staking  2 -> 3
 			// 	upgrade  2 -> 3
 
-			// navtive module:
+			// added module:
 			//  authz
 			//  group
 
 			// ibc application:
 			//  27-interchain-accounts
+			icaModule := app.mm.Modules[icatypes.ModuleName].(ica.AppModule)
+			fromVM[icatypes.ModuleName] = icaModule.ConsensusVersion()
+			// create ICS27 Controller submodule params
+			controllerParams := icacontrollertypes.Params{}
+			// create ICS27 Host submodule params
+			hostParams := icahosttypes.Params{
+				HostEnabled: true,
+				AllowMessages: []string{
+					authzMsgExec,
+					authzMsgGrant,
+					authzMsgRevoke,
+					bankMsgSend,
+					bankMsgMultiSend,
+					distrMsgSetWithdrawAddr,
+					distrMsgWithdrawValidatorCommission,
+					distrMsgFundCommunityPool,
+					distrMsgWithdrawDelegatorReward,
+					feegrantMsgGrantAllowance,
+					feegrantMsgRevokeAllowance,
+					govMsgVoteWeighted,
+					govMsgSubmitProposal,
+					govMsgDeposit,
+					govMsgVote,
+					stakingMsgEditValidator,
+					stakingMsgDelegate,
+					stakingMsgUndelegate,
+					stakingMsgBeginRedelegate,
+					stakingMsgCreateValidator,
+					vestingMsgCreateVestingAccount,
+					ibcMsgTransfer,
+
+					nftMsgIssueDenom,
+					nftMsgTransferDenom,
+					nftMsgMintNFT,
+					nftMsgEditNFT,
+					nftMsgTransferNFT,
+					nftMsgBurnNFT,
+
+					mtMsgIssueDenom,
+					mtMsgTransferDenom,
+					mtMsgMintMT,
+					mtMsgEditMT,
+					mtMsgTransferMT,
+					mtMsgBurnMT,
+				},
+			}
+
+			ctx.Logger().Info("start to init interchainaccount module...")
+			// initialize ICS27 module
+			icaModule.InitModule(ctx, controllerParams, hostParams)
+			ctx.Logger().Info("start to run module migrations...")
 			return app.mm.RunMigrations(ctx, cfg, fromVM)
 		},
 	)

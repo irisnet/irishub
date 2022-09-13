@@ -85,6 +85,11 @@ import (
 	sdkupgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
+	ica "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts"
+	icahost "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host"
+	icahostkeeper "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host/keeper"
+	icahosttypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/types"
 	"github.com/cosmos/ibc-go/v5/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v5/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
@@ -198,6 +203,7 @@ var (
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		groupmodule.AppModuleBasic{},
+		ica.AppModuleBasic{},
 
 		guardian.AppModuleBasic{},
 		token.AppModuleBasic{},
@@ -236,6 +242,7 @@ var (
 		tibcnfttypes.ModuleName:        nil,
 		tibcmttypes.ModuleName:         nil,
 		nfttypes.ModuleName:            nil,
+		icatypes.ModuleName:            nil,
 	}
 
 	nativeToken tokentypes.Token
@@ -282,6 +289,7 @@ type IrisApp struct {
 	//ibc
 	IBCKeeper         *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	IBCTransferKeeper ibctransferkeeper.Keeper
+	ICAHostKeeper     icahostkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	scopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -392,7 +400,7 @@ func NewIrisApp(
 		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey, recordtypes.StoreKey,
 		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
 		farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey, tibcmttypes.StoreKey, mttypes.StoreKey,
-		authzkeeper.StoreKey, group.StoreKey,
+		authzkeeper.StoreKey, group.StoreKey, icahosttypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -424,6 +432,7 @@ func NewIrisApp(
 	app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
 
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec,
@@ -533,6 +542,18 @@ func NewIrisApp(
 		scopedIBCKeeper,
 	)
 
+	app.ICAHostKeeper = icahostkeeper.NewKeeper(
+		appCodec, keys[icahosttypes.StoreKey],
+		app.GetSubspace(icahosttypes.SubModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		scopedICAHostKeeper,
+		app.MsgServiceRouter(),
+	)
+	icaModule := ica.NewAppModule(nil, &app.ICAHostKeeper)
+	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
+
 	// register the proposal types
 	app.TIBCKeeper = tibckeeper.NewKeeper(
 		appCodec,
@@ -587,7 +608,8 @@ func NewIrisApp(
 	// routerModule := router.NewAppModule(app.RouterKeeper, transferIBCModule)
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
+		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule)
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	nfttransferModule := tibcnfttransfer.NewAppModule(app.TIBCNFTTransferKeeper)
@@ -740,6 +762,7 @@ func NewIrisApp(
 		ibc.NewAppModule(app.IBCKeeper), tibc.NewAppModule(app.TIBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
+		icaModule,
 		nfttransferModule,
 		mttransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
@@ -779,6 +802,7 @@ func NewIrisApp(
 		paramstypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
+		icatypes.ModuleName,
 		vestingtypes.ModuleName,
 
 		//self module
@@ -818,6 +842,7 @@ func NewIrisApp(
 		paramstypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
+		icatypes.ModuleName,
 		vestingtypes.ModuleName,
 
 		//self module
@@ -863,6 +888,7 @@ func NewIrisApp(
 		paramstypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
+		icatypes.ModuleName,
 		vestingtypes.ModuleName,
 
 		//self module
@@ -1170,6 +1196,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(farmtypes.ModuleName)
 	paramsKeeper.Subspace(tibchost.ModuleName)
+	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 
 	return paramsKeeper
 }
