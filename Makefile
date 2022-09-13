@@ -140,7 +140,7 @@ proto-swagger-gen:
 ### Testing
 
 
-test: test-unit test-build
+test: test-unit
 test-all: test-race test-cover
 
 test-unit:

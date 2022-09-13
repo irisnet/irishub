@@ -15,8 +15,8 @@ import (
 
 // nolint: deadcode unused
 var (
-	sender, _   = sdk.AccAddressFromHex(crypto.AddressHash([]byte("sender")).String())
-	testAddr, _ = sdk.AccAddressFromHex(crypto.AddressHash([]byte("test")).String())
+	sender, _   = sdk.AccAddressFromHexUnsafe(crypto.AddressHash([]byte("sender")).String())
+	testAddr, _ = sdk.AccAddressFromHexUnsafe(crypto.AddressHash([]byte("test")).String())
 
 	nilAddr        = sdk.AccAddress{}
 	description    = "description"

@@ -47,10 +47,12 @@ func (s *IntegrationTestSuite) SetupSuite() {
 
 	cfg.GenesisState[guardiantypes.ModuleName] = cfg.Codec.MustMarshalJSON(&guardianGenState)
 
+	var err error
 	s.cfg = cfg
-	s.network = network.New(s.T(), cfg)
+	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
+	s.Require().NoError(err)
 
-	_, err := s.network.WaitForHeight(1)
+	_, err = s.network.WaitForHeight(1)
 	s.Require().NoError(err)
 }
 

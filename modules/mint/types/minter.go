@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -11,7 +12,7 @@ const (
 	blocksPerYear = 60 * 60 * 8766 / 5 // 5 second a block, 8766 = 365.25 * 24
 )
 
-var initialIssue = sdk.NewIntWithDecimal(20, 8)
+var initialIssue = sdkmath.NewIntWithDecimal(20, 8)
 
 // Create a new minter object
 func NewMinter(lastUpdate time.Time, inflationBase sdk.Int) Minter {
@@ -25,7 +26,7 @@ func NewMinter(lastUpdate time.Time, inflationBase sdk.Int) Minter {
 func DefaultMinter() Minter {
 	return NewMinter(
 		time.Unix(0, 0).UTC(),
-		initialIssue.Mul(sdk.NewIntWithDecimal(1, 6)), // 20*(10^8)iris, 20*(10^8)*(10^6)uiris
+		initialIssue.Mul(sdkmath.NewIntWithDecimal(1, 6)), // 20*(10^8)iris, 20*(10^8)*(10^6)uiris
 	)
 }
 
