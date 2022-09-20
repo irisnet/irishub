@@ -23,9 +23,10 @@ var (
 	// params store for inflation params
 	KeyInflation = []byte("Inflation")
 	KeyMintDenom = []byte("MintDenom")
+	MaxInflation = sdk.NewDecWithPrec(2, 1)
 )
 
-// ParamTable for mint module
+// ParamKeyTable for mint module
 func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
@@ -66,7 +67,7 @@ func (p *Params) GetParamSpace() string {
 
 // Validate returns err if the Params is invalid
 func (p Params) Validate() error {
-	if p.Inflation.GT(sdk.NewDecWithPrec(2, 1)) || p.Inflation.LT(sdk.ZeroDec()) {
+	if p.Inflation.GT(MaxInflation) || p.Inflation.LT(sdk.ZeroDec()) {
 		return sdkerrors.Wrapf(ErrInvalidMintInflation, "Mint inflation [%s] should be between [0, 0.2] ", p.Inflation.String())
 	}
 	if len(p.MintDenom) == 0 {
@@ -81,7 +82,7 @@ func validateInflation(i interface{}) error {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if v.GT(sdk.NewDecWithPrec(2, 1)) || v.LT(sdk.ZeroDec()) {
+	if v.GT(MaxInflation) || v.LT(sdk.ZeroDec()) {
 		return fmt.Errorf("Mint inflation [%s] should be between [0, 0.2] ", v.String())
 	}
 

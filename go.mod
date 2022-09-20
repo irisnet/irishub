@@ -182,3 +182,5 @@ replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alp
 replace github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.34.21-irita-220906
 
 replace github.com/zondax/hid => github.com/zondax/hid v0.9.0
+
+replace github.com/irisnet/irismod => /Users/zhangzhiqiang/workspace/github/irisnet/irismod

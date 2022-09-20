@@ -1,12 +1,12 @@
 package simapp
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
@@ -304,38 +304,12 @@ func init() {
 	// set coin denom regexs
 	sdk.SetCoinDenomRegex(DefaultCoinDenomRegex)
 
-	nativeToken = tokentypes.Token{
-		Symbol:        "iris",
-		Name:          "Irishub staking token",
-		Scale:         6,
-		MinUnit:       "uiris",
-		InitialSupply: 2000000000,
-		MaxSupply:     10000000000,
-		Mintable:      true,
-		Owner:         sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))).String(),
-	}
-
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
 	}
 
 	DefaultNodeHome = filepath.Join(userHomeDir, ".iris")
-	owner, err := sdk.AccAddressFromBech32(nativeToken.Owner)
-	if err != nil {
-		panic(err)
-	}
-
-	tokentypes.SetNativeToken(
-		nativeToken.Symbol,
-		nativeToken.Name,
-		nativeToken.MinUnit,
-		nativeToken.Scale,
-		nativeToken.InitialSupply,
-		nativeToken.MaxSupply,
-		nativeToken.Mintable,
-		owner,
-	)
 }
 
 // DefaultCoinDenomRegex returns the default regex string
@@ -860,8 +834,6 @@ func NewSimApp(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
-		nfttransferModule,
-		mttransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
 		token.NewAppModule(appCodec, app.TokenKeeper, app.AccountKeeper, app.BankKeeper),
 		record.NewAppModule(appCodec, app.RecordKeeper, app.AccountKeeper, app.BankKeeper),
@@ -939,10 +911,11 @@ func (app *SimApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.
 	var serviceGenState servicetypes.GenesisState
 	app.appCodec.MustUnmarshalJSON(genesisState[servicetypes.ModuleName], &serviceGenState)
 	serviceGenState.Definitions = append(serviceGenState.Definitions, servicetypes.GenOraclePriceSvcDefinition())
-	serviceGenState.Bindings = append(serviceGenState.Bindings, servicetypes.GenOraclePriceSvcBinding(nativeToken.MinUnit))
+	serviceGenState.Bindings = append(serviceGenState.Bindings, servicetypes.GenOraclePriceSvcBinding(sdk.DefaultBondDenom))
 	serviceGenState.Definitions = append(serviceGenState.Definitions, randomtypes.GetSvcDefinition())
 	genesisState[servicetypes.ModuleName] = app.appCodec.MustMarshalJSON(&serviceGenState)
 
+	fmt.Println(string(genesisState[tokentypes.ModuleName]))
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 
