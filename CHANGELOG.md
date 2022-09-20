@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Application
+
+* [\#2759](https://github.com/irisnet/irishub/pull/2759) Fix export error when with flag `--for-zero-height`
+* [\#2752](https://github.com/irisnet/irishub/pull/2752) Bump up cosmos sdk to v0.46.1
+
 ## 1.3.0
 
 *March 19, 2022*
