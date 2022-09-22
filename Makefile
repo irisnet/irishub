@@ -8,6 +8,7 @@ LEDGER_ENABLED ?= true
 BINDIR ?= $(GOPATH)/bin
 SDK_PACK := $(shell go list -m github.com/cosmos/cosmos-sdk | sed  's/ /\@/g')
 NetworkType := $(shell if [ -z ${NetworkType} ]; then echo "mainnet"; else echo ${NetworkType}; fi)
+CURRENT_DIR = $(shell pwd)
 
 export GO111MODULE = on
 
@@ -145,6 +146,19 @@ test-all: test-race test-cover
 
 test-unit:
 	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ${PACKAGES_UNITTEST}
+
+test-sim-nondeterminism-fast:
+	@echo "Running non-determinism test..."
+	@cd ${CURRENT_DIR}/app && go test -mod=readonly -run TestAppStateDeterminism -Enabled=true \
+		-NumBlocks=10 -BlockSize=200 -Commit=true -Period=0 -v -timeout 24h
+
+test-sim-import-export: runsim
+	@echo "Running application import/export simulation. This may take several minutes..."
+	@cd ${CURRENT_DIR}/app && $(BINDIR)/runsim -Jobs=4 -SimAppPkg=. -ExitOnFail 50 5 TestAppImportExport
+
+test-sim-after-import: runsim
+	@echo "Running application simulation-after-import. This may take several minutes..."
+	@cd ${CURRENT_DIR}/app && $(BINDIR)/runsim -Jobs=4 -SimAppPkg=. -ExitOnFail 50 5 TestAppSimulationAfterImport
 
 test-race:
 	@VERSION=$(VERSION) go test -mod=readonly -race -tags='ledger test_ledger_mock' ./...

@@ -5,8 +5,18 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"runtime/debug"
+	"strings"
 	"testing"
 
+	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
+	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
+	mttypes "github.com/irisnet/irismod/modules/mt/types"
+	nfttypes "github.com/irisnet/irismod/modules/nft/types"
+	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
+	randomtypes "github.com/irisnet/irismod/modules/random/types"
+	servicetypes "github.com/irisnet/irismod/modules/service/types"
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	"github.com/stretchr/testify/require"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -156,6 +166,17 @@ func TestAppImportExport(t *testing.T) {
 	err = json.Unmarshal(exported.AppState, &genesisState)
 	require.NoError(t, err)
 
+	defer func() {
+		if r := recover(); r != nil {
+			err := fmt.Sprintf("%v", r)
+			if !strings.Contains(err, "validator set is empty after InitGenesis") {
+				panic(r)
+			}
+			logger.Info("Skipping simulation as all validators have been unbonded")
+			logger.Info("err", err, "stacktrace", string(debug.Stack()))
+		}
+	}()
+
 	ctxA := app.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
 	ctxB := newApp.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
 	newApp.mm.InitGenesis(ctxB, app.AppCodec(), genesisState)
@@ -180,6 +201,17 @@ func TestAppImportExport(t *testing.T) {
 		{app.keys[capabilitytypes.StoreKey], newApp.keys[capabilitytypes.StoreKey], [][]byte{}},
 		{app.keys[ibchost.StoreKey], newApp.keys[ibchost.StoreKey], [][]byte{}},
 		{app.keys[ibctransfertypes.StoreKey], newApp.keys[ibctransfertypes.StoreKey], [][]byte{}},
+
+		// check irismod module
+		{app.keys[tokentypes.StoreKey], newApp.keys[tokentypes.StoreKey], [][]byte{}},
+		{app.keys[oracletypes.StoreKey], newApp.keys[oracletypes.StoreKey], [][]byte{}},
+		//mt.Supply is InitSupply, can be not equal to TotalSupply
+		{app.keys[mttypes.StoreKey], newApp.keys[mttypes.StoreKey], [][]byte{mttypes.PrefixMT}},
+		{app.keys[nfttypes.StoreKey], newApp.keys[nfttypes.StoreKey], [][]byte{{0x05}}},
+		{app.keys[servicetypes.StoreKey], newApp.keys[servicetypes.StoreKey], [][]byte{servicetypes.InternalCounterKey}},
+		{app.keys[randomtypes.StoreKey], newApp.keys[randomtypes.StoreKey], [][]byte{randomtypes.RandomKey}},
+		{app.keys[htlctypes.StoreKey], newApp.keys[htlctypes.StoreKey], [][]byte{}},
+		{app.keys[coinswaptypes.StoreKey], newApp.keys[coinswaptypes.StoreKey], [][]byte{}},
 	}
 
 	for _, skp := range storeKeysPrefixes {

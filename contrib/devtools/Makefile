@@ -119,3 +119,19 @@ buf-stamp:
 	chmod +x "${BIN}/buf"
 
 	touch $@
+
+# Install the runsim binary with a temporary workaround of entering an outside
+# directory as the "go get" command ignores the -mod option and will polute the
+# go.{mod, sum} files.
+#
+# ref: https://github.com/golang/go/issues/30515
+runsim: $(RUNSIM)
+$(RUNSIM):
+	@echo "Installing runsim..."
+	@go install github.com/cosmos/tools/cmd/runsim@v1.0.0
+
+tools-clean:
+	rm -f $(STATIK) $(GOLANGCI_LINT) $(RUNSIM)
+	rm -f tools-stamp
+
+.PHONY: tools-clean statik runsim

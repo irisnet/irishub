@@ -936,8 +936,6 @@ func NewIrisApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 
-		nfttransferModule,
-		mttransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
 		token.NewAppModule(appCodec, app.TokenKeeper, app.AccountKeeper, app.BankKeeper),
 		record.NewAppModule(appCodec, app.RecordKeeper, app.AccountKeeper, app.BankKeeper),
