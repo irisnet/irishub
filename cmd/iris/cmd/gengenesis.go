@@ -10,6 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/irisnet/irishub/app"
 	"github.com/spf13/cobra"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -82,7 +83,9 @@ func merge(cdc codec.Codec, testnet, mainnet *types.GenesisDoc, output string) (
 	mainnetAppState["htlc"] = testnetAppState["htlc"]
 	//testnetAppState["nft"] = mainnetAppState["nft"]
 
-	mergeBankAndAuth(cdc, testnetAppState, mainnetAppState)
+	mergeBank(cdc, testnetAppState, mainnetAppState)
+	mergeAuth(cdc, testnetAppState, mainnetAppState)
+	mergeGov(cdc, testnetAppState, mainnetAppState)
 
 	mainnet.InitialHeight = 0
 	mainnet.ChainID = testnet.ChainID
@@ -100,11 +103,9 @@ var filterAccount = []string{
 	"iaa1tygms3xhhs3yv487phx3dw4a95jn7t7l5e40dj",
 	//bonded_tokens_pool
 	"iaa1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3qef7mx",
-	//farm
-	//"iaa1er8hq8es45ga8m580h8dp4m54vk6j9vckm4t8j",
 }
 
-func mergeBankAndAuth(cdc codec.Codec, testnet, mainnet map[string]json.RawMessage) {
+func mergeBank(cdc codec.Codec, testnet, mainnet map[string]json.RawMessage) {
 	var bankState, testnetBankState banktypes.GenesisState
 	cdc.MustUnmarshalJSON(mainnet["bank"], &bankState)
 
@@ -124,9 +125,10 @@ func mergeBankAndAuth(cdc codec.Codec, testnet, mainnet map[string]json.RawMessa
 	//copy testnet balance to mainnet
 	cdc.MustUnmarshalJSON(testnet["bank"], &testnetBankState)
 	bankState.Balances = append(bankState.Balances, testnetBankState.Balances...)
-
 	mainnet["bank"] = cdc.MustMarshalJSON(&bankState)
+}
 
+func mergeAuth(cdc codec.Codec, testnet, mainnet map[string]json.RawMessage) {
 	var authState, testnetAuthState authtypes.GenesisState
 	cdc.MustUnmarshalJSON(testnet["auth"], &testnetAuthState)
 	cdc.MustUnmarshalJSON(mainnet["auth"], &authState)
@@ -134,25 +136,18 @@ func mergeBankAndAuth(cdc codec.Codec, testnet, mainnet map[string]json.RawMessa
 	for _, account := range testnetAuthState.Accounts {
 		authState.Accounts = append(authState.Accounts, account)
 	}
-	// accounts, err := authtypes.UnpackAccounts(testnetAuthState.Accounts)
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// for _, account := range accounts {
-	// 	acc, err := codectypes.NewAnyWithValue(account)
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	nextNumber := len(authState.Accounts) + 1
-
-	// 	err = account.SetAccountNumber(uint64(nextNumber))
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	authState.Accounts = append(authState.Accounts, acc)
-	// }
 	mainnet["auth"] = cdc.MustMarshalJSON(&authState)
+}
+
+func mergeGov(cdc codec.Codec, testnet, mainnet map[string]json.RawMessage) {
+	var govState, testnetgovState govtypes.GenesisState
+	cdc.MustUnmarshalJSON(testnet["gov"], &testnetgovState)
+	cdc.MustUnmarshalJSON(mainnet["gov"], &govState)
+
+	govState.DepositParams = testnetgovState.DepositParams
+	govState.VotingParams = testnetgovState.VotingParams
+	govState.TallyParams = testnetgovState.TallyParams
+	mainnet["gov"] = cdc.MustMarshalJSON(&govState)
 }
 
 func genesisDocFromFile(genDocFile string) (*types.GenesisDoc, error) {
