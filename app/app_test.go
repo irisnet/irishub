@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"testing"
 
@@ -12,6 +13,7 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/cosmos/cosmos-sdk/simapp"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 func TestIrisAppExport(t *testing.T) {
@@ -40,4 +42,10 @@ func TestIrisAppExport(t *testing.T) {
 func TestGetMaccPerms(t *testing.T) {
 	dup := GetMaccPerms()
 	require.Equal(t, maccPerms, dup, "duplicated module account permissions differed from actual module account permissions")
+}
+
+func TestModuleAddr(t *testing.T) {
+	for k := range maccPerms {
+		fmt.Println(k, authtypes.NewModuleAddress(k).String())
+	}
 }
