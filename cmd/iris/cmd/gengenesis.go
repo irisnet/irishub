@@ -4,8 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"sort"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/irisnet/irishub/app"
 	"github.com/spf13/cobra"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -69,27 +73,86 @@ func merge(cdc codec.Codec, testnet, mainnet *types.GenesisDoc, output string) (
 	if err = tmjson.Unmarshal(testnet.AppState, &testnetAppState); err != nil {
 		panic(err)
 	}
-	// mainnet.Validators = nil
-	// mainnetAppState["staking"] = testnetAppState["staking"]
-	// mainnetAppState["slashing"] = testnetAppState["slashing"]
-	// mainnetAppState["mint"] = testnetAppState["mint"]
-	// mainnetAppState["distribution"] = testnetAppState["distribution"]
-	// mainnetAppState["genutil"] = testnetAppState["genutil"]
-	// mainnetAppState["farm"] = testnetAppState["farm"]
-	testnetAppState["nft"] = mainnetAppState["nft"]
+	mainnet.Validators = nil
+	mainnetAppState["staking"] = testnetAppState["staking"]
+	mainnetAppState["slashing"] = testnetAppState["slashing"]
+	mainnetAppState["mint"] = testnetAppState["mint"]
+	mainnetAppState["distribution"] = testnetAppState["distribution"]
+	mainnetAppState["genutil"] = testnetAppState["genutil"]
+	mainnetAppState["htlc"] = testnetAppState["htlc"]
+	//testnetAppState["nft"] = mainnetAppState["nft"]
 
-	testnet.AppState, err = tmjson.Marshal(testnetAppState)
+	mergeBankAndAuth(cdc, testnetAppState, mainnetAppState)
+
+	mainnet.InitialHeight = 0
+	mainnet.ChainID = testnet.ChainID
+	mainnet.AppState, err = tmjson.Marshal(mainnetAppState)
 	if err != nil {
 		return err
 	}
-	return testnet.SaveAs(output)
+	return mainnet.SaveAs(output)
 }
 
-func mergeBank(cdc codec.Codec, testnet, mainnet map[string]json.RawMessage) {
-	//distribution iaa1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8jaydtw
-	//not_bonded_tokens_pool iaa1tygms3xhhs3yv487phx3dw4a95jn7t7l5e40dj
-	// bonded_tokens_pool iaa1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3qef7mx
-	// farm iaa1er8hq8es45ga8m580h8dp4m54vk6j9vckm4t8j
+var filterAccount = []string{
+	//distribution
+	"iaa1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8jaydtw",
+	//not_bonded_tokens_pool
+	"iaa1tygms3xhhs3yv487phx3dw4a95jn7t7l5e40dj",
+	//bonded_tokens_pool
+	"iaa1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3qef7mx",
+	//farm
+	//"iaa1er8hq8es45ga8m580h8dp4m54vk6j9vckm4t8j",
+}
+
+func mergeBankAndAuth(cdc codec.Codec, testnet, mainnet map[string]json.RawMessage) {
+	var bankState, testnetBankState banktypes.GenesisState
+	cdc.MustUnmarshalJSON(mainnet["bank"], &bankState)
+
+	//clean Supply
+	bankState.Supply = sdk.NewCoins()
+
+	//delete balance
+	k := 0
+	for _, banlance := range bankState.Balances {
+		idx := sort.SearchStrings(filterAccount, banlance.Address)
+		if !(idx < len(filterAccount) && banlance.Address == filterAccount[idx]) {
+			bankState.Balances[k] = banlance
+		}
+	}
+	bankState.Balances = bankState.Balances[:k]
+
+	//copy testnet balance to mainnet
+	cdc.MustUnmarshalJSON(testnet["bank"], &testnetBankState)
+	bankState.Balances = append(bankState.Balances, testnetBankState.Balances...)
+
+	mainnet["bank"] = cdc.MustMarshalJSON(&bankState)
+
+	var authState, testnetAuthState authtypes.GenesisState
+	cdc.MustUnmarshalJSON(testnet["auth"], &testnetAuthState)
+	cdc.MustUnmarshalJSON(mainnet["auth"], &authState)
+
+	for _, account := range testnetAuthState.Accounts {
+		authState.Accounts = append(authState.Accounts, account)
+	}
+	// accounts, err := authtypes.UnpackAccounts(testnetAuthState.Accounts)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// for _, account := range accounts {
+	// 	acc, err := codectypes.NewAnyWithValue(account)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	nextNumber := len(authState.Accounts) + 1
+
+	// 	err = account.SetAccountNumber(uint64(nextNumber))
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	authState.Accounts = append(authState.Accounts, acc)
+	// }
+	mainnet["auth"] = cdc.MustMarshalJSON(&authState)
 }
 
 func genesisDocFromFile(genDocFile string) (*types.GenesisDoc, error) {
