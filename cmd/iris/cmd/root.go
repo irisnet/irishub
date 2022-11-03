@@ -91,7 +91,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		testnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		debug.Cmd(),
 		config.Cmd(),
-		MergeGenesisCommands(),
+		MergeGenesisCommands(encodingConfig),
 	)
 
 	ac := appCreator{

@@ -6,15 +6,18 @@ import (
 	"io/ioutil"
 	"sort"
 
+	"github.com/spf13/cobra"
+
+	tmjson "github.com/tendermint/tendermint/libs/json"
+	"github.com/tendermint/tendermint/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	"github.com/irisnet/irishub/app"
-	"github.com/spf13/cobra"
-	tmjson "github.com/tendermint/tendermint/libs/json"
-	"github.com/tendermint/tendermint/types"
+
+	"github.com/irisnet/irishub/app/params"
 )
 
 const (
@@ -25,12 +28,11 @@ const (
 
 // MergeGenesisCommands registers a sub-tree of commands to interact with
 // local private key storage.
-func MergeGenesisCommands() *cobra.Command {
+func MergeGenesisCommands(encodingConfig params.EncodingConfig) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "merge-genesis",
 		Short: "merge genesis with testnet and mainnet",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			encodingConfig := app.MakeEncodingConfig()
 			testnetGenesisPath, err := cmd.Flags().GetString(testnetFile)
 			if err != nil {
 				return err
@@ -81,7 +83,6 @@ func merge(cdc codec.Codec, testnet, mainnet *types.GenesisDoc, output string) (
 	mainnetAppState["distribution"] = testnetAppState["distribution"]
 	mainnetAppState["genutil"] = testnetAppState["genutil"]
 	mainnetAppState["htlc"] = testnetAppState["htlc"]
-	//testnetAppState["nft"] = mainnetAppState["nft"]
 
 	mergeBank(cdc, testnetAppState, mainnetAppState)
 	mergeAuth(cdc, testnetAppState, mainnetAppState)
