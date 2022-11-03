@@ -14,7 +14,8 @@ service Msg {
   rpc CreatePool(MsgCreatePool) returns (MsgCreatePoolResponse);
 
   // CreatePoolWithCommunityPool defines a method for creating a new farm pool
-  rpc CreatePoolWithCommunityPool(MsgCreatePoolWithCommunityPool) returns (MsgCreatePoolWithCommunityPoolResponse);
+  rpc CreatePoolWithCommunityPool(MsgCreatePoolWithCommunityPool)
+      returns (MsgCreatePoolWithCommunityPoolResponse);
 
   // DestroyPool defines a method for destroying a existed farm pool
   rpc DestroyPool(MsgDestroyPool) returns (MsgDestroyPoolResponse);
@@ -54,11 +55,11 @@ message MsgCreatePool {
 message MsgCreatePoolWithCommunityPool {
   option (gogoproto.equal) = true;
 
-  CommunityPoolCreateFarmProposal content = 1 [(gogoproto.nullable) = false];
+  CommunityPoolCreateFarmProposal content = 1 [ (gogoproto.nullable) = false ];
   repeated cosmos.base.v1beta1.Coin initial_deposit = 2 [
-    (gogoproto.nullable)     = false,
+    (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
-    (gogoproto.moretags)     = "yaml:\"initial_deposit\""
+    (gogoproto.moretags) = "yaml:\"initial_deposit\""
   ];
   string proposer = 3;
 }

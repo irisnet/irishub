@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -39,7 +40,7 @@ func TestToken_ToMinCoin(t *testing.T) {
 				name:    fmt.Sprintf("Main Coin to Min Coin,scale=%d", i),
 				wantErr: false,
 				args:    args{coin: sdk.NewDecCoin(token.Symbol, sdk.NewInt(10))},
-				want:    sdk.NewCoin(token.MinUnit, sdk.NewIntWithDecimal(10, int(token.Scale))),
+				want:    sdk.NewCoin(token.MinUnit, sdkmath.NewIntWithDecimal(10, int(token.Scale))),
 				success: true,
 			},
 			{

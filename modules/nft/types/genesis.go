@@ -11,6 +11,11 @@ func NewGenesisState(collections []Collection) *GenesisState {
 	}
 }
 
+// DefaultGenesisState returns a default genesis state
+func DefaultGenesisState() *GenesisState {
+	return NewGenesisState([]Collection{})
+}
+
 // ValidateGenesis performs basic validation of nfts genesis data returning an
 // error for any failed validation criteria.
 func ValidateGenesis(data GenesisState) error {

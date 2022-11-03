@@ -8,16 +8,22 @@ option go_package = "github.com/irisnet/irismod/modules/random/types";
 
 // Msg defines the oracle Msg service
 service Msg {
-    // RequestRandom defines a method for requesting a new random number
-    rpc RequestRandom(MsgRequestRandom) returns (MsgRequestRandomResponse);
+  // RequestRandom defines a method for requesting a new random number
+  rpc RequestRandom(MsgRequestRandom) returns (MsgRequestRandomResponse);
 }
 
-// MsgRequestRandom defines an sdk.Msg type that supports requesting a random number
+// MsgRequestRandom defines an sdk.Msg type that supports requesting a random
+// number
 message MsgRequestRandom {
-    uint64 block_interval = 1 [ (gogoproto.moretags) = "yaml:\"block_interval\"" ];
-    string consumer = 2;
-    bool oracle = 3;
-    repeated cosmos.base.v1beta1.Coin service_fee_cap = 4 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\"" ];
+  uint64 block_interval = 1
+      [ (gogoproto.moretags) = "yaml:\"block_interval\"" ];
+  string consumer = 2;
+  bool oracle = 3;
+  repeated cosmos.base.v1beta1.Coin service_fee_cap = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.moretags) = "yaml:\"service_fee_cap\""
+  ];
 }
 
 // MsgRequestRandomResponse defines the Msg/RequestRandom response type

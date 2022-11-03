@@ -6,7 +6,6 @@ import (
 
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-	tmtime "github.com/tendermint/tendermint/types/time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -33,7 +32,7 @@ func cs(coins ...sdk.Coin) sdk.Coins {
 }
 
 func ts(minOffset int) uint64 {
-	return uint64(tmtime.Now().Add(time.Duration(minOffset) * time.Minute).Unix())
+	return uint64(time.Now().Add(time.Duration(minOffset) * time.Minute).Unix())
 }
 
 func NewHTLTGenesis(deputyAddress sdk.AccAddress) *types.GenesisState {

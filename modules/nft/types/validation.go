@@ -70,6 +70,13 @@ func Modified(target string) bool {
 	return target != types.DoNotModify
 }
 
+func Modify(origin, target string) string {
+	if target == types.DoNotModify {
+		return origin
+	}
+	return target
+}
+
 // ValidateKeywords checks if the given denomId begins with `DenomKeywords`
 func ValidateKeywords(denomId string) error {
 	if regexpKeyword(denomId) {

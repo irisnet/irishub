@@ -30,7 +30,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// MsgRequestRandom defines an sdk.Msg type that supports requesting a random number
+// MsgRequestRandom defines an sdk.Msg type that supports requesting a random
+// number
 type MsgRequestRandom struct {
 	BlockInterval uint64                                   `protobuf:"varint,1,opt,name=block_interval,json=blockInterval,proto3" json:"block_interval,omitempty" yaml:"block_interval"`
 	Consumer      string                                   `protobuf:"bytes,2,opt,name=consumer,proto3" json:"consumer,omitempty"`
@@ -527,10 +528,7 @@ func (m *MsgRequestRandom) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -580,10 +578,7 @@ func (m *MsgRequestRandomResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {

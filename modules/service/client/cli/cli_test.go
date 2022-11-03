@@ -49,10 +49,11 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	serviceGenesisState.Params.ComplaintRetrospect = time.Duration(time.Second)
 	cfg.GenesisState[servicetypes.ModuleName] = cfg.Codec.MustMarshalJSON(&serviceGenesisState)
 
+	var err error
 	s.cfg = cfg
-	s.network = network.New(s.T(), cfg)
+	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
 
-	_, err := s.network.WaitForHeight(1)
+	_, err = s.network.WaitForHeight(1)
 	s.Require().NoError(err)
 }
 
@@ -86,7 +87,9 @@ func (s *IntegrationTestSuite) TestService() {
 	provider := author
 
 	consumerInfo, _, _ := val.ClientCtx.Keyring.NewMnemonic("NewValidator", keyring.English, sdk.FullFundraiserPath, keyring.DefaultBIP39Passphrase, hd.Secp256k1)
-	consumer := sdk.AccAddress(consumerInfo.GetPubKey().Address())
+	pubKey, err := consumerInfo.GetPubKey()
+	s.Require().NoError(err)
+	consumer := sdk.AccAddress(pubKey.Address())
 
 	reqServiceFee := fmt.Sprintf("50%s", serviceDenom)
 	reqInput := `{"header":{},"body":{}}`
@@ -280,7 +283,7 @@ func (s *IntegrationTestSuite) TestService() {
 			var requestsBz []byte
 			for _, attribute := range event.Attributes {
 				if string(attribute.Key) == types.AttributeKeyRequests {
-					requestsBz = attribute.GetValue()
+					requestsBz = []byte(attribute.GetValue())
 				}
 				if string(attribute.Key) == types.AttributeKeyRequestContextID &&
 					string(attribute.GetValue()) == requestContextId {

@@ -20,7 +20,6 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
 	"github.com/irisnet/irismod/modules/token/client/cli"
-	"github.com/irisnet/irismod/modules/token/client/rest"
 	"github.com/irisnet/irismod/modules/token/keeper"
 	"github.com/irisnet/irismod/modules/token/simulation"
 	"github.com/irisnet/irismod/modules/token/types"
@@ -62,7 +61,7 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 
 // RegisterRESTRoutes registers the REST routes for the token module.
 func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	rest.RegisterHandlers(clientCtx, rtr)
+	//rest.RegisterHandlers(clientCtx, rtr)
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the token module.

@@ -11,213 +11,204 @@ option go_package = "github.com/irisnet/irismod/modules/service/types";
 
 // Query creates service with iservice as rpc
 service Query {
-    // Definition returns service definition
-    rpc Definition(QueryDefinitionRequest) returns (QueryDefinitionResponse) {
-        option (google.api.http).get = "/irismod/service/definitions/{service_name}";
-    }
+  // Definition returns service definition
+  rpc Definition(QueryDefinitionRequest) returns (QueryDefinitionResponse) {
+    option (google.api.http).get =
+        "/irismod/service/definitions/{service_name}";
+  }
 
-    // Binding returns service Binding with service name and provider
-    rpc Binding(QueryBindingRequest) returns (QueryBindingResponse) {
-        option (google.api.http).get = "/irismod/service/bindings/{service_name}/{provider}";
-    }
+  // Binding returns service Binding with service name and provider
+  rpc Binding(QueryBindingRequest) returns (QueryBindingResponse) {
+    option (google.api.http).get =
+        "/irismod/service/bindings/{service_name}/{provider}";
+  }
 
-    // Bindings returns all service Bindings with service name and owner
-    rpc Bindings(QueryBindingsRequest) returns (QueryBindingsResponse) {
-        option (google.api.http).get = "/irismod/service/bindings/{service_name}";
-    }
+  // Bindings returns all service Bindings with service name and owner
+  rpc Bindings(QueryBindingsRequest) returns (QueryBindingsResponse) {
+    option (google.api.http).get = "/irismod/service/bindings/{service_name}";
+  }
 
-    // WithdrawAddress returns the withdraw address of the binding owner
-    rpc WithdrawAddress(QueryWithdrawAddressRequest) returns (QueryWithdrawAddressResponse) {
-        option (google.api.http).get = "/irismod/service/owners/{owner}/withdraw-address";
-    }
+  // WithdrawAddress returns the withdraw address of the binding owner
+  rpc WithdrawAddress(QueryWithdrawAddressRequest)
+      returns (QueryWithdrawAddressResponse) {
+    option (google.api.http).get =
+        "/irismod/service/owners/{owner}/withdraw-address";
+  }
 
-    // RequestContext returns the request context
-    rpc RequestContext(QueryRequestContextRequest) returns (QueryRequestContextResponse) {
-        option (google.api.http).get = "/irismod/service/contexts/{request_context_id}";
-    }
+  // RequestContext returns the request context
+  rpc RequestContext(QueryRequestContextRequest)
+      returns (QueryRequestContextResponse) {
+    option (google.api.http).get =
+        "/irismod/service/contexts/{request_context_id}";
+  }
 
-    // Request returns the request
-    rpc Request(QueryRequestRequest) returns (QueryRequestResponse) {
-        option (google.api.http).get = "/irismod/service/requests/{request_id}";
-    }
+  // Request returns the request
+  rpc Request(QueryRequestRequest) returns (QueryRequestResponse) {
+    option (google.api.http).get = "/irismod/service/requests/{request_id}";
+  }
 
-    // Request returns all requests of one service with provider
-    rpc Requests(QueryRequestsRequest) returns (QueryRequestsResponse) {
-        option (google.api.http).get = "/irismod/service/requests/{service_name}/{provider}";
-    }
+  // Request returns all requests of one service with provider
+  rpc Requests(QueryRequestsRequest) returns (QueryRequestsResponse) {
+    option (google.api.http).get =
+        "/irismod/service/requests/{service_name}/{provider}";
+  }
 
-    // RequestsByReqCtx returns all requests of one service call batch
-    rpc RequestsByReqCtx(QueryRequestsByReqCtxRequest) returns (QueryRequestsByReqCtxResponse) {
-        option (google.api.http).get = "/irismod/service/requests/{request_context_id}/{batch_counter}";
-    }
+  // RequestsByReqCtx returns all requests of one service call batch
+  rpc RequestsByReqCtx(QueryRequestsByReqCtxRequest)
+      returns (QueryRequestsByReqCtxResponse) {
+    option (google.api.http).get =
+        "/irismod/service/requests/{request_context_id}/{batch_counter}";
+  }
 
-    // Response returns the response of request
-    rpc Response(QueryResponseRequest) returns (QueryResponseResponse) {
-        option (google.api.http).get = "/irismod/service/responses/{request_id}";
-    }
+  // Response returns the response of request
+  rpc Response(QueryResponseRequest) returns (QueryResponseResponse) {
+    option (google.api.http).get = "/irismod/service/responses/{request_id}";
+  }
 
-    // Responses returns all responses of one service call batch
-    rpc Responses(QueryResponsesRequest) returns (QueryResponsesResponse) {
-        option (google.api.http).get = "/irismod/service/responses/{request_context_id}/{batch_counter}";
-    }
+  // Responses returns all responses of one service call batch
+  rpc Responses(QueryResponsesRequest) returns (QueryResponsesResponse) {
+    option (google.api.http).get =
+        "/irismod/service/responses/{request_context_id}/{batch_counter}";
+  }
 
-    // EarnedFees returns the earned service fee of one provider
-    rpc EarnedFees(QueryEarnedFeesRequest) returns (QueryEarnedFeesResponse) {
-        option (google.api.http).get = "/irismod/service/fees/{provider}";
-    }
+  // EarnedFees returns the earned service fee of one provider
+  rpc EarnedFees(QueryEarnedFeesRequest) returns (QueryEarnedFeesResponse) {
+    option (google.api.http).get = "/irismod/service/fees/{provider}";
+  }
 
-    // Schema returns the schema
-    rpc Schema(QuerySchemaRequest) returns (QuerySchemaResponse) {
-        option (google.api.http).get = "/irismod/service/schemas/{schema_name}";
-    }
+  // Schema returns the schema
+  rpc Schema(QuerySchemaRequest) returns (QuerySchemaResponse) {
+    option (google.api.http).get = "/irismod/service/schemas/{schema_name}";
+  }
 
-    // Params queries the service parameters
-    rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-        option (google.api.http).get = "/irismod/service/params";
-    }
+  // Params queries the service parameters
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/irismod/service/params";
+  }
 }
 
 // QueryDefinitionRequest is request type for the Query/Definition RPC method
-message QueryDefinitionRequest {
-    string service_name = 1;
-}
+message QueryDefinitionRequest { string service_name = 1; }
 
 // QueryDefinitionResponse is response type for the Query/Definition RPC method
-message QueryDefinitionResponse {
-    ServiceDefinition service_definition = 1;
-}
+message QueryDefinitionResponse { ServiceDefinition service_definition = 1; }
 
 // QueryBindingRequest is request type for the Query/Binding RPC method
 message QueryBindingRequest {
-    string service_name = 1;
-    string provider = 2;
+  string service_name = 1;
+  string provider = 2;
 }
 
 // QueryDefinitionResponse is response type for the Query/Binding RPC method
-message QueryBindingResponse {
-    ServiceBinding service_binding = 1;
-}
+message QueryBindingResponse { ServiceBinding service_binding = 1; }
 
 // QueryBindingsRequest is request type for the Query/Bindings RPC method
 message QueryBindingsRequest {
-    string service_name = 1;
-    string owner = 2;
-    // pagination defines an optional pagination for the request
-    cosmos.base.query.v1beta1.PageRequest pagination = 3;
+  string service_name = 1;
+  string owner = 2;
+  // pagination defines an optional pagination for the request
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
 // QueryDefinitionsResponse is response type for the Query/Bindings RPC method
 message QueryBindingsResponse {
-    repeated ServiceBinding service_bindings = 1;
-    cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  repeated ServiceBinding service_bindings = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-// QueryWithdrawAddressRequest is request type for the Query/WithdrawAddress RPC method
-message QueryWithdrawAddressRequest {
-    string owner = 1;
-}
+// QueryWithdrawAddressRequest is request type for the Query/WithdrawAddress RPC
+// method
+message QueryWithdrawAddressRequest { string owner = 1; }
 
-// QueryWithdrawAddressResponse is response type for the Query/WithdrawAddress RPC method
-message QueryWithdrawAddressResponse {
-    string withdraw_address = 1;
-}
+// QueryWithdrawAddressResponse is response type for the Query/WithdrawAddress
+// RPC method
+message QueryWithdrawAddressResponse { string withdraw_address = 1; }
 
-// QueryRequestContextRequest is request type for the Query/RequestContext RPC method
-message QueryRequestContextRequest {
-    string request_context_id = 1;
-}
+// QueryRequestContextRequest is request type for the Query/RequestContext RPC
+// method
+message QueryRequestContextRequest { string request_context_id = 1; }
 
-// QueryRequestContextResponse is response type for the Query/RequestContext RPC method
-message QueryRequestContextResponse {
-    RequestContext request_context = 1;
-}
+// QueryRequestContextResponse is response type for the Query/RequestContext RPC
+// method
+message QueryRequestContextResponse { RequestContext request_context = 1; }
 
 // QueryRequestRequest is request type for the Query/Request RPC method
-message QueryRequestRequest {
-    string request_id = 1;
-}
+message QueryRequestRequest { string request_id = 1; }
 
 // QueryRequestResponse is response type for the Query/Request RPC method
-message QueryRequestResponse {
-    Request request = 1;
-}
+message QueryRequestResponse { Request request = 1; }
 
 // QueryRequestsRequest is request type for the Query/Requests RPC method
 message QueryRequestsRequest {
-    string service_name = 1;
-    string provider = 2;
-    cosmos.base.query.v1beta1.PageRequest pagination = 3;
+  string service_name = 1;
+  string provider = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
 // QueryRequestsResponse is response type for the Query/Requests RPC method
 message QueryRequestsResponse {
-    repeated Request requests = 1;
-    cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  repeated Request requests = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-// QueryRequestsByReqCtxRequest is request type for the Query/RequestsByReqCtx RPC method
+// QueryRequestsByReqCtxRequest is request type for the Query/RequestsByReqCtx
+// RPC method
 message QueryRequestsByReqCtxRequest {
-    string request_context_id = 1;
-    uint64 batch_counter = 2;
-    cosmos.base.query.v1beta1.PageRequest pagination = 3;
+  string request_context_id = 1;
+  uint64 batch_counter = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
-// QueryRequestsByReqCtxResponse is response type for the Query/RequestsByReqCtx RPC method
+// QueryRequestsByReqCtxResponse is response type for the Query/RequestsByReqCtx
+// RPC method
 message QueryRequestsByReqCtxResponse {
-    repeated Request requests = 1;
-    cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  repeated Request requests = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // QueryResponseRequest is request type for the Query/Response RPC method
-message QueryResponseRequest {
-    string request_id = 1;
-}
+message QueryResponseRequest { string request_id = 1; }
 
 // QueryResponseResponse is response type for the Query/Response RPC method
-message QueryResponseResponse {
-    Response response = 1;
-}
+message QueryResponseResponse { Response response = 1; }
 
 // QueryResponsesRequest is request type for the Query/Responses RPC method
 message QueryResponsesRequest {
-    string request_context_id = 1;
-    uint64 batch_counter = 2;
-    cosmos.base.query.v1beta1.PageRequest pagination = 3;
+  string request_context_id = 1;
+  uint64 batch_counter = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
 // QueryResponsesResponse is response type for the Query/Responses RPC method
 message QueryResponsesResponse {
-    repeated Response responses = 1;
-    cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  repeated Response responses = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // QueryEarnedFeesRequest is request type for the Query/EarnedFees RPC method
-message QueryEarnedFeesRequest {
-    string provider = 1;
-}
+message QueryEarnedFeesRequest { string provider = 1; }
 
 // QueryEarnedFeesResponse is response type for the Query/EarnedFees RPC method
 message QueryEarnedFeesResponse {
-    repeated cosmos.base.v1beta1.Coin fees = 1 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee\"" ];
+  repeated cosmos.base.v1beta1.Coin fees = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.moretags) = "yaml:\"service_fee\""
+  ];
 }
 
 // QuerySchemaRequest is request type for the Query/Schema RPC method
-message QuerySchemaRequest {
-    string schema_name = 1;
-}
+message QuerySchemaRequest { string schema_name = 1; }
 
 // QuerySchemaResponse is response type for the Query/Schema RPC method
-message QuerySchemaResponse {
-    string schema = 1;
-}
+message QuerySchemaResponse { string schema = 1; }
 
 // QueryParametersRequest is request type for the Query/Parameters RPC method
-message QueryParamsRequest {
-}
+message QueryParamsRequest {}
 
 // QueryParametersResponse is response type for the Query/Parameters RPC method
 message QueryParamsResponse {
-    service.Params params = 1 [ (gogoproto.nullable) = false ];
+  service.Params params = 1 [ (gogoproto.nullable) = false ];
 
-    cosmos.base.query.v1beta1.PageResponse res = 2;
+  cosmos.base.query.v1beta1.PageResponse res = 2;
 }

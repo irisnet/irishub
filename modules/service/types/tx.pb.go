@@ -191,7 +191,8 @@ func (m *MsgBindServiceResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgBindServiceResponse proto.InternalMessageInfo
 
-// MsgUpdateServiceBinding defines an SDK message for updating an existing service binding
+// MsgUpdateServiceBinding defines an SDK message for updating an existing
+// service binding
 type MsgUpdateServiceBinding struct {
 	ServiceName string                                   `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty" yaml:"service_name"`
 	Provider    string                                   `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"`
@@ -235,7 +236,8 @@ func (m *MsgUpdateServiceBinding) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateServiceBinding proto.InternalMessageInfo
 
-// MsgUpdateServiceBindingResponse defines the Msg/UpdateServiceBinding response type
+// MsgUpdateServiceBindingResponse defines the Msg/UpdateServiceBinding response
+// type
 type MsgUpdateServiceBindingResponse struct {
 }
 
@@ -272,7 +274,8 @@ func (m *MsgUpdateServiceBindingResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateServiceBindingResponse proto.InternalMessageInfo
 
-// MsgSetWithdrawAddress defines an SDK message to set the withdrawal address for a provider
+// MsgSetWithdrawAddress defines an SDK message to set the withdrawal address
+// for a provider
 type MsgSetWithdrawAddress struct {
 	Owner           string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
 	WithdrawAddress string `protobuf:"bytes,2,opt,name=withdraw_address,json=withdrawAddress,proto3" json:"withdraw_address,omitempty" yaml:"withdraw_address"`
@@ -311,7 +314,8 @@ func (m *MsgSetWithdrawAddress) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetWithdrawAddress proto.InternalMessageInfo
 
-// MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response type
+// MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response
+// type
 type MsgSetWithdrawAddressResponse struct {
 }
 
@@ -388,7 +392,8 @@ func (m *MsgDisableServiceBinding) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDisableServiceBinding proto.InternalMessageInfo
 
-// MsgDisableServiceBindingResponse defines the Msg/DisableServiceBinding response type
+// MsgDisableServiceBindingResponse defines the Msg/DisableServiceBinding
+// response type
 type MsgDisableServiceBindingResponse struct {
 }
 
@@ -466,7 +471,8 @@ func (m *MsgEnableServiceBinding) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgEnableServiceBinding proto.InternalMessageInfo
 
-// MsgEnableServiceBindingResponse defines the Msg/EnableServiceBinding response type
+// MsgEnableServiceBindingResponse defines the Msg/EnableServiceBinding response
+// type
 type MsgEnableServiceBindingResponse struct {
 }
 
@@ -503,7 +509,8 @@ func (m *MsgEnableServiceBindingResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgEnableServiceBindingResponse proto.InternalMessageInfo
 
-// MsgRefundServiceDeposit defines an SDK message to refund deposit from a service binding
+// MsgRefundServiceDeposit defines an SDK message to refund deposit from a
+// service binding
 type MsgRefundServiceDeposit struct {
 	ServiceName string `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty" yaml:"service_name"`
 	Provider    string `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"`
@@ -543,7 +550,8 @@ func (m *MsgRefundServiceDeposit) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRefundServiceDeposit proto.InternalMessageInfo
 
-// MsgRefundServiceDepositResponse defines the Msg/RefundServiceDeposit response type
+// MsgRefundServiceDepositResponse defines the Msg/RefundServiceDeposit response
+// type
 type MsgRefundServiceDepositResponse struct {
 }
 
@@ -781,7 +789,8 @@ func (m *MsgPauseRequestContext) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgPauseRequestContext proto.InternalMessageInfo
 
-// MsgPauseRequestContextResponse defines the Msg/PauseRequestContext response type
+// MsgPauseRequestContextResponse defines the Msg/PauseRequestContext response
+// type
 type MsgPauseRequestContextResponse struct {
 }
 
@@ -857,7 +866,8 @@ func (m *MsgStartRequestContext) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgStartRequestContext proto.InternalMessageInfo
 
-// MsgStartRequestContextResponse defines the Msg/StartRequestContext response type
+// MsgStartRequestContextResponse defines the Msg/StartRequestContext response
+// type
 type MsgStartRequestContextResponse struct {
 }
 
@@ -933,7 +943,8 @@ func (m *MsgKillRequestContext) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgKillRequestContext proto.InternalMessageInfo
 
-// MsgKillRequestContextResponse defines the Msg/KillRequestContext response type
+// MsgKillRequestContextResponse defines the Msg/KillRequestContext response
+// type
 type MsgKillRequestContextResponse struct {
 }
 
@@ -970,7 +981,8 @@ func (m *MsgKillRequestContextResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgKillRequestContextResponse proto.InternalMessageInfo
 
-// MsgUpdateRequestContext defines an SDK message to update a service request context
+// MsgUpdateRequestContext defines an SDK message to update a service request
+// context
 type MsgUpdateRequestContext struct {
 	RequestContextId  string                                   `protobuf:"bytes,1,opt,name=request_context_id,json=requestContextId,proto3" json:"request_context_id,omitempty" yaml:"request_context_id"`
 	Providers         []string                                 `protobuf:"bytes,2,rep,name=providers,proto3" json:"providers,omitempty"`
@@ -1014,7 +1026,8 @@ func (m *MsgUpdateRequestContext) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateRequestContext proto.InternalMessageInfo
 
-// MsgUpdateRequestContextResponse defines the Msg/UpdateRequestContext response type
+// MsgUpdateRequestContextResponse defines the Msg/UpdateRequestContext response
+// type
 type MsgUpdateRequestContextResponse struct {
 }
 
@@ -1051,7 +1064,8 @@ func (m *MsgUpdateRequestContextResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateRequestContextResponse proto.InternalMessageInfo
 
-// MsgWithdrawEarnedFees defines an SDK message to withdraw the fees earned by the provider or owner
+// MsgWithdrawEarnedFees defines an SDK message to withdraw the fees earned by
+// the provider or owner
 type MsgWithdrawEarnedFees struct {
 	Owner    string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
 	Provider string `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"`
@@ -1090,7 +1104,8 @@ func (m *MsgWithdrawEarnedFees) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgWithdrawEarnedFees proto.InternalMessageInfo
 
-// MsgWithdrawEarnedFeesResponse defines the Msg/WithdrawEarnedFees response type
+// MsgWithdrawEarnedFeesResponse defines the Msg/WithdrawEarnedFees response
+// type
 type MsgWithdrawEarnedFeesResponse struct {
 }
 
@@ -3665,10 +3680,7 @@ func (m *MsgDefineService) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -3718,10 +3730,7 @@ func (m *MsgDefineServiceResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -3984,10 +3993,7 @@ func (m *MsgBindService) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4037,10 +4043,7 @@ func (m *MsgBindServiceResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4303,10 +4306,7 @@ func (m *MsgUpdateServiceBinding) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4356,10 +4356,7 @@ func (m *MsgUpdateServiceBindingResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4473,10 +4470,7 @@ func (m *MsgSetWithdrawAddress) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4526,10 +4520,7 @@ func (m *MsgSetWithdrawAddressResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4675,10 +4666,7 @@ func (m *MsgDisableServiceBinding) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4728,10 +4716,7 @@ func (m *MsgDisableServiceBindingResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4911,10 +4896,7 @@ func (m *MsgEnableServiceBinding) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -4964,10 +4946,7 @@ func (m *MsgEnableServiceBindingResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5113,10 +5092,7 @@ func (m *MsgRefundServiceDeposit) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5166,10 +5142,7 @@ func (m *MsgRefundServiceDepositResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5458,10 +5431,7 @@ func (m *MsgCallService) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5543,10 +5513,7 @@ func (m *MsgCallServiceResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5724,10 +5691,7 @@ func (m *MsgRespondService) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5777,10 +5741,7 @@ func (m *MsgRespondServiceResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5894,10 +5855,7 @@ func (m *MsgPauseRequestContext) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -5947,10 +5905,7 @@ func (m *MsgPauseRequestContextResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6064,10 +6019,7 @@ func (m *MsgStartRequestContext) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6117,10 +6069,7 @@ func (m *MsgStartRequestContextResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6234,10 +6183,7 @@ func (m *MsgKillRequestContext) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6287,10 +6233,7 @@ func (m *MsgKillRequestContextResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6527,10 +6470,7 @@ func (m *MsgUpdateRequestContext) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6580,10 +6520,7 @@ func (m *MsgUpdateRequestContextResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6697,10 +6634,7 @@ func (m *MsgWithdrawEarnedFees) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -6750,10 +6684,7 @@ func (m *MsgWithdrawEarnedFeesResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {

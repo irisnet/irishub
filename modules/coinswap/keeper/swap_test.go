@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/stretchr/testify/suite"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -19,14 +20,14 @@ func TestSwapSuite(t *testing.T) {
 }
 
 type Data struct {
-	delta sdk.Int
-	x     sdk.Int
-	y     sdk.Int
+	delta sdkmath.Int
+	x     sdkmath.Int
+	y     sdkmath.Int
 	fee   sdk.Dec
 }
 type SwapCase struct {
 	data   Data
-	expect sdk.Int
+	expect sdkmath.Int
 }
 
 func (suite *TestSuite) TestGetInputPrice() {
@@ -312,7 +313,7 @@ func (suite *TestSuite) TestDoubleSwap() {
 }
 
 func createReservePool(suite *TestSuite, denom string) (sdk.AccAddress, sdk.AccAddress) {
-	amountInit, _ := sdk.NewIntFromString("100000000")
+	amountInit, _ := sdkmath.NewIntFromString("100000000")
 	addrSender := sdk.AccAddress(getRandomString(20))
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
 
@@ -326,10 +327,10 @@ func createReservePool(suite *TestSuite, denom string) (sdk.AccAddress, sdk.AccA
 	err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, addrSender, coins)
 	suite.NoError(err)
 
-	depositAmt, _ := sdk.NewIntFromString("1000")
+	depositAmt, _ := sdkmath.NewIntFromString("1000")
 	depositCoin := sdk.NewCoin(denom, depositAmt)
 
-	standardAmt, _ := sdk.NewIntFromString("1000")
+	standardAmt, _ := sdkmath.NewIntFromString("1000")
 	minReward := sdk.NewInt(1)
 	deadline := time.Now().Add(1 * time.Minute)
 	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender.String())
@@ -392,8 +393,8 @@ func (suite *TestSuite) TestTradeInputForExactOutput() {
 		bought := sdk.NewCoins(outputCoin)
 		sold := sdk.NewCoins(sdk.NewCoin(denomStandard, amt))
 
-		pb := poolBalances.Add(sold...).Sub(bought)
-		sb := senderBlances.Add(bought...).Sub(sold)
+		pb := poolBalances.Add(sold...).Sub(bought...)
+		sb := senderBlances.Add(bought...).Sub(sold...)
 
 		assertResult(suite, poolAddr, sender, pb, sb)
 
@@ -426,8 +427,8 @@ func (suite *TestSuite) TestTradeExactInputForOutput() {
 		sold := sdk.NewCoins(inputCoin)
 		bought := sdk.NewCoins(sdk.NewCoin(denomBTC, amt))
 
-		pb := poolBalances.Add(sold...).Sub(bought)
-		sb := senderBlances.Add(bought...).Sub(sold)
+		pb := poolBalances.Add(sold...).Sub(bought...)
+		sb := senderBlances.Add(bought...).Sub(sold...)
 
 		assertResult(suite, poolAddr, sender, pb, sb)
 

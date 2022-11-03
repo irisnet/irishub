@@ -38,7 +38,7 @@ func NewTxCmd() *cobra.Command {
 	return txCmd
 }
 
-// GetCmdIssueDenom is the CLI command for an IssueDenom transaction
+// GetCmdIssueDenom is the CLI command for an SaveDenom transaction
 func GetCmdIssueDenom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "issue [denom-id]",
@@ -134,7 +134,7 @@ func GetCmdIssueDenom() *cobra.Command {
 	return cmd
 }
 
-// GetCmdMintNFT is the CLI command for a MintNFT transaction
+// GetCmdMintNFT is the CLI command for a SaveNFT transaction
 func GetCmdMintNFT() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "mint [denom-id] [nft-id]",
@@ -332,7 +332,7 @@ func GetCmdTransferNFT() *cobra.Command {
 	return cmd
 }
 
-// GetCmdBurnNFT is the CLI command for sending a BurnNFT transaction
+// GetCmdBurnNFT is the CLI command for sending a RemoveNFT transaction
 func GetCmdBurnNFT() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "burn [denom-id] [nft-id]",

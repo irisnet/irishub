@@ -41,12 +41,16 @@ message Params {
     (gogoproto.nullable) = false
   ];
 
-  cosmos.base.v1beta1.Coin pool_creation_fee = 2 [
+  cosmos.base.v1beta1.Coin pool_creation_fee = 2
+      [ (gogoproto.nullable) = false ];
+
+  string tax_rate = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
 
-  string tax_rate = 3 [ 
+  string unilateral_liquidity_fee = 4 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-    (gogoproto.nullable) = false 
+    (gogoproto.nullable) = false
   ];
 }

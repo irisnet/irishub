@@ -20,7 +20,7 @@ func GetTokenPairByDenom(inputDenom, outputDenom string) string {
 	return fmt.Sprintf("%s-%s", outputDenom, inputDenom)
 }
 
-// GetPoolId returns the pool coin denom by specified sequence.
+// GetPoolId returns the pool-id by counterpartyDenom.
 func GetPoolId(counterpartyDenom string) string {
 	return fmt.Sprintf("pool-%s", counterpartyDenom)
 }

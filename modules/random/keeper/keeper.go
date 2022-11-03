@@ -6,6 +6,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -15,13 +16,13 @@ import (
 // Keeper defines the random module Keeper
 type Keeper struct {
 	cdc           codec.Codec
-	storeKey      sdk.StoreKey
+	storeKey      storetypes.StoreKey
 	bankKeeper    types.BankKeeper
 	serviceKeeper types.ServiceKeeper
 }
 
 // NewKeeper returns a new random keeper
-func NewKeeper(cdc codec.Codec, key sdk.StoreKey, bankKeeper types.BankKeeper, serviceKeeper types.ServiceKeeper) Keeper {
+func NewKeeper(cdc codec.Codec, key storetypes.StoreKey, bankKeeper types.BankKeeper, serviceKeeper types.ServiceKeeper) Keeper {
 	keeper := Keeper{
 		cdc:           cdc,
 		storeKey:      key,

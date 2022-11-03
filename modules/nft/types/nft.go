@@ -56,11 +56,3 @@ func (bnft BaseNFT) GetData() string {
 
 // NFTs define a list of NFT
 type NFTs []exported.NFT
-
-// NewNFTs creates a new set of NFTs
-func NewNFTs(nfts ...exported.NFT) NFTs {
-	if len(nfts) == 0 {
-		return NFTs{}
-	}
-	return NFTs(nfts)
-}

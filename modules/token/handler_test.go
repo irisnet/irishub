@@ -8,6 +8,7 @@ import (
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -26,7 +27,7 @@ var (
 	nativeToken = types.GetNativeToken()
 	denom       = nativeToken.Symbol
 	owner       = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest")))
-	initAmt     = sdk.NewIntWithDecimal(100000000, int(6))
+	initAmt     = sdkmath.NewIntWithDecimal(100000000, int(6))
 	initCoin    = sdk.Coins{sdk.NewCoin(denom, initAmt)}
 )
 
@@ -44,7 +45,7 @@ type HandlerSuite struct {
 }
 
 func (suite *HandlerSuite) SetupTest() {
-	app := simapp.Setup(isCheckTx)
+	app := simapp.Setup(suite.T(), isCheckTx)
 
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
@@ -68,7 +69,7 @@ func (suite *HandlerSuite) issueToken(token types.Token) {
 	mintCoins := sdk.NewCoins(
 		sdk.NewCoin(
 			token.MinUnit,
-			sdk.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)),
+			sdkmath.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)),
 		),
 	)
 
@@ -96,7 +97,7 @@ func (suite *HandlerSuite) TestIssueToken() {
 
 	suite.Equal(nativeTokenAmt1.Sub(fee.Amount), nativeTokenAmt2)
 
-	mintTokenAmt := sdk.NewIntWithDecimal(int64(msg.InitialSupply), int(msg.Scale))
+	mintTokenAmt := sdkmath.NewIntWithDecimal(int64(msg.InitialSupply), int(msg.Scale))
 
 	nativeTokenAmt3 := suite.bk.GetBalance(suite.ctx, owner, msg.MinUnit).Amount
 	suite.Equal(nativeTokenAmt3, mintTokenAmt)
@@ -107,7 +108,7 @@ func (suite *HandlerSuite) TestMintToken() {
 	suite.issueToken(token)
 
 	beginBtcAmt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit).Amount
-	suite.Equal(sdk.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)), beginBtcAmt)
+	suite.Equal(sdkmath.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)), beginBtcAmt)
 
 	beginNativeAmt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), denom).Amount
 
@@ -119,7 +120,7 @@ func (suite *HandlerSuite) TestMintToken() {
 
 	endBtcAmt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit).Amount
 
-	mintBtcAmt := sdk.NewIntWithDecimal(int64(msgMintToken.Amount), int(token.Scale))
+	mintBtcAmt := sdkmath.NewIntWithDecimal(int64(msgMintToken.Amount), int(token.Scale))
 	suite.Equal(beginBtcAmt.Add(mintBtcAmt), endBtcAmt)
 
 	fee, err := suite.keeper.GetTokenMintFee(suite.ctx, token.Symbol)
@@ -135,7 +136,7 @@ func (suite *HandlerSuite) TestBurnToken() {
 	suite.issueToken(token)
 
 	beginBtcAmt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit).Amount
-	suite.Equal(sdk.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)), beginBtcAmt)
+	suite.Equal(sdkmath.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)), beginBtcAmt)
 
 	h := tokenmodule.NewHandler(suite.keeper)
 
@@ -144,7 +145,7 @@ func (suite *HandlerSuite) TestBurnToken() {
 	suite.NoError(err)
 
 	endBtcAmt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit).Amount
-	burnBtcAmt := sdk.NewIntWithDecimal(int64(msgBurnToken.Amount), int(token.Scale))
+	burnBtcAmt := sdkmath.NewIntWithDecimal(int64(msgBurnToken.Amount), int(token.Scale))
 
 	suite.Equal(beginBtcAmt.Sub(burnBtcAmt), endBtcAmt)
 }

@@ -102,7 +102,7 @@ func GetCmdQueryOwner() *cobra.Command {
 				return err
 			}
 			queryClient := types.NewQueryClient(clientCtx)
-			resp, err := queryClient.Owner(context.Background(), &types.QueryOwnerRequest{
+			resp, err := queryClient.NFTsOfOwner(context.Background(), &types.QueryNFTsOfOwnerRequest{
 				DenomId:    denomID,
 				Owner:      args[0],
 				Pagination: pageReq,

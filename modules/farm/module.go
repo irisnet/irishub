@@ -20,7 +20,6 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
 	"github.com/irisnet/irismod/modules/farm/client/cli"
-	"github.com/irisnet/irismod/modules/farm/client/rest"
 	"github.com/irisnet/irismod/modules/farm/keeper"
 	"github.com/irisnet/irismod/modules/farm/simulation"
 	"github.com/irisnet/irismod/modules/farm/types"
@@ -63,7 +62,7 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 
 // RegisterRESTRoutes registers the REST routes for the farm module.
 func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	rest.RegisterHandlers(clientCtx, rtr)
+	//rest.RegisterHandlers(clientCtx, rtr)
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the farm module.

@@ -8,34 +8,43 @@ option go_package = "github.com/irisnet/irismod/modules/oracle/types";
 
 // Msg defines the oracle Msg service
 service Msg {
-    // CreateFeed defines a method for creating a new feed
-    rpc CreateFeed(MsgCreateFeed) returns (MsgCreateFeedResponse);
+  // CreateFeed defines a method for creating a new feed
+  rpc CreateFeed(MsgCreateFeed) returns (MsgCreateFeedResponse);
 
-    // EditFeed defines a method for editing a feed
-    rpc EditFeed(MsgEditFeed) returns (MsgEditFeedResponse);
+  // EditFeed defines a method for editing a feed
+  rpc EditFeed(MsgEditFeed) returns (MsgEditFeedResponse);
 
-    // StartFeed defines a method for starting a feed
-    rpc StartFeed(MsgStartFeed) returns (MsgStartFeedResponse);
+  // StartFeed defines a method for starting a feed
+  rpc StartFeed(MsgStartFeed) returns (MsgStartFeedResponse);
 
-    // PauseFeed defines a method for pausing a feed
-    rpc PauseFeed(MsgPauseFeed) returns (MsgPauseFeedResponse);
+  // PauseFeed defines a method for pausing a feed
+  rpc PauseFeed(MsgPauseFeed) returns (MsgPauseFeedResponse);
 }
 
 // MsgCreateFeed defines an sdk.Msg type that supports creating a feed
 message MsgCreateFeed {
-    string feed_name = 1 [ (gogoproto.moretags) = "yaml:\"feed_name\"" ];
-    uint64 latest_history = 2 [ (gogoproto.moretags) = "yaml:\"latest_history\"" ];
-    string description = 3;
-    string creator = 4;
-    string service_name = 5 [ (gogoproto.moretags) = "yaml:\"service_name\"" ];
-    repeated string providers = 6;
-    string input = 7;
-    int64 timeout = 8;
-    repeated cosmos.base.v1beta1.Coin service_fee_cap = 9 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\"" ];
-    uint64 repeated_frequency = 10 [ (gogoproto.moretags) = "yaml:\"repeated_frequency\"" ];
-    string aggregate_func = 11 [ (gogoproto.moretags) = "yaml:\"aggregate_func\"" ];
-    string value_json_path = 12 [ (gogoproto.moretags) = "yaml:\"value_json_path\"" ];
-    uint32 response_threshold = 13 [ (gogoproto.moretags) = "yaml:\"response_threshold\"" ];
+  string feed_name = 1 [ (gogoproto.moretags) = "yaml:\"feed_name\"" ];
+  uint64 latest_history = 2
+      [ (gogoproto.moretags) = "yaml:\"latest_history\"" ];
+  string description = 3;
+  string creator = 4;
+  string service_name = 5 [ (gogoproto.moretags) = "yaml:\"service_name\"" ];
+  repeated string providers = 6;
+  string input = 7;
+  int64 timeout = 8;
+  repeated cosmos.base.v1beta1.Coin service_fee_cap = 9 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.moretags) = "yaml:\"service_fee_cap\""
+  ];
+  uint64 repeated_frequency = 10
+      [ (gogoproto.moretags) = "yaml:\"repeated_frequency\"" ];
+  string aggregate_func = 11
+      [ (gogoproto.moretags) = "yaml:\"aggregate_func\"" ];
+  string value_json_path = 12
+      [ (gogoproto.moretags) = "yaml:\"value_json_path\"" ];
+  uint32 response_threshold = 13
+      [ (gogoproto.moretags) = "yaml:\"response_threshold\"" ];
 }
 
 // MsgCreateFeedResponse defines the Msg/CreateFeed response type
@@ -43,8 +52,8 @@ message MsgCreateFeedResponse {}
 
 // MsgPauseFeed defines an sdk.Msg type that supports stating a feed
 message MsgStartFeed {
-    string feed_name = 1 [ (gogoproto.moretags) = "yaml:\"feed_name\"" ];
-    string creator = 2;
+  string feed_name = 1 [ (gogoproto.moretags) = "yaml:\"feed_name\"" ];
+  string creator = 2;
 }
 
 // MsgStartFeedResponse defines the Msg/StartFeed response type
@@ -52,8 +61,8 @@ message MsgStartFeedResponse {}
 
 // MsgPauseFeed defines an sdk.Msg type that supports pausing a feed
 message MsgPauseFeed {
-    string feed_name = 1 [ (gogoproto.moretags) = "yaml:\"feed_name\"" ];
-    string creator = 2;
+  string feed_name = 1 [ (gogoproto.moretags) = "yaml:\"feed_name\"" ];
+  string creator = 2;
 }
 
 // MsgPauseFeedResponse defines the Msg/PauseFeed response type
@@ -61,15 +70,22 @@ message MsgPauseFeedResponse {}
 
 // MsgEditFeed defines an sdk.Msg type that supports editing a feed
 message MsgEditFeed {
-    string feed_name = 1 [ (gogoproto.moretags) = "yaml:\"feed_name\"" ];
-    string description = 2;
-    uint64 latest_history = 3 [ (gogoproto.moretags) = "yaml:\"latest_history\"" ];
-    repeated string providers = 4;
-    int64 timeout = 5;
-    repeated cosmos.base.v1beta1.Coin service_fee_cap = 6 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\"" ];
-    uint64 repeated_frequency = 7 [ (gogoproto.moretags) = "yaml:\"repeated_frequency\"" ];
-    uint32 response_threshold = 8 [ (gogoproto.moretags) = "yaml:\"response_threshold\"" ];
-    string creator = 9;
+  string feed_name = 1 [ (gogoproto.moretags) = "yaml:\"feed_name\"" ];
+  string description = 2;
+  uint64 latest_history = 3
+      [ (gogoproto.moretags) = "yaml:\"latest_history\"" ];
+  repeated string providers = 4;
+  int64 timeout = 5;
+  repeated cosmos.base.v1beta1.Coin service_fee_cap = 6 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.moretags) = "yaml:\"service_fee_cap\""
+  ];
+  uint64 repeated_frequency = 7
+      [ (gogoproto.moretags) = "yaml:\"repeated_frequency\"" ];
+  uint32 response_threshold = 8
+      [ (gogoproto.moretags) = "yaml:\"response_threshold\"" ];
+  string creator = 9;
 }
 
 // MsgEditFeedResponse defines the Msg/EditFeed response type

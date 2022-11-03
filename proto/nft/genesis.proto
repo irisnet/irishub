@@ -8,5 +8,5 @@ option go_package = "github.com/irisnet/irismod/modules/nft/types";
 
 // GenesisState defines the NFT module's genesis state
 message GenesisState {
-    repeated Collection collections = 1 [ (gogoproto.nullable) = false ];
+  repeated Collection collections = 1 [ (gogoproto.nullable) = false ];
 }

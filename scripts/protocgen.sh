@@ -2,23 +2,19 @@
 
 set -eo pipefail
 
-proto_dirs=$(find ./proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+echo "Generating gogo proto code"
+cd proto
+proto_dirs=$(find ./ -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
-  protoc \
-  -I "proto" \
-  -I "third_party/proto" \
-  --gocosmos_out=plugins=interfacetype+grpc,\
-Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
-  $(find "${dir}" -maxdepth 1 -name '*.proto')
-
-  # command to generate gRPC gateway (*.pb.gw.go in respective modules) files
-  protoc \
-  -I "proto" \
-  -I "third_party/proto" \
-  --grpc-gateway_out=logtostderr=true:. \
-  $(find "${dir}" -maxdepth 1 -name '*.proto')
-
+  # shellcheck disable=SC2044
+  for file in $(find "${dir}" -maxdepth 1 -name '*.proto'); do
+    if grep "option go_package" $file &> /dev/null ; then
+      buf generate --template buf.gen.gogo.yaml $file
+    fi
+  done
 done
+
+cd ..
 
 # move proto files to the right places
 cp -r github.com/irisnet/irismod/* ./

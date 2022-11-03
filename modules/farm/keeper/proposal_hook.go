@@ -3,6 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	v1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 )
 
 var _ govtypes.GovHooks = GovHook{}
@@ -38,7 +39,7 @@ func (h GovHook) AfterProposalVotingPeriodEnded(ctx sdk.Context, proposalID uint
 	}
 
 	//when the proposal is passed, the content of the proposal is executed by the gov module, which is not directly processed here
-	if proposal.Status == govtypes.StatusPassed {
+	if proposal.Status == v1.StatusPassed {
 		h.k.deleteEscrowInfo(ctx, proposalID)
 		return
 	}

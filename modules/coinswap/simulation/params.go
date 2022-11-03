@@ -1,6 +1,7 @@
 package simulation
 
 import (
+	"fmt"
 	"math/rand"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -17,7 +18,7 @@ func ParamChanges(r *rand.Rand) []simtypes.ParamChange {
 		simulation.NewSimParamChange(
 			types.ModuleName, string(types.KeyFee),
 			func(r *rand.Rand) string {
-				return sdk.NewDecWithPrec(r.Int63n(3), 3).String() // 0.1%~0.3%
+				return fmt.Sprintf("\"%s\"", sdk.NewDecWithPrec(r.Int63n(2)+1, 3).String()) // 0.1%~0.3%
 			},
 		),
 	}

@@ -20,7 +20,6 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
 	"github.com/irisnet/irismod/modules/htlc/client/cli"
-	"github.com/irisnet/irismod/modules/htlc/client/rest"
 	"github.com/irisnet/irismod/modules/htlc/keeper"
 	"github.com/irisnet/irismod/modules/htlc/simulation"
 	"github.com/irisnet/irismod/modules/htlc/types"
@@ -62,7 +61,7 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 
 // RegisterRESTRoutes registers the REST routes for the HTLC module.
 func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	rest.RegisterHandlers(clientCtx, rtr)
+	//rest.RegisterHandlers(clientCtx, rtr)
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the HTLC module.

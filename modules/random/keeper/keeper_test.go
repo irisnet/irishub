@@ -24,7 +24,7 @@ var (
 	testTxBytes          = []byte("test_tx")
 	testHeight           = int64(10000)
 	testBlockInterval    = uint64(100)
-	testConsumer, _      = sdk.AccAddressFromHex(crypto.AddressHash([]byte("test_consumer")).String())
+	testConsumer, _      = sdk.AccAddressFromHexUnsafe(crypto.AddressHash([]byte("test_consumer")).String())
 	testReqID            = []byte("test_req_id")
 	testRandomNumerator  = int64(3)
 	testRandomDenomiator = int64(4)
@@ -40,7 +40,7 @@ type KeeperTestSuite struct {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(false)
+	app := simapp.Setup(suite.T(), false)
 
 	suite.app = app
 	suite.cdc = app.LegacyAmino()

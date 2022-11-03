@@ -129,7 +129,7 @@ buf-stamp:
 runsim: $(RUNSIM)
 $(RUNSIM):
 	@echo "Installing runsim..."
-	@(cd /tmp && go get github.com/cosmos/tools/cmd/runsim@v1.0.0)
+	@go install github.com/cosmos/tools/cmd/runsim@v1.0.0
 
 tools-clean:
 	rm -f $(STATIK) $(GOLANGCI_LINT) $(RUNSIM)

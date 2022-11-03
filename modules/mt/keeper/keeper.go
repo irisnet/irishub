@@ -34,12 +34,12 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 // IssueDenom issues a denom according to the given params
 func (k Keeper) IssueDenom(ctx sdk.Context,
-	id, name string, sednder sdk.AccAddress, data []byte,
+	id, name string, sender sdk.AccAddress, data []byte,
 ) types.Denom {
 	denom := types.Denom{
 		Id:    id,
 		Name:  name,
-		Owner: sednder.String(),
+		Owner: sender.String(),
 		Data:  data,
 	}
 
@@ -84,7 +84,6 @@ func (k Keeper) MintMT(ctx sdk.Context,
 	amount uint64,
 	recipient sdk.AccAddress,
 ) error {
-
 	// increase MT supply
 	if err := k.IncreaseMTSupply(ctx, denomID, mtID, amount); err != nil {
 		return err

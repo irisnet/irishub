@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
 	"github.com/irisnet/irismod/modules/farm/types"
 )
@@ -121,14 +123,26 @@ func (m msgServer) CreatePoolWithCommunityPool(goCtx context.Context,
 		return nil, err
 	}
 
+	data, err := codectypes.NewAnyWithValue(&msg.Content)
+	if err != nil {
+		return nil, err
+	}
+
+	msgs := []sdk.Msg{
+		&govv1.MsgExecLegacyContent{
+			Content:   data,
+			Authority: m.gk.GetGovernanceAccount(ctx).GetAddress().String(),
+		},
+	}
+
 	//create new proposal given a content
-	proposal, err := m.gk.SubmitProposal(ctx, &msg.Content)
+	proposal, err := m.gk.SubmitProposal(ctx, msgs, "")
 	if err != nil {
 		return nil, err
 	}
 
 	// adds a deposit of a specific depositor on a specific proposal
-	_, err = m.gk.AddDeposit(ctx, proposal.ProposalId, proposer, msg.InitialDeposit)
+	_, err = m.gk.AddDeposit(ctx, proposal.Id, proposer, msg.InitialDeposit)
 	if err != nil {
 		return nil, err
 	}
@@ -138,13 +152,13 @@ func (m msgServer) CreatePoolWithCommunityPool(goCtx context.Context,
 		Proposer:     msg.Proposer,
 		FundApplied:  msg.Content.FundApplied,
 		FundSelfBond: msg.Content.FundSelfBond,
-		ProposalId:   proposal.ProposalId,
+		ProposalId:   proposal.Id,
 	})
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeCreatePoolWithCommunityPool,
 			sdk.NewAttribute(types.AttributeValueCreator, msg.Proposer),
-			sdk.NewAttribute(types.AttributeValueProposal, fmt.Sprintf("%d", proposal.ProposalId)),
+			sdk.NewAttribute(types.AttributeValueProposal, fmt.Sprintf("%d", proposal.Id)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

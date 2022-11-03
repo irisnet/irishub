@@ -8,8 +8,8 @@ option go_package = "github.com/irisnet/irismod/modules/mt/types";
 
 // GenesisState defines the MT module's genesis state
 message GenesisState {
-    repeated Collection collections = 1 [(gogoproto.nullable) = false];
-    repeated Owner owners = 2 [(gogoproto.nullable) = false];
+  repeated Collection collections = 1 [ (gogoproto.nullable) = false ];
+  repeated Owner owners = 2 [ (gogoproto.nullable) = false ];
 }
 
 // Collection defines a type of collection
@@ -17,7 +17,7 @@ message Collection {
   option (gogoproto.equal) = true;
 
   Denom denom = 1;
-  repeated MT mts = 2 [(gogoproto.nullable) = false];
+  repeated MT mts = 2 [ (gogoproto.nullable) = false ];
 }
 
 // Owner defines a type of account balances
@@ -25,7 +25,7 @@ message Owner {
   option (gogoproto.equal) = true;
 
   string address = 1;
-  repeated DenomBalance denoms = 2 [(gogoproto.nullable) = false];
+  repeated DenomBalance denoms = 2 [ (gogoproto.nullable) = false ];
 }
 
 // DenomBalance defines a type of denom balances owned by an account
@@ -33,5 +33,5 @@ message DenomBalance {
   option (gogoproto.equal) = true;
 
   string denom_id = 1;
-  repeated Balance balances = 2 [(gogoproto.nullable) = false];
+  repeated Balance balances = 2 [ (gogoproto.nullable) = false ];
 }

@@ -1,258 +1,246 @@
 package cli_test
 
-// import (
-// 	"fmt"
-// 	"testing"
+import (
+	"fmt"
+	"testing"
 
-// 	"github.com/gogo/protobuf/proto"
-// 	"github.com/stretchr/testify/suite"
-// 	"github.com/tidwall/gjson"
+	"github.com/gogo/protobuf/proto"
+	"github.com/stretchr/testify/suite"
+	"github.com/tidwall/gjson"
 
-// 	"github.com/tendermint/tendermint/crypto"
+	"github.com/tendermint/tendermint/crypto"
 
-// 	"github.com/cosmos/cosmos-sdk/client/flags"
-// 	"github.com/cosmos/cosmos-sdk/testutil/network"
-// 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
-// 	mtcli "github.com/irisnet/irismod/modules/mt/client/cli"
-// 	mttestutil "github.com/irisnet/irismod/modules/mt/client/testutil"
-// 	mttypes "github.com/irisnet/irismod/modules/mt/types"
-// 	"github.com/irisnet/irismod/simapp"
-// )
+	mtcli "github.com/irisnet/irismod/modules/mt/client/cli"
+	mttestutil "github.com/irisnet/irismod/modules/mt/client/testutil"
+	mttypes "github.com/irisnet/irismod/modules/mt/types"
+	"github.com/irisnet/irismod/simapp"
+)
 
-// type IntegrationTestSuite struct {
-// 	suite.Suite
+type IntegrationTestSuite struct {
+	suite.Suite
 
-// 	cfg     network.Config
-// 	network *network.Network
-// }
+	cfg     network.Config
+	network *network.Network
+}
 
-// func (s *IntegrationTestSuite) SetupSuite() {
-// 	s.T().Log("setting up integration test suite")
+func (s *IntegrationTestSuite) SetupSuite() {
+	s.T().Log("setting up integration test suite")
 
-// 	cfg := simapp.NewConfig()
-// 	cfg.NumValidators = 2
+	cfg := simapp.NewConfig()
+	cfg.NumValidators = 2
 
-// 	s.cfg = cfg
-// 	s.network = network.New(s.T(), cfg)
+	s.cfg = cfg
 
-// 	_, err := s.network.WaitForHeight(1)
-// 	s.Require().NoError(err)
-// }
+	var err error
+	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
+	s.Require().NoError(err)
 
-// func (s *IntegrationTestSuite) TearDownSuite() {
-// 	s.T().Log("tearing down integration test suite")
-// 	s.network.Cleanup()
-// }
+	_, err = s.network.WaitForHeight(1)
+	s.Require().NoError(err)
+}
 
-// func TestIntegrationTestSuite(t *testing.T) {
-// 	suite.Run(t, new(IntegrationTestSuite))
-// }
+func (s *IntegrationTestSuite) TearDownSuite() {
+	s.T().Log("tearing down integration test suite")
+	s.network.Cleanup()
+}
 
-// func (s *IntegrationTestSuite) TestNft() {
-// 	val := s.network.Validators[0]
-// 	val2 := s.network.Validators[1]
+func TestIntegrationTestSuite(t *testing.T) {
+	suite.Run(t, new(IntegrationTestSuite))
+}
 
-// 	// ---------------------------------------------------------------------------
+func (s *IntegrationTestSuite) TestMT() {
+	val := s.network.Validators[0]
+	val2 := s.network.Validators[1]
 
-// 	from := val.Address
-// 	data := "data"
-// 	mtID := "kitty"
-// 	//owner     := "owner"
-// 	denomName := "name"
-// 	denom := "denom"
+	// ---------------------------------------------------------------------------
+	denomName := "name"
+	data := "data"
+	from := val.Address
+	mintAmt := "10"
+	transferAmt := "5"
+	burnAmt := "5"
 
-// 	//------test GetCmdIssueDenom()-------------
-// 	args := []string{
-// 		fmt.Sprintf("--%s=%s", mtcli.FlagName, denomName),
-// 		fmt.Sprintf("--%s=%s", mtcli.FlagData, data),
+	//------test GetCmdIssueDenom()-------------
+	args := []string{
+		fmt.Sprintf("--%s=%s", mtcli.FlagName, denomName),
+		fmt.Sprintf("--%s=%s", mtcli.FlagData, data),
 
-// 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-// 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-// 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
-// 	}
+		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+	}
 
-// 	respType := proto.Message(&sdk.TxResponse{})
-// 	expectedCode := uint32(0)
+	respType := proto.Message(&sdk.TxResponse{})
+	expectedCode := uint32(0)
 
-// 	bz, err := mttestutil.IssueDenomExec(val.ClientCtx, from.String(), denom, args...)
-// 	s.Require().NoError(err)
-// 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-// 	txResp := respType.(*sdk.TxResponse)
-// 	s.Require().Equal(expectedCode, txResp.Code)
+	bz, err := mttestutil.IssueDenomExec(val.ClientCtx, from.String(), args...)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp := respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
-// 	denomID := gjson.Get(txResp.RawLog, "0.events.0.attributes.0.value").String()
+	denomID := gjson.Get(txResp.RawLog, "0.events.0.attributes.0.value").String()
 
-// 	//------test GetCmdQueryDenom()-------------
-// 	respType = proto.Message(&mttypes.Denom{})
-// 	bz, err = mttestutil.QueryDenomExec(val.ClientCtx, denomID)
-// 	s.Require().NoError(err)
-// 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-// 	denomItem := respType.(*mttypes.Denom)
-// 	s.Require().Equal(denomName, denomItem.Name)
-// 	s.Require().Equal(data, denomItem.Data)
+	//------test GetCmdQueryDenom()-------------
+	respType = proto.Message(&mttypes.Denom{})
+	bz, err = mttestutil.QueryDenomExec(val.ClientCtx, denomID)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	denomItem := respType.(*mttypes.Denom)
+	s.Require().Equal(denomName, denomItem.Name)
+	s.Require().Equal([]byte(data), denomItem.Data)
 
-// 	//------test GetCmdQueryDenoms()-------------
-// 	respType = proto.Message(&mttypes.QueryDenomsResponse{})
-// 	bz, err = mttestutil.QueryDenomsExec(val.ClientCtx)
-// 	s.Require().NoError(err)
-// 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-// 	denomsResp := respType.(*mttypes.QueryDenomsResponse)
-// 	s.Require().Equal(1, len(denomsResp.Denoms))
-// 	s.Require().Equal(denomID, denomsResp.Denoms[0].Id)
+	//------test GetCmdQueryDenoms()-------------
+	respType = proto.Message(&mttypes.QueryDenomsResponse{})
+	bz, err = mttestutil.QueryDenomsExec(val.ClientCtx)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	denomsResp := respType.(*mttypes.QueryDenomsResponse)
+	s.Require().Equal(1, len(denomsResp.Denoms))
+	s.Require().Equal(denomID, denomsResp.Denoms[0].Id)
 
-// 	//------test GetCmdMintMT()-------------
-// 	args = []string{
-// 		fmt.Sprintf("--%s=%s", mtcli.FlagData, data),
-// 		fmt.Sprintf("--%s=%s", mtcli.FlagRecipient, from.String()),
+	//------test GetCmdMintMT()-------------
+	args = []string{
+		fmt.Sprintf("--%s=%s", mtcli.FlagRecipient, from.String()),
+		fmt.Sprintf("--%s=%s", mtcli.FlagAmount, mintAmt),
 
-// 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-// 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-// 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
-// 	}
+		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(100))).String()),
+	}
 
-// 	respType = proto.Message(&sdk.TxResponse{})
+	respType = proto.Message(&sdk.TxResponse{})
 
-// 	bz, err = mttestutil.MintMTExec(val.ClientCtx, from.String(), denomID, mtID, args...)
-// 	s.Require().NoError(err)
-// 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-// 	txResp = respType.(*sdk.TxResponse)
-// 	s.Require().Equal(expectedCode, txResp.Code)
+	bz, err = mttestutil.MintMTExec(val.ClientCtx, from.String(), denomID, args...)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp = respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
-// 	//------test GetCmdQuerySupply()-------------
-// 	// respType = proto.Message(&mttypes.QuerySupplyResponse{})
-// 	// bz, err = mttestutil.QuerySupplyExec(val.ClientCtx, denomID)
-// 	// s.Require().NoError(err)
-// 	// s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-// 	// supplyResp := respType.(*mttypes.QuerySupplyResponse)
-// 	// s.Require().Equal(uint64(1), supplyResp.Amount)
+	respType = proto.Message(&mttypes.QueryMTsResponse{})
+	bz, err = mttestutil.QueryMTsExec(val.ClientCtx, denomID)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	mtsResp := respType.(*mttypes.QueryMTsResponse)
+	s.Require().Equal(1, len(mtsResp.Mts))
 
-// 	//------test GetCmdQueryMT()-------------
-// 	respType = proto.Message(&mttypes.MT{})
-// 	bz, err = mttestutil.QueryMTExec(val.ClientCtx, denomID, mtID)
-// 	s.Require().NoError(err)
-// 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-// 	mtItem := respType.(*mttypes.MT)
-// 	s.Require().Equal(mtID, mtItem.Id)
-// 	s.Require().Equal(data, mtItem.Data)
+	mtID := mtsResp.Mts[0].Id
 
-// 	//------test GetCmdEditMT()-------------
-// 	newTokenDate := "newdata"
-// 	args = []string{
-// 		fmt.Sprintf("--%s=%s", mtcli.FlagData, newTokenDate),
+	//------test GetCmdQueryMT()-------------
+	respType = proto.Message(&mttypes.MT{})
+	bz, err = mttestutil.QueryMTExec(val.ClientCtx, denomID, mtID)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	mtItem := respType.(*mttypes.MT)
+	s.Require().Equal(mtID, mtItem.Id)
 
-// 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-// 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-// 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
-// 	}
+	//-------test GetCmdQueryBalances()----------
+	respType = proto.Message(&mttypes.QueryBalancesResponse{})
+	bz, err = mttestutil.QueryBlancesExec(val.ClientCtx, from.String(), denomID)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	balancesItem := respType.(*mttypes.QueryBalancesResponse)
+	s.Require().Equal(1, len(balancesItem.Balance))
+	s.Require().Equal(uint64(10), balancesItem.Balance[0].Amount)
 
-// 	respType = proto.Message(&sdk.TxResponse{})
+	//------test GetCmdEditMT()-------------
+	newTokenDate := "newdata"
+	args = []string{
+		fmt.Sprintf("--%s=%s", mtcli.FlagData, newTokenDate),
 
-// 	bz, err = mttestutil.EditMTExec(val.ClientCtx, from.String(), denomID, mtID, args...)
-// 	s.Require().NoError(err)
-// 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-// 	txResp = respType.(*sdk.TxResponse)
-// 	s.Require().Equal(expectedCode, txResp.Code)
+		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+	}
 
-// 	respType = proto.Message(&mttypes.MT{})
-// 	bz, err = mttestutil.QueryMTExec(val.ClientCtx, denomID, mtID)
-// 	s.Require().NoError(err)
-// 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-// 	newNftItem := respType.(*mttypes.MT)
-// 	s.Require().Equal(newTokenDate, newNftItem.Data)
+	respType = proto.Message(&sdk.TxResponse{})
 
-// 	//------test GetCmdTransferMT()-------------
-// 	recipient := sdk.AccAddress(crypto.AddressHash([]byte("dgsbl")))
+	bz, err = mttestutil.EditMTExec(val.ClientCtx, from.String(), denomID, mtID, args...)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp = respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
-// 	args = []string{
-// 		fmt.Sprintf("--%s=%s", mtcli.FlagData, data),
+	respType = proto.Message(&mttypes.MT{})
+	bz, err = mttestutil.QueryMTExec(val.ClientCtx, denomID, mtID)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	newMTItem := respType.(*mttypes.MT)
+	s.Require().Equal([]byte(newTokenDate), newMTItem.Data)
 
-// 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-// 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-// 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
-// 	}
+	//------test GetCmdTransferMT()-------------
+	recipient := sdk.AccAddress(crypto.AddressHash([]byte("dgsbl")))
 
-// 	respType = proto.Message(&sdk.TxResponse{})
+	args = []string{
+		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+	}
 
-// 	bz, err = mttestutil.TransferMTExec(val.ClientCtx, from.String(), recipient.String(), denomID, mtID, args...)
-// 	s.Require().NoError(err)
-// 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-// 	txResp = respType.(*sdk.TxResponse)
-// 	s.Require().Equal(expectedCode, txResp.Code)
+	respType = proto.Message(&sdk.TxResponse{})
 
-// 	respType = proto.Message(&mttypes.MT{})
-// 	bz, err = mttestutil.QueryMTExec(val.ClientCtx, denomID, mtID)
-// 	s.Require().NoError(err)
-// 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-// 	mtItem = respType.(*mttypes.MT)
-// 	s.Require().Equal(mtID, mtItem.Id)
-// 	s.Require().Equal(data, mtItem.Data)
+	bz, err = mttestutil.TransferMTExec(val.ClientCtx, from.String(), recipient.String(), denomID, mtID, transferAmt, args...)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp = respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
-// 	//------test GetCmdBurnMT()-------------
-// 	newMTID := "dgsbl"
-// 	args = []string{
-// 		fmt.Sprintf("--%s=%s", mtcli.FlagData, newTokenDate),
-// 		fmt.Sprintf("--%s=%s", mtcli.FlagRecipient, from.String()),
+	respType = proto.Message(&mttypes.MT{})
+	bz, err = mttestutil.QueryMTExec(val.ClientCtx, denomID, mtID)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	mtItem = respType.(*mttypes.MT)
+	s.Require().Equal(mtID, mtItem.Id)
+	s.Require().Equal([]byte(newTokenDate), mtItem.Data)
 
-// 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-// 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-// 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
-// 	}
+	//------test GetCmdBurnMT()-------------
+	args = []string{
+		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+	}
 
-// 	respType = proto.Message(&sdk.TxResponse{})
+	respType = proto.Message(&sdk.TxResponse{})
 
-// 	bz, err = mttestutil.MintMTExec(val.ClientCtx, from.String(), denomID, newMTID, args...)
-// 	s.Require().NoError(err)
-// 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-// 	txResp = respType.(*sdk.TxResponse)
-// 	s.Require().Equal(expectedCode, txResp.Code)
+	bz, err = mttestutil.BurnMTExec(val.ClientCtx, from.String(), denomID, mtID, burnAmt, args...)
+	s.Require().NoError(err)
+	s.Require().NoError(val2.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp = respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
-// 	// respType = proto.Message(&mttypes.QuerySupplyResponse{})
-// 	// bz, err = mttestutil.QuerySupplyExec(val.ClientCtx, denomID)
-// 	// s.Require().NoError(err)
-// 	// s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-// 	// supplyResp = respType.(*mttypes.QuerySupplyResponse)
-// 	// s.Require().Equal(uint64(2), supplyResp.Amount)
+	respType = proto.Message(&mttypes.MT{})
+	bz, err = mttestutil.QueryMTExec(val.ClientCtx, denomID, mtID)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	mtItem2 := respType.(*mttypes.MT)
+	s.Require().Equal(mtID, mtItem2.Id)
+	s.Require().Equal([]byte(newTokenDate), mtItem2.Data)
+	s.Require().Equal(uint64(5), mtItem2.Supply)
 
-// 	// args = []string{
-// 	// 	fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-// 	// 	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-// 	// 	fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
-// 	// }
-// 	respType = proto.Message(&sdk.TxResponse{})
-// 	bz, err = mttestutil.BurnMTExec(val.ClientCtx, from.String(), denomID, newMTID, args...)
-// 	s.Require().NoError(err)
-// 	s.Require().NoError(val2.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-// 	txResp = respType.(*sdk.TxResponse)
-// 	s.Require().Equal(expectedCode, txResp.Code)
+	//------test GetCmdTransferDenom()-------------
+	args = []string{
+		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+	}
 
-// 	// respType = proto.Message(&mttypes.QuerySupplyResponse{})
-// 	// bz, err = mttestutil.QuerySupplyExec(val.ClientCtx, denomID)
-// 	// s.Require().NoError(err)
-// 	// s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-// 	// supplyResp = respType.(*mttypes.QuerySupplyResponse)
-// 	// s.Require().Equal(uint64(1), supplyResp.Amount)
+	respType = proto.Message(&sdk.TxResponse{})
 
-// 	// //------test GetCmdTransferDenom()-------------
-// 	// args = []string{
-// 	// 	fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-// 	// 	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-// 	// 	fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
-// 	// }
+	bz, err = mttestutil.TransferDenomExec(val.ClientCtx, from.String(), val2.Address.String(), denomID, args...)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp = respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
-// 	respType = proto.Message(&sdk.TxResponse{})
-
-// 	bz, err = mttestutil.TransferDenomExec(val.ClientCtx, from.String(), val2.Address.String(), denomID, args...)
-// 	s.Require().NoError(err)
-// 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-// 	txResp = respType.(*sdk.TxResponse)
-// 	s.Require().Equal(expectedCode, txResp.Code)
-
-// 	respType = proto.Message(&mttypes.Denom{})
-// 	bz, err = mttestutil.QueryDenomExec(val.ClientCtx, denomID)
-// 	s.Require().NoError(err)
-// 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-// 	denomItem2 := respType.(*mttypes.Denom)
-// 	s.Require().Equal(val2.Address.String(), denomItem2.Owner)
-// 	s.Require().Equal(denomName, denomItem2.Name)
-// }
+	respType = proto.Message(&mttypes.Denom{})
+	bz, err = mttestutil.QueryDenomExec(val.ClientCtx, denomID)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	denomItem2 := respType.(*mttypes.Denom)
+	s.Require().Equal(val2.Address.String(), denomItem2.Owner)
+	s.Require().Equal(denomName, denomItem2.Name)
+}

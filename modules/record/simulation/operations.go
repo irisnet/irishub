@@ -87,7 +87,7 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 			simAccount.PrivKey,
 		)
 
-		if _, _, err = app.Deliver(txConfig.TxEncoder(), tx); err != nil {
+		if _, _, err = app.SimDeliver(txConfig.TxEncoder(), tx); err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateRecord, err.Error()), nil, err
 		}
 

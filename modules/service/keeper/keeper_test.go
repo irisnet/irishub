@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/tidwall/gjson"
 
-	v040 "github.com/cosmos/cosmos-sdk/x/auth/legacy/v040"
+	v042 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v042"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -86,7 +86,7 @@ func TestKeeperTestSuite(t *testing.T) {
 
 func (suite *KeeperTestSuite) SetupTest() {
 	isCheckTx := false
-	app := simapp.Setup(isCheckTx)
+	app := simapp.Setup(suite.T(), isCheckTx)
 
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
@@ -186,7 +186,7 @@ func (suite *KeeperTestSuite) TestBindService() {
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		suite.Equal(testProvider, sdk.AccAddress(iterator.Key()[v040.AddrLen+1:]))
+		suite.Equal(testProvider, sdk.AccAddress(iterator.Key()[v042.AddrLen+1:]))
 	}
 
 	// update binding

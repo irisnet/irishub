@@ -66,6 +66,13 @@ func (k Keeper) GetPoolByLptDenom(ctx sdk.Context, lptDenom string) (types.Pool,
 	return k.GetPool(ctx, poolId.Value)
 }
 
+// GetPoolBySequenceId return the pool by unique identifier
+func (k Keeper) GetPoolBySequenceId(ctx sdk.Context, poolId uint64) (types.Pool, bool) {
+	lptDenom := types.GetLptDenom(poolId)
+
+	return k.GetPoolByLptDenom(ctx, lptDenom)
+}
+
 // GetPoolBalances return the liquidity pool by the specified anotherCoinDenom
 func (k Keeper) GetPoolBalances(ctx sdk.Context, escrowAddress string) (coins sdk.Coins, err error) {
 	address, err := sdk.AccAddressFromBech32(escrowAddress)

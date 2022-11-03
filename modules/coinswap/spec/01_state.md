@@ -13,5 +13,6 @@ type Params struct {
     Fee sdk.Dec
     PoolCreationFee types.Coin
     TaxRate         sdk.Dec
+	UnilateralLiquidityFee sdk.Dec
 }
 ```

@@ -14,9 +14,8 @@ import (
 )
 
 // IssueDenomExec creates a redelegate message.
-func IssueDenomExec(clientCtx client.Context, from string, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
+func IssueDenomExec(clientCtx client.Context, from string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		denom,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
@@ -24,10 +23,11 @@ func IssueDenomExec(clientCtx client.Context, from string, denom string, extraAr
 	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdIssueDenom(), args)
 }
 
-func BurnMTExec(clientCtx client.Context, from string, denomID string, mtID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func BurnMTExec(clientCtx client.Context, from string, denomID string, mtID string, amount string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
 		mtID,
+		amount,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
@@ -35,10 +35,9 @@ func BurnMTExec(clientCtx client.Context, from string, denomID string, mtID stri
 	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdBurnMT(), args)
 }
 
-func MintMTExec(clientCtx client.Context, from string, denomID string, mtID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func MintMTExec(clientCtx client.Context, from string, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
-		mtID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
@@ -57,12 +56,13 @@ func EditMTExec(clientCtx client.Context, from string, denomID string, mtID stri
 	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdEditMT(), args)
 }
 
-func TransferMTExec(clientCtx client.Context, from string, recipient string, denomID string, mtID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func TransferMTExec(clientCtx client.Context, from string, recipient string, denomID string, mtID string, amount string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
+		from,
 		recipient,
 		denomID,
 		mtID,
-		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+		amount,
 	}
 	args = append(args, extraArgs...)
 
@@ -88,6 +88,16 @@ func QueryDenomsExec(clientCtx client.Context, extraArgs ...string) (testutil.Bu
 	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryDenoms(), args)
 }
 
+func QueryMTsExec(clientCtx client.Context, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := []string{
+		denomID,
+		fmt.Sprintf("--%s=json", cli.OutputFlag),
+	}
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryMTs(), args)
+}
+
 func QueryMTExec(clientCtx client.Context, denomID string, mtID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
@@ -99,11 +109,22 @@ func QueryMTExec(clientCtx client.Context, denomID string, mtID string, extraArg
 	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryMT(), args)
 }
 
+func QueryBlancesExec(clientCtx client.Context, from string, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := []string{
+		from,
+		denomID,
+		fmt.Sprintf("--%s=json", cli.OutputFlag),
+	}
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryBalances(), args)
+}
+
 func TransferDenomExec(clientCtx client.Context, from string, recipient string, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
+		from,
 		recipient,
 		denomID,
-		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 
 	args = append(args, extraArgs...)

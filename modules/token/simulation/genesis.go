@@ -22,7 +22,7 @@ const (
 
 // RandomDec randomized sdk.RandomDec
 func RandomDec(r *rand.Rand) sdk.Dec {
-	return sdk.NewDec(r.Int63())
+	return sdk.NewDecWithPrec(r.Int63n(9)+1, 1)
 }
 
 // RandomInt randomized sdk.Int

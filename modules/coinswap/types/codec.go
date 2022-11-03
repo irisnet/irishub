@@ -23,6 +23,8 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSwapOrder{}, "irismod/coinswap/MsgSwapOrder", nil)
 	cdc.RegisterConcrete(&MsgAddLiquidity{}, "irismod/coinswap/MsgAddLiquidity", nil)
 	cdc.RegisterConcrete(&MsgRemoveLiquidity{}, "irismod/coinswap/MsgRemoveLiquidity", nil)
+	cdc.RegisterConcrete(&MsgAddUnilateralLiquidity{}, "irismod/coinswap/MsgAddUnilateralLiquidity", nil)
+	cdc.RegisterConcrete(&MsgRemoveUnilateralLiquidity{}, "irismod/coinswap/MsgRemoveUnilateralLiquidity", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
@@ -30,6 +32,8 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgSwapOrder{},
 		&MsgAddLiquidity{},
 		&MsgRemoveLiquidity{},
+		&MsgAddUnilateralLiquidity{},
+		&MsgRemoveUnilateralLiquidity{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

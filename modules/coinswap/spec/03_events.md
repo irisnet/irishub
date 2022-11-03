@@ -27,6 +27,15 @@ order: 3
 | message       | module        | coinswap        |
 | message       | sender        | {senderAddress} |
 
+### MsgAddUnilateralLiquidity
+
+| Type                     | Attribute Key    | Attribute Value   |
+|:-------------------------|:-----------------|:------------------|
+| add_unilateral_liquidity | sender           | {senderAddress}   |
+| add_unilateral_liquidity | token_unilateral | {tokenUnilateral} |
+| message                  | module           | coinswap          |
+| message                  | sender           | {senderAddress}   |
+
 ### MsgRemoveLiquidity
 
 | Type             | Attribute Key | Attribute Value |
@@ -35,3 +44,12 @@ order: 3
 | remove_liquidity | token_pair    | {tokenPair}     |
 | message          | module        | coinswap        |
 | message          | sender        | {senderAddress} |
+
+### MsgRemoveUnilateralLiquidity
+
+| Type                        | Attribute Key   | Attribute Value  |
+|:----------------------------|:----------------|:-----------------|
+| remove_unilateral_liquidity | sender          | {senderAddress}  |
+| remove_unilateral_liquidity | token_unilateral| {tokenUnilateral}|
+| message                     | module          | coinswap         |
+| message                     | sender          | {senderAddress}  |

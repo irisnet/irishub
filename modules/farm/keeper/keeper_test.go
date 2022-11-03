@@ -48,7 +48,7 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(isCheckTx)
+	app := simapp.Setup(suite.T(), isCheckTx)
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: 1})
 	suite.app = app
@@ -111,8 +111,8 @@ func (suite *KeeperTestSuite) TestCreatePool() {
 
 	//check balance
 	expectedBal := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, testInitCoinAmt)).
-		Sub(sdk.NewCoins(suite.keeper.CreatePoolFee(ctx))).
-		Sub(testTotalReward)
+		Sub(sdk.NewCoins(suite.keeper.CreatePoolFee(ctx))...).
+		Sub(testTotalReward...)
 	actualBal := suite.app.BankKeeper.GetAllBalances(ctx, testCreator)
 	suite.Require().Equal(expectedBal, actualBal)
 }
@@ -145,7 +145,7 @@ func (suite *KeeperTestSuite) TestDestroyPool() {
 
 	//check balance
 	expectedBal := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, testInitCoinAmt)).
-		Sub(sdk.NewCoins(suite.keeper.CreatePoolFee(ctx)))
+		Sub(sdk.NewCoins(suite.keeper.CreatePoolFee(ctx))...)
 	actualBal := suite.app.BankKeeper.GetAllBalances(ctx, testCreator)
 	suite.Require().Equal(expectedBal, actualBal)
 

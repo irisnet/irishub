@@ -16,7 +16,7 @@ import (
 )
 
 func TestExportGenesis(t *testing.T) {
-	app := simapp.Setup(false)
+	app := simapp.Setup(t, false)
 
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
@@ -30,7 +30,7 @@ func TestExportGenesis(t *testing.T) {
 }
 
 func TestInitGenesis(t *testing.T) {
-	app := simapp.Setup(false)
+	app := simapp.Setup(t, false)
 
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 

@@ -73,7 +73,7 @@ func SimulateMsgCreateHtlc(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 		}
 		amount := simtypes.RandSubsetCoins(r, spendable)
 
-		balance, hasNeg := spendable.SafeSub(amount)
+		balance, hasNeg := spendable.SafeSub(amount...)
 		if hasNeg {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreateHTLC, "Insufficient funds"), nil, nil
 		}
@@ -104,7 +104,8 @@ func SimulateMsgCreateHtlc(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 		}
 
 		txGen := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenTx(
+		tx, err := helpers.GenSignedMockTx(
+			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
@@ -118,7 +119,7 @@ func SimulateMsgCreateHtlc(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
 		}
 
-		_, _, err = app.Deliver(txGen.TxEncoder(), tx)
+		_, _, err = app.SimDeliver(txGen.TxEncoder(), tx)
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to deliver tx"), nil, err
 		}
@@ -161,7 +162,8 @@ func SimulateMsgClaimHtlc(k keeper.Keeper, ak types.AccountKeeper, bk types.Bank
 		}
 
 		txGen := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenTx(
+		tx, err := helpers.GenSignedMockTx(
+			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
@@ -175,7 +177,7 @@ func SimulateMsgClaimHtlc(k keeper.Keeper, ak types.AccountKeeper, bk types.Bank
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
 		}
 
-		_, _, err = app.Deliver(txGen.TxEncoder(), tx)
+		_, _, err = app.SimDeliver(txGen.TxEncoder(), tx)
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to deliver tx"), nil, err
 		}

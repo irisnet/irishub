@@ -20,7 +20,6 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
 	"github.com/irisnet/irismod/modules/random/client/cli"
-	"github.com/irisnet/irismod/modules/random/client/rest"
 	"github.com/irisnet/irismod/modules/random/keeper"
 	"github.com/irisnet/irismod/modules/random/simulation"
 	"github.com/irisnet/irismod/modules/random/types"
@@ -62,7 +61,7 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 
 // RegisterRESTRoutes registers the REST routes for the random module.
 func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	rest.RegisterHandlers(clientCtx, rtr)
+	//rest.RegisterHandlers(clientCtx, rtr)
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the random module.

@@ -260,9 +260,9 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_LiquidityPool_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"irismod", "coinswap", "pools", "lpt_denom"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LiquidityPool_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"irismod", "coinswap", "pools", "lpt_denom"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_LiquidityPools_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"irismod", "coinswap", "pools"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LiquidityPools_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"irismod", "coinswap", "pools"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

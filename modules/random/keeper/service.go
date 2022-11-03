@@ -2,8 +2,6 @@ package keeper
 
 import (
 	"encoding/hex"
-	"math/rand"
-	"time"
 
 	"github.com/tidwall/gjson"
 
@@ -38,8 +36,15 @@ func (k Keeper) RequestService(ctx sdk.Context, consumer sdk.AccAddress, service
 		return nil, sdkerrors.ErrInsufficientFee
 	}
 
-	rand.Seed(time.Now().UnixNano())
-	provider, _ := sdk.AccAddressFromBech32(bindings[rand.Intn(len(bindings))].Provider)
+	prng := types.MakePRNG(
+		ctx.BlockHeader().LastBlockId.Hash,
+		ctx.BlockHeader().Time.UnixNano(),
+		consumer, nil, true)
+	provider, err := sdk.AccAddressFromBech32(bindings[prng.Intn(len(bindings))].Provider)
+	if err != nil {
+		return nil, err
+	}
+
 	timeout := k.serviceKeeper.GetParams(ctx).MaxRequestTimeout
 
 	return k.serviceKeeper.CreateRequestContext(

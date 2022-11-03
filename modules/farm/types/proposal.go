@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
 const (
@@ -12,11 +12,10 @@ const (
 )
 
 // Implements Proposal Interface
-var _ govtypes.Content = &CommunityPoolCreateFarmProposal{}
+var _ govv1beta1.Content = &CommunityPoolCreateFarmProposal{}
 
 func init() {
-	govtypes.RegisterProposalType(ProposalTypeCreateFarmPool)
-	govtypes.RegisterProposalTypeCodec(&CommunityPoolCreateFarmProposal{}, "irismod/CommunityPoolCreateFarmProposal")
+	govv1beta1.RegisterProposalType(ProposalTypeCreateFarmPool)
 }
 
 func (cfp *CommunityPoolCreateFarmProposal) GetTitle() string       { return cfp.Title }
@@ -25,7 +24,7 @@ func (cfp *CommunityPoolCreateFarmProposal) ProposalRoute() string  { return Rou
 func (cfp *CommunityPoolCreateFarmProposal) ProposalType() string   { return ProposalTypeCreateFarmPool }
 func (cfp *CommunityPoolCreateFarmProposal) ValidateBasic() error {
 	// Validate gov base proposal
-	if err := govtypes.ValidateAbstract(cfp); err != nil {
+	if err := govv1beta1.ValidateAbstract(cfp); err != nil {
 		return err
 	}
 	if err := ValidateDescription(cfp.PoolDescription); err != nil {

@@ -6,7 +6,6 @@ import (
 
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-	tmtime "github.com/tendermint/tendermint/types/time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -37,7 +36,7 @@ func htlcs(count int) []types.HTLC {
 
 func htlc(index int) types.HTLC {
 	expireOffset := uint64((index * 15) + 360)
-	timestamp := uint64(tmtime.Now().Add(time.Duration(index) * time.Minute).Unix())
+	timestamp := uint64(time.Now().Add(time.Duration(index) * time.Minute).Unix())
 	randomSecret, _ := GenerateRandomSecret()
 	randomHashLock := types.GetHashLock(randomSecret, timestamp)
 	amount := cs(c("htltbnb", 50000))

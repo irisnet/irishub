@@ -4,12 +4,12 @@ import (
 	gocontext "context"
 	"encoding/hex"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/suite"
 
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	tmtime "github.com/tendermint/tendermint/types/time"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -35,9 +35,12 @@ type QueryTestSuite struct {
 }
 
 func (suite *QueryTestSuite) SetupTest() {
-	app := simapp.SetupWithGenesisHTLC(NewHTLTGenesis(TestDeputy))
+	app := simapp.SetupWithGenesisStateFn(suite.T(), func(cdc codec.Codec, state simapp.GenesisState) simapp.GenesisState {
+		state[types.ModuleName] = cdc.MustMarshalJSON(NewHTLTGenesis(TestDeputy))
+		return state
+	})
 
-	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{Height: 1, Time: tmtime.Now()})
+	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{Height: 1, Time: time.Now()})
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
 	suite.keeper = &app.HTLCKeeper
 	suite.app = app

@@ -1,6 +1,7 @@
 package v152
 
 import (
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -10,7 +11,7 @@ import (
 
 // Parameter store keys
 var (
-	DefaultPoolCreationFee = sdk.NewCoin("uiris", sdk.NewIntWithDecimal(2000, 6))
+	DefaultPoolCreationFee = sdk.NewCoin("uiris", sdkmath.NewIntWithDecimal(2000, 6))
 	DefaultTaxRate         = sdk.NewDecWithPrec(4, 1)
 )
 

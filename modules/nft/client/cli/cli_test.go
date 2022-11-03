@@ -34,9 +34,12 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	cfg.NumValidators = 2
 
 	s.cfg = cfg
-	s.network = network.New(s.T(), cfg)
 
-	_, err := s.network.WaitForHeight(1)
+	var err error
+	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
+	s.Require().NoError(err)
+
+	_, err = s.network.WaitForHeight(1)
 	s.Require().NoError(err)
 }
 
@@ -166,11 +169,11 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(from.String(), nftItem.Owner)
 
 	//------test GetCmdQueryOwner()-------------
-	respType = proto.Message(&nfttypes.QueryOwnerResponse{})
+	respType = proto.Message(&nfttypes.QueryNFTsOfOwnerResponse{})
 	bz, err = nfttestutil.QueryOwnerExec(val.ClientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	ownerResp := respType.(*nfttypes.QueryOwnerResponse)
+	ownerResp := respType.(*nfttypes.QueryNFTsOfOwnerResponse)
 	s.Require().Equal(from.String(), ownerResp.Owner.Address)
 	s.Require().Equal(denom, ownerResp.Owner.IDCollections[0].DenomId)
 	s.Require().Equal(tokenID, ownerResp.Owner.IDCollections[0].TokenIds[0])

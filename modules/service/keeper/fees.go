@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	v040 "github.com/cosmos/cosmos-sdk/x/auth/legacy/v040"
+	v042 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v042"
 
 	"github.com/irisnet/irismod/modules/service/types"
 )
@@ -29,7 +29,7 @@ func (k Keeper) AddEarnedFee(ctx sdk.Context, provider sdk.AccAddress, fee sdk.C
 		return err
 	}
 
-	earnedFee, hasNeg := fee.SafeSub(taxCoins)
+	earnedFee, hasNeg := fee.SafeSub(taxCoins...)
 	if hasNeg {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "%s is less than %s", fee, taxCoins)
 	}
@@ -145,7 +145,7 @@ func (k Keeper) WithdrawEarnedFees(ctx sdk.Context, owner, provider sdk.AccAddre
 		if earnedFees.IsEqual(ownerEarnedFees) {
 			k.DeleteOwnerEarnedFees(ctx, owner)
 		} else {
-			k.SetOwnerEarnedFees(ctx, owner, ownerEarnedFees.Sub(earnedFees))
+			k.SetOwnerEarnedFees(ctx, owner, ownerEarnedFees.Sub(earnedFees...))
 		}
 
 		withdrawFees = earnedFees
@@ -154,7 +154,7 @@ func (k Keeper) WithdrawEarnedFees(ctx sdk.Context, owner, provider sdk.AccAddre
 		defer iterator.Close()
 
 		for ; iterator.Valid(); iterator.Next() {
-			provider := sdk.AccAddress(iterator.Key()[v040.AddrLen+1:])
+			provider := sdk.AccAddress(iterator.Key()[v042.AddrLen+1:])
 			k.DeleteEarnedFees(ctx, provider)
 		}
 

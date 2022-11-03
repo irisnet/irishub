@@ -6,16 +6,16 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/types/query"
+	"github.com/cosmos/cosmos-sdk/x/nft"
 
 	"github.com/irisnet/irismod/modules/nft/types"
 )
 
 var _ types.QueryServer = Keeper{}
 
+// Supply queries the total supply of a given denom or owner
 func (k Keeper) Supply(c context.Context, request *types.QuerySupplyRequest) (*types.QuerySupplyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
@@ -28,95 +28,140 @@ func (k Keeper) Supply(c context.Context, request *types.QuerySupplyRequest) (*t
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "invalid owner address %s", request.Owner)
 		}
-		supply = k.GetTotalSupplyOfOwner(ctx, request.DenomId, owner)
+		supply = k.GetBalance(ctx, request.DenomId, owner)
 	}
 	return &types.QuerySupplyResponse{Amount: supply}, nil
 }
 
-func (k Keeper) Owner(c context.Context, request *types.QueryOwnerRequest) (*types.QueryOwnerResponse, error) {
-	ctx := sdk.UnwrapSDKContext(c)
-
-	ownerAddress, err := sdk.AccAddressFromBech32(request.Owner)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid owner address %s", request.Owner)
+// NFTsOfOwner queries the NFTs of the specified owner
+func (k Keeper) NFTsOfOwner(c context.Context, request *types.QueryNFTsOfOwnerRequest) (*types.QueryNFTsOfOwnerResponse, error) {
+	r := &nft.QueryNFTsRequest{
+		ClassId:    request.DenomId,
+		Owner:      request.Owner,
+		Pagination: shapePageRequest(request.Pagination),
 	}
 
-	owner := types.Owner{
-		Address:       ownerAddress.String(),
-		IDCollections: types.IDCollections{},
-	}
-	idsMap := make(map[string][]string)
-	store := ctx.KVStore(k.storeKey)
-	nftStore := prefix.NewStore(store, types.KeyOwner(ownerAddress, request.DenomId, ""))
-	pageRes, err := query.Paginate(nftStore, shapePageRequest(request.Pagination), func(key []byte, value []byte) error {
-		denomID := request.DenomId
-		tokenID := string(key)
-		if len(request.DenomId) == 0 {
-			denomID, tokenID, _ = types.SplitKeyDenom(key)
-		}
-		if ids, ok := idsMap[denomID]; ok {
-			idsMap[denomID] = append(ids, tokenID)
-		} else {
-			idsMap[denomID] = []string{tokenID}
-			owner.IDCollections = append(
-				owner.IDCollections,
-				types.IDCollection{DenomId: denomID},
-			)
-		}
-		return nil
-	})
+	result, err := k.nk.NFTs(c, r)
 	if err != nil {
 		return nil, err
 	}
-	for i := 0; i < len(owner.IDCollections); i++ {
-		owner.IDCollections[i].TokenIds = idsMap[owner.IDCollections[i].DenomId]
+
+	var denomMap = make(map[string][]string)
+	var denoms []string
+	for _, token := range result.Nfts {
+		if denomMap[token.ClassId] == nil {
+			denomMap[token.ClassId] = []string{}
+			denoms = append(denoms, token.ClassId)
+		}
+		denomMap[token.ClassId] = append(denomMap[token.ClassId], token.Id)
 	}
-	return &types.QueryOwnerResponse{Owner: &owner, Pagination: pageRes}, nil
+
+	var idc []types.IDCollection
+	for _, denomID := range denoms {
+		idc = append(idc, types.IDCollection{
+			DenomId:  denomID,
+			TokenIds: denomMap[denomID],
+		})
+	}
+
+	response := &types.QueryNFTsOfOwnerResponse{
+		Owner: &types.Owner{
+			Address:       request.Owner,
+			IDCollections: idc,
+		},
+		Pagination: result.Pagination,
+	}
+
+	return response, nil
 }
 
+// Collection queries the NFTs of the specified denom
 func (k Keeper) Collection(c context.Context, request *types.QueryCollectionRequest) (*types.QueryCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
-
-	collection, pageRes, err := k.GetPaginateCollection(ctx, request, request.DenomId)
+	denom, err := k.GetDenomInfo(ctx, request.DenomId)
 	if err != nil {
 		return nil, err
 	}
-	return &types.QueryCollectionResponse{Collection: &collection, Pagination: pageRes}, nil
-}
 
-func (k Keeper) Denom(c context.Context, request *types.QueryDenomRequest) (*types.QueryDenomResponse, error) {
-	ctx := sdk.UnwrapSDKContext(c)
-
-	denomObject, found := k.GetDenom(ctx, request.DenomId)
-	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", request.DenomId)
+	r := &nft.QueryNFTsRequest{
+		ClassId:    request.DenomId,
+		Pagination: shapePageRequest(request.Pagination),
 	}
 
-	return &types.QueryDenomResponse{Denom: &denomObject}, nil
+	result, err := k.nk.NFTs(c, r)
+	if err != nil {
+		return nil, err
+	}
+
+	var nfts []types.BaseNFT
+	for _, token := range result.Nfts {
+		owner := k.nk.GetOwner(ctx, request.DenomId, token.Id)
+
+		var nftMetadata types.NFTMetadata
+		if err := k.cdc.Unmarshal(token.Data.GetValue(), &nftMetadata); err != nil {
+			return nil, err
+		}
+
+		nfts = append(nfts, types.BaseNFT{
+			Id:      token.Id,
+			URI:     token.Uri,
+			UriHash: token.UriHash,
+			Name:    nftMetadata.Name,
+			Owner:   owner.String(),
+			Data:    nftMetadata.Data,
+		})
+	}
+
+	collection := &types.Collection{
+		Denom: *denom,
+		NFTs:  nfts,
+	}
+
+	response := &types.QueryCollectionResponse{
+		Collection: collection,
+		Pagination: result.Pagination,
+	}
+
+	return response, nil
 }
 
+// Denom queries the definition of a given denom
+func (k Keeper) Denom(c context.Context, request *types.QueryDenomRequest) (*types.QueryDenomResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+	denom, err := k.GetDenomInfo(ctx, request.DenomId)
+	if err != nil {
+		return nil, err
+	}
+	return &types.QueryDenomResponse{Denom: denom}, nil
+}
+
+// Denoms queries all the denoms
 func (k Keeper) Denoms(c context.Context, req *types.QueryDenomsRequest) (*types.QueryDenomsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
-	var denoms []types.Denom
-	store := ctx.KVStore(k.storeKey)
-	denomStore := prefix.NewStore(store, types.KeyDenomID(""))
-	pageRes, err := query.Paginate(denomStore, shapePageRequest(req.Pagination), func(key []byte, value []byte) error {
-		var denom types.Denom
-		k.cdc.MustUnmarshal(value, &denom)
-		denoms = append(denoms, denom)
-		return nil
+	result, err := k.nk.Classes(c, &nft.QueryClassesRequest{
+		Pagination: shapePageRequest(req.Pagination),
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "paginate: %v", err)
+		return nil, err
+	}
+
+	var denoms []types.Denom
+	for _, denom := range result.Classes {
+		denom, err := k.GetDenomInfo(ctx, denom.Id)
+		if err != nil {
+			return nil, err
+		}
+		denoms = append(denoms, *denom)
 	}
 
 	return &types.QueryDenomsResponse{
 		Denoms:     denoms,
-		Pagination: pageRes,
+		Pagination: result.Pagination,
 	}, nil
 }
 
+// NFT queries the NFT for the given denom and token ID
 func (k Keeper) NFT(c context.Context, request *types.QueryNFTRequest) (*types.QueryNFTResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 

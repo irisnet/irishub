@@ -119,7 +119,8 @@ func (m *QueryRandomResponse) GetRandom() *Random {
 	return nil
 }
 
-// QueryRandomRequestQueueRequest is request type for the Query/RandomRequestQueue RPC method
+// QueryRandomRequestQueueRequest is request type for the
+// Query/RandomRequestQueue RPC method
 type QueryRandomRequestQueueRequest struct {
 	Height int64 `protobuf:"varint,1,opt,name=height,proto3" json:"height,omitempty"`
 }
@@ -164,7 +165,8 @@ func (m *QueryRandomRequestQueueRequest) GetHeight() int64 {
 	return 0
 }
 
-// QueryRandomRequestQueueResponse is response type for the Query/RandomRequestQueue RPC method
+// QueryRandomRequestQueueResponse is response type for the
+// Query/RandomRequestQueue RPC method
 type QueryRandomRequestQueueResponse struct {
 	Requests []Request `protobuf:"bytes,1,rep,name=requests,proto3" json:"requests"`
 }
@@ -633,10 +635,7 @@ func (m *QueryRandomRequest) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
@@ -722,10 +721,7 @@ func (m *QueryRandomResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
@@ -794,10 +790,7 @@ func (m *QueryRandomRequestQueueRequest) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
@@ -881,10 +874,7 @@ func (m *QueryRandomRequestQueueResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {

@@ -7,8 +7,6 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	tmtime "github.com/tendermint/tendermint/types/time"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
@@ -21,7 +19,7 @@ const (
 var (
 	KeyAssetParams = []byte("AssetParams") // asset params key
 
-	DefaultPreviousBlockTime = tmtime.Canonical(time.Unix(1, 0))
+	DefaultPreviousBlockTime = time.Now()
 )
 
 // NewParams is the HTLC params constructor

@@ -1,8 +1,11 @@
 package simulation
 
 import (
+	"encoding/json"
+	"fmt"
 	"math/rand"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
@@ -21,17 +24,19 @@ func ParamChanges(r *rand.Rand) []simtypes.ParamChange {
 	return []simtypes.ParamChange{
 		simulation.NewSimParamChange(types.ModuleName, keyTokenTaxRate,
 			func(r *rand.Rand) string {
-				return RandomDec(r).String()
+				return fmt.Sprintf("\"%s\"", RandomDec(r).String())
 			},
 		),
 		simulation.NewSimParamChange(types.ModuleName, keyIssueTokenBaseFee,
 			func(r *rand.Rand) string {
-				return RandomInt(r).String()
+				fee := sdk.NewCoin(types.GetNativeToken().Symbol, RandomInt(r))
+				bz, _ := json.Marshal(fee)
+				return string(bz)
 			},
 		),
 		simulation.NewSimParamChange(types.ModuleName, keyMintTokenFeeRatio,
 			func(r *rand.Rand) string {
-				return RandomDec(r).String()
+				return fmt.Sprintf("\"%s\"", RandomDec(r).String())
 			},
 		),
 	}

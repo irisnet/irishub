@@ -8,9 +8,11 @@ option go_package = "github.com/irisnet/irismod/modules/service/types";
 
 // GenesisState defines the service module's genesis state
 message GenesisState {
-    Params params = 1 [ (gogoproto.nullable) = false ];
-    repeated ServiceDefinition definitions = 2 [ (gogoproto.nullable) = false ];
-    repeated ServiceBinding bindings = 3 [ (gogoproto.nullable) = false ];
-    map<string, string> withdraw_addresses = 4 [ (gogoproto.moretags) = "yaml:\"withdraw_addresses\"" ];
-    map<string, RequestContext> request_contexts = 5 [ (gogoproto.moretags) = "yaml:\"request_contexts\"" ];
+  Params params = 1 [ (gogoproto.nullable) = false ];
+  repeated ServiceDefinition definitions = 2 [ (gogoproto.nullable) = false ];
+  repeated ServiceBinding bindings = 3 [ (gogoproto.nullable) = false ];
+  map<string, string> withdraw_addresses = 4
+      [ (gogoproto.moretags) = "yaml:\"withdraw_addresses\"" ];
+  map<string, RequestContext> request_contexts = 5
+      [ (gogoproto.moretags) = "yaml:\"request_contexts\"" ];
 }

@@ -1073,7 +1073,7 @@ func (k Keeper) Slash(ctx sdk.Context, requestID tmbytes.HexBytes) error {
 	slashedAmt := sdk.NewDecFromInt(depositAmt).Mul(slashFraction).TruncateInt()
 	slashedCoins := sdk.NewCoins(sdk.NewCoin(baseDenom, slashedAmt))
 
-	deposit, hasNeg := binding.Deposit.SafeSub(slashedCoins)
+	deposit, hasNeg := binding.Deposit.SafeSub(slashedCoins...)
 	if hasNeg {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "%s is less than %s", binding.Deposit.String(), slashedCoins.String())
 	}

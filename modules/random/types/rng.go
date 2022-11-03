@@ -3,6 +3,7 @@ package types
 import (
 	"crypto/sha256"
 	"math/big"
+	"math/rand"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -57,6 +58,11 @@ func (p PRNG) GetRand() *big.Rat {
 	random := new(big.Rat).SetFrac(new(big.Int).Mod(seed, precision), precision)
 
 	return random
+}
+
+func (p PRNG) Intn(n int) int {
+	rnd := rand.New(rand.NewSource(p.GetRand().Denom().Int64()))
+	return rnd.Intn(n)
 }
 
 // SHA256 wraps sha256.Sum256 with result converted to slice

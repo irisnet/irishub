@@ -37,7 +37,22 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ## [Unreleased]
 
+### Bug Fixes
+
+* [\#304](https://github.com/irisnet/irismod/pull/304) Fix nft module import error.
+* [\#314](https://github.com/irisnet/irismod/pull/314) Fix `addLiquidity` panic error.
+
 ### Improvements
+
+* [\#305](https://github.com/irisnet/irismod/pull/305) Remove ibc-go from project.
+* [\#306](https://github.com/irisnet/irismod/pull/306) Bump up cosmos-sdk to v0.46.1.
+* [\#307](https://github.com/irisnet/irismod/pull/307) Refactor proto-gen with docker.
+* [\#308](https://github.com/irisnet/irismod/pull/308) Coinswap module adds unilateral injection liquidity function.
+* [\#309](https://github.com/irisnet/irismod/pull/309) Refactor nft with cosmos-sdk nft module.
+
+### API Breaking Changes
+
+* [\#309](https://github.com/irisnet/irismod/pull/309) GRPC method `Owner` rename to `NFTsOfOwner`, Remove deprecated `Queries` api
 
 ## [v1.6.0] - 2022-08-08
 

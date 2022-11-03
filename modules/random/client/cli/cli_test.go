@@ -38,10 +38,11 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	cfg := simapp.NewConfig()
 	cfg.NumValidators = 1
 
+	var err error
 	s.cfg = cfg
-	s.network = network.New(s.T(), cfg)
+	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
 
-	_, err := s.network.WaitForHeight(1)
+	_, err = s.network.WaitForHeight(1)
 	s.Require().NoError(err)
 }
 
@@ -141,7 +142,7 @@ func (s *IntegrationTestSuite) TestRandom() {
 			var requestsBz []byte
 			for _, attribute := range event.Attributes {
 				if string(attribute.Key) == servicetypes.AttributeKeyRequests {
-					requestsBz = attribute.GetValue()
+					requestsBz = []byte(attribute.GetValue())
 					found = true
 				}
 			}

@@ -151,7 +151,7 @@ func QueryRequestByTxQuery(
 			var requestsBz []byte
 			for _, attribute := range event.Attributes {
 				if string(attribute.Key) == types.AttributeKeyRequests {
-					requestsBz = attribute.GetValue()
+					requestsBz = []byte(attribute.GetValue())
 				}
 				if string(attribute.Key) == types.AttributeKeyRequestContextID &&
 					string(attribute.GetValue()) == contextID.String() {

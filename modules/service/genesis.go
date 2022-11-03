@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/hex"
 	"fmt"
+	"sort"
 
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
@@ -30,15 +31,15 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		}
 	}
 
-	for ownerAddressStr, withdrawAddress := range data.WithdrawAddresses {
+	for _, ownerAddressStr := range getSortedKeys(data.WithdrawAddresses) {
 		ownerAddress, _ := sdk.AccAddressFromBech32(ownerAddressStr)
-		withdrawAddress, _ := sdk.AccAddressFromBech32(withdrawAddress)
+		withdrawAddress, _ := sdk.AccAddressFromBech32(data.WithdrawAddresses[ownerAddressStr])
 		k.SetWithdrawAddress(ctx, ownerAddress, withdrawAddress)
 	}
 
-	for reqContextIDStr, requestContext := range data.RequestContexts {
+	for _, reqContextIDStr := range getSortedKeys(data.RequestContexts) {
 		requestContextID, _ := hex.DecodeString(reqContextIDStr)
-		k.SetRequestContext(ctx, requestContextID, *requestContext)
+		k.SetRequestContext(ctx, requestContextID, *data.RequestContexts[reqContextIDStr])
 	}
 }
 
@@ -106,4 +107,13 @@ func PrepForZeroHeightGenesis(ctx sdk.Context, k keeper.Keeper) {
 	if err := k.ResetRequestContextsStateAndBatch(ctx); err != nil {
 		panic(fmt.Sprintf("failed to reset the request context state: %s", err))
 	}
+}
+
+func getSortedKeys[T string | *types.RequestContext](m map[string]T) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
 }

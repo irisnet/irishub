@@ -20,7 +20,6 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
 	"github.com/irisnet/irismod/modules/service/client/cli"
-	"github.com/irisnet/irismod/modules/service/client/rest"
 	"github.com/irisnet/irismod/modules/service/keeper"
 	"github.com/irisnet/irismod/modules/service/simulation"
 	"github.com/irisnet/irismod/modules/service/types"
@@ -63,7 +62,7 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 
 // RegisterRESTRoutes registers the REST routes for the service module.
 func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	rest.RegisterHandlers(clientCtx, rtr)
+	//rest.RegisterHandlers(clientCtx, rtr)
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the service module.

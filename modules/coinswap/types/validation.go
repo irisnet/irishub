@@ -4,6 +4,7 @@ import (
 	fmt "fmt"
 	"strings"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -60,24 +61,44 @@ func ValidateMaxToken(maxToken sdk.Coin) error {
 	return nil
 }
 
+// ValidateToken verifies whether the exact token is legal
+func ValidateToken(exactToken sdk.Coin) error {
+	if !(exactToken.IsValid() && exactToken.IsPositive()) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid exactToken (%s)", exactToken.String())
+	}
+
+	if strings.HasPrefix(exactToken.Denom, LptTokenPrefix) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "token must be non-liquidity token")
+	}
+	return nil
+}
+
+// ValidateCounterpartyDenom verifies whether the counterparty denom is legal
+func ValidateCounterpartyDenom(counterpartydenom string) error {
+	if counterpartydenom == "" {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "counterparty denom should not be empty")
+	}
+	return nil
+}
+
 // ValidateExactStandardAmt verifies whether the standard token amount is legal
-func ValidateExactStandardAmt(standardAmt sdk.Int) error {
+func ValidateExactStandardAmt(standardAmt sdkmath.Int) error {
 	if !standardAmt.IsPositive() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "standard token amount must be positive")
 	}
 	return nil
 }
 
-// ValidateMinLiquidity verifies whether the minimum liquidity is legal
-func ValidateMinLiquidity(minLiquidity sdk.Int) error {
+// ValidateLiquidity verifies whether the minimum liquidity is legal
+func ValidateLiquidity(minLiquidity sdkmath.Int) error {
 	if minLiquidity.IsNegative() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "minimum liquidity can not be negative")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "liquidity can not be negative")
 	}
 	return nil
 }
 
 // ValidateMinToken verifies whether the minimum token amount is legal
-func ValidateMinToken(minToken sdk.Int) error {
+func ValidateMinToken(minToken sdkmath.Int) error {
 	if minToken.IsNegative() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "minimum token amount can not be negative")
 	}
@@ -97,7 +118,7 @@ func ValidateWithdrawLiquidity(liquidity sdk.Coin) error {
 }
 
 // ValidateMinStandardAmt verifies whether the minimum standard amount is legal
-func ValidateMinStandardAmt(minStandardAmt sdk.Int) error {
+func ValidateMinStandardAmt(minStandardAmt sdkmath.Int) error {
 	if minStandardAmt.IsNegative() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("minimum standard token amount %s can not be negative", minStandardAmt.String()))
 	}
@@ -108,6 +129,14 @@ func ValidateMinStandardAmt(minStandardAmt sdk.Int) error {
 func ValidateLptDenom(lptDenom string) error {
 	if _, err := ParseLptDenom(lptDenom); err != nil {
 		return sdkerrors.Wrap(ErrInvalidDenom, lptDenom)
+	}
+	return nil
+}
+
+// ValidatePoolSequenceId returns nil if the pool id is valid
+func ValidatePoolSequenceId(poolId uint64) error {
+	if poolId == 0 {
+		return sdkerrors.Wrap(ErrReservePoolNotExists, "pool-id is not valid")
 	}
 	return nil
 }

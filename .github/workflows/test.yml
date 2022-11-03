@@ -7,22 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v1
-      - name: Run unit tests
-        uses: cedrickring/golang-action/go1.16@1.7.0
-        env:
-          GO111MODULE: "on"
+        uses: actions/checkout@v3
+      - name: Setup go
+        uses: actions/setup-go@v3
         with:
-          args: make test-unit
-  test-sim:
-    name: Test Simulations
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v1
-      - name: Run simulation tests
-        uses: cedrickring/golang-action/go1.16@1.7.0
-        env:
-          GO111MODULE: "on"
-        with:
-          args: make test-sim-nondeterminism-fast
+          go-version: '^1.18' # The Go version to download (if necessary) and use.
+      - run: make test-unit

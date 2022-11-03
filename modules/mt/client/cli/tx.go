@@ -38,7 +38,7 @@ func NewTxCmd() *cobra.Command {
 	return txCmd
 }
 
-// GetCmdIssueDenom is the CLI command for an IssueDenom transaction
+// GetCmdIssueDenom is the CLI command for an SaveDenom transaction
 func GetCmdIssueDenom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "issue",

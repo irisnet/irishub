@@ -8,43 +8,45 @@ option (gogoproto.goproto_getters_all) = false;
 
 // Msg defines the mt Msg service.
 service Msg {
-    // IssueDenom defines a method for issuing a denom.
-    rpc IssueDenom(MsgIssueDenom) returns (MsgIssueDenomResponse);
+  // IssueDenom defines a method for issuing a denom.
+  rpc IssueDenom(MsgIssueDenom) returns (MsgIssueDenomResponse);
 
-    // TransferDenom defines a method for transferring a denom.
-    rpc TransferDenom(MsgTransferDenom) returns (MsgTransferDenomResponse);
+  // TransferDenom defines a method for transferring a denom.
+  rpc TransferDenom(MsgTransferDenom) returns (MsgTransferDenomResponse);
 
-    // MintMT defines a method for creating a new MT or minting amounts of an existing MT
-    rpc MintMT(MsgMintMT) returns (MsgMintMTResponse);
+  // MintMT defines a method for creating a new MT or minting amounts of an
+  // existing MT
+  rpc MintMT(MsgMintMT) returns (MsgMintMTResponse);
 
-    // EditMT defines a method for editing an MT.
-    rpc EditMT(MsgEditMT) returns (MsgEditMTResponse);
+  // EditMT defines a method for editing an MT.
+  rpc EditMT(MsgEditMT) returns (MsgEditMTResponse);
 
-    // TransferMT defines a method for transferring an MT.
-    rpc TransferMT(MsgTransferMT) returns (MsgTransferMTResponse);
+  // TransferMT defines a method for transferring an MT.
+  rpc TransferMT(MsgTransferMT) returns (MsgTransferMTResponse);
 
-    // BurnMT defines a method for burning an MT.
-    rpc BurnMT(MsgBurnMT) returns (MsgBurnMTResponse);
+  // BurnMT defines a method for burning an MT.
+  rpc BurnMT(MsgBurnMT) returns (MsgBurnMTResponse);
 }
 
 // MsgIssueDenom defines an SDK message for creating a new denom.
 message MsgIssueDenom {
-    option (gogoproto.equal) = true;
+  option (gogoproto.equal) = true;
 
-    string name = 1;
-    bytes data = 2;
-    string sender = 3;
+  string name = 1;
+  bytes data = 2;
+  string sender = 3;
 }
 
 // MsgIssueDenomResponse defines the Msg/IssueDenom response type.
 message MsgIssueDenomResponse {}
 
-// MsgTransferDenom defines an SDK message for transferring an denom to recipient.
+// MsgTransferDenom defines an SDK message for transferring an denom to
+// recipient.
 message MsgTransferDenom {
-    option (gogoproto.equal) = true;
-    string id = 1;
-    string sender = 2;
-    string recipient = 3;
+  option (gogoproto.equal) = true;
+  string id = 1;
+  string sender = 2;
+  string recipient = 3;
 }
 
 // MsgTransferDenomResponse defines the Msg/TransferDenom response type.
@@ -52,14 +54,14 @@ message MsgTransferDenomResponse {}
 
 // MsgMintMT defines an SDK message for creating a new MT.
 message MsgMintMT {
-    option (gogoproto.equal) = true;
+  option (gogoproto.equal) = true;
 
-    string id = 1;
-    string denom_id = 2;
-    uint64 amount = 3;
-    bytes data = 4;
-    string sender = 5;
-    string recipient = 6;
+  string id = 1;
+  string denom_id = 2;
+  uint64 amount = 3;
+  bytes data = 4;
+  string sender = 5;
+  string recipient = 6;
 }
 
 // MsgMintMTResponse defines the Msg/MintMT response type.
@@ -67,12 +69,12 @@ message MsgMintMTResponse {}
 
 // MsgEditMT defines an SDK message for editing an MT.
 message MsgEditMT {
-    option (gogoproto.equal) = true;
+  option (gogoproto.equal) = true;
 
-    string id = 1;
-    string denom_id = 2;
-    bytes data = 3;
-    string sender = 4;
+  string id = 1;
+  string denom_id = 2;
+  bytes data = 3;
+  string sender = 4;
 }
 
 // MsgEditMTResponse defines the Msg/EditMT response type.
@@ -80,13 +82,13 @@ message MsgEditMTResponse {}
 
 // MsgTransferMT defines an SDK message for transferring an MT to recipient.
 message MsgTransferMT {
-    option (gogoproto.equal) = true;
+  option (gogoproto.equal) = true;
 
-    string id = 1;
-    string denom_id = 2;
-    uint64 amount = 3;
-    string sender = 4;
-    string recipient = 5;
+  string id = 1;
+  string denom_id = 2;
+  uint64 amount = 3;
+  string sender = 4;
+  string recipient = 5;
 }
 
 // MsgTransferMTResponse defines the Msg/TransferMT response type.
@@ -94,12 +96,12 @@ message MsgTransferMTResponse {}
 
 // MsgBurnMT defines an SDK message for burning an MT.
 message MsgBurnMT {
-    option (gogoproto.equal) = true;
+  option (gogoproto.equal) = true;
 
-    string id = 1;
-    string denom_id = 2;
-    uint64 amount = 3;
-    string sender = 4;
+  string id = 1;
+  string denom_id = 2;
+  uint64 amount = 3;
+  string sender = 4;
 }
 
 // MsgBurnMTResponse defines the Msg/BurnMT response type.

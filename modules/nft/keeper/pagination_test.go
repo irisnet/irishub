@@ -24,7 +24,7 @@ func TestShapePageRequest(t *testing.T) {
 		CountTotal: true,
 		Reverse:    true,
 	}
-	
+
 	res2 := ShapePageRequest(request)
 	require.NotNil(t, res2)
 	require.Equal(t, res2.Limit, defaultRequest.Limit)           // limit == paginationDefaultLimit

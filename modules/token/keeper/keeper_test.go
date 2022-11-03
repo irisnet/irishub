@@ -8,6 +8,7 @@ import (
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -24,7 +25,7 @@ const (
 var (
 	denom    = types.GetNativeToken().Symbol
 	owner    = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest")))
-	initAmt  = sdk.NewIntWithDecimal(100000000, int(6))
+	initAmt  = sdkmath.NewIntWithDecimal(100000000, int(6))
 	initCoin = sdk.Coins{sdk.NewCoin(denom, initAmt)}
 )
 
@@ -39,7 +40,7 @@ type KeeperTestSuite struct {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(isCheckTx)
+	app := simapp.Setup(suite.T(), isCheckTx)
 
 	suite.legacyAmino = app.LegacyAmino()
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
@@ -72,7 +73,7 @@ func (suite *KeeperTestSuite) issueToken(token types.Token) {
 	mintCoins := sdk.NewCoins(
 		sdk.NewCoin(
 			token.MinUnit,
-			sdk.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)),
+			sdkmath.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)),
 		),
 	)
 
