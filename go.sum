@@ -153,10 +153,10 @@ github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d h1:xDfNPAt8lFiC1U
 github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d/go.mod h1:6QX/PXZ00z/TKoufEY6K/a0k6AhaJrQKdFe6OfVXsa4=
 github.com/bgentry/speakeasy v0.1.0 h1:ByYyxL9InA1OWqxJqqp2A5pYHUrCiAL6K3J+LKSsQkY=
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
-github.com/bianjieai/tendermint v0.34.21-irita-220906 h1:5OzU9tw4jSstC18xu5jPLVnQIwPVZ7GUY4Jwc5n2Cbc=
-github.com/bianjieai/tendermint v0.34.21-irita-220906/go.mod h1:H6lkFRFz2M069v7497/ToAjMs8JhZ5q33WeiGvxlVQ4=
-github.com/bianjieai/tibc-go v0.3.1-0.20220906091731-a288411923da h1:VBIbaqtvZqZAYN+9FUtlkhNlLp+BEPzvfsdVTDmDWoc=
-github.com/bianjieai/tibc-go v0.3.1-0.20220906091731-a288411923da/go.mod h1:mWxd5H7EZHSaorEinAMKrp4TLti7FrnfDsQXQgSb7jA=
+github.com/bianjieai/tendermint v0.34.22-irita-221107 h1:LiFs3jH72dOh+wyF5MQE3RtU9qh429naGVP9xi3EJwg=
+github.com/bianjieai/tendermint v0.34.22-irita-221107/go.mod h1:8ruxLM15hv1mPcrvETcq/4dnwMG4jpkhCu8jrp0pd2c=
+github.com/bianjieai/tibc-go v0.4.0-rc1 h1:S4/B0MjS6E3wcVDYYrZBKfV106KOAat7j5LyUb+rEDc=
+github.com/bianjieai/tibc-go v0.4.0-rc1/go.mod h1:VPlRDW4/WaKmln9TeOI5U6p1QyCNVUWGF5uGk82Sq5U=
 github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40/go.mod h1:8rLXio+WjiTceGBHIoTvn60HIbs7Hm7bcHjyrSqYB9c=
 github.com/boltdb/bolt v1.3.1/go.mod h1:clJnj/oiGkjum5o1McbSZDSLxVThjynRyGBgiAx27Ps=
 github.com/btcsuite/btcd v0.0.0-20190115013929-ed77733ec07d/go.mod h1:d3C0AkH6BRcvO8T0UEPu53cnw4IbV63x1bEjildYhO0=
@@ -617,8 +617,8 @@ github.com/influxdata/promql/v2 v2.12.0/go.mod h1:fxOPu+DY0bqCTCECchSRtWfc+0X19y
 github.com/influxdata/roaring v0.4.13-0.20180809181101-fc520f41fab6/go.mod h1:bSgUQ7q5ZLSO+bKBGqJiCBGAl+9DxyW63zLTujjUlOE=
 github.com/influxdata/tdigest v0.0.0-20181121200506-bf2b5ad3c0a9/go.mod h1:Js0mqiSBE6Ffsg94weZZ2c+v/ciT8QRHFOap7EKDrR0=
 github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368/go.mod h1:Wbbw6tYNvwa5dlB6304Sd+82Z3f7PmVZHVKU637d4po=
-github.com/irisnet/irismod v1.6.1-0.20221017030749-8c9868d5cd4c h1:viGooXkaGOBCYV/i76HIN4B6qmrDMj6lTHOwPU+EzH8=
-github.com/irisnet/irismod v1.6.1-0.20221017030749-8c9868d5cd4c/go.mod h1:yh5Wud/Ohp8dGy0miZOhfC3WbRWpLJlI5Wzjt2dYJDE=
+github.com/irisnet/irismod v1.7.0-rc1 h1:UCvnF0ZRKbejufqpOkFLPFwg8fqLfXVrI7A7+XBdstQ=
+github.com/irisnet/irismod v1.7.0-rc1/go.mod h1:yh5Wud/Ohp8dGy0miZOhfC3WbRWpLJlI5Wzjt2dYJDE=
 github.com/jackpal/go-nat-pmp v1.0.2/go.mod h1:QPH045xvCAeXUZOxsnwmrtiCoxIr9eob+4orBN1SBKc=
 github.com/jedisct1/go-minisign v0.0.0-20190909160543-45766022959e/go.mod h1:G1CVv03EnqU1wYL2dFwXxW2An0az9JTl/ZsqXQeBlkU=
 github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=

@@ -4,14 +4,14 @@ go 1.18
 
 require (
 	cosmossdk.io/math v1.0.0-beta.3
-	github.com/bianjieai/tibc-go v0.3.1-0.20220906091731-a288411923da
+	github.com/bianjieai/tibc-go v0.4.0-rc1
 	github.com/cosmos/cosmos-sdk v0.46.4
 	github.com/cosmos/ibc-go/v5 v5.0.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/irisnet/irismod v1.6.1-0.20221017030749-8c9868d5cd4c
+	github.com/irisnet/irismod v1.7.0-rc1
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
@@ -185,7 +185,7 @@ require (
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
-replace github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.34.21-irita-220906
+replace github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.34.22-irita-221107
 
 replace github.com/zondax/hid => github.com/zondax/hid v0.9.0
 
