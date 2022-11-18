@@ -185,7 +185,7 @@ require (
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
-replace github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.33.1-dev0.0.20221118022626-07e3b27e637c
+replace github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.34.23-irita-221118
 
 replace github.com/zondax/hid => github.com/zondax/hid v0.9.0
 
