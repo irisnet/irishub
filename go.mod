@@ -4,14 +4,14 @@ go 1.18
 
 require (
 	cosmossdk.io/math v1.0.0-beta.3
-	github.com/bianjieai/tibc-go v0.4.0
+	github.com/bianjieai/tibc-go v0.4.1
 	github.com/cosmos/cosmos-sdk v0.46.5
 	github.com/cosmos/ibc-go/v5 v5.0.1
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/irisnet/irismod v1.7.1-0.20221118024454-30813dbdd131
+	github.com/irisnet/irismod v1.7.1
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
