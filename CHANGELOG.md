@@ -37,6 +37,11 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ## [Unreleased]
 
+## [v1.7.1] - 2022-11-18
+
+### Improvements
+* [\#321](https://github.com/irisnet/irismod/pull/321) Bump up cosmos-sdk to v0.46.5.
+
 ## [v1.7.0] - 2022-11-15
 ### Bug Fixes
 
