@@ -102,6 +102,9 @@ import (
 	"github.com/irisnet/irismod/modules/coinswap"
 	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
+	"github.com/irisnet/irismod/modules/farm"
+	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
+	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 	"github.com/irisnet/irismod/modules/htlc"
 	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
@@ -127,21 +130,6 @@ import (
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
-	"github.com/irisnet/irishub/address"
-	irishubante "github.com/irisnet/irishub/ante"
-	irisappparams "github.com/irisnet/irishub/app/params"
-	"github.com/irisnet/irishub/lite"
-	"github.com/irisnet/irishub/modules/guardian"
-	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
-	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
-	"github.com/irisnet/irishub/modules/mint"
-	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
-	minttypes "github.com/irisnet/irishub/modules/mint/types"
-
-	"github.com/irisnet/irismod/modules/farm"
-	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
-	farmtypes "github.com/irisnet/irismod/modules/farm/types"
-
 	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
 	tibcmttransferkeeper "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/keeper"
 	tibcmttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/types"
@@ -155,6 +143,21 @@ import (
 	tibcrouting "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing"
 	tibcroutingtypes "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing/types"
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
+
+	nfttransfer "github.com/bianjieai/nft-transfer"
+	ibcnfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
+	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
+
+	"github.com/irisnet/irishub/address"
+	irishubante "github.com/irisnet/irishub/ante"
+	irisappparams "github.com/irisnet/irishub/app/params"
+	"github.com/irisnet/irishub/lite"
+	"github.com/irisnet/irishub/modules/guardian"
+	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
+	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
+	"github.com/irisnet/irishub/modules/mint"
+	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
+	minttypes "github.com/irisnet/irishub/modules/mint/types"
 )
 
 const appName = "IrisApp"
@@ -219,6 +222,7 @@ var (
 		tibcnfttransfer.AppModuleBasic{},
 		tibcmttransfer.AppModuleBasic{},
 		mt.AppModuleBasic{},
+		nfttransfer.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -287,9 +291,10 @@ type IrisApp struct {
 	GroupKeeper      groupkeeper.Keeper
 
 	//ibc
-	IBCKeeper         *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	IBCTransferKeeper ibctransferkeeper.Keeper
-	ICAHostKeeper     icahostkeeper.Keeper
+	IBCKeeper            *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	IBCTransferKeeper    ibctransferkeeper.Keeper
+	ICAHostKeeper        icahostkeeper.Keeper
+	IBCNFTTransferKeeper ibcnfttransferkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	scopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -400,7 +405,7 @@ func NewIrisApp(
 		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey, recordtypes.StoreKey,
 		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
 		farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey, tibcmttypes.StoreKey, mttypes.StoreKey,
-		authzkeeper.StoreKey, group.StoreKey, icahosttypes.StoreKey,
+		authzkeeper.StoreKey, group.StoreKey, icahosttypes.StoreKey, ibcnfttransfertypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -433,6 +438,7 @@ func NewIrisApp(
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
+	scopedNFTTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibcnfttransfertypes.ModuleName)
 
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec,
@@ -607,11 +613,25 @@ func NewIrisApp(
 	transferModule := transfer.NewAppModule(app.IBCTransferKeeper)
 	transferIBCModule := transfer.NewIBCModule(app.IBCTransferKeeper)
 
+	app.IBCNFTTransferKeeper = ibcnfttransferkeeper.NewKeeper(
+		appCodec,
+		keys[ibcnfttransfertypes.StoreKey],
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		app.NFTKeeper.NFTkeeper(), //TODO
+		scopedNFTTransferKeeper,
+	)
+	ibcnfttransferModule := nfttransfer.NewAppModule(app.IBCNFTTransferKeeper)
+	nfttransferIBCModule := nfttransfer.NewIBCModule(app.IBCNFTTransferKeeper)
+
 	// routerModule := router.NewAppModule(app.RouterKeeper, transferIBCModule)
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
-		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule)
+		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
+		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule)
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	nfttransferModule := tibcnfttransfer.NewAppModule(app.TIBCNFTTransferKeeper)
@@ -778,6 +798,7 @@ func NewIrisApp(
 		oracle.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper),
 		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
 		farm.NewAppModule(appCodec, app.FarmKeeper, app.AccountKeeper, app.BankKeeper),
+		ibcnfttransferModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -823,6 +844,8 @@ func NewIrisApp(
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+
+		ibcnfttransfertypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		//sdk module
@@ -863,6 +886,8 @@ func NewIrisApp(
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+
+		ibcnfttransfertypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -909,6 +934,8 @@ func NewIrisApp(
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+
+		ibcnfttransfertypes.ModuleName,
 	)
 
 	cfg := module.NewConfigurator(appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
@@ -949,6 +976,8 @@ func NewIrisApp(
 		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
 		farm.NewAppModule(appCodec, app.FarmKeeper, app.AccountKeeper, app.BankKeeper),
 		tibc.NewAppModule(app.TIBCKeeper),
+
+		ibcnfttransferModule,
 	)
 
 	app.sm.RegisterStoreDecoders()
