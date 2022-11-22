@@ -191,3 +191,5 @@ replace github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.3
 replace github.com/zondax/hid => github.com/zondax/hid v0.9.0
 
 replace github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
+
+replace github.com/irisnet/irismod => github.com/irisnet/irismod v1.7.0-rc1.0.20221122053912-c1de7385fd7d

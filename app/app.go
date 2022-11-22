@@ -620,7 +620,7 @@ func NewIrisApp(
 		app.IBCKeeper.ChannelKeeper,
 		&app.IBCKeeper.PortKeeper,
 		app.AccountKeeper,
-		app.NFTKeeper.NFTkeeper(), //TODO
+		app.NFTKeeper.NewISC721Keeper(app.AccountKeeper),
 		scopedNFTTransferKeeper,
 	)
 	ibcnfttransferModule := nfttransfer.NewAppModule(app.IBCNFTTransferKeeper)
