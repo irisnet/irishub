@@ -12,7 +12,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/irisnet/irismod v1.7.1
+	github.com/irisnet/irismod v1.7.2-0.20221122055736-c487c2dfad4e
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
@@ -191,5 +191,3 @@ replace github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.3
 replace github.com/zondax/hid => github.com/zondax/hid v0.9.0
 
 replace github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
-
-replace github.com/irisnet/irismod => github.com/irisnet/irismod v1.7.0-rc1.0.20221122053912-c1de7385fd7d
