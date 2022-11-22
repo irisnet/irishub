@@ -190,6 +190,7 @@ init: kill-dev install
 	@echo "Initializing relayer..." 
 	./network/hermes/restore-keys.sh
 	./network/hermes/create-conn.sh
+	./network/hermes/start.sh
 
 init-golang-rly: kill-dev install
 	@echo "Initializing both blockchains..."
