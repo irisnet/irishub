@@ -179,6 +179,37 @@ format:
 benchmark:
 	@go test -mod=readonly -bench=. ./...
 
+###############################################################################
+###                              Set up ibc network                         ###
+###############################################################################
+
+init: kill-dev install 
+	@echo "Initializing both blockchains..."
+	./network/init.sh
+	./network/start.sh
+	@echo "Initializing relayer..." 
+	./network/hermes/restore-keys.sh
+	./network/hermes/create-conn.sh
+
+init-golang-rly: kill-dev install
+	@echo "Initializing both blockchains..."
+	./network/init.sh
+	./network/start.sh
+	@echo "Initializing relayer..."
+	./network/relayer/interchain-nft-config/rly.sh
+
+start: 
+	@echo "Starting up test network"
+	./network/start.sh
+
+start-rly:
+	./network/hermes/start.sh
+
+kill-dev:
+	@echo "Killing irisd and removing previous data"
+	-@rm -rf ./data
+	-@killall iris 2>/dev/null
+
 
 ########################################
 ### Local validator nodes using docker and docker-compose
