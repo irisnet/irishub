@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -21,7 +22,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/server"
-	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/snapshots"
 	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
@@ -33,8 +33,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 
+	ethermintserver "github.com/evmos/ethermint/server"
+	servercfg "github.com/evmos/ethermint/server/config"
+
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/params"
+	"github.com/irisnet/irishub/crypto/keyring"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
@@ -50,6 +54,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
 		WithHomeDir(app.DefaultNodeHome).
+		WithKeyringOptions(keyring.Option()).
 		WithViper("")
 
 	rootCmd := &cobra.Command{
@@ -98,19 +103,19 @@ func initTendermintConfig() *tmcfg.Config {
 	return cfg
 }
 
+// initAppConfig helps to override default appConfig template and configs.
+// return "", nil if no custom configuration is required for the application.
 func initAppConfig() (string, interface{}) {
-	srvCfg := serverconfig.DefaultConfig()
+	customAppTemplate, customAppConfig := servercfg.AppConfig(app.MinUnit)
+	srvCfg, ok := customAppConfig.(servercfg.Config)
+	if !ok {
+		panic(fmt.Errorf("unknown app config type %T", customAppConfig))
+	}
+
 	srvCfg.StateSync.SnapshotInterval = 1000
 	srvCfg.StateSync.SnapshotKeepRecent = 10
 
-	return params.CustomConfigTemplate, params.CustomAppConfig{
-		Config: *srvCfg,
-		// BypassMinFeeMsgTypes: []string{
-		// 	sdk.MsgTypeURL(&ibcchanneltypes.MsgRecvPacket{}),
-		// 	sdk.MsgTypeURL(&ibcchanneltypes.MsgAcknowledgement{}),
-		// 	sdk.MsgTypeURL(&ibcclienttypes.MsgUpdateClient{}),
-		// },
-	}
+	return customAppTemplate, srvCfg
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
@@ -130,7 +135,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		encCfg: encodingConfig,
 	}
 
-	server.AddCommands(rootCmd, app.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
+	ethermintserver.AddCommands(rootCmd, app.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(

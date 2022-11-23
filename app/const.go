@@ -41,4 +41,6 @@ const (
 	mtMsgEditMT        = "/irismod.mt.MsgEditMT"
 	mtMsgTransferMT    = "/irismod.mt.MsgTransferMT"
 	mtMsgBurnMT        = "/irismod.mt.MsgBurnMT"
+
+	MinUnit = "uiris"
 )

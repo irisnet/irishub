@@ -36,6 +36,9 @@ import (
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
+	servercfg "github.com/evmos/ethermint/server/config"
+
+	"github.com/irisnet/irishub/app"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 )
 
@@ -99,7 +102,7 @@ Example:
 
 const nodeDirPerm = 0755
 
-// Initialize the testnet
+// InitTestnet the testnet
 func InitTestnet(
 	clientCtx client.Context,
 	cmd *cobra.Command,
@@ -124,7 +127,7 @@ func InitTestnet(
 	nodeIDs := make([]string, numValidators)
 	valPubKeys := make([]cryptotypes.PubKey, numValidators)
 
-	simappConfig := srvconfig.DefaultConfig()
+	simappConfig := servercfg.DefaultConfig()
 	simappConfig.MinGasPrices = minGasPrices
 	simappConfig.API.Enable = true
 	simappConfig.Telemetry.Enabled = true
@@ -254,6 +257,9 @@ func InitTestnet(
 		if err := writeFile(fmt.Sprintf("%v.json", nodeDirName), gentxsDir, txBz); err != nil {
 			return err
 		}
+
+		customAppTemplate, _ := servercfg.AppConfig(app.MinUnit)
+		srvconfig.SetConfigTemplate(customAppTemplate)
 
 		srvconfig.WriteConfigFile(filepath.Join(nodeDir, "config/app.toml"), simappConfig)
 	}
