@@ -20,7 +20,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	"github.com/cosmos/cosmos-sdk/x/group"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
@@ -151,10 +150,9 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 		},
 	)
 
-	//TODO
 	app.RegisterUpgradeHandler("v1.4",
 		&store.StoreUpgrades{
-			Added: []string{authzkeeper.StoreKey, group.StoreKey},
+			Added: []string{authzkeeper.StoreKey},
 		},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			// version upgrade:
@@ -169,7 +167,6 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 
 			// added module:
 			//  authz
-			//  group
 
 			// ibc application:
 			//  27-interchain-accounts
