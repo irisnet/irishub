@@ -1,0 +1,16 @@
+{
+  "type": "cosmos",
+  "value": {
+    "key": "elgafar-1",
+    "chain-id": "elgafar-1",
+    "rpc-addr": "https://rpc.elgafar-1.stargaze-apis.com:443",
+    "account-prefix": "stars",
+    "keyring-backend": "test",
+    "gas-adjustment": 1.2,
+    "gas-prices": "0.0025ustars",
+    "debug": true,
+    "timeout": "10s",
+    "output-format": "json",
+    "sign-mode": "direct"
+  }
+}
