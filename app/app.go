@@ -146,6 +146,7 @@ import (
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
 	srvflags "github.com/evmos/ethermint/server/flags"
+	ethermint "github.com/evmos/ethermint/types"
 	"github.com/evmos/ethermint/x/evm"
 	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
@@ -458,7 +459,7 @@ func NewIrisApp(
 		appCodec,
 		keys[authtypes.StoreKey],
 		app.GetSubspace(authtypes.ModuleName),
-		authtypes.ProtoBaseAccount,
+		ethermint.ProtoAccount,
 		maccPerms,
 		sdk.Bech32MainPrefix,
 	)

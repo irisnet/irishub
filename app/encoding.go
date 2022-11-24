@@ -3,6 +3,8 @@ package app
 import (
 	"github.com/cosmos/cosmos-sdk/std"
 
+	enccodec "github.com/evmos/ethermint/encoding/codec"
+
 	"github.com/irisnet/irishub/app/params"
 )
 
@@ -13,5 +15,7 @@ func MakeEncodingConfig() params.EncodingConfig {
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+
+	enccodec.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	return encodingConfig
 }
