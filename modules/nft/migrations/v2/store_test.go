@@ -29,7 +29,7 @@ func TestMigrate(t *testing.T) {
 	cdc := app.AppCodec()
 
 	collections := prepareData(ctx, storeKey, cdc)
-	require.NoError(t, v2.Migrate(ctx, storeKey, cdc, app.NFTKeeper.Logger(ctx), app.NFTKeeper))
+	require.NoError(t, v2.Migrate(ctx, storeKey, cdc, app.NFTKeeper.Logger(ctx), app.NFTKeeper.SaveDenom))
 	check(t, ctx, app.NFTKeeper, collections)
 
 }

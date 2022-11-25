@@ -12,36 +12,29 @@ import (
 	"github.com/irisnet/irismod/modules/nft/types"
 )
 
+// Migrate is used to migrate nft data from irismod/nft to x/nft
 func Migrate(ctx sdk.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.Codec,
 	logger log.Logger,
-	k NFTKeeper,
+	saveDenom SaveDenom,
 ) error {
 	logger.Info("migrate store data from version 1 to 2")
 	startTime := time.Now()
-	denoms, err := migrateDenoms(ctx, storeKey, cdc, k)
-	if err != nil {
-		return err
-	}
-	logger.Info("migrate denoms success", "denomNum", len(denoms))
 
-	if err := migrateTokens(ctx, storeKey, cdc, logger, denoms, k); err != nil {
-		return err
-	}
-	logger.Info("migrate store data success", "consume", time.Since(startTime).String())
-	return nil
-}
-
-func migrateDenoms(ctx sdk.Context,
-	storeKey storetypes.StoreKey,
-	cdc codec.Codec,
-	k NFTKeeper,
-) (denoms []string, err error) {
 	store := ctx.KVStore(storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, KeyDenom(""))
 	defer iterator.Close()
 
+	k := keeper{
+		storeKey: storeKey,
+		cdc:      cdc,
+	}
+
+	var (
+		denomNum int64
+		tokenNum int64
+	)
 	for ; iterator.Valid(); iterator.Next() {
 		var denom types.Denom
 		cdc.MustUnmarshal(iterator.Value(), &denom)
@@ -53,10 +46,10 @@ func migrateDenoms(ctx sdk.Context,
 
 		creator, err := sdk.AccAddressFromBech32(denom.Creator)
 		if err != nil {
-			return denoms, err
+			return err
 		}
 
-		if err := k.SaveDenom(ctx, denom.Id,
+		if err := saveDenom(ctx, denom.Id,
 			denom.Name,
 			denom.Schema,
 			denom.Symbol,
@@ -68,23 +61,30 @@ func migrateDenoms(ctx sdk.Context,
 			denom.UriHash,
 			denom.Data,
 		); err != nil {
-			return denoms, err
+			return err
 		}
-		denoms = append(denoms, denom.Id)
+
+		tokenInDenom, err := migrateToken(ctx, k, logger, denom.Id)
+		if err != nil {
+			return err
+		}
+		denomNum++
+		tokenNum += tokenInDenom
 
 	}
-	return denoms, nil
+	logger.Info("migrate store data success",
+		"denomTotalNum", denomNum,
+		"tokenTotalNum", tokenNum,
+		"consume", time.Since(startTime).String(),
+	)
+	return nil
 }
-
-func migrateTokens(ctx sdk.Context,
-	storeKey storetypes.StoreKey,
-	cdc codec.Codec,
+func migrateToken(
+	ctx sdk.Context,
+	k keeper,
 	logger log.Logger,
-	denoms []string,
-	k NFTKeeper,
-) error {
-	store := ctx.KVStore(storeKey)
-
+	denomID string,
+) (int64, error) {
 	var iterator sdk.Iterator
 	defer func() {
 		if iterator != nil {
@@ -92,35 +92,35 @@ func migrateTokens(ctx sdk.Context,
 		}
 	}()
 
+	store := ctx.KVStore(k.storeKey)
+
 	total := int64(0)
-	for _, denomID := range denoms {
-		iterator = sdk.KVStorePrefixIterator(store, KeyNFT(denomID, ""))
-		for ; iterator.Valid(); iterator.Next() {
-			var baseNFT types.BaseNFT
-			cdc.MustUnmarshal(iterator.Value(), &baseNFT)
+	iterator = sdk.KVStorePrefixIterator(store, KeyNFT(denomID, ""))
+	for ; iterator.Valid(); iterator.Next() {
+		var baseNFT types.BaseNFT
+		k.cdc.MustUnmarshal(iterator.Value(), &baseNFT)
 
-			owner, err := sdk.AccAddressFromBech32(baseNFT.Owner)
-			if err != nil {
-				return err
-			}
-
-			//delete unused key
-			store.Delete(KeyNFT(denomID, baseNFT.Id))
-			store.Delete(KeyOwner(owner, denomID, baseNFT.Id))
-
-			if err := k.SaveNFT(ctx, denomID,
-				baseNFT.Id,
-				baseNFT.Name,
-				baseNFT.URI,
-				baseNFT.UriHash,
-				baseNFT.Data,
-				owner,
-			); err != nil {
-				return err
-			}
-			total++
+		owner, err := sdk.AccAddressFromBech32(baseNFT.Owner)
+		if err != nil {
+			return 0, err
 		}
+
+		//delete unused key
+		store.Delete(KeyNFT(denomID, baseNFT.Id))
+		store.Delete(KeyOwner(owner, denomID, baseNFT.Id))
+
+		if err := k.saveNFT(ctx, denomID,
+			baseNFT.Id,
+			baseNFT.Name,
+			baseNFT.URI,
+			baseNFT.UriHash,
+			baseNFT.Data,
+			owner,
+		); err != nil {
+			return 0, err
+		}
+		total++
 	}
-	logger.Info("migrate nft success", "nftNum", total)
-	return nil
+	logger.Info("migrate nft success", "denomID", denomID, "nftNum", total)
+	return total, nil
 }
