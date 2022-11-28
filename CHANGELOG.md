@@ -1,6 +1,16 @@
 # Changelog
 
 ## Unreleased
+## 1.4.1
+
+*November 28, 2022*
+
+### Application
+
+* [\#2780](https://github.com/irisnet/irishub/pull/2780) Bump tibc-go version to v0.4.2
+* [\#2779](https://github.com/irisnet/irishub/pull/2779) Bump up irismod version to v1.7.2
+* [\#2777](https://github.com/irisnet/irishub/pull/2777) Add SetIAVLCacheSize and SetIAVLDisableFastNode
+* [\#2775](https://github.com/irisnet/irishub/pull/2775) Remove group module
 
 ## 1.4.0
 
