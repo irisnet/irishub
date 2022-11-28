@@ -1,6 +1,11 @@
 # Changelog
 
 ## Unreleased
+
+### Bug Fixes
+
+*[\#2783](https://github.com/irisnet/irishub/pull/2783) fix testnetcmd
+
 ## 1.4.1
 
 *November 28, 2022*
