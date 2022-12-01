@@ -100,7 +100,9 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	k.IterateHTLCs(
 		ctx,
 		func(_ tmbytes.HexBytes, h types.HTLC) (stop bool) {
-			htlcs = append(htlcs, h)
+			if h.State == types.Open {
+				htlcs = append(htlcs, h)
+			}
 			return false
 		},
 	)
