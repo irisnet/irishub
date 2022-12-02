@@ -23,7 +23,6 @@ cp -r ./proto ./tmp
 
 proto_dirs=$(find ./tmp/proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
-
     # generate swagger files (filter query files)
     query_file=$(find "${dir}" -maxdepth 1 -name 'query.proto')
     if [[ $dir =~ "cosmos" ]]; then
@@ -54,8 +53,6 @@ sed -i 's/cosmoshub/irishub/g' ./lite/swagger-ui/swagger.yaml
 #     --doc_out=./docs/endpoints \
 #     --doc_opt=./docs/endpoints/protodoc-markdown.tmpl,proto-docs.md \
 #     $(find "$(pwd)/tmp/proto" -maxdepth 5 -name '*.proto')
-# go mod tidy
-
 # cp ./docs/endpoints/proto-docs.md ./docs/zh/endpoints/proto-docs.md
 
 # clean swagger files
