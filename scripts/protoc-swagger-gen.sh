@@ -40,12 +40,12 @@ done
 swagger-combine ./lite/config.json -o ./lite/swagger-ui/swagger.yaml -f yaml --continueOnConflictingPaths true --includeDefinitions true
 
 # replace APIs example
-# sed -r -i '' 's/cosmos1[a-z,0-9]+/iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq/g' ./lite/swagger-ui/swagger.yaml
-# sed -r -i '' 's/cosmosvaloper1[a-z,0-9]+/iva1sltcyjm5k0edlg59t47lsyw8gtgc3nudrwey98/g' ./lite/swagger-ui/swagger.yaml
-# sed -r -i '' 's/cosmosvalconspub1[a-z,0-9]+/icp1zcjduepqwhwqn4h5v6mqa7k3kmy7cjzchsx5ptsrqaulwrgfmghy3k9jtdzs6rdddm/g' ./lite/swagger-ui/swagger.yaml
-# sed -i '' 's/Gaia/IRIShub/g' ./lite/swagger-ui/swagger.yaml
-# sed -i '' 's/gaia/irishub/g' ./lite/swagger-ui/swagger.yaml
-# sed -i '' 's/cosmoshub/irishub/g' ./lite/swagger-ui/swagger.yaml
+sed -r -i 's/cosmos1[a-z,0-9]+/iaa1sltcyjm5k0edlg59t47lsyw8gtgc3nudklntcq/g' ./lite/swagger-ui/swagger.yaml
+sed -r -i 's/cosmosvaloper1[a-z,0-9]+/iva1sltcyjm5k0edlg59t47lsyw8gtgc3nudrwey98/g' ./lite/swagger-ui/swagger.yaml
+sed -r -i 's/cosmosvalconspub1[a-z,0-9]+/icp1zcjduepqwhwqn4h5v6mqa7k3kmy7cjzchsx5ptsrqaulwrgfmghy3k9jtdzs6rdddm/g' ./lite/swagger-ui/swagger.yaml
+sed -i 's/Gaia/IRIShub/g' ./lite/swagger-ui/swagger.yaml
+sed -i 's/gaia/irishub/g' ./lite/swagger-ui/swagger.yaml
+sed -i 's/cosmoshub/irishub/g' ./lite/swagger-ui/swagger.yaml
 
 # generate proto doc
 # buf protoc \
