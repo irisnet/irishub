@@ -2,23 +2,24 @@
 
 set -eo pipefail
 
+rm -rf ./tmp-swagger-gen ./tmp && mkdir -p ./tmp-swagger-gen ./tmp/proto ./tmp/third_party
+
+chmod a+x ./scripts/protoc-swagger-gen-ibc.sh
+./scripts/protoc-swagger-gen-ibc.sh
+
 SDK_VERSION=v0.46.5
 IRISMOD_VERSION=v1.7.2
-IBC_GO=v5.0.1
 
 go mod download github.com/cosmos/cosmos-sdk@${SDK_VERSION}
 go mod download github.com/irisnet/irismod@${IRISMOD_VERSION}
-# go mod download github.com/cosmos/ibc-go/v5@${IBC_GO}
 
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto
-# chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/ibc-go/v5@${IBC_GO}/proto
 
-rm -rf ./tmp-swagger-gen ./tmp && mkdir -p ./tmp-swagger-gen ./tmp/proto ./tmp/third_party
+
 
 cp -r ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto ./tmp && rm -rf ./tmp/proto/cosmos/mint
 cp -r ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto ./tmp
-# cp -r ${GOPATH}/pkg/mod/github.com/cosmos/ibc-go/v5@${IBC_GO}/proto ./tmp
 cp -r ./proto ./tmp
 
 proto_dirs=$(find ./tmp/proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
@@ -26,6 +27,9 @@ for dir in $proto_dirs; do
     # generate swagger files (filter query files)
     query_file=$(find "${dir}" -maxdepth 1 -name 'query.proto')
     if [[ $dir =~ "cosmos" ]]; then
+        query_file=$(find "${dir}" -maxdepth 1 \( -name 'query.proto' -o -name 'service.proto' \))
+    fi
+    if [[ $dir =~ "ibc" ]]; then
         query_file=$(find "${dir}" -maxdepth 1 \( -name 'query.proto' -o -name 'service.proto' \))
     fi
     if [[ ! -z "$query_file" ]]; then
