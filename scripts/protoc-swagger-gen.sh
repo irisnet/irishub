@@ -16,8 +16,6 @@ go mod download github.com/irisnet/irismod@${IRISMOD_VERSION}
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto
 
-
-
 cp -r ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto ./tmp && rm -rf ./tmp/proto/cosmos/mint
 cp -r ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto ./tmp
 cp -r ./proto ./tmp
@@ -50,6 +48,7 @@ sed -i 's/Gaia/IRIShub/g' ./lite/swagger-ui/swagger.yaml
 sed -i 's/gaia/irishub/g' ./lite/swagger-ui/swagger.yaml
 sed -i 's/cosmoshub/irishub/g' ./lite/swagger-ui/swagger.yaml
 
+# TODO
 # generate proto doc
 # buf protoc \
 #     -I "tmp/proto" \
