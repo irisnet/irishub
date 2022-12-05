@@ -152,7 +152,7 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 
 	app.RegisterUpgradeHandler("v1.4",
 		&store.StoreUpgrades{
-			Added: []string{authzkeeper.StoreKey},
+			Added: []string{authzkeeper.StoreKey, icatypes.StoreKey},
 		},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			// version upgrade:
