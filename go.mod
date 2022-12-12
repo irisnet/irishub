@@ -190,3 +190,5 @@ replace github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.3
 replace github.com/zondax/hid => github.com/zondax/hid v0.9.0
 
 replace github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
+
+replace github.com/cosmos/cosmos-sdk => github.com/dreamer-zq/cosmos-sdk v0.34.4-0.20221212105534-06bc45ece739
