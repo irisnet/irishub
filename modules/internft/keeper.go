@@ -23,8 +23,8 @@ func NewInterNftKeeper(cdc codec.Codec,
 		nk:  k.NFTkeeper(),
 		cdc: cdc,
 		ak:  ak,
-		cmr: types.NewClassResolver(cdc, ak.GetModuleAddress),
-		tmr: types.NewTokenResolver(cdc),
+		cb:  types.NewClassBuilder(cdc, ak.GetModuleAddress),
+		tb:  types.NewTokenBuilder(cdc),
 	}
 }
 
@@ -39,7 +39,7 @@ func (ik InterNftKeeper) CreateOrUpdateClass(ctx sdk.Context,
 		err   error
 	)
 	if len(classData) != 0 {
-		class, err = ik.cmr.Build(classID, classURI, classData)
+		class, err = ik.cb.Build(classID, classURI, classData)
 		if err != nil {
 			return err
 		}
@@ -74,7 +74,7 @@ func (ik InterNftKeeper) Mint(ctx sdk.Context,
 	tokenData string,
 	receiver sdk.AccAddress,
 ) error {
-	token, err := ik.tmr.Build(classID, tokenID, tokenURI, tokenData)
+	token, err := ik.tb.Build(classID, tokenID, tokenURI, tokenData)
 	if err != nil {
 		return err
 	}
@@ -94,13 +94,13 @@ func (ik InterNftKeeper) Transfer(
 	if len(tokenData) == 0 {
 		return nil
 	}
-	data, err := ik.tmr.ParseMetadata(tokenData)
+	nft, _ := ik.nk.GetNFT(ctx, classID, tokenID)
+	token, err := ik.tb.Build(classID, tokenID, nft.Uri, tokenData)
 	if err != nil {
 		return err
 	}
-	nft, _ := ik.nk.GetNFT(ctx, classID, tokenID)
-	nft.Data = data
-	return ik.nk.Update(ctx, nft)
+
+	return ik.nk.Update(ctx, token)
 }
 
 func (ik InterNftKeeper) GetClass(ctx sdk.Context, classID string) (nfttransfer.Class, bool) {
@@ -109,7 +109,7 @@ func (ik InterNftKeeper) GetClass(ctx sdk.Context, classID string) (nfttransfer.
 		return nil, false
 	}
 
-	metadata, err := ik.cmr.BuildMetadata(class)
+	metadata, err := ik.cb.BuildMetadata(class)
 	if err != nil {
 		ik.Logger(ctx).Error("encode class data failed")
 		return nil, false
@@ -126,7 +126,7 @@ func (ik InterNftKeeper) GetNFT(ctx sdk.Context, classID, tokenID string) (nfttr
 	if !has {
 		return nil, false
 	}
-	metadata, err := ik.tmr.BuildMetadata(nft)
+	metadata, err := ik.tb.BuildMetadata(nft)
 	if err != nil {
 		ik.Logger(ctx).Error("encode nft data failed")
 		return nil, false
