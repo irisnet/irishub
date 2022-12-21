@@ -22,8 +22,8 @@ type (
 		nk  nftkeeper.Keeper
 		cdc codec.Codec
 		ak  AccountKeeper
-		cmr nfttypes.ClassMetadataResolver
-		tmr nfttypes.TokenMetadataResolver
+		cmr nfttypes.ClassResolver
+		tmr nfttypes.TokenResolver
 	}
 
 	InterClass struct {
