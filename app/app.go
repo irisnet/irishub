@@ -152,6 +152,7 @@ import (
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
+	"github.com/irisnet/irishub/modules/internft"
 	"github.com/irisnet/irishub/modules/mint"
 	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
@@ -602,7 +603,7 @@ func NewIrisApp(
 		app.IBCKeeper.ChannelKeeper,
 		&app.IBCKeeper.PortKeeper,
 		app.AccountKeeper,
-		nftkeeper.NewISC721Keeper(app.NFTKeeper, app.AccountKeeper),
+		internft.NewInterNftKeeper(appCodec, app.NFTKeeper, app.AccountKeeper),
 		scopedNFTTransferKeeper,
 	)
 	ibcnfttransferModule := nfttransfer.NewAppModule(app.IBCNFTTransferKeeper)

@@ -193,3 +193,5 @@ replace github.com/zondax/hid => github.com/zondax/hid v0.9.0
 replace github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
 
 replace github.com/bianjieai/nft-transfer => /Users/zhangzhiqiang/workspace/github/bianjieai/nft-transfer
+
+replace github.com/irisnet/irismod => /Users/zhangzhiqiang/workspace/github/irisnet/irismod
