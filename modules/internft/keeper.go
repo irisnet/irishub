@@ -67,6 +67,7 @@ func (ik InterNftKeeper) CreateOrUpdateClass(ctx sdk.Context,
 	return ik.nk.SaveClass(ctx, class)
 }
 
+// Mint implement the method of ICS721Keeper.Mint
 func (ik InterNftKeeper) Mint(ctx sdk.Context,
 	classID,
 	tokenID,
@@ -81,6 +82,7 @@ func (ik InterNftKeeper) Mint(ctx sdk.Context,
 	return ik.nk.Mint(ctx, token, receiver)
 }
 
+// Transfer implement the method of ICS721Keeper.Transfer
 func (ik InterNftKeeper) Transfer(
 	ctx sdk.Context,
 	classID,
@@ -103,6 +105,7 @@ func (ik InterNftKeeper) Transfer(
 	return ik.nk.Update(ctx, token)
 }
 
+// GetClass implement the method of ICS721Keeper.GetClass
 func (ik InterNftKeeper) GetClass(ctx sdk.Context, classID string) (nfttransfer.Class, bool) {
 	class, exist := ik.nk.GetClass(ctx, classID)
 	if !exist {
@@ -121,6 +124,7 @@ func (ik InterNftKeeper) GetClass(ctx sdk.Context, classID string) (nfttransfer.
 	}, true
 }
 
+// GetNFT implement the method of ICS721Keeper.GetNFT
 func (ik InterNftKeeper) GetNFT(ctx sdk.Context, classID, tokenID string) (nfttransfer.NFT, bool) {
 	nft, has := ik.nk.GetNFT(ctx, classID, tokenID)
 	if !has {
@@ -139,14 +143,17 @@ func (ik InterNftKeeper) GetNFT(ctx sdk.Context, classID, tokenID string) (nfttr
 	}, true
 }
 
+// Burn implement the method of ICS721Keeper.Burn
 func (ik InterNftKeeper) Burn(ctx sdk.Context, classID string, tokenID string) error {
 	return ik.nk.Burn(ctx, classID, tokenID)
 }
 
+// GetOwner implement the method of ICS721Keeper.GetOwner
 func (ik InterNftKeeper) GetOwner(ctx sdk.Context, classID string, tokenID string) sdk.AccAddress {
 	return ik.nk.GetOwner(ctx, classID, tokenID)
 }
 
+// HasClass implement the method of ICS721Keeper.HasClass
 func (ik InterNftKeeper) HasClass(ctx sdk.Context, classID string) bool {
 	return ik.nk.HasClass(ctx, classID)
 }

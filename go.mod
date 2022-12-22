@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	cosmossdk.io/math v1.0.0-beta.3
-	github.com/bianjieai/nft-transfer v1.0.0-beta
+	github.com/bianjieai/nft-transfer v1.0.0-beta.0.20221216084600-cbcc18938381
 	github.com/bianjieai/tibc-go v0.4.1
 	github.com/cosmos/cosmos-sdk v0.46.5
 	github.com/cosmos/ibc-go/v5 v5.0.1
@@ -12,7 +12,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/irisnet/irismod v1.7.2-0.20221209095042-da536b9964da
+	github.com/irisnet/irismod v1.7.2-0.20221222062609-e0b06461dbc3
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
@@ -191,7 +191,3 @@ replace github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.3
 replace github.com/zondax/hid => github.com/zondax/hid v0.9.0
 
 replace github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
-
-replace github.com/bianjieai/nft-transfer => /Users/zhangzhiqiang/workspace/github/bianjieai/nft-transfer
-
-replace github.com/irisnet/irismod => /Users/zhangzhiqiang/workspace/github/irisnet/irismod
