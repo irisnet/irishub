@@ -18,7 +18,7 @@ RUN make build
 
 # ----------------------------
 
-FROM alpine:3.12
+FROM alpine:3.16
 
 # p2p port
 EXPOSE 26656
