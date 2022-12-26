@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"encoding/json"
+	ethermintclient "github.com/evmos/ethermint/client"
 	"io/ioutil"
 
 	"github.com/spf13/cobra"
@@ -58,6 +59,8 @@ The pass backend requires GnuPG: https://gnupg.org/
 		keys.DeleteKeyCommand(),
 		keys.ParseKeyStringCommand(),
 		keys.MigrateCommand(),
+		ethermintclient.UnsafeExportEthKeyCommand(),
+		ethermintclient.UnsafeImportKeyCommand(),
 	)
 
 	cmd.PersistentFlags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
