@@ -22,28 +22,24 @@ func CheckTxFeeWithValidatorMinGasPrices(ctx sdk.Context, tx sdk.Tx) (sdk.Coins,
 
 		minGasPrices := ctx.MinGasPrices()
 
-		//if !minGasPrices.IsZero() {
-		requiredFees := make(sdk.Coins, len(minGasPrices))
-		required := false
-		// Determine the required fees by multiplying each required minimum gas
-		// price by the gas limit, where fee = ceil(minGasPrice * gasLimit).
-		glDec := sdk.NewDec(int64(gas))
-		for i, gp := range minGasPrices {
-			if gp.Amount.IsZero() {
-				priority := getTxPriority(feeCoins, int64(gas))
-				return feeCoins, priority, nil
+		if !minGasPrices.IsZero() {
+			requiredFees := make(sdk.Coins, len(minGasPrices))
+			required := false
+			// Determine the required fees by multiplying each required minimum gas
+			// price by the gas limit, where fee = ceil(minGasPrice * gasLimit).
+			glDec := sdk.NewDec(int64(gas))
+			for i, gp := range minGasPrices {
+				fee := gp.Amount.Mul(glDec)
+				tempCoin := sdk.NewCoin(gp.Denom, fee.Ceil().RoundInt())
+				if feeCoins.IsAnyGTE(sdk.NewCoins(tempCoin)) {
+					required = true
+				}
+				requiredFees[i] = tempCoin
 			}
-			fee := gp.Amount.Mul(glDec)
-			tempCoin := sdk.NewCoin(gp.Denom, fee.Ceil().RoundInt())
-			if feeCoins.IsAnyGTE(sdk.NewCoins(tempCoin)) {
-				required = true
+			if !required {
+				return nil, 0, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "insufficient fees; got: %s required in: %s", feeCoins, requiredFees)
 			}
-			requiredFees[i] = tempCoin
 		}
-		if !required {
-			return nil, 0, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "insufficient fees; got: %s required in: %s", feeCoins, requiredFees)
-		}
-		//}
 
 	}
 
