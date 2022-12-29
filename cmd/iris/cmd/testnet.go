@@ -7,7 +7,9 @@ import (
 	"encoding/json"
 	"fmt"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	"io/ioutil"
+	"math"
 	"net"
 	"os"
 	"path/filepath"
@@ -51,6 +53,8 @@ var (
 	flagNodeCLIHome       = "node-cli-home"
 	flagStartingIPAddress = "starting-ip-address"
 )
+
+var PowerReduction = sdk.NewIntFromUint64(1000000000000000000)
 
 // get cmd to initialize all files for tendermint testnet and application
 func testnetCmd(mbm module.BasicManager, genBalIterator banktypes.GenesisBalancesIterator) *cobra.Command {
@@ -211,9 +215,12 @@ func InitTestnet(
 
 		accTokens := sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)
 		accStakingTokens := sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction)
+		accEvmTokens := sdk.TokensFromConsensusPower(5000, PowerReduction)
+
 		coins := sdk.Coins{
 			sdk.NewCoin(fmt.Sprintf("%stoken", nodeDirName), accTokens),
 			sdk.NewCoin(sdk.DefaultBondDenom, accStakingTokens),
+			sdk.NewCoin(evmEIrisMinUnit, accEvmTokens),
 		}
 
 		genBalances = append(genBalances, banktypes.Balance{Address: addr.String(), Coins: coins.Sort()})
@@ -320,11 +327,29 @@ func initGenFiles(
 	bankGenState.Balances = genBalances
 	appGenState[banktypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&bankGenState)
 
+	// set the point token in the genesis state
+	var tokenGenState tokentypes.GenesisState
+	clientCtx.Codec.MustUnmarshalJSON(appGenState[tokentypes.ModuleName], &tokenGenState)
+	eirisToken := tokentypes.Token{
+		Symbol:        evmEIrisDenom,
+		Name:          "EVM Fee Token",
+		Scale:         18,
+		MinUnit:       evmEIrisMinUnit,
+		InitialSupply: 1000000000,
+		MaxSupply:     math.MaxUint64,
+		Mintable:      true,
+		Owner:         genAccounts[0].GetAddress().String(),
+	}
+
+	tokenGenState.Tokens = append(tokenGenState.Tokens, eirisToken)
+
 	// set the evm fee token denom genesis state
 	var evmGenState evmtypes.GenesisState
 	clientCtx.Codec.MustUnmarshalJSON(appGenState[evmtypes.ModuleName], &evmGenState)
 
-	evmGenState.Params.EvmDenom = evmFeeToken
+	appGenState[tokentypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&tokenGenState)
+
+	evmGenState.Params.EvmDenom = evmEIrisMinUnit
 	appGenState[evmtypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&evmGenState)
 
 	appGenStateJSON, err := json.MarshalIndent(appGenState, "", "  ")

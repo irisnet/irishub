@@ -34,12 +34,12 @@ import (
 
 	ethermintclient "github.com/evmos/ethermint/client"
 	ethermintdebug "github.com/evmos/ethermint/client/debug"
+	etherminthd "github.com/evmos/ethermint/crypto/hd"
 	ethermintserver "github.com/evmos/ethermint/server"
 	servercfg "github.com/evmos/ethermint/server/config"
 
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/params"
-	"github.com/irisnet/irishub/crypto/keyring"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
@@ -55,7 +55,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
 		WithHomeDir(app.DefaultNodeHome).
-		WithKeyringOptions(keyring.Option()).
+		WithKeyringOptions(etherminthd.EthSecp256k1Option()).
 		WithViper("")
 
 	rootCmd := &cobra.Command{
