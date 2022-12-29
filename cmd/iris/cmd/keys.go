@@ -3,17 +3,20 @@ package cmd
 import (
 	"bufio"
 	"encoding/json"
-	ethermintclient "github.com/evmos/ethermint/client"
 	"io/ioutil"
 
-	"github.com/spf13/cobra"
+	cosmoshd "github.com/cosmos/cosmos-sdk/crypto/hd"
+	etherminthd "github.com/evmos/ethermint/crypto/hd"
 
-	"github.com/tendermint/tendermint/libs/cli"
+	ethermintclient "github.com/evmos/ethermint/client"
+	clientkeys "github.com/evmos/ethermint/client/keys"
+	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/keys"
+	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/irisnet/irishub/keystore"
 )
@@ -47,10 +50,22 @@ information:
 The pass backend requires GnuPG: https://gnupg.org/
 `,
 	}
+	// support adding Ethereum supported keys
+	addCmd := keys.AddKeyCommand()
+
+	// update the default signing algorithm value to "secp256k1"
+	algoFlag := addCmd.Flag(flags.FlagKeyAlgorithm)
+	algoFlag.DefValue = string(cosmoshd.Secp256k1Type)
+	err := algoFlag.Value.Set(string(cosmoshd.Secp256k1Type))
+	if err != nil {
+		panic(err)
+	}
+
+	addCmd.RunE = runAddCmd
 
 	cmd.AddCommand(
 		keys.MnemonicKeyCommand(),
-		keys.AddKeyCommand(),
+		addCmd,
 		keys.ExportKeyCommand(),
 		importKeyCommand(),
 		keys.ListKeysCmd(),
@@ -108,4 +123,14 @@ func getArmor(privBytes []byte, passphrase string) (string, error) {
 		return string(privBytes), nil
 	}
 	return keystore.RecoveryAndExportPrivKeyArmor(privBytes, passphrase)
+}
+
+func runAddCmd(cmd *cobra.Command, args []string) error {
+	clientCtx := client.GetClientContextFromCmd(cmd).WithKeyringOptions(etherminthd.EthSecp256k1Option())
+	clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
+	if err != nil {
+		return err
+	}
+	buf := bufio.NewReader(clientCtx.Input)
+	return clientkeys.RunAddCmd(clientCtx, cmd, args, buf)
 }

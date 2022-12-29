@@ -18,7 +18,7 @@ const (
 	MintDenom         = sdk.DefaultBondDenom
 )
 
-//Parameter store key
+// Parameter store key
 var (
 	// params store for inflation params
 	KeyInflation = []byte("Inflation")
