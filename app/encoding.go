@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	enccodec "github.com/evmos/ethermint/encoding/codec"
+
 	"github.com/irisnet/irishub/app/params"
 )
 

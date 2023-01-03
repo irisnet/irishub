@@ -6,13 +6,14 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	evmtypes "github.com/evmos/ethermint/x/evm/types"
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	"io/ioutil"
 	"math"
 	"net"
 	"os"
 	"path/filepath"
+
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
 	"github.com/spf13/cobra"
 

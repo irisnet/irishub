@@ -8,9 +8,10 @@ import (
 
 	ethante "github.com/evmos/ethermint/app/ante"
 
-	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	oraclekeeper "github.com/irisnet/irismod/modules/oracle/keeper"
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
+
+	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 )
 
 // HandlerOptions extend the SDK's AnteHandler options by requiring the IBC
