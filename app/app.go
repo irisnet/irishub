@@ -442,7 +442,7 @@ func NewIrisApp(
 		app.GetSubspace(authtypes.ModuleName),
 		authtypes.ProtoBaseAccount,
 		maccPerms,
-		sdk.Bech32MainPrefix,
+		address.Bech32PrefixAccAddr,
 	)
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(
