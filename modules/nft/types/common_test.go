@@ -17,7 +17,7 @@ var (
 	address2  = CreateTestAddrs(2)[1]
 	tokenURI  = "https://google.com/token-1.json"
 	uriHash   = "uriHash"
-	tokenData = "https://google.com/token-1.json"
+	tokenData = "{\"key1\":\"value1\",\"key2\":\"value2\"}"
 )
 
 // CreateTestAddrs creates test addresses

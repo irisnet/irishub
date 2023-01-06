@@ -12,8 +12,6 @@ import (
 
 const (
 	DoNotModify = "[do-not-modify]"
-	MinDenomLen = 3
-	MaxDenomLen = 128
 
 	MaxTokenURILen = 256
 
@@ -24,10 +22,10 @@ const (
 )
 
 var (
-	// IsAlphaNumeric only accepts [a-z0-9]
-	IsAlphaNumeric = regexp.MustCompile(`^[a-z0-9]+$`).MatchString
-	// IsBeginWithAlpha only begin with [a-z]
-	IsBeginWithAlpha = regexp.MustCompile(`^[a-z].*`).MatchString
+	// DenomID or TokenID can be 3 ~ 128 characters long and support letters, followed by either
+	// a letter, a number or a separator ('/', ':', '.', '_' or '-').
+	idString = `[a-z][a-zA-Z0-9/]{2,127}`
+	regexpID = regexp.MustCompile(fmt.Sprintf(`^%s$`, idString)).MatchString
 
 	keywords          = strings.Join([]string{ReservedPeg, ReservedIBC, ReservedHTLT, ReservedTIBC}, "|")
 	regexpKeywordsFmt = fmt.Sprintf("^(%s).*", keywords)
@@ -36,23 +34,17 @@ var (
 
 // ValidateDenomID verifies whether the  parameters are legal
 func ValidateDenomID(denomID string) error {
-	if len(denomID) < MinDenomLen || len(denomID) > MaxDenomLen {
-		return sdkerrors.Wrapf(ErrInvalidDenom, "the length of denom(%s) only accepts value [%d, %d]", denomID, MinDenomLen, MaxDenomLen)
-	}
 	boolPrifix := strings.HasPrefix(denomID, "tibc-")
-	if !IsBeginWithAlpha(denomID) || !IsAlphaNumeric(denomID) && !boolPrifix {
-		return sdkerrors.Wrapf(ErrInvalidDenom, "the denom(%s) only accepts alphanumeric characters, and begin with an english letter", denomID)
+	if !regexpID(denomID) && !boolPrifix {
+		return sdkerrors.Wrapf(ErrInvalidDenom, "denomID can only accept characters that match the regular expression: (%s),but got (%s)", idString, denomID)
 	}
 	return nil
 }
 
 // ValidateTokenID verify that the tokenID is legal
 func ValidateTokenID(tokenID string) error {
-	if len(tokenID) < MinDenomLen || len(tokenID) > MaxDenomLen {
-		return sdkerrors.Wrapf(ErrInvalidTokenID, "the length of nft id(%s) only accepts value [%d, %d]", tokenID, MinDenomLen, MaxDenomLen)
-	}
-	if !IsBeginWithAlpha(tokenID) || !IsAlphaNumeric(tokenID) {
-		return sdkerrors.Wrapf(ErrInvalidTokenID, "nft id(%s) only accepts alphanumeric characters, and begin with an english letter", tokenID)
+	if !regexpID(tokenID) {
+		return sdkerrors.Wrapf(ErrInvalidDenom, "tokenID can only accept characters that match the regular expression: (%s),but got (%s)", idString, tokenID)
 	}
 	return nil
 }
@@ -83,4 +75,8 @@ func ValidateKeywords(denomId string) error {
 		return sdkerrors.Wrapf(ErrInvalidDenom, "invalid denomId: %s, can not begin with keyword: (%s)", denomId, keywords)
 	}
 	return nil
+}
+
+func IsIBCDenom(denomID string) bool {
+	return strings.HasPrefix(denomID, "ibc/")
 }

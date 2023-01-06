@@ -3,6 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/tidwall/gjson"
 )
 
 // constant used to indicate that some field should not be updated
@@ -59,6 +60,10 @@ func (msg MsgIssueDenom) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
+
+	if len(msg.Data) != 0 && !gjson.Valid(msg.Data) {
+		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "invalid data, must be a JSON string or empty")
+	}
 	return ValidateKeywords(msg.Id)
 }
 
@@ -112,6 +117,10 @@ func (msg MsgTransferNFT) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
+
+	if len(msg.Data) != 0 && Modified(msg.Data) && !gjson.Valid(msg.Data) {
+		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "invalid data, must be a JSON string or empty")
+	}
 	return ValidateTokenID(msg.Id)
 }
 
@@ -164,6 +173,10 @@ func (msg MsgEditNFT) ValidateBasic() error {
 	if err := ValidateTokenURI(msg.URI); err != nil {
 		return err
 	}
+
+	if len(msg.Data) != 0 && Modified(msg.Data) && !gjson.Valid(msg.Data) {
+		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "invalid data, must be a JSON string or empty")
+	}
 	return ValidateTokenID(msg.Id)
 }
 
@@ -215,11 +228,11 @@ func (msg MsgMintNFT) ValidateBasic() error {
 	if err := ValidateDenomID(msg.DenomId); err != nil {
 		return err
 	}
-	if err := ValidateKeywords(msg.DenomId); err != nil {
-		return err
-	}
 	if err := ValidateTokenURI(msg.URI); err != nil {
 		return err
+	}
+	if len(msg.Data) != 0 && !gjson.Valid(msg.Data) {
+		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "invalid data, must be a JSON string or empty")
 	}
 	return ValidateTokenID(msg.Id)
 }

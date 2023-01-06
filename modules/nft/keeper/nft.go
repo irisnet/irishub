@@ -75,8 +75,8 @@ func (k Keeper) UpdateNFT(ctx sdk.Context, denomID,
 	token.Uri = types.Modify(token.Uri, tokenURI)
 	token.UriHash = types.Modify(token.UriHash, tokenURIHash)
 	if types.Modified(tokenNm) || types.Modified(tokenData) {
-		var nftMetadata types.NFTMetadata
-		if err := k.cdc.Unmarshal(token.Data.GetValue(), &nftMetadata); err != nil {
+		nftMetadata, err := types.UnmarshalNFTMetadata(k.cdc, token.Data.GetValue())
+		if err != nil {
 			return err
 		}
 
@@ -129,8 +129,8 @@ func (k Keeper) TransferOwnership(ctx sdk.Context, denomID,
 	token.Uri = types.Modify(token.Uri, tokenURI)
 	token.UriHash = types.Modify(token.UriHash, tokenURIHash)
 	if tokenMetadataChanged {
-		var nftMetadata types.NFTMetadata
-		if err := k.cdc.Unmarshal(token.Data.GetValue(), &nftMetadata); err != nil {
+		nftMetadata, err := types.UnmarshalNFTMetadata(k.cdc, token.Data.GetValue())
+		if err != nil {
 			return err
 		}
 
@@ -164,8 +164,8 @@ func (k Keeper) GetNFT(ctx sdk.Context, denomID, tokenID string) (nft exported.N
 		return nil, sdkerrors.Wrapf(types.ErrUnknownNFT, "not found NFT: %s", denomID)
 	}
 
-	var nftMetadata types.NFTMetadata
-	if err := k.cdc.Unmarshal(token.Data.GetValue(), &nftMetadata); err != nil {
+	nftMetadata, err := types.UnmarshalNFTMetadata(k.cdc, token.Data.GetValue())
+	if err != nil {
 		return nil, err
 	}
 
@@ -184,8 +184,8 @@ func (k Keeper) GetNFT(ctx sdk.Context, denomID, tokenID string) (nft exported.N
 func (k Keeper) GetNFTs(ctx sdk.Context, denom string) (nfts []exported.NFT, err error) {
 	tokens := k.nk.GetNFTsOfClass(ctx, denom)
 	for _, token := range tokens {
-		var nftMetadata types.NFTMetadata
-		if err := k.cdc.Unmarshal(token.Data.GetValue(), &nftMetadata); err != nil {
+		nftMetadata, err := types.UnmarshalNFTMetadata(k.cdc, token.Data.GetValue())
+		if err != nil {
 			return nil, err
 		}
 		nfts = append(nfts, types.BaseNFT{

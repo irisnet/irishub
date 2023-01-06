@@ -51,7 +51,7 @@ var (
 	denomDescription = "this is a class name of a nft"
 	denomUri         = "denom uri"
 	denomUriHash     = "denom uri hash"
-	denomData        = "denom data"
+	denomData        = "{\"key1\":\"value1\",\"key2\":\"value2\"}"
 	isCheckTx        = false
 )
 

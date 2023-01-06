@@ -27,6 +27,13 @@ const (
 	OpWeightMsgTransferDenom = "op_weight_msg_transfer_denom"
 )
 
+var (
+	data = []string{
+		"{\"key1\":\"value1\",\"key2\":\"value2\"}",
+		"{\"irismod:key1\":\"value1\",\"irismod:key2\":\"value2\"}",
+	}
+)
+
 // WeightedOperations returns all the operations from the module with their respective weights
 func WeightedOperations(
 	appParams simtypes.AppParams,
@@ -125,9 +132,9 @@ func SimulateMsgTransferNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 			"",
 			"",
 			"",
-			simtypes.RandStringOfLength(r, 10), // tokenData
-			ownerAddr.String(),                 // sender
-			recipientAccount.Address.String(),  // recipient
+			randData(r),                       // tokenData
+			ownerAddr.String(),                // sender
+			recipientAccount.Address.String(), // recipient
 		)
 		account := ak.GetAccount(ctx, ownerAddr)
 
@@ -185,7 +192,7 @@ func SimulateMsgEditNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 			"",
 			simtypes.RandStringOfLength(r, 45), // tokenURI
 			simtypes.RandStringOfLength(r, 32), // tokenURI
-			simtypes.RandStringOfLength(r, 10), // tokenData
+			randData(r),                        // tokenData
 			ownerAddr.String(),
 		)
 
@@ -237,12 +244,12 @@ func SimulateMsgMintNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 		randomRecipient, _ := simtypes.RandomAcc(r, accs)
 
 		msg := types.NewMsgMintNFT(
-			genNFTID(r, types.MinDenomLen, types.MaxDenomLen), // nft ID
-			randDenom(ctx, k, r, true, false),                 // denom
+			genNFTID(r, 3, 128),               // nft ID
+			randDenom(ctx, k, r, true, false), // denom
 			"",
 			simtypes.RandStringOfLength(r, 45), // tokenURI
 			simtypes.RandStringOfLength(r, 32), // uriHash
-			simtypes.RandStringOfLength(r, 10), // tokenData
+			randData(r),                        // tokenData
 			randomSender.Address.String(),      // sender
 			randomRecipient.Address.String(),   // recipient
 		)
@@ -421,7 +428,7 @@ func SimulateMsgIssueDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ban
 			simtypes.RandStringOfLength(r, 10),
 			simtypes.RandStringOfLength(r, 10),
 			simtypes.RandStringOfLength(r, 32),
-			simtypes.RandStringOfLength(r, 20),
+			randData(r),
 		)
 		account := ak.GetAccount(ctx, sender.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
@@ -484,7 +491,7 @@ func randNFT(ctx sdk.Context, k keeper.Keeper, r *rand.Rand, mintable, editable 
 }
 
 func genDenomID(r *rand.Rand) string {
-	len := simtypes.RandIntBetween(r, types.MinDenomLen, types.MaxDenomLen)
+	len := simtypes.RandIntBetween(r, 3, 128)
 	var denomID string
 	for {
 		denomID = strings.ToLower(simtypes.RandStringOfLength(r, len))
@@ -525,6 +532,11 @@ func randDenom(ctx sdk.Context, k keeper.Keeper, r *rand.Rand, mintable, editabl
 	}
 	idx := r.Intn(len(denoms))
 	return denoms[idx]
+}
+
+func randData(r *rand.Rand) string {
+	idx := r.Intn(len(data))
+	return data[idx]
 }
 
 func genRandomBool(r *rand.Rand) bool {

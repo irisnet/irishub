@@ -97,8 +97,8 @@ func (k Keeper) Collection(c context.Context, request *types.QueryCollectionRequ
 	for _, token := range result.Nfts {
 		owner := k.nk.GetOwner(ctx, request.DenomId, token.Id)
 
-		var nftMetadata types.NFTMetadata
-		if err := k.cdc.Unmarshal(token.Data.GetValue(), &nftMetadata); err != nil {
+		nftMetadata, err := types.UnmarshalNFTMetadata(k.cdc, token.Data.GetValue())
+		if err != nil {
 			return nil, err
 		}
 

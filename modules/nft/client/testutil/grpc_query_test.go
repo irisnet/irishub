@@ -63,7 +63,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	uri := "uri"
 	uriHash := "uriHash"
 	description := "description"
-	data := "data"
+	data := "{\"key1\":\"value1\",\"key2\":\"value2\"}"
 	tokenID := "kitty"
 	//owner     := "owner"
 	denomName := "name"

@@ -63,7 +63,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	uri := "uri"
 	uriHash := "uriHash"
 	description := "description"
-	data := "data"
+	data := "{\"key1\":\"value1\",\"key2\":\"value2\"}"
 	tokenID := "kitty"
 	//owner     := "owner"
 	denomName := "name"
@@ -187,12 +187,12 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(1, len(collectionItem.Collection.NFTs))
 
 	//------test GetCmdEditNFT()-------------
-	newTokenDate := "newdata"
+	newTokenData := "{\"key1\":\"value1\",\"key2\":\"value2\"}"
 	newTokenURI := "newuri"
 	newTokenURIHash := "newuriHash"
 	newTokenName := "new Kitty Token"
 	args = []string{
-		fmt.Sprintf("--%s=%s", nftcli.FlagData, newTokenDate),
+		fmt.Sprintf("--%s=%s", nftcli.FlagData, newTokenData),
 		fmt.Sprintf("--%s=%s", nftcli.FlagURI, newTokenURI),
 		fmt.Sprintf("--%s=%s", nftcli.FlagURIHash, newTokenURIHash),
 		fmt.Sprintf("--%s=%s", nftcli.FlagTokenName, newTokenName),
@@ -218,7 +218,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(newTokenName, newNftItem.Name)
 	s.Require().Equal(newTokenURI, newNftItem.URI)
 	s.Require().Equal(newTokenURIHash, newNftItem.UriHash)
-	s.Require().Equal(newTokenDate, newNftItem.Data)
+	s.Require().Equal(newTokenData, newNftItem.Data)
 
 	//------test GetCmdTransferNFT()-------------
 	recipient := sdk.AccAddress(crypto.AddressHash([]byte("dgsbl")))
@@ -257,7 +257,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	//------test GetCmdBurnNFT()-------------
 	newTokenID := "dgsbl"
 	args = []string{
-		fmt.Sprintf("--%s=%s", nftcli.FlagData, newTokenDate),
+		fmt.Sprintf("--%s=%s", nftcli.FlagData, newTokenData),
 		fmt.Sprintf("--%s=%s", nftcli.FlagRecipient, from.String()),
 		fmt.Sprintf("--%s=%s", nftcli.FlagURI, newTokenURI),
 		fmt.Sprintf("--%s=%s", nftcli.FlagTokenName, newTokenName),
