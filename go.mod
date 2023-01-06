@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	cosmossdk.io/math v1.0.0-beta.3
-	github.com/bianjieai/nft-transfer v1.0.0-beta.0.20221216084600-cbcc18938381
+	github.com/bianjieai/nft-transfer v1.1.0-beta
 	github.com/bianjieai/tibc-go v0.4.1
 	github.com/cosmos/cosmos-sdk v0.46.5
 	github.com/cosmos/ibc-go/v5 v5.0.1
