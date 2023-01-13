@@ -1,6 +1,36 @@
 # Changelog
 
 ## Unreleased
+## 1.4.1
+
+*November 28, 2022*
+
+### Application
+
+* [\#2780](https://github.com/irisnet/irishub/pull/2780) Bump tibc-go version to v0.4.2
+* [\#2779](https://github.com/irisnet/irishub/pull/2779) Bump up irismod version to v1.7.2
+* [\#2777](https://github.com/irisnet/irishub/pull/2777) Add SetIAVLCacheSize and SetIAVLDisableFastNode
+* [\#2775](https://github.com/irisnet/irishub/pull/2775) Remove group module
+
+## 1.4.0
+
+*November 15, 2022*
+### Application
+
+* [\#2759](https://github.com/irisnet/irishub/pull/2759) Fix export error when with flag `--for-zero-height`
+* [\#2766](https://github.com/irisnet/irishub/pull/2766) Bump up cosmos sdk to v0.46.4
+* [\#2768](https://github.com/irisnet/irishub/pull/2768) Bump up ibc-go to v5.0.1
+* [\#2770](https://github.com/irisnet/irishub/pull/2770) Bump up irismod to v1.7.0 & Bump up tibc-go to v0.4.0 
+* [irismod \#309](https://github.com/irisnet/irismod/pull/309) Refactor nft with cosmos-sdk nft module.
+* [irismod \#308](https://github.com/irisnet/irismod/pull/308) Coinswap module adds unilateral injection liquidity function.
+
+### API Breaking Changes
+
+* [irismod \#309](https://github.com/irisnet/irismod/pull/309) GRPC method `Owner` rename to `NFTsOfOwner`, Remove deprecated `Queries` api
+### Bug Fixes
+
+* [irismod \#304](https://github.com/irisnet/irismod/pull/304) Fix nft module import error.
+* [irismod \#314](https://github.com/irisnet/irismod/pull/314) Fix `addLiquidity` panic error.
 
 ## 1.3.0
 

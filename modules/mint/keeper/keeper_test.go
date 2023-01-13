@@ -24,7 +24,7 @@ type KeeperTestSuite struct {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(false)
+	app := simapp.Setup(suite.T(), false)
 
 	suite.cdc = app.LegacyAmino()
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
@@ -65,8 +65,10 @@ func (suite *KeeperTestSuite) TestMintCoins() {
 }
 
 func (suite *KeeperTestSuite) TestAddCollectedFees() {
-
 	mintCoins := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(1000)))
+
+	feeCollector := suite.app.AccountKeeper.GetModuleAccount(suite.ctx, "fee_collector")
+	feeCollectorBalance := suite.app.BankKeeper.GetAllBalances(suite.ctx, feeCollector.GetAddress())
 
 	err := suite.app.MintKeeper.MintCoins(suite.ctx, mintCoins)
 	require.NoError(suite.T(), err)
@@ -82,8 +84,8 @@ func (suite *KeeperTestSuite) TestAddCollectedFees() {
 	coins = suite.app.BankKeeper.GetAllBalances(suite.ctx, acc.GetAddress())
 	require.True(suite.T(), coins.Empty())
 
-	acc1 := suite.app.AccountKeeper.GetModuleAccount(suite.ctx, "fee_collector")
-	coins1 := suite.app.BankKeeper.GetAllBalances(suite.ctx, acc1.GetAddress())
-	require.Equal(suite.T(), coins1, mintCoins)
+	feeCollectorTotalBalance := suite.app.BankKeeper.GetAllBalances(suite.ctx, feeCollector.GetAddress())
+	expectedCollectedFees := feeCollectorTotalBalance.Sub(feeCollectorBalance...)
+	require.Equal(suite.T(), expectedCollectedFees, mintCoins)
 
 }

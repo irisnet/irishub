@@ -1,7 +1,7 @@
 #
 # Build image: docker build -t irisnet/irishub .
 #
-FROM golang:1.16.9-alpine3.14 as builder
+FROM golang:1.18-alpine3.16 as builder
 
 # Set up dependencies
 ENV PACKAGES make gcc git libc-dev bash linux-headers eudev-dev
@@ -18,7 +18,7 @@ RUN make build
 
 # ----------------------------
 
-FROM alpine:3.12
+FROM alpine:3.16
 
 # p2p port
 EXPOSE 26656

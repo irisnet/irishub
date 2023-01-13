@@ -6,11 +6,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func TestNextInflation(t *testing.T) {
-	minter := NewMinter(time.Now(), sdk.NewIntWithDecimal(100, 18))
+	minter := NewMinter(time.Now(), sdkmath.NewIntWithDecimal(100, 18))
 	tests := []struct{ params Params }{
 		{Params{Inflation: sdk.NewDecWithPrec(20, 2), MintDenom: sdk.DefaultBondDenom}},
 		{Params{Inflation: sdk.NewDecWithPrec(10, 2), MintDenom: sdk.DefaultBondDenom}},
@@ -35,9 +36,9 @@ func TestMinterValidate(t *testing.T) {
 		LastUpdate    time.Time
 		InflationBase sdk.Int
 	}{
-		{false, time.Unix(-1, -1), initialIssue.Mul(sdk.NewIntWithDecimal(1, 18))},
-		{false, time.Unix(0, 0), initialIssue.Mul(sdk.NewIntWithDecimal(0, 0))},
-		{true, time.Unix(0, 0), initialIssue.Mul(sdk.NewIntWithDecimal(1, 18))},
+		{false, time.Unix(-1, -1), initialIssue.Mul(sdkmath.NewIntWithDecimal(1, 18))},
+		{false, time.Unix(0, 0), initialIssue.Mul(sdkmath.NewIntWithDecimal(0, 0))},
+		{true, time.Unix(0, 0), initialIssue.Mul(sdkmath.NewIntWithDecimal(1, 18))},
 	}
 	for i, tc := range tests {
 		minter := NewMinter(tc.LastUpdate, tc.InflationBase)
