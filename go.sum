@@ -153,8 +153,8 @@ github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d h1:xDfNPAt8lFiC1U
 github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d/go.mod h1:6QX/PXZ00z/TKoufEY6K/a0k6AhaJrQKdFe6OfVXsa4=
 github.com/bgentry/speakeasy v0.1.0 h1:ByYyxL9InA1OWqxJqqp2A5pYHUrCiAL6K3J+LKSsQkY=
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
-github.com/bianjieai/nft-transfer v1.1.0-beta h1:yg99eMFESw5WxwEsQYM5wwN5fqzIOVAX88VNQ9vZb2g=
-github.com/bianjieai/nft-transfer v1.1.0-beta/go.mod h1:0XSwOqmJlrL0NQvQj8imILddnqDZ7alRrgfwcsjRP2k=
+github.com/bianjieai/nft-transfer v1.1.0-beta.0.20230119074853-a64d5dc19590 h1:siCckoxj2FJtEawoEdmLzsaDFPGVSnzOuLOrfVxtiTU=
+github.com/bianjieai/nft-transfer v1.1.0-beta.0.20230119074853-a64d5dc19590/go.mod h1:0XSwOqmJlrL0NQvQj8imILddnqDZ7alRrgfwcsjRP2k=
 github.com/bianjieai/tendermint v0.34.23-irita-221118 h1:h2DPw6T3DzvsPxGBn+nS9sG/dKuMnSosJNn/WukdLoM=
 github.com/bianjieai/tendermint v0.34.23-irita-221118/go.mod h1:fofLBBl+/2b7po/zE8UwriVPZ7sqGxNYsDsGr4dkKxU=
 github.com/bianjieai/tibc-go v0.4.1 h1:gegHI54v17DSmoG4imxGrZA4oGdyrbRd16VWLj8Y4zo=
