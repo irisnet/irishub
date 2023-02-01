@@ -72,6 +72,10 @@ func (cb ClassBuilder) BuildMetadata(class nft.Class) (string, error) {
 			//when classData is not a legal json, there is no need to parse the data
 			return base64.RawStdEncoding.EncodeToString([]byte(metadata.Data)), nil
 		}
+		//note: if metadata.Data is null, it may cause map to be redefined as nil
+		if kvals == nil {
+			kvals = make(map[string]interface{})
+		}
 	}
 	creator, err := sdk.AccAddressFromBech32(metadata.Creator)
 	if err != nil {
@@ -210,9 +214,13 @@ func (cb ClassBuilder) Build(classID, classURI, classData string) (nft.Class, er
 		}
 	}
 
-	data, err := json.Marshal(dataMap)
-	if err != nil {
-		return nft.Class{}, err
+	var data = ""
+	if len(dataMap) > 0 {
+		dataBz, err := json.Marshal(dataMap)
+		if err != nil {
+			return nft.Class{}, err
+		}
+		data = string(dataBz)
 	}
 
 	any, err := codectypes.NewAnyWithValue(&DenomMetadata{
@@ -220,7 +228,7 @@ func (cb ClassBuilder) Build(classID, classURI, classData string) (nft.Class, er
 		Schema:           schema,
 		MintRestricted:   mintRestricted,
 		UpdateRestricted: updateRestricted,
-		Data:             string(data),
+		Data:             data,
 	})
 	if err != nil {
 		return nft.Class{}, err
@@ -260,6 +268,10 @@ func (tb TokenBuilder) BuildMetadata(token nft.NFT) (string, error) {
 		if err != nil && IsIBCDenom(token.ClassId) {
 			//when nftMetadata is not a legal json, there is no need to parse the data
 			return base64.RawStdEncoding.EncodeToString([]byte(nftMetadata.Data)), nil
+		}
+		//note: if nftMetadata.Data is null, it may cause map to be redefined as nil
+		if kvals == nil {
+			kvals = make(map[string]interface{})
 		}
 	}
 	kvals[TokenKeyName] = MediaField{Value: nftMetadata.Name}
@@ -317,14 +329,18 @@ func (tb TokenBuilder) Build(classId, tokenId, tokenURI, tokenData string) (nft.
 		}
 	}
 
-	data, err := json.Marshal(dataMap)
-	if err != nil {
-		return nft.NFT{}, err
+	var data = ""
+	if len(dataMap) > 0 {
+		dataBz, err := json.Marshal(dataMap)
+		if err != nil {
+			return nft.NFT{}, err
+		}
+		data = string(dataBz)
 	}
 
 	metadata, err := codectypes.NewAnyWithValue(&NFTMetadata{
 		Name: name,
-		Data: string(data),
+		Data: data,
 	})
 	if err != nil {
 		return nft.NFT{}, err
@@ -337,8 +353,4 @@ func (tb TokenBuilder) Build(classId, tokenId, tokenURI, tokenData string) (nft.
 		UriHash: uriHash,
 		Data:    metadata,
 	}, nil
-}
-
-func PopIfExist() {
-
 }
