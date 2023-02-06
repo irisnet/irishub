@@ -8,7 +8,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	v042 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v042"
+	v1 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v1"
 
 	"github.com/irisnet/irismod/modules/service/types"
 )
@@ -438,7 +438,7 @@ func (k Keeper) GetOwnerServiceBindings(ctx sdk.Context, owner sdk.AccAddress, s
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		bindingKey := iterator.Key()[v042.AddrLen+1:]
+		bindingKey := iterator.Key()[v1.AddrLen+1:]
 		sepIndex := bytes.Index(bindingKey, types.Delimiter)
 		serviceName := string(bindingKey[0:sepIndex])
 		provider := sdk.AccAddress(bindingKey[sepIndex+1:])

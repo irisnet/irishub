@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/hex"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -83,4 +84,21 @@ func (k Keeper) FeedValue(c context.Context, req *types.QueryFeedValueRequest) (
 
 	result := k.GetFeedValues(ctx, req.FeedName)
 	return &types.QueryFeedValueResponse{FeedValues: result}, nil
+}
+
+func BuildFeedContext(ctx sdk.Context, k Keeper, feed types.Feed) (feedCtx types.FeedContext) {
+	requestContextID, _ := hex.DecodeString(feed.RequestContextID)
+	reqCtx, found := k.sk.GetRequestContext(ctx, requestContextID)
+	if found {
+		feedCtx.Providers = reqCtx.Providers
+		feedCtx.ResponseThreshold = reqCtx.ResponseThreshold
+		feedCtx.ServiceName = reqCtx.ServiceName
+		feedCtx.Input = reqCtx.Input
+		feedCtx.RepeatedFrequency = reqCtx.RepeatedFrequency
+		feedCtx.ServiceFeeCap = reqCtx.ServiceFeeCap
+		feedCtx.Timeout = reqCtx.Timeout
+		feedCtx.State = reqCtx.State
+	}
+	feedCtx.Feed = &feed
+	return feedCtx
 }

@@ -6,15 +6,13 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
-	"github.com/tidwall/gjson"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
-	"github.com/cosmos/cosmos-sdk/testutil/rest"
+	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	farmcli "github.com/irisnet/irismod/modules/farm/client/cli"
-	"github.com/irisnet/irismod/modules/farm/client/testutil"
+	farmtestutil "github.com/irisnet/irismod/modules/farm/client/testutil"
 	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 	"github.com/irisnet/irismod/simapp"
 )
@@ -22,23 +20,13 @@ import (
 type IntegrationTestSuite struct {
 	suite.Suite
 
-	cfg     network.Config
-	network *network.Network
+	network simapp.Network
 }
 
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	cfg := simapp.NewConfig()
-	cfg.NumValidators = 1
-
-	s.cfg = cfg
-	var err error
-	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
-	s.Require().NoError(err)
-
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.network = simapp.SetupNetwork(s.T())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -60,15 +48,15 @@ func (s *IntegrationTestSuite) TestRest() {
 	creator := val.Address
 	description := "iris-atom farm pool"
 	startHeight := s.LatestHeight() + 1
-	rewardPerBlock := sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10)))
-	lpTokenDenom := s.cfg.BondDenom
-	totalReward := sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(1000)))
+	rewardPerBlock := sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10)))
+	lpTokenDenom := s.network.BondDenom
+	totalReward := sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(1000)))
 	editable := true
 
 	globalFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
 	}
 
 	args := []string{
@@ -81,19 +69,15 @@ func (s *IntegrationTestSuite) TestRest() {
 	}
 
 	args = append(args, globalFlags...)
-	respType := proto.Message(&sdk.TxResponse{})
-	expectedCode := uint32(0)
-
-	bz, err := testutil.CreateFarmPoolExec(clientCtx,
+	txResult := farmtestutil.CreateFarmPoolExec(
+		s.T(),
+		s.network,
+		clientCtx,
 		creator.String(),
 		args...,
 	)
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp := respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
 
-	poolId := gjson.Get(txResp.RawLog, "0.events.3.attributes.1.value").String()
+	poolId := s.network.GetAttribute(farmtypes.EventTypeCreatePool, farmtypes.AttributeValuePoolId, txResult.Events)
 	expectedContents := farmtypes.FarmPoolEntry{
 		Id:              poolId,
 		Description:     description,
@@ -108,9 +92,9 @@ func (s *IntegrationTestSuite) TestRest() {
 		RewardPerBlock:  rewardPerBlock,
 	}
 
-	respType = proto.Message(&farmtypes.QueryFarmPoolsResponse{})
+	respType := proto.Message(&farmtypes.QueryFarmPoolsResponse{})
 	queryPoolURL := fmt.Sprintf("%s/irismod/farm/pools", baseURL)
-	resp, err := rest.GetRequest(queryPoolURL)
+	resp, err := testutil.GetRequest(queryPoolURL)
 
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
@@ -119,19 +103,18 @@ func (s *IntegrationTestSuite) TestRest() {
 
 	_, err = s.network.WaitForHeight(startHeight)
 	s.Require().NoError(err)
+	s.network.WaitForNextBlock()
 
-	respType = proto.Message(&sdk.TxResponse{})
-	lpToken := sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(100))
-	bz, err = testutil.StakeExec(clientCtx,
+	lpToken := sdk.NewCoin(s.network.BondDenom, sdk.NewInt(100))
+	txResult = farmtestutil.StakeExec(
+		s.T(),
+		s.network,
+		clientCtx,
 		creator.String(),
 		poolId,
 		lpToken.String(),
 		globalFlags...,
 	)
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp = respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
 
 	expectFarmer := farmtypes.LockedInfo{
 		PoolId:        poolId,
@@ -141,7 +124,7 @@ func (s *IntegrationTestSuite) TestRest() {
 
 	queryFarmerRespType := proto.Message(&farmtypes.QueryFarmerResponse{})
 	queryFarmInfoURL := fmt.Sprintf("%s/irismod/farm/farmers/%s", baseURL, creator.String())
-	resp, err = rest.GetRequest(queryFarmInfoURL)
+	resp, err = testutil.GetRequest(queryFarmInfoURL)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, queryFarmerRespType))
 	farmer := queryFarmerRespType.(*farmtypes.QueryFarmerResponse)

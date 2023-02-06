@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	v042 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v042"
+	v1 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v1"
 
 	"github.com/irisnet/irismod/modules/service/types"
 )
@@ -154,7 +154,7 @@ func (k Keeper) WithdrawEarnedFees(ctx sdk.Context, owner, provider sdk.AccAddre
 		defer iterator.Close()
 
 		for ; iterator.Valid(); iterator.Next() {
-			provider := sdk.AccAddress(iterator.Key()[v042.AddrLen+1:])
+			provider := sdk.AccAddress(iterator.Key()[v1.AddrLen+1:])
 			k.DeleteEarnedFees(ctx, provider)
 		}
 

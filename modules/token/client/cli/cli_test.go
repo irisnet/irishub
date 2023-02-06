@@ -5,15 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
-	"github.com/tidwall/gjson"
-
 	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	tokencli "github.com/irisnet/irismod/modules/token/client/cli"
@@ -25,23 +20,13 @@ import (
 type IntegrationTestSuite struct {
 	suite.Suite
 
-	cfg     network.Config
-	network *network.Network
+	network simapp.Network
 }
 
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	cfg := simapp.NewConfig()
-	cfg.NumValidators = 1
-
-	var err error
-	s.cfg = cfg
-	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
-	s.Require().NoError(err)
-
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.network = simapp.SetupNetwork(s.T())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -78,66 +63,45 @@ func (s *IntegrationTestSuite) TestToken() {
 		fmt.Sprintf("--%s=%t", tokencli.FlagMintable, mintable),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
 	}
-	respType := proto.Message(&sdk.TxResponse{})
 	expectedCode := uint32(0)
-	bz, err := tokentestutil.IssueTokenExec(clientCtx, from.String(), args...)
+	txResult := tokentestutil.IssueTokenExec(s.T(), s.network, clientCtx, from.String(), args...)
+	s.Require().Equal(expectedCode, txResult.Code)
 
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp := respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
-	tokenSymbol := gjson.Get(txResp.RawLog, "0.events.4.attributes.0.value").String()
+	tokenSymbol := s.network.GetAttribute(tokentypes.EventTypeIssueToken, tokentypes.AttributeKeySymbol, txResult.Events)
 
 	//------test GetCmdQueryTokens()-------------
-	tokens := &[]tokentypes.TokenI{}
-	bz, err = tokentestutil.QueryTokensExec(clientCtx, from.String())
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.LegacyAmino.UnmarshalJSON(bz.Bytes(), tokens))
-	s.Require().Equal(1, len(*tokens))
+	tokens := tokentestutil.QueryTokensExec(s.T(), s.network, clientCtx, from.String())
+	s.Require().Equal(1, len(tokens))
 
 	//------test GetCmdQueryToken()-------------
-	var token tokentypes.TokenI
-	respType = proto.Message(&types.Any{})
-	bz, err = tokentestutil.QueryTokenExec(clientCtx, tokenSymbol)
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*types.Any), &token)
-	s.Require().NoError(err)
+	token := tokentestutil.QueryTokenExec(s.T(), s.network, clientCtx, tokenSymbol)
 	s.Require().Equal(name, token.GetName())
 	s.Require().Equal(symbol, token.GetSymbol())
 	s.Require().Equal(uint64(initialSupply), token.GetInitialSupply())
 
 	//------test GetCmdQueryFee()-------------
-	respType = proto.Message(&tokentypes.QueryFeesResponse{})
-	bz, err = tokentestutil.QueryFeeExec(clientCtx, symbol)
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	feeResp := respType.(*tokentypes.QueryFeesResponse)
-	s.Require().NoError(err)
+	queryFeeResponse := tokentestutil.QueryFeeExec(s.T(), s.network, clientCtx, symbol)
 	expectedFeeResp := "{\"exist\":true,\"issue_fee\":{\"denom\":\"stake\",\"amount\":\"13015\"},\"mint_fee\":{\"denom\":\"stake\",\"amount\":\"1301\"}}"
-	result, _ := json.Marshal(feeResp)
+	result, _ := json.Marshal(queryFeeResponse)
 	s.Require().Equal(expectedFeeResp, string(result))
 
 	//------test GetCmdQueryParams()-------------
-	respType = proto.Message(&tokentypes.Params{})
-	bz, err = tokentestutil.QueryParamsExec(clientCtx)
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	params := respType.(*tokentypes.Params)
-	s.Require().NoError(err)
+	queryParamsResponse := tokentestutil.QueryParamsExec(s.T(), s.network, clientCtx)
 	expectedParams := "{\"token_tax_rate\":\"0.400000000000000000\",\"issue_token_base_fee\":{\"denom\":\"stake\",\"amount\":\"60000\"},\"mint_token_fee_ratio\":\"0.100000000000000000\"}"
-	result, _ = json.Marshal(params)
+	result, _ = json.Marshal(queryParamsResponse)
 	s.Require().Equal(expectedParams, string(result))
 
 	//------test GetCmdMintToken()-------------
-	coinType := proto.Message(&sdk.Coin{})
-	out, err := simapp.QueryBalanceExec(clientCtx, from.String(), symbol)
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(out.Bytes(), coinType))
-	balance := coinType.(*sdk.Coin)
+	balance := simapp.QueryBalanceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		from.String(),
+		symbol,
+	)
 	initAmount := balance.Amount.Int64()
 	mintAmount := int64(50000000)
 
@@ -146,21 +110,20 @@ func (s *IntegrationTestSuite) TestToken() {
 		fmt.Sprintf("--%s=%d", tokencli.FlagAmount, mintAmount),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
 	}
-	respType = proto.Message(&sdk.TxResponse{})
-	bz, err = tokentestutil.MintTokenExec(clientCtx, from.String(), symbol, args...)
 
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp = respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
+	txResult = tokentestutil.MintTokenExec(s.T(), s.network, clientCtx, from.String(), symbol, args...)
+	s.Require().Equal(expectedCode, txResult.Code)
 
-	out, err = simapp.QueryBalanceExec(clientCtx, from.String(), symbol)
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(out.Bytes(), coinType))
-	balance = coinType.(*sdk.Coin)
+	balance = simapp.QueryBalanceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		from.String(),
+		symbol,
+	)
 	exceptedAmount := initAmount + mintAmount
 	s.Require().Equal(exceptedAmount, balance.Amount.Int64())
 
@@ -172,21 +135,20 @@ func (s *IntegrationTestSuite) TestToken() {
 		fmt.Sprintf("--%s=%d", tokencli.FlagAmount, burnAmount),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
 	}
-	respType = proto.Message(&sdk.TxResponse{})
-	bz, err = tokentestutil.BurnTokenExec(clientCtx, from.String(), symbol, args...)
 
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp = respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
+	txResult = tokentestutil.BurnTokenExec(s.T(), s.network, clientCtx, from.String(), symbol, args...)
+	s.Require().Equal(expectedCode, txResult.Code)
 
-	out, err = simapp.QueryBalanceExec(clientCtx, from.String(), symbol)
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(out.Bytes(), coinType))
-	balance = coinType.(*sdk.Coin)
+	balance = simapp.QueryBalanceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		from.String(),
+		symbol,
+	)
 	exceptedAmount = exceptedAmount - burnAmount
 	s.Require().Equal(exceptedAmount, balance.Amount.Int64())
 
@@ -201,25 +163,14 @@ func (s *IntegrationTestSuite) TestToken() {
 		fmt.Sprintf("--%s=%t", tokencli.FlagMintable, newMintable),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
 	}
 
-	respType = proto.Message(&sdk.TxResponse{})
-	bz, err = tokentestutil.EditTokenExec(clientCtx, from.String(), symbol, args...)
+	txResult = tokentestutil.EditTokenExec(s.T(), s.network, clientCtx, from.String(), symbol, args...)
+	s.Require().Equal(expectedCode, txResult.Code)
 
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp = respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
-
-	var token2 tokentypes.TokenI
-	respType = proto.Message(&types.Any{})
-	bz, err = tokentestutil.QueryTokenExec(clientCtx, tokenSymbol)
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*types.Any), &token2)
-	s.Require().NoError(err)
+	token2 := tokentestutil.QueryTokenExec(s.T(), s.network, clientCtx, tokenSymbol)
 	s.Require().Equal(newName, token2.GetName())
 	s.Require().Equal(uint64(newMaxSupply), token2.GetMaxSupply())
 	s.Require().Equal(newMintable, token2.GetMintable())
@@ -231,24 +182,14 @@ func (s *IntegrationTestSuite) TestToken() {
 		fmt.Sprintf("--%s=%s", tokencli.FlagTo, to.String()),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
 	}
-	respType = proto.Message(&sdk.TxResponse{})
-	bz, err = tokentestutil.TransferTokenOwnerExec(clientCtx, from.String(), symbol, args...)
 
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp = respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
+	txResult = tokentestutil.TransferTokenOwnerExec(s.T(), s.network, clientCtx, from.String(), symbol, args...)
+	s.Require().Equal(expectedCode, txResult.Code)
 
-	var token3 tokentypes.TokenI
-	respType = proto.Message(&types.Any{})
-	bz, err = tokentestutil.QueryTokenExec(clientCtx, tokenSymbol)
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*types.Any), &token3)
-	s.Require().NoError(err)
+	token3 := tokentestutil.QueryTokenExec(s.T(), s.network, clientCtx, tokenSymbol)
 	s.Require().Equal(to, token3.GetOwner())
 	// ---------------------------------------------------------------------------
 }

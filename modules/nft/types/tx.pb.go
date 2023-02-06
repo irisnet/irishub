@@ -6,16 +6,15 @@ package types
 import (
 	context "context"
 	fmt "fmt"
-	io "io"
-	math "math"
-	math_bits "math/bits"
-
-	_ "github.com/gogo/protobuf/gogoproto"
-	grpc1 "github.com/gogo/protobuf/grpc"
-	proto "github.com/gogo/protobuf/proto"
+	_ "github.com/cosmos/gogoproto/gogoproto"
+	grpc1 "github.com/cosmos/gogoproto/grpc"
+	proto "github.com/cosmos/gogoproto/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	io "io"
+	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -77,7 +76,7 @@ func (m *MsgIssueDenom) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgIssueDenom proto.InternalMessageInfo
 
-// MsgIssueDenomResponse defines the Msg/SaveDenom response type.
+// MsgIssueDenomResponse defines the Msg/IssueDenom response type.
 type MsgIssueDenomResponse struct {
 }
 
@@ -240,7 +239,7 @@ func (m *MsgEditNFT) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgEditNFT proto.InternalMessageInfo
 
-// MsgEditNFTResponse defines the Msg/UpdateNFT response type.
+// MsgEditNFTResponse defines the Msg/EditNFT response type.
 type MsgEditNFTResponse struct {
 }
 
@@ -322,7 +321,7 @@ func (m *MsgMintNFT) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgMintNFT proto.InternalMessageInfo
 
-// MsgMintNFTResponse defines the Msg/SaveNFT response type.
+// MsgMintNFTResponse defines the Msg/MintNFT response type.
 type MsgMintNFTResponse struct {
 }
 
@@ -399,7 +398,7 @@ func (m *MsgBurnNFT) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgBurnNFT proto.InternalMessageInfo
 
-// MsgBurnNFTResponse defines the Msg/RemoveNFT response type.
+// MsgBurnNFTResponse defines the Msg/BurnNFT response type.
 type MsgBurnNFTResponse struct {
 }
 
@@ -859,7 +858,7 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 
 func (c *msgClient) IssueDenom(ctx context.Context, in *MsgIssueDenom, opts ...grpc.CallOption) (*MsgIssueDenomResponse, error) {
 	out := new(MsgIssueDenomResponse)
-	err := c.cc.Invoke(ctx, "/irismod.nft.Msg/SaveDenom", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/irismod.nft.Msg/IssueDenom", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -868,7 +867,7 @@ func (c *msgClient) IssueDenom(ctx context.Context, in *MsgIssueDenom, opts ...g
 
 func (c *msgClient) MintNFT(ctx context.Context, in *MsgMintNFT, opts ...grpc.CallOption) (*MsgMintNFTResponse, error) {
 	out := new(MsgMintNFTResponse)
-	err := c.cc.Invoke(ctx, "/irismod.nft.Msg/SaveNFT", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/irismod.nft.Msg/MintNFT", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -877,7 +876,7 @@ func (c *msgClient) MintNFT(ctx context.Context, in *MsgMintNFT, opts ...grpc.Ca
 
 func (c *msgClient) EditNFT(ctx context.Context, in *MsgEditNFT, opts ...grpc.CallOption) (*MsgEditNFTResponse, error) {
 	out := new(MsgEditNFTResponse)
-	err := c.cc.Invoke(ctx, "/irismod.nft.Msg/UpdateNFT", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/irismod.nft.Msg/EditNFT", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -895,7 +894,7 @@ func (c *msgClient) TransferNFT(ctx context.Context, in *MsgTransferNFT, opts ..
 
 func (c *msgClient) BurnNFT(ctx context.Context, in *MsgBurnNFT, opts ...grpc.CallOption) (*MsgBurnNFTResponse, error) {
 	out := new(MsgBurnNFTResponse)
-	err := c.cc.Invoke(ctx, "/irismod.nft.Msg/RemoveNFT", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/irismod.nft.Msg/BurnNFT", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -932,19 +931,19 @@ type UnimplementedMsgServer struct {
 }
 
 func (*UnimplementedMsgServer) IssueDenom(ctx context.Context, req *MsgIssueDenom) (*MsgIssueDenomResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SaveDenom not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method IssueDenom not implemented")
 }
 func (*UnimplementedMsgServer) MintNFT(ctx context.Context, req *MsgMintNFT) (*MsgMintNFTResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SaveNFT not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method MintNFT not implemented")
 }
 func (*UnimplementedMsgServer) EditNFT(ctx context.Context, req *MsgEditNFT) (*MsgEditNFTResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateNFT not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method EditNFT not implemented")
 }
 func (*UnimplementedMsgServer) TransferNFT(ctx context.Context, req *MsgTransferNFT) (*MsgTransferNFTResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TransferNFT not implemented")
 }
 func (*UnimplementedMsgServer) BurnNFT(ctx context.Context, req *MsgBurnNFT) (*MsgBurnNFTResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RemoveNFT not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method BurnNFT not implemented")
 }
 func (*UnimplementedMsgServer) TransferDenom(ctx context.Context, req *MsgTransferDenom) (*MsgTransferDenomResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TransferDenom not implemented")
@@ -964,7 +963,7 @@ func _Msg_IssueDenom_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/irismod.nft.Msg/SaveDenom",
+		FullMethod: "/irismod.nft.Msg/IssueDenom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).IssueDenom(ctx, req.(*MsgIssueDenom))
@@ -982,7 +981,7 @@ func _Msg_MintNFT_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/irismod.nft.Msg/SaveNFT",
+		FullMethod: "/irismod.nft.Msg/MintNFT",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).MintNFT(ctx, req.(*MsgMintNFT))
@@ -1000,7 +999,7 @@ func _Msg_EditNFT_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/irismod.nft.Msg/UpdateNFT",
+		FullMethod: "/irismod.nft.Msg/EditNFT",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).EditNFT(ctx, req.(*MsgEditNFT))
@@ -1036,7 +1035,7 @@ func _Msg_BurnNFT_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/irismod.nft.Msg/RemoveNFT",
+		FullMethod: "/irismod.nft.Msg/BurnNFT",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).BurnNFT(ctx, req.(*MsgBurnNFT))
@@ -1067,15 +1066,15 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SaveDenom",
+			MethodName: "IssueDenom",
 			Handler:    _Msg_IssueDenom_Handler,
 		},
 		{
-			MethodName: "SaveNFT",
+			MethodName: "MintNFT",
 			Handler:    _Msg_MintNFT_Handler,
 		},
 		{
-			MethodName: "UpdateNFT",
+			MethodName: "EditNFT",
 			Handler:    _Msg_EditNFT_Handler,
 		},
 		{
@@ -1083,7 +1082,7 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_TransferNFT_Handler,
 		},
 		{
-			MethodName: "RemoveNFT",
+			MethodName: "BurnNFT",
 			Handler:    _Msg_BurnNFT_Handler,
 		},
 		{

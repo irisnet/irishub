@@ -2,131 +2,130 @@ package testutil
 
 import (
 	"fmt"
+	"testing"
 
 	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil"
-	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 
 	farmcli "github.com/irisnet/irismod/modules/farm/client/cli"
+	farmtypes "github.com/irisnet/irismod/modules/farm/types"
+	"github.com/irisnet/irismod/simapp"
 )
 
 // CreateFarmPoolExec creates a redelegate message.
-func CreateFarmPoolExec(clientCtx client.Context,
+func CreateFarmPoolExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator string,
-	extraArgs ...string) (testutil.BufferWriter, error) {
+	extraArgs ...string) *simapp.ResponseTx {
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
 	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdCreateFarmPool(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, farmcli.GetCmdCreateFarmPool(), args)
 }
 
-func QueryFarmPoolsExec(clientCtx client.Context, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryFarmPoolsExec(t *testing.T, network simapp.Network, clientCtx client.Context, extraArgs ...string) *farmtypes.QueryFarmPoolsResponse {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdQueryFarmPools(), args)
+	response := &farmtypes.QueryFarmPoolsResponse{}
+	network.ExecQueryCmd(t, clientCtx, farmcli.GetCmdQueryFarmPools(), args, response)
+	return response
 }
 
-func QueryFarmPoolExec(clientCtx client.Context, poolId string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryFarmPoolExec(t *testing.T, network simapp.Network, clientCtx client.Context, poolId string, extraArgs ...string) *farmtypes.QueryFarmPoolResponse {
 	args := []string{
 		poolId,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdQueryFarmPool(), args)
+	response := &farmtypes.QueryFarmPoolResponse{}
+	network.ExecQueryCmd(t, clientCtx, farmcli.GetCmdQueryFarmPool(), args, response)
+	return response
 }
 
 // AppendRewardExec creates a redelegate message.
-func AppendRewardExec(clientCtx client.Context,
+func AppendRewardExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator,
 	poolId string,
-	extraArgs ...string) (testutil.BufferWriter, error) {
+	extraArgs ...string) *simapp.ResponseTx {
 	args := []string{
 		poolId,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
 	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdAdjustPool(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, farmcli.GetCmdAdjustPool(), args)
 }
 
 // StakeExec creates a redelegate message.
-func StakeExec(clientCtx client.Context,
+func StakeExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator,
 	poolId,
 	lpToken string,
-	extraArgs ...string) (testutil.BufferWriter, error) {
+	extraArgs ...string) *simapp.ResponseTx {
 	args := []string{
 		poolId,
 		lpToken,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
 	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdStake(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, farmcli.GetCmdStake(), args)
 }
 
 // UnstakeExec creates a redelegate message.
-func UnstakeExec(clientCtx client.Context,
+func UnstakeExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator,
 	poolId,
 	lpToken string,
-	extraArgs ...string) (testutil.BufferWriter, error) {
+	extraArgs ...string) *simapp.ResponseTx {
 	args := []string{
 		poolId,
 		lpToken,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
 	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdUnstake(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, farmcli.GetCmdUnstake(), args)
 }
 
 // HarvestExec creates a redelegate message.
-func HarvestExec(clientCtx client.Context,
+func HarvestExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator,
 	poolId string,
-	extraArgs ...string) (testutil.BufferWriter, error) {
+	extraArgs ...string) *simapp.ResponseTx {
 	args := []string{
 		poolId,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
 	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdHarvest(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, farmcli.GetCmdHarvest(), args)
 }
 
 // DestroyExec creates a redelegate message.
-func DestroyExec(clientCtx client.Context,
+func DestroyExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator,
 	poolId string,
-	extraArgs ...string) (testutil.BufferWriter, error) {
+	extraArgs ...string) *simapp.ResponseTx {
 	args := []string{
 		poolId,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
 	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdDestroyFarmPool(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, farmcli.GetCmdDestroyFarmPool(), args)
 }
 
 // QueryFarmerExec creates a redelegate message.
-func QueryFarmerExec(clientCtx client.Context,
+func QueryFarmerExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator string,
-	extraArgs ...string) (testutil.BufferWriter, error) {
+	extraArgs ...string) *farmtypes.QueryFarmerResponse {
 	args := []string{
 		creator,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, farmcli.GetCmdQueryFarmer(), args)
+	response := &farmtypes.QueryFarmerResponse{}
+	network.ExecQueryCmd(t, clientCtx, farmcli.GetCmdQueryFarmer(), args, response)
+	return response
 }
