@@ -153,8 +153,8 @@ github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d h1:xDfNPAt8lFiC1U
 github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d/go.mod h1:6QX/PXZ00z/TKoufEY6K/a0k6AhaJrQKdFe6OfVXsa4=
 github.com/bgentry/speakeasy v0.1.0 h1:ByYyxL9InA1OWqxJqqp2A5pYHUrCiAL6K3J+LKSsQkY=
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
-github.com/bianjieai/nft-transfer v1.1.0-beta.0.20230130023155-3717108661f2 h1:07el5sBXzL2sx8ANEqtlQ5SVKl2GY59LA3WWJrLFldQ=
-github.com/bianjieai/nft-transfer v1.1.0-beta.0.20230130023155-3717108661f2/go.mod h1:0XSwOqmJlrL0NQvQj8imILddnqDZ7alRrgfwcsjRP2k=
+github.com/bianjieai/nft-transfer v1.1.0-beta.0.20230207091420-6b8596c47042 h1:854Tx8xu2M34ntipnAXkVkLBS3I4lihqNzVRIilpnp8=
+github.com/bianjieai/nft-transfer v1.1.0-beta.0.20230207091420-6b8596c47042/go.mod h1:0XSwOqmJlrL0NQvQj8imILddnqDZ7alRrgfwcsjRP2k=
 github.com/bianjieai/tendermint v0.34.23-irita-221118 h1:h2DPw6T3DzvsPxGBn+nS9sG/dKuMnSosJNn/WukdLoM=
 github.com/bianjieai/tendermint v0.34.23-irita-221118/go.mod h1:fofLBBl+/2b7po/zE8UwriVPZ7sqGxNYsDsGr4dkKxU=
 github.com/bianjieai/tibc-go v0.4.1 h1:gegHI54v17DSmoG4imxGrZA4oGdyrbRd16VWLj8Y4zo=
@@ -620,8 +620,8 @@ github.com/influxdata/promql/v2 v2.12.0/go.mod h1:fxOPu+DY0bqCTCECchSRtWfc+0X19y
 github.com/influxdata/roaring v0.4.13-0.20180809181101-fc520f41fab6/go.mod h1:bSgUQ7q5ZLSO+bKBGqJiCBGAl+9DxyW63zLTujjUlOE=
 github.com/influxdata/tdigest v0.0.0-20181121200506-bf2b5ad3c0a9/go.mod h1:Js0mqiSBE6Ffsg94weZZ2c+v/ciT8QRHFOap7EKDrR0=
 github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368/go.mod h1:Wbbw6tYNvwa5dlB6304Sd+82Z3f7PmVZHVKU637d4po=
-github.com/irisnet/irismod v1.7.2-gon-beta.1 h1:46cf/b8s/UtQ5ZiXWBb721rlqCRWciNOywoqlPBBCmc=
-github.com/irisnet/irismod v1.7.2-gon-beta.1/go.mod h1:w5xeSOrFgPblXgRHyecG35etFFWPWxRWqpANgrIzERk=
+github.com/irisnet/irismod v1.7.2-gon-beta.2 h1:MYbgLA68pWHNNZvOr24Iy7MaP4JkDckEKO7+NnIh7sU=
+github.com/irisnet/irismod v1.7.2-gon-beta.2/go.mod h1:w5xeSOrFgPblXgRHyecG35etFFWPWxRWqpANgrIzERk=
 github.com/jackpal/go-nat-pmp v1.0.2/go.mod h1:QPH045xvCAeXUZOxsnwmrtiCoxIr9eob+4orBN1SBKc=
 github.com/jedisct1/go-minisign v0.0.0-20190909160543-45766022959e/go.mod h1:G1CVv03EnqU1wYL2dFwXxW2An0az9JTl/ZsqXQeBlkU=
 github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
