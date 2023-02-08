@@ -55,6 +55,8 @@ var (
 	flagStartingIPAddress = "starting-ip-address"
 )
 
+const nativeIrisMinUnit = "uiris"
+
 var PowerReduction = sdk.NewIntFromUint64(1000000000000000000)
 
 // get cmd to initialize all files for tendermint testnet and application
@@ -217,11 +219,13 @@ func InitTestnet(
 		accTokens := sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)
 		accStakingTokens := sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction)
 		accEvmTokens := sdk.TokensFromConsensusPower(5000, PowerReduction)
+		accIrisTokens := sdk.TokensFromConsensusPower(5000, sdk.DefaultPowerReduction)
 
 		coins := sdk.Coins{
 			sdk.NewCoin(fmt.Sprintf("%stoken", nodeDirName), accTokens),
 			sdk.NewCoin(sdk.DefaultBondDenom, accStakingTokens),
 			sdk.NewCoin(evmEIrisMinUnit, accEvmTokens),
+			sdk.NewCoin(nativeIrisMinUnit, accIrisTokens),
 		}
 
 		genBalances = append(genBalances, banktypes.Balance{Address: addr.String(), Coins: coins.Sort()})
