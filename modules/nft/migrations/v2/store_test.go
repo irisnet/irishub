@@ -2,10 +2,12 @@ package v2_test
 
 import (
 	"fmt"
+
+	gogotypes "github.com/gogo/protobuf/types"
+
 	"math/rand"
 	"testing"
 
-	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/stretchr/testify/require"
 
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"

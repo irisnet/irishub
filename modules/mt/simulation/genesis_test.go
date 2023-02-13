@@ -2,15 +2,14 @@ package simulation
 
 import (
 	"encoding/json"
+	mt "github.com/irisnet/irismod/modules/mt/types"
 	"math/rand"
 	"testing"
-
-	mt "github.com/irisnet/irismod/modules/mt/types"
 
 	"github.com/stretchr/testify/require"
 
 	sdkmath "cosmossdk.io/math"
-	"cosmossdk.io/simapp"
+	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 )

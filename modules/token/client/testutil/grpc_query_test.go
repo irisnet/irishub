@@ -7,9 +7,11 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
+	"github.com/tidwall/gjson"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
+	"github.com/cosmos/cosmos-sdk/testutil/rest"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	tokencli "github.com/irisnet/irismod/modules/token/client/cli"
@@ -21,13 +23,24 @@ import (
 type IntegrationTestSuite struct {
 	suite.Suite
 
-	network simapp.Network
+	cfg     network.Config
+	network *network.Network
 }
 
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	s.network = simapp.SetupNetwork(s.T())
+	cfg := simapp.NewConfig()
+	cfg.NumValidators = 1
+
+	s.cfg = cfg
+
+	var err error
+	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
+	s.Require().NoError(err)
+
+	_, err = s.network.WaitForHeight(1)
+	s.Require().NoError(err)
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -65,17 +78,22 @@ func (s *IntegrationTestSuite) TestToken() {
 		fmt.Sprintf("--%s=%t", tokencli.FlagMintable, mintable),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
 	}
 	respType := proto.Message(&sdk.TxResponse{})
-	txResult := tokentestutil.IssueTokenExec(s.T(), s.network, clientCtx, from.String(), args...)
+	expectedCode := uint32(0)
+	bz, err := tokentestutil.IssueTokenExec(clientCtx, from.String(), args...)
 
-	tokenSymbol := s.network.GetAttribute(tokentypes.EventTypeIssueToken, tokentypes.AttributeKeySymbol, txResult.Events)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp := respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
+	tokenSymbol := gjson.Get(txResp.RawLog, "0.events.4.attributes.0.value").String()
 
 	//------test GetCmdQueryTokens()-------------
 	url := fmt.Sprintf("%s/irismod/token/tokens", baseURL)
-	resp, err := testutil.GetRequest(url)
+	resp, err := rest.GetRequest(url)
 	respType = proto.Message(&tokentypes.QueryTokensResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
@@ -84,7 +102,7 @@ func (s *IntegrationTestSuite) TestToken() {
 
 	//------test GetCmdQueryToken()-------------
 	url = fmt.Sprintf("%s/irismod/token/tokens/%s", baseURL, tokenSymbol)
-	resp, err = testutil.GetRequest(url)
+	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&tokentypes.QueryTokenResponse{})
 	var token tokentypes.TokenI
 	s.Require().NoError(err)
@@ -98,7 +116,7 @@ func (s *IntegrationTestSuite) TestToken() {
 
 	//------test GetCmdQueryFee()-------------
 	url = fmt.Sprintf("%s/irismod/token/tokens/%s/fees", baseURL, tokenSymbol)
-	resp, err = testutil.GetRequest(url)
+	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&tokentypes.QueryFeesResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
@@ -109,7 +127,7 @@ func (s *IntegrationTestSuite) TestToken() {
 
 	//------test GetCmdQueryParams()-------------
 	url = fmt.Sprintf("%s/irismod/token/params", baseURL)
-	resp, err = testutil.GetRequest(url)
+	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&tokentypes.QueryParamsResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))

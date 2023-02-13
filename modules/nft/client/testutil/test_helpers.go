@@ -2,43 +2,29 @@ package testutil
 
 import (
 	"fmt"
-	"testing"
 
 	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/testutil"
+	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 
 	nftcli "github.com/irisnet/irismod/modules/nft/client/cli"
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
-	"github.com/irisnet/irismod/simapp"
 )
 
 // IssueDenomExec creates a redelegate message.
-func IssueDenomExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	from string,
-	denom string,
-	extraArgs ...string,
-) *simapp.ResponseTx {
+func IssueDenomExec(clientCtx client.Context, from string, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denom,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return network.ExecTxCmdWithResult(t, clientCtx, nftcli.GetCmdIssueDenom(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdIssueDenom(), args)
 }
 
-func BurnNFTExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	from string,
-	denomID string,
-	tokenID string,
-	extraArgs ...string,
-) *simapp.ResponseTx {
+func BurnNFTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
 		tokenID,
@@ -46,17 +32,10 @@ func BurnNFTExec(t *testing.T,
 	}
 	args = append(args, extraArgs...)
 
-	return network.ExecTxCmdWithResult(t, clientCtx, nftcli.GetCmdBurnNFT(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdBurnNFT(), args)
 }
 
-func MintNFTExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	from string,
-	denomID string,
-	tokenID string,
-	extraArgs ...string,
-) *simapp.ResponseTx {
+func MintNFTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
 		tokenID,
@@ -64,17 +43,10 @@ func MintNFTExec(t *testing.T,
 	}
 	args = append(args, extraArgs...)
 
-	return network.ExecTxCmdWithResult(t, clientCtx, nftcli.GetCmdMintNFT(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdMintNFT(), args)
 }
 
-func EditNFTExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	from string,
-	denomID string,
-	tokenID string,
-	extraArgs ...string,
-) *simapp.ResponseTx {
+func EditNFTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
 		tokenID,
@@ -82,18 +54,10 @@ func EditNFTExec(t *testing.T,
 	}
 	args = append(args, extraArgs...)
 
-	return network.ExecTxCmdWithResult(t, clientCtx, nftcli.GetCmdEditNFT(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdEditNFT(), args)
 }
 
-func TransferNFTExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	from string,
-	recipient string,
-	denomID string,
-	tokenID string,
-	extraArgs ...string,
-) *simapp.ResponseTx {
+func TransferNFTExec(clientCtx client.Context, from string, recipient string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		recipient,
 		denomID,
@@ -102,111 +66,59 @@ func TransferNFTExec(t *testing.T,
 	}
 	args = append(args, extraArgs...)
 
-	return network.ExecTxCmdWithResult(t, clientCtx, nftcli.GetCmdTransferNFT(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdTransferNFT(), args)
 }
 
-func TransferDenomExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	from string,
-	recipient string,
-	denomID string,
-	extraArgs ...string,
-) *simapp.ResponseTx {
-	args := []string{
-		recipient,
-		denomID,
-		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
-	}
-
-	args = append(args, extraArgs...)
-	return network.ExecTxCmdWithResult(t, clientCtx, nftcli.GetCmdTransferDenom(), args)
-}
-
-func QueryDenomExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	denomID string,
-	extraArgs ...string) *nfttypes.Denom {
+func QueryDenomExec(clientCtx client.Context, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	response := &nfttypes.Denom{}
-	network.ExecQueryCmd(t, clientCtx, nftcli.GetCmdQueryDenom(), args, response)
-	return response
+	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryDenom(), args)
 }
 
-func QueryCollectionExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	denomID string,
-	extraArgs ...string) *nfttypes.QueryCollectionResponse {
+func QueryCollectionExec(clientCtx client.Context, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	response := &nfttypes.QueryCollectionResponse{}
-	network.ExecQueryCmd(t, clientCtx, nftcli.GetCmdQueryCollection(), args, response)
-	return response
+	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryCollection(), args)
 }
 
-func QueryDenomsExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	extraArgs ...string) *nfttypes.QueryDenomsResponse {
+func QueryDenomsExec(clientCtx client.Context, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	response := &nfttypes.QueryDenomsResponse{}
-	network.ExecQueryCmd(t, clientCtx, nftcli.GetCmdQueryDenoms(), args, response)
-	return response
+	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryDenoms(), args)
 }
 
-func QuerySupplyExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	denom string,
-	extraArgs ...string) *nfttypes.QuerySupplyResponse {
+func QuerySupplyExec(clientCtx client.Context, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denom,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	response := &nfttypes.QuerySupplyResponse{}
-	network.ExecQueryCmd(t, clientCtx, nftcli.GetCmdQuerySupply(), args, response)
-	return response
+	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQuerySupply(), args)
 }
 
-func QueryOwnerExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	address string,
-	extraArgs ...string) *nfttypes.QueryNFTsOfOwnerResponse {
+func QueryOwnerExec(clientCtx client.Context, address string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		address,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	response := &nfttypes.QueryNFTsOfOwnerResponse{}
-	network.ExecQueryCmd(t, clientCtx, nftcli.GetCmdQueryOwner(), args, response)
-	return response
+	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryOwner(), args)
 }
 
-func QueryNFTExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	denomID string,
-	tokenID string,
-	extraArgs ...string) *nfttypes.BaseNFT {
+func QueryNFTExec(clientCtx client.Context, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
 		tokenID,
@@ -214,7 +126,16 @@ func QueryNFTExec(t *testing.T,
 	}
 	args = append(args, extraArgs...)
 
-	response := &nfttypes.BaseNFT{}
-	network.ExecQueryCmd(t, clientCtx, nftcli.GetCmdQueryNFT(), args, response)
-	return response
+	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryNFT(), args)
+}
+
+func TransferDenomExec(clientCtx client.Context, from string, recipient string, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := []string{
+		recipient,
+		denomID,
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}
+
+	args = append(args, extraArgs...)
+	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdTransferDenom(), args)
 }

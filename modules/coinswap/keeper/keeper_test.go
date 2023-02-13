@@ -20,14 +20,14 @@ import (
 )
 
 const (
-	denomBTC = "btc"
-	denomETH = "eth"
+	denomStandard = sdk.DefaultBondDenom
+	denomBTC      = "btc"
+	denomETH      = "eth"
 )
 
 var (
-	denomStandard = sdk.DefaultBondDenom
-	addrSender1   sdk.AccAddress
-	addrSender2   sdk.AccAddress
+	addrSender1 sdk.AccAddress
+	addrSender2 sdk.AccAddress
 )
 
 // test that the params can be properly set and retrieved

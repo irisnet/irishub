@@ -2,61 +2,43 @@ package testutil
 
 import (
 	"fmt"
-	"testing"
 
 	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/testutil"
+	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 
 	randomcli "github.com/irisnet/irismod/modules/random/client/cli"
-	randomtypes "github.com/irisnet/irismod/modules/random/types"
-	"github.com/irisnet/irismod/simapp"
 )
 
 // MsgRedelegateExec creates a redelegate message.
-func RequestRandomExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	from string,
-	extraArgs ...string,
-) *simapp.ResponseTx {
+func RequestRandomExec(clientCtx client.Context, from string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return network.ExecTxCmdWithResult(t, clientCtx, randomcli.GetCmdRequestRandom(), args)
+	return clitestutil.ExecTestCLICmd(clientCtx, randomcli.GetCmdRequestRandom(), args)
 }
 
-func QueryRandomExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	requestID string,
-	extraArgs ...string) *randomtypes.Random {
+func QueryRandomExec(clientCtx client.Context, requestID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		requestID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	response := &randomtypes.Random{}
-	network.ExecQueryCmd(t, clientCtx, randomcli.GetCmdQueryRandom(), args, response)
-	return response
+	return clitestutil.ExecTestCLICmd(clientCtx, randomcli.GetCmdQueryRandom(), args)
 }
 
-func QueryRandomRequestQueueExec(t *testing.T,
-	network simapp.Network,
-	clientCtx client.Context,
-	genHeight string,
-	extraArgs ...string) *randomtypes.QueryRandomRequestQueueResponse {
+func QueryRandomRequestQueueExec(clientCtx client.Context, genHeight string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		genHeight,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	response := &randomtypes.QueryRandomRequestQueueResponse{}
-	network.ExecQueryCmd(t, clientCtx, randomcli.GetCmdQueryRandomRequestQueue(), args, response)
-	return response
+	return clitestutil.ExecTestCLICmd(clientCtx, randomcli.GetCmdQueryRandomRequestQueue(), args)
 }

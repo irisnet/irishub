@@ -2,7 +2,6 @@ package simapp
 
 import (
 	"bytes"
-	"context"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -11,8 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"cosmossdk.io/simapp"
-	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
@@ -22,25 +19,22 @@ import (
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
-	codectype "github.com/cosmos/cosmos-sdk/codec/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
-	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	"github.com/cosmos/cosmos-sdk/simapp/helpers"
+	"github.com/cosmos/cosmos-sdk/testutil"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	"github.com/cosmos/cosmos-sdk/testutil/mock"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
-	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/errors"
 	authcli "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 	bankcli "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -48,23 +42,31 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
-// SetupOptions defines arguments that are passed into `Simapp` constructor.
-type SetupOptions struct {
-	Logger  log.Logger
-	DB      *dbm.MemDB
-	AppOpts servertypes.AppOptions
+// DefaultConsensusParams defines the default Tendermint consensus params used in
+// SimApp testing.
+var DefaultConsensusParams = &abci.ConsensusParams{
+	Block: &abci.BlockParams{
+		MaxBytes: 200000,
+		MaxGas:   2000000,
+	},
+	Evidence: &tmproto.EvidenceParams{
+		MaxAgeNumBlocks: 302400,
+		MaxAgeDuration:  504 * time.Hour, // 3 weeks is the max duration
+		MaxBytes:        10000,
+	},
+	Validator: &tmproto.ValidatorParams{
+		PubKeyTypes: []string{
+			tmtypes.ABCIPubKeyTypeEd25519,
+		},
+	},
 }
 
 func setup(withGenesis bool, invCheckPeriod uint) (*SimApp, GenesisState) {
 	db := dbm.NewMemDB()
-
-	appOptions := make(simtestutil.AppOptionsMap, 0)
-	appOptions[flags.FlagHome] = DefaultNodeHome
-	appOptions[server.FlagInvCheckPeriod] = invCheckPeriod
-
-	app := NewSimApp(log.NewNopLogger(), db, nil, true, appOptions)
+	encCdc := MakeTestEncodingConfig()
+	app := NewSimApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, invCheckPeriod, encCdc, EmptyAppOptions{})
 	if withGenesis {
-		return app, app.DefaultGenesis()
+		return app, NewDefaultGenesisState(encCdc.Codec)
 	}
 	return app, GenesisState{}
 }
@@ -127,7 +129,7 @@ func SetupWithGenesisStateFn(t *testing.T, merge func(cdc codec.Codec, state Gen
 	app.InitChain(
 		abci.RequestInitChain{
 			Validators:      []abci.ValidatorUpdate{},
-			ConsensusParams: simtestutil.DefaultConsensusParams,
+			ConsensusParams: DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
 		},
 	)
@@ -143,7 +145,7 @@ func SetupWithGenesisStateFn(t *testing.T, merge func(cdc codec.Codec, state Gen
 }
 
 func NewConfig() network.Config {
-	cfg := network.DefaultConfig(simapp.NewTestNetworkFixture)
+	cfg := network.DefaultConfig()
 	encCfg := MakeTestEncodingConfig() // redundant
 	cfg.Codec = encCfg.Codec
 	cfg.TxConfig = encCfg.TxConfig
@@ -154,10 +156,11 @@ func NewConfig() network.Config {
 	return cfg
 }
 
-func SimAppConstructor(val network.ValidatorI) servertypes.Application {
+func SimAppConstructor(val network.Validator) servertypes.Application {
 	return NewSimApp(
-		val.GetCtx().Logger, dbm.NewMemDB(), nil, true, EmptyAppOptions{},
-		bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
+		val.Ctx.Logger, dbm.NewMemDB(), nil, true, make(map[int64]bool),
+		val.Ctx.Config.RootDir, 0, MakeTestEncodingConfig(), EmptyAppOptions{},
+		bam.SetMinGasPrices(val.AppConfig.MinGasPrices),
 	)
 }
 
@@ -219,7 +222,7 @@ func genesisStateWithValSet(t *testing.T,
 	})
 
 	// update total supply
-	bankGenesis := banktypes.NewGenesisState(banktypes.DefaultGenesisState().Params, balances, totalSupply, []banktypes.Metadata{}, []banktypes.SendEnabled{})
+	bankGenesis := banktypes.NewGenesisState(banktypes.DefaultGenesisState().Params, balances, totalSupply, []banktypes.Metadata{})
 	genesisState[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
 
 	return genesisState
@@ -242,7 +245,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 	app.InitChain(
 		abci.RequestInitChain{
 			Validators:      []abci.ValidatorUpdate{},
-			ConsensusParams: simtestutil.DefaultConsensusParams,
+			ConsensusParams: DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
 		},
 	)
@@ -444,12 +447,12 @@ func SignCheckDeliver(
 	chainID string, accNums, accSeqs []uint64, expSimPass, expPass bool, priv ...cryptotypes.PrivKey,
 ) (sdk.GasInfo, *sdk.Result, error) {
 
-	tx, err := simtestutil.GenSignedMockTx(
+	tx, err := helpers.GenSignedMockTx(
 		rand.New(rand.NewSource(time.Now().UnixNano())),
 		txCfg,
 		msgs,
 		sdk.Coins{sdk.NewInt64Coin(sdk.DefaultBondDenom, 0)},
-		simtestutil.DefaultGenTxGas,
+		helpers.DefaultGenTxGas,
 		chainID,
 		accNums,
 		accSeqs,
@@ -495,12 +498,12 @@ func GenSequenceOfTxs(txGen client.TxConfig, msgs []sdk.Msg, accNums []uint64, i
 	txs := make([]sdk.Tx, numToGenerate)
 	var err error
 	for i := 0; i < numToGenerate; i++ {
-		txs[i], err = simtestutil.GenSignedMockTx(
+		txs[i], err = helpers.GenSignedMockTx(
 			rand.New(rand.NewSource(time.Now().UnixNano())),
 			txGen,
 			msgs,
 			sdk.Coins{sdk.NewInt64Coin(sdk.DefaultBondDenom, 0)},
-			simtestutil.DefaultGenTxGas,
+			helpers.DefaultGenTxGas,
 			"",
 			accNums,
 			initSeqNums,
@@ -586,19 +589,17 @@ func FundModuleAccount(bankKeeper bankkeeper.Keeper, ctx sdk.Context, recipientM
 	return bankKeeper.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, recipientMod, amounts)
 }
 
-func QueryBalancesExec(t *testing.T, network Network, clientCtx client.Context, address string, extraArgs ...string) sdk.Coins {
+func QueryBalancesExec(clientCtx client.Context, address string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		address,
 		fmt.Sprintf("--%s=json", "output"),
 	}
 	args = append(args, extraArgs...)
 
-	result := &banktypes.QueryAllBalancesResponse{}
-	network.ExecQueryCmd(t, clientCtx, bankcli.GetBalancesCmd(), args, result)
-	return result.Balances
+	return clitestutil.ExecTestCLICmd(clientCtx, bankcli.GetBalancesCmd(), args)
 }
 
-func QueryBalanceExec(t *testing.T, network Network, clientCtx client.Context, address string, denom string, extraArgs ...string) *sdk.Coin {
+func QueryBalanceExec(clientCtx client.Context, address string, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		address,
 		fmt.Sprintf("--%s=%s", bankcli.FlagDenom, denom),
@@ -606,47 +607,15 @@ func QueryBalanceExec(t *testing.T, network Network, clientCtx client.Context, a
 	}
 	args = append(args, extraArgs...)
 
-	result := &sdk.Coin{}
-	network.ExecQueryCmd(t, clientCtx, bankcli.GetBalancesCmd(), args, result)
-	return result
+	return clitestutil.ExecTestCLICmd(clientCtx, bankcli.GetBalancesCmd(), args)
 }
 
-func QueryAccountExec(t *testing.T, network Network, clientCtx client.Context, address string, extraArgs ...string) authtypes.AccountI {
+func QueryAccountExec(clientCtx client.Context, address string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		address,
 		fmt.Sprintf("--%s=json", "output"),
 	}
 	args = append(args, extraArgs...)
-	out, err := clitestutil.ExecTestCLICmd(clientCtx, authcli.GetAccountCmd(), args)
-	require.NoError(t, err, "QueryAccountExec  failed")
 
-	respType := proto.Message(&codectype.Any{})
-	require.NoError(t, clientCtx.Codec.UnmarshalJSON(out.Bytes(), respType))
-
-	var account authtypes.AccountI
-	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*codectype.Any), &account)
-	require.NoError(t, err, "UnpackAccount failed")
-
-	return account
-}
-
-func MsgSendExec(t *testing.T, network Network, clientCtx client.Context, from, to, amount fmt.Stringer, extraArgs ...string) *ResponseTx {
-	args := []string{from.String(), to.String(), amount.String()}
-	args = append(args, extraArgs...)
-
-	return network.ExecTxCmdWithResult(t, clientCtx, cli.NewSendTxCmd(), args)
-}
-
-func QueryTx(t *testing.T, clientCtx client.Context, txHash string) abci.ResponseDeliverTx {
-	txResult, _ := QueryTxWithHeight(t, clientCtx, txHash)
-	return txResult
-}
-
-func QueryTxWithHeight(t *testing.T, clientCtx client.Context, txHash string) (abci.ResponseDeliverTx, int64) {
-	txHashBz, err := hex.DecodeString(txHash)
-	require.NoError(t, err, "query tx failed")
-
-	txResult, err := clientCtx.Client.Tx(context.Background(), txHashBz, false)
-	require.NoError(t, err, "query tx failed")
-	return txResult.TxResult, txResult.Height
+	return clitestutil.ExecTestCLICmd(clientCtx, authcli.GetAccountCmd(), args)
 }

@@ -3,10 +3,10 @@ package simulation
 import (
 	"math/rand"
 
-	simappparams "cosmossdk.io/simapp/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
-	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
+	"github.com/cosmos/cosmos-sdk/simapp/helpers"
+	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
@@ -133,12 +133,12 @@ func SimulateMsgIssueDenom(k keeper.Keeper, ak mt.AccountKeeper, bk mt.BankKeepe
 		}
 
 		txCfg := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := simtestutil.GenSignedMockTx(
+		tx, err := helpers.GenSignedMockTx(
 			r,
 			txCfg,
 			[]sdk.Msg{msg},
 			fees,
-			simtestutil.DefaultGenTxGas,
+			helpers.DefaultGenTxGas,
 			chainID,
 			[]uint64{senderAcc.GetAccountNumber()},
 			[]uint64{senderAcc.GetSequence()},
@@ -208,12 +208,12 @@ func SimulateMsgMintMT(k keeper.Keeper, ak mt.AccountKeeper, bk mt.BankKeeper) s
 		}
 
 		txCfg := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := simtestutil.GenSignedMockTx(
+		tx, err := helpers.GenSignedMockTx(
 			r,
 			txCfg,
 			[]sdk.Msg{msg},
 			fees,
-			simtestutil.DefaultGenTxGas,
+			helpers.DefaultGenTxGas,
 			chainID,
 			[]uint64{senderAcc.GetAccountNumber()},
 			[]uint64{senderAcc.GetSequence()},
@@ -276,12 +276,12 @@ func SimulateMsgEditMT(k keeper.Keeper, ak mt.AccountKeeper, bk mt.BankKeeper) s
 		}
 
 		txCfg := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := simtestutil.GenSignedMockTx(
+		tx, err := helpers.GenSignedMockTx(
 			r,
 			txCfg,
 			[]sdk.Msg{msg},
 			fees,
-			simtestutil.DefaultGenTxGas,
+			helpers.DefaultGenTxGas,
 			chainID,
 			[]uint64{senderAcc.GetAccountNumber()},
 			[]uint64{senderAcc.GetSequence()},
@@ -350,12 +350,12 @@ func SimulateMsgTransferMT(k keeper.Keeper, ak mt.AccountKeeper, bk mt.BankKeepe
 		}
 
 		txCfg := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := simtestutil.GenSignedMockTx(
+		tx, err := helpers.GenSignedMockTx(
 			r,
 			txCfg,
 			[]sdk.Msg{msg},
 			fees,
-			simtestutil.DefaultGenTxGas,
+			helpers.DefaultGenTxGas,
 			chainID,
 			[]uint64{senderAcc.GetAccountNumber()},
 			[]uint64{senderAcc.GetSequence()},
@@ -418,12 +418,12 @@ func SimulateMsgBurnMT(k keeper.Keeper, ak mt.AccountKeeper, bk mt.BankKeeper) s
 		}
 
 		txCfg := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := simtestutil.GenSignedMockTx(
+		tx, err := helpers.GenSignedMockTx(
 			r,
 			txCfg,
 			[]sdk.Msg{msg},
 			fees,
-			simtestutil.DefaultGenTxGas,
+			helpers.DefaultGenTxGas,
 			chainID,
 			[]uint64{senderAcc.GetAccountNumber()},
 			[]uint64{senderAcc.GetSequence()},
@@ -484,12 +484,12 @@ func SimulateMsgTransferDenom(k keeper.Keeper, ak mt.AccountKeeper, bk mt.BankKe
 		}
 
 		txCfg := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := simtestutil.GenSignedMockTx(
+		tx, err := helpers.GenSignedMockTx(
 			r,
 			txCfg,
 			[]sdk.Msg{msg},
 			fees,
-			simtestutil.DefaultGenTxGas,
+			helpers.DefaultGenTxGas,
 			chainID,
 			[]uint64{senderAcc.GetAccountNumber()},
 			[]uint64{senderAcc.GetSequence()},

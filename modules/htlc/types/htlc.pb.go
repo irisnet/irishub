@@ -7,9 +7,9 @@ import (
 	fmt "fmt"
 	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	types "github.com/cosmos/cosmos-sdk/types"
-	_ "github.com/cosmos/gogoproto/gogoproto"
-	proto "github.com/cosmos/gogoproto/proto"
-	github_com_cosmos_gogoproto_types "github.com/cosmos/gogoproto/types"
+	_ "github.com/gogo/protobuf/gogoproto"
+	proto "github.com/gogo/protobuf/proto"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	_ "google.golang.org/protobuf/types/known/durationpb"
 	io "io"
 	math "math"
@@ -718,7 +718,7 @@ func (m *AssetSupply) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	n1, err1 := github_com_cosmos_gogoproto_types.StdDurationMarshalTo(m.TimeElapsed, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdDuration(m.TimeElapsed):])
+	n1, err1 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.TimeElapsed, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.TimeElapsed):])
 	if err1 != nil {
 		return 0, err1
 	}
@@ -933,7 +933,7 @@ func (m *SupplyLimit) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x22
-	n7, err7 := github_com_cosmos_gogoproto_types.StdDurationMarshalTo(m.TimePeriod, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdDuration(m.TimePeriod):])
+	n7, err7 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.TimePeriod, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.TimePeriod):])
 	if err7 != nil {
 		return 0, err7
 	}
@@ -1050,7 +1050,7 @@ func (m *AssetSupply) Size() (n int) {
 	n += 1 + l + sovHtlc(uint64(l))
 	l = m.TimeLimitedCurrentSupply.Size()
 	n += 1 + l + sovHtlc(uint64(l))
-	l = github_com_cosmos_gogoproto_types.SizeOfStdDuration(m.TimeElapsed)
+	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.TimeElapsed)
 	n += 1 + l + sovHtlc(uint64(l))
 	return n
 }
@@ -1115,7 +1115,7 @@ func (m *SupplyLimit) Size() (n int) {
 	if m.TimeLimited {
 		n += 2
 	}
-	l = github_com_cosmos_gogoproto_types.SizeOfStdDuration(m.TimePeriod)
+	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.TimePeriod)
 	n += 1 + l + sovHtlc(uint64(l))
 	l = m.TimeBasedLimit.Size()
 	n += 1 + l + sovHtlc(uint64(l))
@@ -1741,7 +1741,7 @@ func (m *AssetSupply) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_cosmos_gogoproto_types.StdDurationUnmarshal(&m.TimeElapsed, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.TimeElapsed, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2269,7 +2269,7 @@ func (m *SupplyLimit) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_cosmos_gogoproto_types.StdDurationUnmarshal(&m.TimePeriod, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.TimePeriod, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

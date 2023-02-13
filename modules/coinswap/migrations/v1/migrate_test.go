@@ -18,18 +18,18 @@ import (
 )
 
 const (
-	denomBTC    = "btc"
-	denomETH    = "eth"
-	denomLptBTC = "swapbtc"
-	denomLptETH = "swapeth"
+	denomStandard = sdk.DefaultBondDenom
+	denomBTC      = "btc"
+	denomETH      = "eth"
+	denomLptBTC   = "swapbtc"
+	denomLptETH   = "swapeth"
 )
 
 var (
-	addrSender1   = sdk.AccAddress(tmhash.SumTruncated([]byte("addrSender1")))
-	addrSender2   = sdk.AccAddress(tmhash.SumTruncated([]byte("addrSender2")))
-	poolAddrBTC   = v1.GetReservePoolAddr(denomLptBTC)
-	poolAddrETH   = v1.GetReservePoolAddr(denomLptETH)
-	denomStandard = sdk.DefaultBondDenom
+	addrSender1 = sdk.AccAddress(tmhash.SumTruncated([]byte("addrSender1")))
+	addrSender2 = sdk.AccAddress(tmhash.SumTruncated([]byte("addrSender2")))
+	poolAddrBTC = v1.GetReservePoolAddr(denomLptBTC)
+	poolAddrETH = v1.GetReservePoolAddr(denomLptETH)
 )
 
 type (

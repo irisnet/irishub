@@ -7,15 +7,16 @@ import (
 	bytes "bytes"
 	context "context"
 	fmt "fmt"
-	_ "github.com/cosmos/gogoproto/gogoproto"
-	grpc1 "github.com/cosmos/gogoproto/grpc"
-	proto "github.com/cosmos/gogoproto/proto"
-	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+
+	_ "github.com/gogo/protobuf/gogoproto"
+	grpc1 "github.com/gogo/protobuf/grpc"
+	proto "github.com/gogo/protobuf/proto"
+	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -69,7 +70,7 @@ func (m *MsgIssueDenom) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgIssueDenom proto.InternalMessageInfo
 
-// MsgIssueDenomResponse defines the Msg/IssueDenom response type.
+// MsgIssueDenomResponse defines the Msg/SaveDenom response type.
 type MsgIssueDenomResponse struct {
 }
 
@@ -791,7 +792,7 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 
 func (c *msgClient) IssueDenom(ctx context.Context, in *MsgIssueDenom, opts ...grpc.CallOption) (*MsgIssueDenomResponse, error) {
 	out := new(MsgIssueDenomResponse)
-	err := c.cc.Invoke(ctx, "/irismod.mt.Msg/IssueDenom", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/irismod.mt.Msg/SaveDenom", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -865,7 +866,7 @@ type UnimplementedMsgServer struct {
 }
 
 func (*UnimplementedMsgServer) IssueDenom(ctx context.Context, req *MsgIssueDenom) (*MsgIssueDenomResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IssueDenom not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method SaveDenom not implemented")
 }
 func (*UnimplementedMsgServer) TransferDenom(ctx context.Context, req *MsgTransferDenom) (*MsgTransferDenomResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TransferDenom not implemented")
@@ -897,7 +898,7 @@ func _Msg_IssueDenom_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/irismod.mt.Msg/IssueDenom",
+		FullMethod: "/irismod.mt.Msg/SaveDenom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).IssueDenom(ctx, req.(*MsgIssueDenom))
@@ -1000,7 +1001,7 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "IssueDenom",
+			MethodName: "SaveDenom",
 			Handler:    _Msg_IssueDenom_Handler,
 		},
 		{

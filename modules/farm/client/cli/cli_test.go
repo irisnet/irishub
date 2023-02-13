@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
+	"github.com/tidwall/gjson"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	farmcli "github.com/irisnet/irismod/modules/farm/client/cli"
@@ -18,13 +21,23 @@ import (
 type IntegrationTestSuite struct {
 	suite.Suite
 
-	network simapp.Network
+	cfg     network.Config
+	network *network.Network
 }
 
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	s.network = simapp.SetupNetwork(s.T())
+	cfg := simapp.NewConfig()
+	cfg.NumValidators = 1
+
+	var err error
+	s.cfg = cfg
+	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
+	s.Require().NoError(err)
+
+	_, err = s.network.WaitForHeight(1)
+	s.Require().NoError(err)
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -45,36 +58,43 @@ func (s *IntegrationTestSuite) TestFarm() {
 	creator := val.Address
 	description := "iris-atom farm pool"
 	startHeight := s.LatestHeight() + 1
-	rewardPerBlock := sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10)))
-	totalReward := sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(1000)))
+	rewardPerBlock := sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10)))
+	lpTokenDenom := s.cfg.BondDenom
+	totalReward := sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(1000)))
 	editable := true
 
 	globalFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
 	}
 
 	args := []string{
 		fmt.Sprintf("--%s=%s", farmcli.FlagDescription, description),
 		fmt.Sprintf("--%s=%d", farmcli.FlagStartHeight, startHeight),
 		fmt.Sprintf("--%s=%s", farmcli.FlagRewardPerBlock, rewardPerBlock),
-		fmt.Sprintf("--%s=%s", farmcli.FlagLPTokenDenom, s.network.BondDenom),
+		fmt.Sprintf("--%s=%s", farmcli.FlagLPTokenDenom, lpTokenDenom),
 		fmt.Sprintf("--%s=%s", farmcli.FlagTotalReward, totalReward),
 		fmt.Sprintf("--%s=%v", farmcli.FlagEditable, editable),
 	}
 
 	args = append(args, globalFlags...)
-	txResult := testutil.CreateFarmPoolExec(
-		s.T(),
-		s.network,
+	respType := proto.Message(&sdk.TxResponse{})
+	expectedCode := uint32(0)
+
+	bz, err := testutil.CreateFarmPoolExec(
 		clientCtx,
 		creator.String(),
 		args...,
 	)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp := respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
-	poolId := s.network.GetAttribute(farmtypes.EventTypeCreatePool, farmtypes.AttributeValuePoolId, txResult.Events)
-	expectedContents := &farmtypes.FarmPoolEntry{
+	poolId := gjson.Get(txResp.RawLog, "0.events.3.attributes.1.value").String()
+	respType = proto.Message(&farmtypes.QueryFarmPoolResponse{})
+	expectedContents := farmtypes.FarmPoolEntry{
 		Id:              poolId,
 		Creator:         creator.String(),
 		Description:     description,
@@ -82,90 +102,103 @@ func (s *IntegrationTestSuite) TestFarm() {
 		EndHeight:       startHeight + 100,
 		Editable:        editable,
 		Expired:         false,
-		TotalLptLocked:  sdk.NewCoin(s.network.BondDenom, sdk.ZeroInt()),
+		TotalLptLocked:  sdk.NewCoin(lpTokenDenom, sdk.ZeroInt()),
 		TotalReward:     totalReward,
 		RemainingReward: totalReward,
 		RewardPerBlock:  rewardPerBlock,
 	}
 
-	respType := testutil.QueryFarmPoolExec(s.T(), s.network, val.ClientCtx, poolId)
-	s.Require().EqualValues(expectedContents, respType.Pool)
+	bz, err = testutil.QueryFarmPoolExec(val.ClientCtx, poolId)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	result := respType.(*farmtypes.QueryFarmPoolResponse)
+	s.Require().EqualValues(expectedContents, *result.Pool)
 
-	reward := sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(1000)))
+	respType = proto.Message(&sdk.TxResponse{})
+	reward := sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(1000)))
+
 	args = []string{
 		fmt.Sprintf("--%s=%v", farmcli.FlagAdditionalReward, reward.String()),
 	}
 	args = append(args, globalFlags...)
-	txResult = testutil.AppendRewardExec(
-		s.T(),
-		s.network,
+	bz, err = testutil.AppendRewardExec(
 		clientCtx,
 		creator.String(),
 		poolId,
 		args...,
 	)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp = respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
-	lpToken := sdk.NewCoin(s.network.BondDenom, sdk.NewInt(100))
-	txResult = testutil.StakeExec(
-		s.T(),
-		s.network,
+	_, err = s.network.WaitForHeight(startHeight)
+	s.Require().NoError(err)
+
+	lpToken := sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(100))
+	bz, err = testutil.StakeExec(
 		clientCtx,
 		creator.String(),
 		poolId,
 		lpToken.String(),
 		globalFlags...,
 	)
-	beginHeight := txResult.Height
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().Equal(expectedCode, txResp.Code)
 
-	unstakeLPToken := sdk.NewCoin(s.network.BondDenom, sdk.NewInt(50))
-	txResult = testutil.UnstakeExec(
-		s.T(),
-		s.network,
+	unstakeLPToken := sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(50))
+	bz, err = testutil.UnstakeExec(
 		clientCtx,
 		creator.String(),
 		poolId,
 		unstakeLPToken.String(),
 		globalFlags...,
 	)
-	endHeight := txResult.Height
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().Equal(expectedCode, txResp.Code)
+	rewardGot := gjson.Get(txResp.RawLog, "0.events.4.attributes.3.value").String()
+	s.Require().Equal(rewardPerBlock.String(), rewardGot)
 
-	rewardGot := s.network.GetAttribute(farmtypes.EventTypeUnstake, farmtypes.AttributeValueReward, txResult.Events)
-	expectedReward := rewardPerBlock.MulInt(sdk.NewInt(endHeight - beginHeight))
-	s.Require().Equal(expectedReward.String(), rewardGot)
-
-	txResult = testutil.HarvestExec(
-		s.T(),
-		s.network,
+	bz, err = testutil.HarvestExec(
 		clientCtx,
 		creator.String(),
 		poolId,
 		globalFlags...,
 	)
-	endHeight1 := txResult.Height
-
-	rewardGot = s.network.GetAttribute(farmtypes.EventTypeHarvest, farmtypes.AttributeValueReward, txResult.Events)
-	expectedReward = rewardPerBlock.MulInt(sdk.NewInt(endHeight1 - endHeight))
-	s.Require().Equal(expectedReward.String(), rewardGot)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().Equal(expectedCode, txResp.Code)
+	rewardGot = gjson.Get(txResp.RawLog, "0.events.2.attributes.2.value").String()
+	s.Require().Equal(rewardPerBlock.String(), rewardGot)
 
 	queryFarmerArgs := []string{
 		fmt.Sprintf("--%s=%s", farmcli.FlagFarmPool, poolId),
 	}
+	expectFarmer := farmtypes.LockedInfo{
+		PoolId:        poolId,
+		Locked:        lpToken.Sub(unstakeLPToken),
+		PendingReward: sdk.Coins{},
+	}
 
-	leftlpToken := lpToken.Sub(unstakeLPToken)
-	response := testutil.QueryFarmerExec(
-		s.T(),
-		s.network,
-		val.ClientCtx, creator.String(), queryFarmerArgs...)
-	s.Require().EqualValues(leftlpToken, response.List[0].Locked)
+	queryFarmerRespType := proto.Message(&farmtypes.QueryFarmerResponse{})
+	bz, err = testutil.QueryFarmerExec(val.ClientCtx, creator.String(), queryFarmerArgs...)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), queryFarmerRespType))
+	result1 := queryFarmerRespType.(*farmtypes.QueryFarmerResponse)
+	s.Require().EqualValues(expectFarmer, *result1.List[0])
 
-	txResult = testutil.DestroyExec(
-		s.T(),
-		s.network,
+	bz, err = testutil.DestroyExec(
 		clientCtx,
 		creator.String(),
 		poolId,
 		globalFlags...,
 	)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	s.Require().Equal(expectedCode, txResp.Code)
+
 }
 
 func (s *IntegrationTestSuite) LatestHeight() int64 {

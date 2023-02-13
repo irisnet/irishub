@@ -8,7 +8,8 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
+	"github.com/cosmos/cosmos-sdk/testutil/rest"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	oraclecli "github.com/irisnet/irismod/modules/oracle/client/cli"
@@ -23,13 +24,24 @@ import (
 type IntegrationTestSuite struct {
 	suite.Suite
 
-	network simapp.Network
+	cfg     network.Config
+	network *network.Network
 }
 
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	s.network = simapp.SetupNetwork(s.T())
+	cfg := simapp.NewConfig()
+	cfg.NumValidators = 1
+
+	s.cfg = cfg
+
+	var err error
+	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
+	s.Require().NoError(err)
+
+	_, err = s.network.WaitForHeight(1)
+	s.Require().NoError(err)
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -44,7 +56,6 @@ func TestIntegrationTestSuite(t *testing.T) {
 func (s *IntegrationTestSuite) TestOracle() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	expectedCode := uint32(0)
 
 	// ---------------------------------------------------------------------------
 	serviceName := "test-service"
@@ -85,12 +96,17 @@ func (s *IntegrationTestSuite) TestOracle() {
 		fmt.Sprintf("--%s=%s", servicecli.FlagSchemas, serviceSchemas),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
 	}
+	respType := proto.Message(&sdk.TxResponse{})
+	expectedCode := uint32(0)
+	bz, err := servicetestutil.DefineServiceExec(clientCtx, author.String(), args...)
 
-	txResult := servicetestutil.DefineServiceExec(s.T(), s.network, clientCtx, author.String(), args...)
-	s.Require().Equal(expectedCode, txResult.Code)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp := respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
 	//------test GetCmdBindService()-------------
 	args = []string{
@@ -102,12 +118,16 @@ func (s *IntegrationTestSuite) TestOracle() {
 		fmt.Sprintf("--%s=%s", servicecli.FlagProvider, provider),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
 	}
-
-	txResult = servicetestutil.BindServiceExec(s.T(), s.network, clientCtx, provider.String(), args...)
-	s.Require().Equal(expectedCode, txResult.Code)
+	respType = proto.Message(&sdk.TxResponse{})
+	expectedCode = uint32(0)
+	bz, err = servicetestutil.BindServiceExec(clientCtx, provider.String(), args...)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp = respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
 	//------test GetCmdCreateFeed()-------------
 	args = []string{
@@ -126,18 +146,24 @@ func (s *IntegrationTestSuite) TestOracle() {
 		fmt.Sprintf("--%s=%s", oraclecli.FlagCreator, creator),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
 	}
 
-	txResult = oracletestutil.CreateFeedExec(s.T(), s.network, clientCtx, creator.String(), args...)
-	s.Require().Equal(expectedCode, txResult.Code)
+	respType = proto.Message(&sdk.TxResponse{})
+	expectedCode = uint32(0)
+
+	bz, err = oracletestutil.CreateFeedExec(clientCtx, creator.String(), args...)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp = respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
 	// ------test GetCmdQueryFeed()-------------
 	url := fmt.Sprintf("%s/irismod/oracle/feeds/%s", baseURL, feedName)
-	resp, err := testutil.GetRequest(url)
+	resp, err := rest.GetRequest(url)
 	s.Require().NoError(err)
-	respType := proto.Message(&oracletypes.QueryFeedResponse{})
+	respType = proto.Message(&oracletypes.QueryFeedResponse{})
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
 	feedResp := respType.(*oracletypes.QueryFeedResponse)
 	s.Require().NoError(err)
@@ -146,7 +172,7 @@ func (s *IntegrationTestSuite) TestOracle() {
 
 	// ------test GetCmdQueryFeeds()-------------
 	url = fmt.Sprintf("%s/irismod/oracle/feeds", baseURL)
-	resp, err = testutil.GetRequest(url)
+	resp, err = rest.GetRequest(url)
 	s.Require().NoError(err)
 	respType = proto.Message(&oracletypes.QueryFeedsResponse{})
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
@@ -157,7 +183,7 @@ func (s *IntegrationTestSuite) TestOracle() {
 
 	// ------test GetCmdQueryFeedValue()-------------
 	url = fmt.Sprintf("%s/irismod/oracle/feeds/%s/values", baseURL, feedName)
-	resp, err = testutil.GetRequest(url)
+	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&oracletypes.QueryFeedValueResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))

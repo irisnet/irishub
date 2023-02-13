@@ -12,7 +12,8 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
+	"github.com/cosmos/cosmos-sdk/testutil/rest"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	randomcli "github.com/irisnet/irismod/modules/random/client/cli"
@@ -27,13 +28,24 @@ import (
 type IntegrationTestSuite struct {
 	suite.Suite
 
-	network simapp.Network
+	cfg     network.Config
+	network *network.Network
 }
 
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	s.network = simapp.SetupNetwork(s.T())
+	cfg := simapp.NewConfig()
+	cfg.NumValidators = 1
+
+	s.cfg = cfg
+
+	var err error
+	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
+	s.Require().NoError(err)
+
+	_, err = s.network.WaitForHeight(1)
+	s.Require().NoError(err)
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -48,11 +60,10 @@ func TestIntegrationTestSuite(t *testing.T) {
 func (s *IntegrationTestSuite) TestRandom() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	expectedCode := uint32(0)
 
 	// ---------------------------------------------------------------------------
-	serviceDeposit := fmt.Sprintf("50000%s", s.network.BondDenom)
-	servicePrices := fmt.Sprintf(`{"price": "50%s"}`, s.network.BondDenom)
+	serviceDeposit := fmt.Sprintf("50000%s", s.cfg.BondDenom)
+	servicePrices := fmt.Sprintf(`{"price": "50%s"}`, s.cfg.BondDenom)
 	qos := int64(3)
 	options := "{}"
 	provider := val.Address
@@ -61,7 +72,7 @@ func (s *IntegrationTestSuite) TestRandom() {
 	from := val.Address
 	blockInterval := 4
 	oracle := true
-	serviceFeeCap := fmt.Sprintf("50%s", s.network.BondDenom)
+	serviceFeeCap := fmt.Sprintf("50%s", s.cfg.BondDenom)
 
 	respResult := `{"code":200,"message":""}`
 	seedStr := "ABCDEF12ABCDEF12ABCDEF12ABCDEF12ABCDEF12ABCDEF12ABCDEF12ABCDEF12"
@@ -77,12 +88,16 @@ func (s *IntegrationTestSuite) TestRandom() {
 		fmt.Sprintf("--%s=%s", servicecli.FlagProvider, provider),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
 	}
-
-	txResult := servicetestutil.BindServiceExec(s.T(), s.network, clientCtx, provider.String(), args...)
-	s.Require().Equal(expectedCode, txResult.Code)
+	respType := proto.Message(&sdk.TxResponse{})
+	expectedCode := uint32(0)
+	bz, err := servicetestutil.BindServiceExec(clientCtx, provider.String(), args...)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp := respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
 	// ------test GetCmdRequestRandom()-------------
 	args = []string{
@@ -91,20 +106,25 @@ func (s *IntegrationTestSuite) TestRandom() {
 		fmt.Sprintf("--%s=%d", randomcli.FlagBlockInterval, blockInterval),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
 	}
 
-	txResult = randomtestutil.RequestRandomExec(s.T(), s.network, clientCtx, from.String(), args...)
-	s.Require().Equal(expectedCode, txResult.Code)
+	respType = proto.Message(&sdk.TxResponse{})
+	expectedCode = uint32(0)
 
-	requestID := gjson.Get(txResult.Log, "0.events.1.attributes.0.value").String()
-	requestHeight := gjson.Get(txResult.Log, "0.events.1.attributes.2.value").Int()
+	bz, err = randomtestutil.RequestRandomExec(clientCtx, from.String(), args...)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp = respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
+	requestID := gjson.Get(txResp.RawLog, "0.events.1.attributes.0.value").String()
+	requestHeight := gjson.Get(txResp.RawLog, "0.events.1.attributes.2.value").Int()
 
 	// ------test GetCmdQueryRandomRequestQueue()-------------
 	url := fmt.Sprintf("%s/irismod/random/queue", baseURL)
-	resp, err := testutil.GetRequest(url)
-	respType := proto.Message(&randomtypes.QueryRandomRequestQueueResponse{})
+	resp, err := rest.GetRequest(url)
+	respType = proto.Message(&randomtypes.QueryRandomRequestQueueResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
 	qrrResp := respType.(*randomtypes.QueryRandomRequestQueueResponse)
@@ -113,12 +133,10 @@ func (s *IntegrationTestSuite) TestRandom() {
 
 	// ------get service request-------------
 	requestHeight = requestHeight + 1
-	_, err = s.network.WaitForHeightWithTimeout(requestHeight, time.Duration(int64(blockInterval+2)*int64(s.network.TimeoutCommit)))
-	if err != nil {
-		s.network.WaitForNBlock(2)
-	}
+	_, err = s.network.WaitForHeightWithTimeout(requestHeight, time.Duration(int64(blockInterval+2)*int64(s.cfg.TimeoutCommit)))
+	s.Require().NoError(err)
 
-	blockResult, err := val.RPCClient.BlockResults(context.Background(), &requestHeight)
+	blockResult, err := clientCtx.Client.BlockResults(context.Background(), &requestHeight)
 	s.Require().NoError(err)
 	var requestId string
 	for _, event := range blockResult.EndBlockEvents {
@@ -128,7 +146,7 @@ func (s *IntegrationTestSuite) TestRandom() {
 			var requestsBz []byte
 			for _, attribute := range event.Attributes {
 				if string(attribute.Key) == servicetypes.AttributeKeyRequests {
-					requestsBz = []byte(attribute.Value)
+					requestsBz = attribute.GetValue()
 					found = true
 				}
 			}
@@ -141,7 +159,7 @@ func (s *IntegrationTestSuite) TestRandom() {
 			requestId = requestIds[0]
 		}
 	}
-	s.Require().NotEmpty(requestId)
+	s.Require().NotNil(requestId)
 
 	// ------respond service request-------------
 	args = []string{
@@ -150,16 +168,21 @@ func (s *IntegrationTestSuite) TestRandom() {
 		fmt.Sprintf("--%s=%s", servicecli.FlagData, respOutput),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
 	}
+	respType = proto.Message(&sdk.TxResponse{})
+	expectedCode = uint32(0)
+	bz, err = servicetestutil.RespondServiceExec(clientCtx, provider.String(), args...)
 
-	txResult = servicetestutil.RespondServiceExec(s.T(), s.network, clientCtx, provider.String(), args...)
-	s.Require().Equal(expectedCode, txResult.Code)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp = respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
 	// ------test GetCmdQueryRandom()-------------
 	url = fmt.Sprintf("%s/irismod/random/randoms/%s", baseURL, requestID)
-	resp, err = testutil.GetRequest(url)
+	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&randomtypes.QueryRandomResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))

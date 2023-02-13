@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
+	"github.com/tidwall/gjson"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	recordcli "github.com/irisnet/irismod/modules/record/client/cli"
@@ -18,13 +21,22 @@ import (
 type IntegrationTestSuite struct {
 	suite.Suite
 
-	network simapp.Network
+	cfg     network.Config
+	network *network.Network
 }
 
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	s.network = simapp.SetupNetwork(s.T())
+	cfg := simapp.NewConfig()
+	cfg.NumValidators = 1
+
+	var err error
+	s.cfg = cfg
+	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
+
+	_, err = s.network.WaitForHeight(1)
+	s.Require().NoError(err)
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -53,22 +65,24 @@ func (s *IntegrationTestSuite) TestRecord() {
 		fmt.Sprintf("--%s=%s", recordcli.FlagMeta, meta),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
 	}
 
+	respType := proto.Message(&sdk.TxResponse{})
 	expectedCode := uint32(0)
 
-	txResult := recordtestutil.CreateRecordExec(s.T(),
-		s.network,
-		clientCtx, from.String(), digest, digestAlgo, args...)
-	s.Require().Equal(expectedCode, txResult.Code)
+	bz, err := recordtestutil.MsgCreateRecordExec(clientCtx, from.String(), digest, digestAlgo, args...)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp := respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
 
-	recordID := s.network.GetAttribute(recordtypes.EventTypeCreateRecord, recordtypes.AttributeKeyRecordID, txResult.Events)
+	recordID := gjson.Get(txResp.RawLog, "0.events.0.attributes.1.value").String()
 
 	// ---------------------------------------------------------------------------
 
-	record := &recordtypes.Record{}
+	respType = proto.Message(&recordtypes.Record{})
 	expectedContents := []recordtypes.Content{{
 		Digest:     digest,
 		DigestAlgo: digestAlgo,
@@ -76,6 +90,9 @@ func (s *IntegrationTestSuite) TestRecord() {
 		Meta:       meta,
 	}}
 
-	recordtestutil.QueryRecordExec(s.T(), s.network, clientCtx, recordID, record)
+	bz, err = recordtestutil.QueryRecordExec(val.ClientCtx, recordID)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
+	record := respType.(*recordtypes.Record)
 	s.Require().Equal(expectedContents, record.Contents)
 }
