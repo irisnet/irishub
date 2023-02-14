@@ -26,6 +26,9 @@ const (
 	flagVestingAmt   = "vesting-amount"
 )
 
+const evmEIrisMinUnit = "wiris"
+const evmEIrisDenom = "eiris"
+
 // AddGenesisAccountCmd returns add-genesis-account cobra Command.
 func AddGenesisAccountCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{

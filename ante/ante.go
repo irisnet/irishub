@@ -1,51 +1,55 @@
-package app
+package ante
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	errortypes "github.com/cosmos/cosmos-sdk/types/errors"
+	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 
-	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
-
-	oraclekeeper "github.com/irisnet/irismod/modules/oracle/keeper"
-	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
+	ethante "github.com/evmos/ethermint/app/ante"
 )
 
-// HandlerOptions extend the SDK's AnteHandler options by requiring the IBC
-// channel keeper.
-type HandlerOptions struct {
-	ante.HandlerOptions
-	BankKeeper           bankkeeper.Keeper
-	TokenKeeper          tokenkeeper.Keeper
-	OracleKeeper         oraclekeeper.Keeper
-	GuardianKeeper       guardiankeeper.Keeper
-	BypassMinFeeMsgTypes []string
-}
+// NewAnteHandler returns an ante handler responsible for attempting to route an
+// Ethereum or SDK transaction to an internal ante handler for performing
+// transaction-level processing (e.g. fee payment, signature verification) before
+// being passed onto it's respective handler.
+func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
+	return func(
+		ctx sdk.Context, tx sdk.Tx, sim bool,
+	) (newCtx sdk.Context, err error) {
+		var anteHandler sdk.AnteHandler
 
-// NewAnteHandler returns an AnteHandler that checks and increments sequence
-// numbers, checks signatures & account numbers, and deducts fees from the first
-// signer.
-func NewAnteHandler(opts HandlerOptions) (sdk.AnteHandler, error) {
-	var sigGasConsumer = opts.SigGasConsumer
-	if sigGasConsumer == nil {
-		sigGasConsumer = ante.DefaultSigVerificationGasConsumer
+		defer ethante.Recover(ctx.Logger(), &err)
+
+		txWithExtensions, ok := tx.(authante.HasExtensionOptionsTx)
+		if ok {
+			opts := txWithExtensions.GetExtensionOptions()
+			if len(opts) > 0 {
+				switch typeURL := opts[0].GetTypeUrl(); typeURL {
+				case "/ethermint.evm.v1.ExtensionOptionsEthereumTx":
+					// handle as *evmtypes.MsgEthereumTx
+					anteHandler = newEthAnteHandler(options)
+				case "/ethermint.types.v1.ExtensionOptionsWeb3Tx":
+					// handle as normal Cosmos SDK tx, except signature is checked for EIP712 representation
+					anteHandler = newCosmosAnteHandlerEip712(options)
+				default:
+					return ctx, errorsmod.Wrapf(
+						errortypes.ErrUnknownExtensionOptions,
+						"rejecting tx with unsupported extension option: %s", typeURL,
+					)
+				}
+				return anteHandler(ctx, tx, sim)
+			}
+		}
+
+		// handle as totally normal Cosmos SDK tx
+		switch tx.(type) {
+		case sdk.Tx:
+			anteHandler = newCosmosAnteHandler(options)
+		default:
+			return ctx, errorsmod.Wrapf(errortypes.ErrUnknownRequest, "invalid transaction type: %T", tx)
+		}
+
+		return anteHandler(ctx, tx, sim)
 	}
-	return sdk.ChainAnteDecorators(
-		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
-		ante.NewExtensionOptionsDecorator(opts.ExtensionOptionChecker),
-		ante.NewValidateBasicDecorator(),
-		ante.NewTxTimeoutHeightDecorator(),
-		ante.NewValidateMemoDecorator(opts.AccountKeeper),
-		ante.NewConsumeGasForTxSizeDecorator(opts.AccountKeeper),
-		ante.NewDeductFeeDecorator(opts.AccountKeeper, opts.BankKeeper, opts.FeegrantKeeper, opts.TxFeeChecker),
-		ante.NewSetPubKeyDecorator(opts.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
-		ante.NewValidateSigCountDecorator(opts.AccountKeeper),
-		ante.NewSigGasConsumeDecorator(opts.AccountKeeper, sigGasConsumer),
-		ante.NewSigVerificationDecorator(opts.AccountKeeper, opts.SignModeHandler),
-		NewValidateTokenDecorator(opts.TokenKeeper),
-		tokenkeeper.NewValidateTokenFeeDecorator(opts.TokenKeeper, opts.BankKeeper),
-		oraclekeeper.NewValidateOracleAuthDecorator(opts.OracleKeeper, opts.GuardianKeeper),
-		NewValidateServiceDecorator(),
-		ante.NewIncrementSequenceDecorator(opts.AccountKeeper),
-	), nil
 }
