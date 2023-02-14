@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	cosmossdk.io/math v1.0.0-beta.4
-	github.com/bianjieai/tibc-go v0.4.2
+	github.com/bianjieai/tibc-go v0.4.3-rc1
 	github.com/cosmos/cosmos-sdk v0.46.9
 	github.com/cosmos/ibc-go/v5 v5.2.0
 	github.com/evmos/ethermint v0.20.0
@@ -12,7 +12,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/irisnet/irismod v1.7.2
+	github.com/irisnet/irismod v1.7.3-rc1
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
@@ -59,7 +59,7 @@ require (
 	github.com/aws/aws-sdk-go v1.40.45 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
-	github.com/bgentry/speakeasy v0.1.0 // indirect
+	github.com/bgentry/speakeasy v0.1.1-0.20220910012023-760eaf8b6816 // indirect
 	github.com/btcsuite/btcd v0.22.1 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
