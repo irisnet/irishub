@@ -7,9 +7,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"net"
 	"os"
 	"path/filepath"
+
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
 	"github.com/spf13/cobra"
 
@@ -36,6 +40,9 @@ import (
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
+	servercfg "github.com/evmos/ethermint/server/config"
+
+	"github.com/irisnet/irishub/app"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 )
 
@@ -47,6 +54,10 @@ var (
 	flagNodeCLIHome       = "node-cli-home"
 	flagStartingIPAddress = "starting-ip-address"
 )
+
+const nativeIrisMinUnit = "uiris"
+
+var PowerReduction = sdk.NewIntFromUint64(1000000000000000000)
 
 // get cmd to initialize all files for tendermint testnet and application
 func testnetCmd(mbm module.BasicManager, genBalIterator banktypes.GenesisBalancesIterator) *cobra.Command {
@@ -99,7 +110,7 @@ Example:
 
 const nodeDirPerm = 0755
 
-// Initialize the testnet
+// InitTestnet the testnet
 func InitTestnet(
 	clientCtx client.Context,
 	cmd *cobra.Command,
@@ -124,7 +135,7 @@ func InitTestnet(
 	nodeIDs := make([]string, numValidators)
 	valPubKeys := make([]cryptotypes.PubKey, numValidators)
 
-	simappConfig := srvconfig.DefaultConfig()
+	simappConfig := servercfg.DefaultConfig()
 	simappConfig.MinGasPrices = minGasPrices
 	simappConfig.API.Enable = true
 	simappConfig.Telemetry.Enabled = true
@@ -207,9 +218,14 @@ func InitTestnet(
 
 		accTokens := sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)
 		accStakingTokens := sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction)
+		accEvmTokens := sdk.TokensFromConsensusPower(5000, PowerReduction)
+		accIrisTokens := sdk.TokensFromConsensusPower(5000, sdk.DefaultPowerReduction)
+
 		coins := sdk.Coins{
 			sdk.NewCoin(fmt.Sprintf("%stoken", nodeDirName), accTokens),
 			sdk.NewCoin(sdk.DefaultBondDenom, accStakingTokens),
+			sdk.NewCoin(evmEIrisMinUnit, accEvmTokens),
+			sdk.NewCoin(nativeIrisMinUnit, accIrisTokens),
 		}
 
 		genBalances = append(genBalances, banktypes.Balance{Address: addr.String(), Coins: coins.Sort()})
@@ -254,6 +270,9 @@ func InitTestnet(
 		if err := writeFile(fmt.Sprintf("%v.json", nodeDirName), gentxsDir, txBz); err != nil {
 			return err
 		}
+
+		customAppTemplate, _ := servercfg.AppConfig(app.MinUnit)
+		srvconfig.SetConfigTemplate(customAppTemplate)
 
 		srvconfig.WriteConfigFile(filepath.Join(nodeDir, "config/app.toml"), simappConfig)
 	}
@@ -312,6 +331,31 @@ func initGenFiles(
 
 	bankGenState.Balances = genBalances
 	appGenState[banktypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&bankGenState)
+
+	// set the point token in the genesis state
+	var tokenGenState tokentypes.GenesisState
+	clientCtx.Codec.MustUnmarshalJSON(appGenState[tokentypes.ModuleName], &tokenGenState)
+	eirisToken := tokentypes.Token{
+		Symbol:        evmEIrisDenom,
+		Name:          "EVM Fee Token",
+		Scale:         18,
+		MinUnit:       evmEIrisMinUnit,
+		InitialSupply: 1000000000,
+		MaxSupply:     math.MaxUint64,
+		Mintable:      true,
+		Owner:         genAccounts[0].GetAddress().String(),
+	}
+
+	tokenGenState.Tokens = append(tokenGenState.Tokens, eirisToken)
+
+	// set the evm fee token denom genesis state
+	var evmGenState evmtypes.GenesisState
+	clientCtx.Codec.MustUnmarshalJSON(appGenState[evmtypes.ModuleName], &evmGenState)
+
+	appGenState[tokentypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&tokenGenState)
+
+	evmGenState.Params.EvmDenom = evmEIrisMinUnit
+	appGenState[evmtypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&evmGenState)
 
 	appGenStateJSON, err := json.MarshalIndent(appGenState, "", "  ")
 	if err != nil {

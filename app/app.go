@@ -1,11 +1,11 @@
 package app
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
+	"github.com/spf13/cast"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -99,6 +99,9 @@ import (
 	"github.com/irisnet/irismod/modules/coinswap"
 	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
+	"github.com/irisnet/irismod/modules/farm"
+	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
+	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 	"github.com/irisnet/irismod/modules/htlc"
 	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
@@ -124,21 +127,6 @@ import (
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
-	"github.com/irisnet/irishub/address"
-	irishubante "github.com/irisnet/irishub/ante"
-	irisappparams "github.com/irisnet/irishub/app/params"
-	"github.com/irisnet/irishub/lite"
-	"github.com/irisnet/irishub/modules/guardian"
-	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
-	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
-	"github.com/irisnet/irishub/modules/mint"
-	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
-	minttypes "github.com/irisnet/irishub/modules/mint/types"
-
-	"github.com/irisnet/irismod/modules/farm"
-	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
-	farmtypes "github.com/irisnet/irismod/modules/farm/types"
-
 	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
 	tibcmttransferkeeper "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/keeper"
 	tibcmttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/types"
@@ -152,6 +140,27 @@ import (
 	tibcrouting "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing"
 	tibcroutingtypes "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing/types"
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
+
+	srvflags "github.com/evmos/ethermint/server/flags"
+	ethermint "github.com/evmos/ethermint/types"
+	"github.com/evmos/ethermint/x/evm"
+	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
+	"github.com/evmos/ethermint/x/evm/vm/geth"
+	"github.com/evmos/ethermint/x/feemarket"
+	feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
+	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
+
+	"github.com/irisnet/irishub/address"
+	irishubante "github.com/irisnet/irishub/ante"
+	irisappparams "github.com/irisnet/irishub/app/params"
+	"github.com/irisnet/irishub/lite"
+	"github.com/irisnet/irishub/modules/guardian"
+	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
+	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
+	"github.com/irisnet/irishub/modules/mint"
+	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
+	minttypes "github.com/irisnet/irishub/modules/mint/types"
 )
 
 const appName = "IrisApp"
@@ -215,6 +224,9 @@ var (
 		tibcnfttransfer.AppModuleBasic{},
 		tibcmttransfer.AppModuleBasic{},
 		mt.AppModuleBasic{},
+
+		evm.AppModuleBasic{},
+		feemarket.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -239,6 +251,7 @@ var (
 		tibcmttypes.ModuleName:         nil,
 		nfttypes.ModuleName:            nil,
 		icatypes.ModuleName:            nil,
+		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
 	}
 
 	nativeToken tokentypes.Token
@@ -310,6 +323,10 @@ type IrisApp struct {
 	TIBCNFTTransferKeeper tibcnfttransferkeeper.Keeper
 	TIBCMTTransferKeeper  tibcmttransferkeeper.Keeper
 
+	// Ethermint keepers
+	EvmKeeper       *evmkeeper.Keeper
+	FeeMarketKeeper feemarketkeeper.Keeper
+
 	// the module manager
 	mm *module.Manager
 
@@ -328,7 +345,7 @@ func init() {
 		Symbol:        "iris",
 		Name:          "Irishub staking token",
 		Scale:         6,
-		MinUnit:       "uiris",
+		MinUnit:       MinUnit,
 		InitialSupply: 2000000000,
 		MaxSupply:     10000000000,
 		Mintable:      true,
@@ -396,8 +413,10 @@ func NewIrisApp(
 		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
 		farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey, tibcmttypes.StoreKey, mttypes.StoreKey,
 		authzkeeper.StoreKey, icahosttypes.StoreKey,
+		// ethermint keys
+		evmtypes.StoreKey, feemarkettypes.StoreKey,
 	)
-	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
+	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
 	// configure state listening capabilities using AppOptions
@@ -433,9 +452,9 @@ func NewIrisApp(
 		appCodec,
 		keys[authtypes.StoreKey],
 		app.GetSubspace(authtypes.ModuleName),
-		authtypes.ProtoBaseAccount,
+		ethermint.ProtoAccount,
 		maccPerms,
-		sdk.Bech32MainPrefix,
+		address.Bech32PrefixAccAddr,
 	)
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(
@@ -714,6 +733,19 @@ func NewIrisApp(
 	govHooks := govtypes.NewMultiGovHooks(farmkeeper.NewGovHook(app.FarmKeeper))
 	app.GovKeeper.SetHooks(govHooks)
 
+	tracer := cast.ToString(appOpts.Get(srvflags.EVMTracer))
+
+	// Create Ethermint keepers
+	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(
+		appCodec, app.GetSubspace(feemarkettypes.ModuleName), keys[feemarkettypes.StoreKey], tkeys[feemarkettypes.TransientKey],
+	)
+
+	app.EvmKeeper = evmkeeper.NewKeeper(
+		appCodec, keys[evmtypes.StoreKey], tkeys[evmtypes.TransientKey], app.GetSubspace(evmtypes.ModuleName),
+		app.AccountKeeper, app.BankKeeper, &stakingKeeper, app.FeeMarketKeeper,
+		nil, geth.NewEVM, tracer,
+	)
+
 	/****  Module Options ****/
 	var skipGenesisInvariants = false
 	opt := appOpts.Get(crisis.FlagSkipGenesisInvariants)
@@ -759,6 +791,10 @@ func NewIrisApp(
 		oracle.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper),
 		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
 		farm.NewAppModule(appCodec, app.FarmKeeper, app.AccountKeeper, app.BankKeeper),
+
+		// Ethermint app modules
+		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
+		feemarket.NewAppModule(app.FeeMarketKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -803,6 +839,9 @@ func NewIrisApp(
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+
+		feemarkettypes.ModuleName,
+		evmtypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		//sdk module
@@ -842,6 +881,9 @@ func NewIrisApp(
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+
+		evmtypes.ModuleName,
+		feemarkettypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -861,6 +903,12 @@ func NewIrisApp(
 		govtypes.ModuleName,
 		minttypes.ModuleName,
 		crisistypes.ModuleName,
+
+		evmtypes.ModuleName,
+		// NOTE: feemarket module needs to be initialized before genutil module:
+		// gentx transactions use MinGasPriceDecorator.AnteHandle
+		feemarkettypes.ModuleName,
+
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		authz.ModuleName,
@@ -926,6 +974,9 @@ func NewIrisApp(
 		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
 		farm.NewAppModule(appCodec, app.FarmKeeper, app.AccountKeeper, app.BankKeeper),
 		tibc.NewAppModule(app.TIBCKeeper),
+
+		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
+		feemarket.NewAppModule(app.FeeMarketKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -935,7 +986,8 @@ func NewIrisApp(
 	app.MountTransientStores(tkeys)
 	app.MountMemoryStores(memKeys)
 
-	anteHandler, err := irishubante.NewAnteHandler(
+	maxGasWanted := cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted))
+	anteHandler := irishubante.NewAnteHandler(
 		irishubante.HandlerOptions{
 			HandlerOptions: ante.HandlerOptions{
 				AccountKeeper:   app.AccountKeeper,
@@ -944,16 +996,17 @@ func NewIrisApp(
 				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 			},
+			AccountKeeper:        app.AccountKeeper,
 			BankKeeper:           app.BankKeeper,
 			TokenKeeper:          app.TokenKeeper,
 			OracleKeeper:         app.OracleKeeper,
 			GuardianKeeper:       app.GuardianKeeper,
+			EvmKeeper:            app.EvmKeeper,
+			FeeMarketKeeper:      app.FeeMarketKeeper,
 			BypassMinFeeMsgTypes: []string{},
+			MaxTxGasWanted:       maxGasWanted,
 		},
 	)
-	if err != nil {
-		panic(fmt.Errorf("failed to create AnteHandler: %s", err))
-	}
 
 	app.SetAnteHandler(anteHandler)
 	app.SetInitChainer(app.InitChainer)
@@ -1174,6 +1227,10 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(farmtypes.ModuleName)
 	paramsKeeper.Subspace(tibchost.ModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
+
+	// ethermint subspaces
+	paramsKeeper.Subspace(evmtypes.ModuleName)
+	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 
 	return paramsKeeper
 }
