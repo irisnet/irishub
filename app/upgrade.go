@@ -228,12 +228,4 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 			return app.mm.RunMigrations(ctx, cfg, fromVM)
 		},
 	)
-
-	app.RegisterUpgradeHandler("v2.0",
-		&store.StoreUpgrades{},
-		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			app.Logger().Info("upgrade irishub mainnet to 2.0")
-			return app.mm.RunMigrations(ctx, cfg, fromVM)
-		},
-	)
 }
