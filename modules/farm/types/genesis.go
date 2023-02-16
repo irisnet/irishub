@@ -2,6 +2,8 @@ package types
 
 import (
 	"fmt"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
@@ -95,7 +97,7 @@ func ValidateGenesis(data GenesisState) error {
 			return fmt.Errorf("locked must be positive, but got %s", info.Locked.String())
 		}
 
-		if err := ValidateCoins("RewardDebt", info.RewardDebt...); err != nil {
+		if err := sdk.NewCoins(info.RewardDebt...).Validate(); err != nil {
 			return err
 		}
 	}
