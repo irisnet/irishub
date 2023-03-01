@@ -332,6 +332,8 @@ type IrisApp struct {
 
 	// simulation manager
 	sm *module.SimulationManager
+
+	bte *BlockTimerExecutor
 }
 
 func init() {
@@ -434,6 +436,7 @@ func NewIrisApp(
 		keys:              keys,
 		tkeys:             tkeys,
 		memKeys:           memKeys,
+		bte:               NewBlockTimerExecutor(),
 	}
 
 	app.ParamsKeeper = initParamsKeeper(appCodec, legacyAmino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
@@ -1016,6 +1019,13 @@ func NewIrisApp(
 	// Set software upgrade execution logic
 	app.RegisterUpgradePlan(cfg)
 
+	app.bte.add(6799800, func(ctx sdk.Context) error {
+		depositParams := app.GovKeeper.GetDepositParams(ctx)
+		depositParams.MinDeposit = sdk.NewCoins(sdk.NewCoin("uiris", sdk.NewInt(10000000)))
+		app.GovKeeper.SetDepositParams(ctx, depositParams)
+		return nil
+	})
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
@@ -1041,6 +1051,7 @@ func (app *IrisApp) Name() string { return app.BaseApp.Name() }
 
 // BeginBlocker application updates every begin block
 func (app *IrisApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+	app.bte.Start(ctx)
 	return app.mm.BeginBlock(ctx, req)
 }
 
