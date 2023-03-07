@@ -2,6 +2,7 @@ package app
 
 import (
 	"io"
+	"math/big"
 	"os"
 	"path/filepath"
 
@@ -155,12 +156,14 @@ import (
 	irishubante "github.com/irisnet/irishub/ante"
 	irisappparams "github.com/irisnet/irishub/app/params"
 	"github.com/irisnet/irishub/lite"
+	irisevm "github.com/irisnet/irishub/modules/evm"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	"github.com/irisnet/irishub/modules/mint"
 	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
+	iristypes "github.com/irisnet/irishub/types"
 )
 
 const appName = "IrisApp"
@@ -260,6 +263,8 @@ var (
 var (
 	_ simapp.App              = (*IrisApp)(nil)
 	_ servertypes.Application = (*IrisApp)(nil)
+
+	eip155ChainID = big.NewInt(6688)
 )
 
 // IrisApp extends an ABCI application, but with most of its parameters exported.
@@ -793,7 +798,7 @@ func NewIrisApp(
 		farm.NewAppModule(appCodec, app.FarmKeeper, app.AccountKeeper, app.BankKeeper),
 
 		// Ethermint app modules
-		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
+		irisevm.NewAppModule(app.EvmKeeper, app.AccountKeeper, big.NewInt(int64(iristypes.EIP155ChainID))),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
 	)
 
