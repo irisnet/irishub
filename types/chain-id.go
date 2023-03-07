@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	EIP155ChainID = 6688
+	EIP155ChainID = "6688"
 )
 
 func BuildEthChainID(chainID string, eip155ChainID *big.Int) string {
@@ -20,4 +20,12 @@ func BuildEthChainID(chainID string, eip155ChainID *big.Int) string {
 		panic("invalid chain-id: " + chainID)
 	}
 	return chains[0] + "_" + eip155ChainID.String() + "-" + chains[1]
+}
+
+func GetEIP155ChainID() *big.Int {
+	chainID, ok := new(big.Int).SetString(EIP155ChainID, 10)
+	if !ok {
+		panic("invalid chain-id: " + EIP155ChainID)
+	}
+	return chainID
 }

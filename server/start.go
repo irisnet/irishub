@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"math/big"
 	"net"
 	"net/http"
 	"os"
@@ -530,7 +529,7 @@ func startInProcess(ctx *server.Context, clientCtx client.Context, appCreator ty
 			return err
 		}
 
-		chainID := iristypes.BuildEthChainID(genDoc.ChainID, big.NewInt(int64(iristypes.EIP155ChainID)))
+		chainID := iristypes.BuildEthChainID(genDoc.ChainID, iristypes.GetEIP155ChainID())
 		clientCtx := clientCtx.WithChainID(chainID)
 
 		tmEndpoint := "/websocket"

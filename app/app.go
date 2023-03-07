@@ -2,7 +2,6 @@ package app
 
 import (
 	"io"
-	"math/big"
 	"os"
 	"path/filepath"
 
@@ -796,7 +795,7 @@ func NewIrisApp(
 		farm.NewAppModule(appCodec, app.FarmKeeper, app.AccountKeeper, app.BankKeeper),
 
 		// Ethermint app modules
-		irisevm.NewAppModule(app.EvmKeeper, app.AccountKeeper, big.NewInt(int64(iristypes.EIP155ChainID))),
+		irisevm.NewAppModule(app.EvmKeeper, app.AccountKeeper, iristypes.GetEIP155ChainID()),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
 	)
 
