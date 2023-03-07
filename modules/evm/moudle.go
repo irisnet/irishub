@@ -2,7 +2,6 @@ package evm
 
 import (
 	"encoding/json"
-	"math/big"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -26,26 +25,24 @@ var (
 // AppModule implements an application module for the evm module.
 type AppModule struct {
 	ethermint.AppModule
-	eip155ChainID *big.Int
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(k *keeper.Keeper, ak types.AccountKeeper, eip155ChainID *big.Int) AppModule {
+func NewAppModule(k *keeper.Keeper, ak types.AccountKeeper) AppModule {
 	return AppModule{
-		AppModule:     ethermint.NewAppModule(k, ak),
-		eip155ChainID: eip155ChainID,
+		AppModule: ethermint.NewAppModule(k, ak),
 	}
 }
 
 // BeginBlock returns the begin block for the evm module.
 func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
-	ethChainID := iristypes.BuildEthChainID(ctx.ChainID(), am.eip155ChainID)
+	ethChainID := iristypes.BuildEthChainID(ctx.ChainID())
 	am.AppModule.BeginBlock(ctx.WithChainID(ethChainID), req)
 }
 
 // InitGenesis performs genesis initialization for the evm module. It returns
 // no validator updates.
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.RawMessage) []abci.ValidatorUpdate {
-	ethChainID := iristypes.BuildEthChainID(ctx.ChainID(), am.eip155ChainID)
+	ethChainID := iristypes.BuildEthChainID(ctx.ChainID())
 	return am.AppModule.InitGenesis(ctx.WithChainID(ethChainID), cdc, data)
 }

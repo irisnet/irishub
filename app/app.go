@@ -162,7 +162,6 @@ import (
 	"github.com/irisnet/irishub/modules/mint"
 	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
-	iristypes "github.com/irisnet/irishub/types"
 )
 
 const appName = "IrisApp"
@@ -795,7 +794,7 @@ func NewIrisApp(
 		farm.NewAppModule(appCodec, app.FarmKeeper, app.AccountKeeper, app.BankKeeper),
 
 		// Ethermint app modules
-		irisevm.NewAppModule(app.EvmKeeper, app.AccountKeeper, iristypes.GetEIP155ChainID()),
+		irisevm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
 	)
 
