@@ -263,8 +263,6 @@ var (
 var (
 	_ simapp.App              = (*IrisApp)(nil)
 	_ servertypes.Application = (*IrisApp)(nil)
-
-	eip155ChainID = big.NewInt(6688)
 )
 
 // IrisApp extends an ABCI application, but with most of its parameters exported.
