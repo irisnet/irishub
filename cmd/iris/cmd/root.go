@@ -39,6 +39,7 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/params"
 	irisserver "github.com/irisnet/irishub/server"
+	iristypes "github.com/irisnet/irishub/types"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
@@ -53,7 +54,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
-		WithHomeDir(app.DefaultNodeHome).
+		WithHomeDir(iristypes.DefaultNodeHome).
 		WithKeyringOptions(etherminthd.EthSecp256k1Option()).
 		WithViper("")
 
@@ -106,7 +107,7 @@ func initTendermintConfig() *tmcfg.Config {
 // initAppConfig helps to override default appConfig template and configs.
 // return "", nil if no custom configuration is required for the application.
 func initAppConfig() (string, interface{}) {
-	customAppTemplate, customAppConfig := servercfg.AppConfig(app.MinUnit)
+	customAppTemplate, customAppConfig := servercfg.AppConfig(iristypes.NativeToken.MinUnit)
 	srvCfg, ok := customAppConfig.(servercfg.Config)
 	if !ok {
 		panic(fmt.Errorf("unknown app config type %T", customAppConfig))
@@ -120,11 +121,11 @@ func initAppConfig() (string, interface{}) {
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
+		genutilcli.InitCmd(app.ModuleBasics, iristypes.DefaultNodeHome),
+		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, iristypes.DefaultNodeHome),
+		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, iristypes.DefaultNodeHome),
 		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
-		AddGenesisAccountCmd(app.DefaultNodeHome),
+		AddGenesisAccountCmd(iristypes.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		testnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		ethermintdebug.Cmd(),
@@ -135,14 +136,14 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		encCfg: encodingConfig,
 	}
 
-	irisserver.AddCommands(rootCmd, app.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
+	irisserver.AddCommands(rootCmd, iristypes.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
 		queryCommand(),
 		txCommand(),
-		Commands(app.DefaultNodeHome),
+		Commands(iristypes.DefaultNodeHome),
 	)
 }
 

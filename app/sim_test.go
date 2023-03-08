@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/irisnet/irishub/types"
+	iristypes "github.com/irisnet/irishub/types"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	mttypes "github.com/irisnet/irismod/modules/mt/types"
@@ -81,7 +83,7 @@ func TestFullAppSimulation(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, fauxMerkleModeOpt)
+	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, types.DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", app.Name())
 
 	// run randomized simulation
@@ -119,7 +121,7 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, fauxMerkleModeOpt)
+	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, types.DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
@@ -159,10 +161,10 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := NewIrisApp(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, fauxMerkleModeOpt)
+	newApp := NewIrisApp(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, types.DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", newApp.Name())
 
-	var genesisState GenesisState
+	var genesisState iristypes.GenesisState
 	err = json.Unmarshal(exported.AppState, &genesisState)
 	require.NoError(t, err)
 
@@ -238,7 +240,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, fauxMerkleModeOpt)
+	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, types.DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
@@ -283,7 +285,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := NewIrisApp(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, fauxMerkleModeOpt)
+	newApp := NewIrisApp(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, types.DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", newApp.Name())
 
 	newApp.InitChain(abci.RequestInitChain{
@@ -334,7 +336,7 @@ func TestAppStateDeterminism(t *testing.T) {
 			}
 
 			db := dbm.NewMemDB()
-			app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, interBlockCacheOpt())
+			app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, types.DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, interBlockCacheOpt())
 
 			fmt.Printf(
 				"running non-determinism simulation; seed %d: %d/%d, attempt: %d/%d\n",

@@ -42,8 +42,8 @@ import (
 
 	servercfg "github.com/evmos/ethermint/server/config"
 
-	"github.com/irisnet/irishub/app"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
+	iristypes "github.com/irisnet/irishub/types"
 )
 
 var (
@@ -271,7 +271,7 @@ func InitTestnet(
 			return err
 		}
 
-		customAppTemplate, _ := servercfg.AppConfig(app.MinUnit)
+		customAppTemplate, _ := servercfg.AppConfig(iristypes.NativeToken.MinUnit)
 		srvconfig.SetConfigTemplate(customAppTemplate)
 
 		srvconfig.WriteConfigFile(filepath.Join(nodeDir, "config/app.toml"), simappConfig)
