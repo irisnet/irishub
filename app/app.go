@@ -155,6 +155,7 @@ import (
 	irishubante "github.com/irisnet/irishub/ante"
 	irisappparams "github.com/irisnet/irishub/app/params"
 	"github.com/irisnet/irishub/lite"
+	irisevm "github.com/irisnet/irishub/modules/evm"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
@@ -793,7 +794,7 @@ func NewIrisApp(
 		farm.NewAppModule(appCodec, app.FarmKeeper, app.AccountKeeper, app.BankKeeper),
 
 		// Ethermint app modules
-		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
+		irisevm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
 	)
 
