@@ -89,10 +89,10 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 		},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			// init farm params
-			amount := sdkmath.NewIntWithDecimal(1000, int(nativeToken.Scale))
+			amount := sdkmath.NewIntWithDecimal(1000, int(types.NativeToken.Scale))
 			farmtypes.SetDefaultGenesisState(farmtypes.GenesisState{
 				Params: farmtypes.Params{
-					PoolCreationFee:     sdk.NewCoin(nativeToken.MinUnit, amount),
+					PoolCreationFee:     sdk.NewCoin(types.NativeToken.MinUnit, amount),
 					MaxRewardCategories: 2,
 				}},
 			)

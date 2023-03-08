@@ -26,14 +26,12 @@ func InitGenesis(appCodec codec.Codec, genesisState types.GenesisState) {
 		evmGenState := etherminttypes.GenesisState{
 			Accounts: []etherminttypes.GenesisAccount{},
 			Params: etherminttypes.Params{
-				EvmDenom:     types.EvmToken.MinUnit,
-				EnableCreate: true,
-				EnableCall:   true,
-				ChainConfig: etherminttypes.ChainConfig{
-					DAOForkSupport: true,
-					EIP150Hash:     "0x0000000000000000000000000000000000000000000000000000000000000000",
-				},
-				AllowUnprotectedTxs: false,
+				EvmDenom:            types.EvmToken.MinUnit,
+				EnableCreate:        true,
+				EnableCall:          true,
+				ChainConfig:         etherminttypes.DefaultChainConfig(),
+				ExtraEIPs:           nil,
+				AllowUnprotectedTxs: etherminttypes.DefaultAllowUnprotectedTxs,
 			},
 		}
 		genesisState[etherminttypes.ModuleName] = appCodec.MustMarshalJSON(&evmGenState)
@@ -109,9 +107,8 @@ func InitGenesis(appCodec codec.Codec, genesisState types.GenesisState) {
 			}
 		}
 		if !oracleBindingExist {
-			serviceGenState.Bindings = append(serviceGenState.Bindings, servicetypes.GenOraclePriceSvcBinding(nativeToken.MinUnit))
+			serviceGenState.Bindings = append(serviceGenState.Bindings, servicetypes.GenOraclePriceSvcBinding(types.NativeToken.MinUnit))
 		}
 		genesisState[servicetypes.ModuleName] = appCodec.MustMarshalJSON(&serviceGenState)
 	}
-
 }

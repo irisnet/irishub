@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"math"
 	"net"
 	"os"
 	"path/filepath"
@@ -224,7 +223,7 @@ func InitTestnet(
 		coins := sdk.Coins{
 			sdk.NewCoin(fmt.Sprintf("%stoken", nodeDirName), accTokens),
 			sdk.NewCoin(sdk.DefaultBondDenom, accStakingTokens),
-			sdk.NewCoin(evmEIrisMinUnit, accEvmTokens),
+			sdk.NewCoin(iristypes.EvmToken.MinUnit, accEvmTokens),
 			sdk.NewCoin(nativeIrisMinUnit, accIrisTokens),
 		}
 
@@ -335,18 +334,8 @@ func initGenFiles(
 	// set the point token in the genesis state
 	var tokenGenState tokentypes.GenesisState
 	clientCtx.Codec.MustUnmarshalJSON(appGenState[tokentypes.ModuleName], &tokenGenState)
-	eirisToken := tokentypes.Token{
-		Symbol:        evmEIrisDenom,
-		Name:          "EVM Fee Token",
-		Scale:         18,
-		MinUnit:       evmEIrisMinUnit,
-		InitialSupply: 1000000000,
-		MaxSupply:     math.MaxUint64,
-		Mintable:      true,
-		Owner:         genAccounts[0].GetAddress().String(),
-	}
 
-	tokenGenState.Tokens = append(tokenGenState.Tokens, eirisToken)
+	tokenGenState.Tokens = append(tokenGenState.Tokens, iristypes.EvmToken)
 
 	// set the evm fee token denom genesis state
 	var evmGenState evmtypes.GenesisState
@@ -354,7 +343,7 @@ func initGenFiles(
 
 	appGenState[tokentypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&tokenGenState)
 
-	evmGenState.Params.EvmDenom = evmEIrisMinUnit
+	evmGenState.Params.EvmDenom = iristypes.EvmToken.MinUnit
 	appGenState[evmtypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&evmGenState)
 
 	appGenStateJSON, err := json.MarshalIndent(appGenState, "", "  ")

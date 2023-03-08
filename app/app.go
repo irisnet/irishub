@@ -242,8 +242,6 @@ var (
 		icatypes.ModuleName:            nil,
 		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
 	}
-
-	nativeToken tokentypes.Token
 )
 
 var (
