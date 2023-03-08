@@ -21,6 +21,7 @@ func NewDefaultGenesisState() types.GenesisState {
 }
 
 func InitGenesis(appCodec codec.Codec, genesisState types.GenesisState) {
+	//TODO: need modify ConsensusParam.Block.MaxGas
 	// add evm genesis
 	if _, ok := genesisState[etherminttypes.ModuleName]; !ok {
 		evmGenState := etherminttypes.GenesisState{
@@ -62,6 +63,7 @@ func InitGenesis(appCodec codec.Codec, genesisState types.GenesisState) {
 		evmTokenExist := false
 		for _, token := range tokenGenState.Tokens {
 			if token.MinUnit == types.EvmToken.MinUnit {
+				evmTokenExist = true
 				break
 			}
 		}
