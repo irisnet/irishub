@@ -22,6 +22,7 @@ type Keeper struct {
 	paramSpace       paramstypes.Subspace
 	blockedAddrs     map[string]bool
 	feeCollectorName string
+	registry         types.SwapRegistry
 }
 
 func NewKeeper(
@@ -44,6 +45,7 @@ func NewKeeper(
 		bankKeeper:       bankKeeper,
 		feeCollectorName: feeCollectorName,
 		blockedAddrs:     blockedAddrs,
+		registry:         make(types.SwapRegistry),
 	}
 }
 
@@ -240,4 +242,75 @@ func (k Keeper) BurnToken(
 	k.AddBurnCoin(ctx, burnCoin)
 
 	return k.bankKeeper.BurnCoins(ctx, types.ModuleName, burnCoins)
+}
+
+// SwapFeeToken swap the fee token
+func (k Keeper) SwapFeeToken(
+	ctx sdk.Context,
+	feePaid sdk.Coin,
+	sender sdk.AccAddress,
+	recipient sdk.AccAddress,
+) (sdk.Coin, error) {
+	burnedCoin, mintedCoin, err := k.calcFeeTokenMinted(ctx, feePaid)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+	burnedCoins := sdk.NewCoins(burnedCoin)
+	// burn coins
+	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, burnedCoins); err != nil {
+		return sdk.Coin{}, err
+	}
+	//k.AddBurnCoin(ctx, burnedCoin)
+	if err := k.bankKeeper.BurnCoins(ctx, types.ModuleName, burnedCoins); err != nil {
+		return sdk.Coin{}, err
+	}
+
+	// mint coins
+	mintedCoins := sdk.NewCoins(mintedCoin)
+	if err := k.bankKeeper.MintCoins(ctx, types.ModuleName, mintedCoins); err != nil {
+		return sdk.Coin{}, err
+	}
+
+	if recipient == nil {
+		recipient = sender
+	}
+	return mintedCoin, k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, recipient, mintedCoins)
+}
+
+func (k Keeper) WithSwapRegistry(registry types.SwapRegistry) Keeper {
+	k.registry = registry
+	return k
+}
+
+func (k Keeper) calcFeeTokenMinted(ctx sdk.Context, feePaid sdk.Coin) (burned sdk.Coin, minted sdk.Coin, err error) {
+	tokenBurned, err := k.GetToken(ctx, feePaid.Denom)
+	if err != nil {
+		return burned, minted, err
+	}
+
+	swapParams, ok := k.registry[tokenBurned.GetMinUnit()]
+	if !ok {
+		return burned, minted, types.ErrInvalidSwap
+	}
+
+	tokenMinted, err := k.GetToken(ctx, swapParams.MinUnit)
+	if err != nil {
+		return burned, minted, err
+	}
+
+	coinBurned, err := tokenBurned.ToMinCoin(sdk.NewDecCoinFromCoin(feePaid))
+	if err != nil {
+		return burned, minted, err
+	}
+
+	var multiple sdk.Dec
+
+	if tokenMinted.GetScale() >= tokenBurned.GetScale() {
+		multiple = sdk.NewDecFromInt(sdkmath.NewIntWithDecimal(1, int(tokenMinted.GetScale()-tokenBurned.GetScale())))
+	} else {
+		multiple = sdk.NewDecWithPrec(1, int64(tokenBurned.GetScale()-tokenMinted.GetScale()))
+	}
+
+	amountMinted := multiple.MulInt(coinBurned.Amount).Mul(swapParams.Ratio).TruncateInt()
+	return coinBurned, sdk.NewCoin(swapParams.MinUnit, amountMinted), nil
 }

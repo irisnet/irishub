@@ -205,3 +205,47 @@ func (m msgServer) TransferTokenOwner(goCtx context.Context, msg *types.MsgTrans
 
 	return &types.MsgTransferTokenOwnerResponse{}, nil
 }
+
+func (m msgServer) SwapFeeToken(goCtx context.Context, msg *types.MsgSwapFeeToken) (*types.MsgSwapFeeTokenResponse, error) {
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	var recipient sdk.AccAddress
+	if len(msg.Recipient) > 0 {
+		recipient, err = sdk.AccAddressFromBech32(msg.Recipient)
+		if err != nil {
+			return nil, err
+		}
+
+		if m.Keeper.blockedAddrs[msg.Recipient] {
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", recipient)
+		}
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	feeGot, err := m.Keeper.SwapFeeToken(ctx, msg.FeePaid, sender, recipient)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeSwapFeeToken,
+			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
+			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
+			sdk.NewAttribute(types.AttributeKeyFeePaid, msg.FeePaid.String()),
+			sdk.NewAttribute(types.AttributeKeyFeeGot, feeGot.String()),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+		),
+	})
+
+	return &types.MsgSwapFeeTokenResponse{
+		FeeGot: feeGot,
+	}, nil
+}

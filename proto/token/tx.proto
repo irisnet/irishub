@@ -2,6 +2,7 @@ syntax = "proto3";
 package irismod.token;
 
 import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/token/types";
 option (gogoproto.goproto_getters_all) = false;
@@ -23,6 +24,9 @@ service Msg {
   // TransferTokenOwner defines a method for minting some tokens
   rpc TransferTokenOwner(MsgTransferTokenOwner)
       returns (MsgTransferTokenOwnerResponse);
+
+  // SwapFeeToken defines a method for swap some fee token
+  rpc SwapFeeToken(MsgSwapFeeToken) returns (MsgSwapFeeTokenResponse);
 }
 
 // MsgIssueToken defines an SDK message for issuing a new token
@@ -84,3 +88,15 @@ message MsgBurnToken {
 
 // MsgBurnTokenResponse defines the Msg/BurnToken response type
 message MsgBurnTokenResponse {}
+
+// MsgSwapFeeToken defines an SDK message for swap fee token
+message MsgSwapFeeToken {
+  cosmos.base.v1beta1.Coin fee_paid = 1 [ (gogoproto.nullable) = false ];
+  string recipient = 2;
+  string sender = 3;
+}
+
+// MsgSwapFeeTokenResponse defines the Msg/SwapFeeToken response type
+message MsgSwapFeeTokenResponse {
+  cosmos.base.v1beta1.Coin fee_got = 1 [ (gogoproto.nullable) = false ];
+}

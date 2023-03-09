@@ -17,6 +17,12 @@ var (
 	tenInt               = big.NewInt(10)
 )
 
+type SwapRegistry map[string]SwapParams
+type SwapParams struct {
+	MinUnit string
+	Ratio   sdk.Dec
+}
+
 // TokenI defines an interface for Token
 type TokenI interface {
 	GetSymbol() string

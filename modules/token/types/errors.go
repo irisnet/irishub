@@ -1,4 +1,4 @@
-//nolint
+// nolint
 package types
 
 import (
@@ -22,4 +22,5 @@ var (
 	ErrNotFoundTokenAmt     = sdkerrors.Register(ModuleName, 14, "burned token amount not found")
 	ErrInvalidAmount        = sdkerrors.Register(ModuleName, 15, "invalid amount")
 	ErrInvalidBaseFee       = sdkerrors.Register(ModuleName, 16, "invalid base fee")
+	ErrInvalidSwap          = sdkerrors.Register(ModuleName, 17, "unregistered swapable fee token")
 )

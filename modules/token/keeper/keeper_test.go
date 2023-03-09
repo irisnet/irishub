@@ -25,6 +25,7 @@ const (
 var (
 	denom    = types.GetNativeToken().Symbol
 	owner    = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest")))
+	add2     = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest1")))
 	initAmt  = sdkmath.NewIntWithDecimal(100000000, int(6))
 	initCoin = sdk.Coins{sdk.NewCoin(denom, initAmt)}
 )
@@ -182,4 +183,52 @@ func (suite *KeeperTestSuite) TestTransferToken() {
 	suite.NoError(err)
 
 	suite.Equal(dstOwner, newToken.GetOwner())
+}
+
+func (suite *KeeperTestSuite) TestSwapFeeToken() {
+	token1 := types.NewToken("token1", "Test Token1", "t1min", 6, 1000, 2000, true, owner)
+	suite.issueToken(token1)
+
+	amt1 := suite.bk.GetBalance(suite.ctx, token1.GetOwner(), token1.MinUnit)
+	suite.Equal("1000000000t1min", amt1.String())
+
+	token2 := types.NewToken("token2", "Test Token1", "t2min", 18, 0, 2000, true, add2)
+	suite.issueToken(token2)
+
+	suite.keeper = suite.keeper.WithSwapRegistry(types.SwapRegistry{
+		token1.MinUnit: types.SwapParams{
+			MinUnit: token2.MinUnit,
+			Ratio:   sdk.NewDec(1),
+		},
+		token2.MinUnit: types.SwapParams{
+			MinUnit: token1.MinUnit,
+			Ratio:   sdk.NewDec(1),
+		},
+	})
+
+	amt2 := suite.bk.GetBalance(suite.ctx, add2, token2.MinUnit)
+	suite.Equal("0t2min", amt2.String())
+
+	feePaid := sdk.NewCoin(token1.Symbol, sdk.NewInt(100))
+
+	feeGot, err := suite.keeper.SwapFeeToken(suite.ctx, feePaid, token1.GetOwner(), token2.GetOwner())
+	suite.NoError(err)
+	suite.Equal("100000000000000000000t2min", feeGot.String())
+
+	amt := suite.bk.GetBalance(suite.ctx, token1.GetOwner(), token1.MinUnit)
+	suite.Equal("900000000t1min", amt.String())
+
+	amt = suite.bk.GetBalance(suite.ctx, token2.GetOwner(), token2.MinUnit)
+	suite.Equal("100000000000000000000t2min", amt.String())
+
+	//reverse test
+	feeGot, err = suite.keeper.SwapFeeToken(suite.ctx, feeGot, token2.GetOwner(), token1.GetOwner())
+	suite.NoError(err)
+	suite.Equal("100000000t1min", feeGot.String())
+
+	amt = suite.bk.GetBalance(suite.ctx, token1.GetOwner(), token1.MinUnit)
+	suite.Equal("1000000000t1min", amt.String())
+
+	amt = suite.bk.GetBalance(suite.ctx, token2.GetOwner(), token2.MinUnit)
+	suite.Equal("0t2min", amt.String())
 }

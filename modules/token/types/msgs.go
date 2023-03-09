@@ -25,6 +25,7 @@ var (
 	_ sdk.Msg = &MsgMintToken{}
 	_ sdk.Msg = &MsgBurnToken{}
 	_ sdk.Msg = &MsgTransferTokenOwner{}
+	_ sdk.Msg = &MsgSwapFeeToken{}
 )
 
 // NewMsgIssueToken - construct token issue msg.
@@ -299,4 +300,31 @@ func (msg MsgBurnToken) ValidateBasic() error {
 	}
 
 	return ValidateSymbol(msg.Symbol)
+}
+
+// GetSigners implements Msg
+func (msg MsgSwapFeeToken) GetSigners() []sdk.AccAddress {
+	from, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
+}
+
+// ValidateBasic implements Msg
+func (msg MsgSwapFeeToken) ValidateBasic() error {
+	// check the owner
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+	}
+
+	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
+	}
+
+	if !(msg.FeePaid.IsValid() && msg.FeePaid.IsPositive()) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid feePaid (%s)", msg.FeePaid.String())
+	}
+
+	return nil
 }

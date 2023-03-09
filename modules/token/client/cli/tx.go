@@ -31,6 +31,7 @@ func NewTxCmd() *cobra.Command {
 		GetCmdMintToken(),
 		GetCmdBurnToken(),
 		GetCmdTransferTokenOwner(),
+		GetCmdSwapFeeToken(),
 	)
 
 	return txCmd
@@ -372,5 +373,60 @@ func GetCmdTransferTokenOwner() *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagTo)
 	flags.AddTxFlagsToCmd(cmd)
 
+	return cmd
+}
+
+// GetCmdSwapFeeToken implements the swap token command
+func GetCmdSwapFeeToken() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "swap-fee [fee_paid]",
+		Long: "Use the input token to exchange for a specified number of other tokens. Note: the exchanged token pair must be registered by the system",
+		Example: fmt.Sprintf(
+			"$ %s tx token swap <fee_paid> "+
+				"--to=<to> "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			sender := clientCtx.GetFromAddress().String()
+			toAddr, err := cmd.Flags().GetString(FlagTo)
+			if err != nil {
+				return err
+			}
+			if toAddr != "" {
+				if _, err := sdk.AccAddressFromBech32(toAddr); err != nil {
+					return err
+				}
+			}
+
+			feePaid, err := sdk.ParseCoinNormalized(args[0])
+			if err != nil {
+				return err
+			}
+
+			msg := &types.MsgSwapFeeToken{
+				FeePaid:   feePaid,
+				Recipient: toAddr,
+				Sender:    sender,
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsSwapFeeToken)
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
