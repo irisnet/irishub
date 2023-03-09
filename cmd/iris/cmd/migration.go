@@ -24,12 +24,12 @@ import (
 func genesisMigrateCmd(appCodec codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use: "genesis-migrate",
-		Short: `The Migrate command only applies to modify the GENESIS data exported by version of IRISHub V1.4.1. On this basis, t
-		he following needs to be modified:
-			1. consensusparams.block.maxgas is adjusted from -1 to 20000000.
-			2. Added EVM and Feemarket related initialization data.
-			3. The token module adds the token definition required by EVM.
-		When IRISHub successfully upgrade to version 2.0, the command will be deleted.
+		Short: `The Migrate command only applies to modify the GENESIS data exported by version of IRISHub V1.4.1. On this basis, 
+				the following needs to be modified:
+					1. consensusparams.block.maxgas is adjusted from -1 to 20000000.
+					2. added EVM and Feemarket related initialization data.
+					3. the token module adds the token definition required by EVM.
+				When IRISHub successfully upgrade to version 2.0, the command will be deleted.
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
