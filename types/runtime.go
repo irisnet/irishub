@@ -44,11 +44,12 @@ func init() {
 		Owner:         sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))).String(),
 	}
 
+	// TODO
 	EvmToken = tokentypes.Token{
-		Symbol:        "eris",
+		Symbol:        "eth",
 		Name:          "Irishub evm token",
 		Scale:         18,
-		MinUnit:       "weris",
+		MinUnit:       "wei",
 		InitialSupply: 0,
 		MaxSupply:     math.MaxUint64,
 		Mintable:      true,

@@ -43,6 +43,8 @@ import (
 
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	iristypes "github.com/irisnet/irishub/types"
+	randomtypes "github.com/irisnet/irismod/modules/random/types"
+	servicetypes "github.com/irisnet/irismod/modules/service/types"
 )
 
 var (
@@ -327,22 +329,26 @@ func initGenFiles(
 	// set the balances in the genesis state
 	var bankGenState banktypes.GenesisState
 	clientCtx.Codec.MustUnmarshalJSON(appGenState[banktypes.ModuleName], &bankGenState)
-
 	bankGenState.Balances = genBalances
 	appGenState[banktypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&bankGenState)
 
 	// set the point token in the genesis state
 	var tokenGenState tokentypes.GenesisState
 	clientCtx.Codec.MustUnmarshalJSON(appGenState[tokentypes.ModuleName], &tokenGenState)
-
 	tokenGenState.Tokens = append(tokenGenState.Tokens, iristypes.EvmToken)
-
-	// set the evm fee token denom genesis state
-	var evmGenState evmtypes.GenesisState
-	clientCtx.Codec.MustUnmarshalJSON(appGenState[evmtypes.ModuleName], &evmGenState)
-
 	appGenState[tokentypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&tokenGenState)
 
+	//set system service in the genesis state
+	var serviceGenState servicetypes.GenesisState
+	clientCtx.Codec.MustUnmarshalJSON(appGenState[servicetypes.ModuleName], &serviceGenState)
+	serviceGenState.Definitions = append(serviceGenState.Definitions, servicetypes.GenOraclePriceSvcDefinition())
+	serviceGenState.Bindings = append(serviceGenState.Bindings, servicetypes.GenOraclePriceSvcBinding(iristypes.NativeToken.MinUnit))
+	serviceGenState.Definitions = append(serviceGenState.Definitions, randomtypes.GetSvcDefinition())
+	appGenState[servicetypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&serviceGenState)
+
+	// set the evm fee token denom in the genesis state
+	var evmGenState evmtypes.GenesisState
+	clientCtx.Codec.MustUnmarshalJSON(appGenState[evmtypes.ModuleName], &evmGenState)
 	evmGenState.Params.EvmDenom = iristypes.EvmToken.MinUnit
 	appGenState[evmtypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&evmGenState)
 
@@ -400,11 +406,14 @@ func collectGenFiles(
 			// set the canonical application state (they should not differ)
 			appState = nodeAppState
 		}
+		genDoc.ConsensusParams.Block.MaxGas = 20000000
+		genDoc.ChainID = chainID
+		genDoc.GenesisTime = genTime
+		genDoc.AppState = appState
 
 		genFile := nodeConfig.GenesisFile()
-
 		// overwrite each validator's genesis file to have a canonical genesis time
-		if err := genutil.ExportGenesisFileWithTime(genFile, chainID, nil, appState, genTime); err != nil {
+		if err := genutil.ExportGenesisFile(genDoc, genFile); err != nil {
 			return err
 		}
 	}
