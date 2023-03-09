@@ -19,5 +19,5 @@ const (
 	AttributeKeyRecipient = "recipient"
 	AttributeKeySender    = "sender"
 	AttributeKeyFeePaid   = "fee_paid"
-	AttributeKeyFeeGot    = "fee_git"
+	AttributeKeyFeeGot    = "fee_got"
 )
