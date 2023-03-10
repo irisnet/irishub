@@ -63,6 +63,7 @@ import (
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	"github.com/irisnet/irishub/modules/mint"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
+	"github.com/irisnet/irishub/types"
 )
 
 // RegisterUpgradePlan register a handler of upgrade plan
@@ -88,10 +89,10 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 		},
 		func(ctx sdk.Context, plan sdkupgrade.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			// init farm params
-			amount := sdkmath.NewIntWithDecimal(1000, int(nativeToken.Scale))
+			amount := sdkmath.NewIntWithDecimal(1000, int(types.NativeToken.Scale))
 			farmtypes.SetDefaultGenesisState(farmtypes.GenesisState{
 				Params: farmtypes.Params{
-					PoolCreationFee:     sdk.NewCoin(nativeToken.MinUnit, amount),
+					PoolCreationFee:     sdk.NewCoin(types.NativeToken.MinUnit, amount),
 					MaxRewardCategories: 2,
 				}},
 			)
@@ -176,49 +177,8 @@ func (app *IrisApp) RegisterUpgradePlan(cfg module.Configurator) {
 			controllerParams := icacontrollertypes.Params{}
 			// create ICS27 Host submodule params
 			hostParams := icahosttypes.Params{
-				HostEnabled: true,
-				AllowMessages: []string{
-					authzMsgExec,
-					authzMsgGrant,
-					authzMsgRevoke,
-					bankMsgSend,
-					bankMsgMultiSend,
-					distrMsgSetWithdrawAddr,
-					distrMsgWithdrawValidatorCommission,
-					distrMsgFundCommunityPool,
-					distrMsgWithdrawDelegatorReward,
-					feegrantMsgGrantAllowance,
-					feegrantMsgRevokeAllowance,
-					legacyGovMsgVoteWeighted,
-					legacyGovMsgSubmitProposal,
-					legacyGovMsgDeposit,
-					legacyGovMsgVote,
-					govMsgVoteWeighted,
-					govMsgSubmitProposal,
-					govMsgDeposit,
-					govMsgVote,
-					stakingMsgEditValidator,
-					stakingMsgDelegate,
-					stakingMsgUndelegate,
-					stakingMsgBeginRedelegate,
-					stakingMsgCreateValidator,
-					vestingMsgCreateVestingAccount,
-					ibcMsgTransfer,
-
-					nftMsgIssueDenom,
-					nftMsgTransferDenom,
-					nftMsgMintNFT,
-					nftMsgEditNFT,
-					nftMsgTransferNFT,
-					nftMsgBurnNFT,
-
-					mtMsgIssueDenom,
-					mtMsgTransferDenom,
-					mtMsgMintMT,
-					mtMsgEditMT,
-					mtMsgTransferMT,
-					mtMsgBurnMT,
-				},
+				HostEnabled:   true,
+				AllowMessages: types.ICAMsgs,
 			}
 
 			ctx.Logger().Info("start to init interchainaccount module...")

@@ -2,12 +2,9 @@ package app
 
 import (
 	"io"
-	"os"
-	"path/filepath"
 
 	"github.com/spf13/cast"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
@@ -162,19 +159,10 @@ import (
 	"github.com/irisnet/irishub/modules/mint"
 	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
+	iristypes "github.com/irisnet/irishub/types"
 )
 
-const appName = "IrisApp"
-
 var (
-	// DefaultNodeHome default home directories for the application daemon
-	DefaultNodeHome string
-
-	// Denominations can be 3 ~ 128 characters long and support letters, followed by either
-	// a letter, a number, ('-'), or a separator ('/').
-	// overwite sdk reDnmString
-	reDnmString = `[a-zA-Z][a-zA-Z0-9/-]{2,127}`
-
 	// ModuleBasics defines the module BasicManager is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
 	// and genesis verification.
@@ -254,8 +242,6 @@ var (
 		icatypes.ModuleName:            nil,
 		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
 	}
-
-	nativeToken tokentypes.Token
 )
 
 var (
@@ -335,52 +321,6 @@ type IrisApp struct {
 	sm *module.SimulationManager
 }
 
-func init() {
-	// set bech32 prefix
-	address.ConfigureBech32Prefix()
-
-	// set coin denom regexs
-	sdk.SetCoinDenomRegex(DefaultCoinDenomRegex)
-
-	nativeToken = tokentypes.Token{
-		Symbol:        "iris",
-		Name:          "Irishub staking token",
-		Scale:         6,
-		MinUnit:       MinUnit,
-		InitialSupply: 2000000000,
-		MaxSupply:     10000000000,
-		Mintable:      true,
-		Owner:         sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))).String(),
-	}
-
-	userHomeDir, err := os.UserHomeDir()
-	if err != nil {
-		panic(err)
-	}
-
-	DefaultNodeHome = filepath.Join(userHomeDir, ".iris")
-	owner, err := sdk.AccAddressFromBech32(nativeToken.Owner)
-	if err != nil {
-		panic(err)
-	}
-
-	tokentypes.SetNativeToken(
-		nativeToken.Symbol,
-		nativeToken.Name,
-		nativeToken.MinUnit,
-		nativeToken.Scale,
-		nativeToken.InitialSupply,
-		nativeToken.MaxSupply,
-		nativeToken.Mintable,
-		owner,
-	)
-}
-
-// DefaultCoinDenomRegex returns the default regex string
-func DefaultCoinDenomRegex() string {
-	return reDnmString
-}
-
 // NewIrisApp returns a reference to an initialized IrisApp.
 func NewIrisApp(
 	logger log.Logger,
@@ -400,7 +340,7 @@ func NewIrisApp(
 	legacyAmino := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
-	bApp := baseapp.NewBaseApp(appName, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
+	bApp := baseapp.NewBaseApp(iristypes.AppName, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
@@ -1052,21 +992,11 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 
 // InitChainer application update at chain initialization
 func (app *IrisApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-	var genesisState GenesisState
+	var genesisState iristypes.GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
-
-	// add system service at InitChainer, overwrite if it exists
-	var serviceGenState servicetypes.GenesisState
-	app.appCodec.MustUnmarshalJSON(genesisState[servicetypes.ModuleName], &serviceGenState)
-	serviceGenState.Definitions = append(serviceGenState.Definitions, servicetypes.GenOraclePriceSvcDefinition())
-	serviceGenState.Bindings = append(serviceGenState.Bindings, servicetypes.GenOraclePriceSvcBinding(nativeToken.MinUnit))
-	serviceGenState.Definitions = append(serviceGenState.Definitions, randomtypes.GetSvcDefinition())
-	genesisState[servicetypes.ModuleName] = app.appCodec.MustMarshalJSON(&serviceGenState)
-
 	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
-
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 
