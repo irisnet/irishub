@@ -586,7 +586,16 @@ func NewIrisApp(
 		app.BankKeeper,
 		app.ModuleAccountAddrs(),
 		authtypes.FeeCollectorName,
-	)
+	).WithSwapRegistry(tokentypes.SwapRegistry{
+		iristypes.NativeToken.MinUnit: tokentypes.SwapParams{
+			MinUnit: iristypes.EvmToken.MinUnit,
+			Ratio:   sdk.OneDec(),
+		},
+		iristypes.EvmToken.MinUnit: tokentypes.SwapParams{
+			MinUnit: iristypes.NativeToken.MinUnit,
+			Ratio:   sdk.OneDec(),
+		},
+	})
 
 	app.RecordKeeper = recordkeeper.NewKeeper(
 		appCodec,
