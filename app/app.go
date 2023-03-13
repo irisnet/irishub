@@ -757,6 +757,10 @@ func NewIrisApp(
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
+
+		feemarkettypes.ModuleName,
+		evmtypes.ModuleName,
+
 		distrtypes.ModuleName,
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
@@ -789,9 +793,6 @@ func NewIrisApp(
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
-
-		feemarkettypes.ModuleName,
-		evmtypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		//sdk module
@@ -799,6 +800,10 @@ func NewIrisApp(
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
+
+		evmtypes.ModuleName,
+		feemarkettypes.ModuleName,
+
 		distrtypes.ModuleName,
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
@@ -831,9 +836,6 @@ func NewIrisApp(
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
-
-		evmtypes.ModuleName,
-		feemarkettypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
