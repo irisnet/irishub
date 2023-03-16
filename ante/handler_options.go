@@ -6,6 +6,9 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
+	ibcante "github.com/cosmos/ibc-go/v5/modules/core/ante"
+	ibckeeper "github.com/cosmos/ibc-go/v5/modules/core/keeper"
+
 	ethante "github.com/evmos/ethermint/app/ante"
 
 	oraclekeeper "github.com/irisnet/irismod/modules/oracle/keeper"
@@ -20,6 +23,7 @@ type HandlerOptions struct {
 	ante.HandlerOptions
 	BankKeeper           bankkeeper.Keeper
 	AccountKeeper        authkeeper.AccountKeeper
+	IBCKeeper            *ibckeeper.Keeper
 	TokenKeeper          tokenkeeper.Keeper
 	OracleKeeper         oraclekeeper.Keeper
 	GuardianKeeper       guardiankeeper.Keeper
@@ -69,6 +73,7 @@ func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
 		oraclekeeper.NewValidateOracleAuthDecorator(options.OracleKeeper, options.GuardianKeeper),
 		NewValidateServiceDecorator(),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
+		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
 	)
 }
 
@@ -90,6 +95,7 @@ func newCosmosAnteHandlerEip712(options HandlerOptions) sdk.AnteHandler {
 		// Note: signature verification uses EIP instead of the cosmos signature validator
 		ethante.NewLegacyEip712SigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
+		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
 		ethante.NewGasWantedDecorator(options.EvmKeeper, options.FeeMarketKeeper),
 	)
 }
