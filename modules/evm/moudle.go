@@ -25,12 +25,14 @@ var (
 // AppModule implements an application module for the evm module.
 type AppModule struct {
 	ethermint.AppModule
+	k *Keeper
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(k *keeper.Keeper, ak types.AccountKeeper) AppModule {
+func NewAppModule(k *keeper.Keeper, ak types.AccountKeeper, bankKeeper types.BankKeeper) AppModule {
 	return AppModule{
 		AppModule: ethermint.NewAppModule(k, ak),
+		k:         &Keeper{k, bankKeeper, false},
 	}
 }
 
@@ -45,4 +47,11 @@ func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.RawMessage) []abci.ValidatorUpdate {
 	ethChainID := iristypes.BuildEthChainID(ctx.ChainID())
 	return am.AppModule.InitGenesis(ctx.WithChainID(ethChainID), cdc, data)
+}
+
+// RegisterServices registers a GRPC query service to respond to the
+// module-specific GRPC queries.
+func (am AppModule) RegisterServices(cfg module.Configurator) {
+	types.RegisterMsgServer(cfg.MsgServer(), am.k)
+	types.RegisterQueryServer(cfg.QueryServer(), am.k.evmkeeper)
 }
