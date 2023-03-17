@@ -1,0 +1,69 @@
+[
+  {
+    "chain_name": "bsc-mainnet",
+    "consensus_state": {
+      "@type": "/tibc.lightclients.bsc.v1.ConsensusState",
+      "timestamp": "1647611347",
+      "number": {
+        "revision_number": "0",
+        "revision_height": "16168200"
+      },
+      "root": "abWdstvDFDWcCzMbZoTBxpy8JQ00Y4m8vwXIJ5UJfpA="
+    },
+    "client_state": {
+      "@type": "/tibc.lightclients.bsc.v1.ClientState",
+      "header": {
+        "parent_hash": "gK4N93vKrdBItCFYHG39MkpYQ9MbmCGD1WkRYqGZSM0=",
+        "uncle_hash": "HcxN6N7HXXqrhbVntszUGtMSRRuUinQT8KFC/UDUk0c=",
+        "coinbase": "cPZXFk5bdWibZLf9H6J18zTyjhg=",
+        "root": "abWdstvDFDWcCzMbZoTBxpy8JQ00Y4m8vwXIJ5UJfpA=",
+        "tx_hash": "xjlDWj3Ix+27DA3y1rzuiAED2vu/WbsFfddHXJ4aX4U=",
+        "receipt_hash": "/WBV/Qcj6Hvv6+150nb/HlVd9KHQ55cRabyGfoTmiZw=",
+        "bloom": "e2vb3ud+f/9qac/35S0+f/7n7D/387/z9/a0/avvL/Tf7x3dt3S+93+j/P/lb73kX9r73ffOfr///96N6//e3Xv3/T/9/PX///z22F1b/7//3Zu+/cf/lnvnLy+L+Pv7/8t97l9fndtf5+z7//nPc/z8v/+//P7ev1+3d8+v//W2fXb7/f//+r3//83fm3+9/77+/99v/f/p7tn//3v1/3/9f9/9+7Pdvb/+fzv+n/l9v7/U16N97O/me82/3/9f99v////Hnst9+Z9/3Qf73r9/P9/d3/z//f+/29/p6+///39T//3b7s/v+p7v//u+cpzHX099/v/37rdu7e/fqw==",
+        "difficulty": "2",
+        "height": {
+          "revision_number": "0",
+          "revision_height": "16168200"
+        },
+        "gas_limit": "80000000",
+        "gas_used": "20949743",
+        "time": "1647611347",
+        "extra": "2IMBAQeEZ2V0aIhnbzEuMTMuNIVsaW51eAAAAMMWe98kZRdsRhr7MW68dzxh+u6FplFdqileJklc729p36aZEdnY5PO7rbibKal8bv+4pBHavGre76qE9QZ8i74tTEB7vklDjthZ/pZbFA3PGqtxqT80m7r+wVUYGbi+Hv6i/EbKdJqhaFsd7YATeF1mI8wY0hQyC2u2R1lw9lcWTlt1aJtkt/0fonXzNPKOGHK2HGAUNC2RRHDsesKXW+NFeWwreuL1ueOGzRtQpFUGltlXy0kA8DqLbI/ZPW9M6kK7s0XbxvDf21vsc5+Mza/MOfPH1uv2N8kVFnPLw2uIpvebYDWfFB35Cgx0USWxMcqv/RKqz2qBGffhFiO1pD2mOOkfZpoTD6wOFaA47t/Gi6PDXHP+1b5KB6+1voB93bB0Y5zZ+mG0dnbAZPxQ1izOL9dUTgssyUaS1KcE3r73vLYTKOLTpznv/NOpk4fQFeJg7vrHLr6h6a4yYaR1onuxAo8UC8KnyEMxiv3qCm48URu9EPRRns433CSIfhG1Xe4iY3nbg8/8aBSVcwwR/d55ukwM7wJ04xgQyd8C+Y+v3g+EH05moc3eJQAhHG2KFCGP08YBM7LybgwbiESjUtuQZz3bCi7/lEqOP2l/BGvLl89+LdDYPXITOImJINIWbksUfftitOOuAA==",
+        "mix_digest": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "nonce": "AAAAAAAAAAA="
+      },
+      "chain_id": "56",
+      "epoch": "200",
+      "block_inteval": "3",
+      "validators": [
+        "JGUXbEYa+zFuvHc8YfruhaZRXao=",
+        "KV4mSVzvb2nfppkR2djk87utuJs=",
+        "Kal8bv+4pBHavGre76qE9QZ8i74=",
+        "LUxAe75JQ47YWf6WWxQNzxqrcak=",
+        "PzSbuv7BVRgZuL4e/qL8Rsp0mqE=",
+        "aFsd7YATeF1mI8wY0hQyC2u2R1k=",
+        "cPZXFk5bdWibZLf9H6J18zTyjhg=",
+        "crYcYBQ0LZFEcOx6wpdb40V5bCs=",
+        "euL1ueOGzRtQpFUGltlXy0kA8Do=",
+        "i2yP2T1vTOpCu7NF28bw39tb7HM=",
+        "n4zNr8w588fW6/Y3yRUWc8vDa4g=",
+        "pvebYDWfFB35Cgx0USWxMcqv/RI=",
+        "qs9qgRn34RYjtaQ9pjjpH2aaEw8=",
+        "rA4VoDju38aLo8Ncc/7VvkoHr7U=",
+        "voB93bB0Y5zZ+mG0dnbAZPxQ1iw=",
+        "zi/XVE4LLMlGktSnBN6+97y2Eyg=",
+        "4tOnOe/806mTh9AV4mDu+scuvqE=",
+        "6a4yYaR1onuxAo8UC8KnyEMxiv0=",
+        "6gpuPFEbvRD0UZ7ON9wkiH4RtV0=",
+        "7iJjeduDz/xoFJVzDBH93nm6TAw=",
+        "7wJ04xgQyd8C+Y+v3g+EH05moc0="
+      ],
+      "recent_signers": [],
+      "contract_address": "HDR5yh3zyWLTFeeVyvB7kN/aKTY=",
+      "trusting_period": "8640000"
+    },
+    "relayers": [
+      "iaa1f4wqy64z33mhu5lwxqwcsmxy4kqpsntvfzdv9s"
+    ]
+  }
+]
