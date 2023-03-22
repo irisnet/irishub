@@ -752,35 +752,32 @@ func NewIrisApp(
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
-		//sdk module
+		// upgrades should be run first
 		upgradetypes.ModuleName,
 		capabilitytypes.ModuleName,
-		authtypes.ModuleName,
-		banktypes.ModuleName,
-
+		minttypes.ModuleName,
 		feemarkettypes.ModuleName,
 		evmtypes.ModuleName,
-
 		distrtypes.ModuleName,
-		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
-		govtypes.ModuleName,
-		minttypes.ModuleName,
-		crisistypes.ModuleName,
-		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
-		authz.ModuleName,
-		feegrant.ModuleName,
-		paramstypes.ModuleName,
+		stakingtypes.ModuleName,
+		authtypes.ModuleName,
+		banktypes.ModuleName,
+		govtypes.ModuleName,
+		crisistypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
 		icatypes.ModuleName,
+		genutiltypes.ModuleName,
+		authz.ModuleName,
+		feegrant.ModuleName,
+		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 
 		//self module
 		tokentypes.ModuleName,
 		tibchost.ModuleName,
-		ibctransfertypes.ModuleName,
 		nfttypes.ModuleName,
 		htlctypes.ModuleName,
 		recordtypes.ModuleName,
@@ -795,35 +792,31 @@ func NewIrisApp(
 		guardiantypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
-		//sdk module
-		upgradetypes.ModuleName,
+		crisistypes.ModuleName,
+		govtypes.ModuleName,
+		stakingtypes.ModuleName,
+		evmtypes.ModuleName,
+		feemarkettypes.ModuleName,
+		ibctransfertypes.ModuleName,
+		ibchost.ModuleName,
+		icatypes.ModuleName,
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
-
-		evmtypes.ModuleName,
-		feemarkettypes.ModuleName,
-
 		distrtypes.ModuleName,
-		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
-		govtypes.ModuleName,
 		minttypes.ModuleName,
-		crisistypes.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		authz.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		ibchost.ModuleName,
-		icatypes.ModuleName,
+		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 
 		//self module
 		tokentypes.ModuleName,
 		tibchost.ModuleName,
-		ibctransfertypes.ModuleName,
 		nfttypes.ModuleName,
 		htlctypes.ModuleName,
 		recordtypes.ModuleName,
