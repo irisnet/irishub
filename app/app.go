@@ -837,49 +837,47 @@ func NewIrisApp(
 	// so that other modules that want to create or claim capabilities afterwards in InitChain
 	// can do so safely.
 	app.mm.SetOrderInitGenesis(
-		//sdk module
-		upgradetypes.ModuleName,
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		distrtypes.ModuleName,
+		govtypes.ModuleName,
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
-		govtypes.ModuleName,
 		minttypes.ModuleName,
-		crisistypes.ModuleName,
-
+		ibctransfertypes.ModuleName,
+		ibchost.ModuleName,
+		icatypes.ModuleName,
+		authz.ModuleName,
+		feegrant.ModuleName,
+		paramstypes.ModuleName,
+		upgradetypes.ModuleName,
+		vestingtypes.ModuleName,
 		evmtypes.ModuleName,
 		// NOTE: feemarket module needs to be initialized before genutil module:
 		// gentx transactions use MinGasPriceDecorator.AnteHandle
 		feemarkettypes.ModuleName,
-
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
-		authz.ModuleName,
-		feegrant.ModuleName,
-		paramstypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		ibchost.ModuleName,
-		icatypes.ModuleName,
-		vestingtypes.ModuleName,
 
 		//self module
 		tokentypes.ModuleName,
 		tibchost.ModuleName,
-		ibctransfertypes.ModuleName,
 		nfttypes.ModuleName,
 		htlctypes.ModuleName,
 		recordtypes.ModuleName,
+		// NOTE: coinswap module needs to be initialized before farm module:
 		coinswaptypes.ModuleName,
+		farmtypes.ModuleName,
+		randomtypes.ModuleName,
 		servicetypes.ModuleName,
 		oracletypes.ModuleName,
-		randomtypes.ModuleName,
-		farmtypes.ModuleName,
 		mttypes.ModuleName,
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+		// NOTE: crisis module must go at the end to check for invariants on each module
+		crisistypes.ModuleName,
 	)
 
 	cfg := module.NewConfigurator(appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
