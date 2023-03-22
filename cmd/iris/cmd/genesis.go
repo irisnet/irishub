@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"sort"
 
 	"github.com/spf13/cobra"
 
@@ -97,13 +96,13 @@ func merge(cdc codec.Codec, testnet, mainnet *types.GenesisDoc, output string) (
 	return mainnet.SaveAs(output)
 }
 
-var filterAccount = []string{
+var filterAccount = map[string]bool{
 	//distribution
-	"iaa1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8jaydtw",
+	"iaa1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8jaydtw": true,
 	//not_bonded_tokens_pool
-	"iaa1tygms3xhhs3yv487phx3dw4a95jn7t7l5e40dj",
+	"iaa1tygms3xhhs3yv487phx3dw4a95jn7t7l5e40dj": true,
 	//bonded_tokens_pool
-	"iaa1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3qef7mx",
+	"iaa1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3qef7mx": true,
 }
 
 func mergeBank(cdc codec.Codec, testnet, mainnet map[string]json.RawMessage) {
@@ -114,14 +113,12 @@ func mergeBank(cdc codec.Codec, testnet, mainnet map[string]json.RawMessage) {
 	bankState.Supply = sdk.NewCoins()
 
 	//delete balance
-	k := 0
-	for _, banlance := range bankState.Balances {
-		idx := sort.SearchStrings(filterAccount, banlance.Address)
-		if !(idx < len(filterAccount) && banlance.Address == filterAccount[idx]) {
-			bankState.Balances[k] = banlance
+	for i := 0; i < len(bankState.Balances); i++ {
+		balance := bankState.Balances[i]
+		if filterAccount[balance.Address] {
+			bankState.Balances = append(bankState.Balances[:i], bankState.Balances[i+1:]...)
 		}
 	}
-	bankState.Balances = bankState.Balances[:k]
 
 	//copy testnet balance to mainnet
 	cdc.MustUnmarshalJSON(testnet["bank"], &testnetBankState)
