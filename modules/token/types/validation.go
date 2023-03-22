@@ -131,3 +131,11 @@ func ValidateAmount(amount uint64) error {
 	}
 	return nil
 }
+
+// ValidateCoin checks if the given coin
+func ValidateCoin(coin sdk.Coin) error {
+	if !coin.IsPositive() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid coin (%s)", coin.String())
+	}
+	return ValidateMinUnit(coin.Denom)
+}

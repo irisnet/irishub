@@ -23,4 +23,5 @@ var (
 	ErrInvalidAmount        = sdkerrors.Register(ModuleName, 15, "invalid amount")
 	ErrInvalidBaseFee       = sdkerrors.Register(ModuleName, 16, "invalid base fee")
 	ErrInvalidSwap          = sdkerrors.Register(ModuleName, 17, "unregistered swapable fee token")
+	ErrInsufficientFee      = sdkerrors.Register(ModuleName, 18, "the amount of tokens after swap is less than 1")
 )

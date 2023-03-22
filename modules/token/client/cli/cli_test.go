@@ -143,14 +143,14 @@ func (s *IntegrationTestSuite) TestToken() {
 
 	args = []string{
 		fmt.Sprintf("--%s=%s", tokencli.FlagTo, from.String()),
-		fmt.Sprintf("--%s=%d", tokencli.FlagAmount, mintAmount),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
 	}
+	coinMintedStr := fmt.Sprintf("%d%s", mintAmount, symbol)
 	respType = proto.Message(&sdk.TxResponse{})
-	bz, err = tokentestutil.MintTokenExec(clientCtx, from.String(), symbol, args...)
+	bz, err = tokentestutil.MintTokenExec(clientCtx, from.String(), coinMintedStr, args...)
 
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
@@ -169,14 +169,14 @@ func (s *IntegrationTestSuite) TestToken() {
 	burnAmount := int64(2000000)
 
 	args = []string{
-		fmt.Sprintf("--%s=%d", tokencli.FlagAmount, burnAmount),
-
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
 	}
+
+	coinBurntStr := fmt.Sprintf("%d%s", burnAmount, symbol)
 	respType = proto.Message(&sdk.TxResponse{})
-	bz, err = tokentestutil.BurnTokenExec(clientCtx, from.String(), symbol, args...)
+	bz, err = tokentestutil.BurnTokenExec(clientCtx, from.String(), coinBurntStr, args...)
 
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())

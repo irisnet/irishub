@@ -70,10 +70,9 @@ message MsgEditTokenResponse {}
 
 // MsgMintToken defines an SDK message for minting a new token
 message MsgMintToken {
-  string symbol = 1;
-  uint64 amount = 2;
-  string to = 3;
-  string owner = 4;
+  cosmos.base.v1beta1.Coin coin = 1 [ (gogoproto.nullable) = false ];
+  string to = 2;
+  string owner = 3;
 }
 
 // MsgMintTokenResponse defines the Msg/MintToken response type
@@ -81,9 +80,8 @@ message MsgMintTokenResponse {}
 
 // MsgBurnToken defines an SDK message for burning some tokens
 message MsgBurnToken {
-  string symbol = 1;
-  uint64 amount = 2;
-  string sender = 3;
+  cosmos.base.v1beta1.Coin coin = 1 [ (gogoproto.nullable) = false ];
+  string sender = 2;
 }
 
 // MsgBurnTokenResponse defines the Msg/BurnToken response type

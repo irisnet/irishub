@@ -236,6 +236,20 @@ func (k Keeper) getTokenByMinUnit(ctx sdk.Context, minUnit string) (token types.
 	return token, nil
 }
 
+func (k Keeper) getSymbolByMinUnit(ctx sdk.Context, minUnit string) (string, error) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(types.KeyMinUint(minUnit))
+	if bz == nil {
+		return "", sdkerrors.Wrap(types.ErrTokenNotExists, fmt.Sprintf("token minUnit %s does not exist", minUnit))
+	}
+
+	var symbol gogotypes.StringValue
+	k.cdc.MustUnmarshal(bz, &symbol)
+
+	return symbol.Value, nil
+}
+
 // reset all indices by the new owner for token query
 func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, symbol string, srcOwner, dstOwner sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)

@@ -32,9 +32,9 @@ func EditTokenExec(clientCtx client.Context, from string, symbol string, extraAr
 	return clitestutil.ExecTestCLICmd(clientCtx, tokencli.GetCmdEditToken(), args)
 }
 
-func MintTokenExec(clientCtx client.Context, from string, symbol string, extraArgs ...string) (testutil.BufferWriter, error) {
+func MintTokenExec(clientCtx client.Context, from string, coinStr string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		symbol,
+		coinStr,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
@@ -42,9 +42,9 @@ func MintTokenExec(clientCtx client.Context, from string, symbol string, extraAr
 	return clitestutil.ExecTestCLICmd(clientCtx, tokencli.GetCmdMintToken(), args)
 }
 
-func BurnTokenExec(clientCtx client.Context, from string, symbol string, extraArgs ...string) (testutil.BufferWriter, error) {
+func BurnTokenExec(clientCtx client.Context, from string, coinStr string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		symbol,
+		coinStr,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)

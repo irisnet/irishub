@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -115,20 +114,23 @@ func (m msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	if err := m.Keeper.DeductMintTokenFee(ctx, owner, msg.Symbol); err != nil {
+	symbol, err := m.Keeper.getSymbolByMinUnit(ctx, msg.Coin.Denom)
+	if err != nil {
 		return nil, err
 	}
 
-	if err := m.Keeper.MintToken(ctx, msg.Symbol, msg.Amount, recipient, owner); err != nil {
+	if err := m.Keeper.DeductMintTokenFee(ctx, owner, symbol); err != nil {
+		return nil, err
+	}
+
+	if err := m.Keeper.MintToken(ctx, msg.Coin, recipient, owner); err != nil {
 		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeMintToken,
-			sdk.NewAttribute(types.AttributeKeySymbol, msg.Symbol),
-			sdk.NewAttribute(types.AttributeKeyAmount, strconv.FormatUint(msg.Amount, 10)),
+			sdk.NewAttribute(types.AttributeKeyAmount, msg.Coin.String()),
 			sdk.NewAttribute(types.AttributeKeyRecipient, recipient.String()),
 		),
 		sdk.NewEvent(
@@ -148,15 +150,14 @@ func (m msgServer) BurnToken(goCtx context.Context, msg *types.MsgBurnToken) (*t
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.BurnToken(ctx, msg.Symbol, msg.Amount, owner); err != nil {
+	if err := m.Keeper.BurnToken(ctx, msg.Coin, owner); err != nil {
 		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeBurnToken,
-			sdk.NewAttribute(types.AttributeKeySymbol, msg.Symbol),
-			sdk.NewAttribute(types.AttributeKeyAmount, strconv.FormatUint(msg.Amount, 10)),
+			sdk.NewAttribute(types.AttributeKeyAmount, msg.Coin.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

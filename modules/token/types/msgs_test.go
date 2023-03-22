@@ -7,6 +7,7 @@ import (
 
 	"github.com/tendermint/tendermint/crypto/tmhash"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -107,14 +108,14 @@ func TestMsgEditTokenGetSignBytes(t *testing.T) {
 func TestMsgMintTokenValidateBasic(t *testing.T) {
 	testData := []struct {
 		msg        string
-		symbol     string
+		minUnit    string
 		owner      string
 		to         string
 		amount     uint64
 		expectPass bool
 	}{
-		{"empty symbol", "", addr1, addr2, 1000, false},
-		{"wrong symbol", "bt", addr1, addr2, 1000, false},
+		{"empty minUnit", "", addr1, addr2, 1000, false},
+		{"wrong minUnit", "bt", addr1, addr2, 1000, false},
 		{"empty owner", "btc", emptyAddr, addr2, 1000, false},
 		{"empty to", "btc", addr1, emptyAddr, 1000, true},
 		{"not empty to", "btc", addr1, addr2, 1000, true},
@@ -123,7 +124,14 @@ func TestMsgMintTokenValidateBasic(t *testing.T) {
 	}
 
 	for _, td := range testData {
-		msg := NewMsgMintToken(td.symbol, td.owner, td.to, td.amount)
+		msg := &MsgMintToken{
+			Coin: sdk.Coin{
+				Denom:  td.minUnit,
+				Amount: sdkmath.NewIntFromUint64(td.amount),
+			},
+			To:    td.to,
+			Owner: td.owner,
+		}
 		if td.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", td.msg)
 		} else {
@@ -135,20 +143,26 @@ func TestMsgMintTokenValidateBasic(t *testing.T) {
 func TestMsgBurnTokenValidateBasic(t *testing.T) {
 	testData := []struct {
 		msg        string
-		symbol     string
+		minUnit    string
 		sender     string
 		amount     uint64
 		expectPass bool
 	}{
 		{"basic good", "btc", addr1, 1000, true},
-		{"empty symbol", "", addr1, 1000, false},
-		{"wrong symbol", "bt", addr1, 1000, false},
+		{"empty minUnit", "", addr1, 1000, false},
+		{"wrong minUnit", "bt", addr1, 1000, false},
 		{"empty sender", "btc", emptyAddr, 1000, false},
 		{"invalid amount", "btc", addr1, 0, false},
 	}
 
 	for _, td := range testData {
-		msg := NewMsgBurnToken(td.symbol, td.sender, td.amount)
+		msg := MsgBurnToken{
+			Coin: sdk.Coin{
+				Denom:  td.minUnit,
+				Amount: sdkmath.NewIntFromUint64(td.amount),
+			},
+			Sender: td.sender,
+		}
 		if td.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", td.msg)
 		} else {

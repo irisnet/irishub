@@ -200,11 +200,10 @@ func GetCmdEditToken() *cobra.Command {
 
 func GetCmdMintToken() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "mint [symbol]",
+		Use:  "mint [coin]",
 		Long: "Mint tokens to a specified address.",
 		Example: fmt.Sprintf(
-			"$ %s tx token mint <symbol> "+
-				"--amount=<amount> "+
+			"$ %s tx token mint <coin> "+
 				"--to=<to> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
@@ -219,12 +218,6 @@ func GetCmdMintToken() *cobra.Command {
 			}
 
 			owner := clientCtx.GetFromAddress().String()
-
-			amount, err := cmd.Flags().GetUint64(FlagAmount)
-			if err != nil {
-				return err
-			}
-
 			addr, err := cmd.Flags().GetString(FlagTo)
 			if err != nil {
 				return err
@@ -235,9 +228,16 @@ func GetCmdMintToken() *cobra.Command {
 				}
 			}
 
-			msg := types.NewMsgMintToken(
-				strings.TrimSpace(args[0]), owner, addr, amount,
-			)
+			coin, token, err := parseCoin(clientCtx, args[0])
+			if err != nil {
+				return err
+			}
+
+			msg := &types.MsgMintToken{
+				Coin:  coin,
+				To:    addr,
+				Owner: owner,
+			}
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -251,7 +251,7 @@ func GetCmdMintToken() *cobra.Command {
 			}
 			if !generateOnly {
 				// query fee
-				fee, err1 := queryTokenFees(clientCtx, args[0])
+				fee, err1 := queryTokenFees(clientCtx, token.GetSymbol())
 				if err1 != nil {
 					return fmt.Errorf("failed to query token minting fee: %s", err1.Error())
 				}
@@ -268,7 +268,6 @@ func GetCmdMintToken() *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsMintToken)
-	_ = cmd.MarkFlagRequired(FlagAmount)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
@@ -276,11 +275,10 @@ func GetCmdMintToken() *cobra.Command {
 
 func GetCmdBurnToken() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "burn [symbol]",
+		Use:  "burn [coin]",
 		Long: "Burn tokens.",
 		Example: fmt.Sprintf(
-			"$ %s tx token burn <symbol> "+
-				"--amount=<amount> "+
+			"$ %s tx token burn <coin> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
@@ -293,26 +291,15 @@ func GetCmdBurnToken() *cobra.Command {
 				return err
 			}
 
-			owner := clientCtx.GetFromAddress().String()
-
-			amount, err := cmd.Flags().GetUint64(FlagAmount)
+			coin, _, err := parseCoin(clientCtx, args[0])
 			if err != nil {
 				return err
 			}
 
-			addr, err := cmd.Flags().GetString(FlagTo)
-			if err != nil {
-				return err
+			msg := &types.MsgBurnToken{
+				Coin:   coin,
+				Sender: clientCtx.GetFromAddress().String(),
 			}
-			if len(addr) > 0 {
-				if _, err = sdk.AccAddressFromBech32(addr); err != nil {
-					return err
-				}
-			}
-
-			msg := types.NewMsgBurnToken(
-				strings.TrimSpace(args[0]), owner, amount,
-			)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -321,9 +308,6 @@ func GetCmdBurnToken() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
-
-	cmd.Flags().AddFlagSet(FsMintToken)
-	_ = cmd.MarkFlagRequired(FlagAmount)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
@@ -382,7 +366,7 @@ func GetCmdSwapFeeToken() *cobra.Command {
 		Use:  "swap-fee [fee_paid]",
 		Long: "Use the input token to exchange for a specified number of other tokens. Note: the exchanged token pair must be registered by the system",
 		Example: fmt.Sprintf(
-			"$ %s tx token swap <fee_paid> "+
+			"$ %s tx token swap-fee <fee_paid> "+
 				"--to=<to> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
@@ -407,13 +391,13 @@ func GetCmdSwapFeeToken() *cobra.Command {
 				}
 			}
 
-			feePaid, err := sdk.ParseCoinNormalized(args[0])
+			coin, _, err := parseCoin(clientCtx, args[0])
 			if err != nil {
 				return err
 			}
 
 			msg := &types.MsgSwapFeeToken{
-				FeePaid:   feePaid,
+				FeePaid:   coin,
 				Recipient: toAddr,
 				Sender:    sender,
 			}

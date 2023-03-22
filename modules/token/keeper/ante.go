@@ -38,7 +38,12 @@ func (dtf ValidateTokenFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 				feeMap[msg.Owner] = fee
 			}
 		case *types.MsgMintToken:
-			fee, err := dtf.k.GetTokenMintFee(ctx, msg.Symbol)
+			symbol, err := dtf.k.getSymbolByMinUnit(ctx, msg.Coin.Denom)
+			if err != nil {
+				return ctx, err
+			}
+
+			fee, err := dtf.k.GetTokenMintFee(ctx, symbol)
 			if err != nil {
 				return ctx, sdkerrors.Wrap(types.ErrInvalidBaseFee, err.Error())
 			}

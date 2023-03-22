@@ -133,10 +133,10 @@ func (suite *KeeperTestSuite) TestMintToken() {
 	amt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit)
 	suite.Equal("1000000000000000000000satoshi", amt.String())
 
-	mintAmount := uint64(1000)
+	coinMinted := sdk.NewCoin(token.MinUnit, sdkmath.NewIntWithDecimal(1000, int(token.Scale)))
 	recipient := sdk.AccAddress{}
 
-	err := suite.keeper.MintToken(suite.ctx, token.Symbol, mintAmount, recipient, token.GetOwner())
+	err := suite.keeper.MintToken(suite.ctx, coinMinted, recipient, token.GetOwner())
 	suite.NoError(err)
 
 	amt = suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit)
@@ -144,13 +144,13 @@ func (suite *KeeperTestSuite) TestMintToken() {
 
 	// mint token without owner
 
-	err = suite.keeper.MintToken(suite.ctx, token.Symbol, mintAmount, owner, sdk.AccAddress{})
+	err = suite.keeper.MintToken(suite.ctx, coinMinted, owner, sdk.AccAddress{})
 	suite.Error(err, "can not mint token without owner when the owner exists")
 
 	token = types.NewToken("atom", "Cosmos Hub", "uatom", 6, 1000, 2000, true, sdk.AccAddress{})
 	suite.issueToken(token)
 
-	err = suite.keeper.MintToken(suite.ctx, token.Symbol, mintAmount, owner, sdk.AccAddress{})
+	err = suite.keeper.MintToken(suite.ctx, sdk.NewCoin(token.MinUnit, sdkmath.OneInt()), owner, sdk.AccAddress{})
 	suite.NoError(err)
 }
 
@@ -161,9 +161,9 @@ func (suite *KeeperTestSuite) TestBurnToken() {
 	amt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit)
 	suite.Equal("1000000000000000000000satoshi", amt.String())
 
-	burnedAmount := uint64(200)
+	coinBurnt := sdk.NewCoin(token.MinUnit, sdkmath.NewIntWithDecimal(200, int(token.Scale)))
 
-	err := suite.keeper.BurnToken(suite.ctx, token.Symbol, burnedAmount, token.GetOwner())
+	err := suite.keeper.BurnToken(suite.ctx, coinBurnt, token.GetOwner())
 	suite.NoError(err)
 
 	amt = suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit)
@@ -209,7 +209,7 @@ func (suite *KeeperTestSuite) TestSwapFeeToken() {
 	amt2 := suite.bk.GetBalance(suite.ctx, add2, token2.MinUnit)
 	suite.Equal("0t2min", amt2.String())
 
-	feePaid := sdk.NewCoin(token1.Symbol, sdk.NewInt(100))
+	feePaid := sdk.NewCoin(token1.MinUnit, sdkmath.NewIntWithDecimal(100, int(token1.Scale)))
 
 	feeGot, err := suite.keeper.SwapFeeToken(suite.ctx, feePaid, token1.GetOwner(), token2.GetOwner())
 	suite.NoError(err)
