@@ -96,7 +96,7 @@ func merge(cdc codec.Codec, testnet, mainnet *types.GenesisDoc, output string) (
 	return mainnet.SaveAs(output)
 }
 
-var filterAccount = map[string]bool{
+var filterAddrs = map[string]bool{
 	//distribution
 	"iaa1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8jaydtw": true,
 	//not_bonded_tokens_pool
@@ -113,13 +113,14 @@ func mergeBank(cdc codec.Codec, testnet, mainnet map[string]json.RawMessage) {
 	bankState.Supply = sdk.NewCoins()
 
 	//delete balance
-	for i := 0; i < len(bankState.Balances); i++ {
-		balance := bankState.Balances[i]
-		if filterAccount[balance.Address] {
-			bankState.Balances = append(bankState.Balances[:i], bankState.Balances[i+1:]...)
+	k := 0
+	for _, balance := range bankState.Balances {
+		if !filterAddrs[balance.Address] {
+			bankState.Balances[k] = balance
+			k++
 		}
 	}
-
+	bankState.Balances = bankState.Balances[:k]
 	//copy testnet balance to mainnet
 	cdc.MustUnmarshalJSON(testnet["bank"], &testnetBankState)
 	bankState.Balances = append(bankState.Balances, testnetBankState.Balances...)
