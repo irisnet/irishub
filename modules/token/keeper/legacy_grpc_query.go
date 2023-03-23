@@ -7,21 +7,21 @@ import (
 	"github.com/irisnet/irismod/modules/token/types/v1beta1"
 )
 
-var _ v1beta1.QueryServer = leagcyQueryServer{}
+var _ v1beta1.QueryServer = legacyQueryServer{}
 
-type leagcyQueryServer struct {
+type legacyQueryServer struct {
 	server v1.QueryServer
 }
 
-// NewLeagcyQueryServer returns an implementation of the token QueryServer interface
+// NewLegacyQueryServer returns an implementation of the token QueryServer interface
 // for the provided Keeper.
-func NewLeagcyQueryServer(server v1.QueryServer) v1beta1.QueryServer {
-	return &leagcyQueryServer{
+func NewLegacyQueryServer(server v1.QueryServer) v1beta1.QueryServer {
+	return &legacyQueryServer{
 		server: server,
 	}
 }
 
-func (q leagcyQueryServer) Token(c context.Context, req *v1beta1.QueryTokenRequest) (*v1beta1.QueryTokenResponse, error) {
+func (q legacyQueryServer) Token(c context.Context, req *v1beta1.QueryTokenRequest) (*v1beta1.QueryTokenResponse, error) {
 	res, err := q.server.Token(c, &v1.QueryTokenRequest{
 		Denom: req.Denom,
 	})
@@ -31,7 +31,7 @@ func (q leagcyQueryServer) Token(c context.Context, req *v1beta1.QueryTokenReque
 	return &v1beta1.QueryTokenResponse{Token: res.Token}, nil
 }
 
-func (q leagcyQueryServer) Tokens(c context.Context, req *v1beta1.QueryTokensRequest) (*v1beta1.QueryTokensResponse, error) {
+func (q legacyQueryServer) Tokens(c context.Context, req *v1beta1.QueryTokensRequest) (*v1beta1.QueryTokensResponse, error) {
 	res, err := q.server.Tokens(c, &v1.QueryTokensRequest{
 		Owner:      req.Owner,
 		Pagination: req.Pagination,
@@ -42,7 +42,7 @@ func (q leagcyQueryServer) Tokens(c context.Context, req *v1beta1.QueryTokensReq
 	return &v1beta1.QueryTokensResponse{Tokens: res.Tokens, Pagination: res.Pagination}, nil
 }
 
-func (q leagcyQueryServer) Fees(c context.Context, req *v1beta1.QueryFeesRequest) (*v1beta1.QueryFeesResponse, error) {
+func (q legacyQueryServer) Fees(c context.Context, req *v1beta1.QueryFeesRequest) (*v1beta1.QueryFeesResponse, error) {
 	res, err := q.server.Fees(c, &v1.QueryFeesRequest{
 		Symbol: req.Symbol,
 	})
@@ -57,7 +57,7 @@ func (q leagcyQueryServer) Fees(c context.Context, req *v1beta1.QueryFeesRequest
 }
 
 // Params return the all the parameter in tonken module
-func (q leagcyQueryServer) Params(c context.Context, req *v1beta1.QueryParamsRequest) (*v1beta1.QueryParamsResponse, error) {
+func (q legacyQueryServer) Params(c context.Context, req *v1beta1.QueryParamsRequest) (*v1beta1.QueryParamsResponse, error) {
 	res, err := q.server.Params(c, &v1.QueryParamsRequest{})
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func (q leagcyQueryServer) Params(c context.Context, req *v1beta1.QueryParamsReq
 }
 
 // TotalBurn return the all burn coin
-func (q leagcyQueryServer) TotalBurn(c context.Context, req *v1beta1.QueryTotalBurnRequest) (*v1beta1.QueryTotalBurnResponse, error) {
+func (q legacyQueryServer) TotalBurn(c context.Context, req *v1beta1.QueryTotalBurnRequest) (*v1beta1.QueryTotalBurnResponse, error) {
 	res, err := q.server.TotalBurn(c, &v1.QueryTotalBurnRequest{})
 	if err != nil {
 		return nil, err

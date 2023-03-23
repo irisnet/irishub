@@ -10,23 +10,23 @@ import (
 	"github.com/irisnet/irismod/modules/token/types/v1beta1"
 )
 
-type leagcyMsgServer struct {
+type legacyMsgServer struct {
 	server v1.MsgServer
 	k      Keeper
 }
 
-var _ v1beta1.MsgServer = leagcyMsgServer{}
+var _ v1beta1.MsgServer = legacyMsgServer{}
 
-// NewLeagcyMsgServerImpl returns an implementation of the token MsgServer interface
+// NewLegacyMsgServerImpl returns an implementation of the token MsgServer interface
 // for the provided Keeper.
-func NewLeagcyMsgServerImpl(server v1.MsgServer, k Keeper) v1beta1.MsgServer {
-	return &leagcyMsgServer{
+func NewLegacyMsgServerImpl(server v1.MsgServer, k Keeper) v1beta1.MsgServer {
+	return &legacyMsgServer{
 		server: server,
 		k:      k,
 	}
 }
 
-func (m leagcyMsgServer) IssueToken(goCtx context.Context, msg *v1beta1.MsgIssueToken) (*v1beta1.MsgIssueTokenResponse, error) {
+func (m legacyMsgServer) IssueToken(goCtx context.Context, msg *v1beta1.MsgIssueToken) (*v1beta1.MsgIssueTokenResponse, error) {
 	_, err := m.server.IssueToken(goCtx, &v1.MsgIssueToken{
 		Symbol:        msg.Symbol,
 		Name:          msg.Name,
@@ -40,7 +40,7 @@ func (m leagcyMsgServer) IssueToken(goCtx context.Context, msg *v1beta1.MsgIssue
 	return &v1beta1.MsgIssueTokenResponse{}, err
 }
 
-func (m leagcyMsgServer) EditToken(goCtx context.Context, msg *v1beta1.MsgEditToken) (*v1beta1.MsgEditTokenResponse, error) {
+func (m legacyMsgServer) EditToken(goCtx context.Context, msg *v1beta1.MsgEditToken) (*v1beta1.MsgEditTokenResponse, error) {
 	_, err := m.server.EditToken(goCtx, &v1.MsgEditToken{
 		Symbol:    msg.Symbol,
 		Name:      msg.Name,
@@ -51,7 +51,7 @@ func (m leagcyMsgServer) EditToken(goCtx context.Context, msg *v1beta1.MsgEditTo
 	return &v1beta1.MsgEditTokenResponse{}, err
 }
 
-func (m leagcyMsgServer) MintToken(goCtx context.Context, msg *v1beta1.MsgMintToken) (*v1beta1.MsgMintTokenResponse, error) {
+func (m legacyMsgServer) MintToken(goCtx context.Context, msg *v1beta1.MsgMintToken) (*v1beta1.MsgMintTokenResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	token, err := m.k.getTokenBySymbol(ctx, msg.Symbol)
 	if err != nil {
@@ -70,7 +70,7 @@ func (m leagcyMsgServer) MintToken(goCtx context.Context, msg *v1beta1.MsgMintTo
 	return &v1beta1.MsgMintTokenResponse{}, err
 }
 
-func (m leagcyMsgServer) BurnToken(goCtx context.Context, msg *v1beta1.MsgBurnToken) (*v1beta1.MsgBurnTokenResponse, error) {
+func (m legacyMsgServer) BurnToken(goCtx context.Context, msg *v1beta1.MsgBurnToken) (*v1beta1.MsgBurnTokenResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	token, err := m.k.getTokenBySymbol(ctx, msg.Symbol)
 	if err != nil {
@@ -88,7 +88,7 @@ func (m leagcyMsgServer) BurnToken(goCtx context.Context, msg *v1beta1.MsgBurnTo
 	return &v1beta1.MsgBurnTokenResponse{}, err
 }
 
-func (m leagcyMsgServer) TransferTokenOwner(goCtx context.Context, msg *v1beta1.MsgTransferTokenOwner) (*v1beta1.MsgTransferTokenOwnerResponse, error) {
+func (m legacyMsgServer) TransferTokenOwner(goCtx context.Context, msg *v1beta1.MsgTransferTokenOwner) (*v1beta1.MsgTransferTokenOwnerResponse, error) {
 	_, err := m.server.TransferTokenOwner(goCtx, &v1.MsgTransferTokenOwner{
 		SrcOwner: msg.SrcOwner,
 		DstOwner: msg.DstOwner,
