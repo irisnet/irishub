@@ -131,6 +131,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		ethermintdebug.Cmd(),
 		config.Cmd(),
 		migrateCmd(encodingConfig.Marshaler),
+		mergeGenesisCmd(encodingConfig),
 	)
 
 	ac := appCreator{

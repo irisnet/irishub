@@ -123,6 +123,7 @@ import (
 	"github.com/irisnet/irismod/modules/token"
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
 
 	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
 	tibcmttransferkeeper "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/keeper"
@@ -586,12 +587,12 @@ func NewIrisApp(
 		app.BankKeeper,
 		app.ModuleAccountAddrs(),
 		authtypes.FeeCollectorName,
-	).WithSwapRegistry(tokentypes.SwapRegistry{
-		iristypes.NativeToken.MinUnit: tokentypes.SwapParams{
+	).WithSwapRegistry(tokenv1.SwapRegistry{
+		iristypes.NativeToken.MinUnit: tokenv1.SwapParams{
 			MinUnit: iristypes.EvmToken.MinUnit,
 			Ratio:   sdk.OneDec(),
 		},
-		iristypes.EvmToken.MinUnit: tokentypes.SwapParams{
+		iristypes.EvmToken.MinUnit: tokenv1.SwapParams{
 			MinUnit: iristypes.NativeToken.MinUnit,
 			Ratio:   sdk.OneDec(),
 		},
@@ -752,35 +753,32 @@ func NewIrisApp(
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
-		//sdk module
+		// upgrades should be run first
 		upgradetypes.ModuleName,
 		capabilitytypes.ModuleName,
-		authtypes.ModuleName,
-		banktypes.ModuleName,
-
+		minttypes.ModuleName,
 		feemarkettypes.ModuleName,
 		evmtypes.ModuleName,
-
 		distrtypes.ModuleName,
-		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
-		govtypes.ModuleName,
-		minttypes.ModuleName,
-		crisistypes.ModuleName,
-		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
-		authz.ModuleName,
-		feegrant.ModuleName,
-		paramstypes.ModuleName,
+		stakingtypes.ModuleName,
+		authtypes.ModuleName,
+		banktypes.ModuleName,
+		govtypes.ModuleName,
+		crisistypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
 		icatypes.ModuleName,
+		genutiltypes.ModuleName,
+		authz.ModuleName,
+		feegrant.ModuleName,
+		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 
 		//self module
 		tokentypes.ModuleName,
 		tibchost.ModuleName,
-		ibctransfertypes.ModuleName,
 		nfttypes.ModuleName,
 		htlctypes.ModuleName,
 		recordtypes.ModuleName,
@@ -795,35 +793,31 @@ func NewIrisApp(
 		guardiantypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
-		//sdk module
-		upgradetypes.ModuleName,
+		crisistypes.ModuleName,
+		govtypes.ModuleName,
+		stakingtypes.ModuleName,
+		evmtypes.ModuleName,
+		feemarkettypes.ModuleName,
+		ibctransfertypes.ModuleName,
+		ibchost.ModuleName,
+		icatypes.ModuleName,
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
-
-		evmtypes.ModuleName,
-		feemarkettypes.ModuleName,
-
 		distrtypes.ModuleName,
-		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
-		govtypes.ModuleName,
 		minttypes.ModuleName,
-		crisistypes.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		authz.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		ibchost.ModuleName,
-		icatypes.ModuleName,
+		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 
 		//self module
 		tokentypes.ModuleName,
 		tibchost.ModuleName,
-		ibctransfertypes.ModuleName,
 		nfttypes.ModuleName,
 		htlctypes.ModuleName,
 		recordtypes.ModuleName,
@@ -844,49 +838,47 @@ func NewIrisApp(
 	// so that other modules that want to create or claim capabilities afterwards in InitChain
 	// can do so safely.
 	app.mm.SetOrderInitGenesis(
-		//sdk module
-		upgradetypes.ModuleName,
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		distrtypes.ModuleName,
+		govtypes.ModuleName,
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
-		govtypes.ModuleName,
 		minttypes.ModuleName,
-		crisistypes.ModuleName,
-
+		ibctransfertypes.ModuleName,
+		ibchost.ModuleName,
+		icatypes.ModuleName,
+		authz.ModuleName,
+		feegrant.ModuleName,
+		paramstypes.ModuleName,
+		upgradetypes.ModuleName,
+		vestingtypes.ModuleName,
 		evmtypes.ModuleName,
 		// NOTE: feemarket module needs to be initialized before genutil module:
 		// gentx transactions use MinGasPriceDecorator.AnteHandle
 		feemarkettypes.ModuleName,
-
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
-		authz.ModuleName,
-		feegrant.ModuleName,
-		paramstypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		ibchost.ModuleName,
-		icatypes.ModuleName,
-		vestingtypes.ModuleName,
 
 		//self module
 		tokentypes.ModuleName,
 		tibchost.ModuleName,
-		ibctransfertypes.ModuleName,
 		nfttypes.ModuleName,
 		htlctypes.ModuleName,
 		recordtypes.ModuleName,
+		// NOTE: coinswap module needs to be initialized before farm module:
 		coinswaptypes.ModuleName,
+		farmtypes.ModuleName,
+		randomtypes.ModuleName,
 		servicetypes.ModuleName,
 		oracletypes.ModuleName,
-		randomtypes.ModuleName,
-		farmtypes.ModuleName,
 		mttypes.ModuleName,
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+		// NOTE: crisis module must go at the end to check for invariants on each module
+		crisistypes.ModuleName,
 	)
 
 	cfg := module.NewConfigurator(appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())

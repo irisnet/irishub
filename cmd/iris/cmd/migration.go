@@ -23,6 +23,7 @@ import (
 
 	"github.com/irisnet/irishub/types"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 func migrateCmd(appCodec codec.Codec) *cobra.Command {
@@ -131,7 +132,7 @@ func migrateAppState(appCodec codec.Codec, initialHeight int64, appState map[str
 
 	// add token genesis
 	{
-		var tokenGenState tokentypes.GenesisState
+		var tokenGenState tokenv1.GenesisState
 		appCodec.MustUnmarshalJSON(appState[tokentypes.ModuleName], &tokenGenState)
 
 		evmTokenExist := false
