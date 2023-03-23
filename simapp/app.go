@@ -113,6 +113,7 @@ import (
 
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
 
 	"github.com/irisnet/irishub/address"
 	"github.com/irisnet/irishub/lite"
@@ -226,7 +227,7 @@ var (
 		nfttypes.ModuleName:            nil,
 	}
 
-	nativeToken tokentypes.Token
+	nativeToken tokenv1.Token
 )
 
 var (
@@ -304,7 +305,7 @@ func init() {
 	// set coin denom regexs
 	sdk.SetCoinDenomRegex(DefaultCoinDenomRegex)
 
-	nativeToken = tokentypes.Token{
+	nativeToken = tokenv1.Token{
 		Symbol:        "iris",
 		Name:          "Irishub staking token",
 		Scale:         6,
@@ -326,7 +327,7 @@ func init() {
 		panic(err)
 	}
 
-	tokentypes.SetNativeToken(
+	tokenv1.SetNativeToken(
 		nativeToken.Symbol,
 		nativeToken.Name,
 		nativeToken.MinUnit,

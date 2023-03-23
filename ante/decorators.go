@@ -11,7 +11,8 @@ import (
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	tokentypesv1 "github.com/irisnet/irismod/modules/token/types/v1"
+	tokentypesv1beta1 "github.com/irisnet/irismod/modules/token/types/v1beta1"
 )
 
 // ValidateTokenDecorator is responsible for restricting the token participation of the swap prefix
@@ -34,8 +35,12 @@ func (vtd ValidateTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulat
 			if containSwapCoin(msg.Token) {
 				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "can't transfer coinswap liquidity tokens through the IBC module")
 			}
-		case *tokentypes.MsgBurnToken:
+		case *tokentypesv1.MsgBurnToken:
 			if _, err := vtd.tk.GetToken(ctx, msg.Coin.Denom); err != nil {
+				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "burnt failed, only native tokens can be burnt")
+			}
+		case *tokentypesv1beta1.MsgBurnToken:
+			if _, err := vtd.tk.GetToken(ctx, msg.Symbol); err != nil {
 				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "burnt failed, only native tokens can be burnt")
 			}
 		case *govv1.MsgSubmitProposal:

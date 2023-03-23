@@ -123,6 +123,7 @@ import (
 	"github.com/irisnet/irismod/modules/token"
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
 
 	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
 	tibcmttransferkeeper "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/keeper"
@@ -586,12 +587,12 @@ func NewIrisApp(
 		app.BankKeeper,
 		app.ModuleAccountAddrs(),
 		authtypes.FeeCollectorName,
-	).WithSwapRegistry(tokentypes.SwapRegistry{
-		iristypes.NativeToken.MinUnit: tokentypes.SwapParams{
+	).WithSwapRegistry(tokenv1.SwapRegistry{
+		iristypes.NativeToken.MinUnit: tokenv1.SwapParams{
 			MinUnit: iristypes.EvmToken.MinUnit,
 			Ratio:   sdk.OneDec(),
 		},
-		iristypes.EvmToken.MinUnit: tokentypes.SwapParams{
+		iristypes.EvmToken.MinUnit: tokenv1.SwapParams{
 			MinUnit: iristypes.NativeToken.MinUnit,
 			Ratio:   sdk.OneDec(),
 		},

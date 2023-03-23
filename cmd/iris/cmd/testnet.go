@@ -45,6 +45,7 @@ import (
 	iristypes "github.com/irisnet/irishub/types"
 	randomtypes "github.com/irisnet/irismod/modules/random/types"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
+	tokentypesv1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 var (
@@ -333,7 +334,7 @@ func initGenFiles(
 	appGenState[banktypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&bankGenState)
 
 	// set the point token in the genesis state
-	var tokenGenState tokentypes.GenesisState
+	var tokenGenState tokentypesv1.GenesisState
 	clientCtx.Codec.MustUnmarshalJSON(appGenState[tokentypes.ModuleName], &tokenGenState)
 	tokenGenState.Tokens = append(tokenGenState.Tokens, iristypes.EvmToken)
 	appGenState[tokentypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&tokenGenState)
