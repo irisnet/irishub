@@ -20,6 +20,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 const (
@@ -79,7 +80,7 @@ func (c command) append(name, typ string, index int) command {
 
 type coinConverter struct {
 	cmds   map[string]command
-	tokens map[string]tokentypes.TokenI
+	tokens map[string]tokenv1.TokenI
 	r, w   *os.File
 }
 
@@ -87,7 +88,7 @@ type coinConverter struct {
 func NewConverter() *coinConverter {
 	return &coinConverter{
 		cmds:   make(map[string]command),
-		tokens: make(map[string]tokentypes.TokenI),
+		tokens: make(map[string]tokenv1.TokenI),
 	}
 }
 
@@ -306,7 +307,7 @@ func (it coinConverter) resolvePath(cfg *config.Config, path string) (paths []st
 	return paths
 }
 
-func (it *coinConverter) queryToken(cmd *cobra.Command, denom string) (ft tokentypes.TokenI, err error) {
+func (it *coinConverter) queryToken(cmd *cobra.Command, denom string) (ft tokenv1.TokenI, err error) {
 	if ft, ok := it.tokens[denom]; ok {
 		return ft, nil
 	}
@@ -320,16 +321,16 @@ func (it *coinConverter) queryToken(cmd *cobra.Command, denom string) (ft tokent
 		return nil, err
 	}
 
-	queryClient := tokentypes.NewQueryClient(clientCtx)
+	queryClient := tokenv1.NewQueryClient(clientCtx)
 
-	res, err := queryClient.Token(context.Background(), &tokentypes.QueryTokenRequest{
+	res, err := queryClient.Token(context.Background(), &tokenv1.QueryTokenRequest{
 		Denom: denom,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	var evi tokentypes.TokenI
+	var evi tokenv1.TokenI
 	err = clientCtx.InterfaceRegistry.UnpackAny(res.Token, &evi)
 	if err != nil {
 		return nil, err

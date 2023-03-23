@@ -592,8 +592,8 @@ github.com/influxdata/tdigest v0.0.0-20181121200506-bf2b5ad3c0a9/go.mod h1:Js0mq
 github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368/go.mod h1:Wbbw6tYNvwa5dlB6304Sd+82Z3f7PmVZHVKU637d4po=
 github.com/informalsystems/tendermint v0.34.26 h1:89XvVexAy62geGWxmDmdmmJvfindx+Su2oTuwfSWMeU=
 github.com/informalsystems/tendermint v0.34.26/go.mod h1:q3uAZ/t5+MblQhFuHSd4flqaLDx7iUtWpwWbwvHAFhs=
-github.com/irisnet/irismod v1.7.3-rc1.0.20230309065214-ef53bfd6f1f8 h1:tnairIUsF/BBnMfN8jeCuB/ZlaAeoApFr2umClmOajk=
-github.com/irisnet/irismod v1.7.3-rc1.0.20230309065214-ef53bfd6f1f8/go.mod h1:B9WxUyCBkMRSaQ+LxXGKhyAPCXDaoXBv8/4T5SH1xR8=
+github.com/irisnet/irismod v1.7.3-rc1.0.20230323070532-5470e23e8e2e h1:R0GXMH/APQF0OvwQT9zjvo097LRinTWO7ukij/03fXc=
+github.com/irisnet/irismod v1.7.3-rc1.0.20230323070532-5470e23e8e2e/go.mod h1:B9WxUyCBkMRSaQ+LxXGKhyAPCXDaoXBv8/4T5SH1xR8=
 github.com/jackpal/go-nat-pmp v1.0.2 h1:KzKSgb7qkJvOUTqYl9/Hg/me3pWgBmERKrTGD7BdWus=
 github.com/jackpal/go-nat-pmp v1.0.2/go.mod h1:QPH045xvCAeXUZOxsnwmrtiCoxIr9eob+4orBN1SBKc=
 github.com/jedisct1/go-minisign v0.0.0-20190909160543-45766022959e/go.mod h1:G1CVv03EnqU1wYL2dFwXxW2An0az9JTl/ZsqXQeBlkU=
