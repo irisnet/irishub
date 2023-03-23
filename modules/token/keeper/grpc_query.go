@@ -16,11 +16,12 @@ import (
 	gogotypes "github.com/gogo/protobuf/types"
 
 	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
-var _ types.QueryServer = Keeper{}
+var _ v1.QueryServer = Keeper{}
 
-func (k Keeper) Token(c context.Context, req *types.QueryTokenRequest) (*types.QueryTokenResponse, error) {
+func (k Keeper) Token(c context.Context, req *v1.QueryTokenRequest) (*v1.QueryTokenResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -40,10 +41,10 @@ func (k Keeper) Token(c context.Context, req *types.QueryTokenRequest) (*types.Q
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryTokenResponse{Token: any}, nil
+	return &v1.QueryTokenResponse{Token: any}, nil
 }
 
-func (k Keeper) Tokens(c context.Context, req *types.QueryTokensRequest) (*types.QueryTokensResponse, error) {
+func (k Keeper) Tokens(c context.Context, req *v1.QueryTokensRequest) (*v1.QueryTokensResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -58,13 +59,13 @@ func (k Keeper) Tokens(c context.Context, req *types.QueryTokensRequest) (*types
 		}
 	}
 
-	var tokens []types.TokenI
+	var tokens []v1.TokenI
 	var pageRes *query.PageResponse
 	store := ctx.KVStore(k.storeKey)
 	if owner == nil {
 		tokenStore := prefix.NewStore(store, types.PrefixTokenForSymbol)
 		pageRes, err = query.Paginate(tokenStore, shapePageRequest(req.Pagination), func(key []byte, value []byte) error {
-			var token types.Token
+			var token v1.Token
 			k.cdc.MustUnmarshal(value, &token)
 			tokens = append(tokens, &token)
 			return nil
@@ -100,10 +101,10 @@ func (k Keeper) Tokens(c context.Context, req *types.QueryTokensRequest) (*types
 		}
 	}
 
-	return &types.QueryTokensResponse{Tokens: result, Pagination: pageRes}, nil
+	return &v1.QueryTokensResponse{Tokens: result, Pagination: pageRes}, nil
 }
 
-func (k Keeper) Fees(c context.Context, req *types.QueryFeesRequest) (*types.QueryFeesResponse, error) {
+func (k Keeper) Fees(c context.Context, req *v1.QueryFeesRequest) (*v1.QueryFeesResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -124,7 +125,7 @@ func (k Keeper) Fees(c context.Context, req *types.QueryFeesRequest) (*types.Que
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryFeesResponse{
+	return &v1.QueryFeesResponse{
 		Exist:    k.HasToken(ctx, req.Symbol),
 		IssueFee: issueFee,
 		MintFee:  mintFee,
@@ -132,17 +133,17 @@ func (k Keeper) Fees(c context.Context, req *types.QueryFeesRequest) (*types.Que
 }
 
 // Params return the all the parameter in tonken module
-func (k Keeper) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+func (k Keeper) Params(c context.Context, req *v1.QueryParamsRequest) (*v1.QueryParamsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 	params := k.GetParamSet(ctx)
 
-	return &types.QueryParamsResponse{Params: params}, nil
+	return &v1.QueryParamsResponse{Params: params}, nil
 }
 
 // TotalBurn return the all burn coin
-func (k Keeper) TotalBurn(c context.Context, req *types.QueryTotalBurnRequest) (*types.QueryTotalBurnResponse, error) {
+func (k Keeper) TotalBurn(c context.Context, req *v1.QueryTotalBurnRequest) (*v1.QueryTotalBurnResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
-	return &types.QueryTotalBurnResponse{
+	return &v1.QueryTotalBurnResponse{
 		BurnedCoins: k.GetAllBurnCoin(ctx),
 	}, nil
 }

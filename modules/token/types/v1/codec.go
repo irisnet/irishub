@@ -1,4 +1,4 @@
-package types
+package v1
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -21,15 +21,14 @@ func init() {
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterInterface((*TokenI)(nil), nil)
+	cdc.RegisterConcrete(&Token{}, "irismod/token/v1/Token", nil)
 
-	cdc.RegisterConcrete(&Token{}, "irismod/token/Token", nil)
-
-	cdc.RegisterConcrete(&MsgIssueToken{}, "irismod/token/MsgIssueToken", nil)
-	cdc.RegisterConcrete(&MsgEditToken{}, "irismod/token/MsgEditToken", nil)
-	cdc.RegisterConcrete(&MsgMintToken{}, "irismod/token/MsgMintToken", nil)
-	cdc.RegisterConcrete(&MsgBurnToken{}, "irismod/token/MsgBurnToken", nil)
-	cdc.RegisterConcrete(&MsgTransferTokenOwner{}, "irismod/token/MsgTransferTokenOwner", nil)
-	cdc.RegisterConcrete(&MsgSwapFeeToken{}, "irismod/token/MsgSwapFeeToken", nil)
+	cdc.RegisterConcrete(&MsgIssueToken{}, "irismod/token/v1/MsgIssueToken", nil)
+	cdc.RegisterConcrete(&MsgEditToken{}, "irismod/token/v1/MsgEditToken", nil)
+	cdc.RegisterConcrete(&MsgMintToken{}, "irismod/token/v1/MsgMintToken", nil)
+	cdc.RegisterConcrete(&MsgBurnToken{}, "irismod/token/v1/MsgBurnToken", nil)
+	cdc.RegisterConcrete(&MsgTransferTokenOwner{}, "irismod/token/v1/MsgTransferTokenOwner", nil)
+	cdc.RegisterConcrete(&MsgSwapFeeToken{}, "irismod/token/v1/MsgSwapFeeToken", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
@@ -42,10 +41,9 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgSwapFeeToken{},
 	)
 	registry.RegisterInterface(
-		"irismod.token.TokenI",
+		"irismod.token.v1.TokenI",
 		(*TokenI)(nil),
 		&Token{},
 	)
-
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

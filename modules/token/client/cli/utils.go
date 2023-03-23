@@ -6,33 +6,33 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 // queryTokenFees retrieves the fees of issuance and minting for the specified symbol
-func queryTokenFees(cliCtx client.Context, symbol string) (types.QueryFeesResponse, error) {
-	queryClient := types.NewQueryClient(cliCtx)
+func queryTokenFees(cliCtx client.Context, symbol string) (v1.QueryFeesResponse, error) {
+	queryClient := v1.NewQueryClient(cliCtx)
 
-	resp, err := queryClient.Fees(context.Background(), &types.QueryFeesRequest{Symbol: symbol})
+	resp, err := queryClient.Fees(context.Background(), &v1.QueryFeesRequest{Symbol: symbol})
 	if err != nil {
-		return types.QueryFeesResponse{}, err
+		return v1.QueryFeesResponse{}, err
 	}
 
 	return *resp, err
 }
 
 // queryToken query token information
-func queryToken(cliCtx client.Context, denom string) (types.TokenI, error) {
-	queryClient := types.NewQueryClient(cliCtx)
+func queryToken(cliCtx client.Context, denom string) (v1.TokenI, error) {
+	queryClient := v1.NewQueryClient(cliCtx)
 
-	resp, err := queryClient.Token(context.Background(), &types.QueryTokenRequest{
+	resp, err := queryClient.Token(context.Background(), &v1.QueryTokenRequest{
 		Denom: denom,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	var evi types.TokenI
+	var evi v1.TokenI
 	err = cliCtx.InterfaceRegistry.UnpackAny(resp.Token, &evi)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func queryToken(cliCtx client.Context, denom string) (types.TokenI, error) {
 	return evi, err
 }
 
-func parseCoin(cliCtx client.Context, denom string) (sdk.Coin, types.TokenI, error) {
+func parseCoin(cliCtx client.Context, denom string) (sdk.Coin, v1.TokenI, error) {
 	decCoin, err := sdk.ParseDecCoin(denom)
 	if err != nil {
 		return sdk.Coin{}, nil, err

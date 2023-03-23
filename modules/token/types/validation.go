@@ -51,31 +51,6 @@ var (
 	regexpMinUint    = regexp.MustCompile(regexpMinUintFmt).MatchString
 )
 
-// ValidateToken checks if the given token is valid
-func ValidateToken(token Token) error {
-	if len(token.Owner) > 0 {
-		if _, err := sdk.AccAddressFromBech32(token.Owner); err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
-		}
-	}
-	if err := ValidateName(token.Name); err != nil {
-		return err
-	}
-	if err := ValidateSymbol(token.Symbol); err != nil {
-		return err
-	}
-	if err := ValidateMinUnit(token.MinUnit); err != nil {
-		return err
-	}
-	if err := ValidateInitialSupply(token.InitialSupply); err != nil {
-		return err
-	}
-	if token.MaxSupply < token.InitialSupply {
-		return sdkerrors.Wrapf(ErrInvalidMaxSupply, "invalid token max supply %d, only accepts value [%d, %d]", token.MaxSupply, token.InitialSupply, uint64(MaximumMaxSupply))
-	}
-	return ValidateScale(token.Scale)
-}
-
 // ValidateInitialSupply verifies whether the initial supply is legal
 func ValidateInitialSupply(initialSupply uint64) error {
 	if initialSupply > MaximumInitSupply {

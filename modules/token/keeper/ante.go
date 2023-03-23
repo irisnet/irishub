@@ -5,6 +5,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 type ValidateTokenFeeDecorator struct {
@@ -26,7 +27,7 @@ func (dtf ValidateTokenFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 	feeMap := make(map[string]sdk.Coin)
 	for _, msg := range tx.GetMsgs() {
 		switch msg := msg.(type) {
-		case *types.MsgIssueToken:
+		case *v1.MsgIssueToken:
 			fee, err := dtf.k.GetTokenIssueFee(ctx, msg.Symbol)
 			if err != nil {
 				return ctx, sdkerrors.Wrap(types.ErrInvalidBaseFee, err.Error())
@@ -37,7 +38,7 @@ func (dtf ValidateTokenFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 			} else {
 				feeMap[msg.Owner] = fee
 			}
-		case *types.MsgMintToken:
+		case *v1.MsgMintToken:
 			symbol, err := dtf.k.getSymbolByMinUnit(ctx, msg.Coin.Denom)
 			if err != nil {
 				return ctx, err

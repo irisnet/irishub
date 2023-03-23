@@ -16,7 +16,7 @@ import (
 
 	tokencli "github.com/irisnet/irismod/modules/token/client/cli"
 	tokentestutil "github.com/irisnet/irismod/modules/token/client/testutil"
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 	"github.com/irisnet/irismod/simapp"
 )
 
@@ -92,22 +92,22 @@ func (s *IntegrationTestSuite) TestToken() {
 	tokenSymbol := gjson.Get(txResp.RawLog, "0.events.4.attributes.0.value").String()
 
 	//------test GetCmdQueryTokens()-------------
-	url := fmt.Sprintf("%s/irismod/token/tokens", baseURL)
+	url := fmt.Sprintf("%s/irismod/token/v1/tokens", baseURL)
 	resp, err := rest.GetRequest(url)
-	respType = proto.Message(&tokentypes.QueryTokensResponse{})
+	respType = proto.Message(&v1.QueryTokensResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
-	tokensResp := respType.(*tokentypes.QueryTokensResponse)
+	tokensResp := respType.(*v1.QueryTokensResponse)
 	s.Require().Equal(2, len(tokensResp.Tokens))
 
 	//------test GetCmdQueryToken()-------------
-	url = fmt.Sprintf("%s/irismod/token/tokens/%s", baseURL, tokenSymbol)
+	url = fmt.Sprintf("%s/irismod/token/v1/tokens/%s", baseURL, tokenSymbol)
 	resp, err = rest.GetRequest(url)
-	respType = proto.Message(&tokentypes.QueryTokenResponse{})
-	var token tokentypes.TokenI
+	respType = proto.Message(&v1.QueryTokenResponse{})
+	var token v1.TokenI
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
-	tokenResp := respType.(*tokentypes.QueryTokenResponse)
+	tokenResp := respType.(*v1.QueryTokenResponse)
 	err = clientCtx.InterfaceRegistry.UnpackAny(tokenResp.Token, &token)
 	s.Require().NoError(err)
 	s.Require().Equal(name, token.GetName())
@@ -115,23 +115,23 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().Equal(uint64(initialSupply), token.GetInitialSupply())
 
 	//------test GetCmdQueryFee()-------------
-	url = fmt.Sprintf("%s/irismod/token/tokens/%s/fees", baseURL, tokenSymbol)
+	url = fmt.Sprintf("%s/irismod/token/v1/tokens/%s/fees", baseURL, tokenSymbol)
 	resp, err = rest.GetRequest(url)
-	respType = proto.Message(&tokentypes.QueryFeesResponse{})
+	respType = proto.Message(&v1.QueryFeesResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
-	feeResp := respType.(*tokentypes.QueryFeesResponse)
+	feeResp := respType.(*v1.QueryFeesResponse)
 	expectedFeeResp := "{\"exist\":true,\"issue_fee\":{\"denom\":\"stake\",\"amount\":\"13015\"},\"mint_fee\":{\"denom\":\"stake\",\"amount\":\"1301\"}}"
 	result, _ := json.Marshal(feeResp)
 	s.Require().Equal(expectedFeeResp, string(result))
 
 	//------test GetCmdQueryParams()-------------
-	url = fmt.Sprintf("%s/irismod/token/params", baseURL)
+	url = fmt.Sprintf("%s/irismod/token/v1/params", baseURL)
 	resp, err = rest.GetRequest(url)
-	respType = proto.Message(&tokentypes.QueryParamsResponse{})
+	respType = proto.Message(&v1.QueryParamsResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
-	paramsResp := respType.(*tokentypes.QueryParamsResponse)
+	paramsResp := respType.(*v1.QueryParamsResponse)
 	s.Require().NoError(err)
 	expectedParams := "{\"token_tax_rate\":\"0.400000000000000000\",\"issue_token_base_fee\":{\"denom\":\"stake\",\"amount\":\"60000\"},\"mint_token_fee_ratio\":\"0.100000000000000000\"}"
 	result, _ = json.Marshal(paramsResp.Params)

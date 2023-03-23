@@ -16,6 +16,7 @@ import (
 
 	"github.com/irisnet/irismod/modules/token/keeper"
 	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 // Simulation operation weights constants
@@ -109,7 +110,7 @@ func SimulateIssueToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 		error,
 	) {
 		token, maxFees := genToken(ctx, r, k, ak, bk, accs)
-		msg := types.NewMsgIssueToken(token.Symbol, token.MinUnit, token.Name, token.Scale, token.InitialSupply, token.MaxSupply, token.Mintable, token.GetOwner().String())
+		msg := v1.NewMsgIssueToken(token.Symbol, token.MinUnit, token.Name, token.Scale, token.InitialSupply, token.MaxSupply, token.Mintable, token.GetOwner().String())
 
 		simAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {
@@ -156,9 +157,9 @@ func SimulateEditToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 
 		token, _, skip := selectOneToken(ctx, k, ak, bk, false)
 		if skip {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgEditToken, "skip edit token"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, v1.TypeMsgEditToken, "skip edit token"), nil, nil
 		}
-		msg := types.NewMsgEditToken(token.GetName(), token.GetSymbol(), token.GetMaxSupply(), types.True, token.GetOwner().String())
+		msg := v1.NewMsgEditToken(token.GetName(), token.GetSymbol(), token.GetMaxSupply(), types.True, token.GetOwner().String())
 
 		simAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {
@@ -207,10 +208,10 @@ func SimulateMintToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 
 		token, maxFee, skip := selectOneToken(ctx, k, ak, bk, true)
 		if skip {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgMintToken, "skip mint token"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, v1.TypeMsgMintToken, "skip mint token"), nil, nil
 		}
 		simToAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgMintToken{
+		msg := &v1.MsgMintToken{
 			Coin: sdk.Coin{
 				Denom:  token.GetMinUnit(),
 				Amount: sdkmath.NewIntWithDecimal(100, int(token.GetScale())),
@@ -264,14 +265,14 @@ func SimulateTransferTokenOwner(k keeper.Keeper, ak types.AccountKeeper, bk type
 
 		token, _, skip := selectOneToken(ctx, k, ak, bk, false)
 		if skip {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferTokenOwner, "skip TransferTokenOwner"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, v1.TypeMsgTransferTokenOwner, "skip TransferTokenOwner"), nil, nil
 		}
 		var simToAccount, _ = simtypes.RandomAcc(r, accs)
 		for simToAccount.Address.Equals(token.GetOwner()) {
 			simToAccount, _ = simtypes.RandomAcc(r, accs)
 		}
 
-		msg := types.NewMsgTransferTokenOwner(token.GetOwner().String(), simToAccount.Address.String(), token.GetSymbol())
+		msg := v1.NewMsgTransferTokenOwner(token.GetOwner().String(), simToAccount.Address.String(), token.GetSymbol())
 
 		simAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {
@@ -320,7 +321,7 @@ func SimulateBurnToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 
 		token, _, skip := selectOneToken(ctx, k, ak, bk, false)
 		if skip {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferTokenOwner, "skip burnToken"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, v1.TypeMsgTransferTokenOwner, "skip burnToken"), nil, nil
 		}
 
 		owner, _ := sdk.AccAddressFromBech32(token.GetOwner().String())
@@ -328,17 +329,17 @@ func SimulateBurnToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 		amount := spendable.AmountOf(token.GetMinUnit())
 		if !amount.IsPositive() {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBurnToken, "Insufficient funds"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, v1.TypeMsgBurnToken, "Insufficient funds"), nil, nil
 		}
 
 		amount2 := simtypes.RandomAmount(r, amount)
 
 		spendable, hasNeg := spendable.SafeSub(sdk.Coins{sdk.NewCoin(token.GetMinUnit(), amount2)}...)
 		if hasNeg {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBurnToken, "Insufficient funds"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, v1.TypeMsgBurnToken, "Insufficient funds"), nil, nil
 		}
 
-		msg := &types.MsgBurnToken{
+		msg := &v1.MsgBurnToken{
 			Coin: sdk.Coin{
 				Denom:  token.GetMinUnit(),
 				Amount: amount2,
@@ -386,14 +387,14 @@ func selectOneToken(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	mint bool,
-) (token types.TokenI, maxFees sdk.Coins, skip bool) {
+) (token v1.TokenI, maxFees sdk.Coins, skip bool) {
 	tokens := k.GetTokens(ctx, nil)
 	if len(tokens) == 0 {
 		return token, maxFees, true
 	}
 
 	for _, t := range tokens {
-		if t.GetSymbol() == types.GetNativeToken().Symbol {
+		if t.GetSymbol() == v1.GetNativeToken().Symbol {
 			continue
 		}
 		if !mint {
@@ -407,11 +408,11 @@ func selectOneToken(
 
 		account := ak.GetAccount(ctx, t.GetOwner())
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
-		spendableStake := spendable.AmountOf(types.GetNativeToken().MinUnit)
+		spendableStake := spendable.AmountOf(v1.GetNativeToken().MinUnit)
 		if spendableStake.IsZero() || spendableStake.LT(mintFee.Amount) {
 			continue
 		}
-		maxFees = sdk.NewCoins(sdk.NewCoin(types.GetNativeToken().MinUnit, spendableStake).Sub(mintFee))
+		maxFees = sdk.NewCoins(sdk.NewCoin(v1.GetNativeToken().MinUnit, spendableStake).Sub(mintFee))
 		token = t
 		return
 	}
@@ -430,9 +431,9 @@ func genToken(ctx sdk.Context,
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	accs []simtypes.Account,
-) (types.Token, sdk.Coins) {
+) (v1.Token, sdk.Coins) {
 
-	var token types.Token
+	var token v1.Token
 	token = randToken(r, accs)
 
 	for k.HasToken(ctx, token.Symbol) {
@@ -461,16 +462,16 @@ loop:
 	simAccount, _ := simtypes.RandomAcc(r, accs)
 	account := ak.GetAccount(ctx, simAccount.Address)
 	spendable := bk.SpendableCoins(ctx, account.GetAddress())
-	spendableStake := spendable.AmountOf(types.GetNativeToken().MinUnit)
+	spendableStake := spendable.AmountOf(v1.GetNativeToken().MinUnit)
 	if spendableStake.IsZero() || spendableStake.LT(fee.Amount) {
 		goto loop
 	}
 	owner = account.GetAddress()
-	maxFees = sdk.NewCoins(sdk.NewCoin(types.GetNativeToken().MinUnit, spendableStake).Sub(fee))
+	maxFees = sdk.NewCoins(sdk.NewCoin(v1.GetNativeToken().MinUnit, spendableStake).Sub(fee))
 	return
 }
 
-func randToken(r *rand.Rand, accs []simtypes.Account) types.Token {
+func randToken(r *rand.Rand, accs []simtypes.Account) v1.Token {
 	var symbol, minUint string
 	for {
 		symbol = randStringBetween(r, types.MinimumSymbolLen, types.MaximumSymbolLen)
@@ -486,7 +487,7 @@ func randToken(r *rand.Rand, accs []simtypes.Account) types.Token {
 	maxSupply := 2 * initialSupply
 	simAccount, _ := simtypes.RandomAcc(r, accs)
 
-	return types.Token{
+	return v1.Token{
 		Symbol:        strings.ToLower(symbol),
 		Name:          name,
 		Scale:         uint32(scale),

@@ -13,6 +13,7 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 type Keeper struct {
@@ -22,7 +23,7 @@ type Keeper struct {
 	paramSpace       paramstypes.Subspace
 	blockedAddrs     map[string]bool
 	feeCollectorName string
-	registry         types.SwapRegistry
+	registry         v1.SwapRegistry
 }
 
 func NewKeeper(
@@ -35,7 +36,7 @@ func NewKeeper(
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !paramSpace.HasKeyTable() {
-		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
+		paramSpace = paramSpace.WithKeyTable(v1.ParamKeyTable())
 	}
 
 	return Keeper{
@@ -45,7 +46,7 @@ func NewKeeper(
 		bankKeeper:       bankKeeper,
 		feeCollectorName: feeCollectorName,
 		blockedAddrs:     blockedAddrs,
-		registry:         make(types.SwapRegistry),
+		registry:         make(v1.SwapRegistry),
 	}
 }
 
@@ -66,7 +67,7 @@ func (k Keeper) IssueToken(
 	mintable bool,
 	owner sdk.AccAddress,
 ) error {
-	token := types.NewToken(
+	token := v1.NewToken(
 		symbol, name, minUnit, scale, initialSupply,
 		maxSupply, mintable, owner,
 	)
@@ -122,7 +123,7 @@ func (k Keeper) EditToken(
 		token.MaxSupply = maxSupply
 	}
 
-	if name != types.DoNotModify {
+	if name != v1.DoNotModify {
 		token.Name = name
 
 		metadata, _ := k.bankKeeper.GetDenomMetaData(ctx, token.MinUnit)
@@ -270,7 +271,7 @@ func (k Keeper) SwapFeeToken(
 	return mintedCoin, k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, recipient, mintedCoins)
 }
 
-func (k Keeper) WithSwapRegistry(registry types.SwapRegistry) Keeper {
+func (k Keeper) WithSwapRegistry(registry v1.SwapRegistry) Keeper {
 	k.registry = registry
 	return k
 }

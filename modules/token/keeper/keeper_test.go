@@ -15,6 +15,7 @@ import (
 
 	"github.com/irisnet/irismod/modules/token/keeper"
 	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 	"github.com/irisnet/irismod/simapp"
 )
 
@@ -23,7 +24,7 @@ const (
 )
 
 var (
-	denom    = types.GetNativeToken().Symbol
+	denom    = v1.GetNativeToken().Symbol
 	owner    = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest")))
 	add2     = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest1")))
 	initAmt  = sdkmath.NewIntWithDecimal(100000000, int(6))
@@ -50,7 +51,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.app = app
 
 	// set params
-	suite.keeper.SetParamSet(suite.ctx, types.DefaultParams())
+	suite.keeper.SetParamSet(suite.ctx, v1.DefaultParams())
 
 	// init tokens to addr
 	err := suite.bk.MintCoins(suite.ctx, types.ModuleName, initCoin)
@@ -63,12 +64,12 @@ func TestKeeperSuite(t *testing.T) {
 	suite.Run(t, new(KeeperTestSuite))
 }
 
-func (suite *KeeperTestSuite) setToken(token types.Token) {
+func (suite *KeeperTestSuite) setToken(token v1.Token) {
 	err := suite.keeper.AddToken(suite.ctx, token)
 	suite.NoError(err)
 }
 
-func (suite *KeeperTestSuite) issueToken(token types.Token) {
+func (suite *KeeperTestSuite) issueToken(token v1.Token) {
 	suite.setToken(token)
 
 	mintCoins := sdk.NewCoins(
@@ -86,7 +87,7 @@ func (suite *KeeperTestSuite) issueToken(token types.Token) {
 }
 
 func (suite *KeeperTestSuite) TestIssueToken() {
-	token := types.NewToken("btc", "Bitcoin Network", "satoshi", 18, 21000000, 21000000, false, owner)
+	token := v1.NewToken("btc", "Bitcoin Network", "satoshi", 18, 21000000, 21000000, false, owner)
 
 	err := suite.keeper.IssueToken(
 		suite.ctx, token.Symbol, token.Name,
@@ -103,11 +104,11 @@ func (suite *KeeperTestSuite) TestIssueToken() {
 	suite.Equal(token.MinUnit, issuedToken.GetMinUnit())
 	suite.Equal(token.Owner, issuedToken.GetOwner().String())
 
-	suite.EqualValues(&token, issuedToken.(*types.Token))
+	suite.EqualValues(&token, issuedToken.(*v1.Token))
 }
 
 func (suite *KeeperTestSuite) TestEditToken() {
-	token := types.NewToken("btc", "Bitcoin Network", "satoshi", 18, 21000000, 21000000, false, owner)
+	token := v1.NewToken("btc", "Bitcoin Network", "satoshi", 18, 21000000, 21000000, false, owner)
 	suite.setToken(token)
 
 	symbol := "btc"
@@ -121,13 +122,13 @@ func (suite *KeeperTestSuite) TestEditToken() {
 	newToken, err := suite.keeper.GetToken(suite.ctx, symbol)
 	suite.NoError(err)
 
-	expToken := types.NewToken("btc", "Bitcoin Token", "satoshi", 18, 21000000, 22000000, mintable.ToBool(), owner)
+	expToken := v1.NewToken("btc", "Bitcoin Token", "satoshi", 18, 21000000, 22000000, mintable.ToBool(), owner)
 
-	suite.EqualValues(newToken.(*types.Token), &expToken)
+	suite.EqualValues(newToken.(*v1.Token), &expToken)
 }
 
 func (suite *KeeperTestSuite) TestMintToken() {
-	token := types.NewToken("btc", "Bitcoin Network", "satoshi", 18, 1000, 2000, true, owner)
+	token := v1.NewToken("btc", "Bitcoin Network", "satoshi", 18, 1000, 2000, true, owner)
 	suite.issueToken(token)
 
 	amt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit)
@@ -147,7 +148,7 @@ func (suite *KeeperTestSuite) TestMintToken() {
 	err = suite.keeper.MintToken(suite.ctx, coinMinted, owner, sdk.AccAddress{})
 	suite.Error(err, "can not mint token without owner when the owner exists")
 
-	token = types.NewToken("atom", "Cosmos Hub", "uatom", 6, 1000, 2000, true, sdk.AccAddress{})
+	token = v1.NewToken("atom", "Cosmos Hub", "uatom", 6, 1000, 2000, true, sdk.AccAddress{})
 	suite.issueToken(token)
 
 	err = suite.keeper.MintToken(suite.ctx, sdk.NewCoin(token.MinUnit, sdkmath.OneInt()), owner, sdk.AccAddress{})
@@ -155,7 +156,7 @@ func (suite *KeeperTestSuite) TestMintToken() {
 }
 
 func (suite *KeeperTestSuite) TestBurnToken() {
-	token := types.NewToken("btc", "Bitcoin Network", "satoshi", 18, 1000, 2000, true, owner)
+	token := v1.NewToken("btc", "Bitcoin Network", "satoshi", 18, 1000, 2000, true, owner)
 	suite.issueToken(token)
 
 	amt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit)
@@ -171,7 +172,7 @@ func (suite *KeeperTestSuite) TestBurnToken() {
 }
 
 func (suite *KeeperTestSuite) TestTransferToken() {
-	token := types.NewToken("btc", "Bitcoin Network", "satoshi", 18, 21000000, 21000000, false, owner)
+	token := v1.NewToken("btc", "Bitcoin Network", "satoshi", 18, 21000000, 21000000, false, owner)
 	suite.setToken(token)
 
 	dstOwner := sdk.AccAddress(tmhash.SumTruncated([]byte("TokenDstOwner")))
@@ -186,21 +187,21 @@ func (suite *KeeperTestSuite) TestTransferToken() {
 }
 
 func (suite *KeeperTestSuite) TestSwapFeeToken() {
-	token1 := types.NewToken("token1", "Test Token1", "t1min", 6, 1000, 2000, true, owner)
+	token1 := v1.NewToken("token1", "Test Token1", "t1min", 6, 1000, 2000, true, owner)
 	suite.issueToken(token1)
 
 	amt1 := suite.bk.GetBalance(suite.ctx, token1.GetOwner(), token1.MinUnit)
 	suite.Equal("1000000000t1min", amt1.String())
 
-	token2 := types.NewToken("token2", "Test Token1", "t2min", 18, 0, 2000, true, add2)
+	token2 := v1.NewToken("token2", "Test Token1", "t2min", 18, 0, 2000, true, add2)
 	suite.issueToken(token2)
 
-	suite.keeper = suite.keeper.WithSwapRegistry(types.SwapRegistry{
-		token1.MinUnit: types.SwapParams{
+	suite.keeper = suite.keeper.WithSwapRegistry(v1.SwapRegistry{
+		token1.MinUnit: v1.SwapParams{
 			MinUnit: token2.MinUnit,
 			Ratio:   sdk.NewDec(1),
 		},
-		token2.MinUnit: types.SwapParams{
+		token2.MinUnit: v1.SwapParams{
 			MinUnit: token1.MinUnit,
 			Ratio:   sdk.NewDec(1),
 		},

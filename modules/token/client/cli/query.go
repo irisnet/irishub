@@ -12,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 
 	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 // GetQueryCmd returns the query commands for the token module.
@@ -51,9 +52,9 @@ func GetCmdQueryToken() *cobra.Command {
 				return err
 			}
 
-			queryClient := types.NewQueryClient(clientCtx)
+			queryClient := v1.NewQueryClient(clientCtx)
 
-			res, err := queryClient.Token(context.Background(), &types.QueryTokenRequest{
+			res, err := queryClient.Token(context.Background(), &v1.QueryTokenRequest{
 				Denom: args[0],
 			})
 
@@ -89,14 +90,14 @@ func GetCmdQueryTokens() *cobra.Command {
 				}
 			}
 
-			queryClient := types.NewQueryClient(clientCtx)
+			queryClient := v1.NewQueryClient(clientCtx)
 			pageReq, err := client.ReadPageRequest(cmd.Flags())
 			if err != nil {
 				return err
 			}
 			res, err := queryClient.Tokens(
 				context.Background(),
-				&types.QueryTokensRequest{
+				&v1.QueryTokensRequest{
 					Owner:      owner.String(),
 					Pagination: pageReq,
 				},
@@ -105,9 +106,9 @@ func GetCmdQueryTokens() *cobra.Command {
 				return err
 			}
 
-			tokens := make([]types.TokenI, 0, len(res.Tokens))
+			tokens := make([]v1.TokenI, 0, len(res.Tokens))
 			for _, eviAny := range res.Tokens {
-				var evi types.TokenI
+				var evi v1.TokenI
 				if err = clientCtx.InterfaceRegistry.UnpackAny(eviAny, &evi); err != nil {
 					return err
 				}
@@ -142,10 +143,10 @@ func GetCmdQueryFee() *cobra.Command {
 			}
 
 			// query token fees
-			queryClient := types.NewQueryClient(clientCtx)
+			queryClient := v1.NewQueryClient(clientCtx)
 			res, err := queryClient.Fees(
 				context.Background(),
-				&types.QueryFeesRequest{
+				&v1.QueryFeesRequest{
 					Symbol: symbol,
 				},
 			)
@@ -173,8 +174,8 @@ func GetCmdQueryParams() *cobra.Command {
 				return err
 			}
 
-			queryClient := types.NewQueryClient(clientCtx)
-			res, err := queryClient.Params(context.Background(), &types.QueryParamsRequest{})
+			queryClient := v1.NewQueryClient(clientCtx)
+			res, err := queryClient.Params(context.Background(), &v1.QueryParamsRequest{})
 			if err != nil {
 				return err
 			}
@@ -199,8 +200,8 @@ func GetCmdQueryTotalBurn() *cobra.Command {
 				return err
 			}
 
-			queryClient := types.NewQueryClient(clientCtx)
-			res, err := queryClient.TotalBurn(context.Background(), &types.QueryTotalBurnRequest{})
+			queryClient := v1.NewQueryClient(clientCtx)
+			res, err := queryClient.TotalBurn(context.Background(), &v1.QueryTotalBurnRequest{})
 			if err != nil {
 				return err
 			}

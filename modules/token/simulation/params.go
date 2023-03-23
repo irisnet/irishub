@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
 	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 const (
@@ -29,7 +30,7 @@ func ParamChanges(r *rand.Rand) []simtypes.ParamChange {
 		),
 		simulation.NewSimParamChange(types.ModuleName, keyIssueTokenBaseFee,
 			func(r *rand.Rand) string {
-				fee := sdk.NewCoin(types.GetNativeToken().Symbol, RandomInt(r))
+				fee := sdk.NewCoin(v1.GetNativeToken().Symbol, RandomInt(r))
 				bz, _ := json.Marshal(fee)
 				return string(bz)
 			},

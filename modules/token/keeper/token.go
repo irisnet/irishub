@@ -10,10 +10,11 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
 	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 // GetTokens returns all existing tokens
-func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress) (tokens []types.TokenI) {
+func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress) (tokens []v1.TokenI) {
 	store := ctx.KVStore(k.storeKey)
 
 	var it sdk.Iterator
@@ -22,7 +23,7 @@ func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress) (tokens []types
 		defer it.Close()
 
 		for ; it.Valid(); it.Next() {
-			var token types.Token
+			var token v1.Token
 			k.cdc.MustUnmarshal(it.Value(), &token)
 
 			tokens = append(tokens, &token)
@@ -47,7 +48,7 @@ func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress) (tokens []types
 }
 
 // GetToken returns the token of the specified symbol or min uint
-func (k Keeper) GetToken(ctx sdk.Context, denom string) (types.TokenI, error) {
+func (k Keeper) GetToken(ctx sdk.Context, denom string) (v1.TokenI, error) {
 	// query token by symbol
 	if token, err := k.getTokenBySymbol(ctx, denom); err == nil {
 		return &token, nil
@@ -62,7 +63,7 @@ func (k Keeper) GetToken(ctx sdk.Context, denom string) (types.TokenI, error) {
 }
 
 // AddToken saves a new token
-func (k Keeper) AddToken(ctx sdk.Context, token types.Token) error {
+func (k Keeper) AddToken(ctx sdk.Context, token v1.Token) error {
 	if k.HasToken(ctx, token.Symbol) {
 		return sdkerrors.Wrapf(types.ErrSymbolAlreadyExists, "symbol already exists: %s", token.Symbol)
 	}
@@ -171,14 +172,14 @@ func (k Keeper) GetAllBurnCoin(ctx sdk.Context) []sdk.Coin {
 }
 
 // GetParamSet returns token params from the global param store
-func (k Keeper) GetParamSet(ctx sdk.Context) types.Params {
-	var p types.Params
+func (k Keeper) GetParamSet(ctx sdk.Context) v1.Params {
+	var p v1.Params
 	k.paramSpace.GetParamSet(ctx, &p)
 	return p
 }
 
 // SetParamSet sets token params to the global param store
-func (k Keeper) SetParamSet(ctx sdk.Context, params types.Params) {
+func (k Keeper) SetParamSet(ctx sdk.Context, params v1.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }
 
@@ -198,14 +199,14 @@ func (k Keeper) setWithMinUnit(ctx sdk.Context, minUnit, symbol string) {
 	store.Set(types.KeyMinUint(minUnit), bz)
 }
 
-func (k Keeper) setToken(ctx sdk.Context, token types.Token) {
+func (k Keeper) setToken(ctx sdk.Context, token v1.Token) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&token)
 
 	store.Set(types.KeySymbol(token.Symbol), bz)
 }
 
-func (k Keeper) getTokenBySymbol(ctx sdk.Context, symbol string) (token types.Token, err error) {
+func (k Keeper) getTokenBySymbol(ctx sdk.Context, symbol string) (token v1.Token, err error) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := store.Get(types.KeySymbol(symbol))
@@ -217,7 +218,7 @@ func (k Keeper) getTokenBySymbol(ctx sdk.Context, symbol string) (token types.To
 	return token, nil
 }
 
-func (k Keeper) getTokenByMinUnit(ctx sdk.Context, minUnit string) (token types.Token, err error) {
+func (k Keeper) getTokenByMinUnit(ctx sdk.Context, minUnit string) (token v1.Token, err error) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := store.Get(types.KeyMinUint(minUnit))

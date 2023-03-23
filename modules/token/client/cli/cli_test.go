@@ -18,7 +18,7 @@ import (
 
 	tokencli "github.com/irisnet/irismod/modules/token/client/cli"
 	tokentestutil "github.com/irisnet/irismod/modules/token/client/testutil"
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 	"github.com/irisnet/irismod/simapp"
 )
 
@@ -92,14 +92,14 @@ func (s *IntegrationTestSuite) TestToken() {
 	tokenSymbol := gjson.Get(txResp.RawLog, "0.events.4.attributes.0.value").String()
 
 	//------test GetCmdQueryTokens()-------------
-	tokens := &[]tokentypes.TokenI{}
+	tokens := &[]v1.TokenI{}
 	bz, err = tokentestutil.QueryTokensExec(clientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.LegacyAmino.UnmarshalJSON(bz.Bytes(), tokens))
 	s.Require().Equal(1, len(*tokens))
 
 	//------test GetCmdQueryToken()-------------
-	var token tokentypes.TokenI
+	var token v1.TokenI
 	respType = proto.Message(&types.Any{})
 	bz, err = tokentestutil.QueryTokenExec(clientCtx, tokenSymbol)
 	s.Require().NoError(err)
@@ -111,22 +111,22 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().Equal(uint64(initialSupply), token.GetInitialSupply())
 
 	//------test GetCmdQueryFee()-------------
-	respType = proto.Message(&tokentypes.QueryFeesResponse{})
+	respType = proto.Message(&v1.QueryFeesResponse{})
 	bz, err = tokentestutil.QueryFeeExec(clientCtx, symbol)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	feeResp := respType.(*tokentypes.QueryFeesResponse)
+	feeResp := respType.(*v1.QueryFeesResponse)
 	s.Require().NoError(err)
 	expectedFeeResp := "{\"exist\":true,\"issue_fee\":{\"denom\":\"stake\",\"amount\":\"13015\"},\"mint_fee\":{\"denom\":\"stake\",\"amount\":\"1301\"}}"
 	result, _ := json.Marshal(feeResp)
 	s.Require().Equal(expectedFeeResp, string(result))
 
 	//------test GetCmdQueryParams()-------------
-	respType = proto.Message(&tokentypes.Params{})
+	respType = proto.Message(&v1.Params{})
 	bz, err = tokentestutil.QueryParamsExec(clientCtx)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	params := respType.(*tokentypes.Params)
+	params := respType.(*v1.Params)
 	s.Require().NoError(err)
 	expectedParams := "{\"token_tax_rate\":\"0.400000000000000000\",\"issue_token_base_fee\":{\"denom\":\"stake\",\"amount\":\"60000\"},\"mint_token_fee_ratio\":\"0.100000000000000000\"}"
 	result, _ = json.Marshal(params)
@@ -213,7 +213,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-	var token2 tokentypes.TokenI
+	var token2 v1.TokenI
 	respType = proto.Message(&types.Any{})
 	bz, err = tokentestutil.QueryTokenExec(clientCtx, tokenSymbol)
 	s.Require().NoError(err)
@@ -242,7 +242,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-	var token3 tokentypes.TokenI
+	var token3 v1.TokenI
 	respType = proto.Message(&types.Any{})
 	bz, err = tokentestutil.QueryTokenExec(clientCtx, tokenSymbol)
 	s.Require().NoError(err)

@@ -1,8 +1,10 @@
-package types
+package v1
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
 )
 
 const (
@@ -59,18 +61,16 @@ func (msg MsgIssueToken) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
-	return ValidateToken(
-		NewToken(
-			msg.Symbol,
-			msg.Name,
-			msg.MinUnit,
-			msg.Scale,
-			msg.InitialSupply,
-			msg.MaxSupply,
-			msg.Mintable,
-			owner,
-		),
-	)
+	return NewToken(
+		msg.Symbol,
+		msg.Name,
+		msg.MinUnit,
+		msg.Scale,
+		msg.InitialSupply,
+		msg.MaxSupply,
+		msg.Mintable,
+		owner,
+	).Validate()
 }
 
 // GetSignBytes Implements Msg.
@@ -133,11 +133,11 @@ func (msg MsgTransferTokenOwner) ValidateBasic() error {
 
 	// check if the `DstOwner` is same as the original owner
 	if srcOwner.Equals(dstOwner) {
-		return ErrInvalidToAddress
+		return tokentypes.ErrInvalidToAddress
 	}
 
 	// check the symbol
-	if err := ValidateSymbol(msg.Symbol); err != nil {
+	if err := tokentypes.ValidateSymbol(msg.Symbol); err != nil {
 		return err
 	}
 
@@ -151,7 +151,7 @@ func (msg MsgTransferTokenOwner) Route() string { return MsgRoute }
 func (msg MsgTransferTokenOwner) Type() string { return TypeMsgTransferTokenOwner }
 
 // NewMsgEditToken creates a MsgEditToken
-func NewMsgEditToken(name, symbol string, maxSupply uint64, mintable Bool, owner string) *MsgEditToken {
+func NewMsgEditToken(name, symbol string, maxSupply uint64, mintable tokentypes.Bool, owner string) *MsgEditToken {
 	return &MsgEditToken{
 		Name:      name,
 		Symbol:    symbol,
@@ -193,11 +193,11 @@ func (msg MsgEditToken) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
-	if err := ValidateName(msg.Name); err != nil {
+	if err := tokentypes.ValidateName(msg.Name); err != nil {
 		return err
 	}
 	// check symbol
-	return ValidateSymbol(msg.Symbol)
+	return tokentypes.ValidateSymbol(msg.Symbol)
 }
 
 // Route implements Msg
@@ -238,7 +238,7 @@ func (msg MsgMintToken) ValidateBasic() error {
 		}
 	}
 
-	return ValidateCoin(msg.Coin)
+	return tokentypes.ValidateCoin(msg.Coin)
 }
 
 // Route implements Msg
@@ -272,7 +272,7 @@ func (msg MsgBurnToken) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
-	return ValidateCoin(msg.Coin)
+	return tokentypes.ValidateCoin(msg.Coin)
 }
 
 // GetSigners implements Msg
@@ -306,5 +306,5 @@ func (msg MsgSwapFeeToken) ValidateBasic() error {
 		}
 	}
 
-	return ValidateCoin(msg.FeePaid)
+	return tokentypes.ValidateCoin(msg.FeePaid)
 }

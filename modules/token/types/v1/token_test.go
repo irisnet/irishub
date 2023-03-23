@@ -1,4 +1,4 @@
-package types
+package v1
 
 import (
 	"fmt"
@@ -7,6 +7,8 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
 )
 
 var (
@@ -27,7 +29,7 @@ func TestToken_ToMinCoin(t *testing.T) {
 		coin sdk.DecCoin
 	}
 
-	for i := uint32(0); i <= MaximumScale; i++ {
+	for i := uint32(0); i <= tokentypes.MaximumScale; i++ {
 		token.Scale = i
 		tests := []struct {
 			name    string
@@ -83,7 +85,7 @@ func TestToken_ToMainCoin(t *testing.T) {
 		coin sdk.Coin
 	}
 
-	for i := uint32(0); i <= MaximumScale; i++ {
+	for i := uint32(0); i <= tokentypes.MaximumScale; i++ {
 		token.Scale = i
 		tests := []struct {
 			name    string

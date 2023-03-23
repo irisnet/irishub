@@ -13,6 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 
 	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 // NewTxCmd returns the transaction commands for the token module.
@@ -92,7 +93,7 @@ func GetCmdIssueToken() *cobra.Command {
 				return err
 			}
 
-			msg := &types.MsgIssueToken{
+			msg := &v1.MsgIssueToken{
 				Symbol:        symbol,
 				Name:          name,
 				MinUnit:       minUnit,
@@ -183,7 +184,7 @@ func GetCmdEditToken() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgEditToken(name, args[0], maxSupply, mintable, owner)
+			msg := v1.NewMsgEditToken(name, args[0], maxSupply, mintable, owner)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -233,7 +234,7 @@ func GetCmdMintToken() *cobra.Command {
 				return err
 			}
 
-			msg := &types.MsgMintToken{
+			msg := &v1.MsgMintToken{
 				Coin:  coin,
 				To:    addr,
 				Owner: owner,
@@ -296,7 +297,7 @@ func GetCmdBurnToken() *cobra.Command {
 				return err
 			}
 
-			msg := &types.MsgBurnToken{
+			msg := &v1.MsgBurnToken{
 				Coin:   coin,
 				Sender: clientCtx.GetFromAddress().String(),
 			}
@@ -343,7 +344,7 @@ func GetCmdTransferTokenOwner() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgTransferTokenOwner(owner, toAddr, strings.TrimSpace(args[0]))
+			msg := v1.NewMsgTransferTokenOwner(owner, toAddr, strings.TrimSpace(args[0]))
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -396,7 +397,7 @@ func GetCmdSwapFeeToken() *cobra.Command {
 				return err
 			}
 
-			msg := &types.MsgSwapFeeToken{
+			msg := &v1.MsgSwapFeeToken{
 				FeePaid:   coin,
 				Recipient: toAddr,
 				Sender:    sender,

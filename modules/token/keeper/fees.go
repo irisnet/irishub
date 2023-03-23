@@ -1,4 +1,4 @@
-//nolint
+// nolint
 package keeper
 
 import (
@@ -8,6 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 // fee factor formula: (ln(len({name}))/ln{base})^{exp}
@@ -58,7 +59,7 @@ func (k Keeper) GetTokenMintFee(ctx sdk.Context, symbol string) (sdk.Coin, error
 	return token.ToMinCoin(sdk.NewDecCoinFromDec(params.IssueTokenBaseFee.Denom, sdk.NewDecFromInt(mintFee)))
 }
 
-func (k Keeper) calcTokenIssueFee(ctx sdk.Context, symbol string) (sdk.Coin, types.Params) {
+func (k Keeper) calcTokenIssueFee(ctx sdk.Context, symbol string) (sdk.Coin, v1.Params) {
 	// get params
 	params := k.GetParamSet(ctx)
 	issueTokenBaseFee := params.IssueTokenBaseFee

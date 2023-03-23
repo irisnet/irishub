@@ -6,8 +6,6 @@ import (
 	"strings"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-
-	"github.com/irisnet/irismod/modules/token/types"
 )
 
 const (
@@ -59,11 +57,11 @@ func ValidateTokenURI(tokenURI string) error {
 
 // Modified returns whether the field is modified
 func Modified(target string) bool {
-	return target != types.DoNotModify
+	return target != DoNotModify
 }
 
 func Modify(origin, target string) string {
-	if target == types.DoNotModify {
+	if target == DoNotModify {
 		return origin
 	}
 	return target

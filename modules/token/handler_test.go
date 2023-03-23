@@ -16,6 +16,7 @@ import (
 	tokenmodule "github.com/irisnet/irismod/modules/token"
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 	"github.com/irisnet/irismod/simapp"
 )
 
@@ -24,7 +25,7 @@ const (
 )
 
 var (
-	nativeToken = types.GetNativeToken()
+	nativeToken = v1.GetNativeToken()
 	denom       = nativeToken.Symbol
 	owner       = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest")))
 	initAmt     = sdkmath.NewIntWithDecimal(100000000, int(6))
@@ -53,7 +54,7 @@ func (suite *HandlerSuite) SetupTest() {
 	suite.bk = app.BankKeeper
 
 	// set params
-	suite.keeper.SetParamSet(suite.ctx, types.DefaultParams())
+	suite.keeper.SetParamSet(suite.ctx, v1.DefaultParams())
 
 	// init tokens to addr
 	err := suite.bk.MintCoins(suite.ctx, types.ModuleName, initCoin)
@@ -62,7 +63,7 @@ func (suite *HandlerSuite) SetupTest() {
 	suite.NoError(err)
 }
 
-func (suite *HandlerSuite) issueToken(token types.Token) {
+func (suite *HandlerSuite) issueToken(token v1.Token) {
 	err := suite.keeper.AddToken(suite.ctx, token)
 	suite.NoError(err)
 
@@ -85,7 +86,7 @@ func (suite *HandlerSuite) TestIssueToken() {
 
 	nativeTokenAmt1 := suite.bk.GetBalance(suite.ctx, owner, denom).Amount
 
-	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 21000000, 21000000, false, owner.String())
+	msg := v1.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 21000000, 21000000, false, owner.String())
 
 	_, err := h(suite.ctx, msg)
 	suite.NoError(err)
@@ -104,7 +105,7 @@ func (suite *HandlerSuite) TestIssueToken() {
 }
 
 func (suite *HandlerSuite) TestMintToken() {
-	token := types.NewToken("btc", "Bitcoin Network", "satoshi", 18, 1000, 2000, true, owner)
+	token := v1.NewToken("btc", "Bitcoin Network", "satoshi", 18, 1000, 2000, true, owner)
 	suite.issueToken(token)
 
 	beginBtcAmt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit).Amount
@@ -114,7 +115,7 @@ func (suite *HandlerSuite) TestMintToken() {
 
 	h := tokenmodule.NewHandler(suite.keeper)
 
-	msgMintToken := &types.MsgMintToken{
+	msgMintToken := &v1.MsgMintToken{
 		Coin: sdk.Coin{
 			Denom:  token.MinUnit,
 			Amount: sdkmath.NewInt(1000),
@@ -137,7 +138,7 @@ func (suite *HandlerSuite) TestMintToken() {
 }
 
 func (suite *HandlerSuite) TestBurnToken() {
-	token := types.NewToken("btc", "Bitcoin Network", "satoshi", 18, 1000, 2000, true, owner)
+	token := v1.NewToken("btc", "Bitcoin Network", "satoshi", 18, 1000, 2000, true, owner)
 	suite.issueToken(token)
 
 	beginBtcAmt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit).Amount
@@ -145,7 +146,7 @@ func (suite *HandlerSuite) TestBurnToken() {
 
 	h := tokenmodule.NewHandler(suite.keeper)
 
-	msgBurnToken := &types.MsgBurnToken{
+	msgBurnToken := &v1.MsgBurnToken{
 		Coin: sdk.Coin{
 			Denom:  token.MinUnit,
 			Amount: sdkmath.NewInt(1000),

@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irismod/modules/token"
-	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 	"github.com/irisnet/irismod/simapp"
 )
 
@@ -23,9 +23,9 @@ func TestExportGenesis(t *testing.T) {
 	// export genesis
 	genesisState := token.ExportGenesis(ctx, app.TokenKeeper)
 
-	require.Equal(t, types.DefaultParams(), genesisState.Params)
+	require.Equal(t, v1.DefaultParams(), genesisState.Params)
 	for _, token := range genesisState.Tokens {
-		require.Equal(t, token, types.GetNativeToken())
+		require.Equal(t, token, v1.GetNativeToken())
 	}
 }
 
@@ -36,14 +36,14 @@ func TestInitGenesis(t *testing.T) {
 
 	// add token
 	addr := sdk.AccAddress(tmhash.SumTruncated([]byte("addr1")))
-	ft := types.NewToken("btc", "Bitcoin Network", "satoshi", 1, 1, 1, true, addr)
+	ft := v1.NewToken("btc", "Bitcoin Network", "satoshi", 1, 1, 1, true, addr)
 
 	burnCoins := []sdk.Coin{
 		{Denom: ft.MinUnit, Amount: sdk.NewInt(1000)},
 	}
-	genesis := types.GenesisState{
-		Params:      types.DefaultParams(),
-		Tokens:      []types.Token{ft},
+	genesis := v1.GenesisState{
+		Params:      v1.DefaultParams(),
+		Tokens:      []v1.Token{ft},
 		BurnedCoins: burnCoins,
 	}
 

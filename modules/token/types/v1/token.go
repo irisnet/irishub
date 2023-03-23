@@ -1,15 +1,14 @@
-package types
+package v1
 
 import (
-	"encoding/json"
 	"math/big"
-	"strconv"
 
 	"github.com/gogo/protobuf/proto"
-	"gopkg.in/yaml.v2"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
 )
 
 var (
@@ -51,7 +50,7 @@ func NewToken(
 ) Token {
 	if maxSupply == 0 {
 		if mintable {
-			maxSupply = MaximumMaxSupply
+			maxSupply = tokentypes.MaximumMaxSupply
 		} else {
 			maxSupply = initialSupply
 		}
@@ -110,15 +109,10 @@ func (t Token) GetOwner() sdk.AccAddress {
 	return owner
 }
 
-func (t Token) String() string {
-	bz, _ := yaml.Marshal(t)
-	return string(bz)
-}
-
 // ToMainCoin returns the main denom coin from args
 func (t Token) ToMainCoin(coin sdk.Coin) (sdk.DecCoin, error) {
 	if t.Symbol != coin.Denom && t.MinUnit != coin.Denom {
-		return sdk.NewDecCoinFromDec(coin.Denom, sdk.ZeroDec()), sdkerrors.Wrapf(ErrTokenNotExists, "token not match")
+		return sdk.NewDecCoinFromDec(coin.Denom, sdk.ZeroDec()), sdkerrors.Wrapf(tokentypes.ErrTokenNotExists, "token not match")
 	}
 
 	if t.Symbol == coin.Denom {
@@ -134,7 +128,7 @@ func (t Token) ToMainCoin(coin sdk.Coin) (sdk.DecCoin, error) {
 // ToMinCoin returns the min denom coin from args
 func (t Token) ToMinCoin(coin sdk.DecCoin) (newCoin sdk.Coin, err error) {
 	if t.Symbol != coin.Denom && t.MinUnit != coin.Denom {
-		return sdk.NewCoin(coin.Denom, sdk.ZeroInt()), sdkerrors.Wrapf(ErrTokenNotExists, "token not match")
+		return sdk.NewCoin(coin.Denom, sdk.ZeroInt()), sdkerrors.Wrapf(tokentypes.ErrTokenNotExists, "token not match")
 	}
 
 	if t.MinUnit == coin.Denom {
@@ -147,63 +141,27 @@ func (t Token) ToMinCoin(coin sdk.DecCoin) (newCoin sdk.Coin, err error) {
 	return sdk.NewCoin(t.MinUnit, amount.TruncateInt()), nil
 }
 
-type Bool string
-
-const (
-	False Bool = "false"
-	True  Bool = "true"
-	Nil   Bool = ""
-)
-
-func (b Bool) ToBool() bool {
-	v := string(b)
-	if len(v) == 0 {
-		return false
+// Validate checks if the given token is valid
+func (t Token) Validate() error {
+	if len(t.Owner) > 0 {
+		if _, err := sdk.AccAddressFromBech32(t.Owner); err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		}
 	}
-	result, _ := strconv.ParseBool(v)
-	return result
-}
-
-func (b Bool) String() string {
-	return string(b)
-}
-
-// Marshal needed for protobuf compatibility
-func (b Bool) Marshal() ([]byte, error) {
-	return []byte(b), nil
-}
-
-// Unmarshal needed for protobuf compatibility
-func (b *Bool) Unmarshal(data []byte) error {
-	*b = Bool(data[:])
-	return nil
-}
-
-// Marshals to JSON using string
-func (b Bool) MarshalJSON() ([]byte, error) {
-	return json.Marshal(b.String())
-}
-
-// UnmarshalJSON from using string
-func (b *Bool) UnmarshalJSON(data []byte) error {
-	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := tokentypes.ValidateName(t.Name); err != nil {
 		return err
 	}
-	*b = Bool(s)
-	return nil
-}
-func ParseBool(v string) (Bool, error) {
-	if len(v) == 0 {
-		return Nil, nil
+	if err := tokentypes.ValidateSymbol(t.Symbol); err != nil {
+		return err
 	}
-	result, err := strconv.ParseBool(v)
-	if err != nil {
-		return Nil, err
+	if err := tokentypes.ValidateMinUnit(t.MinUnit); err != nil {
+		return err
 	}
-	if result {
-		return True, nil
+	if err := tokentypes.ValidateInitialSupply(t.InitialSupply); err != nil {
+		return err
 	}
-	return False, nil
+	if t.MaxSupply < t.InitialSupply {
+		return sdkerrors.Wrapf(tokentypes.ErrInvalidMaxSupply, "invalid token max supply %d, only accepts value [%d, %d]", t.MaxSupply, t.InitialSupply, uint64(tokentypes.MaximumMaxSupply))
+	}
+	return tokentypes.ValidateScale(t.Scale)
 }

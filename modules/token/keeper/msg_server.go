@@ -7,21 +7,22 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 type msgServer struct {
 	Keeper
 }
 
-var _ types.MsgServer = msgServer{}
+var _ v1.MsgServer = msgServer{}
 
 // NewMsgServerImpl returns an implementation of the token MsgServer interface
 // for the provided Keeper.
-func NewMsgServerImpl(keeper Keeper) types.MsgServer {
+func NewMsgServerImpl(keeper Keeper) v1.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
 
-func (m msgServer) IssueToken(goCtx context.Context, msg *types.MsgIssueToken) (*types.MsgIssueTokenResponse, error) {
+func (m msgServer) IssueToken(goCtx context.Context, msg *v1.MsgIssueToken) (*v1.MsgIssueTokenResponse, error) {
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
 		return nil, err
@@ -58,10 +59,10 @@ func (m msgServer) IssueToken(goCtx context.Context, msg *types.MsgIssueToken) (
 		),
 	})
 
-	return &types.MsgIssueTokenResponse{}, nil
+	return &v1.MsgIssueTokenResponse{}, nil
 }
 
-func (m msgServer) EditToken(goCtx context.Context, msg *types.MsgEditToken) (*types.MsgEditTokenResponse, error) {
+func (m msgServer) EditToken(goCtx context.Context, msg *v1.MsgEditToken) (*v1.MsgEditTokenResponse, error) {
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
 		return nil, err
@@ -89,10 +90,10 @@ func (m msgServer) EditToken(goCtx context.Context, msg *types.MsgEditToken) (*t
 		),
 	})
 
-	return &types.MsgEditTokenResponse{}, nil
+	return &v1.MsgEditTokenResponse{}, nil
 }
 
-func (m msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*types.MsgMintTokenResponse, error) {
+func (m msgServer) MintToken(goCtx context.Context, msg *v1.MsgMintToken) (*v1.MsgMintTokenResponse, error) {
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
 		return nil, err
@@ -140,10 +141,10 @@ func (m msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 		),
 	})
 
-	return &types.MsgMintTokenResponse{}, nil
+	return &v1.MsgMintTokenResponse{}, nil
 }
 
-func (m msgServer) BurnToken(goCtx context.Context, msg *types.MsgBurnToken) (*types.MsgBurnTokenResponse, error) {
+func (m msgServer) BurnToken(goCtx context.Context, msg *v1.MsgBurnToken) (*v1.MsgBurnTokenResponse, error) {
 	owner, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
@@ -166,10 +167,10 @@ func (m msgServer) BurnToken(goCtx context.Context, msg *types.MsgBurnToken) (*t
 		),
 	})
 
-	return &types.MsgBurnTokenResponse{}, nil
+	return &v1.MsgBurnTokenResponse{}, nil
 }
 
-func (m msgServer) TransferTokenOwner(goCtx context.Context, msg *types.MsgTransferTokenOwner) (*types.MsgTransferTokenOwnerResponse, error) {
+func (m msgServer) TransferTokenOwner(goCtx context.Context, msg *v1.MsgTransferTokenOwner) (*v1.MsgTransferTokenOwnerResponse, error) {
 	srcOwner, err := sdk.AccAddressFromBech32(msg.SrcOwner)
 	if err != nil {
 		return nil, err
@@ -204,10 +205,10 @@ func (m msgServer) TransferTokenOwner(goCtx context.Context, msg *types.MsgTrans
 		),
 	})
 
-	return &types.MsgTransferTokenOwnerResponse{}, nil
+	return &v1.MsgTransferTokenOwnerResponse{}, nil
 }
 
-func (m msgServer) SwapFeeToken(goCtx context.Context, msg *types.MsgSwapFeeToken) (*types.MsgSwapFeeTokenResponse, error) {
+func (m msgServer) SwapFeeToken(goCtx context.Context, msg *v1.MsgSwapFeeToken) (*v1.MsgSwapFeeTokenResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
@@ -246,7 +247,7 @@ func (m msgServer) SwapFeeToken(goCtx context.Context, msg *types.MsgSwapFeeToke
 		),
 	})
 
-	return &types.MsgSwapFeeTokenResponse{
+	return &v1.MsgSwapFeeTokenResponse{
 		FeeGot: feeGot,
 	}, nil
 }

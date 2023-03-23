@@ -11,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 
 	"github.com/irisnet/irismod/modules/token/types"
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 // Simulation parameter constants
@@ -36,7 +37,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 	var tokenTaxRate sdk.Dec
 	var issueTokenBaseFee sdk.Int
 	var mintTokenFeeRatio sdk.Dec
-	var tokens []types.Token
+	var tokens []v1.Token
 
 	simState.AppParams.GetOrGenerate(
 		simState.Cdc, TokenTaxRate, &tokenTaxRate, simState.Rand,
@@ -51,7 +52,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 			for i := 0; i < 5; i++ {
 				tokens = append(tokens, randToken(r, simState.Accounts))
 			}
-			tokens = append(tokens, types.GetNativeToken())
+			tokens = append(tokens, v1.GetNativeToken())
 		},
 	)
 
@@ -60,8 +61,8 @@ func RandomizedGenState(simState *module.SimulationState) {
 		func(r *rand.Rand) { mintTokenFeeRatio = sdk.NewDecWithPrec(int64(r.Intn(5)), 1) },
 	)
 
-	tokenGenesis := types.NewGenesisState(
-		types.NewParams(tokenTaxRate, sdk.NewCoin(sdk.DefaultBondDenom, issueTokenBaseFee), mintTokenFeeRatio),
+	tokenGenesis := v1.NewGenesisState(
+		v1.NewParams(tokenTaxRate, sdk.NewCoin(sdk.DefaultBondDenom, issueTokenBaseFee), mintTokenFeeRatio),
 		tokens,
 	)
 
