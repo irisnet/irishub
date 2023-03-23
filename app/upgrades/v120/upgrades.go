@@ -48,20 +48,19 @@ import (
 	tibcclienttypes "github.com/bianjieai/tibc-go/modules/tibc/core/02-client/types"
 	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
 
+	"github.com/irisnet/irishub/app/upgrades"
 	"github.com/irisnet/irishub/app/upgrades/v120/tibc"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	"github.com/irisnet/irishub/modules/mint"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
 	"github.com/irisnet/irishub/types"
-
-	"github.com/irisnet/irishub/app/upgrades"
 )
 
 var Upgrade = upgrades.Upgrade{
 	UpgradeName:               "v1.2",
 	UpgradeHandlerConstructor: upgradeHandlerConstructor,
-	StoreUpgrades: store.StoreUpgrades{
+	StoreUpgrades: &store.StoreUpgrades{
 		Added: []string{farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey},
 	},
 }
@@ -80,10 +79,10 @@ func upgradeHandlerConstructor(m *module.Manager, c module.Configurator, app upg
 			NativeChainName: "irishub-mainnet",
 		})
 
-		if err := tibc.CreateClient(ctx,
-			app.AppCodec(),
-			"v1.2",
-			app.TIBCkeeper().ClientKeeper,
+		if err := upgrades.CreateClient(ctx,
+			app.AppCodec,
+			tibc.ClientData,
+			app.TIBCkeeper.ClientKeeper,
 		); err != nil {
 			return nil, err
 		}
@@ -111,6 +110,6 @@ func upgradeHandlerConstructor(m *module.Manager, c module.Configurator, app upg
 		fromVM[servicetypes.ModuleName] = service.AppModule{}.ConsensusVersion()
 		fromVM[oracletypes.ModuleName] = oracle.AppModule{}.ConsensusVersion()
 		fromVM[randomtypes.ModuleName] = random.AppModule{}.ConsensusVersion()
-		return app.ModuleManager().RunMigrations(ctx, c, fromVM)
+		return app.ModuleManager.RunMigrations(ctx, c, fromVM)
 	}
 }

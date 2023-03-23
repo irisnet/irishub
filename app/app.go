@@ -76,7 +76,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
-	sdkupgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	ica "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts"
@@ -258,6 +257,7 @@ type IrisApp struct {
 	legacyAmino       *codec.LegacyAmino
 	appCodec          codec.Codec
 	interfaceRegistry types.InterfaceRegistry
+	configurator      module.Configurator
 
 	invCheckPeriod uint
 
@@ -881,10 +881,10 @@ func NewIrisApp(
 		crisistypes.ModuleName,
 	)
 
-	cfg := module.NewConfigurator(appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
+	app.configurator = module.NewConfigurator(appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
-	app.mm.RegisterServices(cfg)
+	app.mm.RegisterServices(app.configurator)
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	//
@@ -958,7 +958,7 @@ func NewIrisApp(
 	app.SetEndBlocker(app.EndBlocker)
 
 	// Set software upgrade execution logic
-	app.RegisterUpgradePlan(cfg)
+	app.RegisterUpgradePlans()
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -1117,26 +1117,6 @@ func (app *IrisApp) RegisterTendermintService(clientCtx client.Context) {
 		app.interfaceRegistry,
 		app.Query,
 	)
-}
-
-// RegisterUpgradeHandler implements the upgrade execution logic of the upgrade module
-func (app *IrisApp) RegisterUpgradeHandler(
-	planName string,
-	upgrades *storetypes.StoreUpgrades,
-	upgradeHandler sdkupgrade.UpgradeHandler,
-) {
-	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
-	if err != nil {
-		app.Logger().Info("not found upgrade plan", "planName", planName, "err", err.Error())
-		return
-	}
-
-	if upgradeInfo.Name == planName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-		// this configures a no-op upgrade handler for the planName upgrade
-		app.UpgradeKeeper.SetUpgradeHandler(planName, upgradeHandler)
-		// configure store loader that checks if version+1 == upgradeHeight and applies store upgrades
-		app.SetStoreLoader(sdkupgrade.UpgradeStoreLoader(upgradeInfo.Height, upgrades))
-	}
 }
 
 // initParamsKeeper init params keeper and its subspaces
