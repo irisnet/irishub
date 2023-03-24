@@ -1,7 +1,7 @@
-package types
+package v140
 
 var (
-	ICAMsgs = []string{
+	msgTypes = []string{
 		"/cosmos.authz.v1beta1.MsgExec",
 		"/cosmos.authz.v1beta1.MsgGrant",
 		"/cosmos.authz.v1beta1.MsgRevoke",
