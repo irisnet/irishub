@@ -107,6 +107,25 @@
       }
     },
     {
+      "url": "./tmp-swagger-gen/ethermint/evm/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "EvmParams",
+          "Account": "EvmAccount",
+          "Balance": "EvmBalance"
+        }
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/ethermint/feemarket/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "FeeMarketParams",
+          "BaseFee": "FeeMarketBaseFee"
+        }
+      }
+    },
+    {
       "url": "./tmp-swagger-gen/ibc/applications/transfer/v1/query.swagger.json",
       "operationIds": {
         "rename": {

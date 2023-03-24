@@ -5,7 +5,9 @@ set -eo pipefail
 rm -rf ./tmp-swagger-gen ./tmp && mkdir -p ./tmp-swagger-gen ./tmp/proto ./tmp/third_party
 
 chmod a+x ./scripts/protoc-swagger-gen-ibc.sh
+chmod a+x ./scripts/protoc-swagger-gen-evm.sh
 ./scripts/protoc-swagger-gen-ibc.sh
+./scripts/protoc-swagger-gen-evm.sh
 
 SDK_VERSION=v0.46.9
 IRISMOD_VERSION=v1.7.3-rc1.0.20230323070532-5470e23e8e2e
