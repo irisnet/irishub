@@ -32005,7 +32005,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /irismod/token/params:
+  /irismod/token/v1/params:
     get:
       summary: Params queries the token parameters
       operationId: TokenParams
@@ -32263,7 +32263,7 @@ paths:
                         }
       tags:
         - Query
-  /irismod/token/tokens:
+  /irismod/token/v1/tokens:
     get:
       summary: Tokens returns the token list
       operationId: Tokens
@@ -32739,7 +32739,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /irismod/token/tokens/{denom}:
+  /irismod/token/v1/tokens/{denom}:
     get:
       summary: Token returns token with token name
       operationId: Token
@@ -33123,7 +33123,7 @@ paths:
           type: string
       tags:
         - Query
-  /irismod/token/tokens/{symbol}/fees:
+  /irismod/token/v1/tokens/{symbol}/fees:
     get:
       summary: Fees returns the fees to issue or mint a token
       operationId: Fees
@@ -33365,7 +33365,7 @@ paths:
           type: string
       tags:
         - Query
-  /irismod/token/total_burn:
+  /irismod/token/v1/total_burn:
     get:
       summary: TotalBurn queries all the burnt coins
       operationId: TotalBurn
@@ -71066,7 +71066,7 @@ definitions:
        - VOTE_OPTION_ABSTAIN: VOTE_OPTION_ABSTAIN defines an abstain vote option.
        - VOTE_OPTION_NO: VOTE_OPTION_NO defines a no vote option.
        - VOTE_OPTION_NO_WITH_VETO: VOTE_OPTION_NO_WITH_VETO defines a no with veto vote option.
-  irismod.token.Params:
+  irismod.token.v1.Params:
     type: object
     properties:
       token_tax_rate:
@@ -71086,7 +71086,7 @@ definitions:
       mint_token_fee_ratio:
         type: string
     title: Params defines token module's parameters
-  irismod.token.QueryFeesResponse:
+  irismod.token.v1.QueryFeesResponse:
     type: object
     properties:
       exist:
@@ -71116,7 +71116,7 @@ definitions:
           NOTE: The amount field is an Int which implements the custom method
           signatures required by gogoproto.
     title: QueryFeesResponse is response type for the Query/Fees RPC method
-  irismod.token.QueryParamsResponse:
+  irismod.token.v1.QueryParamsResponse:
     type: object
     properties:
       params:
@@ -71171,7 +71171,7 @@ definitions:
     title: >-
       QueryParametersResponse is response type for the Query/Parameters RPC
       method
-  irismod.token.QueryTokenResponse:
+  irismod.token.v1.QueryTokenResponse:
     type: object
     properties:
       Token:
@@ -71337,7 +71337,7 @@ definitions:
                 "value": "1.212s"
               }
     title: QueryTokenResponse is response type for the Query/Token RPC method
-  irismod.token.QueryTokensResponse:
+  irismod.token.v1.QueryTokensResponse:
     type: object
     properties:
       Tokens:
@@ -71534,7 +71534,7 @@ definitions:
                    PageResponse page = 2;
            }
     title: QueryTokensResponse is response type for the Query/Tokens RPC method
-  irismod.token.QueryTotalBurnResponse:
+  irismod.token.v1.QueryTotalBurnResponse:
     type: object
     properties:
       burned_coins:

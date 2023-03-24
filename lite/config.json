@@ -135,7 +135,7 @@
       }
     },
     {
-      "url": "./tmp-swagger-gen/token/query.swagger.json",
+      "url": "./tmp-swagger-gen/token/v1/query.swagger.json",
       "operationIds": {
         "rename": {
           "Params": "TokenParams"
