@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: IRIShub - REST and gRPC Gateway docs
   description: A REST interface for state queries, legacy transactions
-  version: 1.4.1
+  version: 2.0.0
 paths:
   /irismod/token/v1/params:
     get:
@@ -262,6 +262,7 @@ paths:
                         }
       tags:
         - Query
+        - TokenV1
   /irismod/token/v1/tokens:
     get:
       summary: Tokens returns the token list
@@ -738,6 +739,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - TokenV1
   /irismod/token/v1/tokens/{denom}:
     get:
       summary: Token returns token with token name
@@ -1122,6 +1124,7 @@ paths:
           type: string
       tags:
         - Query
+        - TokenV1
   /irismod/token/v1/tokens/{symbol}/fees:
     get:
       summary: Fees returns the fees to issue or mint a token
@@ -1364,6 +1367,7 @@ paths:
           type: string
       tags:
         - Query
+        - TokenV1
   /irismod/token/v1/total_burn:
     get:
       summary: TotalBurn queries all the burnt coins
@@ -1588,6 +1592,7 @@ paths:
                         }
       tags:
         - Query
+        - TokenV1
   /irismod/token/params:
     get:
       summary: Params queries the token parameters
@@ -1846,6 +1851,7 @@ paths:
                         }
       tags:
         - Query
+        - TokenV1beta1
   /irismod/token/tokens:
     get:
       summary: Tokens returns the token list
@@ -2322,6 +2328,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - TokenV1beta1
   /irismod/token/tokens/{denom}:
     get:
       summary: Token returns token with token name
@@ -2706,6 +2713,7 @@ paths:
           type: string
       tags:
         - Query
+        - TokenV1beta1
   /irismod/token/tokens/{symbol}/fees:
     get:
       summary: Fees returns the fees to issue or mint a token
@@ -2948,6 +2956,7 @@ paths:
           type: string
       tags:
         - Query
+        - TokenV1beta1
   /irismod/token/total_burn:
     get:
       summary: TotalBurn queries all the burnt coins
@@ -3172,6 +3181,7 @@ paths:
                         }
       tags:
         - Query
+        - TokenV1beta1
   /irismod/htlc/htlcs/{id}:
     get:
       summary: HTLC queries the HTLC by the specified hash lock
@@ -3284,6 +3294,7 @@ paths:
           type: string
       tags:
         - Query
+        - HTLC
   /irismod/htlc/params:
     get:
       summary: Params queries the htlc parameters
@@ -3359,6 +3370,7 @@ paths:
                       format: byte
       tags:
         - Query
+        - HTLC
   /irismod/htlc/supplies:
     get:
       summary: AssetSupplies queries the supplies of all assets
@@ -3465,6 +3477,7 @@ paths:
                       format: byte
       tags:
         - Query
+        - HTLC
   /irismod/htlc/supplies/{denom}:
     get:
       summary: AssetSupply queries the supply of an asset
@@ -3574,6 +3587,7 @@ paths:
           type: string
       tags:
         - Query
+        - HTLC
   /irismod/coinswap/pools:
     get:
       summary: LiquidityPools returns all the liquidity pools available
@@ -3759,6 +3773,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Coinswap
   /irismod/coinswap/pools/{lpt_denom}:
     get:
       summary: |-
@@ -3864,6 +3879,7 @@ paths:
           type: string
       tags:
         - Query
+        - Coinswap
   /irismod/farm/farmers/{farmer}:
     get:
       operationId: Farmer
@@ -3949,6 +3965,7 @@ paths:
           type: string
       tags:
         - Query
+        - Farm
   /irismod/farm/params:
     get:
       summary: Params queries the htlc parameters
@@ -4006,6 +4023,7 @@ paths:
                       format: byte
       tags:
         - Query
+        - Farm
   /irismod/farm/pool/{id}:
     get:
       operationId: FarmPool
@@ -4129,6 +4147,7 @@ paths:
           type: string
       tags:
         - Query
+        - Farm
   /irismod/farm/pools:
     get:
       operationId: FarmPools
@@ -4337,6 +4356,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Farm
   /irismod/nft/collections/{denom_id}:
     get:
       summary: Collection queries the NFTs of the specified denom
@@ -4513,6 +4533,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - NFT
   /irismod/nft/collections/{denom_id}/supply:
     get:
       summary: Supply queries the total supply of a given denom or owner
@@ -4562,6 +4583,7 @@ paths:
           type: string
       tags:
         - Query
+        - NFT
   /irismod/nft/denoms:
     get:
       summary: Denoms queries all the denoms
@@ -4712,6 +4734,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - NFT
   /irismod/nft/denoms/{denom_id}:
     get:
       summary: Denom queries the definition of a given denom
@@ -4780,6 +4803,7 @@ paths:
           type: string
       tags:
         - Query
+        - NFT
   /irismod/nft/nfts:
     get:
       summary: NFTsOfOwner queries the NFTs of the specified owner
@@ -4932,6 +4956,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - NFT
   /irismod/nft/nfts/{denom_id}/{token_id}:
     get:
       summary: NFT queries the NFT for the given denom and token ID
@@ -4992,6 +5017,7 @@ paths:
           type: string
       tags:
         - Query
+        - NFT
   /irismod/service/bindings/{service_name}:
     get:
       summary: Bindings returns all service Bindings with service name and owner
@@ -5164,6 +5190,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Service
   /irismod/service/bindings/{service_name}/{provider}:
     get:
       summary: Binding returns service Binding with service name and provider
@@ -5249,6 +5276,7 @@ paths:
           type: string
       tags:
         - Query
+        - Service
   /irismod/service/contexts/{request_context_id}:
     get:
       summary: RequestContext returns the request context
@@ -5384,6 +5412,7 @@ paths:
           type: string
       tags:
         - Query
+        - Service
   /irismod/service/definitions/{service_name}:
     get:
       summary: Definition returns service definition
@@ -5444,6 +5473,7 @@ paths:
           type: string
       tags:
         - Query
+        - Service
   /irismod/service/fees/{provider}:
     get:
       summary: EarnedFees returns the earned service fee of one provider
@@ -5503,6 +5533,7 @@ paths:
           type: string
       tags:
         - Query
+        - Service
   /irismod/service/owners/{owner}/withdraw-address:
     get:
       summary: WithdrawAddress returns the withdraw address of the binding owner
@@ -5549,6 +5580,7 @@ paths:
           type: string
       tags:
         - Query
+        - Service
   /irismod/service/params:
     get:
       summary: Params queries the service parameters
@@ -5656,6 +5688,7 @@ paths:
                       format: byte
       tags:
         - Query
+        - Service
   /irismod/service/requests/{request_context_id}/{batch_counter}:
     get:
       summary: RequestsByReqCtx returns all requests of one service call batch
@@ -5834,6 +5867,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Service
   /irismod/service/requests/{request_id}:
     get:
       summary: Request returns the request
@@ -5918,6 +5952,7 @@ paths:
           type: string
       tags:
         - Query
+        - Service
   /irismod/service/requests/{service_name}/{provider}:
     get:
       summary: Request returns all requests of one service with provider
@@ -6093,6 +6128,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Service
   /irismod/service/responses/{request_context_id}/{batch_counter}:
     get:
       summary: Responses returns all responses of one service call batch
@@ -6243,6 +6279,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Service
   /irismod/service/responses/{request_id}:
     get:
       summary: Response returns the response of request
@@ -6302,6 +6339,7 @@ paths:
           type: string
       tags:
         - Query
+        - Service
   /irismod/service/schemas/{schema_name}:
     get:
       summary: Schema returns the schema
@@ -6346,6 +6384,7 @@ paths:
           type: string
       tags:
         - Query
+        - Service
   /irismod/oracle/feeds:
     get:
       summary: Feeds queries the feed list
@@ -6548,6 +6587,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Oracle
   /irismod/oracle/feeds/{feed_name}:
     get:
       summary: Feed queries the feed
@@ -6662,6 +6702,7 @@ paths:
           type: string
       tags:
         - Query
+        - Oracle
   /irismod/oracle/feeds/{feed_name}/values:
     get:
       summary: FeedValue queries the feed value
@@ -6715,6 +6756,7 @@ paths:
           type: string
       tags:
         - Query
+        - Oracle
   /irismod/random/queue:
     get:
       summary: RandomRequestQueue queries the random request queue
@@ -6793,6 +6835,7 @@ paths:
           format: int64
       tags:
         - Query
+        - Random
   /irismod/random/randoms/{req_id}:
     get:
       summary: Random queries the random result
@@ -6846,6 +6889,7 @@ paths:
           type: string
       tags:
         - Query
+        - Random
   /irismod/record/records/{record_id}:
     get:
       summary: Record queries the record by the given record ID
@@ -6910,6 +6954,7 @@ paths:
           type: string
       tags:
         - Query
+        - Record
   /irishub/mint/params:
     get:
       summary: Params queries the mint parameters
@@ -6985,6 +7030,7 @@ paths:
                       format: byte
       tags:
         - Query
+        - Mint
   /irishub/guardian/supers:
     get:
       summary: Supers returns all Supers
@@ -7129,6 +7175,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Guardian
   /ethermint/evm/v1/account/{address}:
     get:
       summary: Account queries an Ethereum account.
@@ -7352,6 +7399,7 @@ paths:
           type: string
       tags:
         - Query
+        - Evm
   /ethermint/evm/v1/balances/{address}:
     get:
       summary: |-
@@ -7570,6 +7618,7 @@ paths:
           type: string
       tags:
         - Query
+        - Evm
   /ethermint/evm/v1/base_fee:
     get:
       summary: >-
@@ -7782,6 +7831,7 @@ paths:
                         }
       tags:
         - Query
+        - Evm
   /ethermint/evm/v1/codes/{address}:
     get:
       summary: Code queries the balance of all coins for a single account.
@@ -7999,6 +8049,7 @@ paths:
           type: string
       tags:
         - Query
+        - Evm
   /ethermint/evm/v1/cosmos_account/{address}:
     get:
       summary: CosmosAccount queries an Ethereum account's Cosmos Address.
@@ -8225,6 +8276,7 @@ paths:
           type: string
       tags:
         - Query
+        - Evm
   /ethermint/evm/v1/estimate_gas:
     get:
       summary: EstimateGas implements the `eth_estimateGas` rpc api
@@ -8461,6 +8513,7 @@ paths:
           format: int64
       tags:
         - Query
+        - Evm
   /ethermint/evm/v1/eth_call:
     get:
       summary: EthCall implements the `eth_call` rpc api
@@ -8790,6 +8843,7 @@ paths:
           format: int64
       tags:
         - Query
+        - Evm
   /ethermint/evm/v1/params:
     get:
       summary: Params queries the parameters of x/evm module.
@@ -9136,6 +9190,7 @@ paths:
                         }
       tags:
         - Query
+        - Evm
   /ethermint/evm/v1/storage/{address}/{key}:
     get:
       summary: Storage queries the balance of all coins for a single account.
@@ -9361,6 +9416,7 @@ paths:
           type: string
       tags:
         - Query
+        - Evm
   /ethermint/evm/v1/trace_block:
     get:
       summary: >-
@@ -9791,6 +9847,7 @@ paths:
           format: int64
       tags:
         - Query
+        - Evm
   /ethermint/evm/v1/trace_tx:
     get:
       summary: TraceTx implements the `debug_traceTransaction` rpc api
@@ -10301,6 +10358,7 @@ paths:
           format: int64
       tags:
         - Query
+        - Evm
   /ethermint/evm/v1/validator_account/{cons_address}:
     get:
       summary: >-
@@ -10531,6 +10589,7 @@ paths:
           type: string
       tags:
         - Query
+        - Evm
   /ethermint/feemarket/v1/base_fee:
     get:
       summary: BaseFee queries the base fee of the parent block of the current block.
@@ -10569,6 +10628,7 @@ paths:
                       format: byte
       tags:
         - Query
+        - Feemarket
   /ethermint/feemarket/v1/block_gas:
     get:
       summary: BlockGas queries the gas used at a given block height
@@ -10608,6 +10668,7 @@ paths:
                       format: byte
       tags:
         - Query
+        - Feemarket
   /ethermint/feemarket/v1/params:
     get:
       summary: Params queries the parameters of x/feemarket module.
@@ -10692,6 +10753,7 @@ paths:
                       format: byte
       tags:
         - Query
+        - Feemarket
   /ibc/apps/transfer/v1/channels/{channel_id}/ports/{port_id}/escrow_address:
     get:
       summary: >-
@@ -10745,6 +10807,7 @@ paths:
           type: string
       tags:
         - Query
+        - IBC
   /ibc/apps/transfer/v1/denom_hashes/{trace}:
     get:
       summary: DenomHash queries a denomination hash information.
@@ -10793,6 +10856,7 @@ paths:
           type: string
       tags:
         - Query
+        - IBC
   /ibc/apps/transfer/v1/denom_traces:
     get:
       summary: DenomTraces queries all denomination traces.
@@ -10929,6 +10993,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - IBC
   /ibc/apps/transfer/v1/denom_traces/{hash}:
     get:
       summary: DenomTrace queries a denomination trace information.
@@ -10994,6 +11059,7 @@ paths:
           type: string
       tags:
         - Query
+        - IBC
   /ibc/apps/transfer/v1/params:
     get:
       summary: Params queries all parameters of the ibc-transfer module.
@@ -11049,2937 +11115,7 @@ paths:
                       format: byte
       tags:
         - Query
-  /ibc/apps/interchain_accounts/controller/v1/owners/{owner}/connections/{connection_id}:
-    get:
-      summary: >-
-        InterchainAccount returns the interchain account address for a given
-        owner address on a given connection
-      operationId: InterchainAccount
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              address:
-                type: string
-            description: >-
-              QueryInterchainAccountResponse the response type for the
-              Query/InterchainAccount RPC method.
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                    value:
-                      type: string
-                      format: byte
-      parameters:
-        - name: owner
-          in: path
-          required: true
-          type: string
-        - name: connection_id
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  /ibc/apps/interchain_accounts/controller/v1/params:
-    get:
-      summary: Params queries all parameters of the ICA controller submodule.
-      operationId: InterchainAccountsControllerParams
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              params:
-                description: params defines the parameters of the module.
-                type: object
-                properties:
-                  controller_enabled:
-                    type: boolean
-                    description: >-
-                      controller_enabled enables or disables the controller
-                      submodule.
-            description: >-
-              QueryParamsResponse is the response type for the Query/Params RPC
-              method.
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                    value:
-                      type: string
-                      format: byte
-      tags:
-        - Query
-  /ibc/apps/interchain_accounts/host/v1/params:
-    get:
-      summary: Params queries all parameters of the ICA host submodule.
-      operationId: InterchainAccountsHostParams
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              params:
-                description: params defines the parameters of the module.
-                type: object
-                properties:
-                  host_enabled:
-                    type: boolean
-                    description: host_enabled enables or disables the host submodule.
-                  allow_messages:
-                    type: array
-                    items:
-                      type: string
-                    description: >-
-                      allow_messages defines a list of sdk message typeURLs
-                      allowed to be executed on a host chain.
-            description: >-
-              QueryParamsResponse is the response type for the Query/Params RPC
-              method.
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                    value:
-                      type: string
-                      format: byte
-      tags:
-        - Query
-  /ibc/apps/fee/v1/channels/{channel_id}/ports/{port_id}/fee_enabled:
-    get:
-      summary: >-
-        FeeEnabledChannel returns true if the provided port and channel
-        identifiers belong to a fee enabled channel
-      operationId: FeeEnabledChannel
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              fee_enabled:
-                type: boolean
-                title: boolean flag representing the fee enabled channel status
-            title: >-
-              QueryFeeEnabledChannelResponse defines the response type for the
-              FeeEnabledChannel rpc
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                      description: >-
-                        A URL/resource name that uniquely identifies the type of
-                        the serialized
-
-                        protocol buffer message. This string must contain at
-                        least
-
-                        one "/" character. The last segment of the URL's path
-                        must represent
-
-                        the fully qualified name of the type (as in
-
-                        `path/google.protobuf.Duration`). The name should be in
-                        a canonical form
-
-                        (e.g., leading "." is not accepted).
-
-
-                        In practice, teams usually precompile into the binary
-                        all types that they
-
-                        expect it to use in the context of Any. However, for
-                        URLs which use the
-
-                        scheme `http`, `https`, or no scheme, one can optionally
-                        set up a type
-
-                        server that maps type URLs to message definitions as
-                        follows:
-
-
-                        * If no scheme is provided, `https` is assumed.
-
-                        * An HTTP GET on the URL must yield a
-                        [google.protobuf.Type][]
-                          value in binary format, or produce an error.
-                        * Applications are allowed to cache lookup results based
-                        on the
-                          URL, or have them precompiled into a binary to avoid any
-                          lookup. Therefore, binary compatibility needs to be preserved
-                          on changes to types. (Use versioned type names to manage
-                          breaking changes.)
-
-                        Note: this functionality is not currently available in
-                        the official
-
-                        protobuf release, and it is not used for type URLs
-                        beginning with
-
-                        type.googleapis.com.
-
-
-                        Schemes other than `http`, `https` (or the empty scheme)
-                        might be
-
-                        used with implementation specific semantics.
-                    value:
-                      type: string
-                      format: byte
-                      description: >-
-                        Must be a valid serialized protocol buffer of the above
-                        specified type.
-                  description: >-
-                    `Any` contains an arbitrary serialized protocol buffer
-                    message along with a
-
-                    URL that describes the type of the serialized message.
-
-
-                    Protobuf library provides support to pack/unpack Any values
-                    in the form
-
-                    of utility functions or additional generated methods of the
-                    Any type.
-
-
-                    Example 1: Pack and unpack a message in C++.
-
-                        Foo foo = ...;
-                        Any any;
-                        any.PackFrom(foo);
-                        ...
-                        if (any.UnpackTo(&foo)) {
-                          ...
-                        }
-
-                    Example 2: Pack and unpack a message in Java.
-
-                        Foo foo = ...;
-                        Any any = Any.pack(foo);
-                        ...
-                        if (any.is(Foo.class)) {
-                          foo = any.unpack(Foo.class);
-                        }
-
-                     Example 3: Pack and unpack a message in Python.
-
-                        foo = Foo(...)
-                        any = Any()
-                        any.Pack(foo)
-                        ...
-                        if any.Is(Foo.DESCRIPTOR):
-                          any.Unpack(foo)
-                          ...
-
-                     Example 4: Pack and unpack a message in Go
-
-                         foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
-                         ...
-                         foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
-                           ...
-                         }
-
-                    The pack methods provided by protobuf library will by
-                    default use
-
-                    'type.googleapis.com/full.type.name' as the type URL and the
-                    unpack
-
-                    methods only use the fully qualified type name after the
-                    last '/'
-
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
-                    type
-
-                    name "y.z".
-
-
-
-                    JSON
-
-                    ====
-
-                    The JSON representation of an `Any` value uses the regular
-
-                    representation of the deserialized, embedded message, with
-                    an
-
-                    additional field `@type` which contains the type URL.
-                    Example:
-
-                        package google.profile;
-                        message Person {
-                          string first_name = 1;
-                          string last_name = 2;
-                        }
-
-                        {
-                          "@type": "type.googleapis.com/google.profile.Person",
-                          "firstName": <string>,
-                          "lastName": <string>
-                        }
-
-                    If the embedded message type is well-known and has a custom
-                    JSON
-
-                    representation, that representation will be embedded adding
-                    a field
-
-                    `value` which holds the custom JSON in addition to the
-                    `@type`
-
-                    field. Example (for message [google.protobuf.Duration][]):
-
-                        {
-                          "@type": "type.googleapis.com/google.protobuf.Duration",
-                          "value": "1.212s"
-                        }
-      parameters:
-        - name: channel_id
-          description: unique channel identifier
-          in: path
-          required: true
-          type: string
-        - name: port_id
-          description: unique port identifier
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  /ibc/apps/fee/v1/channels/{channel_id}/ports/{port_id}/incentivized_packets:
-    get:
-      summary: Gets all incentivized packets for a specific channel
-      operationId: IncentivizedPacketsForChannel
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              incentivized_packets:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    packet_id:
-                      title: >-
-                        unique packet identifier comprised of the channel ID,
-                        port ID and sequence
-                      type: object
-                      properties:
-                        port_id:
-                          type: string
-                          title: channel port identifier
-                        channel_id:
-                          type: string
-                          title: channel unique identifier
-                        sequence:
-                          type: string
-                          format: uint64
-                          title: packet sequence
-                    packet_fees:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          fee:
-                            title: >-
-                              fee encapsulates the recv, ack and timeout fees
-                              associated with an IBC packet
-                            type: object
-                            properties:
-                              recv_fee:
-                                type: array
-                                items:
-                                  type: object
-                                  properties:
-                                    denom:
-                                      type: string
-                                    amount:
-                                      type: string
-                                  description: >-
-                                    Coin defines a token with a denomination and
-                                    an amount.
-
-
-                                    NOTE: The amount field is an Int which
-                                    implements the custom method
-
-                                    signatures required by gogoproto.
-                                title: the packet receive fee
-                              ack_fee:
-                                type: array
-                                items:
-                                  type: object
-                                  properties:
-                                    denom:
-                                      type: string
-                                    amount:
-                                      type: string
-                                  description: >-
-                                    Coin defines a token with a denomination and
-                                    an amount.
-
-
-                                    NOTE: The amount field is an Int which
-                                    implements the custom method
-
-                                    signatures required by gogoproto.
-                                title: the packet acknowledgement fee
-                              timeout_fee:
-                                type: array
-                                items:
-                                  type: object
-                                  properties:
-                                    denom:
-                                      type: string
-                                    amount:
-                                      type: string
-                                  description: >-
-                                    Coin defines a token with a denomination and
-                                    an amount.
-
-
-                                    NOTE: The amount field is an Int which
-                                    implements the custom method
-
-                                    signatures required by gogoproto.
-                                title: the packet timeout fee
-                          refund_address:
-                            type: string
-                            title: the refund address for unspent fees
-                          relayers:
-                            type: array
-                            items:
-                              type: string
-                            title: >-
-                              optional list of relayers permitted to receive
-                              fees
-                        title: >-
-                          PacketFee contains ICS29 relayer fees, refund address
-                          and optional list of permitted relayers
-                      title: list of packet fees
-                  title: >-
-                    IdentifiedPacketFees contains a list of type PacketFee and
-                    associated PacketId
-                title: Map of all incentivized_packets
-            title: >-
-              QueryIncentivizedPacketsResponse defines the response type for the
-              incentivized packets RPC
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                      description: >-
-                        A URL/resource name that uniquely identifies the type of
-                        the serialized
-
-                        protocol buffer message. This string must contain at
-                        least
-
-                        one "/" character. The last segment of the URL's path
-                        must represent
-
-                        the fully qualified name of the type (as in
-
-                        `path/google.protobuf.Duration`). The name should be in
-                        a canonical form
-
-                        (e.g., leading "." is not accepted).
-
-
-                        In practice, teams usually precompile into the binary
-                        all types that they
-
-                        expect it to use in the context of Any. However, for
-                        URLs which use the
-
-                        scheme `http`, `https`, or no scheme, one can optionally
-                        set up a type
-
-                        server that maps type URLs to message definitions as
-                        follows:
-
-
-                        * If no scheme is provided, `https` is assumed.
-
-                        * An HTTP GET on the URL must yield a
-                        [google.protobuf.Type][]
-                          value in binary format, or produce an error.
-                        * Applications are allowed to cache lookup results based
-                        on the
-                          URL, or have them precompiled into a binary to avoid any
-                          lookup. Therefore, binary compatibility needs to be preserved
-                          on changes to types. (Use versioned type names to manage
-                          breaking changes.)
-
-                        Note: this functionality is not currently available in
-                        the official
-
-                        protobuf release, and it is not used for type URLs
-                        beginning with
-
-                        type.googleapis.com.
-
-
-                        Schemes other than `http`, `https` (or the empty scheme)
-                        might be
-
-                        used with implementation specific semantics.
-                    value:
-                      type: string
-                      format: byte
-                      description: >-
-                        Must be a valid serialized protocol buffer of the above
-                        specified type.
-                  description: >-
-                    `Any` contains an arbitrary serialized protocol buffer
-                    message along with a
-
-                    URL that describes the type of the serialized message.
-
-
-                    Protobuf library provides support to pack/unpack Any values
-                    in the form
-
-                    of utility functions or additional generated methods of the
-                    Any type.
-
-
-                    Example 1: Pack and unpack a message in C++.
-
-                        Foo foo = ...;
-                        Any any;
-                        any.PackFrom(foo);
-                        ...
-                        if (any.UnpackTo(&foo)) {
-                          ...
-                        }
-
-                    Example 2: Pack and unpack a message in Java.
-
-                        Foo foo = ...;
-                        Any any = Any.pack(foo);
-                        ...
-                        if (any.is(Foo.class)) {
-                          foo = any.unpack(Foo.class);
-                        }
-
-                     Example 3: Pack and unpack a message in Python.
-
-                        foo = Foo(...)
-                        any = Any()
-                        any.Pack(foo)
-                        ...
-                        if any.Is(Foo.DESCRIPTOR):
-                          any.Unpack(foo)
-                          ...
-
-                     Example 4: Pack and unpack a message in Go
-
-                         foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
-                         ...
-                         foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
-                           ...
-                         }
-
-                    The pack methods provided by protobuf library will by
-                    default use
-
-                    'type.googleapis.com/full.type.name' as the type URL and the
-                    unpack
-
-                    methods only use the fully qualified type name after the
-                    last '/'
-
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
-                    type
-
-                    name "y.z".
-
-
-
-                    JSON
-
-                    ====
-
-                    The JSON representation of an `Any` value uses the regular
-
-                    representation of the deserialized, embedded message, with
-                    an
-
-                    additional field `@type` which contains the type URL.
-                    Example:
-
-                        package google.profile;
-                        message Person {
-                          string first_name = 1;
-                          string last_name = 2;
-                        }
-
-                        {
-                          "@type": "type.googleapis.com/google.profile.Person",
-                          "firstName": <string>,
-                          "lastName": <string>
-                        }
-
-                    If the embedded message type is well-known and has a custom
-                    JSON
-
-                    representation, that representation will be embedded adding
-                    a field
-
-                    `value` which holds the custom JSON in addition to the
-                    `@type`
-
-                    field. Example (for message [google.protobuf.Duration][]):
-
-                        {
-                          "@type": "type.googleapis.com/google.protobuf.Duration",
-                          "value": "1.212s"
-                        }
-      parameters:
-        - name: channel_id
-          in: path
-          required: true
-          type: string
-        - name: port_id
-          in: path
-          required: true
-          type: string
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
-        - name: query_height
-          description: Height to query at.
-          in: query
-          required: false
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /ibc/apps/fee/v1/channels/{channel_id}/relayers/{relayer}/counterparty_payee:
-    get:
-      summary: >-
-        CounterpartyPayee returns the registered counterparty payee for forward
-        relaying
-      operationId: CounterpartyPayee
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              counterparty_payee:
-                type: string
-                title: >-
-                  the counterparty payee address used to compensate forward
-                  relaying
-            title: >-
-              QueryCounterpartyPayeeResponse defines the response type for the
-              CounterpartyPayee rpc
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                      description: >-
-                        A URL/resource name that uniquely identifies the type of
-                        the serialized
-
-                        protocol buffer message. This string must contain at
-                        least
-
-                        one "/" character. The last segment of the URL's path
-                        must represent
-
-                        the fully qualified name of the type (as in
-
-                        `path/google.protobuf.Duration`). The name should be in
-                        a canonical form
-
-                        (e.g., leading "." is not accepted).
-
-
-                        In practice, teams usually precompile into the binary
-                        all types that they
-
-                        expect it to use in the context of Any. However, for
-                        URLs which use the
-
-                        scheme `http`, `https`, or no scheme, one can optionally
-                        set up a type
-
-                        server that maps type URLs to message definitions as
-                        follows:
-
-
-                        * If no scheme is provided, `https` is assumed.
-
-                        * An HTTP GET on the URL must yield a
-                        [google.protobuf.Type][]
-                          value in binary format, or produce an error.
-                        * Applications are allowed to cache lookup results based
-                        on the
-                          URL, or have them precompiled into a binary to avoid any
-                          lookup. Therefore, binary compatibility needs to be preserved
-                          on changes to types. (Use versioned type names to manage
-                          breaking changes.)
-
-                        Note: this functionality is not currently available in
-                        the official
-
-                        protobuf release, and it is not used for type URLs
-                        beginning with
-
-                        type.googleapis.com.
-
-
-                        Schemes other than `http`, `https` (or the empty scheme)
-                        might be
-
-                        used with implementation specific semantics.
-                    value:
-                      type: string
-                      format: byte
-                      description: >-
-                        Must be a valid serialized protocol buffer of the above
-                        specified type.
-                  description: >-
-                    `Any` contains an arbitrary serialized protocol buffer
-                    message along with a
-
-                    URL that describes the type of the serialized message.
-
-
-                    Protobuf library provides support to pack/unpack Any values
-                    in the form
-
-                    of utility functions or additional generated methods of the
-                    Any type.
-
-
-                    Example 1: Pack and unpack a message in C++.
-
-                        Foo foo = ...;
-                        Any any;
-                        any.PackFrom(foo);
-                        ...
-                        if (any.UnpackTo(&foo)) {
-                          ...
-                        }
-
-                    Example 2: Pack and unpack a message in Java.
-
-                        Foo foo = ...;
-                        Any any = Any.pack(foo);
-                        ...
-                        if (any.is(Foo.class)) {
-                          foo = any.unpack(Foo.class);
-                        }
-
-                     Example 3: Pack and unpack a message in Python.
-
-                        foo = Foo(...)
-                        any = Any()
-                        any.Pack(foo)
-                        ...
-                        if any.Is(Foo.DESCRIPTOR):
-                          any.Unpack(foo)
-                          ...
-
-                     Example 4: Pack and unpack a message in Go
-
-                         foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
-                         ...
-                         foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
-                           ...
-                         }
-
-                    The pack methods provided by protobuf library will by
-                    default use
-
-                    'type.googleapis.com/full.type.name' as the type URL and the
-                    unpack
-
-                    methods only use the fully qualified type name after the
-                    last '/'
-
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
-                    type
-
-                    name "y.z".
-
-
-
-                    JSON
-
-                    ====
-
-                    The JSON representation of an `Any` value uses the regular
-
-                    representation of the deserialized, embedded message, with
-                    an
-
-                    additional field `@type` which contains the type URL.
-                    Example:
-
-                        package google.profile;
-                        message Person {
-                          string first_name = 1;
-                          string last_name = 2;
-                        }
-
-                        {
-                          "@type": "type.googleapis.com/google.profile.Person",
-                          "firstName": <string>,
-                          "lastName": <string>
-                        }
-
-                    If the embedded message type is well-known and has a custom
-                    JSON
-
-                    representation, that representation will be embedded adding
-                    a field
-
-                    `value` which holds the custom JSON in addition to the
-                    `@type`
-
-                    field. Example (for message [google.protobuf.Duration][]):
-
-                        {
-                          "@type": "type.googleapis.com/google.protobuf.Duration",
-                          "value": "1.212s"
-                        }
-      parameters:
-        - name: channel_id
-          description: unique channel identifier
-          in: path
-          required: true
-          type: string
-        - name: relayer
-          description: the relayer address to which the counterparty is registered
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  /ibc/apps/fee/v1/channels/{channel_id}/relayers/{relayer}/payee:
-    get:
-      summary: >-
-        Payee returns the registered payee address for a specific channel given
-        the relayer address
-      operationId: Payee
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              payee_address:
-                type: string
-                title: the payee address to which packet fees are paid out
-            title: QueryPayeeResponse defines the response type for the Payee rpc
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                      description: >-
-                        A URL/resource name that uniquely identifies the type of
-                        the serialized
-
-                        protocol buffer message. This string must contain at
-                        least
-
-                        one "/" character. The last segment of the URL's path
-                        must represent
-
-                        the fully qualified name of the type (as in
-
-                        `path/google.protobuf.Duration`). The name should be in
-                        a canonical form
-
-                        (e.g., leading "." is not accepted).
-
-
-                        In practice, teams usually precompile into the binary
-                        all types that they
-
-                        expect it to use in the context of Any. However, for
-                        URLs which use the
-
-                        scheme `http`, `https`, or no scheme, one can optionally
-                        set up a type
-
-                        server that maps type URLs to message definitions as
-                        follows:
-
-
-                        * If no scheme is provided, `https` is assumed.
-
-                        * An HTTP GET on the URL must yield a
-                        [google.protobuf.Type][]
-                          value in binary format, or produce an error.
-                        * Applications are allowed to cache lookup results based
-                        on the
-                          URL, or have them precompiled into a binary to avoid any
-                          lookup. Therefore, binary compatibility needs to be preserved
-                          on changes to types. (Use versioned type names to manage
-                          breaking changes.)
-
-                        Note: this functionality is not currently available in
-                        the official
-
-                        protobuf release, and it is not used for type URLs
-                        beginning with
-
-                        type.googleapis.com.
-
-
-                        Schemes other than `http`, `https` (or the empty scheme)
-                        might be
-
-                        used with implementation specific semantics.
-                    value:
-                      type: string
-                      format: byte
-                      description: >-
-                        Must be a valid serialized protocol buffer of the above
-                        specified type.
-                  description: >-
-                    `Any` contains an arbitrary serialized protocol buffer
-                    message along with a
-
-                    URL that describes the type of the serialized message.
-
-
-                    Protobuf library provides support to pack/unpack Any values
-                    in the form
-
-                    of utility functions or additional generated methods of the
-                    Any type.
-
-
-                    Example 1: Pack and unpack a message in C++.
-
-                        Foo foo = ...;
-                        Any any;
-                        any.PackFrom(foo);
-                        ...
-                        if (any.UnpackTo(&foo)) {
-                          ...
-                        }
-
-                    Example 2: Pack and unpack a message in Java.
-
-                        Foo foo = ...;
-                        Any any = Any.pack(foo);
-                        ...
-                        if (any.is(Foo.class)) {
-                          foo = any.unpack(Foo.class);
-                        }
-
-                     Example 3: Pack and unpack a message in Python.
-
-                        foo = Foo(...)
-                        any = Any()
-                        any.Pack(foo)
-                        ...
-                        if any.Is(Foo.DESCRIPTOR):
-                          any.Unpack(foo)
-                          ...
-
-                     Example 4: Pack and unpack a message in Go
-
-                         foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
-                         ...
-                         foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
-                           ...
-                         }
-
-                    The pack methods provided by protobuf library will by
-                    default use
-
-                    'type.googleapis.com/full.type.name' as the type URL and the
-                    unpack
-
-                    methods only use the fully qualified type name after the
-                    last '/'
-
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
-                    type
-
-                    name "y.z".
-
-
-
-                    JSON
-
-                    ====
-
-                    The JSON representation of an `Any` value uses the regular
-
-                    representation of the deserialized, embedded message, with
-                    an
-
-                    additional field `@type` which contains the type URL.
-                    Example:
-
-                        package google.profile;
-                        message Person {
-                          string first_name = 1;
-                          string last_name = 2;
-                        }
-
-                        {
-                          "@type": "type.googleapis.com/google.profile.Person",
-                          "firstName": <string>,
-                          "lastName": <string>
-                        }
-
-                    If the embedded message type is well-known and has a custom
-                    JSON
-
-                    representation, that representation will be embedded adding
-                    a field
-
-                    `value` which holds the custom JSON in addition to the
-                    `@type`
-
-                    field. Example (for message [google.protobuf.Duration][]):
-
-                        {
-                          "@type": "type.googleapis.com/google.protobuf.Duration",
-                          "value": "1.212s"
-                        }
-      parameters:
-        - name: channel_id
-          description: unique channel identifier
-          in: path
-          required: true
-          type: string
-        - name: relayer
-          description: the relayer address to which the distribution address is registered
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  /ibc/apps/fee/v1/channels/{packet_id.channel_id}/ports/{packet_id.port_id}/sequences/{packet_id.sequence}/incentivized_packet:
-    get:
-      summary: >-
-        IncentivizedPacket returns all packet fees for a packet given its
-        identifier
-      operationId: IncentivizedPacket
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              incentivized_packet:
-                type: object
-                properties:
-                  packet_id:
-                    title: >-
-                      unique packet identifier comprised of the channel ID, port
-                      ID and sequence
-                    type: object
-                    properties:
-                      port_id:
-                        type: string
-                        title: channel port identifier
-                      channel_id:
-                        type: string
-                        title: channel unique identifier
-                      sequence:
-                        type: string
-                        format: uint64
-                        title: packet sequence
-                  packet_fees:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        fee:
-                          title: >-
-                            fee encapsulates the recv, ack and timeout fees
-                            associated with an IBC packet
-                          type: object
-                          properties:
-                            recv_fee:
-                              type: array
-                              items:
-                                type: object
-                                properties:
-                                  denom:
-                                    type: string
-                                  amount:
-                                    type: string
-                                description: >-
-                                  Coin defines a token with a denomination and
-                                  an amount.
-
-
-                                  NOTE: The amount field is an Int which
-                                  implements the custom method
-
-                                  signatures required by gogoproto.
-                              title: the packet receive fee
-                            ack_fee:
-                              type: array
-                              items:
-                                type: object
-                                properties:
-                                  denom:
-                                    type: string
-                                  amount:
-                                    type: string
-                                description: >-
-                                  Coin defines a token with a denomination and
-                                  an amount.
-
-
-                                  NOTE: The amount field is an Int which
-                                  implements the custom method
-
-                                  signatures required by gogoproto.
-                              title: the packet acknowledgement fee
-                            timeout_fee:
-                              type: array
-                              items:
-                                type: object
-                                properties:
-                                  denom:
-                                    type: string
-                                  amount:
-                                    type: string
-                                description: >-
-                                  Coin defines a token with a denomination and
-                                  an amount.
-
-
-                                  NOTE: The amount field is an Int which
-                                  implements the custom method
-
-                                  signatures required by gogoproto.
-                              title: the packet timeout fee
-                        refund_address:
-                          type: string
-                          title: the refund address for unspent fees
-                        relayers:
-                          type: array
-                          items:
-                            type: string
-                          title: optional list of relayers permitted to receive fees
-                      title: >-
-                        PacketFee contains ICS29 relayer fees, refund address
-                        and optional list of permitted relayers
-                    title: list of packet fees
-                title: >-
-                  IdentifiedPacketFees contains a list of type PacketFee and
-                  associated PacketId
-            title: >-
-              QueryIncentivizedPacketsResponse defines the response type for the
-              IncentivizedPacket rpc
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                      description: >-
-                        A URL/resource name that uniquely identifies the type of
-                        the serialized
-
-                        protocol buffer message. This string must contain at
-                        least
-
-                        one "/" character. The last segment of the URL's path
-                        must represent
-
-                        the fully qualified name of the type (as in
-
-                        `path/google.protobuf.Duration`). The name should be in
-                        a canonical form
-
-                        (e.g., leading "." is not accepted).
-
-
-                        In practice, teams usually precompile into the binary
-                        all types that they
-
-                        expect it to use in the context of Any. However, for
-                        URLs which use the
-
-                        scheme `http`, `https`, or no scheme, one can optionally
-                        set up a type
-
-                        server that maps type URLs to message definitions as
-                        follows:
-
-
-                        * If no scheme is provided, `https` is assumed.
-
-                        * An HTTP GET on the URL must yield a
-                        [google.protobuf.Type][]
-                          value in binary format, or produce an error.
-                        * Applications are allowed to cache lookup results based
-                        on the
-                          URL, or have them precompiled into a binary to avoid any
-                          lookup. Therefore, binary compatibility needs to be preserved
-                          on changes to types. (Use versioned type names to manage
-                          breaking changes.)
-
-                        Note: this functionality is not currently available in
-                        the official
-
-                        protobuf release, and it is not used for type URLs
-                        beginning with
-
-                        type.googleapis.com.
-
-
-                        Schemes other than `http`, `https` (or the empty scheme)
-                        might be
-
-                        used with implementation specific semantics.
-                    value:
-                      type: string
-                      format: byte
-                      description: >-
-                        Must be a valid serialized protocol buffer of the above
-                        specified type.
-                  description: >-
-                    `Any` contains an arbitrary serialized protocol buffer
-                    message along with a
-
-                    URL that describes the type of the serialized message.
-
-
-                    Protobuf library provides support to pack/unpack Any values
-                    in the form
-
-                    of utility functions or additional generated methods of the
-                    Any type.
-
-
-                    Example 1: Pack and unpack a message in C++.
-
-                        Foo foo = ...;
-                        Any any;
-                        any.PackFrom(foo);
-                        ...
-                        if (any.UnpackTo(&foo)) {
-                          ...
-                        }
-
-                    Example 2: Pack and unpack a message in Java.
-
-                        Foo foo = ...;
-                        Any any = Any.pack(foo);
-                        ...
-                        if (any.is(Foo.class)) {
-                          foo = any.unpack(Foo.class);
-                        }
-
-                     Example 3: Pack and unpack a message in Python.
-
-                        foo = Foo(...)
-                        any = Any()
-                        any.Pack(foo)
-                        ...
-                        if any.Is(Foo.DESCRIPTOR):
-                          any.Unpack(foo)
-                          ...
-
-                     Example 4: Pack and unpack a message in Go
-
-                         foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
-                         ...
-                         foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
-                           ...
-                         }
-
-                    The pack methods provided by protobuf library will by
-                    default use
-
-                    'type.googleapis.com/full.type.name' as the type URL and the
-                    unpack
-
-                    methods only use the fully qualified type name after the
-                    last '/'
-
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
-                    type
-
-                    name "y.z".
-
-
-
-                    JSON
-
-                    ====
-
-                    The JSON representation of an `Any` value uses the regular
-
-                    representation of the deserialized, embedded message, with
-                    an
-
-                    additional field `@type` which contains the type URL.
-                    Example:
-
-                        package google.profile;
-                        message Person {
-                          string first_name = 1;
-                          string last_name = 2;
-                        }
-
-                        {
-                          "@type": "type.googleapis.com/google.profile.Person",
-                          "firstName": <string>,
-                          "lastName": <string>
-                        }
-
-                    If the embedded message type is well-known and has a custom
-                    JSON
-
-                    representation, that representation will be embedded adding
-                    a field
-
-                    `value` which holds the custom JSON in addition to the
-                    `@type`
-
-                    field. Example (for message [google.protobuf.Duration][]):
-
-                        {
-                          "@type": "type.googleapis.com/google.protobuf.Duration",
-                          "value": "1.212s"
-                        }
-      parameters:
-        - name: packet_id.channel_id
-          description: channel unique identifier
-          in: path
-          required: true
-          type: string
-        - name: packet_id.port_id
-          description: channel port identifier
-          in: path
-          required: true
-          type: string
-        - name: packet_id.sequence
-          description: packet sequence
-          in: path
-          required: true
-          type: string
-          format: uint64
-        - name: query_height
-          description: block height at which to query.
-          in: query
-          required: false
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /ibc/apps/fee/v1/channels/{packet_id.channel_id}/ports/{packet_id.port_id}/sequences/{packet_id.sequence}/total_ack_fees:
-    get:
-      summary: >-
-        TotalAckFees returns the total acknowledgement fees for a packet given
-        its identifier
-      operationId: TotalAckFees
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              ack_fees:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    denom:
-                      type: string
-                    amount:
-                      type: string
-                  description: >-
-                    Coin defines a token with a denomination and an amount.
-
-
-                    NOTE: The amount field is an Int which implements the custom
-                    method
-
-                    signatures required by gogoproto.
-                title: the total packet acknowledgement fees
-            title: >-
-              QueryTotalAckFeesResponse defines the response type for the
-              TotalAckFees rpc
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                      description: >-
-                        A URL/resource name that uniquely identifies the type of
-                        the serialized
-
-                        protocol buffer message. This string must contain at
-                        least
-
-                        one "/" character. The last segment of the URL's path
-                        must represent
-
-                        the fully qualified name of the type (as in
-
-                        `path/google.protobuf.Duration`). The name should be in
-                        a canonical form
-
-                        (e.g., leading "." is not accepted).
-
-
-                        In practice, teams usually precompile into the binary
-                        all types that they
-
-                        expect it to use in the context of Any. However, for
-                        URLs which use the
-
-                        scheme `http`, `https`, or no scheme, one can optionally
-                        set up a type
-
-                        server that maps type URLs to message definitions as
-                        follows:
-
-
-                        * If no scheme is provided, `https` is assumed.
-
-                        * An HTTP GET on the URL must yield a
-                        [google.protobuf.Type][]
-                          value in binary format, or produce an error.
-                        * Applications are allowed to cache lookup results based
-                        on the
-                          URL, or have them precompiled into a binary to avoid any
-                          lookup. Therefore, binary compatibility needs to be preserved
-                          on changes to types. (Use versioned type names to manage
-                          breaking changes.)
-
-                        Note: this functionality is not currently available in
-                        the official
-
-                        protobuf release, and it is not used for type URLs
-                        beginning with
-
-                        type.googleapis.com.
-
-
-                        Schemes other than `http`, `https` (or the empty scheme)
-                        might be
-
-                        used with implementation specific semantics.
-                    value:
-                      type: string
-                      format: byte
-                      description: >-
-                        Must be a valid serialized protocol buffer of the above
-                        specified type.
-                  description: >-
-                    `Any` contains an arbitrary serialized protocol buffer
-                    message along with a
-
-                    URL that describes the type of the serialized message.
-
-
-                    Protobuf library provides support to pack/unpack Any values
-                    in the form
-
-                    of utility functions or additional generated methods of the
-                    Any type.
-
-
-                    Example 1: Pack and unpack a message in C++.
-
-                        Foo foo = ...;
-                        Any any;
-                        any.PackFrom(foo);
-                        ...
-                        if (any.UnpackTo(&foo)) {
-                          ...
-                        }
-
-                    Example 2: Pack and unpack a message in Java.
-
-                        Foo foo = ...;
-                        Any any = Any.pack(foo);
-                        ...
-                        if (any.is(Foo.class)) {
-                          foo = any.unpack(Foo.class);
-                        }
-
-                     Example 3: Pack and unpack a message in Python.
-
-                        foo = Foo(...)
-                        any = Any()
-                        any.Pack(foo)
-                        ...
-                        if any.Is(Foo.DESCRIPTOR):
-                          any.Unpack(foo)
-                          ...
-
-                     Example 4: Pack and unpack a message in Go
-
-                         foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
-                         ...
-                         foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
-                           ...
-                         }
-
-                    The pack methods provided by protobuf library will by
-                    default use
-
-                    'type.googleapis.com/full.type.name' as the type URL and the
-                    unpack
-
-                    methods only use the fully qualified type name after the
-                    last '/'
-
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
-                    type
-
-                    name "y.z".
-
-
-
-                    JSON
-
-                    ====
-
-                    The JSON representation of an `Any` value uses the regular
-
-                    representation of the deserialized, embedded message, with
-                    an
-
-                    additional field `@type` which contains the type URL.
-                    Example:
-
-                        package google.profile;
-                        message Person {
-                          string first_name = 1;
-                          string last_name = 2;
-                        }
-
-                        {
-                          "@type": "type.googleapis.com/google.profile.Person",
-                          "firstName": <string>,
-                          "lastName": <string>
-                        }
-
-                    If the embedded message type is well-known and has a custom
-                    JSON
-
-                    representation, that representation will be embedded adding
-                    a field
-
-                    `value` which holds the custom JSON in addition to the
-                    `@type`
-
-                    field. Example (for message [google.protobuf.Duration][]):
-
-                        {
-                          "@type": "type.googleapis.com/google.protobuf.Duration",
-                          "value": "1.212s"
-                        }
-      parameters:
-        - name: packet_id.channel_id
-          description: channel unique identifier
-          in: path
-          required: true
-          type: string
-        - name: packet_id.port_id
-          description: channel port identifier
-          in: path
-          required: true
-          type: string
-        - name: packet_id.sequence
-          description: packet sequence
-          in: path
-          required: true
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /ibc/apps/fee/v1/channels/{packet_id.channel_id}/ports/{packet_id.port_id}/sequences/{packet_id.sequence}/total_recv_fees:
-    get:
-      summary: >-
-        TotalRecvFees returns the total receive fees for a packet given its
-        identifier
-      operationId: TotalRecvFees
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              recv_fees:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    denom:
-                      type: string
-                    amount:
-                      type: string
-                  description: >-
-                    Coin defines a token with a denomination and an amount.
-
-
-                    NOTE: The amount field is an Int which implements the custom
-                    method
-
-                    signatures required by gogoproto.
-                title: the total packet receive fees
-            title: >-
-              QueryTotalRecvFeesResponse defines the response type for the
-              TotalRecvFees rpc
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                      description: >-
-                        A URL/resource name that uniquely identifies the type of
-                        the serialized
-
-                        protocol buffer message. This string must contain at
-                        least
-
-                        one "/" character. The last segment of the URL's path
-                        must represent
-
-                        the fully qualified name of the type (as in
-
-                        `path/google.protobuf.Duration`). The name should be in
-                        a canonical form
-
-                        (e.g., leading "." is not accepted).
-
-
-                        In practice, teams usually precompile into the binary
-                        all types that they
-
-                        expect it to use in the context of Any. However, for
-                        URLs which use the
-
-                        scheme `http`, `https`, or no scheme, one can optionally
-                        set up a type
-
-                        server that maps type URLs to message definitions as
-                        follows:
-
-
-                        * If no scheme is provided, `https` is assumed.
-
-                        * An HTTP GET on the URL must yield a
-                        [google.protobuf.Type][]
-                          value in binary format, or produce an error.
-                        * Applications are allowed to cache lookup results based
-                        on the
-                          URL, or have them precompiled into a binary to avoid any
-                          lookup. Therefore, binary compatibility needs to be preserved
-                          on changes to types. (Use versioned type names to manage
-                          breaking changes.)
-
-                        Note: this functionality is not currently available in
-                        the official
-
-                        protobuf release, and it is not used for type URLs
-                        beginning with
-
-                        type.googleapis.com.
-
-
-                        Schemes other than `http`, `https` (or the empty scheme)
-                        might be
-
-                        used with implementation specific semantics.
-                    value:
-                      type: string
-                      format: byte
-                      description: >-
-                        Must be a valid serialized protocol buffer of the above
-                        specified type.
-                  description: >-
-                    `Any` contains an arbitrary serialized protocol buffer
-                    message along with a
-
-                    URL that describes the type of the serialized message.
-
-
-                    Protobuf library provides support to pack/unpack Any values
-                    in the form
-
-                    of utility functions or additional generated methods of the
-                    Any type.
-
-
-                    Example 1: Pack and unpack a message in C++.
-
-                        Foo foo = ...;
-                        Any any;
-                        any.PackFrom(foo);
-                        ...
-                        if (any.UnpackTo(&foo)) {
-                          ...
-                        }
-
-                    Example 2: Pack and unpack a message in Java.
-
-                        Foo foo = ...;
-                        Any any = Any.pack(foo);
-                        ...
-                        if (any.is(Foo.class)) {
-                          foo = any.unpack(Foo.class);
-                        }
-
-                     Example 3: Pack and unpack a message in Python.
-
-                        foo = Foo(...)
-                        any = Any()
-                        any.Pack(foo)
-                        ...
-                        if any.Is(Foo.DESCRIPTOR):
-                          any.Unpack(foo)
-                          ...
-
-                     Example 4: Pack and unpack a message in Go
-
-                         foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
-                         ...
-                         foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
-                           ...
-                         }
-
-                    The pack methods provided by protobuf library will by
-                    default use
-
-                    'type.googleapis.com/full.type.name' as the type URL and the
-                    unpack
-
-                    methods only use the fully qualified type name after the
-                    last '/'
-
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
-                    type
-
-                    name "y.z".
-
-
-
-                    JSON
-
-                    ====
-
-                    The JSON representation of an `Any` value uses the regular
-
-                    representation of the deserialized, embedded message, with
-                    an
-
-                    additional field `@type` which contains the type URL.
-                    Example:
-
-                        package google.profile;
-                        message Person {
-                          string first_name = 1;
-                          string last_name = 2;
-                        }
-
-                        {
-                          "@type": "type.googleapis.com/google.profile.Person",
-                          "firstName": <string>,
-                          "lastName": <string>
-                        }
-
-                    If the embedded message type is well-known and has a custom
-                    JSON
-
-                    representation, that representation will be embedded adding
-                    a field
-
-                    `value` which holds the custom JSON in addition to the
-                    `@type`
-
-                    field. Example (for message [google.protobuf.Duration][]):
-
-                        {
-                          "@type": "type.googleapis.com/google.protobuf.Duration",
-                          "value": "1.212s"
-                        }
-      parameters:
-        - name: packet_id.channel_id
-          description: channel unique identifier
-          in: path
-          required: true
-          type: string
-        - name: packet_id.port_id
-          description: channel port identifier
-          in: path
-          required: true
-          type: string
-        - name: packet_id.sequence
-          description: packet sequence
-          in: path
-          required: true
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /ibc/apps/fee/v1/channels/{packet_id.channel_id}/ports/{packet_id.port_id}/sequences/{packet_id.sequence}/total_timeout_fees:
-    get:
-      summary: >-
-        TotalTimeoutFees returns the total timeout fees for a packet given its
-        identifier
-      operationId: TotalTimeoutFees
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              timeout_fees:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    denom:
-                      type: string
-                    amount:
-                      type: string
-                  description: >-
-                    Coin defines a token with a denomination and an amount.
-
-
-                    NOTE: The amount field is an Int which implements the custom
-                    method
-
-                    signatures required by gogoproto.
-                title: the total packet timeout fees
-            title: >-
-              QueryTotalTimeoutFeesResponse defines the response type for the
-              TotalTimeoutFees rpc
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                      description: >-
-                        A URL/resource name that uniquely identifies the type of
-                        the serialized
-
-                        protocol buffer message. This string must contain at
-                        least
-
-                        one "/" character. The last segment of the URL's path
-                        must represent
-
-                        the fully qualified name of the type (as in
-
-                        `path/google.protobuf.Duration`). The name should be in
-                        a canonical form
-
-                        (e.g., leading "." is not accepted).
-
-
-                        In practice, teams usually precompile into the binary
-                        all types that they
-
-                        expect it to use in the context of Any. However, for
-                        URLs which use the
-
-                        scheme `http`, `https`, or no scheme, one can optionally
-                        set up a type
-
-                        server that maps type URLs to message definitions as
-                        follows:
-
-
-                        * If no scheme is provided, `https` is assumed.
-
-                        * An HTTP GET on the URL must yield a
-                        [google.protobuf.Type][]
-                          value in binary format, or produce an error.
-                        * Applications are allowed to cache lookup results based
-                        on the
-                          URL, or have them precompiled into a binary to avoid any
-                          lookup. Therefore, binary compatibility needs to be preserved
-                          on changes to types. (Use versioned type names to manage
-                          breaking changes.)
-
-                        Note: this functionality is not currently available in
-                        the official
-
-                        protobuf release, and it is not used for type URLs
-                        beginning with
-
-                        type.googleapis.com.
-
-
-                        Schemes other than `http`, `https` (or the empty scheme)
-                        might be
-
-                        used with implementation specific semantics.
-                    value:
-                      type: string
-                      format: byte
-                      description: >-
-                        Must be a valid serialized protocol buffer of the above
-                        specified type.
-                  description: >-
-                    `Any` contains an arbitrary serialized protocol buffer
-                    message along with a
-
-                    URL that describes the type of the serialized message.
-
-
-                    Protobuf library provides support to pack/unpack Any values
-                    in the form
-
-                    of utility functions or additional generated methods of the
-                    Any type.
-
-
-                    Example 1: Pack and unpack a message in C++.
-
-                        Foo foo = ...;
-                        Any any;
-                        any.PackFrom(foo);
-                        ...
-                        if (any.UnpackTo(&foo)) {
-                          ...
-                        }
-
-                    Example 2: Pack and unpack a message in Java.
-
-                        Foo foo = ...;
-                        Any any = Any.pack(foo);
-                        ...
-                        if (any.is(Foo.class)) {
-                          foo = any.unpack(Foo.class);
-                        }
-
-                     Example 3: Pack and unpack a message in Python.
-
-                        foo = Foo(...)
-                        any = Any()
-                        any.Pack(foo)
-                        ...
-                        if any.Is(Foo.DESCRIPTOR):
-                          any.Unpack(foo)
-                          ...
-
-                     Example 4: Pack and unpack a message in Go
-
-                         foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
-                         ...
-                         foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
-                           ...
-                         }
-
-                    The pack methods provided by protobuf library will by
-                    default use
-
-                    'type.googleapis.com/full.type.name' as the type URL and the
-                    unpack
-
-                    methods only use the fully qualified type name after the
-                    last '/'
-
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
-                    type
-
-                    name "y.z".
-
-
-
-                    JSON
-
-                    ====
-
-                    The JSON representation of an `Any` value uses the regular
-
-                    representation of the deserialized, embedded message, with
-                    an
-
-                    additional field `@type` which contains the type URL.
-                    Example:
-
-                        package google.profile;
-                        message Person {
-                          string first_name = 1;
-                          string last_name = 2;
-                        }
-
-                        {
-                          "@type": "type.googleapis.com/google.profile.Person",
-                          "firstName": <string>,
-                          "lastName": <string>
-                        }
-
-                    If the embedded message type is well-known and has a custom
-                    JSON
-
-                    representation, that representation will be embedded adding
-                    a field
-
-                    `value` which holds the custom JSON in addition to the
-                    `@type`
-
-                    field. Example (for message [google.protobuf.Duration][]):
-
-                        {
-                          "@type": "type.googleapis.com/google.protobuf.Duration",
-                          "value": "1.212s"
-                        }
-      parameters:
-        - name: packet_id.channel_id
-          description: channel unique identifier
-          in: path
-          required: true
-          type: string
-        - name: packet_id.port_id
-          description: channel port identifier
-          in: path
-          required: true
-          type: string
-        - name: packet_id.sequence
-          description: packet sequence
-          in: path
-          required: true
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /ibc/apps/fee/v1/fee_enabled:
-    get:
-      summary: FeeEnabledChannels returns a list of all fee enabled channels
-      operationId: FeeEnabledChannels
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              fee_enabled_channels:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    port_id:
-                      type: string
-                      title: unique port identifier
-                    channel_id:
-                      type: string
-                      title: unique channel identifier
-                  title: >-
-                    FeeEnabledChannel contains the PortID & ChannelID for a fee
-                    enabled channel
-                title: list of fee enabled channels
-            title: >-
-              QueryFeeEnabledChannelsResponse defines the response type for the
-              FeeEnabledChannels rpc
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                      description: >-
-                        A URL/resource name that uniquely identifies the type of
-                        the serialized
-
-                        protocol buffer message. This string must contain at
-                        least
-
-                        one "/" character. The last segment of the URL's path
-                        must represent
-
-                        the fully qualified name of the type (as in
-
-                        `path/google.protobuf.Duration`). The name should be in
-                        a canonical form
-
-                        (e.g., leading "." is not accepted).
-
-
-                        In practice, teams usually precompile into the binary
-                        all types that they
-
-                        expect it to use in the context of Any. However, for
-                        URLs which use the
-
-                        scheme `http`, `https`, or no scheme, one can optionally
-                        set up a type
-
-                        server that maps type URLs to message definitions as
-                        follows:
-
-
-                        * If no scheme is provided, `https` is assumed.
-
-                        * An HTTP GET on the URL must yield a
-                        [google.protobuf.Type][]
-                          value in binary format, or produce an error.
-                        * Applications are allowed to cache lookup results based
-                        on the
-                          URL, or have them precompiled into a binary to avoid any
-                          lookup. Therefore, binary compatibility needs to be preserved
-                          on changes to types. (Use versioned type names to manage
-                          breaking changes.)
-
-                        Note: this functionality is not currently available in
-                        the official
-
-                        protobuf release, and it is not used for type URLs
-                        beginning with
-
-                        type.googleapis.com.
-
-
-                        Schemes other than `http`, `https` (or the empty scheme)
-                        might be
-
-                        used with implementation specific semantics.
-                    value:
-                      type: string
-                      format: byte
-                      description: >-
-                        Must be a valid serialized protocol buffer of the above
-                        specified type.
-                  description: >-
-                    `Any` contains an arbitrary serialized protocol buffer
-                    message along with a
-
-                    URL that describes the type of the serialized message.
-
-
-                    Protobuf library provides support to pack/unpack Any values
-                    in the form
-
-                    of utility functions or additional generated methods of the
-                    Any type.
-
-
-                    Example 1: Pack and unpack a message in C++.
-
-                        Foo foo = ...;
-                        Any any;
-                        any.PackFrom(foo);
-                        ...
-                        if (any.UnpackTo(&foo)) {
-                          ...
-                        }
-
-                    Example 2: Pack and unpack a message in Java.
-
-                        Foo foo = ...;
-                        Any any = Any.pack(foo);
-                        ...
-                        if (any.is(Foo.class)) {
-                          foo = any.unpack(Foo.class);
-                        }
-
-                     Example 3: Pack and unpack a message in Python.
-
-                        foo = Foo(...)
-                        any = Any()
-                        any.Pack(foo)
-                        ...
-                        if any.Is(Foo.DESCRIPTOR):
-                          any.Unpack(foo)
-                          ...
-
-                     Example 4: Pack and unpack a message in Go
-
-                         foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
-                         ...
-                         foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
-                           ...
-                         }
-
-                    The pack methods provided by protobuf library will by
-                    default use
-
-                    'type.googleapis.com/full.type.name' as the type URL and the
-                    unpack
-
-                    methods only use the fully qualified type name after the
-                    last '/'
-
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
-                    type
-
-                    name "y.z".
-
-
-
-                    JSON
-
-                    ====
-
-                    The JSON representation of an `Any` value uses the regular
-
-                    representation of the deserialized, embedded message, with
-                    an
-
-                    additional field `@type` which contains the type URL.
-                    Example:
-
-                        package google.profile;
-                        message Person {
-                          string first_name = 1;
-                          string last_name = 2;
-                        }
-
-                        {
-                          "@type": "type.googleapis.com/google.profile.Person",
-                          "firstName": <string>,
-                          "lastName": <string>
-                        }
-
-                    If the embedded message type is well-known and has a custom
-                    JSON
-
-                    representation, that representation will be embedded adding
-                    a field
-
-                    `value` which holds the custom JSON in addition to the
-                    `@type`
-
-                    field. Example (for message [google.protobuf.Duration][]):
-
-                        {
-                          "@type": "type.googleapis.com/google.protobuf.Duration",
-                          "value": "1.212s"
-                        }
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
-        - name: query_height
-          description: block height at which to query.
-          in: query
-          required: false
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /ibc/apps/fee/v1/incentivized_packets:
-    get:
-      summary: >-
-        IncentivizedPackets returns all incentivized packets and their
-        associated fees
-      operationId: IncentivizedPackets
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              incentivized_packets:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    packet_id:
-                      title: >-
-                        unique packet identifier comprised of the channel ID,
-                        port ID and sequence
-                      type: object
-                      properties:
-                        port_id:
-                          type: string
-                          title: channel port identifier
-                        channel_id:
-                          type: string
-                          title: channel unique identifier
-                        sequence:
-                          type: string
-                          format: uint64
-                          title: packet sequence
-                    packet_fees:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          fee:
-                            title: >-
-                              fee encapsulates the recv, ack and timeout fees
-                              associated with an IBC packet
-                            type: object
-                            properties:
-                              recv_fee:
-                                type: array
-                                items:
-                                  type: object
-                                  properties:
-                                    denom:
-                                      type: string
-                                    amount:
-                                      type: string
-                                  description: >-
-                                    Coin defines a token with a denomination and
-                                    an amount.
-
-
-                                    NOTE: The amount field is an Int which
-                                    implements the custom method
-
-                                    signatures required by gogoproto.
-                                title: the packet receive fee
-                              ack_fee:
-                                type: array
-                                items:
-                                  type: object
-                                  properties:
-                                    denom:
-                                      type: string
-                                    amount:
-                                      type: string
-                                  description: >-
-                                    Coin defines a token with a denomination and
-                                    an amount.
-
-
-                                    NOTE: The amount field is an Int which
-                                    implements the custom method
-
-                                    signatures required by gogoproto.
-                                title: the packet acknowledgement fee
-                              timeout_fee:
-                                type: array
-                                items:
-                                  type: object
-                                  properties:
-                                    denom:
-                                      type: string
-                                    amount:
-                                      type: string
-                                  description: >-
-                                    Coin defines a token with a denomination and
-                                    an amount.
-
-
-                                    NOTE: The amount field is an Int which
-                                    implements the custom method
-
-                                    signatures required by gogoproto.
-                                title: the packet timeout fee
-                          refund_address:
-                            type: string
-                            title: the refund address for unspent fees
-                          relayers:
-                            type: array
-                            items:
-                              type: string
-                            title: >-
-                              optional list of relayers permitted to receive
-                              fees
-                        title: >-
-                          PacketFee contains ICS29 relayer fees, refund address
-                          and optional list of permitted relayers
-                      title: list of packet fees
-                  title: >-
-                    IdentifiedPacketFees contains a list of type PacketFee and
-                    associated PacketId
-                title: list of identified fees for incentivized packets
-            title: >-
-              QueryIncentivizedPacketsResponse defines the response type for the
-              IncentivizedPackets rpc
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                      description: >-
-                        A URL/resource name that uniquely identifies the type of
-                        the serialized
-
-                        protocol buffer message. This string must contain at
-                        least
-
-                        one "/" character. The last segment of the URL's path
-                        must represent
-
-                        the fully qualified name of the type (as in
-
-                        `path/google.protobuf.Duration`). The name should be in
-                        a canonical form
-
-                        (e.g., leading "." is not accepted).
-
-
-                        In practice, teams usually precompile into the binary
-                        all types that they
-
-                        expect it to use in the context of Any. However, for
-                        URLs which use the
-
-                        scheme `http`, `https`, or no scheme, one can optionally
-                        set up a type
-
-                        server that maps type URLs to message definitions as
-                        follows:
-
-
-                        * If no scheme is provided, `https` is assumed.
-
-                        * An HTTP GET on the URL must yield a
-                        [google.protobuf.Type][]
-                          value in binary format, or produce an error.
-                        * Applications are allowed to cache lookup results based
-                        on the
-                          URL, or have them precompiled into a binary to avoid any
-                          lookup. Therefore, binary compatibility needs to be preserved
-                          on changes to types. (Use versioned type names to manage
-                          breaking changes.)
-
-                        Note: this functionality is not currently available in
-                        the official
-
-                        protobuf release, and it is not used for type URLs
-                        beginning with
-
-                        type.googleapis.com.
-
-
-                        Schemes other than `http`, `https` (or the empty scheme)
-                        might be
-
-                        used with implementation specific semantics.
-                    value:
-                      type: string
-                      format: byte
-                      description: >-
-                        Must be a valid serialized protocol buffer of the above
-                        specified type.
-                  description: >-
-                    `Any` contains an arbitrary serialized protocol buffer
-                    message along with a
-
-                    URL that describes the type of the serialized message.
-
-
-                    Protobuf library provides support to pack/unpack Any values
-                    in the form
-
-                    of utility functions or additional generated methods of the
-                    Any type.
-
-
-                    Example 1: Pack and unpack a message in C++.
-
-                        Foo foo = ...;
-                        Any any;
-                        any.PackFrom(foo);
-                        ...
-                        if (any.UnpackTo(&foo)) {
-                          ...
-                        }
-
-                    Example 2: Pack and unpack a message in Java.
-
-                        Foo foo = ...;
-                        Any any = Any.pack(foo);
-                        ...
-                        if (any.is(Foo.class)) {
-                          foo = any.unpack(Foo.class);
-                        }
-
-                     Example 3: Pack and unpack a message in Python.
-
-                        foo = Foo(...)
-                        any = Any()
-                        any.Pack(foo)
-                        ...
-                        if any.Is(Foo.DESCRIPTOR):
-                          any.Unpack(foo)
-                          ...
-
-                     Example 4: Pack and unpack a message in Go
-
-                         foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
-                         ...
-                         foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
-                           ...
-                         }
-
-                    The pack methods provided by protobuf library will by
-                    default use
-
-                    'type.googleapis.com/full.type.name' as the type URL and the
-                    unpack
-
-                    methods only use the fully qualified type name after the
-                    last '/'
-
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
-                    type
-
-                    name "y.z".
-
-
-
-                    JSON
-
-                    ====
-
-                    The JSON representation of an `Any` value uses the regular
-
-                    representation of the deserialized, embedded message, with
-                    an
-
-                    additional field `@type` which contains the type URL.
-                    Example:
-
-                        package google.profile;
-                        message Person {
-                          string first_name = 1;
-                          string last_name = 2;
-                        }
-
-                        {
-                          "@type": "type.googleapis.com/google.profile.Person",
-                          "firstName": <string>,
-                          "lastName": <string>
-                        }
-
-                    If the embedded message type is well-known and has a custom
-                    JSON
-
-                    representation, that representation will be embedded adding
-                    a field
-
-                    `value` which holds the custom JSON in addition to the
-                    `@type`
-
-                    field. Example (for message [google.protobuf.Duration][]):
-
-                        {
-                          "@type": "type.googleapis.com/google.protobuf.Duration",
-                          "value": "1.212s"
-                        }
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
-        - name: query_height
-          description: block height at which to query.
-          in: query
-          required: false
-          type: string
-          format: uint64
-      tags:
-        - Query
+        - IBC
   /ibc/client/v1/params:
     get:
       summary: ClientParams queries all parameters of the ibc client.
@@ -14200,6 +11336,7 @@ paths:
                         }
       tags:
         - Query
+        - IBC
   /ibc/core/client/v1/client_states:
     get:
       summary: ClientStates queries all the IBC light clients of a chain.
@@ -14690,6 +11827,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - IBC
   /ibc/core/client/v1/client_states/{client_id}:
     get:
       summary: ClientState queries an IBC light client.
@@ -15116,6 +12254,7 @@ paths:
           type: string
       tags:
         - Query
+        - IBC
   /ibc/core/client/v1/client_status/{client_id}:
     get:
       summary: Status queries the status of an IBC client.
@@ -15333,6 +12472,7 @@ paths:
           type: string
       tags:
         - Query
+        - IBC
   /ibc/core/client/v1/consensus_states/{client_id}:
     get:
       summary: |-
@@ -15854,6 +12994,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - IBC
   /ibc/core/client/v1/consensus_states/{client_id}/heights:
     get:
       summary: >-
@@ -16192,6 +13333,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - IBC
   /ibc/core/client/v1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}:
     get:
       summary: >-
@@ -16648,6 +13790,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - IBC
   /ibc/core/client/v1/upgraded_client_states:
     get:
       summary: UpgradedClientState queries an Upgraded IBC light client.
@@ -17030,6 +14173,7 @@ paths:
                         }
       tags:
         - Query
+        - IBC
   /ibc/core/client/v1/upgraded_consensus_states:
     get:
       summary: UpgradedConsensusState queries an Upgraded IBC consensus state.
@@ -17412,6 +14556,7 @@ paths:
                         }
       tags:
         - Query
+        - IBC
   /ibc/core/connection/v1/client_connections/{client_id}:
     get:
       summary: |-
@@ -17665,6 +14810,7 @@ paths:
           type: string
       tags:
         - Query
+        - IBC
   /ibc/core/connection/v1/connections:
     get:
       summary: Connections queries all the IBC connections of a chain.
@@ -18076,6 +15222,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - IBC
   /ibc/core/connection/v1/connections/{connection_id}:
     get:
       summary: Connection queries an IBC connection end.
@@ -18420,6 +15567,7 @@ paths:
           type: string
       tags:
         - Query
+        - IBC
   /ibc/core/connection/v1/connections/{connection_id}/client_state:
     get:
       summary: |-
@@ -18859,6 +16007,7 @@ paths:
           type: string
       tags:
         - Query
+        - IBC
   /ibc/core/connection/v1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}:
     get:
       summary: |-
@@ -19295,6 +16444,7 @@ paths:
           format: uint64
       tags:
         - Query
+        - IBC
   /ibc/core/channel/v1/channels:
     get:
       summary: Channels queries all the IBC channels of a chain.
@@ -19697,6 +16847,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - IBC
   /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}:
     get:
       summary: Channel queries an IBC Channel.
@@ -20027,6 +17178,7 @@ paths:
           type: string
       tags:
         - Query
+        - IBC
   /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/client_state:
     get:
       summary: >-
@@ -20473,6 +17625,7 @@ paths:
           type: string
       tags:
         - Query
+        - IBC
   /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}:
     get:
       summary: |-
@@ -20916,6 +18069,7 @@ paths:
           format: uint64
       tags:
         - Query
+        - IBC
   /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/next_sequence:
     get:
       summary: >-
@@ -21173,6 +18327,7 @@ paths:
           type: string
       tags:
         - Query
+        - IBC
   /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements:
     get:
       summary: >-
@@ -21547,6 +18702,7 @@ paths:
           collectionFormat: multi
       tags:
         - Query
+        - IBC
   /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}:
     get:
       summary: PacketAcknowledgement queries a stored packet acknowledgement hash.
@@ -21812,6 +18968,7 @@ paths:
           format: uint64
       tags:
         - Query
+        - IBC
   /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments:
     get:
       summary: |-
@@ -22175,6 +19332,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - IBC
   /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks:
     get:
       summary: >-
@@ -22442,6 +19600,7 @@ paths:
           minItems: 1
       tags:
         - Query
+        - IBC
   /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets:
     get:
       summary: >-
@@ -22709,6 +19868,7 @@ paths:
           minItems: 1
       tags:
         - Query
+        - IBC
   /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}:
     get:
       summary: PacketCommitment queries a stored packet commitment hash.
@@ -22975,6 +20135,7 @@ paths:
           format: uint64
       tags:
         - Query
+        - IBC
   /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}:
     get:
       summary: >-
@@ -23244,6 +20405,7 @@ paths:
           format: uint64
       tags:
         - Query
+        - IBC
   /ibc/core/channel/v1/connections/{connection}/channels:
     get:
       summary: |-
@@ -23653,6 +20815,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - IBC
   /cosmos/auth/v1beta1/accounts:
     get:
       summary: Accounts returns all the existing accounts
@@ -24121,6 +21284,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Auth
   /cosmos/auth/v1beta1/accounts/{address}:
     get:
       summary: Account returns account details based on address.
@@ -24508,6 +21672,7 @@ paths:
           type: string
       tags:
         - Query
+        - Auth
   /cosmos/auth/v1beta1/address_by_id/{id}:
     get:
       summary: AccountAddressByID returns account address based on account number.
@@ -24729,6 +21894,7 @@ paths:
           format: int64
       tags:
         - Query
+        - Auth
   /cosmos/auth/v1beta1/bech32:
     get:
       summary: Bech32Prefix queries bech32Prefix
@@ -24942,6 +22108,7 @@ paths:
                         }
       tags:
         - Query
+        - Auth
   /cosmos/auth/v1beta1/bech32/{address_bytes}:
     get:
       summary: AddressBytesToString converts Account Address bytes to string
@@ -25161,6 +22328,7 @@ paths:
           format: byte
       tags:
         - Query
+        - Auth
   /cosmos/auth/v1beta1/bech32/{address_string}:
     get:
       summary: AddressStringToBytes converts Address string to bytes
@@ -25380,6 +22548,7 @@ paths:
           type: string
       tags:
         - Query
+        - Auth
   /cosmos/auth/v1beta1/module_accounts:
     get:
       summary: ModuleAccounts returns all the existing module accounts.
@@ -25771,6 +22940,7 @@ paths:
                         }
       tags:
         - Query
+        - Auth
   /cosmos/auth/v1beta1/module_accounts/{name}:
     get:
       summary: ModuleAccountByName returns the module account info by module name
@@ -26157,6 +23327,7 @@ paths:
           type: string
       tags:
         - Query
+        - Auth
   /cosmos/auth/v1beta1/params:
     get:
       summary: Params queries all parameters.
@@ -26383,6 +23554,7 @@ paths:
                         }
       tags:
         - Query
+        - Auth
   /cosmos/bank/v1beta1/balances/{address}:
     get:
       summary: AllBalances queries the balance of all coins for a single account.
@@ -26521,6 +23693,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Bank
   /cosmos/bank/v1beta1/balances/{address}/by_denom:
     get:
       summary: Balance queries the balance of a single coin for a single account.
@@ -26584,6 +23757,7 @@ paths:
           type: string
       tags:
         - Query
+        - Bank
   /cosmos/bank/v1beta1/denom_owners/{denom}:
     get:
       summary: >-
@@ -26748,6 +23922,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Bank
   /cosmos/bank/v1beta1/denoms_metadata:
     get:
       summary: |-
@@ -26959,6 +24134,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Bank
   /cosmos/bank/v1beta1/denoms_metadata/{denom}:
     get:
       summary: DenomsMetadata queries the client metadata of a given coin denomination.
@@ -27093,6 +24269,7 @@ paths:
           type: string
       tags:
         - Query
+        - Bank
   /cosmos/bank/v1beta1/params:
     get:
       summary: Params queries the parameters of x/bank module.
@@ -27150,6 +24327,7 @@ paths:
                       format: byte
       tags:
         - Query
+        - Bank
   /cosmos/bank/v1beta1/spendable_balances/{address}:
     get:
       summary: |-
@@ -27294,6 +24472,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Bank
   /cosmos/bank/v1beta1/supply:
     get:
       summary: TotalSupply queries the total supply of all coins.
@@ -27430,6 +24609,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Bank
   /cosmos/bank/v1beta1/supply/by_denom:
     get:
       summary: SupplyOf queries the supply of a single coin.
@@ -27488,6 +24668,7 @@ paths:
           type: string
       tags:
         - Query
+        - Bank
   /cosmos/base/tendermint/v1beta1/abci_query:
     get:
       summary: >-
@@ -27788,6 +24969,7 @@ paths:
           type: boolean
       tags:
         - Service
+        - Tendermint
   /cosmos/base/tendermint/v1beta1/blocks/latest:
     get:
       summary: GetLatestBlock returns the latest block.
@@ -29102,6 +26284,7 @@ paths:
                         }
       tags:
         - Service
+        - Tendermint
   /cosmos/base/tendermint/v1beta1/blocks/{height}:
     get:
       summary: GetBlockByHeight queries block for given height.
@@ -30422,6 +27605,7 @@ paths:
           format: int64
       tags:
         - Service
+        - Tendermint
   /cosmos/base/tendermint/v1beta1/node_info:
     get:
       summary: GetNodeInfo queries the current node info.
@@ -30700,6 +27884,7 @@ paths:
                         }
       tags:
         - Service
+        - Tendermint
   /cosmos/base/tendermint/v1beta1/syncing:
     get:
       summary: GetSyncing queries node syncing.
@@ -30909,6 +28094,7 @@ paths:
                         }
       tags:
         - Service
+        - Tendermint
   /cosmos/base/tendermint/v1beta1/validatorsets/latest:
     get:
       summary: GetLatestValidatorSet queries latest validator-set.
@@ -31389,6 +28575,7 @@ paths:
           type: boolean
       tags:
         - Service
+        - Tendermint
   /cosmos/base/tendermint/v1beta1/validatorsets/{height}:
     get:
       summary: GetValidatorSetByHeight queries validator-set at a given height.
@@ -31874,6 +29061,7 @@ paths:
           type: boolean
       tags:
         - Service
+        - Tendermint
   /cosmos/distribution/v1beta1/community_pool:
     get:
       summary: CommunityPool queries the community pool coins.
@@ -31932,6 +29120,7 @@ paths:
                       format: byte
       tags:
         - Query
+        - Distribution
   /cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards:
     get:
       summary: |-
@@ -32025,6 +29214,7 @@ paths:
           type: string
       tags:
         - Query
+        - Distribution
   /cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards/{validator_address}:
     get:
       summary: DelegationRewards queries the total rewards accrued by a delegation.
@@ -32092,6 +29282,7 @@ paths:
           type: string
       tags:
         - Query
+        - Distribution
   /cosmos/distribution/v1beta1/delegators/{delegator_address}/validators:
     get:
       summary: DelegatorValidators queries the validators of a delegator.
@@ -32142,6 +29333,7 @@ paths:
           type: string
       tags:
         - Query
+        - Distribution
   /cosmos/distribution/v1beta1/delegators/{delegator_address}/withdraw_address:
     get:
       summary: DelegatorWithdrawAddress queries withdraw address of a delegator.
@@ -32188,6 +29380,7 @@ paths:
           type: string
       tags:
         - Query
+        - Distribution
   /cosmos/distribution/v1beta1/params:
     get:
       summary: Params queries params of the distribution module.
@@ -32237,6 +29430,7 @@ paths:
                       format: byte
       tags:
         - Query
+        - Distribution
   /cosmos/distribution/v1beta1/validators/{validator_address}/commission:
     get:
       summary: ValidatorCommission queries accumulated commission for a validator.
@@ -32302,6 +29496,7 @@ paths:
           type: string
       tags:
         - Query
+        - Distribution
   /cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards:
     get:
       summary: ValidatorOutstandingRewards queries rewards of a validator address.
@@ -32374,6 +29569,7 @@ paths:
           type: string
       tags:
         - Query
+        - Distribution
   /cosmos/distribution/v1beta1/validators/{validator_address}/slashes:
     get:
       summary: ValidatorSlashes queries slash events of a validator.
@@ -32529,6 +29725,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Distribution
   /cosmos/evidence/v1beta1/evidence:
     get:
       summary: AllEvidence queries all evidence.
@@ -32995,6 +30192,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Evidence
   /cosmos/evidence/v1beta1/evidence/{evidence_hash}:
     get:
       summary: Evidence queries evidence based on evidence hash.
@@ -33383,6 +30581,7 @@ paths:
           format: byte
       tags:
         - Query
+        - Evidence
   /cosmos/gov/v1beta1/params/{params_type}:
     get:
       summary: Params queries all parameters of the gov module.
@@ -33659,6 +30858,7 @@ paths:
           type: string
       tags:
         - Query
+        - GovV1beta1
   /cosmos/gov/v1beta1/proposals:
     get:
       summary: Proposals queries all proposals based on given status.
@@ -34245,6 +31445,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - GovV1beta1
   /cosmos/gov/v1beta1/proposals/{proposal_id}:
     get:
       summary: Proposal queries proposal details based on ProposalID.
@@ -34719,6 +31920,7 @@ paths:
           format: uint64
       tags:
         - Query
+        - GovV1beta1
   /cosmos/gov/v1beta1/proposals/{proposal_id}/deposits:
     get:
       summary: Deposits queries all deposits of a single proposal.
@@ -35041,6 +32243,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - GovV1beta1
   /cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}:
     get:
       summary: >-
@@ -35292,6 +32495,7 @@ paths:
           type: string
       tags:
         - Query
+        - GovV1beta1
   /cosmos/gov/v1beta1/proposals/{proposal_id}/tally:
     get:
       summary: TallyResult queries the tally of a proposal vote.
@@ -35518,6 +32722,7 @@ paths:
           format: uint64
       tags:
         - Query
+        - GovV1beta1
   /cosmos/gov/v1beta1/proposals/{proposal_id}/votes:
     get:
       summary: Votes queries votes of a given proposal.
@@ -35873,6 +33078,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - GovV1beta1
   /cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}:
     get:
       summary: Vote queries voted information based on proposalID, voterAddr.
@@ -36155,6 +33361,7 @@ paths:
           type: string
       tags:
         - Query
+        - GovV1beta1
   /cosmos/gov/v1/params/{params_type}:
     get:
       summary: Params queries all parameters of the gov module.
@@ -36428,6 +33635,7 @@ paths:
           type: string
       tags:
         - Query
+        - GovV1
   /cosmos/gov/v1/proposals:
     get:
       summary: Proposals queries all proposals based on given status.
@@ -37021,6 +34229,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - GovV1
   /cosmos/gov/v1/proposals/{proposal_id}:
     get:
       summary: Proposal queries proposal details based on ProposalID.
@@ -37504,6 +34713,7 @@ paths:
           format: uint64
       tags:
         - Query
+        - GovV1
   /cosmos/gov/v1/proposals/{proposal_id}/deposits:
     get:
       summary: Deposits queries all deposits of a single proposal.
@@ -37826,6 +35036,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - GovV1
   /cosmos/gov/v1/proposals/{proposal_id}/deposits/{depositor}:
     get:
       summary: >-
@@ -38077,6 +35288,7 @@ paths:
           type: string
       tags:
         - Query
+        - GovV1
   /cosmos/gov/v1/proposals/{proposal_id}/tally:
     get:
       summary: TallyResult queries the tally of a proposal vote.
@@ -38303,6 +35515,7 @@ paths:
           format: uint64
       tags:
         - Query
+        - GovV1
   /cosmos/gov/v1/proposals/{proposal_id}/votes:
     get:
       summary: Votes queries votes of a given proposal.
@@ -38641,6 +35854,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - GovV1
   /cosmos/gov/v1/proposals/{proposal_id}/votes/{voter}:
     get:
       summary: Vote queries voted information based on proposalID, voterAddr.
@@ -38906,6 +36120,7 @@ paths:
           type: string
       tags:
         - Query
+        - GovV1
   /cosmos/params/v1beta1/params:
     get:
       summary: |-
@@ -38966,6 +36181,7 @@ paths:
           type: string
       tags:
         - Query
+        - Params
   /cosmos/params/v1beta1/subspaces:
     get:
       summary: >-
@@ -39030,6 +36246,7 @@ paths:
                       format: byte
       tags:
         - Query
+        - Params
   /cosmos/slashing/v1beta1/params:
     get:
       summary: Params queries the parameters of slashing module
@@ -39087,6 +36304,7 @@ paths:
                       format: byte
       tags:
         - Query
+        - Slashing
   /cosmos/slashing/v1beta1/signing_infos:
     get:
       summary: SigningInfos queries signing info of all validators
@@ -39264,6 +36482,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Slashing
   /cosmos/slashing/v1beta1/signing_infos/{cons_address}:
     get:
       summary: SigningInfo queries the signing info of given cons address
@@ -39362,6 +36581,7 @@ paths:
           type: string
       tags:
         - Query
+        - Slashing
   /cosmos/staking/v1beta1/delegations/{delegator_addr}:
     get:
       summary: >-
@@ -39705,6 +36925,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Staking
   /cosmos/staking/v1beta1/delegators/{delegator_addr}/redelegations:
     get:
       summary: Redelegations queries redelegations of given address.
@@ -40118,6 +37339,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Staking
   /cosmos/staking/v1beta1/delegators/{delegator_addr}/unbonding_delegations:
     get:
       summary: >-
@@ -40463,6 +37685,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Staking
   /cosmos/staking/v1beta1/delegators/{delegator_addr}/validators:
     get:
       summary: |-
@@ -41072,6 +38295,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Staking
   /cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/{validator_addr}:
     get:
       summary: |-
@@ -41605,6 +38829,7 @@ paths:
           type: string
       tags:
         - Query
+        - Staking
   /cosmos/staking/v1beta1/historical_info/{height}:
     get:
       summary: HistoricalInfo queries the historical info for given height.
@@ -42222,6 +39447,7 @@ paths:
           format: int64
       tags:
         - Query
+        - Staking
   /cosmos/staking/v1beta1/params:
     get:
       summary: Parameters queries the staking parameters.
@@ -42460,6 +39686,7 @@ paths:
                         }
       tags:
         - Query
+        - Staking
   /cosmos/staking/v1beta1/pool:
     get:
       summary: Pool queries the pool info.
@@ -42673,6 +39900,7 @@ paths:
                         }
       tags:
         - Query
+        - Staking
   /cosmos/staking/v1beta1/validators:
     get:
       summary: Validators queries all validators that match the given status.
@@ -43280,6 +40508,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Staking
   /cosmos/staking/v1beta1/validators/{validator_addr}:
     get:
       summary: Validator queries validator info for given validator address.
@@ -43806,6 +41035,7 @@ paths:
           type: string
       tags:
         - Query
+        - Staking
   /cosmos/staking/v1beta1/validators/{validator_addr}/delegations:
     get:
       summary: ValidatorDelegations queries delegate info for given validator.
@@ -44144,6 +41374,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Staking
   /cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}:
     get:
       summary: Delegation queries delegate info for given validator delegator pair.
@@ -44410,6 +41641,7 @@ paths:
           type: string
       tags:
         - Query
+        - Staking
   /cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}/unbonding_delegation:
     get:
       summary: |-
@@ -44679,6 +41911,7 @@ paths:
           type: string
       tags:
         - Query
+        - Staking
   /cosmos/staking/v1beta1/validators/{validator_addr}/unbonding_delegations:
     get:
       summary: >-
@@ -45022,6 +42255,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Staking
   /cosmos/tx/v1beta1/simulate:
     post:
       summary: Simulate simulates executing a transaction for estimating gas usage.
@@ -45496,6 +42730,7 @@ paths:
             $ref: '#/definitions/cosmos.tx.v1beta1.SimulateRequest'
       tags:
         - Service
+        - Tx
   /cosmos/tx/v1beta1/txs:
     get:
       summary: GetTxsEvent fetches txs by event.
@@ -45795,6 +43030,7 @@ paths:
           format: uint64
       tags:
         - Service
+        - Tx
     post:
       summary: BroadcastTx broadcast transaction.
       operationId: BroadcastTx
@@ -46361,6 +43597,7 @@ paths:
               RPC method.
       tags:
         - Service
+        - Tx
   /cosmos/tx/v1beta1/txs/block/{height}:
     get:
       summary: GetBlockWithTxs fetches a block with decoded txs.
@@ -46628,6 +43865,7 @@ paths:
           type: boolean
       tags:
         - Service
+        - Tx
   /cosmos/tx/v1beta1/txs/{hash}:
     get:
       summary: GetTx fetches a tx by hash.
@@ -46837,6 +44075,7 @@ paths:
           type: string
       tags:
         - Service
+        - Tx
   /cosmos/upgrade/v1beta1/applied_plan/{name}:
     get:
       summary: AppliedPlan queries a previously applied upgrade plan by its name.
@@ -47056,6 +44295,7 @@ paths:
           type: string
       tags:
         - Query
+        - Upgrade
   /cosmos/upgrade/v1beta1/authority:
     get:
       summary: Returns the account with authority to conduct upgrades
@@ -47265,6 +44505,7 @@ paths:
                         }
       tags:
         - Query
+        - Upgrade
   /cosmos/upgrade/v1beta1/current_plan:
     get:
       summary: CurrentPlan queries the current upgrade plan.
@@ -47702,6 +44943,7 @@ paths:
                         }
       tags:
         - Query
+        - Upgrade
   /cosmos/upgrade/v1beta1/module_versions:
     get:
       summary: ModuleVersions queries the list of module versions from state.
@@ -47943,6 +45185,7 @@ paths:
           type: string
       tags:
         - Query
+        - Upgrade
   /cosmos/upgrade/v1beta1/upgraded_consensus_state/{last_height}:
     get:
       summary: >-
@@ -48176,6 +45419,7 @@ paths:
           format: int64
       tags:
         - Query
+        - Upgrade
   /cosmos/authz/v1beta1/grants:
     get:
       summary: Returns list of `Authorization`, granted to the grantee by the granter.
@@ -48676,6 +45920,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Authz
   /cosmos/authz/v1beta1/grants/grantee/{grantee}:
     get:
       summary: GranteeGrants returns a list of `GrantAuthorization` by grantee.
@@ -49162,6 +46407,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Authz
   /cosmos/authz/v1beta1/grants/granter/{granter}:
     get:
       summary: GranterGrants returns list of `GrantAuthorization`, granted by granter.
@@ -49648,6 +46894,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Authz
   /cosmos/feegrant/v1beta1/allowance/{granter}/{grantee}:
     get:
       summary: Allowance returns fee granted to the grantee by the granter.
@@ -49957,6 +47204,7 @@ paths:
           type: string
       tags:
         - Query
+        - Feegrant
   /cosmos/feegrant/v1beta1/allowances/{grantee}:
     get:
       summary: Allowances returns all the grants for address.
@@ -50333,6 +47581,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Feegrant
   /cosmos/feegrant/v1beta1/issued/{granter}:
     get:
       summary: AllowancesByGranter returns all the grants given by an address
@@ -50713,6 +47962,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Feegrant
   /cosmos/group/v1/group_info/{group_id}:
     get:
       summary: GroupInfo queries group info based on group id.
@@ -50965,6 +48215,7 @@ paths:
           format: uint64
       tags:
         - Query
+        - Group
   /cosmos/group/v1/group_members/{group_id}:
     get:
       summary: GroupMembers queries members of a group
@@ -51290,6 +48541,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Group
   /cosmos/group/v1/group_policies_by_admin/{admin}:
     get:
       summary: GroupsByAdmin queries group policies by admin address.
@@ -51798,6 +49050,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Group
   /cosmos/group/v1/group_policies_by_group/{group_id}:
     get:
       summary: GroupPoliciesByGroup queries group policies by group id.
@@ -52307,6 +49560,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Group
   /cosmos/group/v1/group_policy_info/{address}:
     get:
       summary: >-
@@ -52735,6 +49989,7 @@ paths:
           type: string
       tags:
         - Query
+        - Group
   /cosmos/group/v1/groups_by_admin/{admin}:
     get:
       summary: GroupsByAdmin queries groups by admin address.
@@ -53068,6 +50323,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Group
   /cosmos/group/v1/groups_by_member/{address}:
     get:
       summary: GroupsByMember queries groups by member address.
@@ -53401,6 +50657,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Group
   /cosmos/group/v1/proposal/{proposal_id}:
     get:
       summary: Proposal queries a proposal based on proposal id.
@@ -53915,6 +51172,7 @@ paths:
           format: uint64
       tags:
         - Query
+        - Group
   /cosmos/group/v1/proposals/{proposal_id}/tally:
     get:
       summary: >-
@@ -54153,6 +51411,7 @@ paths:
           format: uint64
       tags:
         - Query
+        - Group
   /cosmos/group/v1/proposals_by_group_policy/{address}:
     get:
       summary: >-
@@ -54760,6 +52019,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Group
   /cosmos/group/v1/vote_by_proposal_voter/{proposal_id}/{voter}:
     get:
       summary: VoteByProposalVoter queries a vote by proposal id and voter.
@@ -55009,6 +52269,7 @@ paths:
           type: string
       tags:
         - Query
+        - Group
   /cosmos/group/v1/votes_by_proposal/{proposal_id}:
     get:
       summary: VotesByProposal queries a vote by proposal.
@@ -55333,6 +52594,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Group
   /cosmos/group/v1/votes_by_voter/{voter}:
     get:
       summary: VotesByVoter queries a vote by voter.
@@ -55654,6 +52916,7 @@ paths:
           type: boolean
       tags:
         - Query
+        - Group
 definitions:
   cosmos.base.query.v1beta1.PageRequest:
     type: object
@@ -61174,758 +58437,6 @@ definitions:
 
               chain.
     description: QueryParamsResponse is the response type for the Query/Params RPC method.
-  ibc.applications.interchain_accounts.controller.v1.Params:
-    type: object
-    properties:
-      controller_enabled:
-        type: boolean
-        description: controller_enabled enables or disables the controller submodule.
-    description: |-
-      Params defines the set of on-chain interchain accounts parameters.
-      The following parameters may be used to disable the controller submodule.
-  ibc.applications.interchain_accounts.controller.v1.QueryInterchainAccountResponse:
-    type: object
-    properties:
-      address:
-        type: string
-    description: >-
-      QueryInterchainAccountResponse the response type for the
-      Query/InterchainAccount RPC method.
-  ibc.applications.interchain_accounts.controller.v1.QueryParamsResponse:
-    type: object
-    properties:
-      params:
-        description: params defines the parameters of the module.
-        type: object
-        properties:
-          controller_enabled:
-            type: boolean
-            description: controller_enabled enables or disables the controller submodule.
-    description: QueryParamsResponse is the response type for the Query/Params RPC method.
-  ibc.applications.interchain_accounts.host.v1.Params:
-    type: object
-    properties:
-      host_enabled:
-        type: boolean
-        description: host_enabled enables or disables the host submodule.
-      allow_messages:
-        type: array
-        items:
-          type: string
-        description: >-
-          allow_messages defines a list of sdk message typeURLs allowed to be
-          executed on a host chain.
-    description: |-
-      Params defines the set of on-chain interchain accounts parameters.
-      The following parameters may be used to disable the host submodule.
-  ibc.applications.interchain_accounts.host.v1.QueryParamsResponse:
-    type: object
-    properties:
-      params:
-        description: params defines the parameters of the module.
-        type: object
-        properties:
-          host_enabled:
-            type: boolean
-            description: host_enabled enables or disables the host submodule.
-          allow_messages:
-            type: array
-            items:
-              type: string
-            description: >-
-              allow_messages defines a list of sdk message typeURLs allowed to
-              be executed on a host chain.
-    description: QueryParamsResponse is the response type for the Query/Params RPC method.
-  ibc.applications.fee.v1.Fee:
-    type: object
-    properties:
-      recv_fee:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-        title: the packet receive fee
-      ack_fee:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-        title: the packet acknowledgement fee
-      timeout_fee:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-        title: the packet timeout fee
-    title: Fee defines the ICS29 receive, acknowledgement and timeout fees
-  ibc.applications.fee.v1.FeeEnabledChannel:
-    type: object
-    properties:
-      port_id:
-        type: string
-        title: unique port identifier
-      channel_id:
-        type: string
-        title: unique channel identifier
-    title: >-
-      FeeEnabledChannel contains the PortID & ChannelID for a fee enabled
-      channel
-  ibc.applications.fee.v1.IdentifiedPacketFees:
-    type: object
-    properties:
-      packet_id:
-        title: >-
-          unique packet identifier comprised of the channel ID, port ID and
-          sequence
-        type: object
-        properties:
-          port_id:
-            type: string
-            title: channel port identifier
-          channel_id:
-            type: string
-            title: channel unique identifier
-          sequence:
-            type: string
-            format: uint64
-            title: packet sequence
-      packet_fees:
-        type: array
-        items:
-          type: object
-          properties:
-            fee:
-              title: >-
-                fee encapsulates the recv, ack and timeout fees associated with
-                an IBC packet
-              type: object
-              properties:
-                recv_fee:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      denom:
-                        type: string
-                      amount:
-                        type: string
-                    description: >-
-                      Coin defines a token with a denomination and an amount.
-
-
-                      NOTE: The amount field is an Int which implements the
-                      custom method
-
-                      signatures required by gogoproto.
-                  title: the packet receive fee
-                ack_fee:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      denom:
-                        type: string
-                      amount:
-                        type: string
-                    description: >-
-                      Coin defines a token with a denomination and an amount.
-
-
-                      NOTE: The amount field is an Int which implements the
-                      custom method
-
-                      signatures required by gogoproto.
-                  title: the packet acknowledgement fee
-                timeout_fee:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      denom:
-                        type: string
-                      amount:
-                        type: string
-                    description: >-
-                      Coin defines a token with a denomination and an amount.
-
-
-                      NOTE: The amount field is an Int which implements the
-                      custom method
-
-                      signatures required by gogoproto.
-                  title: the packet timeout fee
-            refund_address:
-              type: string
-              title: the refund address for unspent fees
-            relayers:
-              type: array
-              items:
-                type: string
-              title: optional list of relayers permitted to receive fees
-          title: >-
-            PacketFee contains ICS29 relayer fees, refund address and optional
-            list of permitted relayers
-        title: list of packet fees
-    title: >-
-      IdentifiedPacketFees contains a list of type PacketFee and associated
-      PacketId
-  ibc.applications.fee.v1.PacketFee:
-    type: object
-    properties:
-      fee:
-        title: >-
-          fee encapsulates the recv, ack and timeout fees associated with an IBC
-          packet
-        type: object
-        properties:
-          recv_fee:
-            type: array
-            items:
-              type: object
-              properties:
-                denom:
-                  type: string
-                amount:
-                  type: string
-              description: >-
-                Coin defines a token with a denomination and an amount.
-
-
-                NOTE: The amount field is an Int which implements the custom
-                method
-
-                signatures required by gogoproto.
-            title: the packet receive fee
-          ack_fee:
-            type: array
-            items:
-              type: object
-              properties:
-                denom:
-                  type: string
-                amount:
-                  type: string
-              description: >-
-                Coin defines a token with a denomination and an amount.
-
-
-                NOTE: The amount field is an Int which implements the custom
-                method
-
-                signatures required by gogoproto.
-            title: the packet acknowledgement fee
-          timeout_fee:
-            type: array
-            items:
-              type: object
-              properties:
-                denom:
-                  type: string
-                amount:
-                  type: string
-              description: >-
-                Coin defines a token with a denomination and an amount.
-
-
-                NOTE: The amount field is an Int which implements the custom
-                method
-
-                signatures required by gogoproto.
-            title: the packet timeout fee
-      refund_address:
-        type: string
-        title: the refund address for unspent fees
-      relayers:
-        type: array
-        items:
-          type: string
-        title: optional list of relayers permitted to receive fees
-    title: >-
-      PacketFee contains ICS29 relayer fees, refund address and optional list of
-      permitted relayers
-  ibc.applications.fee.v1.QueryCounterpartyPayeeResponse:
-    type: object
-    properties:
-      counterparty_payee:
-        type: string
-        title: the counterparty payee address used to compensate forward relaying
-    title: >-
-      QueryCounterpartyPayeeResponse defines the response type for the
-      CounterpartyPayee rpc
-  ibc.applications.fee.v1.QueryFeeEnabledChannelResponse:
-    type: object
-    properties:
-      fee_enabled:
-        type: boolean
-        title: boolean flag representing the fee enabled channel status
-    title: >-
-      QueryFeeEnabledChannelResponse defines the response type for the
-      FeeEnabledChannel rpc
-  ibc.applications.fee.v1.QueryFeeEnabledChannelsResponse:
-    type: object
-    properties:
-      fee_enabled_channels:
-        type: array
-        items:
-          type: object
-          properties:
-            port_id:
-              type: string
-              title: unique port identifier
-            channel_id:
-              type: string
-              title: unique channel identifier
-          title: >-
-            FeeEnabledChannel contains the PortID & ChannelID for a fee enabled
-            channel
-        title: list of fee enabled channels
-    title: >-
-      QueryFeeEnabledChannelsResponse defines the response type for the
-      FeeEnabledChannels rpc
-  ibc.applications.fee.v1.QueryIncentivizedPacketResponse:
-    type: object
-    properties:
-      incentivized_packet:
-        type: object
-        properties:
-          packet_id:
-            title: >-
-              unique packet identifier comprised of the channel ID, port ID and
-              sequence
-            type: object
-            properties:
-              port_id:
-                type: string
-                title: channel port identifier
-              channel_id:
-                type: string
-                title: channel unique identifier
-              sequence:
-                type: string
-                format: uint64
-                title: packet sequence
-          packet_fees:
-            type: array
-            items:
-              type: object
-              properties:
-                fee:
-                  title: >-
-                    fee encapsulates the recv, ack and timeout fees associated
-                    with an IBC packet
-                  type: object
-                  properties:
-                    recv_fee:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          denom:
-                            type: string
-                          amount:
-                            type: string
-                        description: >-
-                          Coin defines a token with a denomination and an
-                          amount.
-
-
-                          NOTE: The amount field is an Int which implements the
-                          custom method
-
-                          signatures required by gogoproto.
-                      title: the packet receive fee
-                    ack_fee:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          denom:
-                            type: string
-                          amount:
-                            type: string
-                        description: >-
-                          Coin defines a token with a denomination and an
-                          amount.
-
-
-                          NOTE: The amount field is an Int which implements the
-                          custom method
-
-                          signatures required by gogoproto.
-                      title: the packet acknowledgement fee
-                    timeout_fee:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          denom:
-                            type: string
-                          amount:
-                            type: string
-                        description: >-
-                          Coin defines a token with a denomination and an
-                          amount.
-
-
-                          NOTE: The amount field is an Int which implements the
-                          custom method
-
-                          signatures required by gogoproto.
-                      title: the packet timeout fee
-                refund_address:
-                  type: string
-                  title: the refund address for unspent fees
-                relayers:
-                  type: array
-                  items:
-                    type: string
-                  title: optional list of relayers permitted to receive fees
-              title: >-
-                PacketFee contains ICS29 relayer fees, refund address and
-                optional list of permitted relayers
-            title: list of packet fees
-        title: >-
-          IdentifiedPacketFees contains a list of type PacketFee and associated
-          PacketId
-    title: >-
-      QueryIncentivizedPacketsResponse defines the response type for the
-      IncentivizedPacket rpc
-  ibc.applications.fee.v1.QueryIncentivizedPacketsForChannelResponse:
-    type: object
-    properties:
-      incentivized_packets:
-        type: array
-        items:
-          type: object
-          properties:
-            packet_id:
-              title: >-
-                unique packet identifier comprised of the channel ID, port ID
-                and sequence
-              type: object
-              properties:
-                port_id:
-                  type: string
-                  title: channel port identifier
-                channel_id:
-                  type: string
-                  title: channel unique identifier
-                sequence:
-                  type: string
-                  format: uint64
-                  title: packet sequence
-            packet_fees:
-              type: array
-              items:
-                type: object
-                properties:
-                  fee:
-                    title: >-
-                      fee encapsulates the recv, ack and timeout fees associated
-                      with an IBC packet
-                    type: object
-                    properties:
-                      recv_fee:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            denom:
-                              type: string
-                            amount:
-                              type: string
-                          description: >-
-                            Coin defines a token with a denomination and an
-                            amount.
-
-
-                            NOTE: The amount field is an Int which implements
-                            the custom method
-
-                            signatures required by gogoproto.
-                        title: the packet receive fee
-                      ack_fee:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            denom:
-                              type: string
-                            amount:
-                              type: string
-                          description: >-
-                            Coin defines a token with a denomination and an
-                            amount.
-
-
-                            NOTE: The amount field is an Int which implements
-                            the custom method
-
-                            signatures required by gogoproto.
-                        title: the packet acknowledgement fee
-                      timeout_fee:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            denom:
-                              type: string
-                            amount:
-                              type: string
-                          description: >-
-                            Coin defines a token with a denomination and an
-                            amount.
-
-
-                            NOTE: The amount field is an Int which implements
-                            the custom method
-
-                            signatures required by gogoproto.
-                        title: the packet timeout fee
-                  refund_address:
-                    type: string
-                    title: the refund address for unspent fees
-                  relayers:
-                    type: array
-                    items:
-                      type: string
-                    title: optional list of relayers permitted to receive fees
-                title: >-
-                  PacketFee contains ICS29 relayer fees, refund address and
-                  optional list of permitted relayers
-              title: list of packet fees
-          title: >-
-            IdentifiedPacketFees contains a list of type PacketFee and
-            associated PacketId
-        title: Map of all incentivized_packets
-    title: >-
-      QueryIncentivizedPacketsResponse defines the response type for the
-      incentivized packets RPC
-  ibc.applications.fee.v1.QueryIncentivizedPacketsResponse:
-    type: object
-    properties:
-      incentivized_packets:
-        type: array
-        items:
-          type: object
-          properties:
-            packet_id:
-              title: >-
-                unique packet identifier comprised of the channel ID, port ID
-                and sequence
-              type: object
-              properties:
-                port_id:
-                  type: string
-                  title: channel port identifier
-                channel_id:
-                  type: string
-                  title: channel unique identifier
-                sequence:
-                  type: string
-                  format: uint64
-                  title: packet sequence
-            packet_fees:
-              type: array
-              items:
-                type: object
-                properties:
-                  fee:
-                    title: >-
-                      fee encapsulates the recv, ack and timeout fees associated
-                      with an IBC packet
-                    type: object
-                    properties:
-                      recv_fee:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            denom:
-                              type: string
-                            amount:
-                              type: string
-                          description: >-
-                            Coin defines a token with a denomination and an
-                            amount.
-
-
-                            NOTE: The amount field is an Int which implements
-                            the custom method
-
-                            signatures required by gogoproto.
-                        title: the packet receive fee
-                      ack_fee:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            denom:
-                              type: string
-                            amount:
-                              type: string
-                          description: >-
-                            Coin defines a token with a denomination and an
-                            amount.
-
-
-                            NOTE: The amount field is an Int which implements
-                            the custom method
-
-                            signatures required by gogoproto.
-                        title: the packet acknowledgement fee
-                      timeout_fee:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            denom:
-                              type: string
-                            amount:
-                              type: string
-                          description: >-
-                            Coin defines a token with a denomination and an
-                            amount.
-
-
-                            NOTE: The amount field is an Int which implements
-                            the custom method
-
-                            signatures required by gogoproto.
-                        title: the packet timeout fee
-                  refund_address:
-                    type: string
-                    title: the refund address for unspent fees
-                  relayers:
-                    type: array
-                    items:
-                      type: string
-                    title: optional list of relayers permitted to receive fees
-                title: >-
-                  PacketFee contains ICS29 relayer fees, refund address and
-                  optional list of permitted relayers
-              title: list of packet fees
-          title: >-
-            IdentifiedPacketFees contains a list of type PacketFee and
-            associated PacketId
-        title: list of identified fees for incentivized packets
-    title: >-
-      QueryIncentivizedPacketsResponse defines the response type for the
-      IncentivizedPackets rpc
-  ibc.applications.fee.v1.QueryPayeeResponse:
-    type: object
-    properties:
-      payee_address:
-        type: string
-        title: the payee address to which packet fees are paid out
-    title: QueryPayeeResponse defines the response type for the Payee rpc
-  ibc.applications.fee.v1.QueryTotalAckFeesResponse:
-    type: object
-    properties:
-      ack_fees:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-        title: the total packet acknowledgement fees
-    title: >-
-      QueryTotalAckFeesResponse defines the response type for the TotalAckFees
-      rpc
-  ibc.applications.fee.v1.QueryTotalRecvFeesResponse:
-    type: object
-    properties:
-      recv_fees:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-        title: the total packet receive fees
-    title: >-
-      QueryTotalRecvFeesResponse defines the response type for the TotalRecvFees
-      rpc
-  ibc.applications.fee.v1.QueryTotalTimeoutFeesResponse:
-    type: object
-    properties:
-      timeout_fees:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-        title: the total packet timeout fees
-    title: >-
-      QueryTotalTimeoutFeesResponse defines the response type for the
-      TotalTimeoutFees rpc
-  ibc.core.channel.v1.PacketId:
-    type: object
-    properties:
-      port_id:
-        type: string
-        title: channel port identifier
-      channel_id:
-        type: string
-        title: channel unique identifier
-      sequence:
-        type: string
-        format: uint64
-        title: packet sequence
-    title: |-
-      PacketId is an identifer for a unique Packet
-      Source chains refer to packets by source port/channel
-      Destination chains refer to packets by destination port/channel
   ibc.core.client.v1.ConsensusStateWithHeight:
     type: object
     properties:

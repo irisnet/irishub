@@ -3,7 +3,7 @@
   "info": {
     "title": "IRIShub - REST and gRPC Gateway docs",
     "description": "A REST interface for state queries, legacy transactions",
-    "version": "1.4.1"
+    "version": "2.0.0"
   },
   "apis": [
     {
@@ -12,6 +12,11 @@
         "rename": {
           "Params": "TokenParams"
         }
+      },
+      "tags": {
+        "add": [
+          "TokenV1"
+        ]
       }
     },
     {
@@ -24,6 +29,11 @@
           "Fees": "LegacyFees",
           "TotalBurn": "LegacyTotalBurn"
         }
+      },
+      "tags": {
+        "add": [
+          "TokenV1beta1"
+        ]
       }
     },
     {
@@ -32,6 +42,11 @@
         "rename": {
           "Params": "HTLCParams"
         }
+      },
+      "tags": {
+        "add": [
+          "HTLC"
+        ]
       }
     },
     {
@@ -40,6 +55,11 @@
         "rename": {
           "Params": "CoinswapParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Coinswap"
+        ]
       }
     },
     {
@@ -48,6 +68,11 @@
         "rename": {
           "Params": "FarmParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Farm"
+        ]
       }
     },
     {
@@ -56,6 +81,11 @@
         "rename": {
           "Params": "NFTParams"
         }
+      },
+      "tags": {
+        "add": [
+          "NFT"
+        ]
       }
     },
     {
@@ -64,6 +94,11 @@
         "rename": {
           "Params": "ServiceParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Service"
+        ]
       }
     },
     {
@@ -72,6 +107,11 @@
         "rename": {
           "Params": "OracleParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Oracle"
+        ]
       }
     },
     {
@@ -80,6 +120,11 @@
         "rename": {
           "Params": "RandomParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Random"
+        ]
       }
     },
     {
@@ -88,6 +133,11 @@
         "rename": {
           "Params": "RecordParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Record"
+        ]
       }
     },
     {
@@ -96,6 +146,11 @@
         "rename": {
           "Params": "MintParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Mint"
+        ]
       }
     },
     {
@@ -104,6 +159,11 @@
         "rename": {
           "Params": "GuardianParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Guardian"
+        ]
       }
     },
     {
@@ -114,6 +174,11 @@
           "Account": "EvmAccount",
           "Balance": "EvmBalance"
         }
+      },
+      "tags": {
+        "add": [
+          "Evm"
+        ]
       }
     },
     {
@@ -123,6 +188,11 @@
           "Params": "FeeMarketParams",
           "BaseFee": "FeeMarketBaseFee"
         }
+      },
+      "tags": {
+        "add": [
+          "Feemarket"
+        ]
       }
     },
     {
@@ -131,30 +201,11 @@
         "rename": {
           "Params": "TransferParams"
         }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/ibc/applications/interchain_accounts/controller/v1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "InterchainAccountsControllerParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/ibc/applications/interchain_accounts/host/v1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "InterchainAccountsHostParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/ibc/applications/fee/v1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "FeeParams"
-        }
+      },
+      "tags": {
+        "add": [
+          "IBC"
+        ]
       }
     },
     {
@@ -163,6 +214,11 @@
         "rename": {
           "Params": "ClientParams"
         }
+      },
+      "tags": {
+        "add": [
+          "IBC"
+        ]
       }
     },
     {
@@ -171,6 +227,11 @@
         "rename": {
           "Params": "ConnectionParams"
         }
+      },
+      "tags": {
+        "add": [
+          "IBC"
+        ]
       }
     },
     {
@@ -179,6 +240,11 @@
         "rename": {
           "Params": "ChannelParams"
         }
+      },
+      "tags": {
+        "add": [
+          "IBC"
+        ]
       }
     },
     {
@@ -187,6 +253,11 @@
         "rename": {
           "Params": "AuthParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Auth"
+        ]
       }
     },
     {
@@ -195,6 +266,11 @@
         "rename": {
           "Params": "BankParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Bank"
+        ]
       }
     },
     {
@@ -203,6 +279,11 @@
         "rename": {
           "Params": "BaseParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Tendermint"
+        ]
       }
     },
     {
@@ -211,6 +292,11 @@
         "rename": {
           "Params": "DistributionParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Distribution"
+        ]
       }
     },
     {
@@ -219,6 +305,11 @@
         "rename": {
           "Params": "EvidenceParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Evidence"
+        ]
       }
     },
     {
@@ -227,6 +318,11 @@
         "rename": {
           "Params": "GovParams"
         }
+      },
+      "tags": {
+        "add": [
+          "GovV1beta1"
+        ]
       }
     },
     {
@@ -242,6 +338,11 @@
           "Deposits": "GovV1Deposit",
           "TallyResult": "GovV1TallyResult"
         }
+      },
+      "tags": {
+        "add": [
+          "GovV1"
+        ]
       }
     },
     {
@@ -250,6 +351,11 @@
         "rename": {
           "Params": "Params"
         }
+      },
+      "tags": {
+        "add": [
+          "Params"
+        ]
       }
     },
     {
@@ -258,6 +364,11 @@
         "rename": {
           "Params": "SlashingParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Slashing"
+        ]
       }
     },
     {
@@ -267,12 +378,22 @@
           "Params": "StakingParams",
           "DelegatorValidators": "StakingDelegatorValidators"
         }
+      },
+      "tags": {
+        "add": [
+          "Staking"
+        ]
       }
     },
     {
       "url": "./tmp-swagger-gen/cosmos/tx/v1beta1/service.swagger.json",
       "dereference": {
         "circular": "ignore"
+      },
+      "tags": {
+        "add": [
+          "Tx"
+        ]
       }
     },
     {
@@ -282,6 +403,11 @@
           "Params": "UpgradeParams",
           "UpgradedConsensusState": "CosmosUpgradedConsensusState"
         }
+      },
+      "tags": {
+        "add": [
+          "Upgrade"
+        ]
       }
     },
     {
@@ -290,6 +416,11 @@
         "rename": {
           "Params": "AuthzParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Authz"
+        ]
       }
     },
     {
@@ -298,6 +429,11 @@
         "rename": {
           "Params": "FeegrantParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Feegrant"
+        ]
       }
     },
     {
@@ -308,6 +444,11 @@
           "Proposal": "GroupProposal",
           "TallyResult": "GroupTallyResult"
         }
+      },
+      "tags": {
+        "add": [
+          "Group"
+        ]
       }
     }
   ]
