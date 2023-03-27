@@ -3,15 +3,261 @@
   "info": {
     "title": "IRIShub - REST and gRPC Gateway docs",
     "description": "A REST interface for state queries, legacy transactions",
-    "version": "1.4.1"
+    "version": "2.0.0"
   },
   "apis": [
+    {
+      "url": "./tmp-swagger-gen/token/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "TokenParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "TokenV1"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/token/v1beta1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "LegacyTokenParams",
+          "Tokens": "LegacyTokens",
+          "Token": "LegacyToken",
+          "Fees": "LegacyFees",
+          "TotalBurn": "LegacyTotalBurn"
+        }
+      },
+      "tags": {
+        "add": [
+          "TokenV1beta1"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/htlc/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "HTLCParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "HTLC"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/coinswap/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "CoinswapParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "Coinswap"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/farm/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "FarmParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "Farm"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/nft/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "NFTParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "NFT"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/service/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "ServiceParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "Service"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/oracle/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "OracleParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "Oracle"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/random/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "RandomParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "Random"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/record/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "RecordParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "Record"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/mint/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "MintParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "Mint"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/guardian/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "GuardianParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "Guardian"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/ethermint/evm/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "EvmParams",
+          "Account": "EvmAccount",
+          "Balance": "EvmBalance"
+        }
+      },
+      "tags": {
+        "add": [
+          "Evm"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/ethermint/feemarket/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "FeeMarketParams",
+          "BaseFee": "FeeMarketBaseFee"
+        }
+      },
+      "tags": {
+        "add": [
+          "Feemarket"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/ibc/applications/transfer/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "TransferParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "IBC"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/ibc/core/client/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "ClientParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "IBC"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/ibc/core/connection/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "ConnectionParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "IBC"
+        ]
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/ibc/core/channel/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "ChannelParams"
+        }
+      },
+      "tags": {
+        "add": [
+          "IBC"
+        ]
+      }
+    },
     {
       "url": "./tmp-swagger-gen/cosmos/auth/v1beta1/query.swagger.json",
       "operationIds": {
         "rename": {
           "Params": "AuthParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Auth"
+        ]
       }
     },
     {
@@ -20,6 +266,11 @@
         "rename": {
           "Params": "BankParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Bank"
+        ]
       }
     },
     {
@@ -28,6 +279,11 @@
         "rename": {
           "Params": "BaseParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Tendermint"
+        ]
       }
     },
     {
@@ -36,6 +292,11 @@
         "rename": {
           "Params": "DistributionParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Distribution"
+        ]
       }
     },
     {
@@ -44,6 +305,11 @@
         "rename": {
           "Params": "EvidenceParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Evidence"
+        ]
       }
     },
     {
@@ -52,6 +318,11 @@
         "rename": {
           "Params": "GovParams"
         }
+      },
+      "tags": {
+        "add": [
+          "GovV1beta1"
+        ]
       }
     },
     {
@@ -67,6 +338,11 @@
           "Deposits": "GovV1Deposit",
           "TallyResult": "GovV1TallyResult"
         }
+      },
+      "tags": {
+        "add": [
+          "GovV1"
+        ]
       }
     },
     {
@@ -75,6 +351,11 @@
         "rename": {
           "Params": "Params"
         }
+      },
+      "tags": {
+        "add": [
+          "Params"
+        ]
       }
     },
     {
@@ -83,6 +364,11 @@
         "rename": {
           "Params": "SlashingParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Slashing"
+        ]
       }
     },
     {
@@ -92,20 +378,36 @@
           "Params": "StakingParams",
           "DelegatorValidators": "StakingDelegatorValidators"
         }
+      },
+      "tags": {
+        "add": [
+          "Staking"
+        ]
       }
     },
     {
       "url": "./tmp-swagger-gen/cosmos/tx/v1beta1/service.swagger.json",
       "dereference": {
         "circular": "ignore"
+      },
+      "tags": {
+        "add": [
+          "Tx"
+        ]
       }
     },
     {
       "url": "./tmp-swagger-gen/cosmos/upgrade/v1beta1/query.swagger.json",
       "operationIds": {
         "rename": {
-          "Params": "UpgradeParams"
+          "Params": "UpgradeParams",
+          "UpgradedConsensusState": "CosmosUpgradedConsensusState"
         }
+      },
+      "tags": {
+        "add": [
+          "Upgrade"
+        ]
       }
     },
     {
@@ -114,6 +416,11 @@
         "rename": {
           "Params": "AuthzParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Authz"
+        ]
       }
     },
     {
@@ -122,6 +429,11 @@
         "rename": {
           "Params": "FeegrantParams"
         }
+      },
+      "tags": {
+        "add": [
+          "Feegrant"
+        ]
       }
     },
     {
@@ -132,143 +444,11 @@
           "Proposal": "GroupProposal",
           "TallyResult": "GroupTallyResult"
         }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/token/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "TokenParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/htlc/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "HTLCParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/coinswap/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "CoinswapParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/farm/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "FarmParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/nft/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "NFTParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/service/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "ServiceParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/oracle/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "OracleParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/random/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "RandomParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/record/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "RecordParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/mint/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "MintParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/guardian/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "GuardianParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/ibc/applications/transfer/v1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "TransferParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/ibc/applications/interchain_accounts/controller/v1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "InterchainAccountsControllerParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/ibc/applications/interchain_accounts/host/v1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "InterchainAccountsHostParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/ibc/core/client/v1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "ClientParams",
-          "UpgradedConsensusState": "IBCUpgradedConsensusState"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/ibc/core/connection/v1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "ConnectionParams"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/ibc/core/channel/v1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "ChannelParams"
-        }
+      },
+      "tags": {
+        "add": [
+          "Group"
+        ]
       }
     }
   ]

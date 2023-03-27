@@ -61,7 +61,7 @@ $(GOLANGCI_LINT): $(mkfile_dir)/install-golangci-lint.sh
 statik: $(STATIK)
 $(STATIK):
 	@echo "Installing statik..."
-	@(cd /tmp && go get github.com/rakyll/statik@v0.1.6)
+	@(cd /tmp && go install github.com/rakyll/statik@v0.1.6)
 
 PROTOC_VERSION ?= 3.13.0
 PROTOC_GRPC_GATEWAY_VERSION = 1.14.7
