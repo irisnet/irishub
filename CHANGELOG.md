@@ -37,12 +37,24 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ## [Unreleased]
 
+### Improvements
+
+* [\#321](https://github.com/irisnet/irismod/pull/340) The token module supports the exchange of two tokens.
+* [\#321](https://github.com/irisnet/irismod/pull/342) Refator token module .
+
+### Bug Fixes
+
+* [\#321](https://github.com/irisnet/irismod/pull/336) Fix farm genesis validate failed.
+* [\#321](https://github.com/irisnet/irismod/pull/327) Only export htlc with state=open.
+
 ## [v1.7.1] - 2022-11-18
 
 ### Improvements
+
 * [\#321](https://github.com/irisnet/irismod/pull/321) Bump up cosmos-sdk to v0.46.5.
 
 ## [v1.7.0] - 2022-11-15
+
 ### Bug Fixes
 
 * [\#304](https://github.com/irisnet/irismod/pull/304) Fix nft module import error.
