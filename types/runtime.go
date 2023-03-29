@@ -12,6 +12,7 @@ import (
 
 	"github.com/irisnet/irishub/address"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 const (
@@ -19,8 +20,8 @@ const (
 )
 
 var (
-	NativeToken     tokentypes.Token
-	EvmToken        tokentypes.Token
+	NativeToken     tokenv1.Token
+	EvmToken        tokenv1.Token
 	DefaultNodeHome string
 )
 
@@ -33,7 +34,7 @@ func init() {
 		return `[a-zA-Z][a-zA-Z0-9/-]{2,127}`
 	})
 
-	NativeToken = tokentypes.Token{
+	NativeToken = tokenv1.Token{
 		Symbol:        "iris",
 		Name:          "Irishub staking token",
 		Scale:         6,
@@ -45,7 +46,7 @@ func init() {
 	}
 
 	// TODO
-	EvmToken = tokentypes.Token{
+	EvmToken = tokenv1.Token{
 		Symbol:        "eth",
 		Name:          "Irishub evm token",
 		Scale:         18,
@@ -68,7 +69,7 @@ func init() {
 	}
 
 	// replace the default token
-	tokentypes.SetNativeToken(
+	tokenv1.SetNativeToken(
 		NativeToken.Symbol,
 		NativeToken.Name,
 		NativeToken.MinUnit,
