@@ -96,7 +96,6 @@ func migrateGenesis(appCodec codec.Codec, genFile string) error {
 	}
 
 	genDoc.AppState = appStateJSON
-	genDoc.GenesisTime = v200.GenerateGenesisTime()
 	if err := genDoc.ValidateAndComplete(); err != nil {
 		return err
 	}

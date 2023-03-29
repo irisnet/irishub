@@ -1,10 +1,6 @@
 package v200
 
 import (
-	"time"
-
-	tmtime "github.com/tendermint/tendermint/types/time"
-
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	etherminttypes "github.com/evmos/ethermint/x/evm/types"
@@ -18,8 +14,7 @@ import (
 // NOTE: Before the release of irishub 2.0.0, the configuration in this file must be modified
 
 const (
-	MaxBlockGas = 20000000                 // TODO
-	genesisTime = "2023-04-15T00:00:00.0Z" // TODO
+	MaxBlockGas = 20000000 // TODO
 )
 
 var (
@@ -54,13 +49,4 @@ func GenerateEvmParams() etherminttypes.Params {
 func GenerateFeemarketParams(enableHeight int64) feemarkettypes.Params {
 	feemarketParams.EnableHeight = enableHeight
 	return feemarketParams
-}
-
-func GenerateGenesisTime() time.Time {
-	genTime, err := time.Parse(time.RFC3339, genesisTime)
-	if err != nil {
-		panic("parse genesis time error: " + err.Error())
-	}
-
-	return tmtime.Canonical(genTime)
 }
