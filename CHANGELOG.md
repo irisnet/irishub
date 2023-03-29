@@ -41,11 +41,13 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 * [\#321](https://github.com/irisnet/irismod/pull/340) The token module supports the exchange of two tokens.
 * [\#321](https://github.com/irisnet/irismod/pull/342) Refator token module .
+* [\#321](https://github.com/irisnet/irismod/pull/348) Adjust the length limit of classID and nftID in nft .
 
 ### Bug Fixes
 
 * [\#321](https://github.com/irisnet/irismod/pull/336) Fix farm genesis validate failed.
 * [\#321](https://github.com/irisnet/irismod/pull/327) Only export htlc with state=open.
+* [\#321](https://github.com/irisnet/irismod/pull/347) Fix service refund address parse error .
 
 ## [v1.7.1] - 2022-11-18
 
