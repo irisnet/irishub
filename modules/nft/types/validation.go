@@ -20,9 +20,9 @@ const (
 )
 
 var (
-	// DenomID or TokenID can be 3 ~ 128 characters long and support letters, followed by either
+	// DenomID or TokenID can be 3 ~ 100 characters long and support letters, followed by either
 	// a letter, a number or a separator ('/', ':', '.', '_' or '-').
-	idString = `[a-z][a-zA-Z0-9/]{2,127}`
+	idString = `[a-z][a-zA-Z0-9/]{2,100}`
 	regexpID = regexp.MustCompile(fmt.Sprintf(`^%s$`, idString)).MatchString
 
 	keywords          = strings.Join([]string{ReservedPeg, ReservedIBC, ReservedHTLT, ReservedTIBC}, "|")
