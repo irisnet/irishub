@@ -1,9 +1,9 @@
 
-IBC_GO=v5.2.0
+EVM_VERSION=v0.20.0
 
-go mod download github.com/cosmos/ibc-go/v5@${IBC_GO}
+go mod download github.com/evmos/ethermint@${EVM_VERSION}
 
-IBC_PATH=${GOPATH}/pkg/mod/github.com/cosmos/ibc-go/v5@${IBC_GO}
+IBC_PATH=${GOPATH}/pkg/mod/github.com/evmos/ethermint@${EVM_VERSION}
 
 proto_dirs=$(find ${IBC_PATH}/proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
