@@ -7,13 +7,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/config"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 
@@ -21,6 +19,7 @@ import (
 	etherminttypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
+	v200 "github.com/irisnet/irishub/app/upgrades/v200"
 	"github.com/irisnet/irishub/types"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
@@ -84,7 +83,7 @@ func migrateGenesis(appCodec codec.Codec, genFile string) error {
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal genesis state: %w", err)
 	}
-	genDoc.ConsensusParams.Block.MaxGas = 20000000
+	genDoc.ConsensusParams.Block.MaxGas = v200.MaxBlockGas
 	migrateAppState(appCodec, genDoc.InitialHeight, appState)
 
 	appStateJSON, err := json.Marshal(appState)
@@ -93,22 +92,17 @@ func migrateGenesis(appCodec codec.Codec, genFile string) error {
 	}
 
 	genDoc.AppState = appStateJSON
+	genDoc.GenesisTime = v200.GenerateGenesisTime()
 	return genutil.ExportGenesisFile(genDoc, genFile)
 }
 
 func migrateAppState(appCodec codec.Codec, initialHeight int64, appState map[string]json.RawMessage) {
+	evmParams := v200.GenerateEvmParams()
 	// add evm genesis
 	if _, ok := appState[etherminttypes.ModuleName]; !ok {
 		evmGenState := etherminttypes.GenesisState{
 			Accounts: []etherminttypes.GenesisAccount{},
-			Params: etherminttypes.Params{
-				EvmDenom:            types.EvmToken.MinUnit,
-				EnableCreate:        true,
-				EnableCall:          true,
-				ChainConfig:         etherminttypes.DefaultChainConfig(),
-				ExtraEIPs:           nil,
-				AllowUnprotectedTxs: etherminttypes.DefaultAllowUnprotectedTxs,
-			},
+			Params:   evmParams,
 		}
 		appState[etherminttypes.ModuleName] = appCodec.MustMarshalJSON(&evmGenState)
 	}
@@ -116,15 +110,7 @@ func migrateAppState(appCodec codec.Codec, initialHeight int64, appState map[str
 	// add feemarket genesis
 	if _, ok := appState[feemarkettypes.ModuleName]; !ok {
 		evmGenState := feemarkettypes.GenesisState{
-			Params: feemarkettypes.Params{
-				NoBaseFee:                false,
-				BaseFeeChangeDenominator: 8,                        // TODO
-				ElasticityMultiplier:     2,                        // TODO
-				EnableHeight:             initialHeight,            // TODO
-				BaseFee:                  math.NewInt(1000000000),  // TODO
-				MinGasPrice:              sdk.ZeroDec(),            // TODO
-				MinGasMultiplier:         sdk.NewDecWithPrec(5, 1), // TODO
-			},
+			Params:   v200.GenerateFeemarketParams(initialHeight),
 			BlockGas: 0,
 		}
 		appState[feemarkettypes.ModuleName] = appCodec.MustMarshalJSON(&evmGenState)
@@ -137,7 +123,7 @@ func migrateAppState(appCodec codec.Codec, initialHeight int64, appState map[str
 
 		evmTokenExist := false
 		for _, token := range tokenGenState.Tokens {
-			if token.MinUnit == types.EvmToken.MinUnit {
+			if token.MinUnit == evmParams.EvmDenom {
 				evmTokenExist = true
 				break
 			}
