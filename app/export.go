@@ -32,6 +32,9 @@ func (app *IrisApp) ExportAppStateAndValidators(
 	if forZeroHeight {
 		height = 0
 		app.prepForZeroHeightGenesis(ctx, jailAllowedAddrs)
+	} else {
+		// NOTE: service currently does not support non-ZeroHeight export
+		service.PrepForZeroHeightGenesis(ctx, app.ServiceKeeper)
 	}
 
 	genState := app.mm.ExportGenesis(ctx, app.appCodec)
