@@ -109,3 +109,61 @@ type ChainConfig struct {
 	EWASMBlock  sdk.Int `json:"ewasm_block" yaml:"ewasm_block"`   // EWASM switch block (< 0 no fork, 0 = already activated)
 }
 ```
+
+## Config
+
+EVM specific app.toml configuration.
+
+```toml
+###############################################################################
+###                             EVM Configuration                           ###
+###############################################################################
+
+[evm]
+
+# Tracer defines the 'vm.Tracer' type that the EVM will use when the node is run in
+# debug mode. To enable tracing use the '--evm.tracer' flag when starting your node.
+# Valid types are: json|struct|access_list|markdown
+tracer = ""
+
+###############################################################################
+###                           JSON RPC Configuration                        ###
+###############################################################################
+
+[json-rpc]
+
+# Enable defines if the gRPC server should be enabled.
+enable = true
+
+# Address defines the EVM RPC HTTP server address to bind to.
+address = "0.0.0.0:8545"
+
+# Address defines the EVM WebSocket server address to bind to.
+ws-address = "0.0.0.0:8546"
+
+# API defines a list of JSON-RPC namespaces that should be enabled
+# Example: "eth,txpool,personal,net,debug,web3"
+api = "eth,net,web3"
+
+# GasCap sets a cap on gas that can be used in eth_call/estimateGas (0=infinite). Default: 25,000,000.
+gas-cap = 25000000
+
+# EVMTimeout is the global timeout for eth_call. Default: 5s.
+evm-timeout = "5s"
+
+# TxFeeCap is the global tx-fee cap for send transaction. Default: 1eth.
+txfee-cap = 1
+
+# FilterCap sets the global cap for total number of filters that can be created
+filter-cap = 200
+
+# FeeHistoryCap sets the global cap for total number of blocks that can be fetched
+feehistory-cap = 100
+
+# LogsCap defines the max number of results can be returned from single 'eth_getLogs' query.
+logs-cap = 10000
+
+# BlockRangeCap defines the max block range allowed for 'eth_getLogs' query.
+block-range-cap = 10000
+
+```
