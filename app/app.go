@@ -637,6 +637,7 @@ func NewIrisApp(
 			},
 			AccountKeeper:        app.AccountKeeper,
 			BankKeeper:           app.BankKeeper,
+			IBCKeeper:            app.IBCKeeper,
 			TokenKeeper:          app.TokenKeeper,
 			OracleKeeper:         app.OracleKeeper,
 			GuardianKeeper:       app.GuardianKeeper,
