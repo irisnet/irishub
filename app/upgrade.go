@@ -43,6 +43,7 @@ func (app *IrisApp) appKeepers() upgrades.AppKeepers {
 		GetKey:        app.GetKey,
 		ModuleManager: app.mm,
 		TIBCkeeper:    app.TIBCKeeper,
+		ReaderWriter:  app,
 	}
 }
 

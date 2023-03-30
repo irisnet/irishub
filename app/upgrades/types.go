@@ -1,17 +1,24 @@
 package upgrades
 
 import (
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
 
+	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
+	feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
+
 	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
 	servicekeeper "github.com/irisnet/irismod/modules/service/keeper"
+	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 )
 
 // Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal
@@ -29,12 +36,21 @@ type Upgrade struct {
 	StoreUpgrades *store.StoreUpgrades
 }
 
+type ConsensusParamsReaderWriter interface {
+	StoreConsensusParams(ctx sdk.Context, cp *abci.ConsensusParams)
+	GetConsensusParams(ctx sdk.Context) *abci.ConsensusParams
+}
+
 type AppKeepers struct {
-	AppCodec      codec.Codec
-	HTLCKeeper    htlckeeper.Keeper
-	BankKeeper    bankkeeper.Keeper
-	ServiceKeeper servicekeeper.Keeper
-	GetKey        func(moduleName string) *storetypes.KVStoreKey
-	ModuleManager *module.Manager
-	TIBCkeeper    *tibckeeper.Keeper
+	AppCodec        codec.Codec
+	HTLCKeeper      htlckeeper.Keeper
+	BankKeeper      bankkeeper.Keeper
+	ServiceKeeper   servicekeeper.Keeper
+	GetKey          func(moduleName string) *storetypes.KVStoreKey
+	ModuleManager   *module.Manager
+	TIBCkeeper      *tibckeeper.Keeper
+	EvmKeeper       *evmkeeper.Keeper
+	FeeMarketKeeper feemarketkeeper.Keeper
+	TokenKeeper     tokenkeeper.Keeper
+	ReaderWriter    ConsensusParamsReaderWriter
 }
