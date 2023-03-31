@@ -1,27 +1,30 @@
 package cmd
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
 
-	"cosmossdk.io/math"
+	tmjson "github.com/tendermint/tendermint/libs/json"
+	tmos "github.com/tendermint/tendermint/libs/os"
+	tmtypes "github.com/tendermint/tendermint/types"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/config"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 
 	ethermintconfig "github.com/evmos/ethermint/server/config"
 	etherminttypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	"github.com/irisnet/irishub/types"
+	v200 "github.com/irisnet/irishub/app/upgrades/v200"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
@@ -84,7 +87,7 @@ func migrateGenesis(appCodec codec.Codec, genFile string) error {
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal genesis state: %w", err)
 	}
-	genDoc.ConsensusParams.Block.MaxGas = 20000000
+	genDoc.ConsensusParams.Block.MaxGas = v200.MaxBlockGas
 	migrateAppState(appCodec, genDoc.InitialHeight, appState)
 
 	appStateJSON, err := json.Marshal(appState)
@@ -93,22 +96,18 @@ func migrateGenesis(appCodec codec.Codec, genFile string) error {
 	}
 
 	genDoc.AppState = appStateJSON
-	return genutil.ExportGenesisFile(genDoc, genFile)
+	if err := genDoc.ValidateAndComplete(); err != nil {
+		return err
+	}
+	return saveAs(genFile, genDoc)
 }
 
 func migrateAppState(appCodec codec.Codec, initialHeight int64, appState map[string]json.RawMessage) {
+	evmParams := v200.GenerateEvmParams()
 	// add evm genesis
 	if _, ok := appState[etherminttypes.ModuleName]; !ok {
 		evmGenState := etherminttypes.GenesisState{
-			Accounts: []etherminttypes.GenesisAccount{},
-			Params: etherminttypes.Params{
-				EvmDenom:            types.EvmToken.MinUnit,
-				EnableCreate:        true,
-				EnableCall:          true,
-				ChainConfig:         etherminttypes.DefaultChainConfig(),
-				ExtraEIPs:           nil,
-				AllowUnprotectedTxs: etherminttypes.DefaultAllowUnprotectedTxs,
-			},
+			Params: evmParams,
 		}
 		appState[etherminttypes.ModuleName] = appCodec.MustMarshalJSON(&evmGenState)
 	}
@@ -116,16 +115,7 @@ func migrateAppState(appCodec codec.Codec, initialHeight int64, appState map[str
 	// add feemarket genesis
 	if _, ok := appState[feemarkettypes.ModuleName]; !ok {
 		evmGenState := feemarkettypes.GenesisState{
-			Params: feemarkettypes.Params{
-				NoBaseFee:                false,
-				BaseFeeChangeDenominator: 8,                        // TODO
-				ElasticityMultiplier:     2,                        // TODO
-				EnableHeight:             initialHeight,            // TODO
-				BaseFee:                  math.NewInt(1000000000),  // TODO
-				MinGasPrice:              sdk.ZeroDec(),            // TODO
-				MinGasMultiplier:         sdk.NewDecWithPrec(5, 1), // TODO
-			},
-			BlockGas: 0,
+			Params: v200.GenerateFeemarketParams(initialHeight),
 		}
 		appState[feemarkettypes.ModuleName] = appCodec.MustMarshalJSON(&evmGenState)
 	}
@@ -135,16 +125,23 @@ func migrateAppState(appCodec codec.Codec, initialHeight int64, appState map[str
 		var tokenGenState tokenv1.GenesisState
 		appCodec.MustUnmarshalJSON(appState[tokentypes.ModuleName], &tokenGenState)
 
-		evmTokenExist := false
 		for _, token := range tokenGenState.Tokens {
-			if token.MinUnit == types.EvmToken.MinUnit {
-				evmTokenExist = true
-				break
+			if token.MinUnit == evmParams.EvmDenom {
+				panic("evm baseDenom has exist")
 			}
 		}
-		if !evmTokenExist {
-			tokenGenState.Tokens = append(tokenGenState.Tokens, types.EvmToken)
-		}
+		tokenGenState.Tokens = append(tokenGenState.Tokens, v200.GetEvmToken())
 		appState[tokentypes.ModuleName] = appCodec.MustMarshalJSON(&tokenGenState)
 	}
+}
+
+// saveAs is a utility method for saving GenensisDoc as a JSON file.
+func saveAs(file string, genDoc *tmtypes.GenesisDoc) error {
+	genDocBytes, err := tmjson.MarshalIndent(genDoc, "", "  ")
+	if err != nil {
+		return err
+	}
+	hash := sha256.Sum256(genDocBytes)
+	fmt.Println("Genesis File Hash(sha256): ", hex.EncodeToString(hash[:]))
+	return tmos.WriteFile(file, genDocBytes, 0o644)
 }
