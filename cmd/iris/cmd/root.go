@@ -130,7 +130,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		testnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		ethermintdebug.Cmd(),
 		config.Cmd(),
-		migrateCmd(encodingConfig.Marshaler),
 		mergeGenesisCmd(encodingConfig),
 	)
 

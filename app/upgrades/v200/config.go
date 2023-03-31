@@ -6,15 +6,13 @@ import (
 	etherminttypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
-
 	"github.com/irisnet/irishub/types"
 )
 
 // NOTE: Before the release of irishub 2.0.0, the configuration in this file must be modified
 
 const (
-	MaxBlockGas = 20000000 // TODO
+	maxBlockGas = 40000000 // TODO
 )
 
 var (
@@ -38,15 +36,7 @@ var (
 	}
 )
 
-func GetEvmToken() tokenv1.Token {
-	return evmToken
-}
-
-func GenerateEvmParams() etherminttypes.Params {
-	return evmParams
-}
-
-func GenerateFeemarketParams(enableHeight int64) feemarkettypes.Params {
+func generateFeemarketParams(enableHeight int64) feemarkettypes.Params {
 	feemarketParams.EnableHeight = enableHeight
 	return feemarketParams
 }
