@@ -38,8 +38,6 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	ica "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts"
-	icatypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/types"
 	"github.com/cosmos/ibc-go/v5/modules/apps/transfer"
 	ibctransfertypes "github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v5/modules/core"
@@ -123,7 +121,6 @@ var (
 		vesting.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
-		ica.AppModuleBasic{},
 
 		guardian.AppModuleBasic{},
 		token.AppModuleBasic{},
@@ -165,7 +162,6 @@ var (
 		tibcnfttypes.ModuleName:        nil,
 		tibcmttypes.ModuleName:         nil,
 		nfttypes.ModuleName:            nil,
-		icatypes.ModuleName:            nil,
 		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
 	}
 )
@@ -199,7 +195,6 @@ func appModules(
 		ibc.NewAppModule(app.IBCKeeper), tibc.NewAppModule(app.TIBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		app.transferModule,
-		app.icaModule,
 		app.nfttransferModule,
 		app.mttransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
@@ -291,7 +286,6 @@ func orderBeginBlockers() []string {
 		crisistypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
-		icatypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
 		feegrant.ModuleName,
@@ -333,7 +327,6 @@ func orderEndBlockers() []string {
 		feemarkettypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
-		icatypes.ModuleName,
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
@@ -386,7 +379,6 @@ func orderInitBlockers() []string {
 		minttypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
-		icatypes.ModuleName,
 		authz.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
