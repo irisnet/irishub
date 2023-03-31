@@ -17,6 +17,7 @@ var (
 		v120.Upgrade,
 		v130.Upgrade,
 		v140.Upgrade,
+		v120.Upgrade,
 	}
 )
 
