@@ -9,6 +9,7 @@ import (
 	v120 "github.com/irisnet/irishub/app/upgrades/v120"
 	v130 "github.com/irisnet/irishub/app/upgrades/v130"
 	v140 "github.com/irisnet/irishub/app/upgrades/v140"
+	v200 "github.com/irisnet/irishub/app/upgrades/v200"
 )
 
 var (
@@ -17,7 +18,7 @@ var (
 		v120.Upgrade,
 		v130.Upgrade,
 		v140.Upgrade,
-		v120.Upgrade,
+		v200.Upgrade,
 	}
 )
 
@@ -37,13 +38,18 @@ func (app *IrisApp) RegisterUpgradePlans() {
 
 func (app *IrisApp) appKeepers() upgrades.AppKeepers {
 	return upgrades.AppKeepers{
-		AppCodec:      app.AppCodec(),
-		HTLCKeeper:    app.HTLCKeeper,
-		BankKeeper:    app.BankKeeper,
-		ServiceKeeper: app.ServiceKeeper,
-		GetKey:        app.GetKey,
-		ModuleManager: app.mm,
-		TIBCkeeper:    app.TIBCKeeper,
+		AppCodec:        app.AppCodec(),
+		HTLCKeeper:      app.HTLCKeeper,
+		BankKeeper:      app.BankKeeper,
+		AccountKeeper:   app.AccountKeeper,
+		ServiceKeeper:   app.ServiceKeeper,
+		GetKey:          app.GetKey,
+		ModuleManager:   app.mm,
+		TIBCkeeper:      app.TIBCKeeper,
+		EvmKeeper:       app.EvmKeeper,
+		FeeMarketKeeper: app.FeeMarketKeeper,
+		TokenKeeper:     app.TokenKeeper,
+		ReaderWriter:    app,
 	}
 }
 
