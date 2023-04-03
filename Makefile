@@ -11,6 +11,9 @@ NetworkType := $(shell if [ -z ${NetworkType} ]; then echo "mainnet"; else echo 
 CURRENT_DIR = $(shell pwd)
 PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 
+# default mainnet EVM_CHAIN_ID
+EVM_CHAIN_ID ?= 6688
+
 export GO111MODULE = on
 
 # process build tags
@@ -100,9 +103,7 @@ install: check-evm-chain-id go.sum
 	@go install $(BUILD_FLAGS) ./cmd/iris
 
 check-evm-chain-id:
-ifeq ($(EVM_CHAIN_ID),)
-	@echo "EVM_CHAIN_ID is not set"; exit 1
-endif
+	@echo "note: EVM_CHAIN_ID is $(EVM_CHAIN_ID)"
 
 update-swagger-docs: statik proto-swagger-gen
 	$(BINDIR)/statik -src=lite/swagger-ui -dest=lite -f -m

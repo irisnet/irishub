@@ -18,6 +18,8 @@ import (
 	"github.com/evmos/ethermint/x/feemarket"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
+	v1 "github.com/irisnet/irismod/modules/token/types/v1"
+
 	"github.com/irisnet/irishub/app/upgrades"
 	irisevm "github.com/irisnet/irishub/modules/evm"
 )
@@ -39,11 +41,18 @@ func upgradeHandlerConstructor(m *module.Manager, c module.Configurator, app upg
 		app.EvmKeeper.SetParams(ctx, evmParams)
 		app.FeeMarketKeeper.SetParams(ctx, generateFeemarketParams(ctx.BlockHeight()))
 
-		if err := evmToken.Validate(); err != nil {
+		//transfer token ownership
+		token, err := app.TokenKeeper.GetToken(ctx, evmToken.Symbol)
+		if err != nil {
 			return nil, err
 		}
 
-		if err := app.TokenKeeper.AddToken(ctx, evmToken); err != nil {
+		tokenExp, ok := token.(v1.Token)
+		if !ok {
+			return nil, fmt.Errorf("token is not v1.Token")
+		}
+		tokenExp.Owner = evmToken.Owner
+		if err := app.TokenKeeper.UpdateToken(ctx, tokenExp); err != nil {
 			return nil, err
 		}
 
