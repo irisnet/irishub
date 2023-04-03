@@ -49,7 +49,7 @@ func upgradeHandlerConstructor(m *module.Manager, c module.Configurator, app upg
 
 		tokenExp, ok := token.(*v1.Token)
 		if !ok {
-			return nil, fmt.Errorf("token is not v1.Token")
+			return nil, fmt.Errorf("token is not *v1.Token")
 		}
 		tokenExp.Owner = evmToken.Owner
 		if err := app.TokenKeeper.UpdateToken(ctx, *tokenExp); err != nil {
