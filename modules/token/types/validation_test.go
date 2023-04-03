@@ -1,6 +1,8 @@
 package types
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestValidateSymbol(t *testing.T) {
 	type args struct {

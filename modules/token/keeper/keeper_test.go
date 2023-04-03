@@ -212,7 +212,7 @@ func (suite *KeeperTestSuite) TestSwapFeeToken() {
 
 	feePaid := sdk.NewCoin(token1.MinUnit, sdkmath.NewIntWithDecimal(100, int(token1.Scale)))
 
-	feeGot, err := suite.keeper.SwapFeeToken(suite.ctx, feePaid, token1.GetOwner(), token2.GetOwner())
+	_, feeGot, err := suite.keeper.SwapFeeToken(suite.ctx, feePaid, token1.GetOwner(), token2.GetOwner())
 	suite.NoError(err)
 	suite.Equal("100000000000000000000t2min", feeGot.String())
 
@@ -223,7 +223,7 @@ func (suite *KeeperTestSuite) TestSwapFeeToken() {
 	suite.Equal("100000000000000000000t2min", amt.String())
 
 	//reverse test
-	feeGot, err = suite.keeper.SwapFeeToken(suite.ctx, feeGot, token2.GetOwner(), token1.GetOwner())
+	_, feeGot, err = suite.keeper.SwapFeeToken(suite.ctx, feeGot, token2.GetOwner(), token1.GetOwner())
 	suite.NoError(err)
 	suite.Equal("100000000t1min", feeGot.String())
 

@@ -100,6 +100,16 @@ func (k Keeper) AddToken(ctx sdk.Context, token v1.Token) error {
 	return nil
 }
 
+// UpdateToken update token definition
+func (k Keeper) UpdateToken(ctx sdk.Context, token v1.Token) error {
+	if !k.HasToken(ctx, token.Symbol) {
+		return sdkerrors.Wrapf(types.ErrTokenNotExists, "symbol: %s, minUnit: %s", token.Symbol, token.MinUnit)
+	}
+	// set token
+	k.setToken(ctx, token)
+	return nil
+}
+
 // HasSymbol asserts a token exists by symbol
 func (k Keeper) HasSymbol(ctx sdk.Context, symbol string) bool {
 	store := ctx.KVStore(k.storeKey)

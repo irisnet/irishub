@@ -227,7 +227,7 @@ func (m msgServer) SwapFeeToken(goCtx context.Context, msg *v1.MsgSwapFeeToken) 
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	feeGot, err := m.Keeper.SwapFeeToken(ctx, msg.FeePaid, sender, recipient)
+	feePaid, feeGot, err := m.Keeper.SwapFeeToken(ctx, msg.FeePaid, sender, recipient)
 	if err != nil {
 		return nil, err
 	}
@@ -237,7 +237,7 @@ func (m msgServer) SwapFeeToken(goCtx context.Context, msg *v1.MsgSwapFeeToken) 
 			types.EventTypeSwapFeeToken,
 			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
 			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
-			sdk.NewAttribute(types.AttributeKeyFeePaid, msg.FeePaid.String()),
+			sdk.NewAttribute(types.AttributeKeyFeePaid, feePaid.String()),
 			sdk.NewAttribute(types.AttributeKeyFeeGot, feeGot.String()),
 		),
 		sdk.NewEvent(
