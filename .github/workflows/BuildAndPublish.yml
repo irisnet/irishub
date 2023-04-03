@@ -52,8 +52,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.prep.outputs.tags }}
           platforms: linux/amd64,linux/arm64
-          build-args: EVM_CHAIN_ID=6688
-          
 #       - name: Build irishub image
 #         run: source ~/.bashrc; sudo docker build -t irisnet/irishub:latest .
 #       - name: Login dockerhub
