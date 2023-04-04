@@ -39,7 +39,7 @@ func GetCmdQueryDenoms() *cobra.Command {
 		Long:    "Query all denoms.",
 		Example: fmt.Sprintf("$ %s query mt denoms", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -69,7 +69,7 @@ func GetCmdQueryDenom() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query mt denom <denom-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -98,7 +98,7 @@ func GetCmdQueryMTSupply() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query mt supply <denom-id> <mt-id>", version.AppName),
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -127,7 +127,7 @@ func GetCmdQueryMTs() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query mt tokens <denom-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -162,7 +162,7 @@ func GetCmdQueryMT() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query mt token <denom-id> <mt-id>", version.AppName),
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -191,7 +191,7 @@ func GetCmdQueryBalances() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query mt balances <owner> <denom-id>", version.AppName),
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}

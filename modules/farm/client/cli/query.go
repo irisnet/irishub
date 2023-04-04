@@ -38,7 +38,7 @@ func GetCmdQueryFarmPools() *cobra.Command {
 		Example: fmt.Sprintf("$ %s query farm pools", version.AppName),
 		Short:   "Query farm pools by page",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -71,7 +71,7 @@ func GetCmdQueryFarmPool() *cobra.Command {
 		Short:   "Query a farm pool",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
@@ -98,7 +98,7 @@ func GetCmdQueryFarmer() *cobra.Command {
 		Short:   "Query farmer reward",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
