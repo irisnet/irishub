@@ -156,16 +156,17 @@ func (k Keeper) TransferTokenOwner(
 	if srcOwner.String() != token.Owner {
 		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", srcOwner, symbol)
 	}
+	return k.changeTokenOwner(ctx, token, dstOwner)
+}
 
-	token.Owner = dstOwner.String()
-
-	// update token
-	k.setToken(ctx, token)
-
-	// reset all indices
-	k.resetStoreKeyForQueryToken(ctx, token.Symbol, srcOwner, dstOwner)
-
-	return nil
+// UnsafeTransferTokenOwner transfer the token owner without authorization
+// NOTE: this method should be used with caution
+func (k Keeper) UnsafeTransferTokenOwner(ctx sdk.Context, symbol string, to sdk.AccAddress) error {
+	token, err := k.getTokenBySymbol(ctx, symbol)
+	if err != nil {
+		return err
+	}
+	return k.changeTokenOwner(ctx, token, to)
 }
 
 // MintToken mints the specified amount of token to the specified recipient
@@ -294,4 +295,20 @@ func (k Keeper) calcFeeTokenMinted(ctx sdk.Context, feePaid sdk.Coin) (burnt, mi
 
 	burntAmt, mintAmt := types.LossLessSwap(feePaid.Amount, swapParams.Ratio, tokenBurned.GetScale(), tokenMinted.GetScale())
 	return sdk.NewCoin(tokenBurned.MinUnit, burntAmt), sdk.NewCoin(swapParams.MinUnit, mintAmt), nil
+}
+
+func (k Keeper) changeTokenOwner(ctx sdk.Context, srcToken v1.Token, dstOwner sdk.AccAddress) error {
+	srcOwner, err := sdk.AccAddressFromBech32(srcToken.Owner)
+	if err != nil {
+		return err
+	}
+
+	srcToken.Owner = dstOwner.String()
+	// update token
+	k.setToken(ctx, srcToken)
+
+	// reset all indices
+	k.resetStoreKeyForQueryToken(ctx, srcToken.Symbol, srcOwner, dstOwner)
+
+	return nil
 }

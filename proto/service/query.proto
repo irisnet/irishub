@@ -57,7 +57,7 @@ service Query {
   rpc RequestsByReqCtx(QueryRequestsByReqCtxRequest)
       returns (QueryRequestsByReqCtxResponse) {
     option (google.api.http).get =
-        "/irismod/service/requests/{request_context_id}/{batch_counter}";
+        "/irismod/service/requests/contexts/{request_context_id}/{batch_counter}";
   }
 
   // Response returns the response of request
