@@ -5689,7 +5689,7 @@ paths:
       tags:
         - Query
         - Service
-  /irismod/service/requests/{request_context_id}/{batch_counter}:
+  /irismod/service/requests/contexts/{request_context_id}/{batch_counter}:
     get:
       summary: RequestsByReqCtx returns all requests of one service call batch
       operationId: RequestsByReqCtx

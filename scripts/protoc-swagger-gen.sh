@@ -10,7 +10,7 @@ chmod a+x ./scripts/protoc-swagger-gen-evm.sh
 ./scripts/protoc-swagger-gen-evm.sh
 
 SDK_VERSION=v0.46.9
-IRISMOD_VERSION=v1.7.3-rc1.0.20230323070532-5470e23e8e2e
+IRISMOD_VERSION=v1.7.3-rc1.0.20230404025348-fcbd060d7642
 
 go mod download github.com/cosmos/cosmos-sdk@${SDK_VERSION}
 go mod download github.com/irisnet/irismod@${IRISMOD_VERSION}
