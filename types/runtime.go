@@ -2,7 +2,6 @@ package types
 
 // MUST be loaded before running
 import (
-	"math"
 	"os"
 	"path/filepath"
 
@@ -46,12 +45,12 @@ func init() {
 	}
 
 	EvmToken = tokenv1.Token{
-		Symbol:        "eth",
-		Name:          "Irishub evm token",
+		Symbol:        "eris",
+		Name:          "IRISHub EVM Fee Token",
 		Scale:         18,
-		MinUnit:       "wei",
+		MinUnit:       "weris",
 		InitialSupply: 0,
-		MaxSupply:     math.MaxUint64,
+		MaxSupply:     10000000000,
 		Mintable:      true,
 		Owner:         sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))).String(),
 	}
