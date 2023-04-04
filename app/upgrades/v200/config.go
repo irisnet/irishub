@@ -12,11 +12,11 @@ import (
 // NOTE: Before the release of irishub 2.0.0, the configuration in this file must be modified
 
 const (
-	maxBlockGas = 40000000 // TODO
+	maxBlockGas = 40000000
 )
 
 var (
-	evmToken  = types.EvmToken // TODO
+	evmToken  = types.EvmToken
 	evmParams = etherminttypes.Params{
 		EvmDenom:            evmToken.MinUnit,
 		EnableCreate:        true,
@@ -27,12 +27,12 @@ var (
 	}
 
 	feemarketParams = feemarkettypes.Params{
-		NoBaseFee:                false,                    // TODO
-		BaseFeeChangeDenominator: 8,                        // TODO
-		ElasticityMultiplier:     2,                        // TODO
-		BaseFee:                  math.NewInt(1000000000),  // TODO
-		MinGasPrice:              sdk.ZeroDec(),            // TODO
-		MinGasMultiplier:         sdk.NewDecWithPrec(5, 1), // TODO
+		NoBaseFee:                false,
+		BaseFeeChangeDenominator: 8,
+		ElasticityMultiplier:     4,
+		BaseFee:                  math.NewInt(500000000000),
+		MinGasPrice:              sdk.NewDecFromInt(math.NewInt(500000000000)),
+		MinGasMultiplier:         sdk.NewDecWithPrec(5, 1),
 	}
 )
 
