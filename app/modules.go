@@ -41,6 +41,7 @@ import (
 	"github.com/cosmos/ibc-go/v5/modules/apps/transfer"
 	ibctransfertypes "github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v5/modules/core"
+	ibcclientclient "github.com/cosmos/ibc-go/v5/modules/core/02-client/client"
 	ibchost "github.com/cosmos/ibc-go/v5/modules/core/24-host"
 
 	"github.com/irisnet/irismod/modules/coinswap"
@@ -105,6 +106,8 @@ var (
 				distrclient.ProposalHandler,
 				upgradeclient.LegacyProposalHandler,
 				upgradeclient.LegacyCancelProposalHandler,
+				ibcclientclient.UpdateClientProposalHandler,
+				ibcclientclient.UpgradeProposalHandler,
 				tibcclient.CreateClientProposalHandler,
 				tibcclient.UpgradeClientProposalHandler,
 				tibcclient.RegisterRelayerProposalHandler,
