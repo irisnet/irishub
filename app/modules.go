@@ -70,9 +70,8 @@ import (
 	tibcnfttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer"
 	tibcnfttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/types"
 	tibc "github.com/bianjieai/tibc-go/modules/tibc/core"
-	tibcclient "github.com/bianjieai/tibc-go/modules/tibc/core/02-client"
 	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
-	tibcrouting "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing"
+	tibccli "github.com/bianjieai/tibc-go/modules/tibc/core/client/cli"
 
 	"github.com/evmos/ethermint/x/evm"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
@@ -88,6 +87,15 @@ import (
 )
 
 var (
+	legacyProposalHandlers = []govclient.ProposalHandler{
+		paramsclient.ProposalHandler,
+		distrclient.ProposalHandler,
+		upgradeclient.LegacyProposalHandler,
+		upgradeclient.LegacyCancelProposalHandler,
+		ibcclientclient.UpdateClientProposalHandler,
+		ibcclientclient.UpgradeProposalHandler,
+	}
+
 	// ModuleBasics defines the module BasicManager is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
 	// and genesis verification.
@@ -101,18 +109,7 @@ var (
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
-			[]govclient.ProposalHandler{
-				paramsclient.ProposalHandler,
-				distrclient.ProposalHandler,
-				upgradeclient.LegacyProposalHandler,
-				upgradeclient.LegacyCancelProposalHandler,
-				ibcclientclient.UpdateClientProposalHandler,
-				ibcclientclient.UpgradeProposalHandler,
-				tibcclient.CreateClientProposalHandler,
-				tibcclient.UpgradeClientProposalHandler,
-				tibcclient.RegisterRelayerProposalHandler,
-				tibcrouting.SetRoutingRulesProposalHandler,
-			},
+			append(legacyProposalHandlers, tibccli.GovHandlers...),
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
