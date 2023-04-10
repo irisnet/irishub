@@ -3,12 +3,19 @@ package evm
 import (
 	"math/big"
 
+	errortypes "github.com/cosmos/cosmos-sdk/types/errors"
+
+	sdkmath "cosmossdk.io/math"
+
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/evmos/ethermint/x/evm/types"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 )
@@ -30,7 +37,7 @@ import (
 // returning.
 //
 // For relevant discussion see: https://github.com/cosmos/cosmos-sdk/discussions/9072
-func (k *Keeper) ApplyTransaction(ctx sdk.Context, tx *ethtypes.Transaction) (*types.MsgEthereumTxResponse, error) {
+func (k *Keeper) ApplyTransaction(ctx sdk.Context, tx *ethtypes.Transaction, feePayerAddr string) (*types.MsgEthereumTxResponse, error) {
 	var (
 		bloom        *big.Int
 		bloomReceipt ethtypes.Bloom
@@ -121,10 +128,16 @@ func (k *Keeper) ApplyTransaction(ctx sdk.Context, tx *ethtypes.Transaction) (*t
 			ctx.EventManager().EmitEvents(tmpCtx.EventManager().Events())
 		}
 	}
-
-	// refund gas in order to match the Ethereum gas consumption instead of the default SDK one.
-	if err = k.evmkeeper.RefundGas(ctx, msg, msg.Gas()-res.GasUsed, cfg.Params.EvmDenom); err != nil {
-		return nil, errorsmod.Wrapf(err, "failed to refund gas leftover gas to sender %s", msg.From())
+	if feePayerAddr != "" {
+		// refund gas in order to match the Ethereum gas consumption instead of the default SDK one.
+		if err = k.RefundGas(ctx, msg, msg.Gas()-res.GasUsed, feePayerAddr, cfg.Params.EvmDenom); err != nil {
+			return nil, errorsmod.Wrapf(err, "failed to refund gas leftover gas to sender %s", msg.From())
+		}
+	} else {
+		// refund gas in order to match the Ethereum gas consumption instead of the default SDK one.
+		if err = k.evmkeeper.RefundGas(ctx, msg, msg.Gas()-res.GasUsed, cfg.Params.EvmDenom); err != nil {
+			return nil, errorsmod.Wrapf(err, "failed to refund gas leftover gas to sender %s", msg.From())
+		}
 	}
 
 	// if eip1559 transaction,burn the base fee
@@ -150,4 +163,35 @@ func (k *Keeper) ApplyTransaction(ctx sdk.Context, tx *ethtypes.Transaction) (*t
 	// reset the gas meter for current cosmos transaction
 	k.evmkeeper.ResetGasMeterAndConsumeGas(ctx, totalGasUsed)
 	return res, nil
+}
+
+// RefundGas transfers the leftover gas to the sender of the message, caped to half of the total gas
+// consumed in the transaction. Additionally, the function sets the total gas consumed to the value
+// returned by the EVM execution, thus ignoring the previous intrinsic gas consumed during in the
+// AnteHandler.
+func (k *Keeper) RefundGas(ctx sdk.Context, msg core.Message, leftoverGas uint64, feePayer string, denom string) error {
+	// Return EVM tokens for remaining gas, exchanged at the original rate.
+	remaining := new(big.Int).Mul(new(big.Int).SetUint64(leftoverGas), msg.GasPrice())
+
+	switch remaining.Sign() {
+	case -1:
+		// negative refund errors
+		return errorsmod.Wrapf(types.ErrInvalidRefund, "refunded amount value cannot be negative %d", remaining.Int64())
+	case 1:
+		// positive amount refund
+		refundedCoins := sdk.Coins{sdk.NewCoin(denom, sdkmath.NewIntFromBigInt(remaining))}
+		ethAddr := common.HexToAddress(feePayer)
+		feePayerAddr := sdk.AccAddress(ethAddr.Bytes())
+
+		// refund to sender from the fee collector module account, which is the escrow account in charge of collecting tx fees
+		err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, authtypes.FeeCollectorName, feePayerAddr, refundedCoins)
+		if err != nil {
+			err = errorsmod.Wrapf(errortypes.ErrInsufficientFunds, "fee collector account failed to refund fees: %s", err.Error())
+			return errorsmod.Wrapf(err, "failed to refund %d leftover gas (%s)", leftoverGas, refundedCoins.String())
+		}
+	default:
+		// no refund, consume gas and update the tx gas meter
+	}
+
+	return nil
 }
