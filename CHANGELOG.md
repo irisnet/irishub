@@ -17,7 +17,7 @@
 
 * (IRISHub) [\#2824](https://github.com/irisnet/irishub/pull/2824) Feat: update swagger docs & evm configuration
 * (IRISMod) [irismod \#340](https://github.com/irisnet/irismod/pull/340) The token module supports the exchange of two tokens.
-* (IRISMod) [irismod \#342](https://github.com/irisnet/irismod/pull/342) Refator token module.
+* (IRISMod) [irismod \#342](https://github.com/irisnet/irismod/pull/342) Refactor token module.
 * (IRISMod) [irismod \#348](https://github.com/irisnet/irismod/pull/348) Adjust the length limit of classID and nftID in nft.
 
 ### Bug Fixes
