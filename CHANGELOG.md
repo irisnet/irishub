@@ -1,7 +1,5 @@
 # Changelog
 
-## Unreleased
-
 ## 2.0.0
 
 ### State Machine Breaking
