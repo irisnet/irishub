@@ -4,6 +4,9 @@
 
 ### Application
 
+* [\#2831](https://github.com/irisnet/irishub/pull/2831) Bump up tibc-go version to v0.4.3
+* [\#2831](https://github.com/irisnet/irishub/pull/2831) Bump up irismod version to v1.7.3
+* [\#2766](https://github.com/irisnet/irishub/pull/2766) Bump up cosmos sdk to v0.46.9
 * [\#2776](https://github.com/irisnet/irishub/pull/2776) Feat: support evm
 * [\#2824](https://github.com/irisnet/irishub/pull/2824) Feat: update swagger docs & evm configration
 * [\#2822]( https://github.com/irisnet/irishub/pull/2822) Remove ICA module
@@ -16,9 +19,9 @@
 
 ### Bug Fixes
 
-* [\#2828](https://github.com/irisnet/irishub/pull/2828) Fix solve proposal handler route conflict 
+* [\#2828](https://github.com/irisnet/irishub/pull/2828) Fix solve proposal handler route conflict
 * [\#2827](https://github.com/irisnet/irishub/pull/2827) Fix add ibc client proposal for command
-
+* [\#2794](https://github.com/irisnet/irishub/pull/2794) Fix auth bech32 account prefix
 
 * [irismod \#336](https://github.com/irisnet/irismod/pull/336) Fix farm genesis validate failed.
 * [irismod \#327](https://github.com/irisnet/irismod/pull/327) Only export htlc with state=open.
@@ -45,7 +48,7 @@
 * [\#2759](https://github.com/irisnet/irishub/pull/2759) Fix export error when with flag `--for-zero-height`
 * [\#2766](https://github.com/irisnet/irishub/pull/2766) Bump up cosmos sdk to v0.46.4
 * [\#2768](https://github.com/irisnet/irishub/pull/2768) Bump up ibc-go to v5.0.1
-* [\#2770](https://github.com/irisnet/irishub/pull/2770) Bump up irismod to v1.7.0 & Bump up tibc-go to v0.4.0 
+* [\#2770](https://github.com/irisnet/irishub/pull/2770) Bump up irismod to v1.7.0 & Bump up tibc-go to v0.4.0
 * [irismod \#309](https://github.com/irisnet/irismod/pull/309) Refactor nft with cosmos-sdk nft module.
 * [irismod \#308](https://github.com/irisnet/irismod/pull/308) Coinswap module adds unilateral injection liquidity function.
 
