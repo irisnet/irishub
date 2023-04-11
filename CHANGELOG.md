@@ -15,8 +15,7 @@
 
 ### Improvements
 
-* (IRISHub) [\#2824](https://github.com/irisnet/irishub/pull/2824) Feat: update swagger docs & evm configration
-
+* (IRISHub) [\#2824](https://github.com/irisnet/irishub/pull/2824) Feat: update swagger docs & evm configuration
 * (IRISMod) [irismod \#340](https://github.com/irisnet/irismod/pull/340) The token module supports the exchange of two tokens.
 * (IRISMod) [irismod \#342](https://github.com/irisnet/irismod/pull/342) Refator token module.
 * (IRISMod) [irismod \#348](https://github.com/irisnet/irismod/pull/348) Adjust the length limit of classID and nftID in nft.
@@ -26,7 +25,6 @@
 * (IRISHub) [\#2828](https://github.com/irisnet/irishub/pull/2828) Fix solve proposal handler route conflict
 * (IRISHub) [\#2827](https://github.com/irisnet/irishub/pull/2827) Fix add ibc client proposal for command
 * (IRISHub) [\#2794](https://github.com/irisnet/irishub/pull/2794) Fix auth bech32 account prefix
-
 * (IRISMod) [irismod \#336](https://github.com/irisnet/irismod/pull/336) Fix farm genesis validate failed.
 * (IRISMod) [irismod \#327](https://github.com/irisnet/irismod/pull/327) Only export htlc with state=open.
 * (IRISMod) [irismod \#347](https://github.com/irisnet/irismod/pull/347) Fix service refund address parse error.
