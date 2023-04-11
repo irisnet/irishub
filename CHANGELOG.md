@@ -37,8 +37,11 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ## [Unreleased]
 
+## [v1.7.3]
+
 ### Improvements
 
+* [\#335](https://github.com/irisnet/irismod/pull/335) Bump up cosmos-sdk to v0.46.9.
 * [\#340](https://github.com/irisnet/irismod/pull/340) The token module supports the exchange of two tokens.
 * [\#342](https://github.com/irisnet/irismod/pull/342) Refator token module.
 * [\#348](https://github.com/irisnet/irismod/pull/348) Adjust the length limit of classID and nftID in nft.
@@ -109,7 +112,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 * (modules/coinswap) [\#219](https://github.com/irisnet/irismod/pull/219) Refactor coinswap module, the liquidity pool is named with lpt-{index}, and the index is incremented from 1.
 * (modules/nft) [\#212](https://github.com/irisnet/irismod/pull/212) Make the order of commands parameters consistent.
 * (modules/nft) [\#183](https://github.com/irisnet/irismod/issues/183) Enhance NFT module, make it compatible with ERC721 and restrict mint and update operations.
-* [\#180](https://github.com/irisnet/irismod/issues/180) Add simulation tests. 
+* [\#180](https://github.com/irisnet/irismod/issues/180) Add simulation tests.
 * (modules/farm) [\#179](https://github.com/irisnet/irismod/issues/179) Add farm module.
 
 ## [v1.4.0] - 2021-03-26
