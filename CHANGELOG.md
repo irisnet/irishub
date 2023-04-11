@@ -1,33 +1,34 @@
 # Changelog
 
-## Unreleased
+## 2.0.0
 
-### Application
+### State Machine Breaking
 
-* [\#2831](https://github.com/irisnet/irishub/pull/2831) Bump up tibc-go version to v0.4.3
-* [\#2831](https://github.com/irisnet/irishub/pull/2831) Bump up irismod version to v1.7.3
-* [\#2766](https://github.com/irisnet/irishub/pull/2766) Bump up cosmos sdk to v0.46.9
-* [\#2776](https://github.com/irisnet/irishub/pull/2776) Feat: support evm
-* [\#2824](https://github.com/irisnet/irishub/pull/2824) Feat: update swagger docs & evm configration
-* [\#2822]( https://github.com/irisnet/irishub/pull/2822) Remove ICA module
+* (IRISHub) [\#2831](https://github.com/irisnet/irishub/pull/2831) Bump up tibc-go version to v0.4.3
+* (IRISHub) [\#2831](https://github.com/irisnet/irishub/pull/2831) Bump up irismod version to v1.7.3
+* (IRISHub) [\#2766](https://github.com/irisnet/irishub/pull/2766) Bump up cosmos sdk to v0.46.9
+* (IRISHub) [\#2822]( https://github.com/irisnet/irishub/pull/2822) Remove ICA module
+
+### Features
+
+* (IRISHub) [\#2776](https://github.com/irisnet/irishub/pull/2776) Feat: support evm
 
 ### Improvements
 
-* [irismod \#340](https://github.com/irisnet/irismod/pull/340) The token module supports the exchange of two tokens.
-* [irismod \#342](https://github.com/irisnet/irismod/pull/342) Refator token module.
-* [irismod \#348](https://github.com/irisnet/irismod/pull/348) Adjust the length limit of classID and nftID in nft.
+* (IRISHub) [\#2824](https://github.com/irisnet/irishub/pull/2824) Feat: update swagger docs & evm configuration
+* (IRISMod) [irismod \#340](https://github.com/irisnet/irismod/pull/340) The token module supports the exchange of two tokens.
+* (IRISMod) [irismod \#342](https://github.com/irisnet/irismod/pull/342) Refactor token module.
+* (IRISMod) [irismod \#348](https://github.com/irisnet/irismod/pull/348) Adjust the length limit of classID and nftID in nft.
 
 ### Bug Fixes
 
-* [\#2828](https://github.com/irisnet/irishub/pull/2828) Fix solve proposal handler route conflict
-* [\#2827](https://github.com/irisnet/irishub/pull/2827) Fix add ibc client proposal for command
-* [\#2794](https://github.com/irisnet/irishub/pull/2794) Fix auth bech32 account prefix
-
-* [irismod \#336](https://github.com/irisnet/irismod/pull/336) Fix farm genesis validate failed.
-* [irismod \#327](https://github.com/irisnet/irismod/pull/327) Only export htlc with state=open.
-* [irismod \#347](https://github.com/irisnet/irismod/pull/347) Fix service refund address parse error.
-* [irismod \#350](https://github.com/irisnet/irismod/pull/350) Fix address parse errors caused by service rest api conflicts.
-
+* (IRISHub) [\#2828](https://github.com/irisnet/irishub/pull/2828) Fix solve proposal handler route conflict
+* (IRISHub) [\#2827](https://github.com/irisnet/irishub/pull/2827) Fix add ibc client proposal for command
+* (IRISHub) [\#2794](https://github.com/irisnet/irishub/pull/2794) Fix auth bech32 account prefix
+* (IRISMod) [irismod \#336](https://github.com/irisnet/irismod/pull/336) Fix farm genesis validate failed.
+* (IRISMod) [irismod \#327](https://github.com/irisnet/irismod/pull/327) Only export htlc with state=open.
+* (IRISMod) [irismod \#347](https://github.com/irisnet/irismod/pull/347) Fix service refund address parse error.
+* (IRISMod) [irismod \#350](https://github.com/irisnet/irismod/pull/350) Fix address parse errors caused by service rest api conflicts.
 
 ## 1.4.1
 
