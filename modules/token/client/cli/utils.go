@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -41,8 +42,8 @@ func queryToken(cliCtx client.Context, denom string) (v1.TokenI, error) {
 	return evi, err
 }
 
-func parseCoin(cliCtx client.Context, denom string) (sdk.Coin, v1.TokenI, error) {
-	decCoin, err := sdk.ParseDecCoin(denom)
+func parseMainCoin(cliCtx client.Context, coinStr string) (sdk.Coin, v1.TokenI, error) {
+	decCoin, err := sdk.ParseDecCoin(coinStr)
 	if err != nil {
 		return sdk.Coin{}, nil, err
 	}
@@ -50,6 +51,10 @@ func parseCoin(cliCtx client.Context, denom string) (sdk.Coin, v1.TokenI, error)
 	token, err := queryToken(cliCtx, decCoin.Denom)
 	if err != nil {
 		return sdk.Coin{}, nil, err
+	}
+
+	if token.GetSymbol() != decCoin.Denom {
+		return sdk.Coin{}, nil, fmt.Errorf("the cli currently only supports the main unit: %s", token.GetSymbol())
 	}
 
 	coin, err := token.ToMinCoin(decCoin)

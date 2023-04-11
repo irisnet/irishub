@@ -229,7 +229,7 @@ func GetCmdMintToken() *cobra.Command {
 				}
 			}
 
-			coin, token, err := parseCoin(clientCtx, args[0])
+			coin, token, err := parseMainCoin(clientCtx, args[0])
 			if err != nil {
 				return err
 			}
@@ -292,7 +292,7 @@ func GetCmdBurnToken() *cobra.Command {
 				return err
 			}
 
-			coin, _, err := parseCoin(clientCtx, args[0])
+			coin, _, err := parseMainCoin(clientCtx, args[0])
 			if err != nil {
 				return err
 			}
@@ -392,7 +392,7 @@ func GetCmdSwapFeeToken() *cobra.Command {
 				}
 			}
 
-			coin, _, err := parseCoin(clientCtx, args[0])
+			coin, _, err := parseMainCoin(clientCtx, args[0])
 			if err != nil {
 				return err
 			}

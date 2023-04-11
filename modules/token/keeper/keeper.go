@@ -50,6 +50,11 @@ func NewKeeper(
 	}
 }
 
+// Codec returns a k.cdc.
+func (k Keeper) Codec() codec.Codec {
+	return k.cdc
+}
+
 // Logger returns a module-specific logger.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("irismod/%s", types.ModuleName))

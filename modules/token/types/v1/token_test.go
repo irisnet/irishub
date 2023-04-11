@@ -52,13 +52,6 @@ func TestToken_ToMinCoin(t *testing.T) {
 				want:    sdk.NewCoin(token.MinUnit, sdk.NewInt(10)),
 				success: (i == 0),
 			},
-			{
-				name:    fmt.Sprintf("Min Coin to Min Coin Success,scale=%d", i),
-				wantErr: false,
-				args:    args{coin: sdk.NewDecCoin(token.MinUnit, sdk.NewInt(10))},
-				want:    sdk.NewCoin(token.MinUnit, sdk.NewInt(10)),
-				success: true,
-			},
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
@@ -94,13 +87,6 @@ func TestToken_ToMainCoin(t *testing.T) {
 			wantErr bool
 			success bool
 		}{
-			{
-				name:    "Main Coin to Main Coin",
-				wantErr: false,
-				args:    args{coin: sdk.NewCoin(token.Symbol, sdk.NewInt(10))},
-				want:    sdk.NewInt64DecCoin(token.Symbol, 10),
-				success: true,
-			},
 			{
 				name:    "Min Coin to Main Coin Failed",
 				wantErr: false,

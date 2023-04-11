@@ -118,7 +118,7 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	v1.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 
 	v1beta1.RegisterMsgServer(cfg.MsgServer(), keeper.NewLegacyMsgServerImpl(v1MsgServer, am.keeper))
-	v1beta1.RegisterQueryServer(cfg.QueryServer(), keeper.NewLegacyQueryServer(am.keeper))
+	v1beta1.RegisterQueryServer(cfg.QueryServer(), keeper.NewLegacyQueryServer(am.keeper, am.keeper.Codec()))
 
 }
 
