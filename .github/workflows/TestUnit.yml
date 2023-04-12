@@ -1,16 +1,33 @@
 name: TestUnit
-on: [pull_request]
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    paths:
+      - '**.go'
+      - '!lite/**'
 
 jobs:
   test-unit:
     name: Test Units
-    #    runs-on: self-hosted
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
+
       - name: Setup go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v2
         with:
           go-version: '^1.18' # The Go version to download (if necessary) and use.
-      - run: make test-unit
+
+      - name: Cache Go modules
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Run test-unit    
+        run: make test-unit
