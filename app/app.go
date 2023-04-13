@@ -1144,9 +1144,8 @@ func (app *IrisApp) RegisterUpgradeHandler(
 		return
 	}
 
+	app.UpgradeKeeper.SetUpgradeHandler(planName, upgradeHandler)
 	if upgradeInfo.Name == planName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-		// this configures a no-op upgrade handler for the planName upgrade
-		app.UpgradeKeeper.SetUpgradeHandler(planName, upgradeHandler)
 		// configure store loader that checks if version+1 == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(sdkupgrade.UpgradeStoreLoader(upgradeInfo.Height, upgrades))
 	}
