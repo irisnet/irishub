@@ -14,7 +14,9 @@ Since it is the most widely used smart contract programming language in Blockcha
 
 ## Prepare Account for EVM
 
-You might already have an EVM account and hold its mnemonic phrase, but in IRISHub, EVM accounts are displayed with the iaa prefix. You can view it with the following command:
+You might already have an EVM account and hold its mnemonic phrase, but in IRISHub, EVM accounts are displayed with the `iaa` prefix.
+
+### Generate or Recover EVM account in IRIShub
 
 ```bash
 iris keys add <key-name> --algo eth_secp256k1
@@ -22,6 +24,23 @@ iris keys add <key-name> --algo eth_secp256k1
 # or you can choose to recover one
 iris keys add <key-name> --algo eth_secp256k1 --recover
 ```
+
+### Import/Export EVM private key
+
+You can import the private key of an EVM account to generate an iaa account on IRISHub with the following command:
+
+```bash
+iris keys unsafe-import-eth-key <key-name> <private-key>
+```
+
+Conversely, you can export the EVM private key of an iaa account using the following command:
+
+```bash
+iris keys unsafe-export-eth-key <key-name>
+```
+
+### Exchange ERIS in IRISHub
+
 
 IRISHub uses `eris` as the EVM token, which is pegged 1:1 with `iris`. You can exchange them using the following command:
 
