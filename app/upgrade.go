@@ -1,7 +1,8 @@
 package app
 
 import (
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	"fmt"
+
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/irisnet/irishub/app/upgrades"
@@ -24,16 +25,8 @@ var (
 
 // RegisterUpgradePlans register a handler of upgrade plan
 func (app *IrisApp) RegisterUpgradePlans() {
-	for _, u := range plans {
-		app.registerUpgradeHandler(u.UpgradeName,
-			u.StoreUpgrades,
-			u.UpgradeHandlerConstructor(
-				app.mm,
-				app.configurator,
-				app.appKeepers(),
-			),
-		)
-	}
+	app.setupUpgradeStoreLoaders()
+	app.setupUpgradeHandlers()
 }
 
 func (app *IrisApp) appKeepers() upgrades.AppKeepers {
@@ -53,22 +46,33 @@ func (app *IrisApp) appKeepers() upgrades.AppKeepers {
 	}
 }
 
-// registerUpgradeHandler implements the upgrade execution logic of the upgrade module
-func (app *IrisApp) registerUpgradeHandler(
-	planName string,
-	upgrades *storetypes.StoreUpgrades,
-	upgradeHandler upgradetypes.UpgradeHandler,
-) {
+// configure store loader that checks if version == upgradeHeight and applies store upgrades
+func (app *IrisApp) setupUpgradeStoreLoaders() {
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
-		app.Logger().Info("not found upgrade plan", "planName", planName, "err", err.Error())
+		panic(fmt.Sprintf("failed to read upgrade info from disk %s", err))
+	}
+
+	if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		return
 	}
 
-	if upgradeInfo.Name == planName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-		// this configures a no-op upgrade handler for the planName upgrade
-		app.UpgradeKeeper.SetUpgradeHandler(planName, upgradeHandler)
-		// configure store loader that checks if version+1 == upgradeHeight and applies store upgrades
-		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, upgrades))
+	for _, upgrade := range plans {
+		if upgradeInfo.Name == upgrade.UpgradeName {
+			app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, upgrade.StoreUpgrades))
+		}
+	}
+}
+
+func (app *IrisApp) setupUpgradeHandlers() {
+	for _, upgrade := range plans {
+		app.UpgradeKeeper.SetUpgradeHandler(
+			upgrade.UpgradeName,
+			upgrade.UpgradeHandlerConstructor(
+				app.mm,
+				app.configurator,
+				app.appKeepers(),
+			),
+		)
 	}
 }
