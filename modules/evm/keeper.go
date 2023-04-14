@@ -19,9 +19,10 @@ import (
 )
 
 type Keeper struct {
-	evmkeeper  *evmkeeper.Keeper
-	bankKeeper types.BankKeeper
-	hasHook    bool
+	evmkeeper *evmkeeper.Keeper
+	bk        types.BankKeeper
+	ak        types.AccountKeeper
+	hasHook   bool
 }
 
 var _ types.MsgServer = &Keeper{}

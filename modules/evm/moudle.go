@@ -29,10 +29,10 @@ type AppModule struct {
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(k *keeper.Keeper, ak types.AccountKeeper, bankKeeper types.BankKeeper) AppModule {
+func NewAppModule(k *keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) AppModule {
 	return AppModule{
 		AppModule: ethermint.NewAppModule(k, ak),
-		k:         &Keeper{k, bankKeeper, false},
+		k:         &Keeper{k, bk, ak, false},
 	}
 }
 
