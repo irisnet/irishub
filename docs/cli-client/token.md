@@ -5,12 +5,13 @@ Token module allows you to manage assets on IRIS Hub
 ## Available Commands
 
 | Name                                       | Description                                |
-| ------------------------------------------ | ------------------------------------------ |
+|--------------------------------------------|--------------------------------------------|
 | [issue](#iris-tx-token-issue)              | Issue a new token                          |
 | [edit](#iris-tx-token-edit)                | Edit an existing token                     |
 | [transfer](#iris-tx-token-transfer)        | Transfer the ownership of a token          |
 | [mint](#iris-tx-token-mint)                | Mint tokens to a specified address         |
 | [burn](#iris-tx-token-burn)                | Burn some tokens                           |
+| [swap-fee](#iris-tx-token-swap-fee)        | Swap one token with another token          |
 | [token](#iris-query-token-token)           | Query a token by symbol                    |
 | [tokens](#iris-query-token-tokens)         | Query tokens by owner                      |
 | [fee](#iris-query-token-fee)               | Query the token related fees               |
@@ -121,6 +122,19 @@ iris tx token mint [symbol] [flags]
 | -------- | ------ | -------- | ------- | ----------------------------------------------------------------------- |
 | --to     | string |          |         | Address to which the token will be minted, default to the owner address |
 | --amount | uint64 | Yes      | 0       | Amount of the tokens to be minted                                       |
+
+## iris tx token swap-fee
+
+Swap one token with another token. For example, this feature can be used to exchange `IRIS` for `ERIS`.
+
+```bash
+iris tx token swap-fee [fee_paid] --to [reciever]
+```
+**Flags:**
+
+| Name     | Type   | Required | Default | Description                               |
+| -------- | ------ |----------| ------- |-------------------------------------------|
+| --to     | string | Yes      |         | Address to which the token will be swaped |
 
 ### Mint Token
 
