@@ -2,17 +2,7 @@
 
 IRISHub v2.0 changed the generative structure of the entire account system from `auth.BaseAccountProto` to `ethermint.ProtoAccount` , resulting in incompatibility of newly created accounts;
 
-### Using Proto
-
-A new type needs to be registered, and the type structure is here: https://github.com/bianjieai/ethermint/blob/v0.20.0-irishub-1/proto/ethermint/types/v1/account.proto
-
-When the query structure is /ethermint.types.v1.EthAccount, use the new structure analysis;
-
-You can refer to the core-sdk-go written by the irisnet team. The relevant hash is at: https://github.com/irisnet/core-sdk-go/commit/68ed671727e057edb185935c42710f8777dab62f
-
-### Useing LCD
-
-When parsing, please make compatibility according to the required type;
+**Note:** **Accounts before the v2.0 upgrade will not be affected and can still be used normally**
 
 **The following content takes nyancat testnet as an example：**
 
@@ -53,3 +43,19 @@ For accounts upgraded in v2.0, the query structure through LCD is as follows: ht
 }
 ```
 
+
+### Using Proto
+
+A new type needs to be registered, and the type structure is here: https://github.com/bianjieai/ethermint/blob/v0.20.0-irishub-1/proto/ethermint/types/v1/account.proto
+
+When the query structure is /ethermint.types.v1.EthAccount, use the new structure analysis;
+
+You can refer to the core-sdk-go written by the irisnet team. The relevant hash is at: https://github.com/irisnet/core-sdk-go/commit/68ed671727e057edb185935c42710f8777dab62f
+
+### Useing LCD
+
+When parsing, please make compatibility according to the required type;
+
+If the type is `/cosmos.auth.v1beta1.BaseAccount`, use the old structure analysis;
+
+If the type is `/ethermint.types.v1.EthAccount`, use the new structure analysis;
