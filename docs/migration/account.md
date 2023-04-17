@@ -48,7 +48,9 @@ For accounts upgraded in v2.0, the query structure through LCD is as follows: ht
 
 A new type needs to be registered, and the type structure is here: https://github.com/bianjieai/ethermint/blob/v0.20.0-irishub-1/proto/ethermint/types/v1/account.proto
 
-When the query structure is /ethermint.types.v1.EthAccount, use the new structure analysis;
+When the query structure is `/ethermint.types.v1.EthAccount`, use the new structure analysis;
+
+When the query structure is `/cosmos.auth.v1beta1.BaseAccount`, use the old structure analysis;
 
 You can refer to the core-sdk-go written by the irisnet team. The relevant hash is at: https://github.com/irisnet/core-sdk-go/commit/68ed671727e057edb185935c42710f8777dab62f
 
