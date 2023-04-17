@@ -32,6 +32,9 @@ func (app *IrisApp) ExportAppStateAndValidators(
 	if forZeroHeight {
 		height = 0
 		app.prepForZeroHeightGenesis(ctx, jailAllowedAddrs)
+	} else {
+		// NOTE: service currently does not support non-ZeroHeight export
+		service.PrepForZeroHeightGenesis(ctx, app.ServiceKeeper)
 	}
 
 	genState := app.mm.ExportGenesis(ctx, app.appCodec)
@@ -51,7 +54,8 @@ func (app *IrisApp) ExportAppStateAndValidators(
 
 // prepare for fresh start at zero height
 // NOTE zero height genesis is a temporary feature which will be deprecated
-//      in favour of export at a block height
+//
+//	in favour of export at a block height
 func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []string) {
 	applyAllowedAddrs := false
 

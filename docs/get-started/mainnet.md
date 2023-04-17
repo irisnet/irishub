@@ -37,6 +37,7 @@ Next, your node will process all chain upgrades. Between each upgrade, you must 
 | [#8](https://irishub.iobscan.io/#/ProposalsDetail/8)  |  12393048     | 12534300 | [v1.2.0](https://github.com/irisnet/irishub/releases/tag/v1.2.0), [v1.2.1](https://github.com/irisnet/irishub/releases/tag/v1.2.1) |
 | [#11](https://irishub.iobscan.io/#/ProposalsDetail/11)  |  14166918     |  14301916  | [v1.3.0](https://github.com/irisnet/irishub/releases/tag/v1.3.0) |
 | [#19](https://irishub.iobscan.io/#/gov/proposals/19)  |       |  17685953  | [v1.4.1](https://github.com/irisnet/irishub/releases/tag/v1.4.1) |
+ | [#39](https://irishub.iobscan.io/#/gov/proposals/39) |        | 19514010 | [v2.0.0](https://github.com/irisnet/irishub/releases/tag/v2.0.0) | 
 
 :::tip
 You may see some connection errors, it does not matter, the P2P network is trying to find available connections
@@ -60,8 +61,8 @@ iris init <moniker> --chain-id=irishub-1
 [statesync]
 enable = true
 rpc_servers = "http://34.82.96.8:26657,http://34.77.68.145:26657"
-trust_height = 17613000
-trust_hash = "990f1eaf06d456bc22891327e006d520cb407f8ad3bfee1edd43df0de1e1da1c"
+trust_height = 19511000
+trust_hash = "65cbc3a14f81d07ff2367202af1bd1a9c958800e643aedfc80518ec642e89eb8"
 trust_period = "168h"  # 2/3 of unbonding time
 
 #Start Iris

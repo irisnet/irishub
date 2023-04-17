@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -17,7 +18,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
-	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/server"
@@ -33,14 +33,20 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 
+	ethermintdebug "github.com/evmos/ethermint/client/debug"
+	etherminthd "github.com/evmos/ethermint/crypto/hd"
+	servercfg "github.com/evmos/ethermint/server/config"
+
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/params"
+	irisserver "github.com/irisnet/irishub/server"
+	iristypes "github.com/irisnet/irishub/types"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
-	encodingConfig := app.MakeEncodingConfig()
+	encodingConfig := app.MakeConfig(app.ModuleBasics)
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Marshaler).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
@@ -49,7 +55,8 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
-		WithHomeDir(app.DefaultNodeHome).
+		WithHomeDir(iristypes.DefaultNodeHome).
+		WithKeyringOptions(etherminthd.EthSecp256k1Option()).
 		WithViper("")
 
 	rootCmd := &cobra.Command{
@@ -98,46 +105,47 @@ func initTendermintConfig() *tmcfg.Config {
 	return cfg
 }
 
+// initAppConfig helps to override default appConfig template and configs.
+// return "", nil if no custom configuration is required for the application.
 func initAppConfig() (string, interface{}) {
-	srvCfg := serverconfig.DefaultConfig()
+	customAppTemplate, customAppConfig := servercfg.AppConfig(iristypes.NativeToken.MinUnit)
+	srvCfg, ok := customAppConfig.(servercfg.Config)
+	if !ok {
+		panic(fmt.Errorf("unknown app config type %T", customAppConfig))
+	}
+
 	srvCfg.StateSync.SnapshotInterval = 1000
 	srvCfg.StateSync.SnapshotKeepRecent = 10
 
-	return params.CustomConfigTemplate, params.CustomAppConfig{
-		Config: *srvCfg,
-		// BypassMinFeeMsgTypes: []string{
-		// 	sdk.MsgTypeURL(&ibcchanneltypes.MsgRecvPacket{}),
-		// 	sdk.MsgTypeURL(&ibcchanneltypes.MsgAcknowledgement{}),
-		// 	sdk.MsgTypeURL(&ibcclienttypes.MsgUpdateClient{}),
-		// },
-	}
+	return customAppTemplate, srvCfg
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
+		genutilcli.InitCmd(app.ModuleBasics, iristypes.DefaultNodeHome),
+		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, iristypes.DefaultNodeHome),
+		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, iristypes.DefaultNodeHome),
 		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
-		AddGenesisAccountCmd(app.DefaultNodeHome),
+		AddGenesisAccountCmd(iristypes.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		testnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
-		debug.Cmd(),
+		ethermintdebug.Cmd(),
 		config.Cmd(),
+		mergeGenesisCmd(encodingConfig),
 	)
 
 	ac := appCreator{
 		encCfg: encodingConfig,
 	}
 
-	server.AddCommands(rootCmd, app.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
+	irisserver.AddCommands(rootCmd, iristypes.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
 		queryCommand(),
 		txCommand(),
-		Commands(app.DefaultNodeHome),
+		Commands(iristypes.DefaultNodeHome),
 	)
 }
 
@@ -234,7 +242,7 @@ func (ac appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, 
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		app.MakeEncodingConfig(), // Ideally, we would reuse the one created by NewRootCmd.
+		ac.encCfg, // Ideally, we would reuse the one created by NewRootCmd.
 		appOpts,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),

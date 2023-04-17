@@ -10,7 +10,7 @@ on:
 jobs:
   build-images:
     name: Build Images
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
         uses: actions/checkout@v1
@@ -52,7 +52,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.prep.outputs.tags }}
           platforms: linux/amd64,linux/arm64
-          
 #       - name: Build irishub image
 #         run: source ~/.bashrc; sudo docker build -t irisnet/irishub:latest .
 #       - name: Login dockerhub

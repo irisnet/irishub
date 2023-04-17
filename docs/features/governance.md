@@ -23,47 +23,29 @@ The governance process is divided in a few steps that are outlined below:
 
 #### Right to submit a proposal
 
-Any Iris holder, whether bonded or unbonded, can submit proposals by sending a
-`TxGovProposal` transaction. Once a proposal is submitted, it is identified by
-its unique `proposalID`.
+Every account can submit proposals by sending a MsgSubmitProposal transaction. Once a proposal is submitted, it is identified by its unique proposalID.
 
 #### Proposal types
 
-In the initial version of the governance module, there are two types of
-proposal:
-
-- `PlainTextProposal` All the proposals that do not involve a modification of
-  the source code go under this type. For example, an opinion poll would use a
-  proposal of type `PlainTextProposal`.
-
-- `SoftwareUpgradeProposal`. If accepted, validators are expected to update
-  their software in accordance with the proposal. They must do so by following
-  a 2-steps process described in the [Software Upgrade](#software-upgrade)
-  section below. Software upgrade roadmap may be discussed and agreed on via
-  `PlainTextProposals`, but actual software upgrades must be performed via
-  `SoftwareUpgradeProposals`.
-
-Other modules may expand upon the governance module by implementing their own
-proposal types and handlers. These types are registered and processed through the
-governance module (eg. `ParamChangeProposal`), which then execute the respective
-module's proposal handler when a proposal passes. This custom handler may perform
-arbitrary state changes.
+A proposal includes an array of `sdk.Msg`s which are executed automatically if the proposal passes. The messages are executed by the governance `ModuleAccount` itself. Modules such as `x/upgrade`, that want to allow certain messages to be executed by governance only should add a whitelist within the respective msg server, granting the governance module the right to execute the message once a quorum has been reached. The governance module uses the `MsgServiceRouter` to check that these messages are correctly constructed and have a respective path to execute on but do not perform a full validity check.
 
 ### Deposit
 
-To prevent spam, proposals must be submitted with a deposit in the coins defined in the `MinDeposit` param. The voting period will not start until the proposal's deposit equals `MinDeposit`.
+To prevent spam, proposals must be submitted with a deposit in the coins defined by the `MinDeposit` param.
 
-When a proposal is submitted, it has to be accompanied by a deposit that must be strictly positive, but can be inferior to `MinDeposit`. The submitter doesn't need to pay for the entire deposit on their own. If a proposal's deposit is inferior to `MinDeposit`, other token holders can increase the proposal's deposit by sending a `Deposit` transaction. The deposit is kept in an escrow in the governance `ModuleAccount` until the proposal is finalized (passed or rejected).
+When a proposal is submitted, it has to be accompanied with a deposit that must be strictly positive, but can be inferior to `MinDeposit`. The submitter doesn't need to pay for the entire deposit on their own. The newly created proposal is stored in an inactive proposal queue and stays there until its deposit passes the `MinDeposit`. Other token holders can increase the proposal's deposit by sending a `Deposit` transaction. If a proposal doesn't pass the `MinDeposit` before the deposit end time (the time when deposits are no longer accepted), the proposal will be destroyed: the proposal will be removed from state and the deposit will be burned (see x/gov `EndBlocker`). When a proposal deposit passes the `MinDeposit` threshold (even during the proposal submission) before the deposit end time, the proposal will be moved into the active proposal queue and the voting period will begin.
 
-Once the proposal's deposit reaches `MinDeposit`, it enters voting period. If proposal's deposit does not reach `MinDeposit` before `MaxDepositPeriod`, proposal closes and nobody can deposit on it anymore.
+The deposit is kept in escrow and held by the governance `ModuleAccount` until the proposal is finalized (passed or rejected).
 
 #### Deposit refund and burn
 
-When a proposal finalized, the coins from the deposit are either refunded or burned, according to the final tally of the proposal:
+When a proposal is finalized, the coins from the deposit are either refunded or burned according to the final tally of the proposal:
 
-- If the proposal is approved or if it's rejected but _not_ vetoed, deposits will automatically be refunded to their respective depositor (transferred from the governance `ModuleAccount`).
+- If the proposal is approved or rejected but not vetoed, each deposit will be automatically refunded to its respective depositor (transferred from the governance `ModuleAccount`).
 
-- When the proposal is vetoed with a supermajority, deposits be burned from the governance `ModuleAccount`.
+- When the proposal is vetoed with greater than 1/3, deposits will be burned from the governance `ModuleAccount` and the proposal information along with its deposit information will be removed from state.
+
+- All refunded or burned deposits are removed from the state. Events are issued when burning or refunding a deposit.
 
 ### Vote
 
@@ -114,6 +96,12 @@ proposal but accept the result of the vote.
 
 _Note: from the UI, for urgent proposals we should maybe add a ‘Not Urgent’
 option that casts a `NoWithVeto` vote._
+
+#### Weighted Votes
+
+The weighted vote feature allows a staker to split their votes into several voting options. For example, it could use 70% of its voting power to vote Yes and 30% of its voting power to vote No.
+
+Often times the entity owning that address might not be a single individual. For example, a company might have different stakeholders who want to vote differently, and so it makes sense to allow them to split their voting power. Currently, it is not possible for them to do "passthrough voting" and giving their users voting rights over their tokens. However, with this system, exchanges can poll their users for voting preferences, and then vote on-chain proportionally to the results of the poll.
 
 #### Quorum
 
@@ -196,7 +184,7 @@ echo '{
     "deposit": "1000iris"
 }' > proposal.json
 
-iris tx gov submit-proposal param-change proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub
+iris tx gov submit-legacy-proposal param-change proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub
 ```
 
 ### Community pool spending
@@ -213,7 +201,7 @@ echo '{
     "deposit": "1000iris"
 }' > proposal.json
 
-iris tx gov submit-proposal community-pool-spend proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub
+iris tx gov submit-legacy-proposal community-pool-spend proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub
 ```
 
 ### Software upgrade

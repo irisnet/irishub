@@ -1,7 +1,6 @@
-package tibc
+package upgrades
 
 import (
-	_ "embed"
 	"encoding/json"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -10,12 +9,6 @@ import (
 	clientkeeper "github.com/bianjieai/tibc-go/modules/tibc/core/02-client/keeper"
 	"github.com/bianjieai/tibc-go/modules/tibc/core/exported"
 )
-
-//go:embed v120.json
-var v120 []byte
-
-//go:embed v130.json
-var v130 []byte
 
 type (
 	ClientData struct {
@@ -36,10 +29,10 @@ type (
 func CreateClient(
 	ctx sdk.Context,
 	cdc codec.Codec,
-	upgradePlanVersion string,
+	data []byte,
 	clientKeeper clientkeeper.Keeper,
 ) error {
-	clients := loadClient(cdc, upgradePlanVersion)
+	clients := loadClient(cdc, data)
 	for _, client := range clients {
 		// init tibc client
 		if err := clientKeeper.CreateClient(
@@ -56,15 +49,7 @@ func CreateClient(
 	return nil
 }
 
-func loadClient(cdc codec.Codec, version string) (clients []Client) {
-	var data []byte
-	switch version {
-	case "v1.2":
-		data = v120
-	case "v1.3":
-		data = v130
-	}
-
+func loadClient(cdc codec.Codec, data []byte) (clients []Client) {
 	var datas []ClientData
 	if err := json.Unmarshal(data, &datas); err != nil {
 		panic("Unmarshal client.json failed")

@@ -5,10 +5,12 @@ set -eo pipefail
 rm -rf ./tmp-swagger-gen ./tmp && mkdir -p ./tmp-swagger-gen ./tmp/proto ./tmp/third_party
 
 chmod a+x ./scripts/protoc-swagger-gen-ibc.sh
+chmod a+x ./scripts/protoc-swagger-gen-evm.sh
 ./scripts/protoc-swagger-gen-ibc.sh
+./scripts/protoc-swagger-gen-evm.sh
 
-SDK_VERSION=v0.46.5
-IRISMOD_VERSION=v1.7.2
+SDK_VERSION=v0.46.9
+IRISMOD_VERSION=v1.7.3
 
 go mod download github.com/cosmos/cosmos-sdk@${SDK_VERSION}
 go mod download github.com/irisnet/irismod@${IRISMOD_VERSION}

@@ -11,6 +11,9 @@ NetworkType := $(shell if [ -z ${NetworkType} ]; then echo "mainnet"; else echo 
 CURRENT_DIR = $(shell pwd)
 PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 
+# default mainnet EVM_CHAIN_ID
+EVM_CHAIN_ID ?= 6688
+
 export GO111MODULE = on
 
 # process build tags
@@ -56,6 +59,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=iris \
 		  -X github.com/cosmos/cosmos-sdk/version.AppName=iris \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+		  -X github.com/irisnet/irishub/types.EIP155ChainID=$(EVM_CHAIN_ID) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
 
 ifeq ($(WITH_CLEVELDB),yes)
@@ -73,17 +77,17 @@ all: tools install lint
 # The below include contains the tools.
 include contrib/devtools/Makefile
 
-build: go.sum
+build: check-evm-chain-id go.sum
 ifeq ($(OS),Windows_NT)
-	go build $(BUILD_FLAGS) -o build/iris.exe ./cmd/iris
+	@go build $(BUILD_FLAGS) -o build/iris.exe ./cmd/iris
 else
-	go build $(BUILD_FLAGS) -o build/iris ./cmd/iris
+	@go build $(BUILD_FLAGS) -o build/iris ./cmd/iris
 endif
 
-build-linux: go.sum
+build-linux: check-evm-chain-id go.sum
 	LEDGER_ENABLED=false GOOS=linux GOARCH=amd64 $(MAKE) build
 
-build-all-binary: go.sum
+build-all-binary: check-evm-chain-id go.sum
 	LEDGER_ENABLED=false GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) CGO_ENABLED=1 -o build/iris-linux-amd64 ./cmd/iris
 	LEDGER_ENABLED=false GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) CGO_ENABLED=1 -o build/iris-linux-arm64 ./cmd/iris
 	LEDGER_ENABLED=false GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) CGO_ENABLED=1 -o build/iris-windows-amd64.exe ./cmd/iris
@@ -95,8 +99,11 @@ else
 	go build -mod=readonly $(BUILD_FLAGS) -o build/contract_tests ./cmd/contract_tests
 endif
 
-install: go.sum
-	go install $(BUILD_FLAGS) ./cmd/iris
+install: check-evm-chain-id go.sum
+	@go install $(BUILD_FLAGS) ./cmd/iris
+
+check-evm-chain-id:
+	@echo "note: EVM_CHAIN_ID is $(EVM_CHAIN_ID)"
 
 update-swagger-docs: statik proto-swagger-gen
 	$(BINDIR)/statik -src=lite/swagger-ui -dest=lite -f -m

@@ -80,10 +80,11 @@ import (
 	ibctransfertypes "github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v5/modules/core"
 	ibcclient "github.com/cosmos/ibc-go/v5/modules/core/02-client"
+	ibcclientclient "github.com/cosmos/ibc-go/v5/modules/core/02-client/client"
+	ibcclienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
 	porttypes "github.com/cosmos/ibc-go/v5/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v5/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v5/modules/core/keeper"
-	"github.com/irisnet/irismod/modules/token"
 
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/irisnet/irismod/modules/coinswap"
@@ -113,6 +114,7 @@ import (
 
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
 
 	"github.com/irisnet/irishub/address"
 	"github.com/irisnet/irishub/lite"
@@ -126,6 +128,7 @@ import (
 	"github.com/irisnet/irismod/modules/farm"
 	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
 	farmtypes "github.com/irisnet/irismod/modules/farm/types"
+	"github.com/irisnet/irismod/modules/token"
 
 	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
 	tibcmttransferkeeper "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/keeper"
@@ -134,11 +137,9 @@ import (
 	tibcnfttransferkeeper "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/keeper"
 	tibcnfttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/types"
 	tibc "github.com/bianjieai/tibc-go/modules/tibc/core"
-	tibcclient "github.com/bianjieai/tibc-go/modules/tibc/core/02-client"
-	tibcclienttypes "github.com/bianjieai/tibc-go/modules/tibc/core/02-client/types"
 	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
-	tibcrouting "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing"
 	tibcroutingtypes "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing/types"
+	tibccli "github.com/bianjieai/tibc-go/modules/tibc/core/client/cli"
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
 )
 
@@ -153,6 +154,15 @@ var (
 	// overwite sdk reDnmString
 	reDnmString = `[a-zA-Z][a-zA-Z0-9/-]{2,127}`
 
+	legacyProposalHandlers = []govclient.ProposalHandler{
+		paramsclient.ProposalHandler,
+		distrclient.ProposalHandler,
+		upgradeclient.LegacyProposalHandler,
+		upgradeclient.LegacyCancelProposalHandler,
+		ibcclientclient.UpdateClientProposalHandler,
+		ibcclientclient.UpgradeProposalHandler,
+	}
+
 	// ModuleBasics defines the module BasicManager is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
 	// and genesis verification.
@@ -166,16 +176,7 @@ var (
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
-			[]govclient.ProposalHandler{
-				paramsclient.ProposalHandler,
-				distrclient.ProposalHandler,
-				upgradeclient.LegacyProposalHandler,
-				upgradeclient.LegacyCancelProposalHandler,
-				tibcclient.CreateClientProposalHandler,
-				tibcclient.UpgradeClientProposalHandler,
-				tibcclient.RegisterRelayerProposalHandler,
-				tibcrouting.SetRoutingRulesProposalHandler,
-			},
+			append(legacyProposalHandlers, tibccli.GovHandlers...),
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -226,7 +227,7 @@ var (
 		nfttypes.ModuleName:            nil,
 	}
 
-	nativeToken tokentypes.Token
+	nativeToken tokenv1.Token
 )
 
 var (
@@ -304,7 +305,7 @@ func init() {
 	// set coin denom regexs
 	sdk.SetCoinDenomRegex(DefaultCoinDenomRegex)
 
-	nativeToken = tokentypes.Token{
+	nativeToken = tokenv1.Token{
 		Symbol:        "iris",
 		Name:          "Irishub staking token",
 		Scale:         6,
@@ -326,7 +327,7 @@ func init() {
 		panic(err)
 	}
 
-	tokentypes.SetNativeToken(
+	tokenv1.SetNativeToken(
 		nativeToken.Symbol,
 		nativeToken.Name,
 		nativeToken.MinUnit,
@@ -648,9 +649,8 @@ func NewSimApp(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibchost.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
-		AddRoute(tibcclienttypes.RouterKey, tibcclient.NewClientProposalHandler(app.TIBCKeeper.ClientKeeper)).
-		AddRoute(tibcroutingtypes.RouterKey, tibcrouting.NewSetRoutingProposalHandler(app.TIBCKeeper.RoutingKeeper)).
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
+		AddRoute(tibchost.RouterKey, tibccli.NewProposalHandler(app.TIBCKeeper)).
 		AddRoute(farmtypes.RouterKey, farm.NewCommunityPoolCreateFarmProposalHandler(app.FarmKeeper))
 
 	govConfig := govtypes.DefaultConfig()

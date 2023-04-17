@@ -1,5 +1,5 @@
 
-IBC_GO=v5.0.1
+IBC_GO=v5.2.0
 
 go mod download github.com/cosmos/ibc-go/v5@${IBC_GO}
 
