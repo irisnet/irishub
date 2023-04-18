@@ -118,6 +118,7 @@ import (
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
+	"github.com/irisnet/irishub/rpc"
 	iristypes "github.com/irisnet/irishub/types"
 )
 
@@ -586,7 +587,7 @@ func NewIrisApp(
 	app.configurator = module.NewConfigurator(appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
-	app.mm.RegisterServices(app.configurator)
+	app.RegisterServices()
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	//
@@ -772,6 +773,18 @@ func (app *IrisApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APICo
 	// register swagger API from root so that other applications can override easily
 	if apiConfig.Swagger {
 		lite.RegisterSwaggerAPI(clientCtx, apiSvr.Router)
+	}
+}
+
+// RegisterServices implements the Application.RegisterTxService method.
+func (app *IrisApp) RegisterServices() {
+	for _, module := range app.mm.Modules {
+		if module.Name() == authtypes.ModuleName {
+			rpc.RegisterAuthQueryServer(app.configurator,
+				app.GetKey(authtypes.ModuleName), app.AccountKeeper)
+		} else {
+			module.RegisterServices(app.configurator)
+		}
 	}
 }
 
