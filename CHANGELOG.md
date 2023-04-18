@@ -1,24 +1,10 @@
 # Changelog
 
-## [Unreleased]
-
-### Features
-
-### Improvements
-
-### State Machine Breaking
+## [2.0.1]
 
 ### API Breaking Changes
 
 * (IRISHub) [\#2845](https://github.com/irisnet/irishub/pull/2831) Fix query account api incompatibility
-
-### Client Breaking Changes
-
-### CLI Breaking Changes
-
-### Bug Fixes
-
-### Deprecated
 
 ## 2.0.0
 
