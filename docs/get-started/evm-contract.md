@@ -64,8 +64,8 @@ Open the Metamask extension on your browser, you may have to log in to your Meta
 
 Then click the top right circle and go to `Settings > Networks`. Press the `Add Network` button and fill the form as the example below with your application ChainID:
 
-- Network Name: IRISHub
-- RPC URL: http://localhost:8545
+- Network Name: IRISHub 2.0
+- RPC URL: https://evmrpc.irishub-1.irisnet.org
 - ChainID: 6688
 - Symbol: ERIS
 
