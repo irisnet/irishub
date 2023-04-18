@@ -4,7 +4,7 @@
 
 ### API Breaking Changes
 
-* (IRISHub) [\#2845](https://github.com/irisnet/irishub/pull/2831) Fix query account api incompatibility
+* (IRISHub) [\#2845](https://github.com/irisnet/irishub/pull/2845) Fix query account api incompatibility
 
 ## 2.0.0
 
@@ -50,6 +50,7 @@
 ## 1.4.0
 
 *November 15, 2022*
+
 ### Application
 
 * [\#2759](https://github.com/irisnet/irishub/pull/2759) Fix export error when with flag `--for-zero-height`
@@ -62,6 +63,7 @@
 ### API Breaking Changes
 
 * [irismod \#309](https://github.com/irisnet/irismod/pull/309) GRPC method `Owner` rename to `NFTsOfOwner`, Remove deprecated `Queries` api
+
 ### Bug Fixes
 
 * [irismod \#304](https://github.com/irisnet/irismod/pull/304) Fix nft module import error.
