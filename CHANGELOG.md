@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.1]
+
+### API Breaking Changes
+
+* (IRISHub) [\#2845](https://github.com/irisnet/irishub/pull/2831) Fix query account api incompatibility
+
 ## 2.0.0
 
 ### State Machine Breaking
