@@ -781,7 +781,7 @@ func (app *IrisApp) RegisterServices() {
 	for _, module := range app.mm.Modules {
 		if module.Name() == authtypes.ModuleName {
 			rpc.RegisterAuthServer(app.configurator,
-				app.GetKey(authtypes.ModuleName), app.AccountKeeper)
+				app.GetKey(authtypes.StoreKey), app.AccountKeeper)
 		} else {
 			module.RegisterServices(app.configurator)
 		}
