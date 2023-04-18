@@ -780,7 +780,7 @@ func (app *IrisApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APICo
 func (app *IrisApp) RegisterServices() {
 	for _, module := range app.mm.Modules {
 		if module.Name() == authtypes.ModuleName {
-			rpc.RegisterAuthQueryServer(app.configurator,
+			rpc.RegisterAuthServer(app.configurator,
 				app.GetKey(authtypes.ModuleName), app.AccountKeeper)
 		} else {
 			module.RegisterServices(app.configurator)

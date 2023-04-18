@@ -19,20 +19,30 @@ import (
 	ethermint "github.com/evmos/ethermint/types"
 )
 
-var _ authtypes.QueryServer = authQueryServer{}
+var _ authtypes.QueryServer = authServer{}
 
-type authQueryServer struct {
+type authServer struct {
 	key storetypes.StoreKey
 	k   authkeeper.AccountKeeper
 }
 
-func RegisterAuthQueryServer(cfg module.Configurator, key storetypes.StoreKey, k authkeeper.AccountKeeper) {
-	authtypes.RegisterQueryServer(cfg.QueryServer(), authQueryServer{key, k})
+func RegisterAuthServer(cfg module.Configurator, key storetypes.StoreKey, k authkeeper.AccountKeeper) {
+	authtypes.RegisterQueryServer(cfg.QueryServer(), authServer{key, k})
+	m := authkeeper.NewMigrator(k, cfg.QueryServer())
+	err := cfg.RegisterMigration(authtypes.ModuleName, 1, m.Migrate1to2)
+	if err != nil {
+		panic(err)
+	}
+
+	err = cfg.RegisterMigration(authtypes.ModuleName, 2, m.Migrate2to3)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Since: cosmos-sdk 0.43
 // Accounts returns all the existing accounts
-func (a authQueryServer) Accounts(c context.Context, req *types.QueryAccountsRequest) (*types.QueryAccountsResponse, error) {
+func (a authServer) Accounts(c context.Context, req *types.QueryAccountsRequest) (*types.QueryAccountsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -60,7 +70,7 @@ func (a authQueryServer) Accounts(c context.Context, req *types.QueryAccountsReq
 }
 
 // Account returns account details based on address.
-func (a authQueryServer) Account(c context.Context, req *types.QueryAccountRequest) (*types.QueryAccountResponse, error) {
+func (a authServer) Account(c context.Context, req *types.QueryAccountRequest) (*types.QueryAccountResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -96,49 +106,49 @@ func (a authQueryServer) Account(c context.Context, req *types.QueryAccountReque
 // AccountAddressByID returns account address based on account number.
 //
 // Since: cosmos-sdk 0.46.2
-func (a authQueryServer) AccountAddressByID(c context.Context, req *types.QueryAccountAddressByIDRequest) (*types.QueryAccountAddressByIDResponse, error) {
+func (a authServer) AccountAddressByID(c context.Context, req *types.QueryAccountAddressByIDRequest) (*types.QueryAccountAddressByIDResponse, error) {
 	return a.k.AccountAddressByID(c, req)
 }
 
 // Params queries all parameters.
-func (a authQueryServer) Params(ctx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+func (a authServer) Params(ctx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	return a.k.Params(ctx, req)
 }
 
 // ModuleAccounts returns all the existing module accounts.
 //
 // Since: cosmos-sdk 0.46
-func (a authQueryServer) ModuleAccounts(ctx context.Context, req *types.QueryModuleAccountsRequest) (*types.QueryModuleAccountsResponse, error) {
+func (a authServer) ModuleAccounts(ctx context.Context, req *types.QueryModuleAccountsRequest) (*types.QueryModuleAccountsResponse, error) {
 	return a.k.ModuleAccounts(ctx, req)
 }
 
 // ModuleAccountByName returns the module account info by module name
-func (a authQueryServer) ModuleAccountByName(ctx context.Context, req *types.QueryModuleAccountByNameRequest) (*types.QueryModuleAccountByNameResponse, error) {
+func (a authServer) ModuleAccountByName(ctx context.Context, req *types.QueryModuleAccountByNameRequest) (*types.QueryModuleAccountByNameResponse, error) {
 	return a.k.ModuleAccountByName(ctx, req)
 }
 
 // Bech32Prefix queries bech32Prefix
 //
 // Since: cosmos-sdk 0.46
-func (a authQueryServer) Bech32Prefix(ctx context.Context, req *types.Bech32PrefixRequest) (*types.Bech32PrefixResponse, error) {
+func (a authServer) Bech32Prefix(ctx context.Context, req *types.Bech32PrefixRequest) (*types.Bech32PrefixResponse, error) {
 	return a.k.Bech32Prefix(ctx, req)
 }
 
 // AddressBytesToString converts Account Address bytes to string
 //
 // Since: cosmos-sdk 0.46
-func (a authQueryServer) AddressBytesToString(ctx context.Context, req *types.AddressBytesToStringRequest) (*types.AddressBytesToStringResponse, error) {
+func (a authServer) AddressBytesToString(ctx context.Context, req *types.AddressBytesToStringRequest) (*types.AddressBytesToStringResponse, error) {
 	return a.k.AddressBytesToString(ctx, req)
 }
 
 // AddressStringToBytes converts Address string to bytes
 //
 // Since: cosmos-sdk 0.46
-func (a authQueryServer) AddressStringToBytes(ctx context.Context, req *types.AddressStringToBytesRequest) (*types.AddressStringToBytesResponse, error) {
+func (a authServer) AddressStringToBytes(ctx context.Context, req *types.AddressStringToBytesRequest) (*types.AddressStringToBytesResponse, error) {
 	return a.k.AddressStringToBytes(ctx, req)
 }
 
-func (a authQueryServer) decodeAccount(bz []byte) types.AccountI {
+func (a authServer) decodeAccount(bz []byte) types.AccountI {
 	acc, err := a.k.UnmarshalAccount(bz)
 	if err != nil {
 		panic(err)

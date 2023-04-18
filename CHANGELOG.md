@@ -1,5 +1,23 @@
 # Changelog
 
+## [Unreleased]
+
+### Features
+
+### Improvements
+
+### State Machine Breaking
+
+### API Breaking Changes
+
+### Client Breaking Changes
+
+### CLI Breaking Changes
+
+### Bug Fixes
+
+### Deprecated
+
 ## 2.0.0
 
 ### State Machine Breaking
