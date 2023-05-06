@@ -3,6 +3,9 @@ package app
 import (
 	"io"
 
+	"github.com/irisnet/irishub/modules/bridgenft"
+
+	convertertypes "github.com/irisnet/erc721-bridge/x/converter/types"
 	"github.com/spf13/cast"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -114,6 +117,8 @@ import (
 	feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
+	converterkeeper "github.com/irisnet/erc721-bridge/x/converter/keeper"
+
 	"github.com/irisnet/irishub/address"
 	irishubante "github.com/irisnet/irishub/ante"
 	irisappparams "github.com/irisnet/irishub/app/params"
@@ -196,6 +201,9 @@ type IrisApp struct {
 	EvmKeeper       *evmkeeper.Keeper
 	FeeMarketKeeper feemarketkeeper.Keeper
 
+	// erc721-bridge
+	Erc721ConvertKeeper converterkeeper.Keeper
+
 	// the module manager
 	mm *module.Manager
 
@@ -241,6 +249,8 @@ func NewIrisApp(
 		authzkeeper.StoreKey,
 		// ethermint keys
 		evmtypes.StoreKey, feemarkettypes.StoreKey, ibcnfttransfertypes.StoreKey,
+		// erc721-bridge
+		convertertypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -582,6 +592,15 @@ func NewIrisApp(
 		appCodec, keys[evmtypes.StoreKey], tkeys[evmtypes.TransientKey], app.GetSubspace(evmtypes.ModuleName),
 		app.AccountKeeper, app.BankKeeper, &stakingKeeper, app.FeeMarketKeeper,
 		nil, geth.NewEVM, tracer,
+	)
+
+	// Create Convert Keepers
+	app.Erc721ConvertKeeper = converterkeeper.NewKeeper(
+		appCodec,
+		keys[convertertypes.StoreKey],
+		app.AccountKeeper,
+		app.EvmKeeper,
+		bridgenft.NewBridgeNftKeeper(appCodec, app.NFTKeeper, app.AccountKeeper),
 	)
 
 	/****  Module Options ****/

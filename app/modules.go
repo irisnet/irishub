@@ -37,6 +37,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"github.com/irisnet/erc721-bridge/x/converter"
+	convertertypes "github.com/irisnet/erc721-bridge/x/converter/types"
 
 	"github.com/cosmos/ibc-go/v5/modules/apps/transfer"
 	ibctransfertypes "github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
@@ -143,6 +145,8 @@ var (
 
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
+
+		converter.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -167,6 +171,8 @@ var (
 		tibcmttypes.ModuleName:         nil,
 		nfttypes.ModuleName:            nil,
 		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
+
+		convertertypes.ModuleName: nil,
 	}
 )
 
@@ -217,6 +223,9 @@ func appModules(
 		// Ethermint app modules
 		irisevm.NewAppModule(app.EvmKeeper, app.AccountKeeper, app.BankKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
+
+		// bridge app modules
+		converter.NewAppModule(app.Erc721ConvertKeeper, app.AccountKeeper),
 	}
 }
 
@@ -312,6 +321,9 @@ func orderBeginBlockers() []string {
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+
+		// erc721 bridge modules
+		convertertypes.ModuleName,
 	}
 }
 
@@ -361,6 +373,9 @@ func orderEndBlockers() []string {
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+
+		// erc721 bridge modules
+		convertertypes.ModuleName,
 	}
 }
 
@@ -415,5 +430,8 @@ func orderInitBlockers() []string {
 		ibcnfttransfertypes.ModuleName,
 		// NOTE: crisis module must go at the end to check for invariants on each module
 		crisistypes.ModuleName,
+
+		// erc721 bridge modules
+		convertertypes.ModuleName,
 	}
 }
