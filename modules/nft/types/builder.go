@@ -30,6 +30,8 @@ var (
 	ClassKeySchema           = fmt.Sprintf("%s%s", Namespace, "schema")
 	TokenKeyName             = fmt.Sprintf("%s%s", Namespace, "name")
 	TokenKeyURIhash          = fmt.Sprintf("%s%s", Namespace, "uri_hash")
+
+	Base64 = base64.StdEncoding
 )
 
 type (
@@ -70,7 +72,7 @@ func (cb ClassBuilder) BuildMetadata(class nft.Class) (string, error) {
 		err := json.Unmarshal([]byte(metadata.Data), &kvals)
 		if err != nil && IsIBCDenom(class.Id) {
 			//when classData is not a legal json, there is no need to parse the data
-			return base64.RawStdEncoding.EncodeToString([]byte(metadata.Data)), nil
+			return Base64.EncodeToString([]byte(metadata.Data)), nil
 		}
 		//note: if metadata.Data is null, it may cause map to be redefined as nil
 		if kvals == nil {
@@ -95,12 +97,12 @@ func (cb ClassBuilder) BuildMetadata(class nft.Class) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return base64.RawStdEncoding.EncodeToString(data), nil
+	return Base64.EncodeToString(data), nil
 }
 
 // Build create a class from ics721 packetData
 func (cb ClassBuilder) Build(classID, classURI, classData string) (nft.Class, error) {
-	classDataBz, err := base64.RawStdEncoding.DecodeString(classData)
+	classDataBz, err := Base64.DecodeString(classData)
 	if err != nil {
 		return nft.Class{}, err
 	}
@@ -267,7 +269,7 @@ func (tb TokenBuilder) BuildMetadata(token nft.NFT) (string, error) {
 		err := json.Unmarshal([]byte(nftMetadata.Data), &kvals)
 		if err != nil && IsIBCDenom(token.ClassId) {
 			//when nftMetadata is not a legal json, there is no need to parse the data
-			return base64.RawStdEncoding.EncodeToString([]byte(nftMetadata.Data)), nil
+			return Base64.EncodeToString([]byte(nftMetadata.Data)), nil
 		}
 		//note: if nftMetadata.Data is null, it may cause map to be redefined as nil
 		if kvals == nil {
@@ -280,12 +282,12 @@ func (tb TokenBuilder) BuildMetadata(token nft.NFT) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return base64.RawStdEncoding.EncodeToString(data), nil
+	return Base64.EncodeToString(data), nil
 }
 
 // Build create a nft from ics721 packet data
 func (tb TokenBuilder) Build(classId, tokenId, tokenURI, tokenData string) (nft.NFT, error) {
-	tokenDataBz, err := base64.RawStdEncoding.DecodeString(tokenData)
+	tokenDataBz, err := Base64.DecodeString(tokenData)
 	if err != nil {
 		return nft.NFT{}, err
 	}

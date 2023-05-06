@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"testing"
 
@@ -166,7 +165,7 @@ func TestClassBuilder_BuildMetadata(t *testing.T) {
 			class.Data = any
 
 			got, err := cb.BuildMetadata(class)
-			want := base64.RawStdEncoding.EncodeToString([]byte(tt.want))
+			want := Base64.EncodeToString([]byte(tt.want))
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ClassBuilder.BuildMetadata() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -229,7 +228,7 @@ func TestClassBuilder_Build(t *testing.T) {
 				cdc:              cdc,
 				getModuleAddress: getModuleAddress,
 			}
-			classDataRaw := base64.RawStdEncoding.EncodeToString([]byte(tt.args.classData))
+			classDataRaw := Base64.EncodeToString([]byte(tt.args.classData))
 			result, err := cb.Build(classID, classURI, classDataRaw)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ClassBuilder.BuildMetadata() error = %v, wantErr %v", err, tt.wantErr)
