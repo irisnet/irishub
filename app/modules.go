@@ -37,8 +37,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	"github.com/irisnet/erc721-bridge/x/converter"
-	convertertypes "github.com/irisnet/erc721-bridge/x/converter/types"
 
 	"github.com/cosmos/ibc-go/v5/modules/apps/transfer"
 	ibctransfertypes "github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
@@ -81,6 +79,8 @@ import (
 	"github.com/evmos/ethermint/x/feemarket"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
+	"github.com/irisnet/erc721-bridge/x/converter"
+	convertertypes "github.com/irisnet/erc721-bridge/x/converter/types"
 	bridgenfttransfer "github.com/irisnet/erc721-bridge/x/nft-transfer"
 
 	irisappparams "github.com/irisnet/irishub/app/params"
@@ -324,6 +324,7 @@ func orderBeginBlockers() []string {
 
 		// erc721 bridge modules
 		convertertypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 	}
 }
 
@@ -376,6 +377,7 @@ func orderEndBlockers() []string {
 
 		// erc721 bridge modules
 		convertertypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 	}
 }
 
@@ -427,11 +429,11 @@ func orderInitBlockers() []string {
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
-		ibcnfttransfertypes.ModuleName,
-		// NOTE: crisis module must go at the end to check for invariants on each module
-		crisistypes.ModuleName,
-
 		// erc721 bridge modules
 		convertertypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
+
+		// NOTE: crisis module must go at the end to check for invariants on each module
+		crisistypes.ModuleName,
 	}
 }
