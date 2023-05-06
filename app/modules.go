@@ -67,7 +67,6 @@ import (
 	"github.com/irisnet/irismod/modules/token"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
-	nfttransfer "github.com/bianjieai/nft-transfer"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
 	tibcmttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/types"
@@ -81,6 +80,8 @@ import (
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	"github.com/evmos/ethermint/x/feemarket"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
+
+	bridgenfttransfer "github.com/irisnet/erc721-bridge/x/nft-transfer"
 
 	irisappparams "github.com/irisnet/irishub/app/params"
 	irisevm "github.com/irisnet/irishub/modules/evm"
@@ -141,12 +142,11 @@ var (
 		tibcmttransfer.AppModuleBasic{},
 		mt.AppModuleBasic{},
 
-		nfttransfer.AppModuleBasic{},
-
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
 
 		converter.AppModuleBasic{},
+		bridgenfttransfer.AppModule{},
 	)
 
 	// module account permissions
@@ -207,7 +207,6 @@ func appModules(
 		app.transferModule,
 		app.nfttransferModule,
 		app.mttransferModule,
-		app.ibcnfttransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
 		token.NewAppModule(appCodec, app.TokenKeeper, app.AccountKeeper, app.BankKeeper),
 		record.NewAppModule(appCodec, app.RecordKeeper, app.AccountKeeper, app.BankKeeper),
@@ -226,6 +225,7 @@ func appModules(
 
 		// bridge app modules
 		converter.NewAppModule(app.Erc721ConvertKeeper, app.AccountKeeper),
+		app.ibcnfttransferModule,
 	}
 }
 

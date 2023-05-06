@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/irisnet/irishub/modules/bridgenft"
+	"github.com/irisnet/irishub/modules/internft"
 
 	convertertypes "github.com/irisnet/erc721-bridge/x/converter/types"
 	"github.com/spf13/cast"
@@ -118,6 +119,8 @@ import (
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
 	converterkeeper "github.com/irisnet/erc721-bridge/x/converter/keeper"
+	bridgenfttransfer "github.com/irisnet/erc721-bridge/x/nft-transfer"
+	bridgenfttransferkeeper "github.com/irisnet/erc721-bridge/x/nft-transfer/keeper"
 
 	"github.com/irisnet/irishub/address"
 	irishubante "github.com/irisnet/irishub/ante"
@@ -213,7 +216,7 @@ type IrisApp struct {
 	transferModule       transfer.AppModule
 	nfttransferModule    tibcnfttransfer.AppModule
 	mttransferModule     tibcmttransfer.AppModule
-	ibcnfttransferModule nfttransfer.AppModule
+	ibcnfttransferModule bridgenfttransfer.AppModule
 }
 
 // NewIrisApp returns a reference to an initialized IrisApp.
@@ -283,9 +286,6 @@ func NewIrisApp(
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedNFTTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibcnfttransfertypes.ModuleName)
-
-	//TODO
-	_ = scopedNFTTransferKeeper
 
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec,
@@ -432,28 +432,6 @@ func NewIrisApp(
 	)
 	app.transferModule = transfer.NewAppModule(app.IBCTransferKeeper)
 	transferIBCModule := transfer.NewIBCModule(app.IBCTransferKeeper)
-
-	//TODO
-	// app.IBCNFTTransferKeeper = ibcnfttransferkeeper.NewKeeper(
-	// 	appCodec,
-	// 	keys[ibcnfttransfertypes.StoreKey],
-	// 	authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-	// 	app.IBCKeeper.ChannelKeeper,
-	// 	app.IBCKeeper.ChannelKeeper,
-	// 	&app.IBCKeeper.PortKeeper,
-	// 	app.AccountKeeper,
-	// 	internft.NewInterNftKeeper(appCodec, app.NFTKeeper, app.AccountKeeper),
-	// 	scopedNFTTransferKeeper,
-	// )
-	app.ibcnfttransferModule = nfttransfer.NewAppModule(app.IBCNFTTransferKeeper)
-	nfttransferIBCModule := nfttransfer.NewIBCModule(app.IBCNFTTransferKeeper)
-
-	// routerModule := router.NewAppModule(app.RouterKeeper, transferIBCModule)
-	// create static IBC router, add transfer route, then set and seal it
-	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
-		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule)
-	app.IBCKeeper.SetRouter(ibcRouter)
 
 	app.nfttransferModule = tibcnfttransfer.NewAppModule(app.TIBCNFTTransferKeeper)
 	app.mttransferModule = tibcmttransfer.NewAppModule(app.TIBCMTTransferKeeper)
@@ -602,6 +580,36 @@ func NewIrisApp(
 		app.EvmKeeper,
 		bridgenft.NewBridgeNftKeeper(appCodec, app.NFTKeeper, app.AccountKeeper),
 	)
+
+	erc721Keeper := converterkeeper.NewERC721Keeper(app.Erc721ConvertKeeper)
+	internftKeeper := internft.NewInterNftKeeper(appCodec, app.NFTKeeper, app.AccountKeeper)
+
+	nftRouter := ibcnfttransfertypes.NewRouter()
+	nftRouter.AddRoute(ibcnfttransfertypes.NativePortID, internftKeeper).
+		AddRoute(ibcnfttransfertypes.ERC721PortID, erc721Keeper)
+	nftRouter.Seal()
+
+	app.IBCNFTTransferKeeper = ibcnfttransferkeeper.NewKeeper(
+		appCodec,
+		keys[ibcnfttransfertypes.StoreKey],
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		nftRouter,
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper, scopedNFTTransferKeeper,
+	)
+
+	bridenfttransferKeeper := bridgenfttransferkeeper.NewKeeper(app.IBCNFTTransferKeeper, erc721Keeper)
+	app.ibcnfttransferModule = bridgenfttransfer.NewAppModule(nfttransfer.NewAppModule(app.IBCNFTTransferKeeper), bridenfttransferKeeper)
+	nfttransferIBCModule := bridgenfttransfer.NewIBCModule(nfttransfer.NewIBCModule(app.IBCNFTTransferKeeper), bridenfttransferKeeper)
+
+	// routerModule := router.NewAppModule(app.RouterKeeper, transferIBCModule)
+	// create static IBC router, add transfer route, then set and seal it
+	ibcRouter := porttypes.NewRouter()
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
+		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule)
+	app.IBCKeeper.SetRouter(ibcRouter)
 
 	/****  Module Options ****/
 	var skipGenesisInvariants = false
