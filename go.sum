@@ -596,8 +596,8 @@ github.com/influxdata/tdigest v0.0.0-20181121200506-bf2b5ad3c0a9/go.mod h1:Js0mq
 github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368/go.mod h1:Wbbw6tYNvwa5dlB6304Sd+82Z3f7PmVZHVKU637d4po=
 github.com/informalsystems/tendermint v0.34.26 h1:89XvVexAy62geGWxmDmdmmJvfindx+Su2oTuwfSWMeU=
 github.com/informalsystems/tendermint v0.34.26/go.mod h1:q3uAZ/t5+MblQhFuHSd4flqaLDx7iUtWpwWbwvHAFhs=
-github.com/irisnet/erc721-bridge v0.0.0-20230506033958-dea8167b02d8 h1:Xb3eSHItVrbsyPIWU0+VvRsWTLKyauDGkZIsZCKfuZo=
-github.com/irisnet/erc721-bridge v0.0.0-20230506033958-dea8167b02d8/go.mod h1:aP5h9MVTdRJSQJCtoPnhCqhNyU8IGuK0Zg8Tx5Rjbp0=
+github.com/irisnet/erc721-bridge v0.0.0-20230506084804-7f55e3da4b82 h1:8TvrqfhHBMEVQolqPF0r7YVdozLMCB3QrBME9TD5AVs=
+github.com/irisnet/erc721-bridge v0.0.0-20230506084804-7f55e3da4b82/go.mod h1:aP5h9MVTdRJSQJCtoPnhCqhNyU8IGuK0Zg8Tx5Rjbp0=
 github.com/irisnet/irismod v1.7.3 h1:+U1sH5CS6i3d08xXD6ZnSnKspuF6LqIH10AFg9rOakc=
 github.com/irisnet/irismod v1.7.3/go.mod h1:B9WxUyCBkMRSaQ+LxXGKhyAPCXDaoXBv8/4T5SH1xR8=
 github.com/jackpal/go-nat-pmp v1.0.2 h1:KzKSgb7qkJvOUTqYl9/Hg/me3pWgBmERKrTGD7BdWus=
