@@ -65,6 +65,8 @@ import (
 	"github.com/irisnet/irismod/modules/token"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
+	nfttransfer "github.com/bianjieai/nft-transfer"
+	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
 	tibcmttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/types"
 	tibcnfttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer"
@@ -137,6 +139,8 @@ var (
 		tibcmttransfer.AppModuleBasic{},
 		mt.AppModuleBasic{},
 
+		nfttransfer.AppModuleBasic{},
+
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
 	)
@@ -197,6 +201,7 @@ func appModules(
 		app.transferModule,
 		app.nfttransferModule,
 		app.mttransferModule,
+		app.ibcnfttransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
 		token.NewAppModule(appCodec, app.TokenKeeper, app.AccountKeeper, app.BankKeeper),
 		record.NewAppModule(appCodec, app.RecordKeeper, app.AccountKeeper, app.BankKeeper),
@@ -407,6 +412,7 @@ func orderInitBlockers() []string {
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 		// NOTE: crisis module must go at the end to check for invariants on each module
 		crisistypes.ModuleName,
 	}
