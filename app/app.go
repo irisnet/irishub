@@ -638,7 +638,7 @@ func NewIrisApp(
 		bridgenft.NewBridgeNftKeeper(appCodec, app.NFTKeeper, app.AccountKeeper),
 	)
 
-	erc721Keeper := converterkeeper.NewERC721Keeper(app.Erc721ConvertKeeper)
+	erc721Keeper := app.Erc721ConvertKeeper.ERC721Keeper()
 	internftKeeper := internft.NewInterNftKeeper(appCodec, app.NFTKeeper, app.AccountKeeper)
 
 	nftRouter := ibcnfttransfertypes.NewRouter()
@@ -664,7 +664,6 @@ func NewIrisApp(
 	app.ibcnfttransferModule = bridgenfttransfer.NewAppModule(
 		nfttransfer.NewAppModule(app.IBCNFTTransferKeeper),
 		bridenfttransferKeeper,
-		QueryTokenTrace,
 	)
 	nfttransferIBCModule := bridgenfttransfer.NewIBCModule(
 		nfttransfer.NewIBCModule(app.IBCNFTTransferKeeper),
