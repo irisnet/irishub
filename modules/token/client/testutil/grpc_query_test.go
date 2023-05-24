@@ -82,7 +82,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	)
 
 	//------test GetCmdQueryTokens()-------------
-	url := fmt.Sprintf("%s/irismod/token/tokens", baseURL)
+	url := fmt.Sprintf("%s/irismod/token/v1/tokens", baseURL)
 	resp, err := testutil.GetRequest(url)
 	respType := proto.Message(&v1.QueryTokensResponse{})
 	s.Require().NoError(err)
@@ -91,7 +91,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().Equal(2, len(tokensResp.Tokens))
 
 	//------test GetCmdQueryToken()-------------
-	url = fmt.Sprintf("%s/irismod/token/tokens/%s", baseURL, tokenSymbol)
+	url = fmt.Sprintf("%s/irismod/token/v1/tokens/%s", baseURL, tokenSymbol)
 	resp, err = testutil.GetRequest(url)
 	respType = proto.Message(&v1.QueryTokenResponse{})
 	var token v1.TokenI
@@ -105,7 +105,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().Equal(uint64(initialSupply), token.GetInitialSupply())
 
 	//------test GetCmdQueryFee()-------------
-	url = fmt.Sprintf("%s/irismod/token/tokens/%s/fees", baseURL, tokenSymbol)
+	url = fmt.Sprintf("%s/irismod/token/v1/tokens/%s/fees", baseURL, tokenSymbol)
 	resp, err = testutil.GetRequest(url)
 	respType = proto.Message(&v1.QueryFeesResponse{})
 	s.Require().NoError(err)
@@ -116,7 +116,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().Equal(expectedFeeResp, string(result))
 
 	//------test GetCmdQueryParams()-------------
-	url = fmt.Sprintf("%s/irismod/token/params", baseURL)
+	url = fmt.Sprintf("%s/irismod/token/v1/params", baseURL)
 	resp, err = testutil.GetRequest(url)
 	respType = proto.Message(&v1.QueryParamsResponse{})
 	s.Require().NoError(err)

@@ -169,17 +169,27 @@ func NewConfig() network.Config {
 	cfg.TxConfig = encCfg.TxConfig
 	cfg.LegacyAmino = encCfg.Amino
 	cfg.InterfaceRegistry = encCfg.InterfaceRegistry
-	cfg.AppConstructor = SimAppConstructor
+	cfg.AppConstructor = func(val network.ValidatorI) servertypes.Application {
+		return NewSimApp(
+			val.GetCtx().Logger,
+			dbm.NewMemDB(),
+			nil,
+			true,
+			EmptyAppOptions{},
+			bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
+			bam.SetChainID(cfg.ChainID),
+		)
+	}
 	cfg.GenesisState = NewDefaultGenesisState(cfg.Codec)
 	return cfg
 }
 
-func SimAppConstructor(val network.ValidatorI) servertypes.Application {
-	return NewSimApp(
-		val.GetCtx().Logger, dbm.NewMemDB(), nil, true, EmptyAppOptions{},
-		bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
-	)
-}
+// func SimAppConstructor(val network.ValidatorI) servertypes.Application {
+// 	return NewSimApp(
+// 		val.GetCtx().Logger, dbm.NewMemDB(), nil, true, EmptyAppOptions{},
+// 		bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
+// 	)
+// }
 
 func genesisStateWithValSet(t *testing.T,
 	app *SimApp, genesisState GenesisState,

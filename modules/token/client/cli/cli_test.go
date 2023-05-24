@@ -124,14 +124,16 @@ func (s *IntegrationTestSuite) TestToken() {
 			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
 		),
 	}
+	coinMintedStr := fmt.Sprintf("%d%s", mintAmount, symbol)
 
 	txResult = tokentestutil.MintTokenExec(
 		s.T(),
 		s.network,
 		clientCtx,
 		from.String(),
-		symbol,
-		args...)
+		coinMintedStr,
+		args...,
+	)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	balance = simapp.QueryBalanceExec(
@@ -158,12 +160,13 @@ func (s *IntegrationTestSuite) TestToken() {
 		),
 	}
 
+	coinBurntStr := fmt.Sprintf("%d%s", burnAmount, symbol)
 	txResult = tokentestutil.BurnTokenExec(
 		s.T(),
 		s.network,
 		clientCtx,
 		from.String(),
-		symbol,
+		coinBurntStr,
 		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
