@@ -7,9 +7,9 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/tendermint/tendermint/crypto"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	"github.com/cometbft/cometbft/crypto"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -53,7 +53,12 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.app = app
 
-	suite.keeper = keeper.NewKeeper(app.AppCodec(), app.GetKey(types.StoreKey), app.GetSubspace(types.ModuleName), NewMockServiceKeeper())
+	suite.keeper = keeper.NewKeeper(
+		app.AppCodec(),
+		app.GetKey(types.StoreKey),
+		app.GetSubspace(types.ModuleName),
+		NewMockServiceKeeper(),
+	)
 }
 
 func TestKeeperTestSuite(t *testing.T) {
@@ -224,22 +229,34 @@ func NewMockServiceKeeper() MockServiceKeeper {
 	}
 }
 
-func (m MockServiceKeeper) RegisterStateCallback(moduleName string, stateCallback exported.StateCallback) error {
+func (m MockServiceKeeper) RegisterStateCallback(
+	moduleName string,
+	stateCallback exported.StateCallback,
+) error {
 	m.stateCallbackMap[moduleName] = stateCallback
 	return nil
 }
 
-func (m MockServiceKeeper) RegisterResponseCallback(moduleName string, respCallback exported.ResponseCallback) error {
+func (m MockServiceKeeper) RegisterResponseCallback(
+	moduleName string,
+	respCallback exported.ResponseCallback,
+) error {
 	m.callbackMap[moduleName] = respCallback
 	return nil
 }
 
-func (m MockServiceKeeper) RegisterModuleService(moduleName string, moduleService *exported.ModuleService) error {
+func (m MockServiceKeeper) RegisterModuleService(
+	moduleName string,
+	moduleService *exported.ModuleService,
+) error {
 	m.moduleServiceMap[moduleName] = moduleService
 	return nil
 }
 
-func (m MockServiceKeeper) GetRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes) (exported.RequestContext, bool) {
+func (m MockServiceKeeper) GetRequestContext(
+	ctx sdk.Context,
+	requestContextID tmbytes.HexBytes,
+) (exported.RequestContext, bool) {
 	reqCtx, ok := m.cxtMap[strings.ToUpper(hex.EncodeToString(requestContextID))]
 	return reqCtx, ok
 }
@@ -297,7 +314,11 @@ func (m MockServiceKeeper) UpdateRequestContext(
 	return nil
 }
 
-func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes, consumer sdk.AccAddress) error {
+func (m MockServiceKeeper) StartRequestContext(
+	ctx sdk.Context,
+	requestContextID tmbytes.HexBytes,
+	consumer sdk.AccAddress,
+) error {
 	reqCtx := m.cxtMap[strings.ToUpper(hex.EncodeToString(requestContextID))]
 	callback := m.callbackMap[reqCtx.ModuleName]
 	reqCtx.State = servicetypes.RUNNING
@@ -306,7 +327,11 @@ func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID
 	return nil
 }
 
-func (m MockServiceKeeper) PauseRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes, consumer sdk.AccAddress) error {
+func (m MockServiceKeeper) PauseRequestContext(
+	ctx sdk.Context,
+	requestContextID tmbytes.HexBytes,
+	consumer sdk.AccAddress,
+) error {
 	reqCtx := m.cxtMap[strings.ToUpper(hex.EncodeToString(requestContextID))]
 	reqCtx.State = exported.PAUSED
 	m.cxtMap[strings.ToUpper(hex.EncodeToString(requestContextID))] = reqCtx

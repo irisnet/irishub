@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strconv"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	rpcclient "github.com/tendermint/tendermint/rpc/client"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
+	rpcclient "github.com/cometbft/cometbft/rpc/client"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -44,7 +44,11 @@ func QueryRequestContext(
 }
 
 // QueryRequestContextByTxQuery will query for a single request context via a direct txs tags query.
-func QueryRequestContextByTxQuery(cliCtx client.Context, queryRoute string, params types.QueryRequestContextRequest) (
+func QueryRequestContextByTxQuery(
+	cliCtx client.Context,
+	queryRoute string,
+	params types.QueryRequestContextRequest,
+) (
 	requestContext types.RequestContext, err error) {
 	requestContextId, err := hex.DecodeString(params.RequestContextId)
 	if err != nil {
@@ -211,7 +215,12 @@ func QueryResponseByTxQuery(
 ) {
 
 	events := []string{
-		fmt.Sprintf("%s.%s='%s'", types.EventTypeRespondService, types.AttributeKeyRequestID, []byte(fmt.Sprintf("%d", requestID))),
+		fmt.Sprintf(
+			"%s.%s='%s'",
+			types.EventTypeRespondService,
+			types.AttributeKeyRequestID,
+			[]byte(fmt.Sprintf("%d", requestID)),
+		),
 	}
 
 	// NOTE: SearchTxs is used to facilitate the txs query which does not currently

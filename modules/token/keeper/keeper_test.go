@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	"github.com/cometbft/cometbft/crypto/tmhash"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -122,7 +122,16 @@ func (suite *KeeperTestSuite) TestEditToken() {
 	newToken, err := suite.keeper.GetToken(suite.ctx, symbol)
 	suite.NoError(err)
 
-	expToken := v1.NewToken("btc", "Bitcoin Token", "satoshi", 18, 21000000, 22000000, mintable.ToBool(), owner)
+	expToken := v1.NewToken(
+		"btc",
+		"Bitcoin Token",
+		"satoshi",
+		18,
+		21000000,
+		22000000,
+		mintable.ToBool(),
+		owner,
+	)
 
 	suite.EqualValues(newToken.(*v1.Token), &expToken)
 }
@@ -151,7 +160,12 @@ func (suite *KeeperTestSuite) TestMintToken() {
 	token = v1.NewToken("atom", "Cosmos Hub", "uatom", 6, 1000, 2000, true, sdk.AccAddress{})
 	suite.issueToken(token)
 
-	err = suite.keeper.MintToken(suite.ctx, sdk.NewCoin(token.MinUnit, sdkmath.OneInt()), owner, sdk.AccAddress{})
+	err = suite.keeper.MintToken(
+		suite.ctx,
+		sdk.NewCoin(token.MinUnit, sdkmath.OneInt()),
+		owner,
+		sdk.AccAddress{},
+	)
 	suite.NoError(err)
 }
 
@@ -212,7 +226,12 @@ func (suite *KeeperTestSuite) TestSwapFeeToken() {
 
 	feePaid := sdk.NewCoin(token1.MinUnit, sdkmath.NewIntWithDecimal(100, int(token1.Scale)))
 
-	_, feeGot, err := suite.keeper.SwapFeeToken(suite.ctx, feePaid, token1.GetOwner(), token2.GetOwner())
+	_, feeGot, err := suite.keeper.SwapFeeToken(
+		suite.ctx,
+		feePaid,
+		token1.GetOwner(),
+		token2.GetOwner(),
+	)
 	suite.NoError(err)
 	suite.Equal("100000000000000000000t2min", feeGot.String())
 
@@ -223,7 +242,12 @@ func (suite *KeeperTestSuite) TestSwapFeeToken() {
 	suite.Equal("100000000000000000000t2min", amt.String())
 
 	//reverse test
-	_, feeGot, err = suite.keeper.SwapFeeToken(suite.ctx, feeGot, token2.GetOwner(), token1.GetOwner())
+	_, feeGot, err = suite.keeper.SwapFeeToken(
+		suite.ctx,
+		feeGot,
+		token2.GetOwner(),
+		token1.GetOwner(),
+	)
 	suite.NoError(err)
 	suite.Equal("100000000t1min", feeGot.String())
 

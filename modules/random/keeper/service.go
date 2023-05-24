@@ -5,7 +5,7 @@ import (
 
 	"github.com/tidwall/gjson"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -16,7 +16,11 @@ import (
 )
 
 // RequestService requests the service for the oracle seed
-func (k Keeper) RequestService(ctx sdk.Context, consumer sdk.AccAddress, serviceFeeCap sdk.Coins) (tmbytes.HexBytes, error) {
+func (k Keeper) RequestService(
+	ctx sdk.Context,
+	consumer sdk.AccAddress,
+	serviceFeeCap sdk.Coins,
+) (tmbytes.HexBytes, error) {
 	iterator := k.serviceKeeper.ServiceBindingsIterator(ctx, types.ServiceName)
 	defer iterator.Close()
 
@@ -48,8 +52,19 @@ func (k Keeper) RequestService(ctx sdk.Context, consumer sdk.AccAddress, service
 	timeout := k.serviceKeeper.GetParams(ctx).MaxRequestTimeout
 
 	return k.serviceKeeper.CreateRequestContext(
-		ctx, types.ServiceName, []sdk.AccAddress{provider}, consumer, `{"header":{}}`, serviceFeeCap,
-		timeout, false, 0, 0, exported.PAUSED, 1, types.ModuleName,
+		ctx,
+		types.ServiceName,
+		[]sdk.AccAddress{provider},
+		consumer,
+		`{"header":{}}`,
+		serviceFeeCap,
+		timeout,
+		false,
+		0,
+		0,
+		exported.PAUSED,
+		1,
+		types.ModuleName,
 	)
 }
 
@@ -62,7 +77,11 @@ func (k Keeper) StartRequestContext(
 	return k.serviceKeeper.StartRequestContext(ctx, serviceContextID, consumer)
 }
 
-func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID tmbytes.HexBytes, err string) {
+func (k Keeper) HandlerStateChanged(
+	ctx sdk.Context,
+	requestContextID tmbytes.HexBytes,
+	err string,
+) {
 	reqCtx, existed := k.serviceKeeper.GetRequestContext(ctx, requestContextID)
 	if !existed {
 		ctx.Logger().Error(
@@ -80,7 +99,12 @@ func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID tmbytes.He
 }
 
 // HandlerResponse is responsible for processing the data returned from the service module
-func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID tmbytes.HexBytes, responseOutput []string, err error) {
+func (k Keeper) HandlerResponse(
+	ctx sdk.Context,
+	requestContextID tmbytes.HexBytes,
+	responseOutput []string,
+	err error,
+) {
 	if len(responseOutput) == 0 || err != nil {
 		ctx.Logger().Error(
 			"respond service failed",
@@ -139,7 +163,11 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID tmbytes.HexByt
 	// generate a random number
 	consumer, _ := sdk.AccAddressFromBech32(request.Consumer)
 	random := types.MakePRNG(lastBlockHash, currentTimestamp, consumer, seed, true).GetRand()
-	k.SetRandom(ctx, reqID, types.NewRandom(request.TxHash, lastBlockHeight, random.FloatString(types.RandPrec)))
+	k.SetRandom(
+		ctx,
+		reqID,
+		types.NewRandom(request.TxHash, lastBlockHeight, random.FloatString(types.RandPrec)),
+	)
 
 	k.DeleteOracleRandRequest(ctx, requestContextID)
 
@@ -153,7 +181,10 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID tmbytes.HexByt
 }
 
 // GetRequestContext retrieves the request context by the specified request context id
-func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes) (exported.RequestContext, bool) {
+func (k Keeper) GetRequestContext(
+	ctx sdk.Context,
+	requestContextID tmbytes.HexBytes,
+) (exported.RequestContext, bool) {
 	return k.serviceKeeper.GetRequestContext(ctx, requestContextID)
 }
 

@@ -4,8 +4,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
+	"github.com/cometbft/cometbft/crypto"
+	"github.com/cometbft/cometbft/crypto/secp256k1"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -13,7 +13,13 @@ import (
 )
 
 var (
-	DenomMap                    = map[int]string{0: "htltbtc", 1: "htlteth", 2: "htltbnb", 3: "htltxrp", 4: "htltdai"}
+	DenomMap = map[int]string{
+		0: "htltbtc",
+		1: "htlteth",
+		2: "htltbnb",
+		3: "htltxrp",
+		4: "htltdai",
+	}
 	TestDeputy                  = sdk.AccAddress(crypto.AddressHash([]byte("TestDeputy")))
 	TestUser1                   = sdk.AccAddress(crypto.AddressHash([]byte("TestUser1")))
 	TestUser2                   = sdk.AccAddress(crypto.AddressHash([]byte("TestUser2")))

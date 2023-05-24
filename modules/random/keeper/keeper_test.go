@@ -8,8 +8,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/tendermint/tendermint/crypto"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	"github.com/cometbft/cometbft/crypto"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -21,10 +21,12 @@ import (
 
 // define testing variables
 var (
-	testTxBytes          = []byte("test_tx")
-	testHeight           = int64(10000)
-	testBlockInterval    = uint64(100)
-	testConsumer, _      = sdk.AccAddressFromHexUnsafe(crypto.AddressHash([]byte("test_consumer")).String())
+	testTxBytes       = []byte("test_tx")
+	testHeight        = int64(10000)
+	testBlockInterval = uint64(100)
+	testConsumer, _   = sdk.AccAddressFromHexUnsafe(
+		crypto.AddressHash([]byte("test_consumer")).String(),
+	)
 	testReqID            = []byte("test_req_id")
 	testRandomNumerator  = int64(3)
 	testRandomDenomiator = int64(4)
@@ -71,13 +73,29 @@ func (suite *KeeperTestSuite) TestSetRandom() {
 func (suite *KeeperTestSuite) TestRequestRandom() {
 	suite.ctx = suite.ctx.WithBlockHeight(testHeight).WithTxBytes(testTxBytes)
 
-	request, err := suite.keeper.RequestRandom(suite.ctx, testConsumer, testBlockInterval, false, nil)
+	request, err := suite.keeper.RequestRandom(
+		suite.ctx,
+		testConsumer,
+		testBlockInterval,
+		false,
+		nil,
+	)
 	suite.NoError(err)
 
-	expectedRequest := types.NewRequest(testHeight, testConsumer.String(), hex.EncodeToString(types.SHA256(testTxBytes)), false, nil, "")
+	expectedRequest := types.NewRequest(
+		testHeight,
+		testConsumer.String(),
+		hex.EncodeToString(types.SHA256(testTxBytes)),
+		false,
+		nil,
+		"",
+	)
 	suite.Equal(request, expectedRequest)
 
-	iterator := suite.keeper.IterateRandomRequestQueueByHeight(suite.ctx, testHeight+int64(testBlockInterval))
+	iterator := suite.keeper.IterateRandomRequestQueueByHeight(
+		suite.ctx,
+		testHeight+int64(testBlockInterval),
+	)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {

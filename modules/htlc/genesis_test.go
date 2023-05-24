@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -353,10 +353,13 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 				if tc.expectPass {
 					suite.NotPanics(
 						func() {
-							simapp.SetupWithGenesisStateFn(suite.T(), func(cdc codec.Codec, state simapp.GenesisState) simapp.GenesisState {
-								state[types.ModuleName] = cdc.MustMarshalJSON(tc.genState())
-								return state
-							})
+							simapp.SetupWithGenesisStateFn(
+								suite.T(),
+								func(cdc codec.Codec, state simapp.GenesisState) simapp.GenesisState {
+									state[types.ModuleName] = cdc.MustMarshalJSON(tc.genState())
+									return state
+								},
+							)
 						},
 						tc.name,
 					)

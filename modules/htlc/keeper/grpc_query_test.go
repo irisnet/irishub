@@ -8,8 +8,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -35,10 +35,13 @@ type QueryTestSuite struct {
 }
 
 func (suite *QueryTestSuite) SetupTest() {
-	app := simapp.SetupWithGenesisStateFn(suite.T(), func(cdc codec.Codec, state simapp.GenesisState) simapp.GenesisState {
-		state[types.ModuleName] = cdc.MustMarshalJSON(NewHTLTGenesis(TestDeputy))
-		return state
-	})
+	app := simapp.SetupWithGenesisStateFn(
+		suite.T(),
+		func(cdc codec.Codec, state simapp.GenesisState) simapp.GenesisState {
+			state[types.ModuleName] = cdc.MustMarshalJSON(NewHTLTGenesis(TestDeputy))
+			return state
+		},
+	)
 
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{Height: 1, Time: time.Now()})
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
@@ -91,7 +94,10 @@ func TestQueryTestSuite(t *testing.T) {
 }
 
 func (suite *QueryTestSuite) TestQueryAssetSupply() {
-	supplyResp, err := suite.queryClient.AssetSupply(gocontext.Background(), &types.QueryAssetSupplyRequest{Denom: "htltbnb"})
+	supplyResp, err := suite.queryClient.AssetSupply(
+		gocontext.Background(),
+		&types.QueryAssetSupplyRequest{Denom: "htltbnb"},
+	)
 	suite.Require().NoError(err)
 
 	expected, found := suite.keeper.GetAssetSupply(suite.ctx, "htltbnb")
@@ -100,7 +106,10 @@ func (suite *QueryTestSuite) TestQueryAssetSupply() {
 }
 
 func (suite *QueryTestSuite) TestQueryAssetSupplies() {
-	suppliesResp, err := suite.queryClient.AssetSupplies(gocontext.Background(), &types.QueryAssetSuppliesRequest{})
+	suppliesResp, err := suite.queryClient.AssetSupplies(
+		gocontext.Background(),
+		&types.QueryAssetSuppliesRequest{},
+	)
 	suite.Require().NoError(err)
 
 	expected := suite.keeper.GetAllAssetSupplies(suite.ctx)
@@ -108,7 +117,10 @@ func (suite *QueryTestSuite) TestQueryAssetSupplies() {
 }
 
 func (suite *QueryTestSuite) TestQueryHTLC() {
-	htlcResp, err := suite.queryClient.HTLC(gocontext.Background(), &types.QueryHTLCRequest{Id: suite.htlcIDs[0].String()})
+	htlcResp, err := suite.queryClient.HTLC(
+		gocontext.Background(),
+		&types.QueryHTLCRequest{Id: suite.htlcIDs[0].String()},
+	)
 	suite.Require().NoError(err)
 
 	expected, found := suite.keeper.GetHTLC(suite.ctx, suite.htlcIDs[0])

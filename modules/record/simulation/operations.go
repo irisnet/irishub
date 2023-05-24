@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	simappparams "cosmossdk.io/simapp/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -56,7 +56,11 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 
 		record, err := genRecord(r, accs)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateRecord, err.Error()), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.EventTypeCreateRecord,
+				err.Error(),
+			), nil, err
 		}
 
 		creator, _ := sdk.AccAddressFromBech32(record.Creator)
@@ -64,7 +68,14 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 
 		simAccount, found := simtypes.FindAccount(accs, creator)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateRecord, "creator not found"), nil, fmt.Errorf("account %s not found", record.Creator)
+			return simtypes.NoOpMsg(
+					types.ModuleName,
+					types.EventTypeCreateRecord,
+					"creator not found",
+				), nil, fmt.Errorf(
+					"account %s not found",
+					record.Creator,
+				)
 		}
 
 		account := ak.GetAccount(ctx, creator)
@@ -72,7 +83,11 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateRecord, err.Error()), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.EventTypeCreateRecord,
+				err.Error(),
+			), nil, err
 		}
 		txConfig := simappparams.MakeTestEncodingConfig().TxConfig
 		tx, _ := irishelpers.GenTx(
@@ -88,7 +103,11 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 		)
 
 		if _, _, err = app.SimDeliver(txConfig.TxEncoder(), tx); err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateRecord, err.Error()), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.EventTypeCreateRecord,
+				err.Error(),
+			), nil, err
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "simulate issue token", nil), nil, nil

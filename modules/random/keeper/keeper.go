@@ -3,7 +3,7 @@ package keeper
 import (
 	"encoding/hex"
 
-	"github.com/tendermint/tendermint/libs/log"
+	"github.com/cometbft/cometbft/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -22,7 +22,12 @@ type Keeper struct {
 }
 
 // NewKeeper returns a new random keeper
-func NewKeeper(cdc codec.Codec, key storetypes.StoreKey, bankKeeper types.BankKeeper, serviceKeeper types.ServiceKeeper) Keeper {
+func NewKeeper(
+	cdc codec.Codec,
+	key storetypes.StoreKey,
+	bankKeeper types.BankKeeper,
+	serviceKeeper types.ServiceKeeper,
+) Keeper {
 	keeper := Keeper{
 		cdc:           cdc,
 		storeKey:      key,
@@ -66,7 +71,14 @@ func (k Keeper) RequestRandom(
 		}
 
 		// build request
-		request = types.NewRequest(currentHeight, consumer.String(), hex.EncodeToString(txHash), oracle, serviceFeeCap, requestContextID.String())
+		request = types.NewRequest(
+			currentHeight,
+			consumer.String(),
+			hex.EncodeToString(txHash),
+			oracle,
+			serviceFeeCap,
+			requestContextID.String(),
+		)
 	} else {
 		// build request
 		request = types.NewRequest(currentHeight, consumer.String(), hex.EncodeToString(txHash), oracle, nil, "")
@@ -89,7 +101,12 @@ func (k Keeper) SetRandom(ctx sdk.Context, reqID []byte, random types.Random) {
 }
 
 // EnqueueRandomRequest enqueues the random number request
-func (k Keeper) EnqueueRandomRequest(ctx sdk.Context, height int64, reqID []byte, request types.Request) {
+func (k Keeper) EnqueueRandomRequest(
+	ctx sdk.Context,
+	height int64,
+	reqID []byte,
+	request types.Request,
+) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&request)
 	store.Set(types.KeyRandomRequestQueue(height, reqID), bz)
@@ -102,19 +119,29 @@ func (k Keeper) DequeueRandomRequest(ctx sdk.Context, height int64, reqID []byte
 }
 
 // SetOracleRandRequest stores the oracle random number request
-func (k Keeper) SetOracleRandRequest(ctx sdk.Context, requestContextID []byte, request types.Request) {
+func (k Keeper) SetOracleRandRequest(
+	ctx sdk.Context,
+	requestContextID []byte,
+	request types.Request,
+) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&request)
 	store.Set(types.KeyOracleRandomRequest(requestContextID), bz)
 }
 
 // GetOracleRandRequest retrieves the oracle random number request by the specified request id
-func (k Keeper) GetOracleRandRequest(ctx sdk.Context, requestContextID []byte) (types.Request, error) {
+func (k Keeper) GetOracleRandRequest(
+	ctx sdk.Context,
+	requestContextID []byte,
+) (types.Request, error) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := store.Get(types.KeyOracleRandomRequest(requestContextID))
 	if bz == nil {
-		return types.Request{}, sdkerrors.Wrap(types.ErrInvalidRequestContextID, hex.EncodeToString(requestContextID))
+		return types.Request{}, sdkerrors.Wrap(
+			types.ErrInvalidRequestContextID,
+			hex.EncodeToString(requestContextID),
+		)
 	}
 
 	var request types.Request
@@ -168,7 +195,10 @@ func (k Keeper) IterateRandomRequestQueueByHeight(ctx sdk.Context, height int64)
 }
 
 // IterateRandomRequestQueue iterates through the random number request queue
-func (k Keeper) IterateRandomRequestQueue(ctx sdk.Context, op func(h int64, reqID []byte, r types.Request) (stop bool)) {
+func (k Keeper) IterateRandomRequestQueue(
+	ctx sdk.Context,
+	op func(h int64, reqID []byte, r types.Request) (stop bool),
+) {
 	store := ctx.KVStore(k.storeKey)
 
 	iterator := sdk.KVStorePrefixIterator(store, types.RandomRequestQueueKey)

@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -12,7 +12,12 @@ import (
 // RegisterModuleService registers a module service
 func (k Keeper) RegisterModuleService(moduleName string, moduleService *types.ModuleService) error {
 	if _, ok := k.moduleServices[moduleName]; ok {
-		return sdkerrors.Wrapf(types.ErrModuleServiceRegistered, "%s already registered for module %s", "module service", moduleName)
+		return sdkerrors.Wrapf(
+			types.ErrModuleServiceRegistered,
+			"%s already registered for module %s",
+			"module service",
+			moduleName,
+		)
 	}
 
 	k.SetModuleService(moduleName, moduleService)
@@ -32,7 +37,9 @@ func (k Keeper) GetModuleServiceByModuleName(moduleName string) (*types.ModuleSe
 	return k.moduleServices[moduleName], true
 }
 
-func (k Keeper) GetModuleServiceByServiceName(serviceName string) (string, *types.ModuleService, bool) {
+func (k Keeper) GetModuleServiceByServiceName(
+	serviceName string,
+) (string, *types.ModuleService, bool) {
 	for moduleName, mdouleSvc := range k.moduleServices {
 		if mdouleSvc.ServiceName == serviceName {
 			return moduleName, mdouleSvc, true
@@ -59,7 +66,11 @@ func (k Keeper) RequestModuleService(
 	for i, provider := range requestContext.Providers {
 		pd, err := sdk.AccAddressFromBech32(provider)
 		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid provider address: %s", provider)
+			return sdkerrors.Wrapf(
+				sdkerrors.ErrInvalidAddress,
+				"invalid provider address: %s",
+				provider,
+			)
 		}
 		pds[i] = pd
 	}
@@ -80,7 +91,12 @@ func (k Keeper) RequestModuleService(
 		return err
 	}
 
-	requestIDs := k.InitiateRequests(ctx, reqContextID, []sdk.AccAddress{moduleService.Provider}, make(map[string][]string))
+	requestIDs := k.InitiateRequests(
+		ctx,
+		reqContextID,
+		[]sdk.AccAddress{moduleService.Provider},
+		make(map[string][]string),
+	)
 
 	result, output := moduleService.ReuquestService(ctx, input)
 	request, _, err := k.AddResponse(ctx, requestIDs[0], moduleService.Provider, result, output)

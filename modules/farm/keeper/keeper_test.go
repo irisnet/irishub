@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"testing"
 
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -259,27 +259,37 @@ func (suite *KeeperTestSuite) TestStake() {
 			rewardPerShare: sdk.ZeroDec(),
 		},
 		{
-			height:         200,
-			stakeCoin:      lpToken,
-			locked:         lpToken.Amount.MulRaw(2),
-			expectReward:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000))),
-			debt:           sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(200_000_000))),
+			height:    200,
+			stakeCoin: lpToken,
+			locked:    lpToken.Amount.MulRaw(2),
+			expectReward: sdk.NewCoins(
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000)),
+			),
+			debt: sdk.NewCoins(
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(200_000_000)),
+			),
 			rewardPerShare: sdk.NewDecFromIntWithPrec(sdk.NewInt(1), 0),
 		},
 		{
-			height:         300,
-			stakeCoin:      lpToken,
-			locked:         lpToken.Amount.MulRaw(3),
-			expectReward:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000))),
-			debt:           sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(450_000_000))),
+			height:    300,
+			stakeCoin: lpToken,
+			locked:    lpToken.Amount.MulRaw(3),
+			expectReward: sdk.NewCoins(
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000)),
+			),
+			debt: sdk.NewCoins(
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(450_000_000)),
+			),
 			rewardPerShare: sdk.NewDecFromIntWithPrec(sdk.NewInt(15), 1),
 		},
 		{
-			height:         400,
-			stakeCoin:      lpToken,
-			locked:         lpToken.Amount.MulRaw(4),
-			expectReward:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(99999999))),
-			debt:           sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(733_333_333))),
+			height:       400,
+			stakeCoin:    lpToken,
+			locked:       lpToken.Amount.MulRaw(4),
+			expectReward: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(99999999))),
+			debt: sdk.NewCoins(
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(733_333_333)),
+			),
 			rewardPerShare: sdk.NewDecFromIntWithPrec(sdk.NewInt(1_833_333_333_333_333_333), 18),
 		},
 	}
@@ -375,31 +385,47 @@ func (suite *KeeperTestSuite) TestHarvest() {
 
 	var testcase = []args{
 		{
-			index:          1,
-			height:         200,
-			expectReward:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000))),
-			debt:           sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000))),
+			index:  1,
+			height: 200,
+			expectReward: sdk.NewCoins(
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000)),
+			),
+			debt: sdk.NewCoins(
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000)),
+			),
 			rewardPerShare: sdk.NewDecFromIntWithPrec(sdk.NewInt(1), 0),
 		},
 		{
-			index:          2,
-			height:         300,
-			expectReward:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000))),
-			debt:           sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(200_000_000))),
+			index:  2,
+			height: 300,
+			expectReward: sdk.NewCoins(
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000)),
+			),
+			debt: sdk.NewCoins(
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(200_000_000)),
+			),
 			rewardPerShare: sdk.NewDecFromIntWithPrec(sdk.NewInt(2), 0),
 		},
 		{
-			index:          3,
-			height:         400,
-			expectReward:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000))),
-			debt:           sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(300_000_000))),
+			index:  3,
+			height: 400,
+			expectReward: sdk.NewCoins(
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000)),
+			),
+			debt: sdk.NewCoins(
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(300_000_000)),
+			),
 			rewardPerShare: sdk.NewDecFromIntWithPrec(sdk.NewInt(3), 0),
 		},
 		{
-			index:          4,
-			height:         500,
-			expectReward:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000))),
-			debt:           sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(400_000_000))),
+			index:  4,
+			height: 500,
+			expectReward: sdk.NewCoins(
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000)),
+			),
+			debt: sdk.NewCoins(
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(400_000_000)),
+			),
 			rewardPerShare: sdk.NewDecFromIntWithPrec(sdk.NewInt(4), 0),
 		},
 	}
@@ -472,7 +498,8 @@ func (suite *KeeperTestSuite) AssertUnstake(
 	//check farm pool
 	pool, exist := suite.keeper.GetPool(ctx, poolId)
 	suite.Require().True(exist)
-	suite.Require().Equal(pool.TotalLptLocked.String(), poolSrc.TotalLptLocked.Sub(unstakeCoin).String())
+	suite.Require().
+		Equal(pool.TotalLptLocked.String(), poolSrc.TotalLptLocked.Sub(unstakeCoin).String())
 
 	//check reward rules again
 	rules := suite.keeper.GetRewardRules(ctx, poolId)

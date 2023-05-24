@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	"github.com/cometbft/cometbft/crypto/tmhash"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 )
 
 func TestIDGenerate(t *testing.T) {
@@ -21,8 +21,15 @@ func TestIDGenerate(t *testing.T) {
 	requestContextBatchCounter := uint64(math.MaxUint64)
 	requestHeight := int64(math.MaxInt64)
 	batchRequestIndex := int16(math.MaxInt16)
-	requestID := GenerateRequestID(contextID, requestContextBatchCounter, requestHeight, batchRequestIndex)
-	contextID1, requestContextBatchCounter1, requestHeight1, batchRequestIndex1, _ := SplitRequestID(requestID)
+	requestID := GenerateRequestID(
+		contextID,
+		requestContextBatchCounter,
+		requestHeight,
+		batchRequestIndex,
+	)
+	contextID1, requestContextBatchCounter1, requestHeight1, batchRequestIndex1, _ := SplitRequestID(
+		requestID,
+	)
 	require.Equal(t, contextID, contextID1)
 	require.Equal(t, requestContextBatchCounter, requestContextBatchCounter1)
 	require.Equal(t, requestHeight, requestHeight1)

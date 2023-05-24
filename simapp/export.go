@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"log"
 
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/irisnet/irismod/modules/htlc"
 	"github.com/irisnet/irismod/modules/oracle"
 	"github.com/irisnet/irismod/modules/random"
 	"github.com/irisnet/irismod/modules/service"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -77,10 +77,13 @@ func (app *SimApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []
 	/* Handle fee distribution state. */
 
 	// withdraw all validator commission
-	app.StakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
-		_, _ = app.DistrKeeper.WithdrawValidatorCommission(ctx, val.GetOperator())
-		return false
-	})
+	app.StakingKeeper.IterateValidators(
+		ctx,
+		func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
+			_, _ = app.DistrKeeper.WithdrawValidatorCommission(ctx, val.GetOperator())
+			return false
+		},
+	)
 
 	// withdraw all delegator rewards
 	dels := app.StakingKeeper.GetAllDelegations(ctx)
@@ -106,18 +109,21 @@ func (app *SimApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []
 	ctx = ctx.WithBlockHeight(0)
 
 	// reinitialize all validators
-	app.StakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
-		// donate any unwithdrawn outstanding reward fraction tokens to the community pool
-		scraps := app.DistrKeeper.GetValidatorOutstandingRewardsCoins(ctx, val.GetOperator())
-		feePool := app.DistrKeeper.GetFeePool(ctx)
-		feePool.CommunityPool = feePool.CommunityPool.Add(scraps...)
-		app.DistrKeeper.SetFeePool(ctx, feePool)
+	app.StakingKeeper.IterateValidators(
+		ctx,
+		func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
+			// donate any unwithdrawn outstanding reward fraction tokens to the community pool
+			scraps := app.DistrKeeper.GetValidatorOutstandingRewardsCoins(ctx, val.GetOperator())
+			feePool := app.DistrKeeper.GetFeePool(ctx)
+			feePool.CommunityPool = feePool.CommunityPool.Add(scraps...)
+			app.DistrKeeper.SetFeePool(ctx, feePool)
 
-		if err := app.DistrKeeper.Hooks().AfterValidatorCreated(ctx, val.GetOperator()); err != nil {
-			panic(err)
-		}
-		return false
-	})
+			if err := app.DistrKeeper.Hooks().AfterValidatorCreated(ctx, val.GetOperator()); err != nil {
+				panic(err)
+			}
+			return false
+		},
+	)
 
 	// reinitialize all delegations
 	for _, del := range dels {
@@ -144,22 +150,28 @@ func (app *SimApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []
 	/* Handle staking state. */
 
 	// iterate through redelegations, reset creation height
-	app.StakingKeeper.IterateRedelegations(ctx, func(_ int64, red stakingtypes.Redelegation) (stop bool) {
-		for i := range red.Entries {
-			red.Entries[i].CreationHeight = 0
-		}
-		app.StakingKeeper.SetRedelegation(ctx, red)
-		return false
-	})
+	app.StakingKeeper.IterateRedelegations(
+		ctx,
+		func(_ int64, red stakingtypes.Redelegation) (stop bool) {
+			for i := range red.Entries {
+				red.Entries[i].CreationHeight = 0
+			}
+			app.StakingKeeper.SetRedelegation(ctx, red)
+			return false
+		},
+	)
 
 	// iterate through unbonding delegations, reset creation height
-	app.StakingKeeper.IterateUnbondingDelegations(ctx, func(_ int64, ubd stakingtypes.UnbondingDelegation) (stop bool) {
-		for i := range ubd.Entries {
-			ubd.Entries[i].CreationHeight = 0
-		}
-		app.StakingKeeper.SetUnbondingDelegation(ctx, ubd)
-		return false
-	})
+	app.StakingKeeper.IterateUnbondingDelegations(
+		ctx,
+		func(_ int64, ubd stakingtypes.UnbondingDelegation) (stop bool) {
+			for i := range ubd.Entries {
+				ubd.Entries[i].CreationHeight = 0
+			}
+			app.StakingKeeper.SetUnbondingDelegation(ctx, ubd)
+			return false
+		},
+	)
 
 	// Iterate through validators by power descending, reset bond heights, and
 	// update bond intra-tx counters.

@@ -3,7 +3,7 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
+	"github.com/cometbft/cometbft/libs/log"
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -114,7 +114,12 @@ func (k Keeper) EditToken(
 	}
 
 	if owner.String() != token.Owner {
-		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", owner, symbol)
+		return sdkerrors.Wrapf(
+			types.ErrInvalidOwner,
+			"the address %s is not the owner of the token %s",
+			owner,
+			symbol,
+		)
 	}
 
 	if maxSupply > 0 {
@@ -122,7 +127,11 @@ func (k Keeper) EditToken(
 		issuedMainUnitAmt := issuedAmt.Quo(sdkmath.NewIntWithDecimal(1, int(token.Scale)))
 
 		if sdk.NewIntFromUint64(maxSupply).LT(issuedMainUnitAmt) {
-			return sdkerrors.Wrapf(types.ErrInvalidMaxSupply, "max supply must not be less than %s", issuedMainUnitAmt)
+			return sdkerrors.Wrapf(
+				types.ErrInvalidMaxSupply,
+				"max supply must not be less than %s",
+				issuedMainUnitAmt,
+			)
 		}
 
 		token.MaxSupply = maxSupply
@@ -159,7 +168,12 @@ func (k Keeper) TransferTokenOwner(
 	}
 
 	if srcOwner.String() != token.Owner {
-		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", srcOwner, symbol)
+		return sdkerrors.Wrapf(
+			types.ErrInvalidOwner,
+			"the address %s is not the owner of the token %s",
+			srcOwner,
+			symbol,
+		)
 	}
 	return k.changeTokenOwner(ctx, token, dstOwner)
 }
@@ -188,7 +202,12 @@ func (k Keeper) MintToken(
 	}
 
 	if owner.String() != token.Owner {
-		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", owner, token.Symbol)
+		return sdkerrors.Wrapf(
+			types.ErrInvalidOwner,
+			"the address %s is not the owner of the token %s",
+			owner,
+			token.Symbol,
+		)
 	}
 
 	if !token.Mintable {
@@ -274,7 +293,12 @@ func (k Keeper) SwapFeeToken(
 	if recipient == nil {
 		recipient = sender
 	}
-	return burnedCoin, mintedCoin, k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, recipient, mintedCoins)
+	return burnedCoin, mintedCoin, k.bankKeeper.SendCoinsFromModuleToAccount(
+		ctx,
+		types.ModuleName,
+		recipient,
+		mintedCoins,
+	)
 }
 
 func (k Keeper) WithSwapRegistry(registry v1.SwapRegistry) Keeper {
@@ -282,7 +306,10 @@ func (k Keeper) WithSwapRegistry(registry v1.SwapRegistry) Keeper {
 	return k
 }
 
-func (k Keeper) calcFeeTokenMinted(ctx sdk.Context, feePaid sdk.Coin) (burnt, minted sdk.Coin, err error) {
+func (k Keeper) calcFeeTokenMinted(
+	ctx sdk.Context,
+	feePaid sdk.Coin,
+) (burnt, minted sdk.Coin, err error) {
 	tokenBurned, err := k.getTokenByMinUnit(ctx, feePaid.Denom)
 	if err != nil {
 		return burnt, minted, err
@@ -298,11 +325,20 @@ func (k Keeper) calcFeeTokenMinted(ctx sdk.Context, feePaid sdk.Coin) (burnt, mi
 		return burnt, minted, err
 	}
 
-	burntAmt, mintAmt := types.LossLessSwap(feePaid.Amount, swapParams.Ratio, tokenBurned.GetScale(), tokenMinted.GetScale())
+	burntAmt, mintAmt := types.LossLessSwap(
+		feePaid.Amount,
+		swapParams.Ratio,
+		tokenBurned.GetScale(),
+		tokenMinted.GetScale(),
+	)
 	return sdk.NewCoin(tokenBurned.MinUnit, burntAmt), sdk.NewCoin(swapParams.MinUnit, mintAmt), nil
 }
 
-func (k Keeper) changeTokenOwner(ctx sdk.Context, srcToken v1.Token, dstOwner sdk.AccAddress) error {
+func (k Keeper) changeTokenOwner(
+	ctx sdk.Context,
+	srcToken v1.Token,
+	dstOwner sdk.AccAddress,
+) error {
 	srcOwner, err := sdk.AccAddressFromBech32(srcToken.Owner)
 	if err != nil {
 		return err

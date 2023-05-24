@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -196,7 +196,11 @@ func ParseResult(result string) (Result, error) {
 	var r Result
 
 	if err := json.Unmarshal([]byte(result), &r); err != nil {
-		return r, sdkerrors.Wrapf(ErrInvalidResponseResult, "failed to unmarshal the result: %s", err)
+		return r, sdkerrors.Wrapf(
+			ErrInvalidResponseResult,
+			"failed to unmarshal the result: %s",
+			err,
+		)
 	}
 
 	return r, nil
@@ -278,7 +282,12 @@ func SplitRequestContextID(contextID tmbytes.HexBytes) (tmbytes.HexBytes, int64,
 }
 
 // GenerateRequestID generates a unique request ID from the given params
-func GenerateRequestID(requestContextID tmbytes.HexBytes, requestContextBatchCounter uint64, requestHeight int64, batchRequestIndex int16) tmbytes.HexBytes {
+func GenerateRequestID(
+	requestContextID tmbytes.HexBytes,
+	requestContextBatchCounter uint64,
+	requestHeight int64,
+	batchRequestIndex int16,
+) tmbytes.HexBytes {
 	contextID := make([]byte, len(requestContextID))
 	copy(contextID, requestContextID)
 

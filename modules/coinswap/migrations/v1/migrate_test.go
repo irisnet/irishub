@@ -3,9 +3,9 @@ package v1_test
 import (
 	"testing"
 
+	"github.com/cometbft/cometbft/crypto/tmhash"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/assert"
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -107,7 +107,14 @@ func setupWithGenesisAccounts(t *testing.T) (*simapp.SimApp, verifyFunc) {
 	}
 
 	genAccs := []authtypes.GenesisAccount{senderAcc1, senderAcc2, poolBTCAcc, poolETHAcc}
-	app := simapp.SetupWithGenesisAccounts(t, genAccs, sender1Balances, sender2Balances, poolBTCBalances, poolETHBalances)
+	app := simapp.SetupWithGenesisAccounts(
+		t,
+		genAccs,
+		sender1Balances,
+		sender2Balances,
+		poolBTCBalances,
+		poolETHBalances,
+	)
 
 	verify := func(ctx sdk.Context, t *testing.T) {
 		ethPoolId := coinswaptypes.GetPoolId(denomETH)

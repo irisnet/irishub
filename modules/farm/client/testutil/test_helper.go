@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/tendermint/tendermint/libs/cli"
+	"github.com/cometbft/cometbft/libs/cli"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -25,7 +25,12 @@ func CreateFarmPoolExec(t *testing.T, network simapp.Network, clientCtx client.C
 	return network.ExecTxCmdWithResult(t, clientCtx, farmcli.GetCmdCreateFarmPool(), args)
 }
 
-func QueryFarmPoolsExec(t *testing.T, network simapp.Network, clientCtx client.Context, extraArgs ...string) *farmtypes.QueryFarmPoolsResponse {
+func QueryFarmPoolsExec(
+	t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	extraArgs ...string,
+) *farmtypes.QueryFarmPoolsResponse {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
@@ -36,7 +41,13 @@ func QueryFarmPoolsExec(t *testing.T, network simapp.Network, clientCtx client.C
 	return response
 }
 
-func QueryFarmPoolExec(t *testing.T, network simapp.Network, clientCtx client.Context, poolId string, extraArgs ...string) *farmtypes.QueryFarmPoolResponse {
+func QueryFarmPoolExec(
+	t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	poolId string,
+	extraArgs ...string,
+) *farmtypes.QueryFarmPoolResponse {
 	args := []string{
 		poolId,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),

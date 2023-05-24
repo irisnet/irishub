@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	"github.com/cometbft/cometbft/crypto/tmhash"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -86,7 +86,16 @@ func (suite *HandlerSuite) TestIssueToken() {
 
 	nativeTokenAmt1 := suite.bk.GetBalance(suite.ctx, owner, denom).Amount
 
-	msg := v1.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 21000000, 21000000, false, owner.String())
+	msg := v1.NewMsgIssueToken(
+		"btc",
+		"satoshi",
+		"Bitcoin Network",
+		18,
+		21000000,
+		21000000,
+		false,
+		owner.String(),
+	)
 
 	_, err := h(suite.ctx, msg)
 	suite.NoError(err)
@@ -109,7 +118,10 @@ func (suite *HandlerSuite) TestMintToken() {
 	suite.issueToken(token)
 
 	beginBtcAmt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit).Amount
-	suite.Equal(sdkmath.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)), beginBtcAmt)
+	suite.Equal(
+		sdkmath.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)),
+		beginBtcAmt,
+	)
 
 	beginNativeAmt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), denom).Amount
 
@@ -142,7 +154,10 @@ func (suite *HandlerSuite) TestBurnToken() {
 	suite.issueToken(token)
 
 	beginBtcAmt := suite.bk.GetBalance(suite.ctx, token.GetOwner(), token.MinUnit).Amount
-	suite.Equal(sdkmath.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)), beginBtcAmt)
+	suite.Equal(
+		sdkmath.NewIntWithDecimal(int64(token.InitialSupply), int(token.Scale)),
+		beginBtcAmt,
+	)
 
 	h := tokenmodule.NewHandler(suite.keeper)
 

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cometbft/cometbft/crypto"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/irisnet/irismod/modules/htlc/types"
 )

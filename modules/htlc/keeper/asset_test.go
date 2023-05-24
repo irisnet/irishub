@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -27,10 +27,13 @@ type AssetTestSuite struct {
 }
 
 func (suite *AssetTestSuite) SetupTest() {
-	app := simapp.SetupWithGenesisStateFn(suite.T(), func(cdc codec.Codec, state simapp.GenesisState) simapp.GenesisState {
-		state[types.ModuleName] = cdc.MustMarshalJSON(NewHTLTGenesis(TestDeputy))
-		return state
-	})
+	app := simapp.SetupWithGenesisStateFn(
+		suite.T(),
+		func(cdc codec.Codec, state simapp.GenesisState) simapp.GenesisState {
+			state[types.ModuleName] = cdc.MustMarshalJSON(NewHTLTGenesis(TestDeputy))
+			return state
+		},
+	)
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{Height: 1, Time: time.Now()})
 
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
@@ -215,7 +218,9 @@ func (suite *AssetTestSuite) TestDecrementCurrentAssetSupply() {
 				if tc.expectPass {
 					suite.True(found)
 					suite.NoError(err)
-					suite.True(preSupply.CurrentSupply.Sub(tc.args.coin).IsEqual(postSupply.CurrentSupply))
+					suite.True(
+						preSupply.CurrentSupply.Sub(tc.args.coin).IsEqual(postSupply.CurrentSupply),
+					)
 				} else {
 					suite.Error(err)
 					suite.Equal(preSupply.CurrentSupply, postSupply.CurrentSupply)
@@ -263,7 +268,10 @@ func (suite *AssetTestSuite) TestIncrementIncomingAssetSupply() {
 				if tc.expectPass {
 					suite.True(found)
 					suite.NoError(err)
-					suite.Equal(preSupply.IncomingSupply.Add(tc.args.coin), postSupply.IncomingSupply)
+					suite.Equal(
+						preSupply.IncomingSupply.Add(tc.args.coin),
+						postSupply.IncomingSupply,
+					)
 				} else {
 					suite.Error(err)
 					suite.Equal(preSupply.IncomingSupply, postSupply.IncomingSupply)
@@ -370,7 +378,10 @@ func (suite *AssetTestSuite) TestDecrementIncomingAssetSupply() {
 				if tc.expectPass {
 					suite.True(found)
 					suite.NoError(err)
-					suite.True(preSupply.IncomingSupply.Sub(tc.args.coin).IsEqual(postSupply.IncomingSupply))
+					suite.True(
+						preSupply.IncomingSupply.Sub(tc.args.coin).
+							IsEqual(postSupply.IncomingSupply),
+					)
 				} else {
 					suite.Error(err)
 					suite.Equal(preSupply.IncomingSupply, postSupply.IncomingSupply)
@@ -418,7 +429,10 @@ func (suite *AssetTestSuite) TestIncrementOutgoingAssetSupply() {
 				if tc.expectPass {
 					suite.True(found)
 					suite.NoError(err)
-					suite.Equal(preSupply.OutgoingSupply.Add(tc.args.coin), postSupply.OutgoingSupply)
+					suite.Equal(
+						preSupply.OutgoingSupply.Add(tc.args.coin),
+						postSupply.OutgoingSupply,
+					)
 				} else {
 					suite.Error(err)
 					suite.Equal(preSupply.OutgoingSupply, postSupply.OutgoingSupply)
@@ -466,7 +480,10 @@ func (suite *AssetTestSuite) TestDecrementOutgoingAssetSupply() {
 				if tc.expectPass {
 					suite.True(found)
 					suite.NoError(err)
-					suite.True(preSupply.OutgoingSupply.Sub(tc.args.coin).IsEqual(postSupply.OutgoingSupply))
+					suite.True(
+						preSupply.OutgoingSupply.Sub(tc.args.coin).
+							IsEqual(postSupply.OutgoingSupply),
+					)
 				} else {
 					suite.Error(err)
 					suite.Equal(preSupply.OutgoingSupply, postSupply.OutgoingSupply)
@@ -493,9 +510,15 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 	}{{
 		"rate-limited increment time",
 		args{
-			asset:          "htltinc",
-			duration:       time.Second,
-			expectedSupply: types.NewAssetSupply(c("htltinc", 10), c("htltinc", 5), c("htltinc", 5), c("htltinc", 0), time.Second),
+			asset:    "htltinc",
+			duration: time.Second,
+			expectedSupply: types.NewAssetSupply(
+				c("htltinc", 10),
+				c("htltinc", 5),
+				c("htltinc", 5),
+				c("htltinc", 0),
+				time.Second,
+			),
 		},
 		errArgs{
 			expectPanic: false,
@@ -504,9 +527,15 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 	}, {
 		"rate-limited increment time half",
 		args{
-			asset:          "htltinc",
-			duration:       time.Minute * 30,
-			expectedSupply: types.NewAssetSupply(c("htltinc", 10), c("htltinc", 5), c("htltinc", 5), c("htltinc", 0), time.Minute*30),
+			asset:    "htltinc",
+			duration: time.Minute * 30,
+			expectedSupply: types.NewAssetSupply(
+				c("htltinc", 10),
+				c("htltinc", 5),
+				c("htltinc", 5),
+				c("htltinc", 0),
+				time.Minute*30,
+			),
 		},
 		errArgs{
 			expectPanic: false,
@@ -515,9 +544,15 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 	}, {
 		"rate-limited period change",
 		args{
-			asset:          "htltinc",
-			duration:       time.Hour + time.Second,
-			expectedSupply: types.NewAssetSupply(c("htltinc", 10), c("htltinc", 5), c("htltinc", 5), c("htltinc", 0), time.Duration(0)),
+			asset:    "htltinc",
+			duration: time.Hour + time.Second,
+			expectedSupply: types.NewAssetSupply(
+				c("htltinc", 10),
+				c("htltinc", 5),
+				c("htltinc", 5),
+				c("htltinc", 0),
+				time.Duration(0),
+			),
 		},
 		errArgs{
 			expectPanic: false,
@@ -526,9 +561,15 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 	}, {
 		"rate-limited period change exact",
 		args{
-			asset:          "htltinc",
-			duration:       time.Hour,
-			expectedSupply: types.NewAssetSupply(c("htltinc", 10), c("htltinc", 5), c("htltinc", 5), c("htltinc", 0), time.Duration(0)),
+			asset:    "htltinc",
+			duration: time.Hour,
+			expectedSupply: types.NewAssetSupply(
+				c("htltinc", 10),
+				c("htltinc", 5),
+				c("htltinc", 5),
+				c("htltinc", 0),
+				time.Duration(0),
+			),
 		},
 		errArgs{
 			expectPanic: false,
@@ -537,9 +578,15 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 	}, {
 		"rate-limited period change big",
 		args{
-			asset:          "htltinc",
-			duration:       time.Hour * 4,
-			expectedSupply: types.NewAssetSupply(c("htltinc", 10), c("htltinc", 5), c("htltinc", 5), c("htltinc", 0), time.Duration(0)),
+			asset:    "htltinc",
+			duration: time.Hour * 4,
+			expectedSupply: types.NewAssetSupply(
+				c("htltinc", 10),
+				c("htltinc", 5),
+				c("htltinc", 5),
+				c("htltinc", 0),
+				time.Duration(0),
+			),
 		},
 		errArgs{
 			expectPanic: false,
@@ -548,9 +595,15 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 	}, {
 		"non rate-limited increment time",
 		args{
-			asset:          "htltbnb",
-			duration:       time.Second,
-			expectedSupply: types.NewAssetSupply(c("htltbnb", 5), c("htltbnb", 5), c("htltbnb", 40), c("htltbnb", 0), time.Duration(0)),
+			asset:    "htltbnb",
+			duration: time.Second,
+			expectedSupply: types.NewAssetSupply(
+				c("htltbnb", 5),
+				c("htltbnb", 5),
+				c("htltbnb", 40),
+				c("htltbnb", 0),
+				time.Duration(0),
+			),
 		},
 		errArgs{
 			expectPanic: false,
@@ -559,9 +612,15 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 	}, {
 		"new asset increment time",
 		args{
-			asset:          "htltlol",
-			duration:       time.Second,
-			expectedSupply: types.NewAssetSupply(c("htltlol", 0), c("htltlol", 0), c("htltlol", 0), c("htltlol", 0), time.Second),
+			asset:    "htltlol",
+			duration: time.Second,
+			expectedSupply: types.NewAssetSupply(
+				c("htltlol", 0),
+				c("htltlol", 0),
+				c("htltlol", 0),
+				c("htltlol", 0),
+				time.Second,
+			),
 		},
 		errArgs{
 			expectPanic: false,

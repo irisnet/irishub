@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/cometbft/cometbft/crypto"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -11,7 +12,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/nft"
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/require"
-	"github.com/tendermint/tendermint/crypto"
 )
 
 func TestTokenBuilder_Build(t *testing.T) {
@@ -73,7 +73,9 @@ func GetEncoding() codec.Codec {
 }
 
 func TestClassBuilder_BuildMetadata(t *testing.T) {
-	creator, err := sdk.AccAddressFromHexUnsafe(crypto.AddressHash([]byte("test_consumer")).String())
+	creator, err := sdk.AccAddressFromHexUnsafe(
+		crypto.AddressHash([]byte("test_consumer")).String(),
+	)
 	require.NoError(t, err, "AccAddressFromHexUnsafe failed")
 
 	cdc := GetEncoding()
@@ -178,7 +180,9 @@ func TestClassBuilder_BuildMetadata(t *testing.T) {
 }
 
 func TestClassBuilder_Build(t *testing.T) {
-	creator, err := sdk.AccAddressFromHexUnsafe(crypto.AddressHash([]byte("test_consumer")).String())
+	creator, err := sdk.AccAddressFromHexUnsafe(
+		crypto.AddressHash([]byte("test_consumer")).String(),
+	)
 	require.NoError(t, err, "AccAddressFromHexUnsafe failed")
 
 	cdc := GetEncoding()

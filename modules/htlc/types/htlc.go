@@ -4,8 +4,8 @@ import (
 	fmt "fmt"
 	time "time"
 
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	"github.com/cometbft/cometbft/crypto/tmhash"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -88,7 +88,10 @@ func (h HTLC) Validate() error {
 		return sdkerrors.Wrapf(ErrInvalidDirection, "invalid htlt direction")
 	}
 	if h.State != Completed && len(h.Secret) > 0 {
-		return sdkerrors.Wrapf(ErrInvalidSecret, "secret must be empty when the HTLC has not be claimed")
+		return sdkerrors.Wrapf(
+			ErrInvalidSecret,
+			"secret must be empty when the HTLC has not be claimed",
+		)
 	}
 	if h.State == Completed && len(h.Secret) != SecretLength {
 		return sdkerrors.Wrapf(ErrInvalidSecret, "length of the secret must be %d", SecretLength)
@@ -130,11 +133,22 @@ func (a AssetSupply) Validate() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "current supply %s", a.CurrentSupply)
 	}
 	if !a.TimeLimitedCurrentSupply.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "time-limited current supply %s", a.CurrentSupply)
+		return sdkerrors.Wrapf(
+			sdkerrors.ErrInvalidCoins,
+			"time-limited current supply %s",
+			a.CurrentSupply,
+		)
 	}
 	denom := a.CurrentSupply.Denom
-	if (a.IncomingSupply.Denom != denom) || (a.OutgoingSupply.Denom != denom) || (a.TimeLimitedCurrentSupply.Denom != denom) {
-		return fmt.Errorf("asset supply denoms do not match %s %s %s %s", a.CurrentSupply.Denom, a.IncomingSupply.Denom, a.OutgoingSupply.Denom, a.TimeLimitedCurrentSupply.Denom)
+	if (a.IncomingSupply.Denom != denom) || (a.OutgoingSupply.Denom != denom) ||
+		(a.TimeLimitedCurrentSupply.Denom != denom) {
+		return fmt.Errorf(
+			"asset supply denoms do not match %s %s %s %s",
+			a.CurrentSupply.Denom,
+			a.IncomingSupply.Denom,
+			a.OutgoingSupply.Denom,
+			a.TimeLimitedCurrentSupply.Denom,
+		)
 	}
 	return nil
 }

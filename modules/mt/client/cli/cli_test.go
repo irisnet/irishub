@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/tendermint/tendermint/crypto"
+	"github.com/cometbft/cometbft/crypto"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -60,7 +60,11 @@ func (s *IntegrationTestSuite) TestMT() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
 	txResult := mttestutil.IssueDenomExec(
@@ -70,7 +74,11 @@ func (s *IntegrationTestSuite) TestMT() {
 		from.String(),
 		args...,
 	)
-	denomID := s.network.GetAttribute(mttypes.EventTypeIssueDenom, mttypes.AttributeKeyDenomID, txResult.Events)
+	denomID := s.network.GetAttribute(
+		mttypes.EventTypeIssueDenom,
+		mttypes.AttributeKeyDenomID,
+		txResult.Events,
+	)
 
 	//------test GetCmdQueryDenom()-------------
 	queryDenomRespType := mttestutil.QueryDenomExec(s.T(), s.network, clientCtx, denomID)
@@ -89,7 +97,11 @@ func (s *IntegrationTestSuite) TestMT() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(100))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(100))).String(),
+		),
 	}
 
 	txResult = mttestutil.MintMTExec(s.T(),
@@ -97,13 +109,23 @@ func (s *IntegrationTestSuite) TestMT() {
 		clientCtx, from.String(), denomID, args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
-	mtID := s.network.GetAttribute(mttypes.EventTypeMintMT, mttypes.AttributeKeyMTID, txResult.Events)
+	mtID := s.network.GetAttribute(
+		mttypes.EventTypeMintMT,
+		mttypes.AttributeKeyMTID,
+		txResult.Events,
+	)
 	//------test GetCmdQueryMT()-------------
 	queryMTResponse := mttestutil.QueryMTExec(s.T(), s.network, clientCtx, denomID, mtID)
 	s.Require().Equal(mtID, queryMTResponse.Id)
 
 	//-------test GetCmdQueryBalances()----------
-	queryBalancesResponse := mttestutil.QueryBlancesExec(s.T(), s.network, clientCtx, from.String(), denomID)
+	queryBalancesResponse := mttestutil.QueryBlancesExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		from.String(),
+		denomID,
+	)
 	s.Require().Equal(1, len(queryBalancesResponse.Balance))
 	s.Require().Equal(uint64(10), queryBalancesResponse.Balance[0].Amount)
 
@@ -114,7 +136,11 @@ func (s *IntegrationTestSuite) TestMT() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
 	txResult = mttestutil.EditMTExec(s.T(),
@@ -131,7 +157,11 @@ func (s *IntegrationTestSuite) TestMT() {
 	args = []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
 	txResult = mttestutil.TransferMTExec(s.T(),
@@ -147,7 +177,11 @@ func (s *IntegrationTestSuite) TestMT() {
 	args = []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
 	txResult = mttestutil.BurnMTExec(s.T(),
@@ -164,7 +198,11 @@ func (s *IntegrationTestSuite) TestMT() {
 	args = []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
 	txResult = mttestutil.TransferDenomExec(s.T(),

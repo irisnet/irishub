@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	"github.com/cometbft/cometbft/crypto/tmhash"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -27,18 +27,34 @@ var (
 	secret               = tmbytes.HexBytes(tmhash.Sum([]byte("secret")))
 	secretStr            = secret.String()
 	timestamp            = uint64(1580000000)
-	hashLock             = tmbytes.HexBytes(tmhash.Sum(append(secret, sdk.Uint64ToBigEndian(timestamp)...)))
-	hashLockStr          = hashLock.String()
-	id                   = tmbytes.HexBytes(tmhash.Sum(append(append(append(hashLock, sender...), recipient...), []byte(amount.String())...)))
-	idStr                = id.String()
-	timeLock             = uint64(50)
-	transfer             = true
-	notTransfer          = false
+	hashLock             = tmbytes.HexBytes(
+		tmhash.Sum(append(secret, sdk.Uint64ToBigEndian(timestamp)...)),
+	)
+	hashLockStr = hashLock.String()
+	id          = tmbytes.HexBytes(
+		tmhash.Sum(
+			append(append(append(hashLock, sender...), recipient...), []byte(amount.String())...),
+		),
+	)
+	idStr       = id.String()
+	timeLock    = uint64(50)
+	transfer    = true
+	notTransfer = false
 )
 
 // TestNewMsgCreateHTLC tests constructor for MsgCreateHTLC
 func TestNewMsgCreateHTLC(t *testing.T) {
-	msg := types.NewMsgCreateHTLC(senderStr, recipientStr, receiverOnOtherChain, senderOnOtherChain, amount, hashLockStr, timestamp, timeLock, notTransfer)
+	msg := types.NewMsgCreateHTLC(
+		senderStr,
+		recipientStr,
+		receiverOnOtherChain,
+		senderOnOtherChain,
+		amount,
+		hashLockStr,
+		timestamp,
+		timeLock,
+		notTransfer,
+	)
 
 	require.Equal(t, senderStr, msg.Sender)
 	require.Equal(t, recipientStr, msg.To)
@@ -52,13 +68,33 @@ func TestNewMsgCreateHTLC(t *testing.T) {
 
 // TestMsgCreateHTLCRoute tests Route for MsgCreateHTLC
 func TestMsgCreateHTLCRoute(t *testing.T) {
-	msg := types.NewMsgCreateHTLC(senderStr, recipientStr, receiverOnOtherChain, senderOnOtherChain, amount, hashLockStr, timestamp, timeLock, notTransfer)
+	msg := types.NewMsgCreateHTLC(
+		senderStr,
+		recipientStr,
+		receiverOnOtherChain,
+		senderOnOtherChain,
+		amount,
+		hashLockStr,
+		timestamp,
+		timeLock,
+		notTransfer,
+	)
 	require.Equal(t, "htlc", msg.Route())
 }
 
 // TestMsgCreateHTLCType tests Type for MsgCreateHTLC
 func TestMsgCreateHTLCType(t *testing.T) {
-	msg := types.NewMsgCreateHTLC(senderStr, recipientStr, receiverOnOtherChain, senderOnOtherChain, amount, hashLockStr, timestamp, timeLock, notTransfer)
+	msg := types.NewMsgCreateHTLC(
+		senderStr,
+		recipientStr,
+		receiverOnOtherChain,
+		senderOnOtherChain,
+		amount,
+		hashLockStr,
+		timestamp,
+		timeLock,
+		notTransfer,
+	)
 	require.Equal(t, "create_htlc", msg.Type())
 }
 
@@ -72,16 +108,116 @@ func TestMsgCreateHTLCValidation(t *testing.T) {
 	invalidLargeTimeLock := uint64(34561)
 
 	testMsgs := []types.MsgCreateHTLC{
-		types.NewMsgCreateHTLC(senderStr, recipientStr, receiverOnOtherChain, senderOnOtherChain, amount, hashLockStr, timestamp, timeLock, notTransfer),             // valid htlc msg
-		types.NewMsgCreateHTLC(senderStr, recipientStr, receiverOnOtherChain, senderOnOtherChain, amount, hashLockStr, timestamp, timeLock, transfer),                // valid htlt msg
-		types.NewMsgCreateHTLC(emptyAddr, recipientStr, receiverOnOtherChain, senderOnOtherChain, amount, hashLockStr, timestamp, timeLock, notTransfer),             // missing sender
-		types.NewMsgCreateHTLC(senderStr, emptyAddr, receiverOnOtherChain, senderOnOtherChain, amount, hashLockStr, timestamp, timeLock, notTransfer),                // missing recipient
-		types.NewMsgCreateHTLC(senderStr, recipientStr, invalidReceiverOnOtherChain, senderOnOtherChain, amount, hashLockStr, timestamp, timeLock, notTransfer),      // too long receiver on other chain
-		types.NewMsgCreateHTLC(senderStr, recipientStr, receiverOnOtherChain, invalidSenderOnOtherChain, amount, hashLockStr, timestamp, timeLock, notTransfer),      // too long sender on other chain
-		types.NewMsgCreateHTLC(senderStr, recipientStr, receiverOnOtherChain, senderOnOtherChain, invalidAmount, hashLockStr, timestamp, timeLock, notTransfer),      // invalid amount
-		types.NewMsgCreateHTLC(senderStr, recipientStr, receiverOnOtherChain, senderOnOtherChain, amount, invalidHashLock, timestamp, timeLock, notTransfer),         // invalid hash lock
-		types.NewMsgCreateHTLC(senderStr, recipientStr, receiverOnOtherChain, senderOnOtherChain, amount, hashLockStr, timestamp, invalidSmallTimeLock, notTransfer), // too small time lock
-		types.NewMsgCreateHTLC(senderStr, recipientStr, receiverOnOtherChain, senderOnOtherChain, amount, hashLockStr, timestamp, invalidLargeTimeLock, notTransfer), // too large time lock
+		types.NewMsgCreateHTLC(
+			senderStr,
+			recipientStr,
+			receiverOnOtherChain,
+			senderOnOtherChain,
+			amount,
+			hashLockStr,
+			timestamp,
+			timeLock,
+			notTransfer,
+		), // valid htlc msg
+		types.NewMsgCreateHTLC(
+			senderStr,
+			recipientStr,
+			receiverOnOtherChain,
+			senderOnOtherChain,
+			amount,
+			hashLockStr,
+			timestamp,
+			timeLock,
+			transfer,
+		), // valid htlt msg
+		types.NewMsgCreateHTLC(
+			emptyAddr,
+			recipientStr,
+			receiverOnOtherChain,
+			senderOnOtherChain,
+			amount,
+			hashLockStr,
+			timestamp,
+			timeLock,
+			notTransfer,
+		), // missing sender
+		types.NewMsgCreateHTLC(
+			senderStr,
+			emptyAddr,
+			receiverOnOtherChain,
+			senderOnOtherChain,
+			amount,
+			hashLockStr,
+			timestamp,
+			timeLock,
+			notTransfer,
+		), // missing recipient
+		types.NewMsgCreateHTLC(
+			senderStr,
+			recipientStr,
+			invalidReceiverOnOtherChain,
+			senderOnOtherChain,
+			amount,
+			hashLockStr,
+			timestamp,
+			timeLock,
+			notTransfer,
+		), // too long receiver on other chain
+		types.NewMsgCreateHTLC(
+			senderStr,
+			recipientStr,
+			receiverOnOtherChain,
+			invalidSenderOnOtherChain,
+			amount,
+			hashLockStr,
+			timestamp,
+			timeLock,
+			notTransfer,
+		), // too long sender on other chain
+		types.NewMsgCreateHTLC(
+			senderStr,
+			recipientStr,
+			receiverOnOtherChain,
+			senderOnOtherChain,
+			invalidAmount,
+			hashLockStr,
+			timestamp,
+			timeLock,
+			notTransfer,
+		), // invalid amount
+		types.NewMsgCreateHTLC(
+			senderStr,
+			recipientStr,
+			receiverOnOtherChain,
+			senderOnOtherChain,
+			amount,
+			invalidHashLock,
+			timestamp,
+			timeLock,
+			notTransfer,
+		), // invalid hash lock
+		types.NewMsgCreateHTLC(
+			senderStr,
+			recipientStr,
+			receiverOnOtherChain,
+			senderOnOtherChain,
+			amount,
+			hashLockStr,
+			timestamp,
+			invalidSmallTimeLock,
+			notTransfer,
+		), // too small time lock
+		types.NewMsgCreateHTLC(
+			senderStr,
+			recipientStr,
+			receiverOnOtherChain,
+			senderOnOtherChain,
+			amount,
+			hashLockStr,
+			timestamp,
+			invalidLargeTimeLock,
+			notTransfer,
+		), // too large time lock
 	}
 
 	testCases := []struct {
@@ -113,7 +249,17 @@ func TestMsgCreateHTLCValidation(t *testing.T) {
 
 // TestMsgCreateHTLCGetSignBytes tests GetSignBytes for MsgCreateHTLC
 func TestMsgCreateHTLCGetSignBytes(t *testing.T) {
-	msg := types.NewMsgCreateHTLC(senderStr, recipientStr, receiverOnOtherChain, senderOnOtherChain, amount, hashLockStr, timestamp, timeLock, notTransfer)
+	msg := types.NewMsgCreateHTLC(
+		senderStr,
+		recipientStr,
+		receiverOnOtherChain,
+		senderOnOtherChain,
+		amount,
+		hashLockStr,
+		timestamp,
+		timeLock,
+		notTransfer,
+	)
 	res := msg.GetSignBytes()
 
 	expected := `{"type":"irismod/htlc/MsgCreateHTLC","value":{"amount":[{"amount":"10","denom":"stake"}],"hash_lock":"6F4ECE9B22CFC1CF39C9C73DD2D35867A8EC97C48A9C2F664FE5287865A18C2E","receiver_on_other_chain":"receiverOnOtherChain","sender":"cosmos1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgmr4lac","sender_on_other_chain":"senderOnOtherChain","time_lock":"50","timestamp":"1580000000","to":"cosmos1vewsdxxmeraett7ztsaym88jsrv85kzm8ekjsg"}}`
@@ -122,7 +268,17 @@ func TestMsgCreateHTLCGetSignBytes(t *testing.T) {
 
 // TestMsgCreateHTLCGetSigners tests GetSigners for MsgCreateHTLC
 func TestMsgCreateHTLCGetSigners(t *testing.T) {
-	msg := types.NewMsgCreateHTLC(senderStr, recipientStr, receiverOnOtherChain, senderOnOtherChain, amount, hashLockStr, timestamp, timeLock, notTransfer)
+	msg := types.NewMsgCreateHTLC(
+		senderStr,
+		recipientStr,
+		receiverOnOtherChain,
+		senderOnOtherChain,
+		amount,
+		hashLockStr,
+		timestamp,
+		timeLock,
+		notTransfer,
+	)
 	res := msg.GetSigners()
 
 	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"

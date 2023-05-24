@@ -1,7 +1,7 @@
 package types
 
 import (
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -20,7 +20,7 @@ type BankKeeper interface {
 	SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 }
 
-//expected Service keeper
+// expected Service keeper
 type ServiceKeeper interface {
 	RegisterResponseCallback(
 		moduleName string, respCallback service.ResponseCallback,

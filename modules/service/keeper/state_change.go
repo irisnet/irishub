@@ -3,7 +3,7 @@ package keeper
 import (
 	"encoding/json"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -11,7 +11,11 @@ import (
 )
 
 // CompleteBatch completes a running batch
-func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestContext, requestContextID tmbytes.HexBytes) types.RequestContext {
+func (k Keeper) CompleteBatch(
+	ctx sdk.Context,
+	requestContext types.RequestContext,
+	requestContextID tmbytes.HexBytes,
+) types.RequestContext {
 	requestContext.BatchState = types.BATCHCOMPLETED
 
 	if len(requestContext.ModuleName) != 0 {
@@ -39,7 +43,11 @@ func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestConte
 }
 
 // CleanBatch cleans up all requests and responses related to the batch
-func (k Keeper) CleanBatch(ctx sdk.Context, requestContext types.RequestContext, requestContextID tmbytes.HexBytes) {
+func (k Keeper) CleanBatch(
+	ctx sdk.Context,
+	requestContext types.RequestContext,
+	requestContextID tmbytes.HexBytes,
+) {
 	// remove all requests and responses of this batch
 	iterator := k.RequestsIteratorByReqCtx(ctx, requestContextID, requestContext.BatchCounter)
 	defer iterator.Close()
@@ -52,7 +60,11 @@ func (k Keeper) CleanBatch(ctx sdk.Context, requestContext types.RequestContext,
 }
 
 // CompleteServiceContext completes a running or paused context
-func (k Keeper) CompleteServiceContext(ctx sdk.Context, context types.RequestContext, requestContextID tmbytes.HexBytes) {
+func (k Keeper) CompleteServiceContext(
+	ctx sdk.Context,
+	context types.RequestContext,
+	requestContextID tmbytes.HexBytes,
+) {
 	k.DeleteRequestContext(ctx, requestContextID)
 
 	ctx.EventManager().EmitEvents(sdk.Events{

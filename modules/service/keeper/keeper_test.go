@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/tidwall/gjson"
 
-	abci "github.com/tendermint/tendermint/abci/types"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	abci "github.com/cometbft/cometbft/abci/types"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -111,24 +111,55 @@ func (suite *KeeperTestSuite) setTestAddrs() {
 func (suite *KeeperTestSuite) addCoinsToAddr(addr sdk.AccAddress, coins sdk.Coins) {
 	err := suite.app.BankKeeper.MintCoins(suite.ctx, minttypes.ModuleName, coins)
 	suite.NoError(err)
-	err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, minttypes.ModuleName, addr, coins)
+	err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(
+		suite.ctx,
+		minttypes.ModuleName,
+		addr,
+		coins,
+	)
 	suite.NoError(err)
 }
 
 func (suite *KeeperTestSuite) addCoinsToModule(name string, coins sdk.Coins) {
 	err := suite.app.BankKeeper.MintCoins(suite.ctx, minttypes.ModuleName, coins)
 	suite.NoError(err)
-	err = suite.app.BankKeeper.SendCoinsFromModuleToModule(suite.ctx, minttypes.ModuleName, name, coins)
+	err = suite.app.BankKeeper.SendCoinsFromModuleToModule(
+		suite.ctx,
+		minttypes.ModuleName,
+		name,
+		coins,
+	)
 	suite.NoError(err)
 }
 
 func (suite *KeeperTestSuite) setServiceDefinition() {
-	svcDef := types.NewServiceDefinition(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas)
+	svcDef := types.NewServiceDefinition(
+		testServiceName,
+		testServiceDesc,
+		testServiceTags,
+		testAuthor,
+		testAuthorDesc,
+		testSchemas,
+	)
 	suite.keeper.SetServiceDefinition(suite.ctx, svcDef)
 }
 
-func (suite *KeeperTestSuite) setServiceBinding(available bool, disabledTime time.Time, provider, owner sdk.AccAddress) {
-	svcBinding := types.NewServiceBinding(testServiceName, provider, testDeposit, testPricing, testQoS, testOptions, available, disabledTime, owner)
+func (suite *KeeperTestSuite) setServiceBinding(
+	available bool,
+	disabledTime time.Time,
+	provider, owner sdk.AccAddress,
+) {
+	svcBinding := types.NewServiceBinding(
+		testServiceName,
+		provider,
+		testDeposit,
+		testPricing,
+		testQoS,
+		testOptions,
+		available,
+		disabledTime,
+		owner,
+	)
 	suite.keeper.SetServiceBinding(suite.ctx, svcBinding)
 	suite.keeper.SetOwnerServiceBinding(suite.ctx, svcBinding)
 
@@ -142,7 +173,15 @@ func (suite *KeeperTestSuite) setServiceBinding(available bool, disabledTime tim
 }
 
 func (suite *KeeperTestSuite) TestDefineService() {
-	err := suite.keeper.AddServiceDefinition(suite.ctx, testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas)
+	err := suite.keeper.AddServiceDefinition(
+		suite.ctx,
+		testServiceName,
+		testServiceDesc,
+		testServiceTags,
+		testAuthor,
+		testAuthorDesc,
+		testSchemas,
+	)
 	suite.NoError(err)
 
 	svcDef, found := suite.keeper.GetServiceDefinition(suite.ctx, testServiceName)
@@ -159,7 +198,16 @@ func (suite *KeeperTestSuite) TestDefineService() {
 func (suite *KeeperTestSuite) TestBindService() {
 	suite.setServiceDefinition()
 
-	err := suite.keeper.AddServiceBinding(suite.ctx, testServiceName, testProvider, testDeposit, testPricing, testQoS, testOptions, testOwner)
+	err := suite.keeper.AddServiceBinding(
+		suite.ctx,
+		testServiceName,
+		testProvider,
+		testDeposit,
+		testPricing,
+		testQoS,
+		testOptions,
+		testOwner,
+	)
 	suite.NoError(err)
 
 	svcBinding, found := suite.keeper.GetServiceBinding(suite.ctx, testServiceName, testProvider)
@@ -195,10 +243,23 @@ func (suite *KeeperTestSuite) TestBindService() {
 	newOptions := "{}"
 
 	provider, _ := sdk.AccAddressFromBech32(svcBinding.Provider)
-	err = suite.keeper.UpdateServiceBinding(suite.ctx, svcBinding.ServiceName, provider, testAddedDeposit, newPricing, newQoS, newOptions, testOwner)
+	err = suite.keeper.UpdateServiceBinding(
+		suite.ctx,
+		svcBinding.ServiceName,
+		provider,
+		testAddedDeposit,
+		newPricing,
+		newQoS,
+		newOptions,
+		testOwner,
+	)
 	suite.NoError(err)
 
-	updatedSvcBinding, found := suite.keeper.GetServiceBinding(suite.ctx, svcBinding.ServiceName, provider)
+	updatedSvcBinding, found := suite.keeper.GetServiceBinding(
+		suite.ctx,
+		svcBinding.ServiceName,
+		provider,
+	)
 	suite.True(found)
 
 	suite.True(updatedSvcBinding.Deposit.IsEqual(svcBinding.Deposit.Add(testAddedDeposit...)))
@@ -238,7 +299,13 @@ func (suite *KeeperTestSuite) TestEnableServiceBinding() {
 	disabledTime := time.Now().UTC()
 	suite.setServiceBinding(false, disabledTime, testProvider, testOwner)
 
-	err := suite.keeper.EnableServiceBinding(suite.ctx, testServiceName, testProvider, nil, testOwner)
+	err := suite.keeper.EnableServiceBinding(
+		suite.ctx,
+		testServiceName,
+		testProvider,
+		nil,
+		testOwner,
+	)
 	suite.NoError(err)
 
 	svcBinding, found := suite.keeper.GetServiceBinding(suite.ctx, testServiceName, testProvider)
@@ -323,7 +390,17 @@ func (suite *KeeperTestSuite) TestKeeperRequestContext() {
 	newRepeatedFreq := testRepeatedFreq + 10
 	newRepeatedTotal := int64(-1)
 
-	err = suite.keeper.UpdateRequestContext(ctx, requestContextID, nil, 0, newServiceFeeCap, newTimeout, newRepeatedFreq, newRepeatedTotal, consumer)
+	err = suite.keeper.UpdateRequestContext(
+		ctx,
+		requestContextID,
+		nil,
+		0,
+		newServiceFeeCap,
+		newTimeout,
+		newRepeatedFreq,
+		newRepeatedTotal,
+		consumer,
+	)
 	suite.NoError(err)
 
 	requestContext, found = suite.keeper.GetRequestContext(ctx, requestContextID)
@@ -381,9 +458,23 @@ func (suite *KeeperTestSuite) TestKeeperRequestService() {
 	ctx := suite.ctx.WithBlockHeight(blockHeight)
 	suite.app.BeginBlocker(ctx, abci.RequestBeginBlock{})
 
-	requestContextID, requestContext := suite.setRequestContext(ctx, consumer, providers, types.RUNNING, 0, "")
+	requestContextID, requestContext := suite.setRequestContext(
+		ctx,
+		consumer,
+		providers,
+		types.RUNNING,
+		0,
+		"",
+	)
 
-	newProviders, totalServiceFees, _, _ := suite.keeper.FilterServiceProviders(ctx, testServiceName, providers, testTimeout, testServiceFeeCap, consumer)
+	newProviders, totalServiceFees, _, _ := suite.keeper.FilterServiceProviders(
+		ctx,
+		testServiceName,
+		providers,
+		testTimeout,
+		testServiceFeeCap,
+		consumer,
+	)
 	suite.Equal(providers, newProviders)
 	suite.Equal("4stake", totalServiceFees.String())
 
@@ -417,7 +508,11 @@ func (suite *KeeperTestSuite) TestKeeperRequestService() {
 		suite.Equal(testProvider.String(), request.Provider)
 	}
 
-	iterator = suite.keeper.ActiveRequestsIteratorByReqCtx(ctx, requestContextID, requestContext.BatchCounter)
+	iterator = suite.keeper.ActiveRequestsIteratorByReqCtx(
+		ctx,
+		requestContextID,
+		requestContext.BatchCounter,
+	)
 	defer iterator.Close()
 
 	suite.True(iterator.Valid())
@@ -450,13 +545,27 @@ func (suite *KeeperTestSuite) TestKeeperRequestService() {
 	suite.keeper.SetRequestVolume(ctx, consumer, testServiceName, testProvider1, 1)
 
 	// service fees will change due to the increased volume
-	_, totalServiceFees, _, _ = suite.keeper.FilterServiceProviders(ctx, testServiceName, providers, testTimeout, testServiceFeeCap, consumer)
+	_, totalServiceFees, _, _ = suite.keeper.FilterServiceProviders(
+		ctx,
+		testServiceName,
+		providers,
+		testTimeout,
+		testServiceFeeCap,
+		consumer,
+	)
 	suite.Equal("4stake", totalServiceFees.String())
 
 	// satifying providers will change due to the condition changed
 	newTimeout := int64(40)
 
-	newProviders, _, _, _ = suite.keeper.FilterServiceProviders(ctx, testServiceName, providers, newTimeout, testServiceFeeCap, consumer)
+	newProviders, _, _, _ = suite.keeper.FilterServiceProviders(
+		ctx,
+		testServiceName,
+		providers,
+		newTimeout,
+		testServiceFeeCap,
+		consumer,
+	)
 	suite.Equal(0, len(newProviders))
 }
 
@@ -472,7 +581,14 @@ func (suite *KeeperTestSuite) TestKeeperRespondService() {
 	blockHeight := int64(1000)
 	ctx = ctx.WithBlockHeight(blockHeight)
 
-	requestContextID, requestContext := suite.setRequestContext(ctx, consumer, []sdk.AccAddress{provider}, types.RUNNING, 0, "")
+	requestContextID, requestContext := suite.setRequestContext(
+		ctx,
+		consumer,
+		[]sdk.AccAddress{provider},
+		types.RUNNING,
+		0,
+		"",
+	)
 
 	requestContext.BatchCounter++
 	suite.keeper.SetRequestContext(ctx, requestContextID, requestContext)
@@ -503,7 +619,13 @@ func (suite *KeeperTestSuite) TestKeeperRespondService() {
 	suite.Equal(uint64(1), volume)
 
 	// respond request 2
-	_, _, err = suite.keeper.AddResponse(ctx, requestID2, provider, testErrorResult, testEmptyOutput)
+	_, _, err = suite.keeper.AddResponse(
+		ctx,
+		requestID2,
+		provider,
+		testErrorResult,
+		testEmptyOutput,
+	)
 	suite.NoError(err)
 
 	requestContext, _ = suite.keeper.GetRequestContext(ctx, requestContextID)
@@ -569,7 +691,14 @@ func (suite *KeeperTestSuite) TestRequestServiceFromModule() {
 	blockHeight := int64(1000)
 	ctx = ctx.WithBlockHeight(blockHeight)
 
-	requestContextID, requestContext := suite.setRequestContext(ctx, consumer, providers, types.RUNNING, respThreshold, moduleName)
+	requestContextID, requestContext := suite.setRequestContext(
+		ctx,
+		consumer,
+		providers,
+		types.RUNNING,
+		respThreshold,
+		moduleName,
+	)
 
 	requestContext.BatchCounter++
 	suite.keeper.SetRequestContext(ctx, requestContextID, requestContext)
@@ -697,7 +826,13 @@ func (suite *KeeperTestSuite) setRequestContext(
 	return requestContextID, requestContext
 }
 
-func (suite *KeeperTestSuite) setRequest(ctx sdk.Context, consumer sdk.AccAddress, provider sdk.AccAddress, requestContextID []byte, serviceFee sdk.Coins) tmbytes.HexBytes {
+func (suite *KeeperTestSuite) setRequest(
+	ctx sdk.Context,
+	consumer sdk.AccAddress,
+	provider sdk.AccAddress,
+	requestContextID []byte,
+	serviceFee sdk.Coins,
+) tmbytes.HexBytes {
 	requestContext, _ := suite.keeper.GetRequestContext(ctx, requestContextID)
 
 	err := suite.keeper.DeductServiceFees(ctx, consumer, serviceFee)
@@ -710,13 +845,24 @@ func (suite *KeeperTestSuite) setRequest(ctx sdk.Context, consumer sdk.AccAddres
 
 	requestContext.BatchRequestCount++
 
-	requestID := types.GenerateRequestID(requestContextID, request.RequestContextBatchCounter, ctx.BlockHeight(), int16(requestContext.BatchRequestCount))
+	requestID := types.GenerateRequestID(
+		requestContextID,
+		request.RequestContextBatchCounter,
+		ctx.BlockHeight(),
+		int16(requestContext.BatchRequestCount),
+	)
 	suite.keeper.SetCompactRequest(ctx, requestID, request)
 
 	requestContext.BatchState = types.BATCHRUNNING
 	suite.keeper.SetRequestContext(ctx, requestContextID, requestContext)
 
-	suite.keeper.AddActiveRequest(ctx, requestContext.ServiceName, provider, request.RequestHeight+requestContext.Timeout, requestID)
+	suite.keeper.AddActiveRequest(
+		ctx,
+		requestContext.ServiceName,
+		provider,
+		request.RequestHeight+requestContext.Timeout,
+		requestID,
+	)
 	suite.keeper.AddActiveRequestByID(ctx, requestID)
 
 	return requestID
@@ -727,7 +873,10 @@ type MockOracleService struct {
 	feeds map[string]string
 }
 
-func (m MockOracleService) GetExchangeRate(ctx sdk.Context, input string) (result string, output string) {
+func (m MockOracleService) GetExchangeRate(
+	ctx sdk.Context,
+	input string,
+) (result string, output string) {
 	feedName := gjson.Get(input, "body").Get("pair").String()
 
 	value, ok := m.feeds[feedName]
