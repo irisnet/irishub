@@ -9,13 +9,13 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/tidwall/gjson"
 
-	v042 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v042"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	v1 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v1"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 
 	"github.com/irisnet/irismod/modules/service/keeper"
@@ -186,7 +186,7 @@ func (suite *KeeperTestSuite) TestBindService() {
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		suite.Equal(testProvider, sdk.AccAddress(iterator.Key()[v042.AddrLen+1:]))
+		suite.Equal(testProvider, sdk.AccAddress(iterator.Key()[v1.AddrLen+1:]))
 	}
 
 	// update binding

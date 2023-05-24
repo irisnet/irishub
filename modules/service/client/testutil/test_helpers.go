@@ -2,45 +2,68 @@ package testutil
 
 import (
 	"fmt"
+	"testing"
 
 	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil"
-	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 
 	servicecli "github.com/irisnet/irismod/modules/service/client/cli"
+	servicetypes "github.com/irisnet/irismod/modules/service/types"
+	"github.com/irisnet/irismod/simapp"
 )
 
-func DefineServiceExec(clientCtx client.Context, from string, extraArgs ...string) (testutil.BufferWriter, error) {
+func DefineServiceExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdDefineService(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdDefineService(), args)
 }
 
-func BindServiceExec(clientCtx client.Context, from string, extraArgs ...string) (testutil.BufferWriter, error) {
+func BindServiceExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdBindService(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdBindService(), args)
 }
 
-func UpdateBindingExec(clientCtx client.Context, from string, extraArgs ...string) (testutil.BufferWriter, error) {
+func UpdateBindingExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdUpdateServiceBinding(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdUpdateServiceBinding(), args)
 }
 
-func RefundDepositExec(clientCtx client.Context, serviceName, provider, from string, extraArgs ...string) (testutil.BufferWriter, error) {
+func RefundDepositExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	serviceName,
+	provider,
+	from string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		serviceName,
 		provider,
@@ -48,10 +71,17 @@ func RefundDepositExec(clientCtx client.Context, serviceName, provider, from str
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdRefundServiceDeposit(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdRefundServiceDeposit(), args)
 }
 
-func DisableServiceExec(clientCtx client.Context, serviceName, provider, from string, extraArgs ...string) (testutil.BufferWriter, error) {
+func DisableServiceExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	serviceName,
+	provider,
+	from string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		serviceName,
 		provider,
@@ -59,10 +89,17 @@ func DisableServiceExec(clientCtx client.Context, serviceName, provider, from st
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdDisableServiceBinding(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdDisableServiceBinding(), args)
 }
 
-func EnableServiceExec(clientCtx client.Context, serviceName, provider, from string, extraArgs ...string) (testutil.BufferWriter, error) {
+func EnableServiceExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	serviceName,
+	provider,
+	from string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		serviceName,
 		provider,
@@ -70,79 +107,93 @@ func EnableServiceExec(clientCtx client.Context, serviceName, provider, from str
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdEnableServiceBinding(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdEnableServiceBinding(), args)
 }
 
-func CallServiceExec(clientCtx client.Context, from string, extraArgs ...string) (testutil.BufferWriter, error) {
+func CallServiceExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdCallService(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdCallService(), args)
 }
 
-func RespondServiceExec(clientCtx client.Context, from string, extraArgs ...string) (testutil.BufferWriter, error) {
+func RespondServiceExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdRespondService(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdRespondService(), args)
 }
 
-func SetWithdrawAddrExec(clientCtx client.Context, withdrawalAddress, from string, extraArgs ...string) (testutil.BufferWriter, error) {
+func SetWithdrawAddrExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	withdrawalAddress,
+	from string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		withdrawalAddress,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdSetWithdrawAddr(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdSetWithdrawAddr(), args)
 }
 
-func WithdrawEarnedFeesExec(clientCtx client.Context, provider, from string, extraArgs ...string) (testutil.BufferWriter, error) {
+func WithdrawEarnedFeesExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	provider,
+	from string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		provider,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdWithdrawEarnedFees(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdWithdrawEarnedFees(), args)
 }
 
-func QueryServiceDefinitionExec(clientCtx client.Context, serviceName string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryServiceDefinitionExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	serviceName string,
+	extraArgs ...string,
+) *servicetypes.ServiceDefinition {
 	args := []string{
 		serviceName,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryServiceDefinition(), args)
+	response := &servicetypes.ServiceDefinition{}
+	network.ExecQueryCmd(t, clientCtx, servicecli.GetCmdQueryServiceDefinition(), args, response)
+	return response
 }
 
-func QueryServiceBindingExec(clientCtx client.Context, serviceName, provider string, extraArgs ...string) (testutil.BufferWriter, error) {
-	args := []string{
-		serviceName,
-		provider,
-		fmt.Sprintf("--%s=json", cli.OutputFlag),
-	}
-	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryServiceBinding(), args)
-}
-
-func QueryServiceBindingsExec(clientCtx client.Context, serviceName string, extraArgs ...string) (testutil.BufferWriter, error) {
-	args := []string{
-		serviceName,
-		fmt.Sprintf("--%s=json", cli.OutputFlag),
-	}
-	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryServiceBindings(), args)
-}
-
-func QueryServiceRequestsExec(clientCtx client.Context, serviceName, provider string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryServiceBindingExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	serviceName,
+	provider string,
+	extraArgs ...string,
+) *servicetypes.ServiceBinding {
 	args := []string{
 		serviceName,
 		provider,
@@ -150,10 +201,53 @@ func QueryServiceRequestsExec(clientCtx client.Context, serviceName, provider st
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryServiceRequests(), args)
+	response := &servicetypes.ServiceBinding{}
+	network.ExecQueryCmd(t, clientCtx, servicecli.GetCmdQueryServiceBinding(), args, response)
+	return response
 }
 
-func QueryServiceRequestsByReqCtx(clientCtx client.Context, requestContextID, batchCounter string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryServiceBindingsExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	serviceName string,
+	extraArgs ...string,
+) *servicetypes.QueryBindingsResponse {
+	args := []string{
+		serviceName,
+		fmt.Sprintf("--%s=json", cli.OutputFlag),
+	}
+	args = append(args, extraArgs...)
+
+	response := &servicetypes.QueryBindingsResponse{}
+	network.ExecQueryCmd(t, clientCtx, servicecli.GetCmdQueryServiceBindings(), args, response)
+	return response
+}
+
+func QueryServiceRequestsExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	serviceName,
+	provider string,
+	extraArgs ...string) *servicetypes.QueryRequestsResponse {
+	args := []string{
+		serviceName,
+		provider,
+		fmt.Sprintf("--%s=json", cli.OutputFlag),
+	}
+	args = append(args, extraArgs...)
+
+	response := &servicetypes.QueryRequestsResponse{}
+	network.ExecQueryCmd(t, clientCtx, servicecli.GetCmdQueryServiceRequests(), args, response)
+	return response
+}
+
+func QueryServiceRequestsByReqCtx(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	requestContextID,
+	batchCounter string,
+	extraArgs ...string,
+) *servicetypes.QueryRequestsResponse {
 	args := []string{
 		requestContextID,
 		batchCounter,
@@ -161,44 +255,74 @@ func QueryServiceRequestsByReqCtx(clientCtx client.Context, requestContextID, ba
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryServiceRequests(), args)
+	response := &servicetypes.QueryRequestsResponse{}
+	network.ExecQueryCmd(t, clientCtx, servicecli.GetCmdQueryServiceRequests(), args, response)
+	return response
+
 }
 
-func QueryEarnedFeesExec(clientCtx client.Context, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryEarnedFeesExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	extraArgs ...string,
+) *servicetypes.QueryEarnedFeesResponse {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryEarnedFees(), args)
+	response := &servicetypes.QueryEarnedFeesResponse{}
+	network.ExecQueryCmd(t, clientCtx, servicecli.GetCmdQueryEarnedFees(), args, response)
+	return response
 }
 
-func QueryRequestContextExec(clientCtx client.Context, contextId string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryRequestContextExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	contextId string,
+	extraArgs ...string,
+) *servicetypes.RequestContext {
 	args := []string{
 		contextId,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryRequestContext(), args)
+	response := &servicetypes.RequestContext{}
+	network.ExecQueryCmd(t, clientCtx, servicecli.GetCmdQueryRequestContext(), args, response)
+	return response
 }
 
-func QueryServiceRequestExec(clientCtx client.Context, requestId string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryServiceRequestExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	requestId string,
+	extraArgs ...string,
+) *servicetypes.Request {
 	args := []string{
 		requestId,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryServiceRequest(), args)
+	response := &servicetypes.Request{}
+	network.ExecQueryCmd(t, clientCtx, servicecli.GetCmdQueryServiceRequest(), args, response)
+	return response
 }
 
-func QueryServiceResponseExec(clientCtx client.Context, requestId string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryServiceResponseExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	requestId string,
+	extraArgs ...string,
+) *servicetypes.Response {
 	args := []string{
 		requestId,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryServiceResponse(), args)
+	response := &servicetypes.Response{}
+	network.ExecQueryCmd(t, clientCtx, servicecli.GetCmdQueryServiceResponse(), args, response)
+	return response
 }

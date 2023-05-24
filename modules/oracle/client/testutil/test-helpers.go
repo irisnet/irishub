@@ -2,82 +2,119 @@ package testutil
 
 import (
 	"fmt"
+	"testing"
 
 	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil"
-	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 
 	oraclecli "github.com/irisnet/irismod/modules/oracle/client/cli"
+	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
+	"github.com/irisnet/irismod/simapp"
 )
 
 // MsgRedelegateExec creates a redelegate message.
-func CreateFeedExec(clientCtx client.Context, from string, extraArgs ...string) (testutil.BufferWriter, error) {
+func CreateFeedExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	extraArgs ...string) *simapp.ResponseTx {
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, oraclecli.GetCmdCreateFeed(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, oraclecli.GetCmdCreateFeed(), args)
 }
 
-func EditFeedExec(clientCtx client.Context, from string, feedName string, extraArgs ...string) (testutil.BufferWriter, error) {
-	args := []string{
-		feedName,
-		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
-	}
-	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, oraclecli.GetCmdEditFeed(), args)
-}
-
-func StartFeedExec(clientCtx client.Context, from string, feedName string, extraArgs ...string) (testutil.BufferWriter, error) {
-	args := []string{
-		feedName,
-		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
-	}
-	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, oraclecli.GetCmdStartFeed(), args)
-}
-
-func PauseFeedExec(clientCtx client.Context, from string, feedName string, extraArgs ...string) (testutil.BufferWriter, error) {
+func EditFeedExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	feedName string,
+	extraArgs ...string) *simapp.ResponseTx {
 	args := []string{
 		feedName,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, oraclecli.GetCmdPauseFeed(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, oraclecli.GetCmdEditFeed(), args)
 }
 
-func QueryFeedExec(clientCtx client.Context, feedName string, extraArgs ...string) (testutil.BufferWriter, error) {
+func StartFeedExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	feedName string,
+	extraArgs ...string) *simapp.ResponseTx {
+	args := []string{
+		feedName,
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}
+	args = append(args, extraArgs...)
+
+	return network.ExecTxCmdWithResult(t, clientCtx, oraclecli.GetCmdStartFeed(), args)
+}
+
+func PauseFeedExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	feedName string,
+	extraArgs ...string) *simapp.ResponseTx {
+	args := []string{
+		feedName,
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}
+	args = append(args, extraArgs...)
+
+	return network.ExecTxCmdWithResult(t, clientCtx, oraclecli.GetCmdPauseFeed(), args)
+}
+
+func QueryFeedExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	feedName string,
+	extraArgs ...string) *oracletypes.FeedContext {
 	args := []string{
 		feedName,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, oraclecli.GetCmdQueryFeed(), args)
+	response := &oracletypes.FeedContext{}
+	network.ExecQueryCmd(t, clientCtx, oraclecli.GetCmdQueryFeed(), args, response)
+	return response
 }
 
-func QueryFeedsExec(clientCtx client.Context, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryFeedsExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	extraArgs ...string) *oracletypes.QueryFeedsResponse {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, oraclecli.GetCmdQueryFeeds(), args)
+	response := &oracletypes.QueryFeedsResponse{}
+	network.ExecQueryCmd(t, clientCtx, oraclecli.GetCmdQueryFeeds(), args, response)
+	return response
 }
 
-func QueryFeedValueExec(clientCtx client.Context, feedName string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryFeedValueExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	feedName string,
+	extraArgs ...string) *oracletypes.QueryFeedValueResponse {
 	args := []string{
 		feedName,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, oraclecli.GetCmdQueryFeedValue(), args)
+	response := &oracletypes.QueryFeedValueResponse{}
+	network.ExecQueryCmd(t, clientCtx, oraclecli.GetCmdQueryFeedValue(), args, response)
+	return response
 }

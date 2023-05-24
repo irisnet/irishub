@@ -2,28 +2,44 @@ package testutil
 
 import (
 	"fmt"
+	"testing"
 
+	"github.com/gogo/protobuf/proto"
 	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil"
-	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 
 	mtcli "github.com/irisnet/irismod/modules/mt/client/cli"
+	mttypes "github.com/irisnet/irismod/modules/mt/types"
+	"github.com/irisnet/irismod/simapp"
 )
 
 // IssueDenomExec creates a redelegate message.
-func IssueDenomExec(clientCtx client.Context, from string, extraArgs ...string) (testutil.BufferWriter, error) {
+func IssueDenomExec(
+	t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdIssueDenom(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, mtcli.GetCmdIssueDenom(), args)
 }
 
-func BurnMTExec(clientCtx client.Context, from string, denomID string, mtID string, amount string, extraArgs ...string) (testutil.BufferWriter, error) {
+func BurnMTExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	denomID string,
+	mtID string,
+	amount string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		denomID,
 		mtID,
@@ -32,20 +48,33 @@ func BurnMTExec(clientCtx client.Context, from string, denomID string, mtID stri
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdBurnMT(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, mtcli.GetCmdBurnMT(), args)
 }
 
-func MintMTExec(clientCtx client.Context, from string, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func MintMTExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	denomID string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdMintMT(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, mtcli.GetCmdMintMT(), args)
 }
 
-func EditMTExec(clientCtx client.Context, from string, denomID string, mtID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func EditMTExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	denomID string,
+	mtID string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		denomID,
 		mtID,
@@ -53,10 +82,19 @@ func EditMTExec(clientCtx client.Context, from string, denomID string, mtID stri
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdEditMT(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, mtcli.GetCmdEditMT(), args)
 }
 
-func TransferMTExec(clientCtx client.Context, from string, recipient string, denomID string, mtID string, amount string, extraArgs ...string) (testutil.BufferWriter, error) {
+func TransferMTExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	recipient string,
+	denomID string,
+	mtID string,
+	amount string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		from,
 		recipient,
@@ -66,50 +104,78 @@ func TransferMTExec(clientCtx client.Context, from string, recipient string, den
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdTransferMT(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, mtcli.GetCmdTransferMT(), args)
 }
 
-func QueryDenomExec(clientCtx client.Context, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryDenomExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	denomID string,
+	extraArgs ...string) *mttypes.Denom {
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryDenom(), args)
+	response := &mttypes.Denom{}
+	network.ExecQueryCmd(t, clientCtx, mtcli.GetCmdQueryDenom(), args, response)
+	return response
 }
 
-func QueryDenomsExec(clientCtx client.Context, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryDenomsExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	extraArgs ...string) *mttypes.QueryDenomsResponse {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryDenoms(), args)
+	response := &mttypes.QueryDenomsResponse{}
+	network.ExecQueryCmd(t, clientCtx, mtcli.GetCmdQueryDenoms(), args, response)
+	return response
 }
 
-func QueryMTsExec(clientCtx client.Context, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryMTsExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	denomID string,
+	resp proto.Message,
+	extraArgs ...string,
+) {
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryMTs(), args)
+	network.ExecQueryCmd(t, clientCtx, mtcli.GetCmdQueryMTs(), args, resp)
 }
 
-func QueryMTExec(clientCtx client.Context, denomID string, mtID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryMTExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	denomID string,
+	mtID string,
+	extraArgs ...string) *mttypes.MT {
 	args := []string{
 		denomID,
 		mtID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryMT(), args)
+	response := &mttypes.MT{}
+	network.ExecQueryCmd(t, clientCtx, mtcli.GetCmdQueryMT(), args, response)
+	return response
 }
 
-func QueryBlancesExec(clientCtx client.Context, from string, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryBlancesExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	denomID string,
+	extraArgs ...string) *mttypes.QueryBalancesResponse {
 	args := []string{
 		from,
 		denomID,
@@ -117,10 +183,19 @@ func QueryBlancesExec(clientCtx client.Context, from string, denomID string, ext
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdQueryBalances(), args)
+	response := &mttypes.QueryBalancesResponse{}
+	network.ExecQueryCmd(t, clientCtx, mtcli.GetCmdQueryBalances(), args, response)
+	return response
 }
 
-func TransferDenomExec(clientCtx client.Context, from string, recipient string, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func TransferDenomExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	recipient string,
+	denomID string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		from,
 		recipient,
@@ -128,5 +203,5 @@ func TransferDenomExec(clientCtx client.Context, from string, recipient string, 
 	}
 
 	args = append(args, extraArgs...)
-	return clitestutil.ExecTestCLICmd(clientCtx, mtcli.GetCmdTransferDenom(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, mtcli.GetCmdTransferDenom(), args)
 }
