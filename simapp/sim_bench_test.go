@@ -8,6 +8,7 @@ import (
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/require"
 
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/server"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
@@ -48,7 +49,15 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 	appOptions[flags.FlagHome] = DefaultNodeHome
 	appOptions[server.FlagInvCheckPeriod] = simcli.FlagPeriodValue
 
-	app := NewSimApp(logger, db, nil, true, appOptions, interBlockCacheOpt())
+	app := NewSimApp(
+		logger,
+		db,
+		nil,
+		true,
+		appOptions,
+		interBlockCacheOpt(),
+		baseapp.SetChainID(config.ChainID),
+	)
 
 	// run randomized simulation
 	_, simParams, simErr := simulation.SimulateFromSeed(
@@ -108,7 +117,15 @@ func BenchmarkInvariants(b *testing.B) {
 	appOptions[flags.FlagHome] = DefaultNodeHome
 	appOptions[server.FlagInvCheckPeriod] = simcli.FlagPeriodValue
 
-	app := NewSimApp(logger, db, nil, true, appOptions, interBlockCacheOpt())
+	app := NewSimApp(
+		logger,
+		db,
+		nil,
+		true,
+		appOptions,
+		interBlockCacheOpt(),
+		baseapp.SetChainID(config.ChainID),
+	)
 
 	// run randomized simulation
 	_, simParams, simErr := simulation.SimulateFromSeed(
