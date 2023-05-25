@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.2
+
+### Improvements
+
+* (IRISHUb) [\#](https://github.com/irisnet/irishub/pull/) Bump up ibc-go to v5.2.1
+
 ## 2.0.1
 
 ### API Breaking Changes
