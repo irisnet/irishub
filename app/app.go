@@ -110,6 +110,7 @@ import (
 	tibccli "github.com/bianjieai/tibc-go/modules/tibc/core/client/cli"
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
 
+	"github.com/evmos/ethermint/ethereum/eip712"
 	srvflags "github.com/evmos/ethermint/server/flags"
 	ethermint "github.com/evmos/ethermint/types"
 	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
@@ -235,6 +236,12 @@ func NewIrisApp(
 	appCodec := encodingConfig.Marshaler
 	legacyAmino := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
+
+	eip712.SetConfig(eip712.Config{
+		InterfaceRegistry: interfaceRegistry,
+		Amino:             legacyAmino,
+		ChainIDBuilder:    iristypes.BuildEthChainID,
+	})
 
 	bApp := baseapp.NewBaseApp(
 		iristypes.AppName,

@@ -208,4 +208,4 @@ replace github.com/zondax/hid => github.com/zondax/hid v0.9.0
 replace github.com/tendermint/tendermint => github.com/informalsystems/tendermint v0.34.26
 
 // use bianjieai fork of ethermint
-replace github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.20.0-irishub-1
+replace github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.20.1-0.20230602055216-f39a134cbc64
