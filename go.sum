@@ -138,8 +138,8 @@ github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d/go.mod h1:6QX/PXZ
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
 github.com/bgentry/speakeasy v0.1.1-0.20220910012023-760eaf8b6816 h1:41iFGWnSlI2gVpmOtVTJZNodLdLQLn/KsJqFvXwnd/s=
 github.com/bgentry/speakeasy v0.1.1-0.20220910012023-760eaf8b6816/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
-github.com/bianjieai/ethermint v0.20.0-irishub-1 h1:Wp/5xV5JVcPO4HCYMKOE6ks+QForncsghrloT0nqIek=
-github.com/bianjieai/ethermint v0.20.0-irishub-1/go.mod h1:6GwJlPogJh9aiWrDGNIOIQ0fX2Lo3Tc7sTvrSe+BFL4=
+github.com/bianjieai/ethermint v0.20.1-0.20230605013951-db87b54350e9 h1:mHEcJRJEEh6xlI5cxtXJWNwFiDEY6RkFiWrh5xpeubI=
+github.com/bianjieai/ethermint v0.20.1-0.20230605013951-db87b54350e9/go.mod h1:6GwJlPogJh9aiWrDGNIOIQ0fX2Lo3Tc7sTvrSe+BFL4=
 github.com/bianjieai/nft-transfer v1.1.1-beta.0.20230420064251-695f56a8d352 h1:zkpobkOiJWCKrJa4zlAx0YZsdlGsrPkcXYyCbZ+E+wA=
 github.com/bianjieai/nft-transfer v1.1.1-beta.0.20230420064251-695f56a8d352/go.mod h1:bZ9rO7aUT04ZBEO5I4/fi7rbu5Z1LDxg2A2+m9+eToI=
 github.com/bianjieai/tibc-go v0.4.3 h1:SlV6nmZZHTgkdpPLFnSoKPyKZJRZMKcTPxoF7UWdCm4=

@@ -110,6 +110,7 @@ import (
 	tibccli "github.com/bianjieai/tibc-go/modules/tibc/core/client/cli"
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
 
+	"github.com/evmos/ethermint/ethereum/eip712"
 	srvflags "github.com/evmos/ethermint/server/flags"
 	ethermint "github.com/evmos/ethermint/types"
 	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
@@ -306,6 +307,8 @@ func NewIrisApp(
 		tkeys:             tkeys,
 		memKeys:           memKeys,
 	}
+
+	app.initRuntime()
 
 	app.ParamsKeeper = initParamsKeeper(
 		appCodec,
@@ -920,6 +923,13 @@ func (app *IrisApp) RegisterTendermintService(clientCtx client.Context) {
 		app.interfaceRegistry,
 		app.Query,
 	)
+}
+
+func (app *IrisApp) initRuntime() {
+	eip712.InjectCodec(eip712.Codec{
+		InterfaceRegistry: app.interfaceRegistry,
+		Amino:             app.legacyAmino,
+	})
 }
 
 // initParamsKeeper init params keeper and its subspaces
