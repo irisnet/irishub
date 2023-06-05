@@ -237,12 +237,6 @@ func NewIrisApp(
 	legacyAmino := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
-	eip712.SetConfig(eip712.Config{
-		InterfaceRegistry: interfaceRegistry,
-		Amino:             legacyAmino,
-		ChainIDBuilder:    iristypes.BuildEthChainID,
-	})
-
 	bApp := baseapp.NewBaseApp(
 		iristypes.AppName,
 		logger,
@@ -313,6 +307,8 @@ func NewIrisApp(
 		tkeys:             tkeys,
 		memKeys:           memKeys,
 	}
+
+	app.initRuntime()
 
 	app.ParamsKeeper = initParamsKeeper(
 		appCodec,
@@ -927,6 +923,13 @@ func (app *IrisApp) RegisterTendermintService(clientCtx client.Context) {
 		app.interfaceRegistry,
 		app.Query,
 	)
+}
+
+func (app *IrisApp) initRuntime() {
+	eip712.InjectCodec(eip712.Codec{
+		InterfaceRegistry: app.interfaceRegistry,
+		Amino:             app.legacyAmino,
+	})
 }
 
 // initParamsKeeper init params keeper and its subspaces

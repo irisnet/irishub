@@ -9,6 +9,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	etherminttypes "github.com/evmos/ethermint/types"
+
 	"github.com/irisnet/irishub/address"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
@@ -77,4 +79,6 @@ func init() {
 		NativeToken.Mintable,
 		owner,
 	)
+
+	etherminttypes.InjectChainIDParser(parseChainID)
 }
