@@ -12,8 +12,6 @@ import (
 	ethermint "github.com/evmos/ethermint/x/evm"
 	"github.com/evmos/ethermint/x/evm/keeper"
 	"github.com/evmos/ethermint/x/evm/types"
-
-	iristypes "github.com/irisnet/irishub/types"
 )
 
 var (
@@ -38,15 +36,15 @@ func NewAppModule(k *keeper.Keeper, ak types.AccountKeeper, bankKeeper types.Ban
 
 // BeginBlock returns the begin block for the evm module.
 func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
-	ethChainID := iristypes.BuildEthChainID(ctx.ChainID())
-	am.AppModule.BeginBlock(ctx.WithChainID(ethChainID), req)
+	//ethChainID := iristypes.BuildEthChainID(ctx.ChainID())
+	am.AppModule.BeginBlock(ctx.WithChainID(ctx.ChainID()), req)
 }
 
 // InitGenesis performs genesis initialization for the evm module. It returns
 // no validator updates.
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.RawMessage) []abci.ValidatorUpdate {
-	ethChainID := iristypes.BuildEthChainID(ctx.ChainID())
-	return am.AppModule.InitGenesis(ctx.WithChainID(ethChainID), cdc, data)
+	//ethChainID := iristypes.BuildEthChainID(ctx.ChainID())
+	return am.AppModule.InitGenesis(ctx.WithChainID(ctx.ChainID()), cdc, data)
 }
 
 // RegisterServices registers a GRPC query service to respond to the
