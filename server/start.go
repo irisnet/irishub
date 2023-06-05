@@ -527,7 +527,6 @@ func startInProcess(ctx *server.Context, clientCtx client.Context, appCreator ty
 			return err
 		}
 
-		//chainID := iristypes.BuildEthChainID(genDoc.ChainID)
 		clientCtx := clientCtx.WithChainID(genDoc.ChainID)
 
 		tmEndpoint := "/websocket"
