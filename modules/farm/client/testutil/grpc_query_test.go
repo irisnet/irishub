@@ -56,7 +56,11 @@ func (s *IntegrationTestSuite) TestRest() {
 	globalFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
 	args := []string{
@@ -77,7 +81,11 @@ func (s *IntegrationTestSuite) TestRest() {
 		args...,
 	)
 
-	poolId := s.network.GetAttribute(farmtypes.EventTypeCreatePool, farmtypes.AttributeValuePoolId, txResult.Events)
+	poolId := s.network.GetAttribute(
+		farmtypes.EventTypeCreatePool,
+		farmtypes.AttributeValuePoolId,
+		txResult.Events,
+	)
 	expectedContents := farmtypes.FarmPoolEntry{
 		Id:              poolId,
 		Description:     description,
@@ -128,6 +136,12 @@ func (s *IntegrationTestSuite) TestRest() {
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, queryFarmerRespType))
 	farmer := queryFarmerRespType.(*farmtypes.QueryFarmerResponse)
+
+	if farmer.Height-txResult.Height > 0 {
+		expectFarmer.PendingReward = rewardPerBlock.MulInt(
+			sdk.NewInt((farmer.Height - txResult.Height)),
+		)
+	}
 	s.Require().EqualValues(expectFarmer, *farmer.List[0])
 }
 
