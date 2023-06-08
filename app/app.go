@@ -288,7 +288,7 @@ func NewIrisApp(
 		memKeys:           memKeys,
 	}
 
-	app.initRuntime()
+	app.init()
 
 	app.ParamsKeeper = initParamsKeeper(
 		appCodec,
@@ -862,7 +862,7 @@ func (app *IrisApp) RegisterTendermintService(clientCtx client.Context) {
 	)
 }
 
-func (app *IrisApp) initRuntime() {
+func (app *IrisApp) init() {
 	eip712.InjectCodec(eip712.Codec{
 		InterfaceRegistry: app.interfaceRegistry,
 		Amino:             app.legacyAmino,
