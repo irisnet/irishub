@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.3
+
+### Improvements
+
+* (IRISHub) [\#2854](https://github.com/irisnet/irishub/pull/2854) Bump up Cosmos-SDK to v0.46.13
+
 ## 2.0.2
 
 ### Improvements
