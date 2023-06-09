@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -45,10 +45,13 @@ func TestHTLCTestSuite(t *testing.T) {
 }
 
 func (suite *HTLCTestSuite) SetupTest() {
-	app := simapp.SetupWithGenesisStateFn(suite.T(), func(cdc codec.Codec, state simapp.GenesisState) simapp.GenesisState {
-		state[types.ModuleName] = cdc.MustMarshalJSON(NewHTLTGenesis(TestDeputy))
-		return state
-	})
+	app := simapp.SetupWithGenesisStateFn(
+		suite.T(),
+		func(cdc codec.Codec, state simapp.GenesisState) simapp.GenesisState {
+			state[types.ModuleName] = cdc.MustMarshalJSON(NewHTLTGenesis(TestDeputy))
+			return state
+		},
+	)
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{Height: 1, Time: time.Now()})
 
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
@@ -62,7 +65,12 @@ func (suite *HTLCTestSuite) SetupTest() {
 	coins := cs(c(BNB_DENOM, STARING_BNB_BALANCE), c(OTHER_DENOM, STARING_OTHER_BALANCE))
 	for _, acc := range addrs {
 		_ = suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, coins)
-		_ = suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, acc, coins)
+		_ = suite.app.BankKeeper.SendCoinsFromModuleToAccount(
+			suite.ctx,
+			types.ModuleName,
+			acc,
+			coins,
+		)
 	}
 
 	suite.setTestParams()
@@ -388,7 +396,11 @@ func (suite *HTLCTestSuite) TestCreateHTLC() {
 					htlcAssetDenom = BNB_DENOM
 				}
 
-				senderBalancePre := suite.app.BankKeeper.GetBalance(suite.ctx, tc.args.sender, htlcAssetDenom)
+				senderBalancePre := suite.app.BankKeeper.GetBalance(
+					suite.ctx,
+					tc.args.sender,
+					htlcAssetDenom,
+				)
 				assetSupplyPre, _ := suite.keeper.GetAssetSupply(suite.ctx, htlcAssetDenom)
 
 				// Create htlt
@@ -406,11 +418,20 @@ func (suite *HTLCTestSuite) TestCreateHTLC() {
 				)
 
 				// Load sender's account after htlt creation
-				senderBalancePost := suite.app.BankKeeper.GetBalance(suite.ctx, tc.args.sender, htlcAssetDenom)
+				senderBalancePost := suite.app.BankKeeper.GetBalance(
+					suite.ctx,
+					tc.args.sender,
+					htlcAssetDenom,
+				)
 				assetSupplyPost, _ := suite.keeper.GetAssetSupply(suite.ctx, htlcAssetDenom)
 
 				// Load expected htlt ID
-				expectedHTLCID := types.GetID(tc.args.sender, tc.args.receiver, tc.args.amount, tc.args.hashLock)
+				expectedHTLCID := types.GetID(
+					tc.args.sender,
+					tc.args.receiver,
+					tc.args.amount,
+					tc.args.hashLock,
+				)
 				suite.Equal(expectedHTLCID, id, tc.name)
 
 				if tc.expectPass {
@@ -418,11 +439,23 @@ func (suite *HTLCTestSuite) TestCreateHTLC() {
 					// Check incoming/outgoing asset supply increased
 					switch tc.args.direction {
 					case types.Incoming:
-						suite.Equal(assetSupplyPre.IncomingSupply.Add(tc.args.amount[0]).String(), assetSupplyPost.IncomingSupply.String(), tc.name)
+						suite.Equal(
+							assetSupplyPre.IncomingSupply.Add(tc.args.amount[0]).String(),
+							assetSupplyPost.IncomingSupply.String(),
+							tc.name,
+						)
 					case types.Outgoing:
 						// Check coins moved
-						suite.Equal(senderBalancePre.Sub(tc.args.amount[0]).String(), senderBalancePost.String(), tc.name)
-						suite.Equal(assetSupplyPre.OutgoingSupply.Add(tc.args.amount[0]).String(), assetSupplyPost.OutgoingSupply.String(), tc.name)
+						suite.Equal(
+							senderBalancePre.Sub(tc.args.amount[0]).String(),
+							senderBalancePost.String(),
+							tc.name,
+						)
+						suite.Equal(
+							assetSupplyPre.OutgoingSupply.Add(tc.args.amount[0]).String(),
+							assetSupplyPost.OutgoingSupply.String(),
+							tc.name,
+						)
 					default:
 						suite.Fail("should not have invalid direction", tc.name)
 					}
@@ -591,7 +624,12 @@ func (suite *HTLCTestSuite) TestClaimHtlc() {
 				)
 				suite.NoError(err, tc.name)
 
-				realHTLCID := types.GetID(sender, expectedRecipient, tc.args.amount, suite.hashLocks[i])
+				realHTLCID := types.GetID(
+					sender,
+					expectedRecipient,
+					tc.args.amount,
+					suite.hashLocks[i],
+				)
 				suite.Equal(realHTLCID, id, tc.name)
 
 				// If args contains an invalid htlc ID claim attempt will use it instead of the real htlc ID
@@ -613,13 +651,27 @@ func (suite *HTLCTestSuite) TestClaimHtlc() {
 				// Run the beginblocker before attempting claim
 				htlc.BeginBlocker(tc.claimCtx, *suite.keeper)
 
-				expectedRecipientBalancePre := suite.app.BankKeeper.GetBalance(suite.ctx, expectedRecipient, tc.args.amount[0].Denom)
-				assetSupplyPre, _ := suite.keeper.GetAssetSupply(tc.claimCtx, tc.args.amount[0].Denom)
+				expectedRecipientBalancePre := suite.app.BankKeeper.GetBalance(
+					suite.ctx,
+					expectedRecipient,
+					tc.args.amount[0].Denom,
+				)
+				assetSupplyPre, _ := suite.keeper.GetAssetSupply(
+					tc.claimCtx,
+					tc.args.amount[0].Denom,
+				)
 
 				// Attempt to claim htlc
 				_, _, _, err = suite.keeper.ClaimHTLC(tc.claimCtx, htlcID, claimSecret)
-				expectedRecipientBalancePost := suite.app.BankKeeper.GetBalance(suite.ctx, expectedRecipient, tc.args.amount[0].Denom)
-				assetSupplyPost, _ := suite.keeper.GetAssetSupply(tc.claimCtx, tc.args.amount[0].Denom)
+				expectedRecipientBalancePost := suite.app.BankKeeper.GetBalance(
+					suite.ctx,
+					expectedRecipient,
+					tc.args.amount[0].Denom,
+				)
+				assetSupplyPost, _ := suite.keeper.GetAssetSupply(
+					tc.claimCtx,
+					tc.args.amount[0].Denom,
+				)
 
 				if tc.expectPass {
 					suite.NoError(err, tc.name)
@@ -628,20 +680,49 @@ func (suite *HTLCTestSuite) TestClaimHtlc() {
 					switch tc.args.direction {
 					case types.Incoming:
 						// Check coins moved
-						suite.Equal(expectedRecipientBalancePre.Add(tc.args.amount[0]).String(), expectedRecipientBalancePost.String(), tc.name)
+						suite.Equal(
+							expectedRecipientBalancePre.Add(tc.args.amount[0]).String(),
+							expectedRecipientBalancePost.String(),
+							tc.name,
+						)
 						// Check incoming supply decreased
-						suite.Equal(assetSupplyPre.IncomingSupply.Amount.Sub(tc.args.amount[0].Amount).String(), assetSupplyPost.IncomingSupply.Amount.String(), tc.name)
+						suite.Equal(
+							assetSupplyPre.IncomingSupply.Amount.Sub(tc.args.amount[0].Amount).
+								String(),
+							assetSupplyPost.IncomingSupply.Amount.String(),
+							tc.name,
+						)
 						// Check current supply increased
-						suite.Equal(assetSupplyPre.CurrentSupply.Add(tc.args.amount[0]).String(), assetSupplyPost.CurrentSupply.String(), tc.name)
+						suite.Equal(
+							assetSupplyPre.CurrentSupply.Add(tc.args.amount[0]).String(),
+							assetSupplyPost.CurrentSupply.String(),
+							tc.name,
+						)
 						// Check outgoing supply not changed
-						suite.Equal(assetSupplyPre.OutgoingSupply.String(), assetSupplyPost.OutgoingSupply.String(), tc.name)
+						suite.Equal(
+							assetSupplyPre.OutgoingSupply.String(),
+							assetSupplyPost.OutgoingSupply.String(),
+							tc.name,
+						)
 					case types.Outgoing:
 						// Check incoming supply not changed
-						suite.Equal(assetSupplyPre.IncomingSupply.String(), assetSupplyPost.IncomingSupply.String(), tc.name)
+						suite.Equal(
+							assetSupplyPre.IncomingSupply.String(),
+							assetSupplyPost.IncomingSupply.String(),
+							tc.name,
+						)
 						// Check current supply decreased
-						suite.Equal(assetSupplyPre.CurrentSupply.Sub(tc.args.amount[0]).String(), assetSupplyPost.CurrentSupply.String(), tc.name)
+						suite.Equal(
+							assetSupplyPre.CurrentSupply.Sub(tc.args.amount[0]).String(),
+							assetSupplyPost.CurrentSupply.String(),
+							tc.name,
+						)
 						// Check outgoing supply decreased
-						suite.Equal(assetSupplyPre.OutgoingSupply.Sub(tc.args.amount[0]).String(), assetSupplyPost.OutgoingSupply.String(), tc.name)
+						suite.Equal(
+							assetSupplyPre.OutgoingSupply.Sub(tc.args.amount[0]).String(),
+							assetSupplyPost.OutgoingSupply.String(),
+							tc.name,
+						)
 					default:
 						suite.Fail("should not have invalid direction")
 					}
@@ -734,7 +815,10 @@ func (suite *HTLCTestSuite) TestRefundHTLC() {
 				if tc.args.direction == types.Outgoing {
 					sender = suite.addrs[6]
 					expectedRecipient = suite.deputy
-					err := suite.keeper.IncrementCurrentAssetSupply(suite.ctx, expectedRefundAmount[0])
+					err := suite.keeper.IncrementCurrentAssetSupply(
+						suite.ctx,
+						expectedRefundAmount[0],
+					)
 					suite.Nil(err)
 				}
 
@@ -753,35 +837,82 @@ func (suite *HTLCTestSuite) TestRefundHTLC() {
 				)
 				suite.NoError(err, tc.name)
 
-				realHTLCID := types.GetID(sender, expectedRecipient, expectedRefundAmount, suite.hashLocks[i])
+				realHTLCID := types.GetID(
+					sender,
+					expectedRecipient,
+					expectedRefundAmount,
+					suite.hashLocks[i],
+				)
 				suite.Equal(realHTLCID, id, tc.name)
 
-				originalSenderBalancePre := suite.app.BankKeeper.GetBalance(tc.refundCtx, sender, expectedRefundAmount[0].Denom)
-				assetSupplyPre, _ := suite.keeper.GetAssetSupply(tc.refundCtx, expectedRefundAmount[0].Denom)
+				originalSenderBalancePre := suite.app.BankKeeper.GetBalance(
+					tc.refundCtx,
+					sender,
+					expectedRefundAmount[0].Denom,
+				)
+				assetSupplyPre, _ := suite.keeper.GetAssetSupply(
+					tc.refundCtx,
+					expectedRefundAmount[0].Denom,
+				)
 
 				// Run the beginblocker before attempting refund
 				htlc.BeginBlocker(tc.refundCtx, *suite.keeper)
 
-				originalSenderBalancePost := suite.app.BankKeeper.GetBalance(tc.refundCtx, sender, expectedRefundAmount[0].Denom)
-				assetSupplyPost, _ := suite.keeper.GetAssetSupply(tc.refundCtx, expectedRefundAmount[0].Denom)
+				originalSenderBalancePost := suite.app.BankKeeper.GetBalance(
+					tc.refundCtx,
+					sender,
+					expectedRefundAmount[0].Denom,
+				)
+				assetSupplyPost, _ := suite.keeper.GetAssetSupply(
+					tc.refundCtx,
+					expectedRefundAmount[0].Denom,
+				)
 
 				if tc.expectPass {
 					// Check asset supply changes
 					switch tc.args.direction {
 					case types.Incoming:
 						// Check incoming supply decreased
-						suite.Equal(assetSupplyPre.IncomingSupply.Sub(expectedRefundAmount[0]).String(), assetSupplyPost.IncomingSupply.String(), tc.name)
+						suite.Equal(
+							assetSupplyPre.IncomingSupply.Sub(expectedRefundAmount[0]).String(),
+							assetSupplyPost.IncomingSupply.String(),
+							tc.name,
+						)
 						// Check current, outgoing supply not changed
-						suite.Equal(assetSupplyPre.CurrentSupply.String(), assetSupplyPost.CurrentSupply.String(), tc.name)
-						suite.Equal(assetSupplyPre.OutgoingSupply.String(), assetSupplyPost.OutgoingSupply.String(), tc.name)
+						suite.Equal(
+							assetSupplyPre.CurrentSupply.String(),
+							assetSupplyPost.CurrentSupply.String(),
+							tc.name,
+						)
+						suite.Equal(
+							assetSupplyPre.OutgoingSupply.String(),
+							assetSupplyPost.OutgoingSupply.String(),
+							tc.name,
+						)
 					case types.Outgoing:
 						// Check coins moved
-						suite.Equal(originalSenderBalancePre.Add(expectedRefundAmount[0]).String(), originalSenderBalancePost.String(), tc.name)
+						suite.Equal(
+							originalSenderBalancePre.Add(expectedRefundAmount[0]).String(),
+							originalSenderBalancePost.String(),
+							tc.name,
+						)
 						// Check incoming, current supply not changed
-						suite.Equal(assetSupplyPre.IncomingSupply.String(), assetSupplyPost.IncomingSupply.String(), tc.name)
-						suite.Equal(assetSupplyPre.CurrentSupply.String(), assetSupplyPost.CurrentSupply.String(), tc.name)
+						suite.Equal(
+							assetSupplyPre.IncomingSupply.String(),
+							assetSupplyPost.IncomingSupply.String(),
+							tc.name,
+						)
+						suite.Equal(
+							assetSupplyPre.CurrentSupply.String(),
+							assetSupplyPost.CurrentSupply.String(),
+							tc.name,
+						)
 						// Check outgoing supply decreased
-						suite.Equal(assetSupplyPre.OutgoingSupply.Sub(expectedRefundAmount[0]).String(), assetSupplyPost.OutgoingSupply.String(), tc.name)
+						suite.Equal(
+							assetSupplyPre.OutgoingSupply.Sub(expectedRefundAmount[0]).String(),
+							assetSupplyPost.OutgoingSupply.String(),
+							tc.name,
+						)
 					default:
 						suite.Fail("should not have invalid direction")
 					}

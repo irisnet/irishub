@@ -5,7 +5,7 @@ import (
 
 	gogotypes "github.com/gogo/protobuf/types"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -26,7 +26,10 @@ func (k Keeper) GetFeed(ctx sdk.Context, feedName string) (feed types.Feed, foun
 }
 
 // GetFeedByReqCtxID returns the feed by the request context ID
-func (k Keeper) GetFeedByReqCtxID(ctx sdk.Context, requestContextID tmbytes.HexBytes) (feed types.Feed, found bool) {
+func (k Keeper) GetFeedByReqCtxID(
+	ctx sdk.Context,
+	requestContextID tmbytes.HexBytes,
+) (feed types.Feed, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.GetReqCtxIDKey(requestContextID))
 	var feedName gogotypes.StringValue

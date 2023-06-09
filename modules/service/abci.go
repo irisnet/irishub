@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -29,13 +29,24 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 		_ = k.RefundServiceFee(ctx, consumer, request.ServiceFee)
 
 		provider, _ := sdk.AccAddressFromBech32(request.Provider)
-		k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, requestID)
+		k.DeleteActiveRequest(
+			ctx,
+			request.ServiceName,
+			provider,
+			request.ExpirationHeight,
+			requestID,
+		)
 	}
 
 	// handler for the expired request batch
 	expiredRequestBatchHandler := func(requestContextID tmbytes.HexBytes, requestContext types.RequestContext) {
 		if requestContext.BatchState != types.BATCHCOMPLETED {
-			k.IterateActiveRequests(ctx, requestContextID, requestContext.BatchCounter, expiredRequestHandler)
+			k.IterateActiveRequests(
+				ctx,
+				requestContextID,
+				requestContext.BatchCounter,
+				expiredRequestHandler,
+			)
 			resContext := k.CompleteBatch(ctx, requestContext, requestContextID)
 			requestContext = resContext
 		}
@@ -48,8 +59,15 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 		}
 
 		if requestContext.State == types.RUNNING {
-			if requestContext.Repeated && (requestContext.RepeatedTotal < 0 || int64(requestContext.BatchCounter) < requestContext.RepeatedTotal) {
-				k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight()-requestContext.Timeout+int64(requestContext.RepeatedFrequency))
+			if requestContext.Repeated &&
+				(requestContext.RepeatedTotal < 0 || int64(requestContext.BatchCounter) < requestContext.RepeatedTotal) {
+				k.AddNewRequestBatch(
+					ctx,
+					requestContextID,
+					ctx.BlockHeight()-requestContext.Timeout+int64(
+						requestContext.RepeatedFrequency,
+					),
+				)
 			} else {
 				k.CompleteServiceContext(ctx, requestContext, requestContextID)
 			}
@@ -83,7 +101,10 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 					sdk.NewEvent(
 						types.EventTypeNoExchangeRate,
 						sdk.NewAttribute(types.AttributeKeyPriceDenom, rawDenom),
-						sdk.NewAttribute(types.AttributeKeyRequestContextID, requestContextID.String()),
+						sdk.NewAttribute(
+							types.AttributeKeyRequestContextID,
+							requestContextID.String(),
+						),
 						sdk.NewAttribute(types.AttributeKeyServiceName, requestContext.ServiceName),
 						sdk.NewAttribute(types.AttributeKeyConsumer, requestContext.Consumer),
 					),
@@ -93,12 +114,21 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 
 			if len(providers) > 0 && len(providers) >= int(requestContext.ResponseThreshold) {
 				if err := k.DeductServiceFees(ctx, consumer, totalPrices); err != nil {
-					k.OnRequestContextPaused(ctx, requestContext, requestContextID, "insufficient balances")
+					k.OnRequestContextPaused(
+						ctx,
+						requestContext,
+						requestContextID,
+						"insufficient balances",
+					)
 				}
 
 				if requestContext.State == types.RUNNING {
 					_ = k.InitiateRequests(ctx, requestContextID, providers, providerRequests)
-					k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
+					k.AddRequestBatchExpiration(
+						ctx,
+						requestContextID,
+						ctx.BlockHeight()+requestContext.Timeout,
+					)
 				}
 			} else {
 				k.SkipCurrentRequestBatch(ctx, requestContextID, *requestContext)

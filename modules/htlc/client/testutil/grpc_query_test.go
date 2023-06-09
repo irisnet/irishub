@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/tendermint/tendermint/crypto"
+	"github.com/cometbft/cometbft/crypto"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	htlccli "github.com/irisnet/irismod/modules/htlc/client/cli"
@@ -21,24 +19,13 @@ import (
 type IntegrationTestSuite struct {
 	suite.Suite
 
-	cfg     network.Config
-	network *network.Network
+	network simapp.Network
 }
 
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	cfg := simapp.NewConfig()
-	cfg.NumValidators = 1
-
-	s.cfg = cfg
-
-	var err error
-	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
-	s.Require().NoError(err)
-
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.network = simapp.SetupNetwork(s.T())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -73,30 +60,19 @@ func (s *IntegrationTestSuite) TestHtlc() {
 		fmt.Sprintf("--%s=%d", htlccli.FlagTimestamp, timestamp),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	respType := proto.Message(&sdk.TxResponse{})
-	expectedCode := uint32(0)
-
-	bz, err := htlctestutil.CreateHTLCExec(val.ClientCtx, from.String(), args...)
-	s.Require().NoError(err)
-	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp := respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
-
-	//------test GetCmdQueryHTLC()-------------
-	//url := fmt.Sprintf("%s/irismod/htlc/htlcs/%s", baseURL, hashLock)
-	//resp, err := rest.GetRequest(url)
-	//respType = proto.Message(&htlctypes.QueryHTLCResponse{})
-	//s.Require().NoError(err)
-	//s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(resp, respType))
-	//htlcResp := respType.(*htlctypes.QueryHTLCResponse)
-	//s.Require().Equal(amount, htlcResp.Htlc.Amount.String())
-	//s.Require().Equal(from.String(), htlcResp.Htlc.Sender)
-	//s.Require().Equal(to.String(), htlcResp.Htlc.To)
-	//s.Require().Equal(receiverOnOtherChain, htlcResp.Htlc.ReceiverOnOtherChain)
-	//s.Require().Equal(timestamp, htlcResp.Htlc.Timestamp)
-	//s.Require().Equal(stateOpen, htlcResp.Htlc.State.String())
+	_ = htlctestutil.CreateHTLCExec(
+		s.T(),
+		s.network,
+		val.ClientCtx,
+		from.String(),
+		args...,
+	)
 }

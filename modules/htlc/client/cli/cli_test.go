@@ -7,15 +7,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/client/testutil"
 
 	htlccli "github.com/irisnet/irismod/modules/htlc/client/cli"
 	htlctestutil "github.com/irisnet/irismod/modules/htlc/client/testutil"
@@ -49,8 +46,7 @@ DDzEQAPXBQflzNW6wbne9IfT651zCSm+j1MWaGk=
 type IntegrationTestSuite struct {
 	suite.Suite
 
-	cfg     network.Config
-	network *network.Network
+	network simapp.Network
 }
 
 func c(denom string, amount int64) sdk.Coin {
@@ -73,14 +69,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 
 	Deputy, _ = sdk.AccAddressFromBech32(DEPUTY_ADDR)
 	cfg.GenesisState[htlctypes.ModuleName] = cfg.Codec.MustMarshalJSON(NewHTLTGenesis(Deputy))
-
-	var err error
-	s.cfg = cfg
-	s.network, err = network.New(s.T(), s.T().TempDir(), cfg)
-	s.Require().NoError(err)
-
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.network = simapp.SetupNetworkWithConfig(s.T(), cfg)
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -93,26 +82,30 @@ func TestIntegrationTestSuite(t *testing.T) {
 }
 
 func (s *IntegrationTestSuite) TestHTLC() {
-
 	// ---------------------------------------------------------------
-
 	ctx := s.network.Validators[0].ClientCtx
 	err := ctx.Keyring.ImportPrivKey("deputy", DeputyArmor, "1234567890")
 	s.Require().NoError(err)
 
 	args := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	respType := proto.Message(&sdk.TxResponse{})
-	expectedCode := uint32(0)
-	bz, err := banktestutil.MsgSendExec(ctx, s.network.Validators[0].Address, Deputy, cs(c(sdk.DefaultBondDenom, 50000000)), args...)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp := respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
+	_ = simapp.MsgSendExec(
+		s.T(),
+		s.network,
+		ctx,
+		s.network.Validators[0].Address,
+		Deputy,
+		cs(c(sdk.DefaultBondDenom, 50000000)),
+		args...,
+	)
 
 	// ---------------------------------------------------------------
 
@@ -186,80 +179,107 @@ func (s *IntegrationTestSuite) TestHTLC() {
 	args = []string{
 		fmt.Sprintf("--%s=%s", htlccli.FlagTo, testCases[0].args.receiver),
 		fmt.Sprintf("--%s=%s", htlccli.FlagAmount, testCases[0].args.amount),
-		fmt.Sprintf("--%s=%s", htlccli.FlagReceiverOnOtherChain, testCases[0].args.receiverOtherChain),
+		fmt.Sprintf(
+			"--%s=%s",
+			htlccli.FlagReceiverOnOtherChain,
+			testCases[0].args.receiverOtherChain,
+		),
 		fmt.Sprintf("--%s=%s", htlccli.FlagSenderOnOtherChain, testCases[0].args.senderOtherChain),
-		fmt.Sprintf("--%s=%s", htlccli.FlagHashLock, tmbytes.HexBytes(htlctypes.GetHashLock(testCases[0].args.secret, testCases[0].args.timestamp)).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			htlccli.FlagHashLock,
+			tmbytes.HexBytes(htlctypes.GetHashLock(testCases[0].args.secret, testCases[0].args.timestamp)).
+				String(),
+		),
 		fmt.Sprintf("--%s=%d", htlccli.FlagTimeLock, testCases[0].args.timeLock),
 		fmt.Sprintf("--%s=%d", htlccli.FlagTimestamp, testCases[0].args.timestamp),
-		fmt.Sprintf("--%s=%s", htlccli.FlagTransfer, strconv.FormatBool(testCases[0].args.transfer)),
+		fmt.Sprintf(
+			"--%s=%s",
+			htlccli.FlagTransfer,
+			strconv.FormatBool(testCases[0].args.transfer),
+		),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	respType = proto.Message(&sdk.TxResponse{})
-	expectedCode = uint32(0)
-
-	bz, err = htlctestutil.CreateHTLCExec(ctx, testCases[0].args.sender.String(), args...)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp = respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
+	txResult := htlctestutil.CreateHTLCExec(
+		s.T(),
+		s.network,
+		ctx,
+		testCases[0].args.sender.String(),
+		args...,
+	)
 
 	// ---------------------------------------------------------------
 
 	expectedhtlc := htlctypes.HTLC{
-		Id:                   htlctypes.GetID(testCases[0].args.sender, testCases[0].args.receiver, testCases[0].args.amount, htlctypes.GetHashLock(testCases[0].args.secret, testCases[0].args.timestamp)).String(),
+		Id: htlctypes.GetID(testCases[0].args.sender, testCases[0].args.receiver, testCases[0].args.amount, htlctypes.GetHashLock(testCases[0].args.secret, testCases[0].args.timestamp)).
+			String(),
 		Sender:               testCases[0].args.sender.String(),
 		To:                   testCases[0].args.receiver.String(),
 		ReceiverOnOtherChain: ReceiverOnOtherChain,
 		SenderOnOtherChain:   SenderOnOtherChain,
 		Amount:               testCases[0].args.amount,
 		Secret:               "",
-		HashLock:             tmbytes.HexBytes(htlctypes.GetHashLock(testCases[0].args.secret, testCases[0].args.timestamp)).String(),
-		Timestamp:            testCases[0].args.timestamp,
-		ExpirationHeight:     uint64(txResp.Height) + testCases[0].args.timeLock,
-		State:                htlctypes.Open,
-		ClosedBlock:          0,
-		Transfer:             testCases[0].args.transfer,
-		Direction:            testCases[0].args.direction,
+		HashLock: tmbytes.HexBytes(htlctypes.GetHashLock(testCases[0].args.secret, testCases[0].args.timestamp)).
+			String(),
+		Timestamp:        testCases[0].args.timestamp,
+		ExpirationHeight: uint64(txResult.Height) + testCases[0].args.timeLock,
+		State:            htlctypes.Open,
+		ClosedBlock:      0,
+		Transfer:         testCases[0].args.transfer,
+		Direction:        testCases[0].args.direction,
 	}
-	respType = proto.Message(&htlctypes.HTLC{})
-	bz, err = htlctestutil.QueryHTLCExec(ctx, expectedhtlc.Id)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	htlcItem := respType.(*htlctypes.HTLC)
-	s.Require().Equal(expectedhtlc.String(), htlcItem.String())
+	respType := htlctestutil.QueryHTLCExec(
+		s.T(),
+		s.network,
+		ctx,
+		expectedhtlc.Id,
+	)
+	s.Require().Equal(expectedhtlc.String(), respType.String())
 
 	// ---------------------------------------------------------------
 
 	args = []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	respType = proto.Message(&sdk.TxResponse{})
+	txResult = htlctestutil.ClaimHTLCExec(
+		s.T(),
+		s.network,
+		ctx,
+		testCases[0].args.sender.String(),
+		expectedhtlc.Id,
+		testCases[0].args.secret.String(),
+		args...,
+	)
 
-	bz, err = htlctestutil.ClaimHTLCExec(ctx, testCases[0].args.sender.String(), expectedhtlc.Id, testCases[0].args.secret.String(), args...)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp = respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
+	respType = htlctestutil.QueryHTLCExec(
+		s.T(),
+		s.network,
+		ctx,
+		expectedhtlc.Id,
+	)
+	s.Require().Equal(htlctypes.Completed.String(), respType.State.String())
 
-	respType = proto.Message(&htlctypes.HTLC{})
-	bz, err = htlctestutil.QueryHTLCExec(ctx, expectedhtlc.Id)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	htlcItem = respType.(*htlctypes.HTLC)
-	s.Require().Equal(htlctypes.Completed.String(), htlcItem.State.String())
-
-	coinType := proto.Message(&sdk.Coin{})
-	out, err := simapp.QueryBalanceExec(ctx, testCases[0].args.receiver.String(), sdk.DefaultBondDenom)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(out.Bytes(), coinType))
-	balance := coinType.(*sdk.Coin)
+	balance := simapp.QueryBalanceExec(
+		s.T(),
+		s.network,
+		ctx, testCases[0].args.receiver.String(),
+		sdk.DefaultBondDenom,
+	)
 	s.Require().Equal("400001000stake", balance.String())
 
 	// ---------------------------------------------------------------
@@ -269,74 +289,100 @@ func (s *IntegrationTestSuite) TestHTLC() {
 	args = []string{
 		fmt.Sprintf("--%s=%s", htlccli.FlagTo, testCases[1].args.receiver),
 		fmt.Sprintf("--%s=%s", htlccli.FlagAmount, testCases[1].args.amount),
-		fmt.Sprintf("--%s=%s", htlccli.FlagReceiverOnOtherChain, testCases[1].args.receiverOtherChain),
+		fmt.Sprintf(
+			"--%s=%s",
+			htlccli.FlagReceiverOnOtherChain,
+			testCases[1].args.receiverOtherChain,
+		),
 		fmt.Sprintf("--%s=%s", htlccli.FlagSenderOnOtherChain, testCases[1].args.senderOtherChain),
-		fmt.Sprintf("--%s=%s", htlccli.FlagHashLock, tmbytes.HexBytes(htlctypes.GetHashLock(testCases[1].args.secret, testCases[1].args.timestamp)).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			htlccli.FlagHashLock,
+			tmbytes.HexBytes(htlctypes.GetHashLock(testCases[1].args.secret, testCases[1].args.timestamp)).
+				String(),
+		),
 		fmt.Sprintf("--%s=%d", htlccli.FlagTimeLock, testCases[1].args.timeLock),
 		fmt.Sprintf("--%s=%d", htlccli.FlagTimestamp, testCases[1].args.timestamp),
-		fmt.Sprintf("--%s=%s", htlccli.FlagTransfer, strconv.FormatBool(testCases[1].args.transfer)),
+		fmt.Sprintf(
+			"--%s=%s",
+			htlccli.FlagTransfer,
+			strconv.FormatBool(testCases[1].args.transfer),
+		),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	respType = proto.Message(&sdk.TxResponse{})
-	expectedCode = uint32(0)
-
-	bz, err = htlctestutil.CreateHTLCExec(ctx, testCases[1].args.sender.String(), args...)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp = respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
+	txResult = htlctestutil.CreateHTLCExec(
+		s.T(),
+		s.network,
+		ctx,
+		testCases[1].args.sender.String(),
+		args...,
+	)
 
 	// ---------------------------------------------------------------
 
 	expectedhtlt := htlctypes.HTLC{
-		Id:                   htlctypes.GetID(testCases[1].args.sender, testCases[1].args.receiver, testCases[1].args.amount, htlctypes.GetHashLock(testCases[1].args.secret, testCases[1].args.timestamp)).String(),
+		Id: htlctypes.GetID(testCases[1].args.sender, testCases[1].args.receiver, testCases[1].args.amount, htlctypes.GetHashLock(testCases[1].args.secret, testCases[1].args.timestamp)).
+			String(),
 		Sender:               testCases[1].args.sender.String(),
 		To:                   testCases[1].args.receiver.String(),
 		ReceiverOnOtherChain: ReceiverOnOtherChain,
 		SenderOnOtherChain:   SenderOnOtherChain,
 		Amount:               testCases[1].args.amount,
 		Secret:               "",
-		HashLock:             tmbytes.HexBytes(htlctypes.GetHashLock(testCases[1].args.secret, testCases[1].args.timestamp)).String(),
-		Timestamp:            testCases[1].args.timestamp,
-		ExpirationHeight:     uint64(txResp.Height) + testCases[1].args.timeLock,
-		State:                htlctypes.Open,
-		ClosedBlock:          0,
-		Transfer:             testCases[1].args.transfer,
-		Direction:            testCases[1].args.direction,
+		HashLock: tmbytes.HexBytes(htlctypes.GetHashLock(testCases[1].args.secret, testCases[1].args.timestamp)).
+			String(),
+		Timestamp:        testCases[1].args.timestamp,
+		ExpirationHeight: uint64(txResult.Height) + testCases[1].args.timeLock,
+		State:            htlctypes.Open,
+		ClosedBlock:      0,
+		Transfer:         testCases[1].args.transfer,
+		Direction:        testCases[1].args.direction,
 	}
-	respType = proto.Message(&htlctypes.HTLC{})
-	bz, err = htlctestutil.QueryHTLCExec(ctx, expectedhtlt.Id)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	htltItem := respType.(*htlctypes.HTLC)
-	s.Require().Equal(expectedhtlt.String(), htltItem.String())
+	respType = htlctestutil.QueryHTLCExec(
+		s.T(),
+		s.network,
+		ctx,
+		expectedhtlt.Id,
+	)
+	s.Require().Equal(expectedhtlt.String(), respType.String())
 
 	// ---------------------------------------------------------------
 
 	args = []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	respType = proto.Message(&sdk.TxResponse{})
+	txResult = htlctestutil.ClaimHTLCExec(
+		s.T(),
+		s.network,
+		ctx,
+		testCases[1].args.sender.String(),
+		expectedhtlt.Id,
+		testCases[1].args.secret.String(),
+		args...,
+	)
 
-	bz, err = htlctestutil.ClaimHTLCExec(ctx, testCases[1].args.sender.String(), expectedhtlt.Id, testCases[1].args.secret.String(), args...)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp = respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
-
-	respType = proto.Message(&htlctypes.HTLC{})
-	bz, err = htlctestutil.QueryHTLCExec(ctx, expectedhtlc.Id)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	htltItem = respType.(*htlctypes.HTLC)
-	s.Require().Equal(htlctypes.Completed.String(), htltItem.State.String())
+	respType = htlctestutil.QueryHTLCExec(
+		s.T(),
+		s.network,
+		ctx,
+		expectedhtlc.Id,
+	)
+	s.Require().Equal(htlctypes.Completed.String(), respType.State.String())
 
 	// ---------------------------------------------------------------
 	// HTLT OUTGOING
@@ -345,74 +391,101 @@ func (s *IntegrationTestSuite) TestHTLC() {
 	args = []string{
 		fmt.Sprintf("--%s=%s", htlccli.FlagTo, testCases[2].args.receiver),
 		fmt.Sprintf("--%s=%s", htlccli.FlagAmount, testCases[2].args.amount),
-		fmt.Sprintf("--%s=%s", htlccli.FlagReceiverOnOtherChain, testCases[2].args.receiverOtherChain),
+		fmt.Sprintf(
+			"--%s=%s",
+			htlccli.FlagReceiverOnOtherChain,
+			testCases[2].args.receiverOtherChain,
+		),
 		fmt.Sprintf("--%s=%s", htlccli.FlagSenderOnOtherChain, testCases[2].args.senderOtherChain),
-		fmt.Sprintf("--%s=%s", htlccli.FlagHashLock, tmbytes.HexBytes(htlctypes.GetHashLock(testCases[2].args.secret, testCases[2].args.timestamp)).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			htlccli.FlagHashLock,
+			tmbytes.HexBytes(htlctypes.GetHashLock(testCases[2].args.secret, testCases[2].args.timestamp)).
+				String(),
+		),
 		fmt.Sprintf("--%s=%d", htlccli.FlagTimeLock, testCases[2].args.timeLock),
 		fmt.Sprintf("--%s=%d", htlccli.FlagTimestamp, testCases[2].args.timestamp),
-		fmt.Sprintf("--%s=%s", htlccli.FlagTransfer, strconv.FormatBool(testCases[2].args.transfer)),
+		fmt.Sprintf(
+			"--%s=%s",
+			htlccli.FlagTransfer,
+			strconv.FormatBool(testCases[2].args.transfer),
+		),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	respType = proto.Message(&sdk.TxResponse{})
-	expectedCode = uint32(0)
-
-	bz, err = htlctestutil.CreateHTLCExec(ctx, testCases[2].args.sender.String(), args...)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp = respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
+	txResult = htlctestutil.CreateHTLCExec(
+		s.T(),
+		s.network,
+		ctx,
+		testCases[2].args.sender.String(),
+		args...,
+	)
 
 	// ---------------------------------------------------------------
 
 	expectedhtlt = htlctypes.HTLC{
-		Id:                   htlctypes.GetID(testCases[2].args.sender, testCases[2].args.receiver, testCases[2].args.amount, htlctypes.GetHashLock(testCases[2].args.secret, testCases[2].args.timestamp)).String(),
+		Id: htlctypes.GetID(testCases[2].args.sender, testCases[2].args.receiver, testCases[2].args.amount, htlctypes.GetHashLock(testCases[2].args.secret, testCases[2].args.timestamp)).
+			String(),
 		Sender:               testCases[2].args.sender.String(),
 		To:                   testCases[2].args.receiver.String(),
 		ReceiverOnOtherChain: ReceiverOnOtherChain,
 		SenderOnOtherChain:   SenderOnOtherChain,
 		Amount:               testCases[2].args.amount,
 		Secret:               "",
-		HashLock:             tmbytes.HexBytes(htlctypes.GetHashLock(testCases[2].args.secret, testCases[2].args.timestamp)).String(),
-		Timestamp:            testCases[2].args.timestamp,
-		ExpirationHeight:     uint64(txResp.Height) + testCases[2].args.timeLock,
-		State:                htlctypes.Open,
-		ClosedBlock:          0,
-		Transfer:             testCases[2].args.transfer,
-		Direction:            testCases[2].args.direction,
+		HashLock: tmbytes.HexBytes(htlctypes.GetHashLock(testCases[2].args.secret, testCases[2].args.timestamp)).
+			String(),
+		Timestamp:        testCases[2].args.timestamp,
+		ExpirationHeight: uint64(txResult.Height) + testCases[2].args.timeLock,
+		State:            htlctypes.Open,
+		ClosedBlock:      0,
+		Transfer:         testCases[2].args.transfer,
+		Direction:        testCases[2].args.direction,
 	}
-	respType = proto.Message(&htlctypes.HTLC{})
-	bz, err = htlctestutil.QueryHTLCExec(ctx, expectedhtlt.Id)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	htltItem = respType.(*htlctypes.HTLC)
-	s.Require().Equal(expectedhtlt.String(), htltItem.String())
+
+	respType = htlctestutil.QueryHTLCExec(
+		s.T(),
+		s.network,
+		ctx,
+		expectedhtlc.Id,
+	)
+	s.Require().Equal(htlctypes.Completed.String(), respType.State.String())
 
 	// ---------------------------------------------------------------
 
 	args = []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	respType = proto.Message(&sdk.TxResponse{})
+	txResult = htlctestutil.ClaimHTLCExec(
+		s.T(),
+		s.network,
+		ctx,
+		testCases[2].args.sender.String(),
+		expectedhtlt.Id,
+		testCases[2].args.secret.String(),
+		args...,
+	)
 
-	bz, err = htlctestutil.ClaimHTLCExec(ctx, testCases[2].args.sender.String(), expectedhtlt.Id, testCases[2].args.secret.String(), args...)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp = respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
-
-	respType = proto.Message(&htlctypes.HTLC{})
-	bz, err = htlctestutil.QueryHTLCExec(ctx, expectedhtlc.Id)
-	s.Require().NoError(err)
-	s.Require().NoError(ctx.Codec.UnmarshalJSON(bz.Bytes(), respType))
-	htltItem = respType.(*htlctypes.HTLC)
-	s.Require().Equal(htlctypes.Completed.String(), htltItem.State.String())
+	respType = htlctestutil.QueryHTLCExec(
+		s.T(),
+		s.network,
+		ctx,
+		expectedhtlc.Id,
+	)
+	s.Require().Equal(htlctypes.Completed.String(), respType.State.String())
 
 	// ---------------------------------------------------------------
 }

@@ -6,9 +6,9 @@ package v1beta1
 import (
 	context "context"
 	fmt "fmt"
-	_ "github.com/gogo/protobuf/gogoproto"
-	grpc1 "github.com/gogo/protobuf/grpc"
-	proto "github.com/gogo/protobuf/proto"
+	_ "github.com/cosmos/gogoproto/gogoproto"
+	grpc1 "github.com/cosmos/gogoproto/grpc"
+	proto "github.com/cosmos/gogoproto/proto"
 	github_com_irisnet_irismod_modules_token_types "github.com/irisnet/irismod/modules/token/types"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"

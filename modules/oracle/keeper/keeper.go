@@ -8,7 +8,7 @@ import (
 
 	"github.com/tidwall/gjson"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -323,7 +323,10 @@ func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID tmbytes.He
 	k.dequeueAndEnqueue(ctx, feed.FeedName, oldState, reqCtx.State)
 }
 
-func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes) (serviceexported.RequestContext, bool) {
+func (k Keeper) GetRequestContext(
+	ctx sdk.Context,
+	requestContextID tmbytes.HexBytes,
+) (serviceexported.RequestContext, bool) {
 	return k.sk.GetRequestContext(ctx, requestContextID)
 }
 

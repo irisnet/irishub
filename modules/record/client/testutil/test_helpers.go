@@ -2,19 +2,26 @@ package testutil
 
 import (
 	"fmt"
+	"testing"
 
-	"github.com/tendermint/tendermint/libs/cli"
+	"github.com/cometbft/cometbft/libs/cli"
+	"github.com/gogo/protobuf/proto"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil"
-	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 
 	recordcli "github.com/irisnet/irismod/modules/record/client/cli"
+	"github.com/irisnet/irismod/simapp"
 )
 
-// MsgRedelegateExec creates a redelegate message.
-func MsgCreateRecordExec(clientCtx client.Context, from string, digest string, digestAlgo string, extraArgs ...string) (testutil.BufferWriter, error) {
+// CreateRecordExec creates a redelegate message.
+func CreateRecordExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	digest string,
+	digestAlgo string,
+	extraArgs ...string) *simapp.ResponseTx {
 	args := []string{
 		digest,
 		digestAlgo,
@@ -22,15 +29,20 @@ func MsgCreateRecordExec(clientCtx client.Context, from string, digest string, d
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, recordcli.GetCmdCreateRecord(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, recordcli.GetCmdCreateRecord(), args)
 }
 
-func QueryRecordExec(clientCtx client.Context, recordID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryRecordExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	recordID string,
+	resp proto.Message,
+	extraArgs ...string) {
 	args := []string{
 		recordID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, recordcli.GetCmdQueryRecord(), args)
+	network.ExecQueryCmd(t, clientCtx, recordcli.GetCmdQueryRecord(), args, resp)
 }

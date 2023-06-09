@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -52,9 +52,21 @@ func (suite *GenesisTestSuite) TestExportGenesis() {
 	suite.ctx = suite.ctx.WithBlockHeight(testHeight).WithTxBytes(testTxBytes)
 
 	// request rands
-	_, err := suite.keeper.RequestRandom(suite.ctx, testConsumer1, testBlockInterval1, false, sdk.NewCoins())
+	_, err := suite.keeper.RequestRandom(
+		suite.ctx,
+		testConsumer1,
+		testBlockInterval1,
+		false,
+		sdk.NewCoins(),
+	)
 	suite.NoError(err)
-	_, err = suite.keeper.RequestRandom(suite.ctx, testConsumer2, testBlockInterval2, false, sdk.NewCoins())
+	_, err = suite.keeper.RequestRandom(
+		suite.ctx,
+		testConsumer2,
+		testBlockInterval2,
+		false,
+		sdk.NewCoins(),
+	)
 	suite.NoError(err)
 
 	// precede to the new block
@@ -62,10 +74,13 @@ func (suite *GenesisTestSuite) TestExportGenesis() {
 
 	// get the pending requests from queue
 	storedRequests := make(map[int64][]types.Request)
-	suite.keeper.IterateRandomRequestQueue(suite.ctx, func(h int64, reqID []byte, r types.Request) bool {
-		storedRequests[h] = append(storedRequests[h], r)
-		return false
-	})
+	suite.keeper.IterateRandomRequestQueue(
+		suite.ctx,
+		func(h int64, reqID []byte, r types.Request) bool {
+			storedRequests[h] = append(storedRequests[h], r)
+			return false
+		},
+	)
 	suite.Equal(2, len(storedRequests))
 
 	// export genesis

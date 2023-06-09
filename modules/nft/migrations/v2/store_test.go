@@ -2,15 +2,13 @@ package v2_test
 
 import (
 	"fmt"
-
-	gogotypes "github.com/gogo/protobuf/types"
-
 	"math/rand"
 	"testing"
 
+	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/stretchr/testify/require"
 
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -29,12 +27,19 @@ func TestMigrate(t *testing.T) {
 	cdc := app.AppCodec()
 
 	collections := prepareData(ctx, storeKey, cdc)
-	require.NoError(t, v2.Migrate(ctx, storeKey, cdc, app.NFTKeeper.Logger(ctx), app.NFTKeeper.SaveDenom))
+	require.NoError(
+		t,
+		v2.Migrate(ctx, storeKey, cdc, app.NFTKeeper.Logger(ctx), app.NFTKeeper.SaveDenom),
+	)
 	check(t, ctx, app.NFTKeeper, collections)
 
 }
 
-func prepareData(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Codec) (collection []types.Collection) {
+func prepareData(
+	ctx sdk.Context,
+	storeKey storetypes.StoreKey,
+	cdc codec.Codec,
+) (collection []types.Collection) {
 	addrs := simapp.CreateTestAddrs(10)
 	for i := 1; i <= 10; i++ {
 		denom := types.Denom{
@@ -98,27 +103,49 @@ func setDenom(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Codec, de
 }
 
 // MintNFT mints an NFT and manages the NFT's existence within Collections and Owners
-func mintNFT(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Codec, denomID string, baseToken types.BaseNFT) {
+func mintNFT(
+	ctx sdk.Context,
+	storeKey storetypes.StoreKey,
+	cdc codec.Codec,
+	denomID string,
+	baseToken types.BaseNFT,
+) {
 	setNFT(ctx, storeKey, cdc, denomID, baseToken)
 	setOwner(ctx, storeKey, cdc, denomID, baseToken.Id, baseToken.Owner)
 	increaseSupply(ctx, storeKey, cdc, denomID)
 }
 
-func setNFT(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Codec, denomID string, baseToken types.BaseNFT) {
+func setNFT(
+	ctx sdk.Context,
+	storeKey storetypes.StoreKey,
+	cdc codec.Codec,
+	denomID string,
+	baseToken types.BaseNFT,
+) {
 	store := ctx.KVStore(storeKey)
 
 	bz := cdc.MustMarshal(&baseToken)
 	store.Set(v2.KeyNFT(denomID, baseToken.Id), bz)
 }
 
-func setOwner(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Codec, denomID, tokenID, owner string) {
+func setOwner(
+	ctx sdk.Context,
+	storeKey storetypes.StoreKey,
+	cdc codec.Codec,
+	denomID, tokenID, owner string,
+) {
 	store := ctx.KVStore(storeKey)
 	bz := mustMarshalTokenID(cdc, tokenID)
 	ownerAddr := sdk.MustAccAddressFromBech32(owner)
 	store.Set(v2.KeyOwner(ownerAddr, denomID, tokenID), bz)
 }
 
-func increaseSupply(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Codec, denomID string) {
+func increaseSupply(
+	ctx sdk.Context,
+	storeKey storetypes.StoreKey,
+	cdc codec.Codec,
+	denomID string,
+) {
 	supply := getTotalSupply(ctx, storeKey, cdc, denomID)
 	supply++
 
@@ -127,7 +154,12 @@ func increaseSupply(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Cod
 	store.Set(v2.KeyCollection(denomID), bz)
 }
 
-func getTotalSupply(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Codec, denomID string) uint64 {
+func getTotalSupply(
+	ctx sdk.Context,
+	storeKey storetypes.StoreKey,
+	cdc codec.Codec,
+	denomID string,
+) uint64 {
 	store := ctx.KVStore(storeKey)
 	bz := store.Get(v2.KeyCollection(denomID))
 	if len(bz) == 0 {

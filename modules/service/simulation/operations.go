@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"math/rand"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
+	cosmossimappparams "cosmossdk.io/simapp/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/simapp/helpers"
-	cosmossimappparams "github.com/cosmos/cosmos-sdk/simapp/params"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
@@ -75,7 +75,11 @@ func WeightedOperations(
 		},
 	)
 
-	appParams.GetOrGenerate(cdc, OpWeightMsgUpdateServiceBinding, &weightMsgUpdateServiceBinding, nil,
+	appParams.GetOrGenerate(
+		cdc,
+		OpWeightMsgUpdateServiceBinding,
+		&weightMsgUpdateServiceBinding,
+		nil,
 		func(_ *rand.Rand) {
 			weightMsgUpdateServiceBinding = DefaultWeightMsgUpdateServiceBinding
 		},
@@ -87,25 +91,41 @@ func WeightedOperations(
 		},
 	)
 
-	appParams.GetOrGenerate(cdc, OpWeightMsgDisableServiceBinding, &weightMsgDisableServiceBinding, nil,
+	appParams.GetOrGenerate(
+		cdc,
+		OpWeightMsgDisableServiceBinding,
+		&weightMsgDisableServiceBinding,
+		nil,
 		func(_ *rand.Rand) {
 			weightMsgDisableServiceBinding = DefaultWeightMsgDisableServiceBinding
 		},
 	)
 
-	appParams.GetOrGenerate(cdc, OpWeightMsgEnableServiceBinding, &weightMsgEnableServiceBinding, nil,
+	appParams.GetOrGenerate(
+		cdc,
+		OpWeightMsgEnableServiceBinding,
+		&weightMsgEnableServiceBinding,
+		nil,
 		func(_ *rand.Rand) {
 			weightMsgEnableServiceBinding = DefaultWeightMsgEnableServiceBinding
 		},
 	)
 
-	appParams.GetOrGenerate(cdc, OpWeightMsgRefundServiceDeposit, &weightMsgRefundServiceDeposit, nil,
+	appParams.GetOrGenerate(
+		cdc,
+		OpWeightMsgRefundServiceDeposit,
+		&weightMsgRefundServiceDeposit,
+		nil,
 		func(_ *rand.Rand) {
 			weightMsgRefundServiceDeposit = DefaultWeightMsgRefundServiceDeposit
 		},
 	)
 
-	appParams.GetOrGenerate(cdc, OpWeightMsgRefundServiceDeposit, &weightMsgRefundServiceDeposit, nil,
+	appParams.GetOrGenerate(
+		cdc,
+		OpWeightMsgRefundServiceDeposit,
+		&weightMsgRefundServiceDeposit,
+		nil,
 		func(_ *rand.Rand) {
 			weightMsgRefundServiceDeposit = DefaultWeightMsgRefundServiceDeposit
 		},
@@ -141,7 +161,11 @@ func WeightedOperations(
 		},
 	)
 
-	appParams.GetOrGenerate(cdc, OpWeightMsgUpdateRequestContext, &weightMsgUpdateRequestContext, nil,
+	appParams.GetOrGenerate(
+		cdc,
+		OpWeightMsgUpdateRequestContext,
+		&weightMsgUpdateRequestContext,
+		nil,
 		func(_ *rand.Rand) {
 			weightMsgUpdateRequestContext = DefaultWeightMsgUpdateRequestContext
 		},
@@ -214,7 +238,11 @@ func WeightedOperations(
 }
 
 // SimulateMsgDefineService generates a MsgDefineService with random values.
-func SimulateMsgDefineService(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgDefineService(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
@@ -230,27 +258,42 @@ func SimulateMsgDefineService(ak types.AccountKeeper, bk types.BankKeeper, k kee
 		account := ak.GetAccount(ctx, simAccount.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
-		msg := types.NewMsgDefineService(serviceName, serviceDescription, tags, simAccount.Address.String(), authorDescription, schemas)
+		msg := types.NewMsgDefineService(
+			serviceName,
+			serviceDescription,
+			tags,
+			simAccount.Address.String(),
+			authorDescription,
+			schemas,
+		)
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			simAccount.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -262,84 +305,144 @@ func SimulateMsgDefineService(ak types.AccountKeeper, bk types.BankKeeper, k kee
 }
 
 // SimulateMsgBindService generates a MsgBindService with random values.
-func SimulateMsgBindService(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgBindService(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		def, err := GenServiceDefinition(r, k, ctx)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBindService, "def not exsit"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgBindService,
+				"def not exsit",
+			), nil, nil
 		}
 
 		owner, err := sdk.AccAddressFromBech32(def.Author)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBindService, "invalid owner address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgBindService,
+				"invalid owner address",
+			), nil, nil
 		}
 
 		acc, found := simtypes.FindAccount(accs, owner)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBindService, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgBindService,
+				"account not found",
+			), nil, nil
 		}
 
 		account := ak.GetAccount(ctx, acc.Address)
 		spendable := bk.SpendableCoins(ctx, owner)
 
-		pricing := fmt.Sprintf(`{"price":"%d%s"}`, simtypes.RandIntBetween(r, 10, 50), sdk.DefaultBondDenom)
+		pricing := fmt.Sprintf(
+			`{"price":"%d%s"}`,
+			simtypes.RandIntBetween(r, 10, 50),
+			sdk.DefaultBondDenom,
+		)
 
 		parsedPricing, err := k.ParsePricing(ctx, pricing)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBindService, err.Error()), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgBindService,
+				err.Error(),
+			), nil, err
 		}
 
 		deposit, err := k.GetMinDeposit(ctx, parsedPricing)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBindService, "invalid minimum deposit"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgBindService,
+				"invalid minimum deposit",
+			), nil, nil
 		}
 
 		// random provider address
 		provider, _ := simtypes.RandomAcc(r, accs)
 		if provider.Address == nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBindService, "service binding provider invalid"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgBindService,
+				"service binding provider invalid",
+			), nil, nil
 		}
 
 		currentOwner, found := k.GetOwner(ctx, provider.Address)
 		if found && !owner.Equals(currentOwner) {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBindService, "owner not matching"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgBindService,
+				"owner not matching",
+			), nil, nil
 		}
 
 		if _, found := k.GetServiceBinding(ctx, def.Name, provider.Address); found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBindService, "service binding already exists"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgBindService,
+				"service binding already exists",
+			), nil, nil
 		}
 
 		qos := uint64(simtypes.RandIntBetween(r, 10, 100))
 		options := "{}"
-		msg := types.NewMsgBindService(def.Name, provider.Address.String(), deposit, pricing, qos, options, def.Author)
+		msg := types.NewMsgBindService(
+			def.Name,
+			provider.Address.String(),
+			deposit,
+			pricing,
+			qos,
+			options,
+			def.Author,
+		)
 
 		spendable, hasNeg := spendable.SafeSub(deposit...)
 		if hasNeg {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBindService, "Insufficient funds"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgBindService,
+				"Insufficient funds",
+			), nil, nil
 		}
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -351,67 +454,115 @@ func SimulateMsgBindService(ak types.AccountKeeper, bk types.BankKeeper, k keepe
 }
 
 // SimulateMsgUpdateServiceBinding generates a MsgUpdateServiceBinding with random values.
-func SimulateMsgUpdateServiceBinding(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgUpdateServiceBinding(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		binding, err := GenServiceBinding(r, k, ctx)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateServiceBinding, "binding not exist"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgUpdateServiceBinding,
+				"binding not exist",
+			), nil, nil
 		}
 		owner, err := sdk.AccAddressFromBech32(binding.Owner)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateServiceBinding, "invalid owner address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgUpdateServiceBinding,
+				"invalid owner address",
+			), nil, nil
 		}
 
 		acc, found := simtypes.FindAccount(accs, owner)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateServiceBinding, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgUpdateServiceBinding,
+				"account not found",
+			), nil, nil
 		}
 		account := ak.GetAccount(ctx, acc.Address)
 		spendable := bk.SpendableCoins(ctx, owner)
 
-		pricing := fmt.Sprintf(`{"price":"%d%s"}`, simtypes.RandIntBetween(r, 10, 50), sdk.DefaultBondDenom)
+		pricing := fmt.Sprintf(
+			`{"price":"%d%s"}`,
+			simtypes.RandIntBetween(r, 10, 50),
+			sdk.DefaultBondDenom,
+		)
 		qos := uint64(simtypes.RandIntBetween(r, 10, 100))
 		options := "{}"
 
 		parsedPricing, err := k.ParsePricing(ctx, pricing)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBindService, err.Error()), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgBindService,
+				err.Error(),
+			), nil, err
 		}
 
 		deposit, err := k.GetMinDeposit(ctx, parsedPricing)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBindService, "invalid minimum deposit"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgBindService,
+				"invalid minimum deposit",
+			), nil, nil
 		}
 
 		spendable, hasNeg := spendable.SafeSub(deposit...)
 		if hasNeg {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateServiceBinding, "Insufficient funds"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgUpdateServiceBinding,
+				"Insufficient funds",
+			), nil, nil
 		}
 
-		msg := types.NewMsgUpdateServiceBinding(binding.ServiceName, binding.Provider, deposit, pricing, qos, options, acc.Address.String())
+		msg := types.NewMsgUpdateServiceBinding(
+			binding.ServiceName,
+			binding.Provider,
+			deposit,
+			pricing,
+			qos,
+			options,
+			acc.Address.String(),
+		)
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -423,7 +574,11 @@ func SimulateMsgUpdateServiceBinding(ak types.AccountKeeper, bk types.BankKeeper
 }
 
 // SimulateMsgSetWithdrawAddress generates a MsgSetWithdrawAddress with random values.
-func SimulateMsgSetWithdrawAddress(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgSetWithdrawAddress(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
@@ -432,16 +587,28 @@ func SimulateMsgSetWithdrawAddress(ak types.AccountKeeper, bk types.BankKeeper, 
 
 		binding, err := GenServiceBinding(r, k, ctx)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetWithdrawAddress, "binding not exist"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgSetWithdrawAddress,
+				"binding not exist",
+			), nil, nil
 		}
 		owner, err := sdk.AccAddressFromBech32(binding.Owner)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetWithdrawAddress, "invalid owner address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgSetWithdrawAddress,
+				"invalid owner address",
+			), nil, nil
 		}
 
 		acc, found := simtypes.FindAccount(accs, owner)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetWithdrawAddress, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgSetWithdrawAddress,
+				"account not found",
+			), nil, nil
 		}
 		account := ak.GetAccount(ctx, acc.Address)
 		spendable := bk.SpendableCoins(ctx, owner)
@@ -450,23 +617,31 @@ func SimulateMsgSetWithdrawAddress(ak types.AccountKeeper, bk types.BankKeeper, 
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -478,51 +653,83 @@ func SimulateMsgSetWithdrawAddress(ak types.AccountKeeper, bk types.BankKeeper, 
 }
 
 // SimulateMsgDisableServiceBinding generates a MsgDisableServiceBinding with random values.
-func SimulateMsgDisableServiceBinding(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgDisableServiceBinding(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		binding, err := GenServiceBinding(r, k, ctx)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDisableServiceBinding, "binding not exist"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgDisableServiceBinding,
+				"binding not exist",
+			), nil, nil
 		}
 		if !binding.Available {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDisableServiceBinding, "binding is disabled"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgDisableServiceBinding,
+				"binding is disabled",
+			), nil, nil
 		}
 		owner, err := sdk.AccAddressFromBech32(binding.Owner)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDisableServiceBinding, "invalid owner address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgDisableServiceBinding,
+				"invalid owner address",
+			), nil, nil
 		}
 
 		acc, found := simtypes.FindAccount(accs, owner)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDisableServiceBinding, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgDisableServiceBinding,
+				"account not found",
+			), nil, nil
 		}
 		account := ak.GetAccount(ctx, acc.Address)
 		spendable := bk.SpendableCoins(ctx, owner)
 
-		msg := types.NewMsgDisableServiceBinding(binding.ServiceName, binding.Provider, binding.Owner)
+		msg := types.NewMsgDisableServiceBinding(
+			binding.ServiceName,
+			binding.Provider,
+			binding.Owner,
+		)
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -534,66 +741,111 @@ func SimulateMsgDisableServiceBinding(ak types.AccountKeeper, bk types.BankKeepe
 }
 
 // SimulateMsgEnableServiceBinding generates a MsgEnableServiceBinding with random values.
-func SimulateMsgEnableServiceBinding(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgEnableServiceBinding(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		binding, err := GenServiceBinding(r, k, ctx)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgEnableServiceBinding, "binding not exist"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgEnableServiceBinding,
+				"binding not exist",
+			), nil, nil
 		}
 		if binding.Available {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgEnableServiceBinding, "binding is available"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgEnableServiceBinding,
+				"binding is available",
+			), nil, nil
 		}
 		owner, err := sdk.AccAddressFromBech32(binding.Owner)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgEnableServiceBinding, "invalid owner address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgEnableServiceBinding,
+				"invalid owner address",
+			), nil, nil
 		}
 
 		acc, found := simtypes.FindAccount(accs, owner)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgEnableServiceBinding, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgEnableServiceBinding,
+				"account not found",
+			), nil, nil
 		}
 		account := ak.GetAccount(ctx, acc.Address)
 		spendable := bk.SpendableCoins(ctx, owner)
 
 		provider, err := sdk.AccAddressFromBech32(binding.Provider)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgEnableServiceBinding, "invalid provider address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgEnableServiceBinding,
+				"invalid provider address",
+			), nil, nil
 		}
 		pricing := k.GetPricing(ctx, binding.ServiceName, provider)
 		deposit, err := k.GetMinDeposit(ctx, pricing)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgBindService, "invalid minimum deposit"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgBindService,
+				"invalid minimum deposit",
+			), nil, nil
 		}
 
 		spendable, hasNeg := spendable.SafeSub(deposit...)
 		if hasNeg {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateServiceBinding, "Insufficient funds"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgUpdateServiceBinding,
+				"Insufficient funds",
+			), nil, nil
 		}
 
-		msg := types.NewMsgEnableServiceBinding(binding.ServiceName, binding.Provider, deposit, binding.Owner)
+		msg := types.NewMsgEnableServiceBinding(
+			binding.ServiceName,
+			binding.Provider,
+			deposit,
+			binding.Owner,
+		)
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -605,61 +857,98 @@ func SimulateMsgEnableServiceBinding(ak types.AccountKeeper, bk types.BankKeeper
 }
 
 // SimulateMsgRefundServiceDeposit generates a MsgRefundServiceDeposit with random values.
-func SimulateMsgRefundServiceDeposit(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgRefundServiceDeposit(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		binding, err := GenServiceBindingDisabled(r, k, ctx)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgRefundServiceDeposit, "binding not exist"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgRefundServiceDeposit,
+				"binding not exist",
+			), nil, nil
 		}
 
 		owner, err := sdk.AccAddressFromBech32(binding.Owner)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgRefundServiceDeposit, "invalid owner address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgRefundServiceDeposit,
+				"invalid owner address",
+			), nil, nil
 		}
 
 		acc, found := simtypes.FindAccount(accs, owner)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgRefundServiceDeposit, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgRefundServiceDeposit,
+				"account not found",
+			), nil, nil
 		}
 		account := ak.GetAccount(ctx, acc.Address)
 		spendable := bk.SpendableCoins(ctx, owner)
 
 		provider, err := sdk.AccAddressFromBech32(binding.Provider)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgRefundServiceDeposit, "invalid provider address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgRefundServiceDeposit,
+				"invalid provider address",
+			), nil, nil
 		}
 
-		refundableTime := binding.DisabledTime.Add(k.ArbitrationTimeLimit(ctx)).Add(k.ComplaintRetrospect(ctx))
+		refundableTime := binding.DisabledTime.Add(k.ArbitrationTimeLimit(ctx)).
+			Add(k.ComplaintRetrospect(ctx))
 
 		currentTime := ctx.BlockHeader().Time
 		if currentTime.Before(refundableTime) {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgRefundServiceDeposit, "invalid refundable time"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgRefundServiceDeposit,
+				"invalid refundable time",
+			), nil, nil
 		}
 
-		msg := types.NewMsgRefundServiceDeposit(binding.ServiceName, provider.String(), owner.String())
+		msg := types.NewMsgRefundServiceDeposit(
+			binding.ServiceName,
+			provider.String(),
+			owner.String(),
+		)
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -671,7 +960,11 @@ func SimulateMsgRefundServiceDeposit(ak types.AccountKeeper, bk types.BankKeeper
 }
 
 // SimulateMsgCallService generates a MsgCallService with random values.
-func SimulateMsgCallService(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgCallService(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
@@ -679,21 +972,35 @@ func SimulateMsgCallService(ak types.AccountKeeper, bk types.BankKeeper, k keepe
 		account := ak.GetAccount(ctx, simAccount.Address)
 		binding, err := GenServiceBinding(r, k, ctx)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCallService, "binding not exist"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgCallService,
+				"binding not exist",
+			), nil, nil
 		}
 		definition, found := k.GetServiceDefinition(ctx, binding.ServiceName)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCallService, "serviceDefinition not exist"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgCallService,
+				"serviceDefinition not exist",
+			), nil, nil
 		}
 		providers := GetProviders(definition, k, ctx)
 		if len(providers) == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCallService, "providers not exist"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgCallService,
+				"providers not exist",
+			), nil, nil
 		}
 
 		serviceName := binding.ServiceName
 		consumer := simAccount.Address.String()
 		input := `{"header":{},"body":{}}`
-		serviceFeeCap := sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(int64(simtypes.RandIntBetween(r, 2, 10))))}
+		serviceFeeCap := sdk.Coins{
+			sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(int64(simtypes.RandIntBetween(r, 2, 10)))),
+		}
 		timeout := int64(simtypes.RandIntBetween(r, 1, int(k.MaxRequestTimeout(ctx))))
 
 		repeated := true
@@ -706,12 +1013,20 @@ func SimulateMsgCallService(ak types.AccountKeeper, bk types.BankKeeper, k keepe
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 		spendable, hasNeg := spendable.SafeSub(serviceFeeCap...)
 		if hasNeg {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCallService, "Insufficient funds"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgCallService,
+				"Insufficient funds",
+			), nil, nil
 		}
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txConfig := cosmossimappparams.MakeTestEncodingConfig().TxConfig
@@ -720,14 +1035,18 @@ func SimulateMsgCallService(ak types.AccountKeeper, bk types.BankKeeper, k keepe
 			txConfig,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			simAccount.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txConfig.TxEncoder(), tx); err != nil {
@@ -739,19 +1058,31 @@ func SimulateMsgCallService(ak types.AccountKeeper, bk types.BankKeeper, k keepe
 }
 
 // SimulateMsgRespondService generates a MsgRespondService with random values.
-func SimulateMsgRespondService(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgRespondService(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		request := GenRequest(r, k, ctx)
 		if request.Size() == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgRespondService, "request is not exsit"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgRespondService,
+				"request is not exsit",
+			), nil, nil
 		}
 
 		provider, err := sdk.AccAddressFromBech32(request.Provider)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgRespondService, "invalid address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgRespondService,
+				"invalid address",
+			), nil, nil
 		}
 
 		result := `{"code":200,"message":""}`
@@ -761,30 +1092,42 @@ func SimulateMsgRespondService(ak types.AccountKeeper, bk types.BankKeeper, k ke
 
 		acc, found := simtypes.FindAccount(accs, provider)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgRespondService, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgRespondService,
+				"account not found",
+			), nil, nil
 		}
 
 		account := ak.GetAccount(ctx, acc.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -797,56 +1140,88 @@ func SimulateMsgRespondService(ak types.AccountKeeper, bk types.BankKeeper, k ke
 }
 
 // SimulateMsgPauseRequestContext generates a MsgSPauseRequestContext with random values.
-func SimulateMsgPauseRequestContext(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgPauseRequestContext(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		// requestContext must be running
 		requestContextId := GenRunningContextId(r, k, ctx)
 		if len(requestContextId) == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPauseRequestContext, "requestContextId not exist"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgPauseRequestContext,
+				"requestContextId not exist",
+			), nil, nil
 		}
 
 		requestContext, found := k.GetRequestContext(ctx, requestContextId)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPauseRequestContext, "requestContext not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgPauseRequestContext,
+				"requestContext not found",
+			), nil, nil
 		}
 		if len(requestContext.ModuleName) > 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPauseRequestContext, "not authorized operation"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgPauseRequestContext,
+				"not authorized operation",
+			), nil, nil
 		}
 		consumer, err := sdk.AccAddressFromBech32(requestContext.Consumer)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPauseRequestContext, "invalid address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgPauseRequestContext,
+				"invalid address",
+			), nil, nil
 		}
 
 		msg := types.NewMsgPauseRequestContext(requestContextId.String(), consumer.String())
 
 		acc, found := simtypes.FindAccount(accs, consumer)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPauseRequestContext, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgPauseRequestContext,
+				"account not found",
+			), nil, nil
 		}
 
 		account := ak.GetAccount(ctx, acc.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -858,61 +1233,97 @@ func SimulateMsgPauseRequestContext(ak types.AccountKeeper, bk types.BankKeeper,
 }
 
 // SimulateMsgStartRequestContext generates a MsgStartRequestContext with random values.
-func SimulateMsgStartRequestContext(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgStartRequestContext(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		requestContextId := GenPausedRequestContextId(r, k, ctx)
 		if len(requestContextId) == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStartRequestContext, "requestContextId not exist"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgStartRequestContext,
+				"requestContextId not exist",
+			), nil, nil
 		}
 
 		requestContext, found := k.GetRequestContext(ctx, requestContextId)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStartRequestContext, "requestContext not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgStartRequestContext,
+				"requestContext not found",
+			), nil, nil
 		}
 
 		if !requestContext.Repeated {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStartRequestContext, "requestContext non repeated"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgStartRequestContext,
+				"requestContext non repeated",
+			), nil, nil
 		}
 
 		if len(requestContext.ModuleName) > 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStartRequestContext, "not authorized operation"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgStartRequestContext,
+				"not authorized operation",
+			), nil, nil
 		}
 		consumer, err := sdk.AccAddressFromBech32(requestContext.Consumer)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStartRequestContext, "invalid address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgStartRequestContext,
+				"invalid address",
+			), nil, nil
 		}
 
 		msg := types.NewMsgStartRequestContext(requestContextId.String(), consumer.String())
 
 		acc, found := simtypes.FindAccount(accs, consumer)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStartRequestContext, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgStartRequestContext,
+				"account not found",
+			), nil, nil
 		}
 
 		account := ak.GetAccount(ctx, acc.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -924,60 +1335,96 @@ func SimulateMsgStartRequestContext(ak types.AccountKeeper, bk types.BankKeeper,
 }
 
 // SimulateMsgKillRequestContext generates a MsgKillRequestContext with random values.
-func SimulateMsgKillRequestContext(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgKillRequestContext(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		requestContextId := GenRequestContextId(r, k, ctx)
 		if len(requestContextId) == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgKillRequestContext, "requestContextId not exist"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgKillRequestContext,
+				"requestContextId not exist",
+			), nil, nil
 		}
 
 		requestContext, found := k.GetRequestContext(ctx, requestContextId)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgKillRequestContext, "requestContext not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgKillRequestContext,
+				"requestContext not found",
+			), nil, nil
 		}
 
 		if !requestContext.Repeated {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgKillRequestContext, "requestContext non repeated"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgKillRequestContext,
+				"requestContext non repeated",
+			), nil, nil
 		}
 		if len(requestContext.ModuleName) > 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgKillRequestContext, "not authorized operation"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgKillRequestContext,
+				"not authorized operation",
+			), nil, nil
 		}
 		consumer, err := sdk.AccAddressFromBech32(requestContext.Consumer)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgKillRequestContext, "invalid address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgKillRequestContext,
+				"invalid address",
+			), nil, nil
 		}
 
 		msg := types.NewMsgKillRequestContext(requestContextId.String(), consumer.String())
 
 		acc, found := simtypes.FindAccount(accs, consumer)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgKillRequestContext, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgKillRequestContext,
+				"account not found",
+			), nil, nil
 		}
 
 		account := ak.GetAccount(ctx, acc.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -989,48 +1436,90 @@ func SimulateMsgKillRequestContext(ak types.AccountKeeper, bk types.BankKeeper, 
 }
 
 // SimulateMsgUpdateRequestContext generates a MsgUpdateRequestContext with random values.
-func SimulateMsgUpdateRequestContext(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgUpdateRequestContext(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		requestContextId := GenRequestContextId(r, k, ctx)
 		if len(requestContextId) == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateRequestContext, "requestContextId not exist"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgUpdateRequestContext,
+				"requestContextId not exist",
+			), nil, nil
 		}
 
 		requestContext, found := k.GetRequestContext(ctx, requestContextId)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateRequestContext, "request not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgUpdateRequestContext,
+				"request not found",
+			), nil, nil
 		}
 
 		if requestContext.State == types.COMPLETED {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateRequestContext, "request context completed"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgUpdateRequestContext,
+				"request context completed",
+			), nil, nil
 		}
 		if len(requestContext.ModuleName) > 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateRequestContext, "not authorized operation"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgUpdateRequestContext,
+				"not authorized operation",
+			), nil, nil
 		}
 		consumer, err := sdk.AccAddressFromBech32(requestContext.Consumer)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateRequestContext, "invalid address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgUpdateRequestContext,
+				"invalid address",
+			), nil, nil
 		}
 
 		definition, found := k.GetServiceDefinition(ctx, requestContext.ServiceName)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateRequestContext, "definition not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgUpdateRequestContext,
+				"definition not found",
+			), nil, nil
 		}
 		providers := GetProviders(definition, k, ctx)
 
-		serviceFeeCap := sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(int64(simtypes.RandIntBetween(r, 2, 10))))}
+		serviceFeeCap := sdk.Coins{
+			sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(int64(simtypes.RandIntBetween(r, 2, 10)))),
+		}
 		timeout := r.Int63n(k.MaxRequestTimeout(ctx))
 		repeatedFrequency := uint64(0)
 		repeatedTotal := int64(0)
 
-		msg := types.NewMsgUpdateRequestContext(requestContextId.String(), providers, serviceFeeCap, timeout, repeatedFrequency, repeatedTotal, consumer.String())
+		msg := types.NewMsgUpdateRequestContext(
+			requestContextId.String(),
+			providers,
+			serviceFeeCap,
+			timeout,
+			repeatedFrequency,
+			repeatedTotal,
+			consumer.String(),
+		)
 
 		acc, found := simtypes.FindAccount(accs, consumer)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgKillRequestContext, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgKillRequestContext,
+				"account not found",
+			), nil, nil
 		}
 
 		account := ak.GetAccount(ctx, acc.Address)
@@ -1038,28 +1527,40 @@ func SimulateMsgUpdateRequestContext(ak types.AccountKeeper, bk types.BankKeeper
 		spendable, hasNeg := spendable.SafeSub(serviceFeeCap...)
 
 		if hasNeg {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCallService, "Insufficient funds"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgCallService,
+				"Insufficient funds",
+			), nil, nil
 		}
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -1071,23 +1572,39 @@ func SimulateMsgUpdateRequestContext(ak types.AccountKeeper, bk types.BankKeeper
 }
 
 // SimulateMsgWithdrawEarnedFees generates a MsgWithdrawEarnedFees with random values.
-func SimulateMsgWithdrawEarnedFees(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgWithdrawEarnedFees(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		binding, err := GenServiceBinding(r, k, ctx)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgWithdrawEarnedFees, "binding not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgWithdrawEarnedFees,
+				"binding not found",
+			), nil, nil
 		}
 
 		owner, err := sdk.AccAddressFromBech32(binding.Owner)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgWithdrawEarnedFees, "invalid address"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgWithdrawEarnedFees,
+				"invalid address",
+			), nil, nil
 		}
 		acc, found := simtypes.FindAccount(accs, owner)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgWithdrawEarnedFees, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgWithdrawEarnedFees,
+				"account not found",
+			), nil, nil
 		}
 
 		account := ak.GetAccount(ctx, acc.Address)
@@ -1097,23 +1614,31 @@ func SimulateMsgWithdrawEarnedFees(ak types.AccountKeeper, bk types.BankKeeper, 
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -1126,7 +1651,11 @@ func SimulateMsgWithdrawEarnedFees(ak types.AccountKeeper, bk types.BankKeeper, 
 }
 
 // GenServiceDefinition randomized serviceDefinition
-func GenServiceDefinition(r *rand.Rand, k keeper.Keeper, ctx sdk.Context) (types.ServiceDefinition, error) {
+func GenServiceDefinition(
+	r *rand.Rand,
+	k keeper.Keeper,
+	ctx sdk.Context,
+) (types.ServiceDefinition, error) {
 	var definitions []types.ServiceDefinition
 	k.IterateServiceDefinitions(
 		ctx,
@@ -1142,7 +1671,11 @@ func GenServiceDefinition(r *rand.Rand, k keeper.Keeper, ctx sdk.Context) (types
 }
 
 // GenServiceBinding randomized serviceBinding
-func GenServiceBinding(r *rand.Rand, k keeper.Keeper, ctx sdk.Context) (types.ServiceBinding, error) {
+func GenServiceBinding(
+	r *rand.Rand,
+	k keeper.Keeper,
+	ctx sdk.Context,
+) (types.ServiceBinding, error) {
 	var bindings []types.ServiceBinding
 	k.IterateServiceBindings(
 		ctx,
@@ -1158,7 +1691,11 @@ func GenServiceBinding(r *rand.Rand, k keeper.Keeper, ctx sdk.Context) (types.Se
 }
 
 // GenServiceBindingDisabled randomized serviceBindingDisabled
-func GenServiceBindingDisabled(r *rand.Rand, k keeper.Keeper, ctx sdk.Context) (types.ServiceBinding, error) {
+func GenServiceBindingDisabled(
+	r *rand.Rand,
+	k keeper.Keeper,
+	ctx sdk.Context,
+) (types.ServiceBinding, error) {
 	var bindings []types.ServiceBinding
 	k.IterateServiceBindings(
 		ctx,
@@ -1278,7 +1815,11 @@ func GenPausedRequestContextId(r *rand.Rand, k keeper.Keeper, ctx sdk.Context) t
 	return tmbytes.HexBytes{}
 }
 
-func GetProviders(definition types.ServiceDefinition, k keeper.Keeper, ctx sdk.Context) (providers []string) {
+func GetProviders(
+	definition types.ServiceDefinition,
+	k keeper.Keeper,
+	ctx sdk.Context,
+) (providers []string) {
 	if definition.Size() == 0 {
 		return
 	}

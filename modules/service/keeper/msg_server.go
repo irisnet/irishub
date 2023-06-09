@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -25,7 +25,10 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 }
 
 // DefineService handles MsgDefineService
-func (m msgServer) DefineService(goCtx context.Context, msg *types.MsgDefineService) (*types.MsgDefineServiceResponse, error) {
+func (m msgServer) DefineService(
+	goCtx context.Context,
+	msg *types.MsgDefineService,
+) (*types.MsgDefineServiceResponse, error) {
 	author, err := sdk.AccAddressFromBech32(msg.Author)
 	if err != nil {
 		return nil, err
@@ -56,9 +59,16 @@ func (m msgServer) DefineService(goCtx context.Context, msg *types.MsgDefineServ
 }
 
 // BindService handles MsgBindService
-func (m msgServer) BindService(goCtx context.Context, msg *types.MsgBindService) (*types.MsgBindServiceResponse, error) {
+func (m msgServer) BindService(
+	goCtx context.Context,
+	msg *types.MsgBindService,
+) (*types.MsgBindServiceResponse, error) {
 	if _, _, found := m.Keeper.GetModuleServiceByServiceName(msg.ServiceName); found {
-		return nil, sdkerrors.Wrapf(types.ErrBindModuleService, "module service %s", msg.ServiceName)
+		return nil, sdkerrors.Wrapf(
+			types.ErrBindModuleService,
+			"module service %s",
+			msg.ServiceName,
+		)
 	}
 
 	provider, err := sdk.AccAddressFromBech32(msg.Provider)
@@ -96,7 +106,10 @@ func (m msgServer) BindService(goCtx context.Context, msg *types.MsgBindService)
 }
 
 // UpdateServiceBinding handles MsgUpdateServiceBinding
-func (m msgServer) UpdateServiceBinding(goCtx context.Context, msg *types.MsgUpdateServiceBinding) (*types.MsgUpdateServiceBindingResponse, error) {
+func (m msgServer) UpdateServiceBinding(
+	goCtx context.Context,
+	msg *types.MsgUpdateServiceBinding,
+) (*types.MsgUpdateServiceBindingResponse, error) {
 	provider, err := sdk.AccAddressFromBech32(msg.Provider)
 	if err != nil {
 		return nil, err
@@ -132,7 +145,10 @@ func (m msgServer) UpdateServiceBinding(goCtx context.Context, msg *types.MsgUpd
 }
 
 // SetWithdrawAddress handles MsgSetWithdrawAddress
-func (m msgServer) SetWithdrawAddress(goCtx context.Context, msg *types.MsgSetWithdrawAddress) (*types.MsgSetWithdrawAddressResponse, error) {
+func (m msgServer) SetWithdrawAddress(
+	goCtx context.Context,
+	msg *types.MsgSetWithdrawAddress,
+) (*types.MsgSetWithdrawAddressResponse, error) {
 	withdrawAddress, err := sdk.AccAddressFromBech32(msg.WithdrawAddress)
 	if err != nil {
 		return nil, err
@@ -143,7 +159,11 @@ func (m msgServer) SetWithdrawAddress(goCtx context.Context, msg *types.MsgSetWi
 	}
 
 	if m.Keeper.blockedAddrs[msg.WithdrawAddress] {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.WithdrawAddress)
+		return nil, sdkerrors.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"%s is a module account",
+			msg.WithdrawAddress,
+		)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -166,7 +186,10 @@ func (m msgServer) SetWithdrawAddress(goCtx context.Context, msg *types.MsgSetWi
 }
 
 // EnableServiceBinding handles MsgEnableServiceBinding
-func (m msgServer) EnableServiceBinding(goCtx context.Context, msg *types.MsgEnableServiceBinding) (*types.MsgEnableServiceBindingResponse, error) {
+func (m msgServer) EnableServiceBinding(
+	goCtx context.Context,
+	msg *types.MsgEnableServiceBinding,
+) (*types.MsgEnableServiceBindingResponse, error) {
 	provider, err := sdk.AccAddressFromBech32(msg.Provider)
 	if err != nil {
 		return nil, err
@@ -199,7 +222,10 @@ func (m msgServer) EnableServiceBinding(goCtx context.Context, msg *types.MsgEna
 }
 
 // DisableServiceBinding handles MsgDisableServiceBinding
-func (m msgServer) DisableServiceBinding(goCtx context.Context, msg *types.MsgDisableServiceBinding) (*types.MsgDisableServiceBindingResponse, error) {
+func (m msgServer) DisableServiceBinding(
+	goCtx context.Context,
+	msg *types.MsgDisableServiceBinding,
+) (*types.MsgDisableServiceBindingResponse, error) {
 	provider, err := sdk.AccAddressFromBech32(msg.Provider)
 	if err != nil {
 		return nil, err
@@ -232,7 +258,10 @@ func (m msgServer) DisableServiceBinding(goCtx context.Context, msg *types.MsgDi
 }
 
 // RefundServiceDeposit handles MsgRefundServiceDeposit
-func (m msgServer) RefundServiceDeposit(goCtx context.Context, msg *types.MsgRefundServiceDeposit) (*types.MsgRefundServiceDepositResponse, error) {
+func (m msgServer) RefundServiceDeposit(
+	goCtx context.Context,
+	msg *types.MsgRefundServiceDeposit,
+) (*types.MsgRefundServiceDepositResponse, error) {
 	provider, err := sdk.AccAddressFromBech32(msg.Provider)
 	if err != nil {
 		return nil, err
@@ -265,7 +294,10 @@ func (m msgServer) RefundServiceDeposit(goCtx context.Context, msg *types.MsgRef
 }
 
 // CallService handles MsgCallService
-func (m msgServer) CallService(goCtx context.Context, msg *types.MsgCallService) (*types.MsgCallServiceResponse, error) {
+func (m msgServer) CallService(
+	goCtx context.Context,
+	msg *types.MsgCallService,
+) (*types.MsgCallServiceResponse, error) {
 	var reqContextID tmbytes.HexBytes
 	var err error
 
@@ -327,7 +359,10 @@ func (m msgServer) CallService(goCtx context.Context, msg *types.MsgCallService)
 }
 
 // RespondService handles MsgRespondService
-func (m msgServer) RespondService(goCtx context.Context, msg *types.MsgRespondService) (*types.MsgRespondServiceResponse, error) {
+func (m msgServer) RespondService(
+	goCtx context.Context,
+	msg *types.MsgRespondService,
+) (*types.MsgRespondServiceResponse, error) {
 	provider, err := sdk.AccAddressFromBech32(msg.Provider)
 	if err != nil {
 		return nil, err
@@ -364,7 +399,10 @@ func (m msgServer) RespondService(goCtx context.Context, msg *types.MsgRespondSe
 }
 
 // PauseRequestContext handles MsgPauseRequestContext
-func (m msgServer) PauseRequestContext(goCtx context.Context, msg *types.MsgPauseRequestContext) (*types.MsgPauseRequestContextResponse, error) {
+func (m msgServer) PauseRequestContext(
+	goCtx context.Context,
+	msg *types.MsgPauseRequestContext,
+) (*types.MsgPauseRequestContextResponse, error) {
 	consumer, err := sdk.AccAddressFromBech32(msg.Consumer)
 	if err != nil {
 		return nil, err
@@ -400,7 +438,10 @@ func (m msgServer) PauseRequestContext(goCtx context.Context, msg *types.MsgPaus
 }
 
 // StartRequestContext handles MsgStartRequestContext
-func (m msgServer) StartRequestContext(goCtx context.Context, msg *types.MsgStartRequestContext) (*types.MsgStartRequestContextResponse, error) {
+func (m msgServer) StartRequestContext(
+	goCtx context.Context,
+	msg *types.MsgStartRequestContext,
+) (*types.MsgStartRequestContextResponse, error) {
 	consumer, err := sdk.AccAddressFromBech32(msg.Consumer)
 	if err != nil {
 		return nil, err
@@ -436,7 +477,10 @@ func (m msgServer) StartRequestContext(goCtx context.Context, msg *types.MsgStar
 }
 
 // KillRequestContext handles MsgKillRequestContext
-func (m msgServer) KillRequestContext(goCtx context.Context, msg *types.MsgKillRequestContext) (*types.MsgKillRequestContextResponse, error) {
+func (m msgServer) KillRequestContext(
+	goCtx context.Context,
+	msg *types.MsgKillRequestContext,
+) (*types.MsgKillRequestContextResponse, error) {
 	consumer, err := sdk.AccAddressFromBech32(msg.Consumer)
 	if err != nil {
 		return nil, err
@@ -472,7 +516,10 @@ func (m msgServer) KillRequestContext(goCtx context.Context, msg *types.MsgKillR
 }
 
 // UpdateRequestContext handles MsgUpdateRequestContext
-func (m msgServer) UpdateRequestContext(goCtx context.Context, msg *types.MsgUpdateRequestContext) (*types.MsgUpdateRequestContextResponse, error) {
+func (m msgServer) UpdateRequestContext(
+	goCtx context.Context,
+	msg *types.MsgUpdateRequestContext,
+) (*types.MsgUpdateRequestContextResponse, error) {
 	consumer, err := sdk.AccAddressFromBech32(msg.Consumer)
 	if err != nil {
 		return nil, err
@@ -521,7 +568,10 @@ func (m msgServer) UpdateRequestContext(goCtx context.Context, msg *types.MsgUpd
 }
 
 // WithdrawEarnedFees handles MsgWithdrawEarnedFees
-func (m msgServer) WithdrawEarnedFees(goCtx context.Context, msg *types.MsgWithdrawEarnedFees) (*types.MsgWithdrawEarnedFeesResponse, error) {
+func (m msgServer) WithdrawEarnedFees(
+	goCtx context.Context,
+	msg *types.MsgWithdrawEarnedFees,
+) (*types.MsgWithdrawEarnedFeesResponse, error) {
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
 		return nil, err

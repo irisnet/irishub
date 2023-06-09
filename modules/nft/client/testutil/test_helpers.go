@@ -2,29 +2,43 @@ package testutil
 
 import (
 	"fmt"
+	"testing"
 
-	"github.com/tendermint/tendermint/libs/cli"
+	"github.com/cometbft/cometbft/libs/cli"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil"
-	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 
 	nftcli "github.com/irisnet/irismod/modules/nft/client/cli"
+	nfttypes "github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/simapp"
 )
 
 // IssueDenomExec creates a redelegate message.
-func IssueDenomExec(clientCtx client.Context, from string, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
+func IssueDenomExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	denom string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		denom,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdIssueDenom(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, nftcli.GetCmdIssueDenom(), args)
 }
 
-func BurnNFTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func BurnNFTExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	denomID string,
+	tokenID string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		denomID,
 		tokenID,
@@ -32,10 +46,17 @@ func BurnNFTExec(clientCtx client.Context, from string, denomID string, tokenID 
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdBurnNFT(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, nftcli.GetCmdBurnNFT(), args)
 }
 
-func MintNFTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func MintNFTExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	denomID string,
+	tokenID string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		denomID,
 		tokenID,
@@ -43,10 +64,17 @@ func MintNFTExec(clientCtx client.Context, from string, denomID string, tokenID 
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdMintNFT(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, nftcli.GetCmdMintNFT(), args)
 }
 
-func EditNFTExec(clientCtx client.Context, from string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func EditNFTExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	denomID string,
+	tokenID string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		denomID,
 		tokenID,
@@ -54,10 +82,18 @@ func EditNFTExec(clientCtx client.Context, from string, denomID string, tokenID 
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdEditNFT(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, nftcli.GetCmdEditNFT(), args)
 }
 
-func TransferNFTExec(clientCtx client.Context, from string, recipient string, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func TransferNFTExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	recipient string,
+	denomID string,
+	tokenID string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		recipient,
 		denomID,
@@ -66,59 +102,111 @@ func TransferNFTExec(clientCtx client.Context, from string, recipient string, de
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdTransferNFT(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, nftcli.GetCmdTransferNFT(), args)
 }
 
-func QueryDenomExec(clientCtx client.Context, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func TransferDenomExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	recipient string,
+	denomID string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
+	args := []string{
+		recipient,
+		denomID,
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}
+
+	args = append(args, extraArgs...)
+	return network.ExecTxCmdWithResult(t, clientCtx, nftcli.GetCmdTransferDenom(), args)
+}
+
+func QueryDenomExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	denomID string,
+	extraArgs ...string) *nfttypes.Denom {
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryDenom(), args)
+	response := &nfttypes.Denom{}
+	network.ExecQueryCmd(t, clientCtx, nftcli.GetCmdQueryDenom(), args, response)
+	return response
 }
 
-func QueryCollectionExec(clientCtx client.Context, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryCollectionExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	denomID string,
+	extraArgs ...string) *nfttypes.QueryCollectionResponse {
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryCollection(), args)
+	response := &nfttypes.QueryCollectionResponse{}
+	network.ExecQueryCmd(t, clientCtx, nftcli.GetCmdQueryCollection(), args, response)
+	return response
 }
 
-func QueryDenomsExec(clientCtx client.Context, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryDenomsExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	extraArgs ...string) *nfttypes.QueryDenomsResponse {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryDenoms(), args)
+	response := &nfttypes.QueryDenomsResponse{}
+	network.ExecQueryCmd(t, clientCtx, nftcli.GetCmdQueryDenoms(), args, response)
+	return response
 }
 
-func QuerySupplyExec(clientCtx client.Context, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QuerySupplyExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	denom string,
+	extraArgs ...string) *nfttypes.QuerySupplyResponse {
 	args := []string{
 		denom,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQuerySupply(), args)
+	response := &nfttypes.QuerySupplyResponse{}
+	network.ExecQueryCmd(t, clientCtx, nftcli.GetCmdQuerySupply(), args, response)
+	return response
 }
 
-func QueryOwnerExec(clientCtx client.Context, address string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryOwnerExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	address string,
+	extraArgs ...string) *nfttypes.QueryNFTsOfOwnerResponse {
 	args := []string{
 		address,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryOwner(), args)
+	response := &nfttypes.QueryNFTsOfOwnerResponse{}
+	network.ExecQueryCmd(t, clientCtx, nftcli.GetCmdQueryOwner(), args, response)
+	return response
 }
 
-func QueryNFTExec(clientCtx client.Context, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryNFTExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	denomID string,
+	tokenID string,
+	extraArgs ...string) *nfttypes.BaseNFT {
 	args := []string{
 		denomID,
 		tokenID,
@@ -126,16 +214,7 @@ func QueryNFTExec(clientCtx client.Context, denomID string, tokenID string, extr
 	}
 	args = append(args, extraArgs...)
 
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryNFT(), args)
-}
-
-func TransferDenomExec(clientCtx client.Context, from string, recipient string, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
-	args := []string{
-		recipient,
-		denomID,
-		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
-	}
-
-	args = append(args, extraArgs...)
-	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdTransferDenom(), args)
+	response := &nfttypes.BaseNFT{}
+	network.ExecQueryCmd(t, clientCtx, nftcli.GetCmdQueryNFT(), args, response)
+	return response
 }

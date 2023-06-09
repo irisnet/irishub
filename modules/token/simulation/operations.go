@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	sdkmath "cosmossdk.io/math"
+	simappparams "cosmossdk.io/simapp/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/simapp/helpers"
-	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
@@ -97,7 +97,11 @@ func WeightedOperations(
 }
 
 // SimulateIssueToken tests and runs a single msg issue a new token
-func SimulateIssueToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
+func SimulateIssueToken(
+	k keeper.Keeper,
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand,
 		app *baseapp.BaseApp,
@@ -110,34 +114,58 @@ func SimulateIssueToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 		error,
 	) {
 		token, maxFees := genToken(ctx, r, k, ak, bk, accs)
-		msg := v1.NewMsgIssueToken(token.Symbol, token.MinUnit, token.Name, token.Scale, token.InitialSupply, token.MaxSupply, token.Mintable, token.GetOwner().String())
+		msg := v1.NewMsgIssueToken(
+			token.Symbol,
+			token.MinUnit,
+			token.Name,
+			token.Scale,
+			token.InitialSupply,
+			token.MaxSupply,
+			token.Mintable,
+			token.GetOwner().String(),
+		)
 
 		simAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), fmt.Sprintf("account %s not found", token.Owner)), nil, fmt.Errorf("account %s not found", token.Owner)
+			return simtypes.NoOpMsg(
+					types.ModuleName,
+					msg.Type(),
+					fmt.Sprintf("account %s not found", token.Owner),
+				), nil, fmt.Errorf(
+					"account %s not found",
+					token.Owner,
+				)
 		}
 
 		owner, _ := sdk.AccAddressFromBech32(msg.Owner)
 		account := ak.GetAccount(ctx, owner)
 		fees, err := simtypes.RandomFees(r, ctx, maxFees)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			simAccount.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err = app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -149,7 +177,11 @@ func SimulateIssueToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 }
 
 // SimulateEditToken tests and runs a single msg edit a existed token
-func SimulateEditToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
+func SimulateEditToken(
+	k keeper.Keeper,
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
 		accs []simtypes.Account, chainID string,
@@ -157,13 +189,30 @@ func SimulateEditToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 
 		token, _, skip := selectOneToken(ctx, k, ak, bk, false)
 		if skip {
-			return simtypes.NoOpMsg(types.ModuleName, v1.TypeMsgEditToken, "skip edit token"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				v1.TypeMsgEditToken,
+				"skip edit token",
+			), nil, nil
 		}
-		msg := v1.NewMsgEditToken(token.GetName(), token.GetSymbol(), token.GetMaxSupply(), types.True, token.GetOwner().String())
+		msg := v1.NewMsgEditToken(
+			token.GetName(),
+			token.GetSymbol(),
+			token.GetMaxSupply(),
+			types.True,
+			token.GetOwner().String(),
+		)
 
 		simAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), fmt.Sprintf("account %s not found", token.GetOwner())), nil, fmt.Errorf("account %s not found", token.GetOwner())
+			return simtypes.NoOpMsg(
+					types.ModuleName,
+					msg.Type(),
+					fmt.Sprintf("account %s not found", token.GetOwner()),
+				), nil, fmt.Errorf(
+					"account %s not found",
+					token.GetOwner(),
+				)
 		}
 
 		owner, _ := sdk.AccAddressFromBech32(msg.Owner)
@@ -172,23 +221,31 @@ func SimulateEditToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			simAccount.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err = app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -200,7 +257,11 @@ func SimulateEditToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 }
 
 // SimulateMintToken tests and runs a single msg mint a existed token
-func SimulateMintToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
+func SimulateMintToken(
+	k keeper.Keeper,
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
 		accs []simtypes.Account, chainID string,
@@ -208,7 +269,11 @@ func SimulateMintToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 
 		token, maxFee, skip := selectOneToken(ctx, k, ak, bk, true)
 		if skip {
-			return simtypes.NoOpMsg(types.ModuleName, v1.TypeMsgMintToken, "skip mint token"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				v1.TypeMsgMintToken,
+				"skip mint token",
+			), nil, nil
 		}
 		simToAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &v1.MsgMintToken{
@@ -222,30 +287,45 @@ func SimulateMintToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 
 		ownerAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), fmt.Sprintf("account %s not found", token.GetOwner())), nil, fmt.Errorf("account %s not found", token.GetOwner())
+			return simtypes.NoOpMsg(
+					types.ModuleName,
+					msg.Type(),
+					fmt.Sprintf("account %s not found", token.GetOwner()),
+				), nil, fmt.Errorf(
+					"account %s not found",
+					token.GetOwner(),
+				)
 		}
 
 		owner, _ := sdk.AccAddressFromBech32(msg.Owner)
 		account := ak.GetAccount(ctx, owner)
 		fees, err := simtypes.RandomFees(r, ctx, maxFee)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			ownerAccount.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err = app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -257,7 +337,11 @@ func SimulateMintToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 }
 
 // SimulateTransferTokenOwner tests and runs a single msg transfer to others
-func SimulateTransferTokenOwner(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
+func SimulateTransferTokenOwner(
+	k keeper.Keeper,
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
 		accs []simtypes.Account, chainID string,
@@ -265,18 +349,33 @@ func SimulateTransferTokenOwner(k keeper.Keeper, ak types.AccountKeeper, bk type
 
 		token, _, skip := selectOneToken(ctx, k, ak, bk, false)
 		if skip {
-			return simtypes.NoOpMsg(types.ModuleName, v1.TypeMsgTransferTokenOwner, "skip TransferTokenOwner"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				v1.TypeMsgTransferTokenOwner,
+				"skip TransferTokenOwner",
+			), nil, nil
 		}
 		var simToAccount, _ = simtypes.RandomAcc(r, accs)
 		for simToAccount.Address.Equals(token.GetOwner()) {
 			simToAccount, _ = simtypes.RandomAcc(r, accs)
 		}
 
-		msg := v1.NewMsgTransferTokenOwner(token.GetOwner().String(), simToAccount.Address.String(), token.GetSymbol())
+		msg := v1.NewMsgTransferTokenOwner(
+			token.GetOwner().String(),
+			simToAccount.Address.String(),
+			token.GetSymbol(),
+		)
 
 		simAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), fmt.Sprintf("account %s not found", token.GetOwner())), nil, fmt.Errorf("account %s not found", token.GetOwner())
+			return simtypes.NoOpMsg(
+					types.ModuleName,
+					msg.Type(),
+					fmt.Sprintf("account %s not found", token.GetOwner()),
+				), nil, fmt.Errorf(
+					"account %s not found",
+					token.GetOwner(),
+				)
 		}
 
 		srcOwner, _ := sdk.AccAddressFromBech32(msg.SrcOwner)
@@ -285,23 +384,31 @@ func SimulateTransferTokenOwner(k keeper.Keeper, ak types.AccountKeeper, bk type
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			simAccount.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err = app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -313,7 +420,11 @@ func SimulateTransferTokenOwner(k keeper.Keeper, ak types.AccountKeeper, bk type
 }
 
 // SimulateBurnToken tests and runs a single msg burn a existed token
-func SimulateBurnToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
+func SimulateBurnToken(
+	k keeper.Keeper,
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
 		accs []simtypes.Account, chainID string,
@@ -321,7 +432,11 @@ func SimulateBurnToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 
 		token, _, skip := selectOneToken(ctx, k, ak, bk, false)
 		if skip {
-			return simtypes.NoOpMsg(types.ModuleName, v1.TypeMsgTransferTokenOwner, "skip burnToken"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				v1.TypeMsgTransferTokenOwner,
+				"skip burnToken",
+			), nil, nil
 		}
 
 		owner, _ := sdk.AccAddressFromBech32(token.GetOwner().String())
@@ -329,14 +444,23 @@ func SimulateBurnToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 		amount := spendable.AmountOf(token.GetMinUnit())
 		if !amount.IsPositive() {
-			return simtypes.NoOpMsg(types.ModuleName, v1.TypeMsgBurnToken, "Insufficient funds"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				v1.TypeMsgBurnToken,
+				"Insufficient funds",
+			), nil, nil
 		}
 
 		amount2 := simtypes.RandomAmount(r, amount)
 
-		spendable, hasNeg := spendable.SafeSub(sdk.Coins{sdk.NewCoin(token.GetMinUnit(), amount2)}...)
+		spendable, hasNeg := spendable.SafeSub(
+			sdk.Coins{sdk.NewCoin(token.GetMinUnit(), amount2)}...)
 		if hasNeg {
-			return simtypes.NoOpMsg(types.ModuleName, v1.TypeMsgBurnToken, "Insufficient funds"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				v1.TypeMsgBurnToken,
+				"Insufficient funds",
+			), nil, nil
 		}
 
 		msg := &v1.MsgBurnToken{
@@ -349,28 +473,43 @@ func SimulateBurnToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 
 		ownerAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), fmt.Sprintf("account %s not found", token.GetOwner())), nil, fmt.Errorf("account %s not found", token.GetOwner())
+			return simtypes.NoOpMsg(
+					types.ModuleName,
+					msg.Type(),
+					fmt.Sprintf("account %s not found", token.GetOwner()),
+				), nil, fmt.Errorf(
+					"account %s not found",
+					token.GetOwner(),
+				)
 		}
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
 		txGen := simappparams.MakeTestEncodingConfig().TxConfig
-		tx, err := helpers.GenSignedMockTx(
+		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			ownerAccount.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err = app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -412,7 +551,9 @@ func selectOneToken(
 		if spendableStake.IsZero() || spendableStake.LT(mintFee.Amount) {
 			continue
 		}
-		maxFees = sdk.NewCoins(sdk.NewCoin(v1.GetNativeToken().MinUnit, spendableStake).Sub(mintFee))
+		maxFees = sdk.NewCoins(
+			sdk.NewCoin(v1.GetNativeToken().MinUnit, spendableStake).Sub(mintFee),
+		)
 		token = t
 		return
 	}

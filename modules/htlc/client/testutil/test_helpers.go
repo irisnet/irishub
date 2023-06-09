@@ -2,44 +2,58 @@ package testutil
 
 import (
 	"fmt"
+	"testing"
 
-	"github.com/tendermint/tendermint/libs/cli"
+	"github.com/cometbft/cometbft/libs/cli"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil"
-	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 
 	htlccli "github.com/irisnet/irismod/modules/htlc/client/cli"
+	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
+	"github.com/irisnet/irismod/simapp"
 )
 
 // MsgRedelegateExec creates a redelegate message.
-func CreateHTLCExec(clientCtx client.Context, from string, extraArgs ...string) (testutil.BufferWriter, error) {
+func CreateHTLCExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	extraArgs ...string) *simapp.ResponseTx {
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, htlccli.GetCmdCreateHTLC(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, htlccli.GetCmdCreateHTLC(), args)
 }
 
-func ClaimHTLCExec(clientCtx client.Context, from string, id string, secret string, extraArgs ...string) (testutil.BufferWriter, error) {
+func ClaimHTLCExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	id string,
+	secret string,
+	extraArgs ...string) *simapp.ResponseTx {
 	args := []string{
 		id,
 		secret,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
 	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, htlccli.GetCmdClaimHTLC(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, htlccli.GetCmdClaimHTLC(), args)
 }
 
-func QueryHTLCExec(clientCtx client.Context, id string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryHTLCExec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	id string,
+	extraArgs ...string) *htlctypes.HTLC {
 	args := []string{
 		id,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, htlccli.GetCmdQueryHTLC(), args)
+	response := &htlctypes.HTLC{}
+	network.ExecQueryCmd(t, clientCtx, htlccli.GetCmdQueryHTLC(), args, response)
+	return response
 }

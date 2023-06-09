@@ -4,8 +4,8 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
 	"github.com/irisnet/irismod/modules/htlc/keeper"
 	"github.com/irisnet/irismod/modules/htlc/types"
@@ -80,16 +80,40 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 			panic(err)
 		}
 		if supply.CurrentSupply.Amount.GT(limit.Limit) {
-			panic(fmt.Sprintf("asset's current supply %s is over the supply limit %s", supply.CurrentSupply, limit.Limit))
+			panic(
+				fmt.Sprintf(
+					"asset's current supply %s is over the supply limit %s",
+					supply.CurrentSupply,
+					limit.Limit,
+				),
+			)
 		}
 		if supply.IncomingSupply.Amount.GT(limit.Limit) {
-			panic(fmt.Sprintf("asset's incoming supply %s is over the supply limit %s", supply.IncomingSupply, limit.Limit))
+			panic(
+				fmt.Sprintf(
+					"asset's incoming supply %s is over the supply limit %s",
+					supply.IncomingSupply,
+					limit.Limit,
+				),
+			)
 		}
 		if supply.IncomingSupply.Amount.Add(supply.CurrentSupply.Amount).GT(limit.Limit) {
-			panic(fmt.Sprintf("asset's incoming supply + current supply %s is over the supply limit %s", supply.IncomingSupply.Add(supply.CurrentSupply), limit.Limit))
+			panic(
+				fmt.Sprintf(
+					"asset's incoming supply + current supply %s is over the supply limit %s",
+					supply.IncomingSupply.Add(supply.CurrentSupply),
+					limit.Limit,
+				),
+			)
 		}
 		if supply.OutgoingSupply.Amount.GT(limit.Limit) {
-			panic(fmt.Sprintf("asset's outgoing supply %s is over the supply limit %s", supply.OutgoingSupply, limit.Limit))
+			panic(
+				fmt.Sprintf(
+					"asset's outgoing supply %s is over the supply limit %s",
+					supply.OutgoingSupply,
+					limit.Limit,
+				),
+			)
 		}
 	}
 }

@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	"github.com/cometbft/cometbft/crypto/tmhash"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -20,14 +20,14 @@ import (
 )
 
 const (
-	denomStandard = sdk.DefaultBondDenom
-	denomBTC      = "btc"
-	denomETH      = "eth"
+	denomBTC = "btc"
+	denomETH = "eth"
 )
 
 var (
-	addrSender1 sdk.AccAddress
-	addrSender2 sdk.AccAddress
+	denomStandard = sdk.DefaultBondDenom
+	addrSender1   sdk.AccAddress
+	addrSender2   sdk.AccAddress
 )
 
 // test that the params can be properly set and retrieved
@@ -115,7 +115,13 @@ func (suite *TestSuite) TestLiquidity() {
 	minReward := sdkmath.NewInt(1)
 	deadline := time.Now().Add(1 * time.Minute)
 
-	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender1.String())
+	msg := types.NewMsgAddLiquidity(
+		depositCoin,
+		standardAmt,
+		minReward,
+		deadline.Unix(),
+		addrSender1.String(),
+	)
 	_, err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
 	suite.NoError(err)
 
@@ -130,7 +136,10 @@ func (suite *TestSuite) TestLiquidity() {
 
 	reservePoolBalances := suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
 	sender1Balances := suite.app.BankKeeper.GetAllBalances(suite.ctx, addrSender1)
-	suite.Equal("10000000000000000000", suite.app.BankKeeper.GetSupply(suite.ctx, lptDenom).Amount.String())
+	suite.Equal(
+		"10000000000000000000",
+		suite.app.BankKeeper.GetSupply(suite.ctx, lptDenom).Amount.String(),
+	)
 
 	expCoins := sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 100),
@@ -140,13 +149,20 @@ func (suite *TestSuite) TestLiquidity() {
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 2999999900),
-		sdk.NewCoin(denomStandard, sdkmath.NewIntWithDecimal(2, 19).Sub(sdk.NewIntFromUint64(5000))),
+		sdk.NewCoin(
+			denomStandard,
+			sdkmath.NewIntWithDecimal(2, 19).Sub(sdk.NewIntFromUint64(5000)),
+		),
 		sdk.NewCoin(lptDenom, sdkmath.NewIntWithDecimal(1, 19)),
 	)
 	suite.Equal(expCoins.Sort().String(), sender1Balances.Sort().String())
 
 	// test add liquidity (pool exists)
-	expLptDenom, _ := suite.app.CoinswapKeeper.GetLptDenomFromDenoms(suite.ctx, denomBTC, denomStandard)
+	expLptDenom, _ := suite.app.CoinswapKeeper.GetLptDenomFromDenoms(
+		suite.ctx,
+		denomBTC,
+		denomStandard,
+	)
 	suite.Require().Equal(expLptDenom, lptDenom)
 	btcAmt, _ = sdkmath.NewIntFromString("201")
 	standardAmt, _ = sdkmath.NewIntFromString("20000000000000000000")
@@ -154,13 +170,22 @@ func (suite *TestSuite) TestLiquidity() {
 	minReward = sdkmath.NewInt(1)
 	deadline = time.Now().Add(1 * time.Minute)
 
-	msg = types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender2.String())
+	msg = types.NewMsgAddLiquidity(
+		depositCoin,
+		standardAmt,
+		minReward,
+		deadline.Unix(),
+		addrSender2.String(),
+	)
 	_, err = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
 	suite.NoError(err)
 
 	reservePoolBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
 	sender2Balances := suite.app.BankKeeper.GetAllBalances(suite.ctx, addrSender2)
-	suite.Equal("30000000000000000000", suite.app.BankKeeper.GetSupply(suite.ctx, lptDenom).Amount.String())
+	suite.Equal(
+		"30000000000000000000",
+		suite.app.BankKeeper.GetSupply(suite.ctx, lptDenom).Amount.String(),
+	)
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 301),
@@ -190,11 +215,17 @@ func (suite *TestSuite) TestLiquidity() {
 
 	reservePoolBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
 	sender1Balances = suite.app.BankKeeper.GetAllBalances(suite.ctx, addrSender1)
-	suite.Equal("20000000000000000000", suite.app.BankKeeper.GetSupply(suite.ctx, lptDenom).Amount.String())
+	suite.Equal(
+		"20000000000000000000",
+		suite.app.BankKeeper.GetSupply(suite.ctx, lptDenom).Amount.String(),
+	)
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 3000000000),
-		sdk.NewCoin(denomStandard, sdkmath.NewIntWithDecimal(3, 19).Sub(sdk.NewIntFromUint64(5000))),
+		sdk.NewCoin(
+			denomStandard,
+			sdkmath.NewIntWithDecimal(3, 19).Sub(sdk.NewIntFromUint64(5000)),
+		),
 	)
 	suite.Equal(expCoins.Sort().String(), sender1Balances.Sort().String())
 
@@ -223,7 +254,10 @@ func (suite *TestSuite) TestLiquidity() {
 
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denomBTC, 3000000000),
-		sdk.NewCoin(denomStandard, sdkmath.NewIntWithDecimal(3, 19).Sub(sdkmath.NewIntFromUint64(5000))),
+		sdk.NewCoin(
+			denomStandard,
+			sdkmath.NewIntWithDecimal(3, 19).Sub(sdkmath.NewIntFromUint64(5000)),
+		),
 	)
 	suite.Equal(expCoins.Sort().String(), sender1Balances.Sort().String())
 	suite.Equal("", reservePoolBalances.String())
@@ -254,7 +288,10 @@ func (suite *TestSuite) TestLiquidity2() {
 	// 1.1 lptAmt
 	reservePoolBalances := suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
 	sender1Balances := suite.app.BankKeeper.GetAllBalances(suite.ctx, addrSender1)
-	suite.Equal("10000000000000000000", suite.app.BankKeeper.GetSupply(suite.ctx, pool.LptDenom).Amount.String())
+	suite.Equal(
+		"10000000000000000000",
+		suite.app.BankKeeper.GetSupply(suite.ctx, pool.LptDenom).Amount.String(),
+	)
 
 	// 1.2 poolBalances
 	expCoins := sdk.NewCoins(
@@ -265,9 +302,18 @@ func (suite *TestSuite) TestLiquidity2() {
 
 	// 1.3 accountBalances
 	expCoins = sdk.NewCoins(
-		sdk.NewInt64Coin(denomBTC, 2999999900),                                                       // 3*10^9 - 100
-		sdk.NewCoin(denomStandard, sdkmath.NewIntWithDecimal(2, 19).Sub(sdk.NewIntFromUint64(5000))), // 2*10^19 - 5000
-		sdk.NewCoin(pool.LptDenom, sdkmath.NewIntWithDecimal(1, 19)),                                 // 10^19
+		sdk.NewInt64Coin(
+			denomBTC,
+			2999999900,
+		), // 3*10^9 - 100
+		sdk.NewCoin(
+			denomStandard,
+			sdkmath.NewIntWithDecimal(2, 19).Sub(sdk.NewIntFromUint64(5000)),
+		), // 2*10^19 - 5000
+		sdk.NewCoin(
+			pool.LptDenom,
+			sdkmath.NewIntWithDecimal(1, 19),
+		), // 10^19
 	)
 	suite.Equal(expCoins.Sort().String(), sender1Balances.Sort().String())
 
@@ -288,7 +334,10 @@ func (suite *TestSuite) TestLiquidity2() {
 	// 2.1 lptAmt
 	reservePoolBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
 	sender2Balances := suite.app.BankKeeper.GetAllBalances(suite.ctx, addrSender2)
-	suite.Equal("14135062787267695755", suite.app.BankKeeper.GetSupply(suite.ctx, pool.LptDenom).Amount.String()) // todo theoretical lpt ammount
+	suite.Equal(
+		"14135062787267695755",
+		suite.app.BankKeeper.GetSupply(suite.ctx, pool.LptDenom).Amount.String(),
+	) // todo theoretical lpt ammount
 
 	// 2.2 poolBalances
 	expCoins = sdk.NewCoins(
@@ -332,7 +381,10 @@ func (suite *TestSuite) TestLiquidity3() {
 	// 1.1 lptAmt
 	reservePoolBalances := suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
 	sender1Balances := suite.app.BankKeeper.GetAllBalances(suite.ctx, addrSender1)
-	suite.Equal("10000000000000000000", suite.app.BankKeeper.GetSupply(suite.ctx, pool.LptDenom).Amount.String())
+	suite.Equal(
+		"10000000000000000000",
+		suite.app.BankKeeper.GetSupply(suite.ctx, pool.LptDenom).Amount.String(),
+	)
 
 	// 1.2 poolBalances
 	expCoins := sdk.NewCoins(
@@ -343,9 +395,18 @@ func (suite *TestSuite) TestLiquidity3() {
 
 	// 1.3 accountBalances
 	expCoins = sdk.NewCoins(
-		sdk.NewInt64Coin(denomBTC, 2999999900),                                                       // 3*10^9 - 100
-		sdk.NewCoin(denomStandard, sdkmath.NewIntWithDecimal(2, 19).Sub(sdk.NewIntFromUint64(5000))), // 2*10^19 - 5000
-		sdk.NewCoin(pool.LptDenom, sdkmath.NewIntWithDecimal(1, 19)),                                 // 10^19
+		sdk.NewInt64Coin(
+			denomBTC,
+			2999999900,
+		), // 3*10^9 - 100
+		sdk.NewCoin(
+			denomStandard,
+			sdkmath.NewIntWithDecimal(2, 19).Sub(sdk.NewIntFromUint64(5000)),
+		), // 2*10^19 - 5000
+		sdk.NewCoin(
+			pool.LptDenom,
+			sdkmath.NewIntWithDecimal(1, 19),
+		), // 10^19
 	)
 	suite.Equal(expCoins.Sort().String(), sender1Balances.Sort().String())
 
@@ -366,7 +427,10 @@ func (suite *TestSuite) TestLiquidity3() {
 	// 2.1 lptAmt
 	reservePoolBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
 	sender1Balances = suite.app.BankKeeper.GetAllBalances(suite.ctx, addrSender1)
-	suite.Equal("5000000000000000000", suite.app.BankKeeper.GetSupply(suite.ctx, pool.LptDenom).Amount.String())
+	suite.Equal(
+		"5000000000000000000",
+		suite.app.BankKeeper.GetSupply(suite.ctx, pool.LptDenom).Amount.String(),
+	)
 
 	// 2.2 poolBalances
 	expCoins = sdk.NewCoins(

@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/tendermint/tendermint/crypto/tmhash"
+	"github.com/cometbft/cometbft/crypto/tmhash"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -31,7 +31,8 @@ var (
 	testPricing      = `{"price":"1stake"}`
 	testQoS          = uint64(50)
 	testOptions      = "{}"
-	testWithdrawAddr = sdk.AccAddress(tmhash.SumTruncated([]byte("test-withdrawal-address"))).String()
+	testWithdrawAddr = sdk.AccAddress(tmhash.SumTruncated([]byte("test-withdrawal-address"))).
+				String()
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 
 	testConsumer      = sdk.AccAddress(tmhash.SumTruncated([]byte("test-consumer"))).String()
@@ -45,9 +46,12 @@ var (
 	testResult = `{"code":200,"message":""}`
 	testOutput = `{"header":{},"body":{"last":"100"}}`
 
-	rawTestRequestContextID = GenerateRequestContextID(tmhash.Sum([]byte("test-request-context-id")), 0)
-	testRequestContextID    = rawTestRequestContextID.String()
-	testRequestID           = GenerateRequestID(rawTestRequestContextID, 1, 1, 1).String()
+	rawTestRequestContextID = GenerateRequestContextID(
+		tmhash.Sum([]byte("test-request-context-id")),
+		0,
+	)
+	testRequestContextID = rawTestRequestContextID.String()
+	testRequestID        = GenerateRequestID(rawTestRequestContextID, 1, 1, 1).String()
 
 	// -------------
 
@@ -56,13 +60,27 @@ var (
 
 // TestMsgDefineServiceRoute tests Route for MsgDefineService
 func TestMsgDefineServiceRoute(t *testing.T) {
-	msg := NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas)
+	msg := NewMsgDefineService(
+		testServiceName,
+		testServiceDesc,
+		testServiceTags,
+		testAuthor,
+		testAuthorDesc,
+		testSchemas,
+	)
 	require.Equal(t, RouterKey, msg.Route())
 }
 
 // TestMsgDefineServiceType tests Type for MsgDefineService
 func TestMsgDefineServiceType(t *testing.T) {
-	msg := NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas)
+	msg := NewMsgDefineService(
+		testServiceName,
+		testServiceDesc,
+		testServiceTags,
+		testAuthor,
+		testAuthorDesc,
+		testSchemas,
+	)
 	require.Equal(t, "define_service", msg.Type())
 }
 
@@ -80,19 +98,110 @@ func TestMsgDefineServiceValidation(t *testing.T) {
 	invalidSchemasNoOutput := `{"input":{"type":"object"}}`
 
 	testMsgs := []*MsgDefineService{
-		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),            // valid msg
-		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, emptyAddress, testAuthorDesc, testSchemas),          // missing author address
-		NewMsgDefineService(invalidName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),                // service name contains illegal characters
-		NewMsgDefineService(invalidLongName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),            // too long service name
-		NewMsgDefineService(testServiceName, invalidLongDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),            // too long service description
-		NewMsgDefineService(testServiceName, testServiceDesc, invalidMoreTags, testAuthor, testAuthorDesc, testSchemas),            // too many tags
-		NewMsgDefineService(testServiceName, testServiceDesc, invalidLongTags, testAuthor, testAuthorDesc, testSchemas),            // too long tag
-		NewMsgDefineService(testServiceName, testServiceDesc, invalidEmptyTags, testAuthor, testAuthorDesc, testSchemas),           // empty tag
-		NewMsgDefineService(testServiceName, testServiceDesc, invalidDuplicateTags, testAuthor, testAuthorDesc, testSchemas),       // duplicate tags
-		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, invalidLongDesc, testSchemas),           // too long author description
-		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, invalidSchemas),         // invalid schemas
-		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, invalidSchemasNoInput),  // missing input schema
-		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, invalidSchemasNoOutput), // missing output schema
+		NewMsgDefineService(
+			testServiceName,
+			testServiceDesc,
+			testServiceTags,
+			testAuthor,
+			testAuthorDesc,
+			testSchemas,
+		), // valid msg
+		NewMsgDefineService(
+			testServiceName,
+			testServiceDesc,
+			testServiceTags,
+			emptyAddress,
+			testAuthorDesc,
+			testSchemas,
+		), // missing author address
+		NewMsgDefineService(
+			invalidName,
+			testServiceDesc,
+			testServiceTags,
+			testAuthor,
+			testAuthorDesc,
+			testSchemas,
+		), // service name contains illegal characters
+		NewMsgDefineService(
+			invalidLongName,
+			testServiceDesc,
+			testServiceTags,
+			testAuthor,
+			testAuthorDesc,
+			testSchemas,
+		), // too long service name
+		NewMsgDefineService(
+			testServiceName,
+			invalidLongDesc,
+			testServiceTags,
+			testAuthor,
+			testAuthorDesc,
+			testSchemas,
+		), // too long service description
+		NewMsgDefineService(
+			testServiceName,
+			testServiceDesc,
+			invalidMoreTags,
+			testAuthor,
+			testAuthorDesc,
+			testSchemas,
+		), // too many tags
+		NewMsgDefineService(
+			testServiceName,
+			testServiceDesc,
+			invalidLongTags,
+			testAuthor,
+			testAuthorDesc,
+			testSchemas,
+		), // too long tag
+		NewMsgDefineService(
+			testServiceName,
+			testServiceDesc,
+			invalidEmptyTags,
+			testAuthor,
+			testAuthorDesc,
+			testSchemas,
+		), // empty tag
+		NewMsgDefineService(
+			testServiceName,
+			testServiceDesc,
+			invalidDuplicateTags,
+			testAuthor,
+			testAuthorDesc,
+			testSchemas,
+		), // duplicate tags
+		NewMsgDefineService(
+			testServiceName,
+			testServiceDesc,
+			testServiceTags,
+			testAuthor,
+			invalidLongDesc,
+			testSchemas,
+		), // too long author description
+		NewMsgDefineService(
+			testServiceName,
+			testServiceDesc,
+			testServiceTags,
+			testAuthor,
+			testAuthorDesc,
+			invalidSchemas,
+		), // invalid schemas
+		NewMsgDefineService(
+			testServiceName,
+			testServiceDesc,
+			testServiceTags,
+			testAuthor,
+			testAuthorDesc,
+			invalidSchemasNoInput,
+		), // missing input schema
+		NewMsgDefineService(
+			testServiceName,
+			testServiceDesc,
+			testServiceTags,
+			testAuthor,
+			testAuthorDesc,
+			invalidSchemasNoOutput,
+		), // missing output schema
 	}
 
 	testCases := []struct {
@@ -127,7 +236,14 @@ func TestMsgDefineServiceValidation(t *testing.T) {
 
 // TestMsgDefineServiceGetSignBytes tests GetSignBytes for MsgDefineService
 func TestMsgDefineServiceGetSignBytes(t *testing.T) {
-	msg := NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas)
+	msg := NewMsgDefineService(
+		testServiceName,
+		testServiceDesc,
+		testServiceTags,
+		testAuthor,
+		testAuthorDesc,
+		testSchemas,
+	)
 	res := msg.GetSignBytes()
 
 	expected := `{"type":"irismod/service/MsgDefineService","value":{"author":"cosmos1tkelht5u9ywfaww3fehvdtvncwwhf539w406rh","author_description":"test-author-desc","description":"test-service-desc","name":"test-service","schemas":"{\"input\":{\"type\":\"object\"},\"output\":{\"type\":\"object\"}}","tags":["tag1","tag2"]}}`
@@ -136,7 +252,14 @@ func TestMsgDefineServiceGetSignBytes(t *testing.T) {
 
 // TestMsgDefineServiceGetSigners tests GetSigners for MsgDefineService
 func TestMsgDefineServiceGetSigners(t *testing.T) {
-	msg := NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas)
+	msg := NewMsgDefineService(
+		testServiceName,
+		testServiceDesc,
+		testServiceTags,
+		testAuthor,
+		testAuthorDesc,
+		testSchemas,
+	)
 	res := msg.GetSigners()
 
 	expected := "[5DB3FBAE9C291C9EB9D14E6EC6AD93C39D74D225]"
@@ -145,13 +268,29 @@ func TestMsgDefineServiceGetSigners(t *testing.T) {
 
 // TestMsgBindServiceRoute tests Route for MsgBindService
 func TestMsgBindServiceRoute(t *testing.T) {
-	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testQoS, testOptions, testOwner)
+	msg := NewMsgBindService(
+		testServiceName,
+		testProvider,
+		testDeposit,
+		testPricing,
+		testQoS,
+		testOptions,
+		testOwner,
+	)
 	require.Equal(t, RouterKey, msg.Route())
 }
 
 // TestMsgBindServiceType tests Type for MsgBindService
 func TestMsgBindServiceType(t *testing.T) {
-	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testQoS, testOptions, testOwner)
+	msg := NewMsgBindService(
+		testServiceName,
+		testProvider,
+		testDeposit,
+		testPricing,
+		testQoS,
+		testOptions,
+		testOwner,
+	)
 	require.Equal(t, "bind_service", msg.Type())
 }
 
@@ -170,20 +309,132 @@ func TestMsgBindServiceValidation(t *testing.T) {
 	validUpperDenomPricing := `{"price":"5ibc/9EBF7EBE6F8FFD34617809F3CF00E04A10D8B7226048F68866371FB9DAD8A25D"}`
 
 	testMsgs := []*MsgBindService{
-		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testQoS, testOptions, testOwner),                 // valid msg
-		NewMsgBindService(testServiceName, testProvider, testDeposit, validUpperDenomPricing, testQoS, testOptions, testOwner),      // Pricing denom accepts the upper characters
-		NewMsgBindService(testServiceName, emptyAddress, testDeposit, testPricing, testQoS, testOptions, testOwner),                 // missing provider address
-		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testQoS, testOptions, emptyAddress),              // missing owner address
-		NewMsgBindService(invalidName, testProvider, testDeposit, testPricing, testQoS, testOptions, testOwner),                     // service name contains illegal characters
-		NewMsgBindService(invalidLongName, testProvider, testDeposit, testPricing, testQoS, testOptions, testOwner),                 // too long service name
-		NewMsgBindService(testServiceName, testProvider, invalidDeposit, testPricing, testQoS, testOptions, testOwner),              // invalid deposit
-		NewMsgBindService(testServiceName, testProvider, testDeposit, "", testQoS, testOptions, testOwner),                          // missing pricing
-		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPricing, testQoS, testOptions, testOwner),              // invalid Pricing JSON Schema instance
-		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidDenomPricing, testQoS, testOptions, testOwner),         // invalid pricing denom
-		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPromotionTimePricing, testQoS, testOptions, testOwner), // invalid promotion time lack of time zone
-		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPromotionVolPricing, testQoS, testOptions, testOwner),  // invalid promotion volume
-		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, invalidQoS, testOptions, testOwner),              // invalid qos
-		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testQoS, invalidOptions, testOwner),              // invalid options
+		NewMsgBindService(
+			testServiceName,
+			testProvider,
+			testDeposit,
+			testPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // valid msg
+		NewMsgBindService(
+			testServiceName,
+			testProvider,
+			testDeposit,
+			validUpperDenomPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // Pricing denom accepts the upper characters
+		NewMsgBindService(
+			testServiceName,
+			emptyAddress,
+			testDeposit,
+			testPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // missing provider address
+		NewMsgBindService(
+			testServiceName,
+			testProvider,
+			testDeposit,
+			testPricing,
+			testQoS,
+			testOptions,
+			emptyAddress,
+		), // missing owner address
+		NewMsgBindService(
+			invalidName,
+			testProvider,
+			testDeposit,
+			testPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // service name contains illegal characters
+		NewMsgBindService(
+			invalidLongName,
+			testProvider,
+			testDeposit,
+			testPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // too long service name
+		NewMsgBindService(
+			testServiceName,
+			testProvider,
+			invalidDeposit,
+			testPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // invalid deposit
+		NewMsgBindService(
+			testServiceName,
+			testProvider,
+			testDeposit,
+			"",
+			testQoS,
+			testOptions,
+			testOwner,
+		), // missing pricing
+		NewMsgBindService(
+			testServiceName,
+			testProvider,
+			testDeposit,
+			invalidPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // invalid Pricing JSON Schema instance
+		NewMsgBindService(
+			testServiceName,
+			testProvider,
+			testDeposit,
+			invalidDenomPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // invalid pricing denom
+		NewMsgBindService(
+			testServiceName,
+			testProvider,
+			testDeposit,
+			invalidPromotionTimePricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // invalid promotion time lack of time zone
+		NewMsgBindService(
+			testServiceName,
+			testProvider,
+			testDeposit,
+			invalidPromotionVolPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // invalid promotion volume
+		NewMsgBindService(
+			testServiceName,
+			testProvider,
+			testDeposit,
+			testPricing,
+			invalidQoS,
+			testOptions,
+			testOwner,
+		), // invalid qos
+		NewMsgBindService(
+			testServiceName,
+			testProvider,
+			testDeposit,
+			testPricing,
+			testQoS,
+			invalidOptions,
+			testOwner,
+		), // invalid options
 	}
 
 	testCases := []struct {
@@ -219,7 +470,15 @@ func TestMsgBindServiceValidation(t *testing.T) {
 
 // TestMsgBindServiceGetSignBytes tests GetSignBytes for MsgBindService
 func TestMsgBindServiceGetSignBytes(t *testing.T) {
-	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testQoS, testOptions, testOwner)
+	msg := NewMsgBindService(
+		testServiceName,
+		testProvider,
+		testDeposit,
+		testPricing,
+		testQoS,
+		testOptions,
+		testOwner,
+	)
 	res := msg.GetSignBytes()
 
 	expected := `{"type":"irismod/service/MsgBindService","value":{"deposit":[{"amount":"10000","denom":"stake"}],"options":"{}","owner":"cosmos1dtrajkx72qwf8gesp2z4rjz6p7klycmmh2lnvn","pricing":"{\"price\":\"1stake\"}","provider":"cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe","qos":"50","service_name":"test-service"}}`
@@ -228,20 +487,44 @@ func TestMsgBindServiceGetSignBytes(t *testing.T) {
 
 // TestMsgBindServiceGetSigners tests GetSigners for MsgBindService
 func TestMsgBindServiceGetSigners(t *testing.T) {
-	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testQoS, "", testOwner)
+	msg := NewMsgBindService(
+		testServiceName,
+		testProvider,
+		testDeposit,
+		testPricing,
+		testQoS,
+		"",
+		testOwner,
+	)
 	res := msg.GetSigners()
 	require.Equal(t, "[6AC7D958DE501C93A3300A8551C85A0FADF2637B]", fmt.Sprintf("%v", res))
 }
 
 // TestMsgUpdateServiceBindingRoute tests Route for MsgUpdateServiceBinding
 func TestMsgUpdateServiceBindingRoute(t *testing.T) {
-	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "", 0, testOptions, testOwner)
+	msg := NewMsgUpdateServiceBinding(
+		testServiceName,
+		testProvider,
+		testAddedDeposit,
+		"",
+		0,
+		testOptions,
+		testOwner,
+	)
 	require.Equal(t, RouterKey, msg.Route())
 }
 
 // TestMsgUpdateServiceBindingType tests Type for MsgUpdateServiceBinding
 func TestMsgUpdateServiceBindingType(t *testing.T) {
-	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "", 0, testOptions, testOwner)
+	msg := NewMsgUpdateServiceBinding(
+		testServiceName,
+		testProvider,
+		testAddedDeposit,
+		"",
+		0,
+		testOptions,
+		testOwner,
+	)
 	require.Equal(t, "update_service_binding", msg.Type())
 }
 
@@ -260,21 +543,141 @@ func TestMsgUpdateServiceBindingValidation(t *testing.T) {
 	validUpperDenomPricing := `{"price":"5ibc/9EBF7EBE6F8FFD34617809F3CF00E04A10D8B7226048F68866371FB9DAD8A25D"}`
 
 	testMsgs := []*MsgUpdateServiceBinding{
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, testPricing, testQoS, testOptions, testOwner),                   // valid msg
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, validUpperDenomPricing, testQoS, testOptions, testOwner),        // Pricing denom accepts the upper characters
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, emptyAddedDeposit, testPricing, testQoS, testOptions, testOwner),                  // empty deposit is allowed
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "", testQoS, testOptions, testOwner),                            // empty pricing is allowed
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, testPricing, 0, testOptions, testOwner),                         // 0 is allowed for qos
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, emptyAddedDeposit, "", 0, testOptions, testOwner),                                 // deposit, pricing and qos can be empty at the same time
-		NewMsgUpdateServiceBinding(testServiceName, emptyAddress, testAddedDeposit, testPricing, testQoS, testOptions, testOwner),                   // missing provider address
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, testPricing, testQoS, testOptions, emptyAddress),                // missing owner address
-		NewMsgUpdateServiceBinding(invalidName, testProvider, testAddedDeposit, testPricing, testQoS, testOptions, testOwner),                       // service name contains illegal characters
-		NewMsgUpdateServiceBinding(invalidLongName, testProvider, testAddedDeposit, testPricing, testQoS, testOptions, testOwner),                   // too long service name
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPricing, testQoS, testOptions, testOwner),                // invalid Pricing JSON Schema instance
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidDenomPricing, testQoS, testOptions, testOwner),           // invalid pricing denom
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPromotionTimePricing, testQoS, testOptions, testOwner),   // invalid promotion time lack of time zone
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPromotionVolPricing, testQoS, testOptions, testOwner),    // invalid promotion volume
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPromotionVolPricing, testQoS, invalidOptions, testOwner), // invalid options
+		NewMsgUpdateServiceBinding(
+			testServiceName,
+			testProvider,
+			testAddedDeposit,
+			testPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // valid msg
+		NewMsgUpdateServiceBinding(
+			testServiceName,
+			testProvider,
+			testAddedDeposit,
+			validUpperDenomPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // Pricing denom accepts the upper characters
+		NewMsgUpdateServiceBinding(
+			testServiceName,
+			testProvider,
+			emptyAddedDeposit,
+			testPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // empty deposit is allowed
+		NewMsgUpdateServiceBinding(
+			testServiceName,
+			testProvider,
+			testAddedDeposit,
+			"",
+			testQoS,
+			testOptions,
+			testOwner,
+		), // empty pricing is allowed
+		NewMsgUpdateServiceBinding(
+			testServiceName,
+			testProvider,
+			testAddedDeposit,
+			testPricing,
+			0,
+			testOptions,
+			testOwner,
+		), // 0 is allowed for qos
+		NewMsgUpdateServiceBinding(
+			testServiceName,
+			testProvider,
+			emptyAddedDeposit,
+			"",
+			0,
+			testOptions,
+			testOwner,
+		), // deposit, pricing and qos can be empty at the same time
+		NewMsgUpdateServiceBinding(
+			testServiceName,
+			emptyAddress,
+			testAddedDeposit,
+			testPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // missing provider address
+		NewMsgUpdateServiceBinding(
+			testServiceName,
+			testProvider,
+			testAddedDeposit,
+			testPricing,
+			testQoS,
+			testOptions,
+			emptyAddress,
+		), // missing owner address
+		NewMsgUpdateServiceBinding(
+			invalidName,
+			testProvider,
+			testAddedDeposit,
+			testPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // service name contains illegal characters
+		NewMsgUpdateServiceBinding(
+			invalidLongName,
+			testProvider,
+			testAddedDeposit,
+			testPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // too long service name
+		NewMsgUpdateServiceBinding(
+			testServiceName,
+			testProvider,
+			testAddedDeposit,
+			invalidPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // invalid Pricing JSON Schema instance
+		NewMsgUpdateServiceBinding(
+			testServiceName,
+			testProvider,
+			testAddedDeposit,
+			invalidDenomPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // invalid pricing denom
+		NewMsgUpdateServiceBinding(
+			testServiceName,
+			testProvider,
+			testAddedDeposit,
+			invalidPromotionTimePricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // invalid promotion time lack of time zone
+		NewMsgUpdateServiceBinding(
+			testServiceName,
+			testProvider,
+			testAddedDeposit,
+			invalidPromotionVolPricing,
+			testQoS,
+			testOptions,
+			testOwner,
+		), // invalid promotion volume
+		NewMsgUpdateServiceBinding(
+			testServiceName,
+			testProvider,
+			testAddedDeposit,
+			invalidPromotionVolPricing,
+			testQoS,
+			invalidOptions,
+			testOwner,
+		), // invalid options
 	}
 
 	testCases := []struct {
@@ -311,7 +714,15 @@ func TestMsgUpdateServiceBindingValidation(t *testing.T) {
 
 // TestMsgUpdateServiceBindingGetSignBytes tests GetSignBytes for MsgUpdateServiceBinding
 func TestMsgUpdateServiceBindingGetSignBytes(t *testing.T) {
-	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "{\"price\":\"1\"}", 1, "", testOwner)
+	msg := NewMsgUpdateServiceBinding(
+		testServiceName,
+		testProvider,
+		testAddedDeposit,
+		"{\"price\":\"1\"}",
+		1,
+		"",
+		testOwner,
+	)
 	res := msg.GetSignBytes()
 
 	expected := `{"type":"irismod/service/MsgUpdateServiceBinding","value":{"deposit":[{"amount":"100","denom":"stake"}],"owner":"cosmos1dtrajkx72qwf8gesp2z4rjz6p7klycmmh2lnvn","pricing":"{\"price\":\"1\"}","provider":"cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe","qos":"1","service_name":"test-service"}}`
@@ -320,7 +731,15 @@ func TestMsgUpdateServiceBindingGetSignBytes(t *testing.T) {
 
 // TestMsgUpdateServiceBindingGetSigners tests GetSigners for MsgUpdateServiceBinding
 func TestMsgUpdateServiceBindingGetSigners(t *testing.T) {
-	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "", 0, testOptions, testOwner)
+	msg := NewMsgUpdateServiceBinding(
+		testServiceName,
+		testProvider,
+		testAddedDeposit,
+		"",
+		0,
+		testOptions,
+		testOwner,
+	)
 	res := msg.GetSigners()
 	require.Equal(t, "[6AC7D958DE501C93A3300A8551C85A0FADF2637B]", fmt.Sprintf("%v", res))
 }
@@ -402,11 +821,27 @@ func TestMsgDisableServiceBindingValidation(t *testing.T) {
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 
 	testMsgs := []*MsgDisableServiceBinding{
-		NewMsgDisableServiceBinding(testServiceName, testProvider, testOwner),    // valid msg
-		NewMsgDisableServiceBinding(testServiceName, emptyAddress, testOwner),    // missing provider address
-		NewMsgDisableServiceBinding(testServiceName, testProvider, emptyAddress), // missing owner address
-		NewMsgDisableServiceBinding(invalidName, testProvider, testOwner),        // service name contains illegal characters
-		NewMsgDisableServiceBinding(invalidLongName, testProvider, testOwner),    // too long service name
+		NewMsgDisableServiceBinding(testServiceName, testProvider, testOwner), // valid msg
+		NewMsgDisableServiceBinding(
+			testServiceName,
+			emptyAddress,
+			testOwner,
+		), // missing provider address
+		NewMsgDisableServiceBinding(
+			testServiceName,
+			testProvider,
+			emptyAddress,
+		), // missing owner address
+		NewMsgDisableServiceBinding(
+			invalidName,
+			testProvider,
+			testOwner,
+		), // service name contains illegal characters
+		NewMsgDisableServiceBinding(
+			invalidLongName,
+			testProvider,
+			testOwner,
+		), // too long service name
 	}
 
 	testCases := []struct {
@@ -468,12 +903,42 @@ func TestMsgEnableServiceBindingValidation(t *testing.T) {
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 
 	testMsgs := []*MsgEnableServiceBinding{
-		NewMsgEnableServiceBinding(testServiceName, testProvider, testAddedDeposit, testOwner),    // valid msg
-		NewMsgEnableServiceBinding(testServiceName, testProvider, emptyAddedDeposit, testOwner),   // empty deposit is allowed
-		NewMsgEnableServiceBinding(testServiceName, emptyAddress, testAddedDeposit, testOwner),    // missing provider address
-		NewMsgEnableServiceBinding(testServiceName, testProvider, testAddedDeposit, emptyAddress), // missing owner address
-		NewMsgEnableServiceBinding(invalidName, testProvider, testAddedDeposit, testOwner),        // service name contains illegal characters
-		NewMsgEnableServiceBinding(invalidLongName, testProvider, testAddedDeposit, testOwner),    // too long service name
+		NewMsgEnableServiceBinding(
+			testServiceName,
+			testProvider,
+			testAddedDeposit,
+			testOwner,
+		), // valid msg
+		NewMsgEnableServiceBinding(
+			testServiceName,
+			testProvider,
+			emptyAddedDeposit,
+			testOwner,
+		), // empty deposit is allowed
+		NewMsgEnableServiceBinding(
+			testServiceName,
+			emptyAddress,
+			testAddedDeposit,
+			testOwner,
+		), // missing provider address
+		NewMsgEnableServiceBinding(
+			testServiceName,
+			testProvider,
+			testAddedDeposit,
+			emptyAddress,
+		), // missing owner address
+		NewMsgEnableServiceBinding(
+			invalidName,
+			testProvider,
+			testAddedDeposit,
+			testOwner,
+		), // service name contains illegal characters
+		NewMsgEnableServiceBinding(
+			invalidLongName,
+			testProvider,
+			testAddedDeposit,
+			testOwner,
+		), // too long service name
 	}
 
 	testCases := []struct {
@@ -534,11 +999,27 @@ func TestMsgRefundServiceDepositValidation(t *testing.T) {
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 
 	testMsgs := []*MsgRefundServiceDeposit{
-		NewMsgRefundServiceDeposit(testServiceName, testProvider, testOwner),    // valid msg
-		NewMsgRefundServiceDeposit(testServiceName, emptyAddress, testOwner),    // missing provider address
-		NewMsgRefundServiceDeposit(testServiceName, testProvider, emptyAddress), // missing owner address
-		NewMsgRefundServiceDeposit(invalidName, testProvider, testOwner),        // service name contains illegal characters
-		NewMsgRefundServiceDeposit(invalidLongName, testProvider, testOwner),    // too long service name
+		NewMsgRefundServiceDeposit(testServiceName, testProvider, testOwner), // valid msg
+		NewMsgRefundServiceDeposit(
+			testServiceName,
+			emptyAddress,
+			testOwner,
+		), // missing provider address
+		NewMsgRefundServiceDeposit(
+			testServiceName,
+			testProvider,
+			emptyAddress,
+		), // missing owner address
+		NewMsgRefundServiceDeposit(
+			invalidName,
+			testProvider,
+			testOwner,
+		), // service name contains illegal characters
+		NewMsgRefundServiceDeposit(
+			invalidLongName,
+			testProvider,
+			testOwner,
+		), // too long service name
 	}
 
 	testCases := []struct {
@@ -758,18 +1239,68 @@ func TestMsgRespondServiceValidation(t *testing.T) {
 	invalidResultNoMsg := `{"code":200}`
 
 	testMsgs := []*MsgRespondService{
-		NewMsgRespondService(testRequestID, testProvider, testResult, testOutput),     // valid msg
-		NewMsgRespondService(testRequestID, testProvider, validResult400, ""),         // valid msg
-		NewMsgRespondService(testRequestID, emptyAddress, testResult, testOutput),     // missing provider address
-		NewMsgRespondService(invalidRequestID, testProvider, testResult, testOutput),  // invalid request ID
-		NewMsgRespondService(testRequestID, testProvider, "", testOutput),             // missing result
-		NewMsgRespondService(testRequestID, testProvider, invalidResult, ""),          // invalid result
-		NewMsgRespondService(testRequestID, testProvider, invalidResultCode, ""),      // invalid result code
-		NewMsgRespondService(testRequestID, testProvider, invalidResultNoCode, ""),    // missing result code
-		NewMsgRespondService(testRequestID, testProvider, invalidResultNoMsg, ""),     // missing result message
-		NewMsgRespondService(testRequestID, testProvider, testResult, ""),             // output should be provided when the result code is 200
-		NewMsgRespondService(testRequestID, testProvider, testResult, invalidOutput),  // invalid output
-		NewMsgRespondService(testRequestID, testProvider, validResult400, testOutput), // output should not be provided when the result code is not 200
+		NewMsgRespondService(testRequestID, testProvider, testResult, testOutput), // valid msg
+		NewMsgRespondService(testRequestID, testProvider, validResult400, ""),     // valid msg
+		NewMsgRespondService(
+			testRequestID,
+			emptyAddress,
+			testResult,
+			testOutput,
+		), // missing provider address
+		NewMsgRespondService(
+			invalidRequestID,
+			testProvider,
+			testResult,
+			testOutput,
+		), // invalid request ID
+		NewMsgRespondService(
+			testRequestID,
+			testProvider,
+			"",
+			testOutput,
+		), // missing result
+		NewMsgRespondService(
+			testRequestID,
+			testProvider,
+			invalidResult,
+			"",
+		), // invalid result
+		NewMsgRespondService(
+			testRequestID,
+			testProvider,
+			invalidResultCode,
+			"",
+		), // invalid result code
+		NewMsgRespondService(
+			testRequestID,
+			testProvider,
+			invalidResultNoCode,
+			"",
+		), // missing result code
+		NewMsgRespondService(
+			testRequestID,
+			testProvider,
+			invalidResultNoMsg,
+			"",
+		), // missing result message
+		NewMsgRespondService(
+			testRequestID,
+			testProvider,
+			testResult,
+			"",
+		), // output should be provided when the result code is 200
+		NewMsgRespondService(
+			testRequestID,
+			testProvider,
+			testResult,
+			invalidOutput,
+		), // invalid output
+		NewMsgRespondService(
+			testRequestID,
+			testProvider,
+			validResult400,
+			testOutput,
+		), // output should not be provided when the result code is not 200
 	}
 
 	testCases := []struct {
@@ -838,9 +1369,15 @@ func TestMsgPauseRequestContextValidation(t *testing.T) {
 	invalidRequestContextID := "invalid-request-context-id"
 
 	testMsgs := []*MsgPauseRequestContext{
-		NewMsgPauseRequestContext(testRequestContextID, testConsumer),    // valid msg
-		NewMsgPauseRequestContext(testRequestContextID, emptyAddress),    // missing consumer address
-		NewMsgPauseRequestContext(invalidRequestContextID, testConsumer), // invalid request context ID
+		NewMsgPauseRequestContext(testRequestContextID, testConsumer), // valid msg
+		NewMsgPauseRequestContext(
+			testRequestContextID,
+			emptyAddress,
+		), // missing consumer address
+		NewMsgPauseRequestContext(
+			invalidRequestContextID,
+			testConsumer,
+		), // invalid request context ID
 	}
 
 	testCases := []struct {
@@ -898,9 +1435,15 @@ func TestMsgStartRequestContextValidation(t *testing.T) {
 	invalidRequestContextID := "invalid-request-context-id"
 
 	testMsgs := []*MsgStartRequestContext{
-		NewMsgStartRequestContext(testRequestContextID, testConsumer),    // valid msg
-		NewMsgStartRequestContext(testRequestContextID, emptyAddress),    // missing consumer address
-		NewMsgStartRequestContext(invalidRequestContextID, testConsumer), // invalid request context ID
+		NewMsgStartRequestContext(testRequestContextID, testConsumer), // valid msg
+		NewMsgStartRequestContext(
+			testRequestContextID,
+			emptyAddress,
+		), // missing consumer address
+		NewMsgStartRequestContext(
+			invalidRequestContextID,
+			testConsumer,
+		), // invalid request context ID
 	}
 
 	testCases := []struct {
@@ -958,9 +1501,12 @@ func TestMsgKillRequestContextValidation(t *testing.T) {
 	invalidRequestContextID := "invalid-request-context-id"
 
 	testMsgs := []*MsgKillRequestContext{
-		NewMsgKillRequestContext(testRequestContextID, testConsumer),    // valid msg
-		NewMsgKillRequestContext(testRequestContextID, emptyAddress),    // missing consumer address
-		NewMsgKillRequestContext(invalidRequestContextID, testConsumer), // invalid request context ID
+		NewMsgKillRequestContext(testRequestContextID, testConsumer), // valid msg
+		NewMsgKillRequestContext(testRequestContextID, emptyAddress), // missing consumer address
+		NewMsgKillRequestContext(
+			invalidRequestContextID,
+			testConsumer,
+		), // invalid request context ID
 	}
 
 	testCases := []struct {
@@ -1023,15 +1569,87 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 	invalidDenomCoins := sdk.Coins{sdk.Coin{Denom: "eth+min", Amount: sdk.NewInt(1000)}}
 
 	testMsgs := []*MsgUpdateRequestContext{
-		NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testTimeout, testRepeatedFreq, testRepeatedTotal, testConsumer), // valid msg
-		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, 0, testConsumer),                                                                  // allow all not to be updated
-		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, 0, emptyAddress),                                                                  // missing consumer address
-		NewMsgUpdateRequestContext(invalidRequestContextID, nil, nil, 0, 0, 0, testConsumer),                                                               // invalid request context ID
-		NewMsgUpdateRequestContext(testRequestContextID, invalidDuplicateProviders, nil, 0, 0, 0, testConsumer),                                            // duplicate providers
-		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, invalidTimeout, 0, 0, testConsumer),                                                     // invalid timeout
-		NewMsgUpdateRequestContext(invalidRequestContextID, nil, nil, testTimeout, invalidLessRepeatedFreq, 0, testConsumer),                               // invalid repeated frequency
-		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, invalidRepeatedTotal, testConsumer),                                               // invalid repeated total
-		NewMsgUpdateRequestContext(testRequestContextID, nil, invalidDenomCoins, 0, 0, 0, testConsumer),                                                    // invalid service fee denom
+		NewMsgUpdateRequestContext(
+			testRequestContextID,
+			testProviders,
+			testServiceFeeCap,
+			testTimeout,
+			testRepeatedFreq,
+			testRepeatedTotal,
+			testConsumer,
+		), // valid msg
+		NewMsgUpdateRequestContext(
+			testRequestContextID,
+			nil,
+			nil,
+			0,
+			0,
+			0,
+			testConsumer,
+		), // allow all not to be updated
+		NewMsgUpdateRequestContext(
+			testRequestContextID,
+			nil,
+			nil,
+			0,
+			0,
+			0,
+			emptyAddress,
+		), // missing consumer address
+		NewMsgUpdateRequestContext(
+			invalidRequestContextID,
+			nil,
+			nil,
+			0,
+			0,
+			0,
+			testConsumer,
+		), // invalid request context ID
+		NewMsgUpdateRequestContext(
+			testRequestContextID,
+			invalidDuplicateProviders,
+			nil,
+			0,
+			0,
+			0,
+			testConsumer,
+		), // duplicate providers
+		NewMsgUpdateRequestContext(
+			testRequestContextID,
+			nil,
+			nil,
+			invalidTimeout,
+			0,
+			0,
+			testConsumer,
+		), // invalid timeout
+		NewMsgUpdateRequestContext(
+			invalidRequestContextID,
+			nil,
+			nil,
+			testTimeout,
+			invalidLessRepeatedFreq,
+			0,
+			testConsumer,
+		), // invalid repeated frequency
+		NewMsgUpdateRequestContext(
+			testRequestContextID,
+			nil,
+			nil,
+			0,
+			0,
+			invalidRepeatedTotal,
+			testConsumer,
+		), // invalid repeated total
+		NewMsgUpdateRequestContext(
+			testRequestContextID,
+			nil,
+			invalidDenomCoins,
+			0,
+			0,
+			0,
+			testConsumer,
+		), // invalid service fee denom
 	}
 
 	testCases := []struct {
@@ -1062,7 +1680,15 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 
 // TestMsgUpdateRequestContextGetSignBytes tests GetSignBytes for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextGetSignBytes(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testTimeout, testRepeatedFreq, testRepeatedTotal, testConsumer)
+	msg := NewMsgUpdateRequestContext(
+		testRequestContextID,
+		testProviders,
+		testServiceFeeCap,
+		testTimeout,
+		testRepeatedFreq,
+		testRepeatedTotal,
+		testConsumer,
+	)
 	res := msg.GetSignBytes()
 
 	expected := `{"type":"irismod/service/MsgUpdateRequestContext","value":{"consumer":"cosmos1d8ydkv60gkj3sc98lvnxpddlfwwluvp6jc59a0","providers":["cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe"],"repeated_frequency":"120","repeated_total":"100","request_context_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000","service_fee_cap":[{"amount":"100","denom":"stake"}],"timeout":"100"}}`
@@ -1071,7 +1697,15 @@ func TestMsgUpdateRequestContextGetSignBytes(t *testing.T) {
 
 // TestMsgUpdateRequestContextGetSigners tests GetSigners for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextGetSigners(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testTimeout, testRepeatedFreq, testRepeatedTotal, testConsumer)
+	msg := NewMsgUpdateRequestContext(
+		testRequestContextID,
+		testProviders,
+		testServiceFeeCap,
+		testTimeout,
+		testRepeatedFreq,
+		testRepeatedTotal,
+		testConsumer,
+	)
 	res := msg.GetSigners()
 	require.Equal(t, "[69C8DB334F45A51860A7FB2660B5BF4B9DFE303A]", fmt.Sprintf("%v", res))
 }

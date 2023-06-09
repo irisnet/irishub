@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -87,11 +87,14 @@ func GetCmdQueryServiceDefinition() *cobra.Command {
 // GetCmdQueryServiceBinding implements the query service binding command
 func GetCmdQueryServiceBinding() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "binding [service-name] [provider-address]",
-		Short:   "Query a service binding",
-		Long:    "Query details of a service binding.",
-		Example: fmt.Sprintf("$ %s query service binding <service-name> <provider-address>", version.AppName),
-		Args:    cobra.ExactArgs(2),
+		Use:   "binding [service-name] [provider-address]",
+		Short: "Query a service binding",
+		Long:  "Query details of a service binding.",
+		Example: fmt.Sprintf(
+			"$ %s query service binding <service-name> <provider-address>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -130,11 +133,14 @@ func GetCmdQueryServiceBinding() *cobra.Command {
 // GetCmdQueryServiceBindings implements the query service bindings command
 func GetCmdQueryServiceBindings() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "bindings [service-name]",
-		Short:   "Query all bindings of a service definition with an optional owner",
-		Long:    "Query all bindings of a service definition with an optional owner.",
-		Example: fmt.Sprintf("$ %s query service bindings <service-name> --owner=<address>", version.AppName),
-		Args:    cobra.ExactArgs(1),
+		Use:   "bindings [service-name]",
+		Short: "Query all bindings of a service definition with an optional owner",
+		Long:  "Query all bindings of a service definition with an optional owner.",
+		Example: fmt.Sprintf(
+			"$ %s query service bindings <service-name> --owner=<address>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -255,7 +261,11 @@ func GetCmdQueryServiceRequest() *cobra.Command {
 			}
 
 			if res.Request.Empty() {
-				request, err := utils.QueryRequestByTxQuery(clientCtx, types.QuerierRoute, requestID)
+				request, err := utils.QueryRequestByTxQuery(
+					clientCtx,
+					types.QuerierRoute,
+					requestID,
+				)
 				if err != nil {
 					return err
 				}
@@ -277,11 +287,14 @@ func GetCmdQueryServiceRequest() *cobra.Command {
 // GetCmdQueryServiceRequests implements the query service requests command
 func GetCmdQueryServiceRequests() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "requests [service-name] [provider] | [request-context-id] [batch-counter]",
-		Short:   "Query active requests by the service binding or request context ID",
-		Long:    "Query active requests by the service binding or request context ID.",
-		Example: fmt.Sprintf("$ %s query service requests <service-name> <provider> | <request-context-id> <batch-counter>", version.AppName),
-		Args:    cobra.ExactArgs(2),
+		Use:   "requests [service-name] [provider] | [request-context-id] [batch-counter]",
+		Short: "Query active requests by the service binding or request context ID",
+		Long:  "Query active requests by the service binding or request context ID.",
+		Example: fmt.Sprintf(
+			"$ %s query service requests <service-name> <provider> | <request-context-id> <batch-counter>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -373,7 +386,11 @@ func GetCmdQueryServiceResponse() *cobra.Command {
 			}
 
 			if res.Response.Empty() {
-				response, err := utils.QueryResponseByTxQuery(clientCtx, types.QuerierRoute, requestID)
+				response, err := utils.QueryResponseByTxQuery(
+					clientCtx,
+					types.QuerierRoute,
+					requestID,
+				)
 				if err != nil {
 					return err
 				}
@@ -395,11 +412,14 @@ func GetCmdQueryServiceResponse() *cobra.Command {
 // GetCmdQueryServiceResponses implements the query service responses command
 func GetCmdQueryServiceResponses() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "responses [request-context-id] [batch-counter]",
-		Short:   "Query active responses by the request context ID and batch counter",
-		Long:    "Query active responses by the request context ID and batch counter.",
-		Example: fmt.Sprintf("$ %s query service responses <request-context-id> <batch-counter>", version.AppName),
-		Args:    cobra.ExactArgs(2),
+		Use:   "responses [request-context-id] [batch-counter]",
+		Short: "Query active responses by the request context ID and batch counter",
+		Long:  "Query active responses by the request context ID and batch counter.",
+		Example: fmt.Sprintf(
+			"$ %s query service responses <request-context-id> <batch-counter>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 
@@ -446,11 +466,14 @@ func GetCmdQueryServiceResponses() *cobra.Command {
 // GetCmdQueryRequestContext implements the query request context command
 func GetCmdQueryRequestContext() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "request-context [request-context-id]",
-		Short:   "Query a request context",
-		Long:    "Query a request context.",
-		Example: fmt.Sprintf("$ %s query service request-context <request-context-id>", version.AppName),
-		Args:    cobra.ExactArgs(1),
+		Use:   "request-context [request-context-id]",
+		Short: "Query a request context",
+		Long:  "Query a request context.",
+		Example: fmt.Sprintf(
+			"$ %s query service request-context <request-context-id>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {

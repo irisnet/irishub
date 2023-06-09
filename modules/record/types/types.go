@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/tendermint/tendermint/libs/bytes"
+	"github.com/cometbft/cometbft/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

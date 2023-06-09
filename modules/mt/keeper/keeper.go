@@ -3,7 +3,7 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
+	"github.com/cometbft/cometbft/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -121,7 +121,11 @@ func (k Keeper) TransferOwner(ctx sdk.Context,
 
 	srcOwnerAmount := k.GetBalance(ctx, denomID, mtID, srcOwner)
 	if srcOwnerAmount < amount {
-		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient balance: %d", srcOwnerAmount)
+		return sdkerrors.Wrapf(
+			sdkerrors.ErrInsufficientFunds,
+			"insufficient balance: %d",
+			srcOwnerAmount,
+		)
 	}
 
 	return k.Transfer(ctx, denomID, mtID, amount, srcOwner, dstOwner)
@@ -135,7 +139,11 @@ func (k Keeper) BurnMT(ctx sdk.Context,
 
 	srcOwnerAmount := k.GetBalance(ctx, denomID, mtID, owner)
 	if srcOwnerAmount < amount {
-		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient balance: %d", srcOwnerAmount)
+		return sdkerrors.Wrapf(
+			sdkerrors.ErrInsufficientFunds,
+			"insufficient balance: %d",
+			srcOwnerAmount,
+		)
 	}
 
 	// sub balance

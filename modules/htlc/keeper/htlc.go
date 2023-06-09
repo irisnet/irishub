@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -97,7 +97,11 @@ func (k Keeper) createHTLT(
 	var direction types.SwapDirection
 
 	if len(amount) != 1 {
-		return direction, sdkerrors.Wrapf(types.ErrInvalidAmount, "amount %s must contain exactly one coin", amount.String())
+		return direction, sdkerrors.Wrapf(
+			types.ErrInvalidAmount,
+			"amount %s must contain exactly one coin",
+			amount.String(),
+		)
 	}
 
 	asset, err := k.GetAsset(ctx, amount[0].Denom)
@@ -111,7 +115,13 @@ func (k Keeper) createHTLT(
 
 	// Swap amount must be within the specified swap amount limits
 	if amount[0].Amount.LT(asset.MinSwapAmount) || amount[0].Amount.GT(asset.MaxSwapAmount) {
-		return direction, sdkerrors.Wrapf(types.ErrInvalidAmount, "amount %s outside range [%s, %s]", amount[0].Amount, asset.MinSwapAmount.String(), asset.MaxSwapAmount)
+		return direction, sdkerrors.Wrapf(
+			types.ErrInvalidAmount,
+			"amount %s outside range [%s, %s]",
+			amount[0].Amount,
+			asset.MinSwapAmount.String(),
+			asset.MaxSwapAmount,
+		)
 	}
 
 	// Unix timestamp must be in range [-15 mins, 30 mins) of the current time
@@ -122,7 +132,8 @@ func (k Keeper) createHTLT(
 			types.ErrInvalidTimestamp,
 			fmt.Sprintf(
 				"timestamp can neither be 15 minutes ahead of the current time, nor 30 minutes later. block time: %s, timestamp: %s",
-				ctx.BlockTime().String(), time.Unix(int64(timestamp), 0).UTC().String(),
+				ctx.BlockTime().String(),
+				time.Unix(int64(timestamp), 0).UTC().String(),
 			),
 		)
 	}
@@ -131,7 +142,11 @@ func (k Keeper) createHTLT(
 
 	if sender.Equals(deputyAddress) {
 		if to.Equals(deputyAddress) {
-			return direction, sdkerrors.Wrapf(types.ErrInvalidAccount, "deputy cannot be both sender and receiver: %s", asset.DeputyAddress)
+			return direction, sdkerrors.Wrapf(
+				types.ErrInvalidAccount,
+				"deputy cannot be both sender and receiver: %s",
+				asset.DeputyAddress,
+			)
 		}
 		direction = types.Incoming
 	} else {
@@ -157,7 +172,13 @@ func (k Keeper) createHTLT(
 	case types.Outgoing:
 		// Outgoing swaps must have a time lock within the accepted range
 		if timeLock < asset.MinBlockLock || timeLock > asset.MaxBlockLock {
-			return direction, sdkerrors.Wrapf(types.ErrInvalidTimeLock, "time lock %d outside range [%d, %d]", timeLock, asset.MinBlockLock, asset.MaxBlockLock)
+			return direction, sdkerrors.Wrapf(
+				types.ErrInvalidTimeLock,
+				"time lock %d outside range [%d, %d]",
+				timeLock,
+				asset.MinBlockLock,
+				asset.MaxBlockLock,
+			)
 		}
 		// Amount in outgoing swaps must be able to pay the deputy's fixed fee.
 		if amount[0].Amount.LT(asset.FixedFee.Add(asset.MinSwapAmount)) {
@@ -306,7 +327,12 @@ func (k Keeper) refundHTLC(ctx sdk.Context, sender sdk.AccAddress, amount sdk.Co
 	return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sender, amount)
 }
 
-func (k Keeper) refundHTLT(ctx sdk.Context, direction types.SwapDirection, sender sdk.AccAddress, amount sdk.Coins) error {
+func (k Keeper) refundHTLT(
+	ctx sdk.Context,
+	direction types.SwapDirection,
+	sender sdk.AccAddress,
+	amount sdk.Coins,
+) error {
 	switch direction {
 	case types.Incoming:
 		if err := k.DecrementIncomingAssetSupply(ctx, amount[0]); err != nil {
@@ -352,13 +378,21 @@ func (k Keeper) GetHTLC(ctx sdk.Context, id tmbytes.HexBytes) (htlc types.HTLC, 
 }
 
 // AddHTLCToExpiredQueue adds the specified HTLC to the expiration queue
-func (k Keeper) AddHTLCToExpiredQueue(ctx sdk.Context, expirationHeight uint64, id tmbytes.HexBytes) {
+func (k Keeper) AddHTLCToExpiredQueue(
+	ctx sdk.Context,
+	expirationHeight uint64,
+	id tmbytes.HexBytes,
+) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(types.GetHTLCExpiredQueueKey(expirationHeight, id), []byte{})
 }
 
 // DeleteHTLCFromExpiredQueue removes the specified HTLC from the expiration queue
-func (k Keeper) DeleteHTLCFromExpiredQueue(ctx sdk.Context, expirationHeight uint64, id tmbytes.HexBytes) {
+func (k Keeper) DeleteHTLCFromExpiredQueue(
+	ctx sdk.Context,
+	expirationHeight uint64,
+	id tmbytes.HexBytes,
+) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetHTLCExpiredQueueKey(expirationHeight, id))
 }
