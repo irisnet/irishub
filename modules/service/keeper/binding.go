@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"time"
 
-	gogotypes "github.com/gogo/protobuf/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -80,7 +80,17 @@ func (k Keeper) AddServiceBinding(
 	available := true
 	disabledTime := time.Time{}
 
-	svcBinding := types.NewServiceBinding(serviceName, provider, deposit, pricing, qos, options, available, disabledTime, owner)
+	svcBinding := types.NewServiceBinding(
+		serviceName,
+		provider,
+		deposit,
+		pricing,
+		qos,
+		options,
+		available,
+		disabledTime,
+		owner,
+	)
 
 	k.SetServiceBinding(ctx, svcBinding)
 	k.SetOwnerServiceBinding(ctx, svcBinding)
@@ -327,7 +337,11 @@ func (k Keeper) EnableServiceBinding(
 }
 
 // RefundDeposit refunds the deposit from the specified service binding
-func (k Keeper) RefundDeposit(ctx sdk.Context, serviceName string, provider, owner sdk.AccAddress) error {
+func (k Keeper) RefundDeposit(
+	ctx sdk.Context,
+	serviceName string,
+	provider, owner sdk.AccAddress,
+) error {
 	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
 		return sdkerrors.Wrap(types.ErrUnknownServiceBinding, "")
@@ -350,7 +364,8 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, serviceName string, provider, own
 		return sdkerrors.Wrap(types.ErrInvalidDeposit, "the deposit of the service binding is zero")
 	}
 
-	refundableTime := binding.DisabledTime.Add(k.ArbitrationTimeLimit(ctx)).Add(k.ComplaintRetrospect(ctx))
+	refundableTime := binding.DisabledTime.Add(k.ArbitrationTimeLimit(ctx)).
+		Add(k.ComplaintRetrospect(ctx))
 
 	currentTime := ctx.BlockHeader().Time
 	if currentTime.Before(refundableTime) {
@@ -429,7 +444,11 @@ func (k Keeper) SetOwnerServiceBinding(ctx sdk.Context, svcBinding types.Service
 }
 
 // GetOwnerServiceBindings retrieves the service bindings with the specified service name and owner
-func (k Keeper) GetOwnerServiceBindings(ctx sdk.Context, owner sdk.AccAddress, serviceName string) []*types.ServiceBinding {
+func (k Keeper) GetOwnerServiceBindings(
+	ctx sdk.Context,
+	owner sdk.AccAddress,
+	serviceName string,
+) []*types.ServiceBinding {
 	store := ctx.KVStore(k.storeKey)
 
 	bindings := make([]*types.ServiceBinding, 0)
@@ -499,7 +518,11 @@ func (k Keeper) SetPricing(
 }
 
 // GetPricing retrieves the pricing of the specified service binding
-func (k Keeper) GetPricing(ctx sdk.Context, serviceName string, provider sdk.AccAddress) (pricing types.Pricing) {
+func (k Keeper) GetPricing(
+	ctx sdk.Context,
+	serviceName string,
+	provider sdk.AccAddress,
+) (pricing types.Pricing) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := store.Get(types.GetPricingKey(serviceName, provider))
@@ -649,7 +672,12 @@ func (k Keeper) validatePricing(ctx sdk.Context, pricing types.Pricing) error {
 		baseDenom := k.BaseDenom(ctx)
 
 		if priceDenom != baseDenom {
-			return sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid denom: %s, service fee only accepts %s", priceDenom, baseDenom)
+			return sdkerrors.Wrapf(
+				types.ErrInvalidPricing,
+				"invalid denom: %s, service fee only accepts %s",
+				priceDenom,
+				baseDenom,
+			)
 		}
 	}
 

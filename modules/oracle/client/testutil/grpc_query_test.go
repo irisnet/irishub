@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gogo/protobuf/proto"
+	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -86,10 +86,19 @@ func (s *IntegrationTestSuite) TestOracle() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	txResult := servicetestutil.DefineServiceExec(s.T(), s.network, clientCtx, author.String(), args...)
+	txResult := servicetestutil.DefineServiceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		author.String(),
+		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	//------test GetCmdBindService()-------------
@@ -103,10 +112,19 @@ func (s *IntegrationTestSuite) TestOracle() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	txResult = servicetestutil.BindServiceExec(s.T(), s.network, clientCtx, provider.String(), args...)
+	txResult = servicetestutil.BindServiceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		provider.String(),
+		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	//------test GetCmdCreateFeed()-------------
@@ -127,7 +145,11 @@ func (s *IntegrationTestSuite) TestOracle() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
 	txResult = oracletestutil.CreateFeedExec(s.T(), s.network, clientCtx, creator.String(), args...)

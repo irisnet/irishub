@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
+	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -74,7 +74,11 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
 	_ = tokentestutil.IssueTokenExec(s.T(), s.network, clientCtx, from.String(), args...)
@@ -127,7 +131,11 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 
 	reqBz, err := val.ClientCtx.Codec.MarshalJSON(req)
 	s.Require().NoError(err)
-	res, err := testutil.PostRequest(fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL), "application/json", reqBz)
+	res, err := testutil.PostRequest(
+		fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL),
+		"application/json",
+		reqBz,
+	)
 	s.Require().NoError(err)
 	var result tx.BroadcastTxResponse
 	err = val.ClientCtx.Codec.UnmarshalJSON(res, &result)
@@ -193,7 +201,11 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 
 	reqBz, err = val.ClientCtx.Codec.MarshalJSON(req)
 	s.Require().NoError(err)
-	res, err = testutil.PostRequest(fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL), "application/json", reqBz)
+	res, err = testutil.PostRequest(
+		fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL),
+		"application/json",
+		reqBz,
+	)
 	s.Require().NoError(err)
 	err = val.ClientCtx.Codec.UnmarshalJSON(res, &result)
 	s.Require().NoError(err)
@@ -257,7 +269,11 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 
 	reqBz, err = val.ClientCtx.Codec.MarshalJSON(req)
 	s.Require().NoError(err)
-	_, err = testutil.PostRequest(fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL), "application/json", reqBz)
+	_, err = testutil.PostRequest(
+		fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL),
+		"application/json",
+		reqBz,
+	)
 	s.Require().NoError(err)
 	err = val.ClientCtx.Codec.UnmarshalJSON(res, &result)
 	s.Require().NoError(err)
@@ -321,7 +337,11 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 
 	reqBz, err = val.ClientCtx.Codec.MarshalJSON(req)
 	s.Require().NoError(err)
-	_, err = testutil.PostRequest(fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL), "application/json", reqBz)
+	_, err = testutil.PostRequest(
+		fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL),
+		"application/json",
+		reqBz,
+	)
 	s.Require().NoError(err)
 	err = val.ClientCtx.Codec.UnmarshalJSON(res, &result)
 	s.Require().NoError(err)
@@ -380,7 +400,11 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 
 	reqBz, err = val.ClientCtx.Codec.MarshalJSON(req)
 	s.Require().NoError(err)
-	_, err = testutil.PostRequest(fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL), "application/json", reqBz)
+	_, err = testutil.PostRequest(
+		fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL),
+		"application/json",
+		reqBz,
+	)
 	s.Require().NoError(err)
 	err = val.ClientCtx.Codec.UnmarshalJSON(res, &result)
 	s.Require().NoError(err)
@@ -439,7 +463,11 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 
 	reqBz, err = val.ClientCtx.Codec.MarshalJSON(req)
 	s.Require().NoError(err)
-	_, err = testutil.PostRequest(fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL), "application/json", reqBz)
+	_, err = testutil.PostRequest(
+		fmt.Sprintf("%s/cosmos/tx/v1beta1/txs", baseURL),
+		"application/json",
+		reqBz,
+	)
 	s.Require().NoError(err)
 	err = val.ClientCtx.Codec.UnmarshalJSON(res, &result)
 	s.Require().NoError(err)

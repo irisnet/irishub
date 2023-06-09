@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"testing"
 
-	gogotypes "github.com/gogo/protobuf/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 	"github.com/stretchr/testify/require"
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"

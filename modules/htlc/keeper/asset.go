@@ -3,7 +3,7 @@ package keeper
 import (
 	"time"
 
-	gogotypes "github.com/gogo/protobuf/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -60,7 +60,12 @@ func (k Keeper) DecrementCurrentAssetSupply(ctx sdk.Context, coin sdk.Coin) erro
 	// Resulting current supply must be greater than or equal to 0
 	// Use sdk.Int instead of sdk.Coin to prevent panic if true
 	if supply.CurrentSupply.Amount.Sub(coin.Amount).IsNegative() {
-		return sdkerrors.Wrapf(types.ErrInvalidCurrentSupply, "decrease %s, asset supply %s", coin, supply.CurrentSupply)
+		return sdkerrors.Wrapf(
+			types.ErrInvalidCurrentSupply,
+			"decrease %s, asset supply %s",
+			coin,
+			supply.CurrentSupply,
+		)
 	}
 
 	supply.CurrentSupply = supply.CurrentSupply.Sub(coin)
@@ -84,7 +89,13 @@ func (k Keeper) IncrementIncomingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 	}
 	supplyLimit := sdk.NewCoin(coin.Denom, limit.Limit)
 	if supplyLimit.IsLT(totalSupply.Add(coin)) {
-		return sdkerrors.Wrapf(types.ErrExceedsSupplyLimit, "increase %s, asset supply %s, limit %s", coin, totalSupply, supplyLimit)
+		return sdkerrors.Wrapf(
+			types.ErrExceedsSupplyLimit,
+			"increase %s, asset supply %s, limit %s",
+			coin,
+			totalSupply,
+			supplyLimit,
+		)
 	}
 
 	if limit.TimeLimited {
@@ -114,7 +125,12 @@ func (k Keeper) DecrementIncomingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 	// Resulting incoming supply must be greater than or equal to 0
 	// Use sdk.Int instead of sdk.Coin to prevent panic if true
 	if supply.IncomingSupply.Amount.Sub(coin.Amount).IsNegative() {
-		return sdkerrors.Wrapf(types.ErrInvalidIncomingSupply, "decrease %s, incoming supply %s", coin, supply.IncomingSupply)
+		return sdkerrors.Wrapf(
+			types.ErrInvalidIncomingSupply,
+			"decrease %s, incoming supply %s",
+			coin,
+			supply.IncomingSupply,
+		)
 	}
 
 	supply.IncomingSupply = supply.IncomingSupply.Sub(coin)
@@ -153,7 +169,12 @@ func (k Keeper) DecrementOutgoingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 	// Resulting outgoing supply must be greater than or equal to 0
 	// Use sdk.Int instead of sdk.Coin to prevent panic if true
 	if supply.OutgoingSupply.Amount.Sub(coin.Amount).IsNegative() {
-		return sdkerrors.Wrapf(types.ErrInvalidOutgoingSupply, "decrease %s, outgoing supply %s", coin, supply.OutgoingSupply)
+		return sdkerrors.Wrapf(
+			types.ErrInvalidOutgoingSupply,
+			"decrease %s, outgoing supply %s",
+			coin,
+			supply.OutgoingSupply,
+		)
 	}
 
 	supply.OutgoingSupply = supply.OutgoingSupply.Sub(coin)
@@ -202,7 +223,10 @@ func (k Keeper) UpdateTimeBasedSupplyLimits(ctx sdk.Context) {
 }
 
 // GetAssetSupply gets an asset's current supply from the store.
-func (k Keeper) GetAssetSupply(ctx sdk.Context, denom string) (assetSupply types.AssetSupply, found bool) {
+func (k Keeper) GetAssetSupply(
+	ctx sdk.Context,
+	denom string,
+) (assetSupply types.AssetSupply, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.GetAssetSupplyKey(denom))
 	if bz == nil {

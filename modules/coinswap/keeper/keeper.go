@@ -7,7 +7,6 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/cometbft/cometbft/libs/log"
-	gogotypes "github.com/gogo/protobuf/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -39,6 +38,7 @@ func NewKeeper(
 	ak types.AccountKeeper,
 	blockedAddrs map[string]bool,
 	feeCollectorName string,
+	authority string,
 ) Keeper {
 	// ensure coinswap module account is set
 	if addr := ak.GetModuleAddress(types.ModuleName); addr == nil {
@@ -52,6 +52,7 @@ func NewKeeper(
 		cdc:              cdc,
 		blockedAddrs:     blockedAddrs,
 		feeCollectorName: feeCollectorName,
+		authority:        authority,
 	}
 }
 
@@ -650,51 +651,4 @@ func (k Keeper) removeUnilateralLiquidity(ctx sdk.Context,
 	coins := sdk.NewCoins(sdk.NewCoin(targetTokenDenom, targetTokenAmtAfterFee))
 
 	return coins, k.bk.SendCoins(ctx, poolAddr, sender, coins)
-}
-
-// GetParams sets the x/staking module parameters.
-func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get([]byte(types.ParamsKey))
-	if bz == nil {
-		return params
-	}
-
-	k.cdc.MustUnmarshal(bz, &params)
-	return params
-}
-
-// SetParams sets the parameters for the coinswap module.
-// SetParams sets the x/staking module parameters.
-func (k Keeper) SetParams(ctx sdk.Context, params types.Params) error {
-	if err := params.Validate(); err != nil {
-		return err
-	}
-
-	store := ctx.KVStore(k.storeKey)
-	bz, err := k.cdc.Marshal(&params)
-	if err != nil {
-		return err
-	}
-	store.Set([]byte(types.ParamsKey), bz)
-
-	return nil
-}
-
-// SetStandardDenom sets the standard denom for the coinswap module.
-func (k Keeper) SetStandardDenom(ctx sdk.Context, denom string) {
-	store := ctx.KVStore(k.storeKey)
-	denomWrap := gogotypes.StringValue{Value: denom}
-	bz := k.cdc.MustMarshal(&denomWrap)
-	store.Set(types.KeyStandardDenom, bz)
-}
-
-// GetStandardDenom returns the standard denom of the coinswap module.
-func (k Keeper) GetStandardDenom(ctx sdk.Context) string {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.KeyStandardDenom)
-
-	var denomWrap = gogotypes.StringValue{}
-	k.cdc.MustUnmarshal(bz, &denomWrap)
-	return denomWrap.Value
 }

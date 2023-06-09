@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gogo/protobuf/proto"
+	"github.com/cosmos/gogoproto/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -13,7 +13,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
-	gogotypes "github.com/gogo/protobuf/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	"github.com/irisnet/irismod/modules/token/types"
 	v1 "github.com/irisnet/irismod/modules/token/types/v1"
@@ -21,7 +21,10 @@ import (
 
 var _ v1.QueryServer = Keeper{}
 
-func (k Keeper) Token(c context.Context, req *v1.QueryTokenRequest) (*v1.QueryTokenResponse, error) {
+func (k Keeper) Token(
+	c context.Context,
+	req *v1.QueryTokenRequest,
+) (*v1.QueryTokenResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -44,7 +47,10 @@ func (k Keeper) Token(c context.Context, req *v1.QueryTokenRequest) (*v1.QueryTo
 	return &v1.QueryTokenResponse{Token: any}, nil
 }
 
-func (k Keeper) Tokens(c context.Context, req *v1.QueryTokensRequest) (*v1.QueryTokensResponse, error) {
+func (k Keeper) Tokens(
+	c context.Context,
+	req *v1.QueryTokensRequest,
+) (*v1.QueryTokensResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -55,7 +61,10 @@ func (k Keeper) Tokens(c context.Context, req *v1.QueryTokensRequest) (*v1.Query
 	if len(req.Owner) > 0 {
 		owner, err = sdk.AccAddressFromBech32(req.Owner)
 		if err != nil {
-			return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("invalid owner address (%s)", err))
+			return nil, status.Errorf(
+				codes.InvalidArgument,
+				fmt.Sprintf("invalid owner address (%s)", err),
+			)
 		}
 	}
 
@@ -64,12 +73,16 @@ func (k Keeper) Tokens(c context.Context, req *v1.QueryTokensRequest) (*v1.Query
 	store := ctx.KVStore(k.storeKey)
 	if owner == nil {
 		tokenStore := prefix.NewStore(store, types.PrefixTokenForSymbol)
-		pageRes, err = query.Paginate(tokenStore, shapePageRequest(req.Pagination), func(key []byte, value []byte) error {
-			var token v1.Token
-			k.cdc.MustUnmarshal(value, &token)
-			tokens = append(tokens, &token)
-			return nil
-		})
+		pageRes, err = query.Paginate(
+			tokenStore,
+			shapePageRequest(req.Pagination),
+			func(key []byte, value []byte) error {
+				var token v1.Token
+				k.cdc.MustUnmarshal(value, &token)
+				tokens = append(tokens, &token)
+				return nil
+			},
+		)
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "paginate: %v", err)
 		}
@@ -133,7 +146,10 @@ func (k Keeper) Fees(c context.Context, req *v1.QueryFeesRequest) (*v1.QueryFees
 }
 
 // Params return the all the parameter in tonken module
-func (k Keeper) Params(c context.Context, req *v1.QueryParamsRequest) (*v1.QueryParamsResponse, error) {
+func (k Keeper) Params(
+	c context.Context,
+	req *v1.QueryParamsRequest,
+) (*v1.QueryParamsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 	params := k.GetParamSet(ctx)
 
@@ -141,7 +157,10 @@ func (k Keeper) Params(c context.Context, req *v1.QueryParamsRequest) (*v1.Query
 }
 
 // TotalBurn return the all burn coin
-func (k Keeper) TotalBurn(c context.Context, req *v1.QueryTotalBurnRequest) (*v1.QueryTotalBurnResponse, error) {
+func (k Keeper) TotalBurn(
+	c context.Context,
+	req *v1.QueryTotalBurnRequest,
+) (*v1.QueryTotalBurnResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 	return &v1.QueryTotalBurnResponse{
 		BurnedCoins: k.GetAllBurnCoin(ctx),

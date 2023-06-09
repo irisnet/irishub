@@ -467,6 +467,7 @@ func NewSimApp(
 		app.AccountKeeper,
 		app.ModuleAccountAddrs(),
 		authtypes.FeeCollectorName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.ServiceKeeper = servicekeeper.NewKeeper(
@@ -1058,7 +1059,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(tokentypes.ModuleName)
 	paramsKeeper.Subspace(recordtypes.ModuleName)
 	paramsKeeper.Subspace(htlctypes.ModuleName)
-	paramsKeeper.Subspace(coinswaptypes.ModuleName)
+	paramsKeeper.Subspace(coinswaptypes.ModuleName).WithKeyTable(coinswaptypes.ParamKeyTable())
 	paramsKeeper.Subspace(servicetypes.ModuleName)
 	paramsKeeper.Subspace(farmtypes.ModuleName)
 
