@@ -16,8 +16,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
+	"github.com/irisnet/irismod/modules/coinswap/exported"
 	"github.com/irisnet/irismod/modules/coinswap/keeper"
 	"github.com/irisnet/irismod/modules/coinswap/simulation"
 	"github.com/irisnet/irismod/modules/coinswap/types"
@@ -90,7 +90,7 @@ type AppModule struct {
 	keeper         keeper.Keeper
 	accountKeeper  types.AccountKeeper
 	bankKeeper     types.BankKeeper
-	legacySubspace paramstypes.Subspace
+	legacySubspace exported.Subspace
 }
 
 // NewAppModule creates a new AppModule object
@@ -99,7 +99,7 @@ func NewAppModule(
 	keeper keeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-	legacySubspace paramstypes.Subspace,
+	legacySubspace exported.Subspace,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{cdc: cdc},

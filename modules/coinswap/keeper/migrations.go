@@ -2,8 +2,8 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
+	"github.com/irisnet/irismod/modules/coinswap/exported"
 	v1 "github.com/irisnet/irismod/modules/coinswap/migrations/v1"
 	v2 "github.com/irisnet/irismod/modules/coinswap/migrations/v2"
 	v3 "github.com/irisnet/irismod/modules/coinswap/migrations/v3"
@@ -13,11 +13,11 @@ import (
 // Migrator is a struct for handling in-place store migrations.
 type Migrator struct {
 	k              Keeper
-	legacySubspace paramstypes.Subspace
+	legacySubspace exported.Subspace
 }
 
 // NewMigrator returns a new Migrator.
-func NewMigrator(k Keeper, legacySubspace paramstypes.Subspace) Migrator {
+func NewMigrator(k Keeper, legacySubspace exported.Subspace) Migrator {
 	return Migrator{k: k, legacySubspace: legacySubspace}
 }
 
