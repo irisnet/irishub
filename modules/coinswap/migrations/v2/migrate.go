@@ -18,7 +18,7 @@ var (
 type (
 	CoinswapKeeper interface {
 		GetParams(ctx sdk.Context) types.Params
-		SetParams(ctx sdk.Context, params types.Params)
+		SetParams(ctx sdk.Context, params types.Params) error
 	}
 
 	Params struct {
@@ -33,8 +33,7 @@ func Migrate(ctx sdk.Context, k CoinswapKeeper, paramSpace paramstypes.Subspace)
 		PoolCreationFee: DefaultPoolCreationFee,
 		TaxRate:         DefaultTaxRate,
 	}
-	k.SetParams(ctx, newParams)
-	return nil
+	return k.SetParams(ctx, newParams)
 }
 
 // GetLegacyParams gets the parameters for the coinswap module.

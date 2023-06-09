@@ -11,7 +11,7 @@ import (
 )
 
 type msgServer struct {
-	Keeper
+	k Keeper
 }
 
 var _ types.MsgServer = msgServer{}
@@ -19,17 +19,23 @@ var _ types.MsgServer = msgServer{}
 // NewMsgServerImpl returns an implementation of the coinswap MsgServer interface
 // for the provided Keeper.
 func NewMsgServerImpl(keeper Keeper) types.MsgServer {
-	return &msgServer{Keeper: keeper}
+	return &msgServer{k: keeper}
 }
 
-func (m msgServer) AddLiquidity(goCtx context.Context, msg *types.MsgAddLiquidity) (*types.MsgAddLiquidityResponse, error) {
+func (m msgServer) AddLiquidity(
+	goCtx context.Context,
+	msg *types.MsgAddLiquidity,
+) (*types.MsgAddLiquidityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDeadline, "deadline has passed for MsgAddLiquidity")
+		return nil, sdkerrors.Wrap(
+			types.ErrInvalidDeadline,
+			"deadline has passed for MsgAddLiquidity",
+		)
 	}
 
-	mintToken, err := m.Keeper.AddLiquidity(ctx, msg)
+	mintToken, err := m.k.AddLiquidity(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
@@ -47,14 +53,20 @@ func (m msgServer) AddLiquidity(goCtx context.Context, msg *types.MsgAddLiquidit
 	}, nil
 }
 
-func (m msgServer) AddUnilateralLiquidity(goCtx context.Context, msg *types.MsgAddUnilateralLiquidity) (*types.MsgAddUnilateralLiquidityResponse, error) {
+func (m msgServer) AddUnilateralLiquidity(
+	goCtx context.Context,
+	msg *types.MsgAddUnilateralLiquidity,
+) (*types.MsgAddUnilateralLiquidityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDeadline, "deadline has passed for MsgAddUnilateralLiquidity")
+		return nil, sdkerrors.Wrap(
+			types.ErrInvalidDeadline,
+			"deadline has passed for MsgAddUnilateralLiquidity",
+		)
 	}
 
-	mintToken, err := m.Keeper.AddUnilateralLiquidity(ctx, msg)
+	mintToken, err := m.k.AddUnilateralLiquidity(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
@@ -72,13 +84,19 @@ func (m msgServer) AddUnilateralLiquidity(goCtx context.Context, msg *types.MsgA
 	}, nil
 }
 
-func (m msgServer) RemoveLiquidity(goCtx context.Context, msg *types.MsgRemoveLiquidity) (*types.MsgRemoveLiquidityResponse, error) {
+func (m msgServer) RemoveLiquidity(
+	goCtx context.Context,
+	msg *types.MsgRemoveLiquidity,
+) (*types.MsgRemoveLiquidityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDeadline, "deadline has passed for MsgRemoveLiquidity")
+		return nil, sdkerrors.Wrap(
+			types.ErrInvalidDeadline,
+			"deadline has passed for MsgRemoveLiquidity",
+		)
 	}
-	withdrawCoins, err := m.Keeper.RemoveLiquidity(ctx, msg)
+	withdrawCoins, err := m.k.RemoveLiquidity(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
@@ -101,13 +119,19 @@ func (m msgServer) RemoveLiquidity(goCtx context.Context, msg *types.MsgRemoveLi
 	}, nil
 }
 
-func (m msgServer) RemoveUnilateralLiquidity(goCtx context.Context, msg *types.MsgRemoveUnilateralLiquidity) (*types.MsgRemoveUnilateralLiquidityResponse, error) {
+func (m msgServer) RemoveUnilateralLiquidity(
+	goCtx context.Context,
+	msg *types.MsgRemoveUnilateralLiquidity,
+) (*types.MsgRemoveUnilateralLiquidityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDeadline, "deadline has passed for MsgRemoveLiquidity")
+		return nil, sdkerrors.Wrap(
+			types.ErrInvalidDeadline,
+			"deadline has passed for MsgRemoveLiquidity",
+		)
 	}
-	withdrawCoins, err := m.Keeper.RemoveUnilateralLiquidity(ctx, msg)
+	withdrawCoins, err := m.k.RemoveUnilateralLiquidity(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
@@ -130,18 +154,25 @@ func (m msgServer) RemoveUnilateralLiquidity(goCtx context.Context, msg *types.M
 	}, nil
 }
 
-func (m msgServer) SwapCoin(goCtx context.Context, msg *types.MsgSwapOrder) (*types.MsgSwapCoinResponse, error) {
+func (m msgServer) SwapCoin(
+	goCtx context.Context,
+	msg *types.MsgSwapOrder,
+) (*types.MsgSwapCoinResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDeadline, "deadline has passed for MsgSwapOrder")
 	}
 
-	if m.Keeper.blockedAddrs[msg.Output.Address] {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to receive external funds", msg.Output.Address)
+	if m.k.blockedAddrs[msg.Output.Address] {
+		return nil, sdkerrors.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"%s is not allowed to receive external funds",
+			msg.Output.Address,
+		)
 	}
 
-	if err := m.Keeper.Swap(ctx, msg); err != nil {
+	if err := m.k.Swap(ctx, msg); err != nil {
 		return nil, err
 	}
 
@@ -153,4 +184,24 @@ func (m msgServer) SwapCoin(goCtx context.Context, msg *types.MsgSwapOrder) (*ty
 		),
 	)
 	return &types.MsgSwapCoinResponse{}, nil
+}
+
+func (m msgServer) UpdateParams(
+	goCtx context.Context,
+	msg *types.MsgUpdateParams,
+) (*types.MsgUpdateParamsResponse, error) {
+	if m.k.authority != msg.Authority {
+		return nil, sdkerrors.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"invalid authority; expected %s, got %s",
+			m.k.authority,
+			msg.Authority,
+		)
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := m.k.SetParams(ctx, msg.Params); err != nil {
+		return nil, err
+	}
+	return &types.MsgUpdateParamsResponse{}, nil
 }

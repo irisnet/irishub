@@ -13,7 +13,6 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/irisnet/irismod/modules/coinswap/types"
 )
@@ -24,8 +23,8 @@ type Keeper struct {
 	storeKey         storetypes.StoreKey
 	bk               types.BankKeeper
 	ak               types.AccountKeeper
-	paramSpace       paramstypes.Subspace
 	feeCollectorName string
+	authority        string
 	blockedAddrs     map[string]bool
 }
 
@@ -36,7 +35,6 @@ type Keeper struct {
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	key storetypes.StoreKey,
-	paramSpace paramstypes.Subspace,
 	bk types.BankKeeper,
 	ak types.AccountKeeper,
 	blockedAddrs map[string]bool,
@@ -47,17 +45,11 @@ func NewKeeper(
 		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
 	}
 
-	// set KeyTable if it has not already been set
-	if !paramSpace.HasKeyTable() {
-		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
-	}
-
 	return Keeper{
 		storeKey:         key,
 		bk:               bk,
 		ak:               ak,
 		cdc:              cdc,
-		paramSpace:       paramSpace,
 		blockedAddrs:     blockedAddrs,
 		feeCollectorName: feeCollectorName,
 	}
@@ -660,16 +652,33 @@ func (k Keeper) removeUnilateralLiquidity(ctx sdk.Context,
 	return coins, k.bk.SendCoins(ctx, poolAddr, sender, coins)
 }
 
-// GetParams gets the parameters for the coinswap module.
-func (k Keeper) GetParams(ctx sdk.Context) types.Params {
-	var swapParams types.Params
-	k.paramSpace.GetParamSet(ctx, &swapParams)
-	return swapParams
+// GetParams sets the x/staking module parameters.
+func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get([]byte(types.ParamsKey))
+	if bz == nil {
+		return params
+	}
+
+	k.cdc.MustUnmarshal(bz, &params)
+	return params
 }
 
 // SetParams sets the parameters for the coinswap module.
-func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
+// SetParams sets the x/staking module parameters.
+func (k Keeper) SetParams(ctx sdk.Context, params types.Params) error {
+	if err := params.Validate(); err != nil {
+		return err
+	}
+
+	store := ctx.KVStore(k.storeKey)
+	bz, err := k.cdc.Marshal(&params)
+	if err != nil {
+		return err
+	}
+	store.Set([]byte(types.ParamsKey), bz)
+
+	return nil
 }
 
 // SetStandardDenom sets the standard denom for the coinswap module.

@@ -17,7 +17,10 @@ import (
 var _ types.QueryServer = Keeper{}
 
 // LiquidityPool returns the liquidity pool information of the denom
-func (k Keeper) LiquidityPool(c context.Context, req *types.QueryLiquidityPoolRequest) (*types.QueryLiquidityPoolResponse, error) {
+func (k Keeper) LiquidityPool(
+	c context.Context,
+	req *types.QueryLiquidityPoolRequest,
+) (*types.QueryLiquidityPoolResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -25,7 +28,11 @@ func (k Keeper) LiquidityPool(c context.Context, req *types.QueryLiquidityPoolRe
 	ctx := sdk.UnwrapSDKContext(c)
 	pool, exists := k.GetPoolByLptDenom(ctx, req.LptDenom)
 	if !exists {
-		return nil, sdkerrors.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", req.LptDenom)
+		return nil, sdkerrors.Wrapf(
+			types.ErrReservePoolNotExists,
+			"liquidity pool token: %s",
+			req.LptDenom,
+		)
 	}
 
 	balances, err := k.GetPoolBalancesByLptDenom(ctx, pool.LptDenom)
@@ -51,7 +58,10 @@ func (k Keeper) LiquidityPool(c context.Context, req *types.QueryLiquidityPoolRe
 	return &res, nil
 }
 
-func (k Keeper) LiquidityPools(c context.Context, req *types.QueryLiquidityPoolsRequest) (*types.QueryLiquidityPoolsResponse, error) {
+func (k Keeper) LiquidityPools(
+	c context.Context,
+	req *types.QueryLiquidityPoolsRequest,
+) (*types.QueryLiquidityPoolsResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -62,7 +72,7 @@ func (k Keeper) LiquidityPools(c context.Context, req *types.QueryLiquidityPools
 
 	store := ctx.KVStore(k.storeKey)
 	nftStore := prefix.NewStore(store, []byte(types.KeyPool))
-	pageRes, err := query.Paginate(nftStore, req.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.Paginate(nftStore, req.Pagination, func(_ []byte, value []byte) error {
 		var pool types.Pool
 		k.cdc.MustUnmarshal(value, &pool)
 
@@ -75,9 +85,12 @@ func (k Keeper) LiquidityPools(c context.Context, req *types.QueryLiquidityPools
 			Id:            pool.Id,
 			EscrowAddress: pool.EscrowAddress,
 			Standard:      sdk.NewCoin(pool.StandardDenom, balances.AmountOf(pool.StandardDenom)),
-			Token:         sdk.NewCoin(pool.CounterpartyDenom, balances.AmountOf(pool.CounterpartyDenom)),
-			Lpt:           k.bk.GetSupply(ctx, pool.LptDenom),
-			Fee:           params.Fee.String(),
+			Token: sdk.NewCoin(
+				pool.CounterpartyDenom,
+				balances.AmountOf(pool.CounterpartyDenom),
+			),
+			Lpt: k.bk.GetSupply(ctx, pool.LptDenom),
+			Fee: params.Fee.String(),
 		})
 		return nil
 	})
@@ -88,4 +101,12 @@ func (k Keeper) LiquidityPools(c context.Context, req *types.QueryLiquidityPools
 		Pagination: pageRes,
 		Pools:      pools,
 	}, nil
+}
+
+func (k Keeper) Params(
+	c context.Context,
+	req *types.QueryParamsRequest,
+) (*types.QueryParamsResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+	return &types.QueryParamsResponse{Params: k.GetParams(ctx)}, nil
 }

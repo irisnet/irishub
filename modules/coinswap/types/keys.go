@@ -26,6 +26,9 @@ const (
 	// KeyPoolLptDenom is the key used to store the pool information  in
 	// the keeper.
 	KeyPoolLptDenom = "lptDenom"
+
+	// prefix for parameters for module x/coinswap
+	ParamsKey = "params"
 )
 
 // GetPoolKey return the stored pool key for the given pooId.
