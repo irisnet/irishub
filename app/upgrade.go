@@ -14,13 +14,12 @@ import (
 )
 
 var (
-	plans = []upgrades.Upgrade{
-		v110.Upgrade,
-		v120.Upgrade,
-		v130.Upgrade,
-		v140.Upgrade,
-		v200.Upgrade,
-	}
+	router = upgrades.NewUpgradeRouter().
+		Register(v110.Upgrade).
+		Register(v120.Upgrade).
+		Register(v130.Upgrade).
+		Register(v140.Upgrade).
+		Register(v200.Upgrade)
 )
 
 // RegisterUpgradePlans register a handler of upgrade plan
@@ -57,17 +56,18 @@ func (app *IrisApp) setupUpgradeStoreLoaders() {
 		return
 	}
 
-	for _, upgrade := range plans {
-		if upgradeInfo.Name == upgrade.UpgradeName {
-			app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, upgrade.StoreUpgrades))
-		}
-	}
+	app.SetStoreLoader(
+		upgradetypes.UpgradeStoreLoader(
+			upgradeInfo.Height,
+			router.UpgradeInfo(upgradeInfo.Name).StoreUpgrades,
+		),
+	)
 }
 
 func (app *IrisApp) setupUpgradeHandlers() {
-	for _, upgrade := range plans {
+	for upgradeName, upgrade := range router.Routers() {
 		app.UpgradeKeeper.SetUpgradeHandler(
-			upgrade.UpgradeName,
+			upgradeName,
 			upgrade.UpgradeHandlerConstructor(
 				app.mm,
 				app.configurator,
