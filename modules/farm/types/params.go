@@ -4,7 +4,6 @@ import (
 	fmt "fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 // Farm params default values
@@ -14,29 +13,12 @@ var (
 	DefaultMaxRewardCategories = uint32(2)
 )
 
-// Keys for parameter access
-// nolint
-var (
-	KeyPoolCreationFee     = []byte("CreatePoolFee")
-	KeyTaxRate             = []byte("TaxRate") // fee key
-	KeyMaxRewardCategories = []byte("MaxRewardCategories")
-)
-
 // NewParams creates a new Params instance
 func NewParams(createPoolFee sdk.Coin, maxRewardCategories uint32, taxRate sdk.Dec) Params {
 	return Params{
 		PoolCreationFee:     createPoolFee,
 		TaxRate:             taxRate,
 		MaxRewardCategories: maxRewardCategories,
-	}
-}
-
-// ParamSetPairs implements paramstypes.ParamSet
-func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
-	return paramstypes.ParamSetPairs{
-		paramstypes.NewParamSetPair(KeyPoolCreationFee, &p.PoolCreationFee, validatePoolCreationFee),
-		paramstypes.NewParamSetPair(KeyMaxRewardCategories, &p.MaxRewardCategories, validateMaxRewardCategories),
-		paramstypes.NewParamSetPair(KeyTaxRate, &p.TaxRate, validateTaxRate),
 	}
 }
 

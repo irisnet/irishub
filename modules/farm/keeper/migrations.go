@@ -21,10 +21,10 @@ func NewMigrator(k Keeper, legacySubspace exported.Subspace) Migrator {
 
 // Migrate1to2 migrates from version 1 to 2.
 func (m Migrator) Migrate1to2(ctx sdk.Context) error {
-	return v2.Migrate(ctx, m.k, m.k.ak, m.k.paramSpace)
+	return v2.Migrate(ctx, m.k, m.k.ak, m.legacySubspace)
 }
 
 // Migrate1to2 migrates from version 2 to 3.
 func (m Migrator) Migrate2to3(ctx sdk.Context) error {
-	return v3.Migrate(ctx, m.k, m.k.paramSpace)
+	return v3.Migrate(ctx, m.k, m.legacySubspace)
 }
