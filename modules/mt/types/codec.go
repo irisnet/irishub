@@ -8,7 +8,7 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
-	gogotypes "github.com/gogo/protobuf/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	"github.com/irisnet/irismod/modules/mt/exported"
 )

@@ -3,7 +3,7 @@ package keeper
 import (
 	"fmt"
 
-	gogotypes "github.com/gogo/protobuf/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -74,7 +74,10 @@ func (k Keeper) GetPoolBySequenceId(ctx sdk.Context, poolId uint64) (types.Pool,
 }
 
 // GetPoolBalances return the liquidity pool by the specified anotherCoinDenom
-func (k Keeper) GetPoolBalances(ctx sdk.Context, escrowAddress string) (coins sdk.Coins, err error) {
+func (k Keeper) GetPoolBalances(
+	ctx sdk.Context,
+	escrowAddress string,
+) (coins sdk.Coins, err error) {
 	address, err := sdk.AccAddressFromBech32(escrowAddress)
 	if err != nil {
 		return coins, err
@@ -86,7 +89,10 @@ func (k Keeper) GetPoolBalances(ctx sdk.Context, escrowAddress string) (coins sd
 	return k.bk.GetAllBalances(ctx, acc.GetAddress()), nil
 }
 
-func (k Keeper) GetPoolBalancesByLptDenom(ctx sdk.Context, lptDenom string) (coins sdk.Coins, err error) {
+func (k Keeper) GetPoolBalancesByLptDenom(
+	ctx sdk.Context,
+	lptDenom string,
+) (coins sdk.Coins, err error) {
 	address := types.GetReservePoolAddr(lptDenom)
 	acc := k.ak.GetAccount(ctx, address)
 	if acc == nil {
@@ -103,7 +109,15 @@ func (k Keeper) GetLptDenomFromDenoms(ctx sdk.Context, denom1, denom2 string) (s
 
 	standardDenom := k.GetStandardDenom(ctx)
 	if denom1 != standardDenom && denom2 != standardDenom {
-		return "", sdkerrors.Wrap(types.ErrNotContainStandardDenom, fmt.Sprintf("standard denom: %s, denom1: %s, denom2: %s", standardDenom, denom1, denom2))
+		return "", sdkerrors.Wrap(
+			types.ErrNotContainStandardDenom,
+			fmt.Sprintf(
+				"standard denom: %s, denom1: %s, denom2: %s",
+				standardDenom,
+				denom1,
+				denom2,
+			),
+		)
 	}
 
 	counterpartyDenom := denom1
@@ -113,7 +127,11 @@ func (k Keeper) GetLptDenomFromDenoms(ctx sdk.Context, denom1, denom2 string) (s
 	poolId := types.GetPoolId(counterpartyDenom)
 	pool, has := k.GetPool(ctx, poolId)
 	if !has {
-		return "", sdkerrors.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", counterpartyDenom)
+		return "", sdkerrors.Wrapf(
+			types.ErrReservePoolNotExists,
+			"liquidity pool token: %s",
+			counterpartyDenom,
+		)
 	}
 	return pool.LptDenom, nil
 }

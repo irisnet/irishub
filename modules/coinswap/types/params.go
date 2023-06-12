@@ -39,7 +39,11 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 		paramtypes.NewParamSetPair(KeyFee, &p.Fee, validateFee),
 		paramtypes.NewParamSetPair(KeyPoolCreationFee, &p.PoolCreationFee, validatePoolCreationFee),
 		paramtypes.NewParamSetPair(KeyTaxRate, &p.TaxRate, validateTaxRate),
-		paramtypes.NewParamSetPair(KeyUnilateralLiquidityFee, &p.UnilateralLiquidityFee, validateUnilateraLiquiditylFee),
+		paramtypes.NewParamSetPair(
+			KeyUnilateralLiquidityFee,
+			&p.UnilateralLiquidityFee,
+			validateUnilateraLiquiditylFee,
+		),
 	}
 }
 
@@ -65,6 +69,18 @@ func (p Params) String() string {
 func (p Params) Validate() error {
 	if !p.Fee.GT(sdk.ZeroDec()) || !p.Fee.LT(sdk.OneDec()) {
 		return fmt.Errorf("fee must be positive and less than 1: %s", p.Fee.String())
+	}
+
+	if !p.PoolCreationFee.IsPositive() {
+		return fmt.Errorf("poolCreationFee must be positive: %s", p.PoolCreationFee.String())
+	}
+
+	if !p.TaxRate.GT(sdk.ZeroDec()) || !p.TaxRate.LT(sdk.OneDec()) {
+		return fmt.Errorf("fee must be positive and less than 1: %s", p.TaxRate.String())
+	}
+
+	if !p.UnilateralLiquidityFee.GTE(sdk.ZeroDec()) || !p.UnilateralLiquidityFee.LT(sdk.OneDec()) {
+		return fmt.Errorf("fee must be positive and less than 1: %s", p.TaxRate.String())
 	}
 	return nil
 }
@@ -114,7 +130,10 @@ func validateUnilateraLiquiditylFee(i interface{}) error {
 
 	// unilateral fee should be in range of [0, 1)
 	if !v.GTE(sdk.ZeroDec()) || !v.LT(sdk.OneDec()) {
-		return fmt.Errorf("unilateral liquidity fee must be positive and less than 1: %s", v.String())
+		return fmt.Errorf(
+			"unilateral liquidity fee must be positive and less than 1: %s",
+			v.String(),
+		)
 	}
 
 	return nil

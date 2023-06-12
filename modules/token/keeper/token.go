@@ -3,7 +3,7 @@ package keeper
 import (
 	"fmt"
 
-	gogotypes "github.com/gogo/protobuf/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -65,11 +65,19 @@ func (k Keeper) GetToken(ctx sdk.Context, denom string) (v1.TokenI, error) {
 // AddToken saves a new token
 func (k Keeper) AddToken(ctx sdk.Context, token v1.Token) error {
 	if k.HasToken(ctx, token.Symbol) {
-		return sdkerrors.Wrapf(types.ErrSymbolAlreadyExists, "symbol already exists: %s", token.Symbol)
+		return sdkerrors.Wrapf(
+			types.ErrSymbolAlreadyExists,
+			"symbol already exists: %s",
+			token.Symbol,
+		)
 	}
 
 	if k.HasToken(ctx, token.MinUnit) {
-		return sdkerrors.Wrapf(types.ErrMinUnitAlreadyExists, "min-unit already exists: %s", token.MinUnit)
+		return sdkerrors.Wrapf(
+			types.ErrMinUnitAlreadyExists,
+			"min-unit already exists: %s",
+			token.MinUnit,
+		)
 	}
 
 	// set token
@@ -147,7 +155,11 @@ func (k Keeper) GetBurnCoin(ctx sdk.Context, minUint string) (sdk.Coin, error) {
 	bz := store.Get(key)
 
 	if len(bz) == 0 {
-		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrNotFoundTokenAmt, "not found symbol: %s", minUint)
+		return sdk.Coin{}, sdkerrors.Wrapf(
+			types.ErrNotFoundTokenAmt,
+			"not found symbol: %s",
+			minUint,
+		)
 	}
 
 	var coin sdk.Coin
@@ -211,7 +223,10 @@ func (k Keeper) getTokenBySymbol(ctx sdk.Context, symbol string) (token v1.Token
 
 	bz := store.Get(types.KeySymbol(symbol))
 	if bz == nil {
-		return token, sdkerrors.Wrap(types.ErrTokenNotExists, fmt.Sprintf("token symbol %s does not exist", symbol))
+		return token, sdkerrors.Wrap(
+			types.ErrTokenNotExists,
+			fmt.Sprintf("token symbol %s does not exist", symbol),
+		)
 	}
 
 	k.cdc.MustUnmarshal(bz, &token)
@@ -223,7 +238,10 @@ func (k Keeper) getTokenByMinUnit(ctx sdk.Context, minUnit string) (token v1.Tok
 
 	bz := store.Get(types.KeyMinUint(minUnit))
 	if bz == nil {
-		return token, sdkerrors.Wrap(types.ErrTokenNotExists, fmt.Sprintf("token minUnit %s does not exist", minUnit))
+		return token, sdkerrors.Wrap(
+			types.ErrTokenNotExists,
+			fmt.Sprintf("token minUnit %s does not exist", minUnit),
+		)
 	}
 
 	var symbol gogotypes.StringValue
@@ -242,7 +260,10 @@ func (k Keeper) getSymbolByMinUnit(ctx sdk.Context, minUnit string) (string, err
 
 	bz := store.Get(types.KeyMinUint(minUnit))
 	if bz == nil {
-		return "", sdkerrors.Wrap(types.ErrTokenNotExists, fmt.Sprintf("token minUnit %s does not exist", minUnit))
+		return "", sdkerrors.Wrap(
+			types.ErrTokenNotExists,
+			fmt.Sprintf("token minUnit %s does not exist", minUnit),
+		)
 	}
 
 	var symbol gogotypes.StringValue
@@ -252,7 +273,11 @@ func (k Keeper) getSymbolByMinUnit(ctx sdk.Context, minUnit string) (string, err
 }
 
 // reset all indices by the new owner for token query
-func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, symbol string, srcOwner, dstOwner sdk.AccAddress) {
+func (k Keeper) resetStoreKeyForQueryToken(
+	ctx sdk.Context,
+	symbol string,
+	srcOwner, dstOwner sdk.AccAddress,
+) {
 	store := ctx.KVStore(k.storeKey)
 
 	// delete the old key

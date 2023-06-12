@@ -3,7 +3,7 @@ package v1beta1
 import (
 	"math/big"
 
-	"github.com/gogo/protobuf/proto"
+	"github.com/cosmos/gogoproto/proto"
 	"gopkg.in/yaml.v2"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -111,7 +111,13 @@ func (t Token) String() string {
 // ToMainCoin returns the main denom coin from args
 func (t Token) ToMainCoin(coin sdk.Coin) (sdk.DecCoin, error) {
 	if t.Symbol != coin.Denom && t.MinUnit != coin.Denom {
-		return sdk.NewDecCoinFromDec(coin.Denom, sdk.ZeroDec()), sdkerrors.Wrapf(tokentypes.ErrTokenNotExists, "token not match")
+		return sdk.NewDecCoinFromDec(
+				coin.Denom,
+				sdk.ZeroDec(),
+			), sdkerrors.Wrapf(
+				tokentypes.ErrTokenNotExists,
+				"token not match",
+			)
 	}
 
 	if t.Symbol == coin.Denom {
@@ -127,7 +133,13 @@ func (t Token) ToMainCoin(coin sdk.Coin) (sdk.DecCoin, error) {
 // ToMinCoin returns the min denom coin from args
 func (t Token) ToMinCoin(coin sdk.DecCoin) (newCoin sdk.Coin, err error) {
 	if t.Symbol != coin.Denom && t.MinUnit != coin.Denom {
-		return sdk.NewCoin(coin.Denom, sdk.ZeroInt()), sdkerrors.Wrapf(tokentypes.ErrTokenNotExists, "token not match")
+		return sdk.NewCoin(
+				coin.Denom,
+				sdk.ZeroInt(),
+			), sdkerrors.Wrapf(
+				tokentypes.ErrTokenNotExists,
+				"token not match",
+			)
 	}
 
 	if t.MinUnit == coin.Denom {
@@ -160,7 +172,13 @@ func (t Token) Validate() error {
 		return err
 	}
 	if t.MaxSupply < t.InitialSupply {
-		return sdkerrors.Wrapf(tokentypes.ErrInvalidMaxSupply, "invalid token max supply %d, only accepts value [%d, %d]", t.MaxSupply, t.InitialSupply, uint64(tokentypes.MaximumMaxSupply))
+		return sdkerrors.Wrapf(
+			tokentypes.ErrInvalidMaxSupply,
+			"invalid token max supply %d, only accepts value [%d, %d]",
+			t.MaxSupply,
+			t.InitialSupply,
+			uint64(tokentypes.MaximumMaxSupply),
+		)
 	}
 	return tokentypes.ValidateScale(t.Scale)
 }

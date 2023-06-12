@@ -17,6 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
+	"github.com/irisnet/irismod/modules/coinswap/exported"
 	"github.com/irisnet/irismod/modules/coinswap/keeper"
 	"github.com/irisnet/irismod/modules/coinswap/simulation"
 	"github.com/irisnet/irismod/modules/coinswap/types"
@@ -86,9 +87,10 @@ func (AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) 
 type AppModule struct {
 	AppModuleBasic
 
-	keeper        keeper.Keeper
-	accountKeeper types.AccountKeeper
-	bankKeeper    types.BankKeeper
+	keeper         keeper.Keeper
+	accountKeeper  types.AccountKeeper
+	bankKeeper     types.BankKeeper
+	legacySubspace exported.Subspace
 }
 
 // NewAppModule creates a new AppModule object
@@ -97,12 +99,14 @@ func NewAppModule(
 	keeper keeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
+	legacySubspace exported.Subspace,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{cdc: cdc},
 		keeper:         keeper,
 		accountKeeper:  accountKeeper,
 		bankKeeper:     bankKeeper,
+		legacySubspace: legacySubspace,
 	}
 }
 
@@ -114,7 +118,7 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 
-	m := keeper.NewMigrator(am.keeper)
+	m := keeper.NewMigrator(am.keeper, am.legacySubspace)
 	if err := cfg.RegisterMigration(types.ModuleName, 1, m.Migrate1to2); err != nil {
 		panic(fmt.Sprintf("failed to migrate nft from version 1 to 2: %v", err))
 	}
@@ -125,6 +129,10 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 
 	if err := cfg.RegisterMigration(types.ModuleName, 3, m.Migrate3to4); err != nil {
 		panic(fmt.Sprintf("failed to migrate coinswap from version 3 to 4: %v", err))
+	}
+
+	if err := cfg.RegisterMigration(types.ModuleName, 4, m.Migrate4to5); err != nil {
+		panic(fmt.Sprintf("failed to migrate coinswap from version 4 to 5: %v", err))
 	}
 }
 
@@ -151,7 +159,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 // ConsensusVersion implements AppModule/ConsensusVersion.
-func (AppModule) ConsensusVersion() uint64 { return 4 }
+func (AppModule) ConsensusVersion() uint64 { return 5 }
 
 // ____________________________________________________________________________
 

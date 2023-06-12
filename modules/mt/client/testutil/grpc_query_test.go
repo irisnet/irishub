@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/gogo/protobuf/proto"
+	"github.com/cosmos/gogoproto/proto"
 	mtcli "github.com/irisnet/irismod/modules/mt/client/cli"
 	mttestutil "github.com/irisnet/irismod/modules/mt/client/testutil"
 	mttypes "github.com/irisnet/irismod/modules/mt/types"
@@ -58,7 +58,11 @@ func (s *IntegrationTestSuite) TestMT() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 	txResult := mttestutil.IssueDenomExec(
 		s.T(),
@@ -68,7 +72,11 @@ func (s *IntegrationTestSuite) TestMT() {
 		args...,
 	)
 	s.Require().Equal(expectedCode, txResult.Code)
-	denomID = s.network.GetAttribute(mttypes.EventTypeIssueDenom, mttypes.AttributeKeyDenomID, txResult.Events)
+	denomID = s.network.GetAttribute(
+		mttypes.EventTypeIssueDenom,
+		mttypes.AttributeKeyDenomID,
+		txResult.Events,
+	)
 
 	// Mint
 	args = []string{
@@ -77,7 +85,11 @@ func (s *IntegrationTestSuite) TestMT() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(100))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(100))).String(),
+		),
 	}
 
 	txResult = mttestutil.MintMTExec(s.T(),
@@ -85,7 +97,11 @@ func (s *IntegrationTestSuite) TestMT() {
 		clientCtx, from.String(), denomID, args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
-	mtID = s.network.GetAttribute(mttypes.EventTypeMintMT, mttypes.AttributeKeyMTID, txResult.Events)
+	mtID = s.network.GetAttribute(
+		mttypes.EventTypeMintMT,
+		mttypes.AttributeKeyMTID,
+		txResult.Events,
+	)
 
 	//Denom
 	respType := proto.Message(&mttypes.QueryDenomResponse{})

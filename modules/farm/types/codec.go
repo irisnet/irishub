@@ -1,7 +1,7 @@
 package types
 
 import (
-	gogotypes "github.com/gogo/protobuf/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -24,7 +24,11 @@ func init() {
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreatePool{}, "irismod/farm/MsgCreatePool", nil)
-	cdc.RegisterConcrete(&MsgCreatePoolWithCommunityPool{}, "irismod/farm/MsgCreatePoolWithCommunityPool", nil)
+	cdc.RegisterConcrete(
+		&MsgCreatePoolWithCommunityPool{},
+		"irismod/farm/MsgCreatePoolWithCommunityPool",
+		nil,
+	)
 	cdc.RegisterConcrete(&MsgDestroyPool{}, "irismod/farm/MsgDestroyPool", nil)
 	cdc.RegisterConcrete(&MsgAdjustPool{}, "irismod/farm/MsgAdjustPool", nil)
 	cdc.RegisterConcrete(&MsgStake{}, "irismod/farm/MsgStake", nil)

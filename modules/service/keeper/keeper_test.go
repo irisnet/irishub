@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	gogotypes "github.com/gogo/protobuf/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 	"github.com/stretchr/testify/suite"
 	"github.com/tidwall/gjson"
 

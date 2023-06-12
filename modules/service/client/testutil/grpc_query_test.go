@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
+	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -76,7 +76,13 @@ func (s *IntegrationTestSuite) TestService() {
 	author := val.Address
 	provider := author
 
-	consumerInfo, _, _ := val.ClientCtx.Keyring.NewMnemonic("NewValidator", keyring.English, sdk.FullFundraiserPath, keyring.DefaultBIP39Passphrase, hd.Secp256k1)
+	consumerInfo, _, _ := val.ClientCtx.Keyring.NewMnemonic(
+		"NewValidator",
+		keyring.English,
+		sdk.FullFundraiserPath,
+		keyring.DefaultBIP39Passphrase,
+		hd.Secp256k1,
+	)
 
 	consumer, err := consumerInfo.GetAddress()
 	s.Require().NoError(err)
@@ -99,10 +105,19 @@ func (s *IntegrationTestSuite) TestService() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	txResult := servicetestutil.DefineServiceExec(s.T(), s.network, clientCtx, author.String(), args...)
+	txResult := servicetestutil.DefineServiceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		author.String(),
+		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	//------test GetCmdQueryServiceDefinition()-------------
@@ -125,10 +140,19 @@ func (s *IntegrationTestSuite) TestService() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	txResult = servicetestutil.BindServiceExec(s.T(), s.network, clientCtx, provider.String(), args...)
+	txResult = servicetestutil.BindServiceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		provider.String(),
+		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	//------test GetCmdQueryServiceBinding()-------------
@@ -154,10 +178,21 @@ func (s *IntegrationTestSuite) TestService() {
 	args = []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	txResult = servicetestutil.DisableServiceExec(s.T(), s.network, clientCtx, serviceName, provider.String(), provider.String(), args...)
+	txResult = servicetestutil.DisableServiceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		serviceName,
+		provider.String(),
+		provider.String(),
+		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	url = fmt.Sprintf("%s/irismod/service/bindings/%s/%s", baseURL, serviceName, provider.String())
@@ -172,10 +207,21 @@ func (s *IntegrationTestSuite) TestService() {
 	args = []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	txResult = servicetestutil.RefundDepositExec(s.T(), s.network, clientCtx, serviceName, provider.String(), provider.String(), args...)
+	txResult = servicetestutil.RefundDepositExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		serviceName,
+		provider.String(),
+		provider.String(),
+		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	url = fmt.Sprintf("%s/irismod/service/bindings/%s/%s", baseURL, serviceName, provider.String())
@@ -192,10 +238,21 @@ func (s *IntegrationTestSuite) TestService() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	txResult = servicetestutil.EnableServiceExec(s.T(), s.network, clientCtx, serviceName, provider.String(), provider.String(), args...)
+	txResult = servicetestutil.EnableServiceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		serviceName,
+		provider.String(),
+		provider.String(),
+		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	url = fmt.Sprintf("%s/irismod/service/bindings/%s/%s", baseURL, serviceName, provider.String())
@@ -213,7 +270,11 @@ func (s *IntegrationTestSuite) TestService() {
 	args = []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
 	txResult = simapp.MsgSendExec(s.T(), s.network, clientCtx, provider, consumer, amount, args...)
@@ -229,13 +290,26 @@ func (s *IntegrationTestSuite) TestService() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	txResult = servicetestutil.CallServiceExec(s.T(), s.network, clientCtx, consumer.String(), args...)
+	txResult = servicetestutil.CallServiceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		consumer.String(),
+		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
-	requestContextId := s.network.GetAttribute(servicetypes.EventTypeCreateContext, servicetypes.AttributeKeyRequestContextID, txResult.Events)
+	requestContextId := s.network.GetAttribute(
+		servicetypes.EventTypeCreateContext,
+		servicetypes.AttributeKeyRequestContextID,
+		txResult.Events,
+	)
 	requestHeight := txResult.Height
 
 	blockResult, err := val.RPCClient.BlockResults(context.Background(), &requestHeight)
@@ -285,10 +359,19 @@ func (s *IntegrationTestSuite) TestService() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	txResult = servicetestutil.RespondServiceExec(s.T(), s.network, clientCtx, provider.String(), args...)
+	txResult = servicetestutil.RespondServiceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		provider.String(),
+		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	//------test GetCmdQueryEarnedFees()-------------

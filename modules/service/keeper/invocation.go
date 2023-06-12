@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	gogotypes "github.com/gogo/protobuf/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"

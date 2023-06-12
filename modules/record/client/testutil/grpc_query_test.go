@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gogo/protobuf/proto"
+	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -56,7 +56,11 @@ func (s *IntegrationTestSuite) TestQueryRecordGRPC() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
 	expectedCode := uint32(0)
@@ -66,7 +70,11 @@ func (s *IntegrationTestSuite) TestQueryRecordGRPC() {
 		clientCtx, from.String(), digest, digestAlgo, args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
-	recordID := s.network.GetAttribute(recordtypes.EventTypeCreateRecord, recordtypes.AttributeKeyRecordID, txResult.Events)
+	recordID := s.network.GetAttribute(
+		recordtypes.EventTypeCreateRecord,
+		recordtypes.AttributeKeyRecordID,
+		txResult.Events,
+	)
 	// ---------------------------------------------------------------------------
 
 	baseURL := val.APIAddress

@@ -3,6 +3,8 @@ package irismod.coinswap;
 
 import "coinswap/coinswap.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/coinswap/types";
@@ -10,68 +12,62 @@ option (gogoproto.goproto_getters_all) = false;
 
 // Msg defines the coinswap Msg service
 service Msg {
-  // AddLiquidity defines a method for depositing some tokens to the liquidity
-  // pool
+  // AddLiquidity defines a method for depositing some tokens to the liquidity pool
   rpc AddLiquidity(MsgAddLiquidity) returns (MsgAddLiquidityResponse);
 
-  // AddUnilateralLiquidity defines a method for depositing some tokens
-  // unilaterally to the liquidity pool
+  // AddUnilateralLiquidity defines a method for depositing some tokens unilaterally to the liquidity pool
   rpc AddUnilateralLiquidity(MsgAddUnilateralLiquidity)
       returns (MsgAddUnilateralLiquidityResponse);
 
-  // RemoveLiquidity defines a method for withdraw some tokens from the
-  // liquidity pool
+  // RemoveLiquidity defines a method for withdraw some tokens from the liquidity pool
   rpc RemoveLiquidity(MsgRemoveLiquidity) returns (MsgRemoveLiquidityResponse);
 
-  // RemoveUnilateralLiquidity defines a method for withdraw some tokens
-  // unilaterally from the liquidity pool
+  // RemoveUnilateralLiquidity defines a method for withdraw some tokens unilaterally from the liquidity pool
   rpc RemoveUnilateralLiquidity(MsgRemoveUnilateralLiquidity)
       returns (MsgRemoveUnilateralLiquidityResponse);
 
-  // SwapCoin defines a method for swapping a token with the other token from
-  // the liquidity pool
+  // SwapCoin defines a method for swapping a token with the other token from the liquidity pool
   rpc SwapCoin(MsgSwapOrder) returns (MsgSwapCoinResponse);
+
+  // UpdateParams defines a governance operation for updating the x/coinswap module parameters.
+  // The authority is defined in the keeper.
+  //
+  // Since: cosmos-sdk 0.47
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 }
 
 // MsgAddLiquidity defines a msg for adding liquidity to a reserve pool
 message MsgAddLiquidity {
-  cosmos.base.v1beta1.Coin max_token = 1 [
-    (gogoproto.nullable) = false,
-    (gogoproto.moretags) = "yaml:\"max_token\""
-  ];
+  option (cosmos.msg.v1.signer) = "sender";
+
+  cosmos.base.v1beta1.Coin max_token = 1 [(gogoproto.nullable) = false];
   string exact_standard_amt = 2 [
-    (gogoproto.moretags) = "yaml:\"exact_standard_amt\"",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
   ];
   string min_liquidity = 3 [
-    (gogoproto.moretags) = "yaml:\"min_liquidity\"",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
   ];
   int64 deadline = 4;
-  string sender = 5;
+  string sender = 5 [(cosmos_proto.scalar) = "cosmos.AddressString"];
 }
 
 // MsgAddLiquidityResponse defines the Msg/AddLiquidity response type
 message MsgAddLiquidityResponse { cosmos.base.v1beta1.Coin mint_token = 1; }
 
-// MsgAddLiquidityUni defines a msg for adding liquidity unilaterally to a
-// reserve pool
+// MsgAddLiquidityUni defines a msg for adding liquidity unilaterally to a reserve pool
 message MsgAddUnilateralLiquidity {
-  string counterparty_denom = 1
-      [ (gogoproto.moretags) = "yaml:\"conuterparty_denom\"" ];
-  cosmos.base.v1beta1.Coin exact_token = 2 [
-    (gogoproto.nullable) = false,
-    (gogoproto.moretags) = "yaml:\"exact_token\""
-  ]; // exact amount of token
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string counterparty_denom = 1;
+  cosmos.base.v1beta1.Coin exact_token = 2 [(gogoproto.nullable) = false]; // exact amount of token
   string min_liquidity = 3 [
-    (gogoproto.moretags) = "yaml:\"min_liquidity\"",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
   ];
   int64 deadline = 4;
-  string sender = 5;
+  string sender = 5 [(cosmos_proto.scalar) = "cosmos.AddressString"];
 }
 
 // MsgAddLiquidityUniResponse defines the Msg/AddLiquidityUni response type
@@ -81,62 +77,75 @@ message MsgAddUnilateralLiquidityResponse {
 
 // MsgRemoveLiquidity defines a msg for removing liquidity from a reserve pool
 message MsgRemoveLiquidity {
-  cosmos.base.v1beta1.Coin withdraw_liquidity = 1 [
-    (gogoproto.nullable) = false,
-    (gogoproto.moretags) = "yaml:\"withdraw_liquidity\""
-  ];
+  option (cosmos.msg.v1.signer) = "sender";
+
+  cosmos.base.v1beta1.Coin withdraw_liquidity = 1 [(gogoproto.nullable) = false];
   string min_token = 2 [
-    (gogoproto.moretags) = "yaml:\"min_token\"",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
   ];
   string min_standard_amt = 3 [
-    (gogoproto.moretags) = "yaml:\"min_standard_amt\"",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
   ];
   int64 deadline = 4;
-  string sender = 5;
+  string sender = 5 [(cosmos_proto.scalar) = "cosmos.AddressString"];
 }
 
 // MsgRemoveLiquidityResponse defines the Msg/RemoveLiquidity response type
 message MsgRemoveLiquidityResponse {
-  repeated cosmos.base.v1beta1.Coin withdraw_coins = 1
-      [ (gogoproto.nullable) = false ];
+  repeated cosmos.base.v1beta1.Coin withdraw_coins = 1[ (gogoproto.nullable) = false ];
 }
 
-// MsgRemoveUnilateralLiquidity defines a msg for removing liquidity
-// unilaterally to a reserve pool
+// MsgRemoveUnilateralLiquidity defines a msg for removing liquiditys unilaterally to a reserve pool
 message MsgRemoveUnilateralLiquidity {
-  string counterparty_denom = 1
-      [ (gogoproto.moretags) = "yaml:\"conuterparty_denom\"" ];
-  cosmos.base.v1beta1.Coin min_token = 2 [
-    (gogoproto.nullable) = false,
-    (gogoproto.moretags) = "yaml:\"min_token\""
-  ]; // minimum amount of token
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string counterparty_denom = 1;
+  cosmos.base.v1beta1.Coin min_token = 2 [(gogoproto.nullable) = false]; // minimum amount of token
   string exact_liquidity = 3 [
-    (gogoproto.moretags) = "yaml:\"exact_liquidity\"",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
   ];
   int64 deadline = 4;
-  string sender = 5;
+  string sender = 5 [(cosmos_proto.scalar) = "cosmos.AddressString"];
 }
 
-// MsgRemoveUnilateralLiquidityResponse defines the Msg/RemoveLiquidity response
-// type
+// MsgRemoveUnilateralLiquidityResponse defines the Msg/RemoveLiquidity response type
 message MsgRemoveUnilateralLiquidityResponse {
-  repeated cosmos.base.v1beta1.Coin withdraw_coins = 1
-      [ (gogoproto.nullable) = false ];
+  repeated cosmos.base.v1beta1.Coin withdraw_coins = 1[ (gogoproto.nullable) = false ];
 }
 
 // MsgSwapOrder defines a msg for swap order
 message MsgSwapOrder {
+  option (cosmos.msg.v1.signer) = "inputs";
+
   Input input = 1 [ (gogoproto.nullable) = false ];
   Output output = 2 [ (gogoproto.nullable) = false ];
   int64 deadline = 3;
-  bool is_buy_order = 4 [ (gogoproto.moretags) = "yaml:\"is_buy_order\"" ];
+  bool is_buy_order = 4;
 }
 
 // MsgSwapCoinResponse defines the Msg/SwapCoin response type
 message MsgSwapCoinResponse {}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority    = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the x/coinswap parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [(gogoproto.nullable) = false];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParamsResponse {}

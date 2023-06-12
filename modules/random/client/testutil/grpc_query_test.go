@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
+	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/suite"
 	"github.com/tidwall/gjson"
 
@@ -78,10 +78,19 @@ func (s *IntegrationTestSuite) TestRandom() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	txResult := servicetestutil.BindServiceExec(s.T(), s.network, clientCtx, provider.String(), args...)
+	txResult := servicetestutil.BindServiceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		provider.String(),
+		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	// ------test GetCmdRequestRandom()-------------
@@ -92,7 +101,11 @@ func (s *IntegrationTestSuite) TestRandom() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
 	txResult = randomtestutil.RequestRandomExec(s.T(), s.network, clientCtx, from.String(), args...)
@@ -113,7 +126,10 @@ func (s *IntegrationTestSuite) TestRandom() {
 
 	// ------get service request-------------
 	requestHeight = requestHeight + 1
-	_, err = s.network.WaitForHeightWithTimeout(requestHeight, time.Duration(int64(blockInterval+2)*int64(s.network.TimeoutCommit)))
+	_, err = s.network.WaitForHeightWithTimeout(
+		requestHeight,
+		time.Duration(int64(blockInterval+2)*int64(s.network.TimeoutCommit)),
+	)
 	if err != nil {
 		s.network.WaitForNBlock(2)
 	}
@@ -151,10 +167,19 @@ func (s *IntegrationTestSuite) TestRandom() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	txResult = servicetestutil.RespondServiceExec(s.T(), s.network, clientCtx, provider.String(), args...)
+	txResult = servicetestutil.RespondServiceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		provider.String(),
+		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	// ------test GetCmdQueryRandom()-------------

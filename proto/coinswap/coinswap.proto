@@ -2,6 +2,7 @@ syntax = "proto3";
 package irismod.coinswap;
 
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/msg/v1/msg.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/coinswap/types";
@@ -9,6 +10,8 @@ option (gogoproto.goproto_getters_all) = false;
 
 // Input defines the properties of order's input
 message Input {
+  option (cosmos.msg.v1.signer) = "address";
+
   string address = 1;
   cosmos.base.v1beta1.Coin coin = 2 [ (gogoproto.nullable) = false ];
 }
@@ -19,6 +22,7 @@ message Output {
   cosmos.base.v1beta1.Coin coin = 2 [ (gogoproto.nullable) = false ];
 }
 
+// Pool defines the properties the liquidity pool
 message Pool {
   string id = 1;
   // denom of base coin of the pool
