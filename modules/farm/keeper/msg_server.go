@@ -24,7 +24,10 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
 
-func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (*types.MsgCreatePoolResponse, error) {
+func (m msgServer) CreatePool(
+	goCtx context.Context,
+	msg *types.MsgCreatePool,
+) (*types.MsgCreatePoolResponse, error) {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return nil, err
@@ -40,7 +43,9 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 		)
 	}
 
-	if maxRewardCategories := m.Keeper.MaxRewardCategories(ctx); uint32(len(msg.TotalReward)) > maxRewardCategories {
+	if maxRewardCategories := m.Keeper.MaxRewardCategories(ctx); uint32(
+		len(msg.TotalReward),
+	) > maxRewardCategories {
 		return nil, sdkerrors.Wrapf(
 			types.ErrInvalidRewardRule,
 			"the max reward category num is [%d], but got [%d]",
@@ -85,8 +90,10 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 	return &types.MsgCreatePoolResponse{}, nil
 }
 
-func (m msgServer) CreatePoolWithCommunityPool(goCtx context.Context,
-	msg *types.MsgCreatePoolWithCommunityPool) (*types.MsgCreatePoolWithCommunityPoolResponse, error) {
+func (m msgServer) CreatePoolWithCommunityPool(
+	goCtx context.Context,
+	msg *types.MsgCreatePoolWithCommunityPool,
+) (*types.MsgCreatePoolWithCommunityPoolResponse, error) {
 	proposer, err := sdk.AccAddressFromBech32(msg.Proposer)
 	if err != nil {
 		return nil, err
@@ -169,7 +176,10 @@ func (m msgServer) CreatePoolWithCommunityPool(goCtx context.Context,
 	return &types.MsgCreatePoolWithCommunityPoolResponse{}, nil
 }
 
-func (m msgServer) DestroyPool(goCtx context.Context, msg *types.MsgDestroyPool) (*types.MsgDestroyPoolResponse, error) {
+func (m msgServer) DestroyPool(
+	goCtx context.Context,
+	msg *types.MsgDestroyPool,
+) (*types.MsgDestroyPoolResponse, error) {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return nil, err
@@ -197,7 +207,10 @@ func (m msgServer) DestroyPool(goCtx context.Context, msg *types.MsgDestroyPool)
 	return &types.MsgDestroyPoolResponse{}, nil
 }
 
-func (m msgServer) AdjustPool(goCtx context.Context, msg *types.MsgAdjustPool) (*types.MsgAdjustPoolResponse, error) {
+func (m msgServer) AdjustPool(
+	goCtx context.Context,
+	msg *types.MsgAdjustPool,
+) (*types.MsgAdjustPoolResponse, error) {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return nil, err
@@ -228,7 +241,10 @@ func (m msgServer) AdjustPool(goCtx context.Context, msg *types.MsgAdjustPool) (
 	return &types.MsgAdjustPoolResponse{}, nil
 }
 
-func (m msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.MsgStakeResponse, error) {
+func (m msgServer) Stake(
+	goCtx context.Context,
+	msg *types.MsgStake,
+) (*types.MsgStakeResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
@@ -256,7 +272,10 @@ func (m msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.Msg
 	return &types.MsgStakeResponse{Reward: reward}, nil
 }
 
-func (m msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types.MsgUnstakeResponse, error) {
+func (m msgServer) Unstake(
+	goCtx context.Context,
+	msg *types.MsgUnstake,
+) (*types.MsgUnstakeResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
@@ -284,7 +303,10 @@ func (m msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types
 	return &types.MsgUnstakeResponse{Reward: reward}, nil
 }
 
-func (m msgServer) Harvest(goCtx context.Context, msg *types.MsgHarvest) (*types.MsgHarvestResponse, error) {
+func (m msgServer) Harvest(
+	goCtx context.Context,
+	msg *types.MsgHarvest,
+) (*types.MsgHarvestResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
@@ -309,4 +331,22 @@ func (m msgServer) Harvest(goCtx context.Context, msg *types.MsgHarvest) (*types
 		),
 	})
 	return &types.MsgHarvestResponse{Reward: reward}, nil
+}
+
+func (m msgServer) UpdateParams(
+	goCtx context.Context,
+	msg *types.MsgUpdateParams,
+) (*types.MsgUpdateParamsResponse, error) {
+	if m.authority != msg.Authority {
+		return nil, sdkerrors.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"invalid authority; expected %s, got %s",
+			m.authority,
+			msg.Authority,
+		)
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	m.SetParams(ctx, msg.Params)
+	return &types.MsgUpdateParamsResponse{}, nil
 }

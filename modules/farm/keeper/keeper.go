@@ -24,6 +24,7 @@ type Keeper struct {
 	dk                                  types.DistrKeeper
 	gk                                  types.GovKeeper
 	feeCollectorName, communityPoolName string // name of the fee collector
+	authority                           string
 }
 
 func NewKeeper(

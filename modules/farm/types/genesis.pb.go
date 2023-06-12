@@ -23,6 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// GenesisState defines the genesis information exported by the farm module
 type GenesisState struct {
 	Params    Params       `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
 	Pools     []FarmPool   `protobuf:"bytes,2,rep,name=pools,proto3" json:"pools"`

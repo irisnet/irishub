@@ -32,6 +32,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// QueryFarmPoolsRequest is request type for the Query/FarmPools RPC method
 type QueryFarmPoolsRequest struct {
 	Pagination *query.PageRequest `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
@@ -76,6 +77,7 @@ func (m *QueryFarmPoolsRequest) GetPagination() *query.PageRequest {
 	return nil
 }
 
+// FarmPoolEntry defines the properties of farm pool
 type FarmPoolEntry struct {
 	Id              string                                   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Creator         string                                   `protobuf:"bytes,2,opt,name=creator,proto3" json:"creator,omitempty"`
@@ -193,6 +195,7 @@ func (m *FarmPoolEntry) GetRewardPerBlock() github_com_cosmos_cosmos_sdk_types.C
 	return nil
 }
 
+// QueryFarmPoolsResponse is response type for the Query/FarmPools RPC method
 type QueryFarmPoolsResponse struct {
 	Pools      []*FarmPoolEntry    `protobuf:"bytes,1,rep,name=pools,proto3" json:"pools,omitempty"`
 	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
@@ -245,6 +248,7 @@ func (m *QueryFarmPoolsResponse) GetPagination() *query.PageResponse {
 	return nil
 }
 
+// QueryFarmPoolsRequest is request type for the Query/FarmPool RPC method
 type QueryFarmPoolRequest struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
@@ -289,6 +293,7 @@ func (m *QueryFarmPoolRequest) GetId() string {
 	return ""
 }
 
+// QueryFarmPoolResponse is response type for the Query/FarmPool RPC method
 type QueryFarmPoolResponse struct {
 	Pool *FarmPoolEntry `protobuf:"bytes,1,opt,name=pool,proto3" json:"pool,omitempty"`
 }
@@ -333,6 +338,7 @@ func (m *QueryFarmPoolResponse) GetPool() *FarmPoolEntry {
 	return nil
 }
 
+// QueryFarmerRequest is request type for the Query/Farmer RPC method
 type QueryFarmerRequest struct {
 	Farmer string `protobuf:"bytes,1,opt,name=farmer,proto3" json:"farmer,omitempty"`
 	PoolId string `protobuf:"bytes,2,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
@@ -385,6 +391,7 @@ func (m *QueryFarmerRequest) GetPoolId() string {
 	return ""
 }
 
+// QueryFarmerResponse is response type for the Query/Farmer RPC method
 type QueryFarmerResponse struct {
 	List   []*LockedInfo `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
 	Height int64         `protobuf:"varint,2,opt,name=height,proto3" json:"height,omitempty"`
@@ -437,6 +444,7 @@ func (m *QueryFarmerResponse) GetHeight() int64 {
 	return 0
 }
 
+// QueryParamsRequest is request type for the Query/Params RPC method
 type QueryParamsRequest struct {
 }
 
@@ -473,6 +481,7 @@ func (m *QueryParamsRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryParamsRequest proto.InternalMessageInfo
 
+// QueryParamsResponse is response type for the Query/Params RPC method
 type QueryParamsResponse struct {
 	Params Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
 }
@@ -517,6 +526,7 @@ func (m *QueryParamsResponse) GetParams() Params {
 	return Params{}
 }
 
+// LockedInfo defines the information of the farmer's current pledge
 type LockedInfo struct {
 	PoolId        string                                   `protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 	Locked        github_com_cosmos_cosmos_sdk_types.Coin  `protobuf:"bytes,2,opt,name=locked,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Coin" json:"locked"`
@@ -656,10 +666,13 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
+	// FarmPools returns all the farm pool
 	FarmPools(ctx context.Context, in *QueryFarmPoolsRequest, opts ...grpc.CallOption) (*QueryFarmPoolsResponse, error)
+	// FarmPool returns the farm pool for the provided id
 	FarmPool(ctx context.Context, in *QueryFarmPoolRequest, opts ...grpc.CallOption) (*QueryFarmPoolResponse, error)
+	// Farmer returns the farmer for the provided farmer address
 	Farmer(ctx context.Context, in *QueryFarmerRequest, opts ...grpc.CallOption) (*QueryFarmerResponse, error)
-	// Params queries the htlc parameters
+	// Params queries the farm parameters
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 }
 
@@ -709,10 +722,13 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
+	// FarmPools returns all the farm pool
 	FarmPools(context.Context, *QueryFarmPoolsRequest) (*QueryFarmPoolsResponse, error)
+	// FarmPool returns the farm pool for the provided id
 	FarmPool(context.Context, *QueryFarmPoolRequest) (*QueryFarmPoolResponse, error)
+	// Farmer returns the farmer for the provided farmer address
 	Farmer(context.Context, *QueryFarmerRequest) (*QueryFarmerResponse, error)
-	// Params queries the htlc parameters
+	// Params queries the farm parameters
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 }
 

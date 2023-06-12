@@ -25,6 +25,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// FarmPool defines the properties of farm pool
 type FarmPool struct {
 	Id                     string                                  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Creator                string                                  `protobuf:"bytes,2,opt,name=creator,proto3" json:"creator,omitempty"`
@@ -70,6 +71,7 @@ func (m *FarmPool) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_FarmPool proto.InternalMessageInfo
 
+// RewardRule defines the properties of farm pool reward
 type RewardRule struct {
 	Reward          string                                 `protobuf:"bytes,1,opt,name=reward,proto3" json:"reward,omitempty"`
 	TotalReward     github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,2,opt,name=total_reward,json=totalReward,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_reward"`
@@ -111,6 +113,7 @@ func (m *RewardRule) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RewardRule proto.InternalMessageInfo
 
+// FarmInfo records the current information of the farm pool
 type FarmInfo struct {
 	PoolId     string                                   `protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 	Address    string                                   `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
@@ -151,6 +154,7 @@ func (m *FarmInfo) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_FarmInfo proto.InternalMessageInfo
 
+// Params records the current params information of the farm pool
 type Params struct {
 	PoolCreationFee     github_com_cosmos_cosmos_sdk_types.Coin `protobuf:"bytes,1,opt,name=pool_creation_fee,json=poolCreationFee,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Coin" json:"pool_creation_fee"`
 	MaxRewardCategories uint32                                  `protobuf:"varint,2,opt,name=max_reward_categories,json=maxRewardCategories,proto3" json:"max_reward_categories,omitempty"`
@@ -190,6 +194,7 @@ func (m *Params) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Params proto.InternalMessageInfo
 
+// EscrowInfo create delegate information for farm pool proposals
 type EscrowInfo struct {
 	Proposer     string       `protobuf:"bytes,1,opt,name=proposer,proto3" json:"proposer,omitempty"`
 	FundApplied  []types.Coin `protobuf:"bytes,2,rep,name=fund_applied,json=fundApplied,proto3" json:"fund_applied"`
@@ -230,8 +235,7 @@ func (m *EscrowInfo) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EscrowInfo proto.InternalMessageInfo
 
-// CommunityPoolCreateFarmProposal is a gov Content type for creating a farm
-// pool with community pool
+// CommunityPoolCreateFarmProposal is a gov Content type for creating a farm pool with community pool
 type CommunityPoolCreateFarmProposal struct {
 	Title           string       `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	Description     string       `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
