@@ -28,7 +28,7 @@ func TestMigrate(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	expParams := app.CoinswapKeeper.GetParams(ctx)
-	require.Equal(t, expParams, params, "v4.Migrate failed")
+	expParams := app.FarmKeeper.GetParams(ctx)
+	require.Equal(t, expParams, params, "v3.Migrate failed")
 
 }
