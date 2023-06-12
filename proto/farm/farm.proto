@@ -66,6 +66,9 @@ message FarmInfo {
 
 // Params records the current params information of the farm pool
 message Params {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_stringer) = false;
+
   cosmos.base.v1beta1.Coin pool_creation_fee = 1 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.nullable) = false

@@ -3,6 +3,8 @@ package types
 import (
 	fmt "fmt"
 
+	"sigs.k8s.io/yaml"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -30,6 +32,12 @@ func DefaultParams() Params {
 // Validate validates a set of params
 func (p Params) Validate() error {
 	return validatePoolCreationFee(p.PoolCreationFee)
+}
+
+// String returns a human readable string representation of the parameters.
+func (p Params) String() string {
+	out, _ := yaml.Marshal(p)
+	return string(out)
 }
 
 func validatePoolCreationFee(i interface{}) error {
