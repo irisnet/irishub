@@ -17,24 +17,31 @@ var (
 
 type (
 	FarmKeeper interface {
-		SetParams(ctx sdk.Context, params types.Params)
+		SetParams(ctx sdk.Context, params types.Params) error
 	}
 
 	Params struct {
 		PoolCreationFee     sdk.Coin `protobuf:"bytes,1,opt,name=pool_creation_fee,json=poolCreationFee,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Coin" json:"pool_creation_fee"`
-		MaxRewardCategories uint32   `protobuf:"varint,2,opt,name=max_reward_categories,json=maxRewardCategories,proto3" json:"max_reward_categories,omitempty"`
-		TaxRate             sdk.Dec  `protobuf:"bytes,3,opt,name=tax_rate,json=taxRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"tax_rate"`
+		MaxRewardCategories uint32   `protobuf:"varint,2,opt,name=max_reward_categories,json=maxRewardCategories,proto3"                                           json:"max_reward_categories,omitempty"`
+		TaxRate             sdk.Dec  `protobuf:"bytes,3,opt,name=tax_rate,json=taxRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec"                   json:"tax_rate"`
 	}
 )
 
-func Migrate(ctx sdk.Context, k FarmKeeper, ak types.AccountKeeper, paramSpace paramstypes.Subspace) error {
+func Migrate(
+	ctx sdk.Context,
+	k FarmKeeper,
+	ak types.AccountKeeper,
+	paramSpace paramstypes.Subspace,
+) error {
 	params := GetLegacyParams(ctx, paramSpace)
 	newParams := types.Params{
 		MaxRewardCategories: params.MaxRewardCategories,
 		PoolCreationFee:     DefaultPoolCreationFee,
 		TaxRate:             DefaultTaxRate,
 	}
-	k.SetParams(ctx, newParams)
+	if err := k.SetParams(ctx, newParams); err != nil {
+		return err
+	}
 
 	//Grant burner permissions to the farm module account
 	acc := ak.GetModuleAccount(ctx, types.ModuleName)

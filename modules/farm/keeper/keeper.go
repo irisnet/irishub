@@ -36,7 +36,7 @@ func NewKeeper(
 	gk types.GovKeeper,
 	validateLPToken types.ValidateLPToken,
 	paramSpace paramstypes.Subspace,
-	feeCollectorName, communityPoolName string,
+	feeCollectorName, communityPoolName, authority string,
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !paramSpace.HasKeyTable() {
@@ -63,6 +63,7 @@ func NewKeeper(
 		paramSpace:        paramSpace,
 		feeCollectorName:  feeCollectorName,
 		communityPoolName: communityPoolName,
+		authority:         authority,
 	}
 }
 

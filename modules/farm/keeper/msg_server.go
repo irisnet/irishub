@@ -13,7 +13,7 @@ import (
 )
 
 type msgServer struct {
-	Keeper
+	k Keeper
 }
 
 var _ types.MsgServer = msgServer{}
@@ -21,7 +21,7 @@ var _ types.MsgServer = msgServer{}
 // NewMsgServerImpl returns an implementation of the farm MsgServer interface
 // for the provided Keeper.
 func NewMsgServerImpl(keeper Keeper) types.MsgServer {
-	return &msgServer{Keeper: keeper}
+	return &msgServer{k: keeper}
 }
 
 func (m msgServer) CreatePool(
@@ -43,7 +43,7 @@ func (m msgServer) CreatePool(
 		)
 	}
 
-	if maxRewardCategories := m.Keeper.MaxRewardCategories(ctx); uint32(
+	if maxRewardCategories := m.k.MaxRewardCategories(ctx); uint32(
 		len(msg.TotalReward),
 	) > maxRewardCategories {
 		return nil, sdkerrors.Wrapf(
@@ -54,14 +54,14 @@ func (m msgServer) CreatePool(
 	}
 
 	//check valid lp token denom
-	if err := m.Keeper.validateLPToken(ctx, msg.LptDenom); err != nil {
+	if err := m.k.validateLPToken(ctx, msg.LptDenom); err != nil {
 		return nil, sdkerrors.Wrapf(
 			types.ErrInvalidLPToken,
 			"The lp token denom[%s] is not exist",
 			msg.LptDenom,
 		)
 	}
-	pool, err := m.Keeper.CreatePool(
+	pool, err := m.k.CreatePool(
 		ctx,
 		msg.Description,
 		msg.LptDenom,
@@ -101,7 +101,7 @@ func (m msgServer) CreatePoolWithCommunityPool(
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	totalReward := sdk.NewCoins(msg.Content.FundApplied...).Add(msg.Content.FundSelfBond...)
-	maxRewardCategories := m.Keeper.MaxRewardCategories(ctx)
+	maxRewardCategories := m.k.MaxRewardCategories(ctx)
 	if uint32(len(totalReward)) > maxRewardCategories {
 		return nil, sdkerrors.Wrapf(
 			types.ErrInvalidRewardRule,
@@ -111,7 +111,7 @@ func (m msgServer) CreatePoolWithCommunityPool(
 	}
 
 	//check valid lp token denom
-	if err := m.Keeper.validateLPToken(ctx, msg.Content.LptDenom); err != nil {
+	if err := m.k.validateLPToken(ctx, msg.Content.LptDenom); err != nil {
 		return nil, sdkerrors.Wrapf(
 			types.ErrInvalidLPToken,
 			"The lp token denom[%s] is not exist",
@@ -120,13 +120,13 @@ func (m msgServer) CreatePoolWithCommunityPool(
 	}
 
 	//escrow FundSelfBond to EscrowCollector
-	if err := m.bk.SendCoinsFromAccountToModule(ctx,
+	if err := m.k.bk.SendCoinsFromAccountToModule(ctx,
 		proposer, types.EscrowCollector, msg.Content.FundSelfBond); err != nil {
 		return nil, err
 	}
 
 	//escrow FundApplied to EscrowCollector
-	if err := m.escrowFromFeePool(ctx, msg.Content.FundApplied); err != nil {
+	if err := m.k.escrowFromFeePool(ctx, msg.Content.FundApplied); err != nil {
 		return nil, err
 	}
 
@@ -138,24 +138,24 @@ func (m msgServer) CreatePoolWithCommunityPool(
 	msgs := []sdk.Msg{
 		&govv1.MsgExecLegacyContent{
 			Content:   data,
-			Authority: m.gk.GetGovernanceAccount(ctx).GetAddress().String(),
+			Authority: m.k.gk.GetGovernanceAccount(ctx).GetAddress().String(),
 		},
 	}
 
 	//create new proposal given a content
-	proposal, err := m.gk.SubmitProposal(ctx, msgs, "")
+	proposal, err := m.k.gk.SubmitProposal(ctx, msgs, "")
 	if err != nil {
 		return nil, err
 	}
 
 	// adds a deposit of a specific depositor on a specific proposal
-	_, err = m.gk.AddDeposit(ctx, proposal.Id, proposer, msg.InitialDeposit)
+	_, err = m.k.gk.AddDeposit(ctx, proposal.Id, proposer, msg.InitialDeposit)
 	if err != nil {
 		return nil, err
 	}
 
 	// add a escrowInfo to the proposal
-	m.SetEscrowInfo(ctx, types.EscrowInfo{
+	m.k.SetEscrowInfo(ctx, types.EscrowInfo{
 		Proposer:     msg.Proposer,
 		FundApplied:  msg.Content.FundApplied,
 		FundSelfBond: msg.Content.FundSelfBond,
@@ -187,7 +187,7 @@ func (m msgServer) DestroyPool(
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	refundCoin, err := m.Keeper.DestroyPool(ctx, msg.PoolId, creator)
+	refundCoin, err := m.k.DestroyPool(ctx, msg.PoolId, creator)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +217,7 @@ func (m msgServer) AdjustPool(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err = m.Keeper.AdjustPool(
+	if err = m.k.AdjustPool(
 		ctx,
 		msg.PoolId,
 		msg.AdditionalReward,
@@ -251,7 +251,7 @@ func (m msgServer) Stake(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	reward, err := m.Keeper.Stake(ctx, msg.PoolId, msg.Amount, sender)
+	reward, err := m.k.Stake(ctx, msg.PoolId, msg.Amount, sender)
 	if err != nil {
 		return nil, err
 	}
@@ -282,7 +282,7 @@ func (m msgServer) Unstake(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	reward, err := m.Keeper.Unstake(ctx, msg.PoolId, msg.Amount, sender)
+	reward, err := m.k.Unstake(ctx, msg.PoolId, msg.Amount, sender)
 	if err != nil {
 		return nil, err
 	}
@@ -313,7 +313,7 @@ func (m msgServer) Harvest(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	reward, err := m.Keeper.Harvest(ctx, msg.PoolId, sender)
+	reward, err := m.k.Harvest(ctx, msg.PoolId, sender)
 	if err != nil {
 		return nil, err
 	}
@@ -337,16 +337,16 @@ func (m msgServer) UpdateParams(
 	goCtx context.Context,
 	msg *types.MsgUpdateParams,
 ) (*types.MsgUpdateParamsResponse, error) {
-	if m.authority != msg.Authority {
+	if m.k.authority != msg.Authority {
 		return nil, sdkerrors.Wrapf(
 			sdkerrors.ErrUnauthorized,
 			"invalid authority; expected %s, got %s",
-			m.authority,
+			m.k.authority,
 			msg.Authority,
 		)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	m.SetParams(ctx, msg.Params)
+	m.k.SetParams(ctx, msg.Params)
 	return &types.MsgUpdateParamsResponse{}, nil
 }

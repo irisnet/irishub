@@ -6,7 +6,7 @@ import (
 	"github.com/irisnet/irismod/modules/coinswap/types"
 )
 
-// GetParams sets the x/staking module parameters.
+// GetParams sets the coinswap module parameters.
 func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get([]byte(types.ParamsKey))
@@ -19,7 +19,6 @@ func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
 }
 
 // SetParams sets the parameters for the coinswap module.
-// SetParams sets the x/staking module parameters.
 func (k Keeper) SetParams(ctx sdk.Context, params types.Params) error {
 	if err := params.Validate(); err != nil {
 		return err
