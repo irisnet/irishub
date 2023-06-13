@@ -44,7 +44,7 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) error {
 	if err != nil {
 		return err
 	}
-	store.Set([]byte(types.ParamsKey), bz)
+	store.Set(types.ParamsKey, bz)
 
 	return nil
 }
