@@ -92,7 +92,8 @@ message EscrowInfo {
   uint64 proposal_id = 4;
 }
 
-// CommunityPoolCreateFarmProposal is a gov Content type for creating a farm pool with community pool
+// CommunityPoolCreateFarmProposal is a gov Content type for creating a farm
+// pool with community pool
 message CommunityPoolCreateFarmProposal {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_stringer) = false;

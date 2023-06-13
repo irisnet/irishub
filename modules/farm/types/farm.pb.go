@@ -234,7 +234,8 @@ func (m *EscrowInfo) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EscrowInfo proto.InternalMessageInfo
 
-// CommunityPoolCreateFarmProposal is a gov Content type for creating a farm pool with community pool
+// CommunityPoolCreateFarmProposal is a gov Content type for creating a farm
+// pool with community pool
 type CommunityPoolCreateFarmProposal struct {
 	Title           string       `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	Description     string       `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`

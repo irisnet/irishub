@@ -76,7 +76,6 @@ message QueryFarmPoolRequest { string id = 1; }
 // QueryFarmPoolResponse is response type for the Query/FarmPool RPC method
 message QueryFarmPoolResponse { FarmPoolEntry pool = 1; }
 
-
 // QueryFarmerRequest is request type for the Query/Farmer RPC method
 message QueryFarmerRequest {
   string farmer = 1;
