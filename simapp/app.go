@@ -454,10 +454,10 @@ func NewSimApp(
 	app.HTLCKeeper = htlckeeper.NewKeeper(
 		appCodec,
 		keys[htlctypes.StoreKey],
-		app.GetSubspace(htlctypes.ModuleName),
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.ModuleAccountAddrs(),
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.CoinswapKeeper = coinswapkeeper.NewKeeper(
@@ -620,7 +620,13 @@ func NewSimApp(
 		record.NewAppModule(appCodec, app.RecordKeeper, app.AccountKeeper, app.BankKeeper),
 		nft.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
 		mt.NewAppModule(appCodec, app.MTKeeper, app.AccountKeeper, app.BankKeeper),
-		htlc.NewAppModule(appCodec, app.HTLCKeeper, app.AccountKeeper, app.BankKeeper),
+		htlc.NewAppModule(
+			appCodec,
+			app.HTLCKeeper,
+			app.AccountKeeper,
+			app.BankKeeper,
+			app.GetSubspace(htlctypes.ModuleName),
+		),
 		coinswap.NewAppModule(
 			appCodec,
 			app.CoinswapKeeper,
@@ -1064,7 +1070,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(tokentypes.ModuleName)
 	paramsKeeper.Subspace(recordtypes.ModuleName)
-	paramsKeeper.Subspace(htlctypes.ModuleName)
+	paramsKeeper.Subspace(htlctypes.ModuleName).WithKeyTable(htlctypes.ParamKeyTable())
 	paramsKeeper.Subspace(coinswaptypes.ModuleName).WithKeyTable(coinswaptypes.ParamKeyTable())
 	paramsKeeper.Subspace(servicetypes.ModuleName)
 	paramsKeeper.Subspace(farmtypes.ModuleName).WithKeyTable(farmtypes.ParamKeyTable())

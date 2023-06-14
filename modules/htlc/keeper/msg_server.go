@@ -12,7 +12,7 @@ import (
 )
 
 type msgServer struct {
-	Keeper
+	k Keeper
 }
 
 var _ types.MsgServer = msgServer{}
@@ -20,11 +20,14 @@ var _ types.MsgServer = msgServer{}
 // NewMsgServerImpl returns an implementation of the HTLC MsgServer interface
 // for the provided Keeper.
 func NewMsgServerImpl(keeper Keeper) types.MsgServer {
-	return &msgServer{Keeper: keeper}
+	return &msgServer{k: keeper}
 }
 
 // CreateHTLC creates an HTLC
-func (m msgServer) CreateHTLC(goCtx context.Context, msg *types.MsgCreateHTLC) (*types.MsgCreateHTLCResponse, error) {
+func (m msgServer) CreateHTLC(
+	goCtx context.Context,
+	msg *types.MsgCreateHTLC,
+) (*types.MsgCreateHTLCResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
@@ -40,12 +43,12 @@ func (m msgServer) CreateHTLC(goCtx context.Context, msg *types.MsgCreateHTLC) (
 		return nil, err
 	}
 
-	if m.Keeper.blockedAddrs[msg.To] {
+	if m.k.blockedAddrs[msg.To] {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.To)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	id, err := m.Keeper.CreateHTLC(
+	id, err := m.k.CreateHTLC(
 		ctx,
 		sender,
 		to,
@@ -82,7 +85,10 @@ func (m msgServer) CreateHTLC(goCtx context.Context, msg *types.MsgCreateHTLC) (
 	}, nil
 }
 
-func (m msgServer) ClaimHTLC(goCtx context.Context, msg *types.MsgClaimHTLC) (*types.MsgClaimHTLCResponse, error) {
+func (m msgServer) ClaimHTLC(
+	goCtx context.Context,
+	msg *types.MsgClaimHTLC,
+) (*types.MsgClaimHTLCResponse, error) {
 	id, err := hex.DecodeString(msg.Id)
 	if err != nil {
 		return nil, err
@@ -94,7 +100,7 @@ func (m msgServer) ClaimHTLC(goCtx context.Context, msg *types.MsgClaimHTLC) (*t
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	hashLock, transfer, direction, err := m.Keeper.ClaimHTLC(ctx, id, secret)
+	hashLock, transfer, direction, err := m.k.ClaimHTLC(ctx, id, secret)
 	if err != nil {
 		return nil, err
 	}
@@ -116,4 +122,22 @@ func (m msgServer) ClaimHTLC(goCtx context.Context, msg *types.MsgClaimHTLC) (*t
 		),
 	})
 	return &types.MsgClaimHTLCResponse{}, nil
+}
+
+func (m msgServer) UpdateParams(
+	goCtx context.Context,
+	msg *types.MsgUpdateParams,
+) (*types.MsgUpdateParamsResponse, error) {
+	if m.k.authority != msg.Authority {
+		return nil, sdkerrors.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"invalid authority; expected %s, got %s",
+			m.k.authority,
+			msg.Authority,
+		)
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	m.k.SetParams(ctx, msg.Params)
+	return &types.MsgUpdateParamsResponse{}, nil
 }

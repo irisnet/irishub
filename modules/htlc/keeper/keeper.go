@@ -9,7 +9,6 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/irisnet/irismod/modules/htlc/types"
 )
@@ -18,38 +17,33 @@ import (
 type Keeper struct {
 	storeKey      storetypes.StoreKey
 	cdc           codec.Codec
-	paramSpace    paramstypes.Subspace
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
 	blockedAddrs  map[string]bool
+	authority     string
 }
 
 // NewKeeper creates a new HTLC Keeper instance
 func NewKeeper(
 	cdc codec.Codec,
 	key storetypes.StoreKey,
-	paramSpace paramstypes.Subspace,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	blockedAddrs map[string]bool,
+	authority string,
 ) Keeper {
 	// ensure the HTLC module account is set
 	if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
 		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
 	}
 
-	// set KeyTable if it has not already been set
-	if !paramSpace.HasKeyTable() {
-		paramSpace = paramSpace.WithKeyTable(ParamKeyTable())
-	}
-
 	return Keeper{
 		storeKey:      key,
 		cdc:           cdc,
-		paramSpace:    paramSpace,
 		accountKeeper: accountKeeper,
 		bankKeeper:    bankKeeper,
 		blockedAddrs:  blockedAddrs,
+		authority:     authority,
 	}
 }
 

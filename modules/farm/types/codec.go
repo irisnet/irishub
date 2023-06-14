@@ -34,6 +34,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgStake{}, "irismod/farm/MsgStake", nil)
 	cdc.RegisterConcrete(&MsgUnstake{}, "irismod/farm/MsgUnstake", nil)
 	cdc.RegisterConcrete(&MsgHarvest{}, "irismod/farm/MsgHarvest", nil)
+	cdc.RegisterConcrete(&MsgUpdateParams{}, "irismod/farm/MsgUpdateParams", nil)
 }
 
 // RegisterInterfaces registers the interface
@@ -47,6 +48,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgStake{},
 		&MsgUnstake{},
 		&MsgHarvest{},
+		&MsgUpdateParams{},
 	)
 
 	registry.RegisterImplementations(

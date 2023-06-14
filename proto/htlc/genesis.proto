@@ -14,7 +14,6 @@ message GenesisState {
   repeated AssetSupply supplies = 3 [ (gogoproto.nullable) = false ];
   google.protobuf.Timestamp previous_block_time = 4 [
     (gogoproto.nullable) = false,
-    (gogoproto.stdtime) = true,
-    (gogoproto.moretags) = "yaml:\"previous_block_time\""
+    (gogoproto.stdtime) = true
   ];
 }
