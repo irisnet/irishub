@@ -1,4 +1,4 @@
-package v4_test
+package v5_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	v4 "github.com/irisnet/irismod/modules/coinswap/migrations/v4"
+	v5 "github.com/irisnet/irismod/modules/coinswap/migrations/v5"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	"github.com/irisnet/irismod/simapp"
 )
@@ -21,7 +21,7 @@ func TestMigrate(t *testing.T) {
 	params := coinswaptypes.DefaultParams()
 	legacySubspace.SetParamSet(ctx, &params)
 
-	err := v4.Migrate(
+	err := v5.Migrate(
 		ctx,
 		app.CoinswapKeeper,
 		legacySubspace,
