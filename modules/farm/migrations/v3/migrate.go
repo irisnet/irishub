@@ -3,8 +3,8 @@ package v3
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/farm/exported"
 	"github.com/irisnet/irismod/modules/farm/types"
+	"github.com/irisnet/irismod/types/exported"
 )
 
 // FarmKeeper defines a interface for SetParams function

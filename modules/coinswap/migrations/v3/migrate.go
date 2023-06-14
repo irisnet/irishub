@@ -3,8 +3,8 @@ package v3
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/coinswap/exported"
 	"github.com/irisnet/irismod/modules/coinswap/types"
+	"github.com/irisnet/irismod/types/exported"
 )
 
 var (

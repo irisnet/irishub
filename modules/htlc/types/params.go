@@ -3,40 +3,20 @@ package types
 import (
 	fmt "fmt"
 	"strings"
-	time "time"
 
 	"gopkg.in/yaml.v2"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 const (
 	FormatHTLTAssetPrefix = "htlt"
 )
 
-// Parameter store keys
-var (
-	KeyAssetParams = []byte("AssetParams") // asset params key
-
-	DefaultPreviousBlockTime = time.Now()
-)
-
 // NewParams is the HTLC params constructor
 func NewParams(assetParams []AssetParam) Params {
 	return Params{
 		AssetParams: assetParams,
-	}
-}
-
-// ParamKeyTable returns the TypeTable for coinswap module
-func ParamKeyTable() paramtypes.KeyTable {
-	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
-}
-
-func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
-	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(KeyAssetParams, &p.AssetParams, validateAssetParams),
 	}
 }
 

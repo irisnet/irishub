@@ -1,7 +1,7 @@
 package types
 
 import (
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	"github.com/irisnet/irismod/types/exported"
 )
 
 // Parameter store keys
@@ -14,17 +14,17 @@ var (
 )
 
 // ParamKeyTable returns the TypeTable for coinswap module
-func ParamKeyTable() paramtypes.KeyTable {
-	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
+func ParamKeyTable() exported.KeyTable {
+	return exported.NewKeyTable().RegisterParamSet(&Params{})
 }
 
 // ParamSetPairs implements paramtypes.KeyValuePairs
-func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
-	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(KeyFee, &p.Fee, validateFee),
-		paramtypes.NewParamSetPair(KeyPoolCreationFee, &p.PoolCreationFee, validatePoolCreationFee),
-		paramtypes.NewParamSetPair(KeyTaxRate, &p.TaxRate, validateTaxRate),
-		paramtypes.NewParamSetPair(
+func (p *Params) ParamSetPairs() exported.ParamSetPairs {
+	return exported.ParamSetPairs{
+		exported.NewParamSetPair(KeyFee, &p.Fee, validateFee),
+		exported.NewParamSetPair(KeyPoolCreationFee, &p.PoolCreationFee, validatePoolCreationFee),
+		exported.NewParamSetPair(KeyTaxRate, &p.TaxRate, validateTaxRate),
+		exported.NewParamSetPair(
 			KeyUnilateralLiquidityFee,
 			&p.UnilateralLiquidityFee,
 			validateUnilateraLiquiditylFee,
