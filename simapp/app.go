@@ -478,6 +478,7 @@ func NewSimApp(
 		app.GetSubspace(servicetypes.ModuleName),
 		app.ModuleAccountAddrs(),
 		servicetypes.FeeCollectorName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.OracleKeeper = oracleKeeper.NewKeeper(
