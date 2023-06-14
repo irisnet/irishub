@@ -3,35 +3,46 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/irisnet/irismod/modules/htlc/types"
 )
 
-// ParamKeyTable for htlc module
-func ParamKeyTable() paramstypes.KeyTable {
-	return paramstypes.NewKeyTable().RegisterParamSet(&types.Params{})
+// GetParams sets the farm module parameters.
+func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get([]byte(types.ParamsKey))
+	if bz == nil {
+		return params
+	}
+
+	k.cdc.MustUnmarshal(bz, &params)
+	return params
 }
 
-// GetParams gets all parameteras as types.Params
-func (k Keeper) GetParams(ctx sdk.Context) types.Params {
-	return types.NewParams(k.AssetParams(ctx))
-}
+// SetParams sets the farm module parameters.
+func (k Keeper) SetParams(ctx sdk.Context, params types.Params) error {
+	if err := params.Validate(); err != nil {
+		return err
+	}
 
-// MaxRequestTimeout returns the maximum request timeout
-func (k Keeper) AssetParams(ctx sdk.Context) (res []types.AssetParam) {
-	k.paramSpace.Get(ctx, types.KeyAssetParams, &res)
-	return
-}
+	store := ctx.KVStore(k.storeKey)
+	bz, err := k.cdc.Marshal(&params)
+	if err != nil {
+		return err
+	}
+	store.Set(types.ParamsKey, bz)
 
-// SetParams sets the params to the store
-func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
+	return nil
 }
 
 // ------------------------------------------
 //				Asset
 // ------------------------------------------
+
+// MaxRequestTimeout returns the maximum request timeout
+func (k Keeper) AssetParams(ctx sdk.Context) (res []types.AssetParam) {
+	return k.GetParams(ctx).AssetParams
+}
 
 // GetAsset returns the asset param associated with the input denom
 func (k Keeper) GetAsset(ctx sdk.Context, denom string) (types.AssetParam, error) {

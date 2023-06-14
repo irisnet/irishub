@@ -27,6 +27,7 @@ var (
 	HTLCExpiredQueueKey  = []byte{0x02} // prefix for the HTLC expiration queue
 	AssetSupplyPrefix    = []byte{0x03} // prefix for the HTLT supply
 	PreviousBlockTimeKey = []byte{0x04} // prefix for the HTLT supply previous block time
+	ParamsKey            = []byte{0x05} // prefix for the HTLT params
 )
 
 // GetHTLCKey returns the key for the HTLC with the specified hash lock
