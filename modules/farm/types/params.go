@@ -3,8 +3,9 @@ package types
 import (
 	fmt "fmt"
 
+	"sigs.k8s.io/yaml"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 // Farm params default values
@@ -12,14 +13,6 @@ var (
 	DefaultPoolCreationFee     = sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000)) // 5000stake
 	DefaulttTaxRate            = sdk.NewDecWithPrec(4, 1)                            // 0.4 (40%)
 	DefaultMaxRewardCategories = uint32(2)
-)
-
-// Keys for parameter access
-// nolint
-var (
-	KeyPoolCreationFee     = []byte("CreatePoolFee")
-	KeyTaxRate             = []byte("TaxRate") // fee key
-	KeyMaxRewardCategories = []byte("MaxRewardCategories")
 )
 
 // NewParams creates a new Params instance
@@ -31,15 +24,6 @@ func NewParams(createPoolFee sdk.Coin, maxRewardCategories uint32, taxRate sdk.D
 	}
 }
 
-// ParamSetPairs implements paramstypes.ParamSet
-func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
-	return paramstypes.ParamSetPairs{
-		paramstypes.NewParamSetPair(KeyPoolCreationFee, &p.PoolCreationFee, validatePoolCreationFee),
-		paramstypes.NewParamSetPair(KeyMaxRewardCategories, &p.MaxRewardCategories, validateMaxRewardCategories),
-		paramstypes.NewParamSetPair(KeyTaxRate, &p.TaxRate, validateTaxRate),
-	}
-}
-
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
 	return NewParams(DefaultPoolCreationFee, DefaultMaxRewardCategories, DefaulttTaxRate)
@@ -48,6 +32,12 @@ func DefaultParams() Params {
 // Validate validates a set of params
 func (p Params) Validate() error {
 	return validatePoolCreationFee(p.PoolCreationFee)
+}
+
+// String returns a human readable string representation of the parameters.
+func (p Params) String() string {
+	out, _ := yaml.Marshal(p)
+	return string(out)
 }
 
 func validatePoolCreationFee(i interface{}) error {

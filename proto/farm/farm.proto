@@ -7,6 +7,7 @@ import "gogoproto/gogo.proto";
 option go_package = "github.com/irisnet/irismod/modules/farm/types";
 option (gogoproto.goproto_getters_all) = false;
 
+// FarmPool defines the properties of farm pool
 message FarmPool {
   option (gogoproto.equal) = true;
 
@@ -24,6 +25,7 @@ message FarmPool {
   repeated RewardRule rules = 9 [ (gogoproto.nullable) = false ];
 }
 
+// RewardRule defines the properties of farm pool reward
 message RewardRule {
   option (gogoproto.equal) = true;
 
@@ -46,6 +48,7 @@ message RewardRule {
   ];
 }
 
+// FarmInfo records the current information of the farm pool
 message FarmInfo {
   option (gogoproto.equal) = true;
 
@@ -61,7 +64,11 @@ message FarmInfo {
   ];
 }
 
+// Params records the current params information of the farm pool
 message Params {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_stringer) = false;
+
   cosmos.base.v1beta1.Coin pool_creation_fee = 1 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.nullable) = false
@@ -73,6 +80,7 @@ message Params {
   ];
 }
 
+// EscrowInfo create delegate information for farm pool proposals
 message EscrowInfo {
   option (gogoproto.equal) = true;
 

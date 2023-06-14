@@ -37,6 +37,7 @@ var (
 	FarmPoolSeq       = []byte{0x05}
 	FarmPoolKey       = []byte{0x06} // key for farm pool
 	EscrowInfoKey     = []byte{0x07}
+	ParamsKey         = []byte{0x08}
 )
 
 func KeyFarmPool(poolId string) []byte {
@@ -66,7 +67,9 @@ func PrefixFarmInfo(address string) []byte {
 }
 
 func KeyActiveFarmPool(height int64, poolId string) []byte {
-	return append(append(ActiveFarmPoolKey, sdk.Uint64ToBigEndian(uint64(height))...), []byte(poolId)...)
+	return append(
+		append(ActiveFarmPoolKey, sdk.Uint64ToBigEndian(uint64(height))...),
+		[]byte(poolId)...)
 }
 
 func PrefixActiveFarmPool(height int64) []byte {

@@ -494,9 +494,9 @@ func NewSimApp(
 		//app.GovKeeper,
 		nil,
 		func(ctx sdk.Context, lpTokenDenom string) error { return nil },
-		app.GetSubspace(farmtypes.ModuleName),
 		authtypes.FeeCollectorName,
 		distrtypes.ModuleName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	// register the proposal types
@@ -631,7 +631,13 @@ func NewSimApp(
 		service.NewAppModule(appCodec, app.ServiceKeeper, app.AccountKeeper, app.BankKeeper),
 		oracle.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper),
 		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
-		farm.NewAppModule(appCodec, app.FarmKeeper, app.AccountKeeper, app.BankKeeper),
+		farm.NewAppModule(
+			appCodec,
+			app.FarmKeeper,
+			app.AccountKeeper,
+			app.BankKeeper,
+			app.GetSubspace(coinswaptypes.ModuleName),
+		),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 	)
 
@@ -1061,7 +1067,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(htlctypes.ModuleName)
 	paramsKeeper.Subspace(coinswaptypes.ModuleName).WithKeyTable(coinswaptypes.ParamKeyTable())
 	paramsKeeper.Subspace(servicetypes.ModuleName)
-	paramsKeeper.Subspace(farmtypes.ModuleName)
+	paramsKeeper.Subspace(farmtypes.ModuleName).WithKeyTable(farmtypes.ParamKeyTable())
 
 	return paramsKeeper
 }
