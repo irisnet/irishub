@@ -22,6 +22,7 @@ type Keeper struct {
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
 	blockedAddrs  map[string]bool
+	authority     string
 }
 
 // NewKeeper creates a new HTLC Keeper instance
@@ -32,6 +33,7 @@ func NewKeeper(
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	blockedAddrs map[string]bool,
+	authority string,
 ) Keeper {
 	// ensure the HTLC module account is set
 	if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
@@ -50,6 +52,7 @@ func NewKeeper(
 		accountKeeper: accountKeeper,
 		bankKeeper:    bankKeeper,
 		blockedAddrs:  blockedAddrs,
+		authority:     authority,
 	}
 }
 

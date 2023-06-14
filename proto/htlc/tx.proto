@@ -2,37 +2,46 @@ syntax = "proto3";
 package irismod.htlc;
 
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
+import "htlc/htlc.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/htlc/types";
 option (gogoproto.goproto_getters_all) = false;
 
 // Msg defines the HTLC Msg service
 service Msg {
+  option (cosmos.msg.v1.service) = true;
+
   // CreateHTLC defines a method for creating a HTLC
   rpc CreateHTLC(MsgCreateHTLC) returns (MsgCreateHTLCResponse);
 
   // ClaimHTLC defines a method for claiming a HTLC
   rpc ClaimHTLC(MsgClaimHTLC) returns (MsgClaimHTLCResponse);
+  // UpdateParams defines a governance operation for updating the x/htlc
+  // module parameters. The authority is defined in the keeper.
+  //
+  // Since: cosmos-sdk 0.47
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 }
 
 // MsgCreateHTLC defines a message to create an HTLC
 message MsgCreateHTLC {
   option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1;
   string to = 2;
-  string receiver_on_other_chain = 3
-      [ (gogoproto.moretags) = "yaml:\"receiver_on_other_chain\"" ];
-  string sender_on_other_chain = 4
-      [ (gogoproto.moretags) = "yaml:\"sender_on_other_chain\"" ];
+  string receiver_on_other_chain = 3;
+  string sender_on_other_chain = 4;
   repeated cosmos.base.v1beta1.Coin amount = 5 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
-  string hash_lock = 6 [ (gogoproto.moretags) = "yaml:\"hash_lock\"" ];
+  string hash_lock = 6;
   uint64 timestamp = 7;
-  uint64 time_lock = 8 [ (gogoproto.moretags) = "yaml:\"time_lock\"" ];
+  uint64 time_lock = 8;
   bool transfer = 9;
 }
 
@@ -42,11 +51,34 @@ message MsgCreateHTLCResponse { string id = 1; }
 // MsgClaimHTLC defines a message to claim an HTLC
 message MsgClaimHTLC {
   option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1;
-  string id = 2 [ (gogoproto.moretags) = "yaml:\"id\"" ];
+  string id = 2;
   string secret = 3;
 }
 
 // MsgClaimHTLCResponse defines the Msg/ClaimHTLC response type
 message MsgClaimHTLCResponse {}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address that controls the module (defaults to x/gov unless
+  // overwritten).
+  string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+
+  // params defines the x/coinswap parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [ (gogoproto.nullable) = false ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParamsResponse {}
