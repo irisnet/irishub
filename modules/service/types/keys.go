@@ -58,6 +58,7 @@ var (
 	EarnedFeesKey                = []byte{0x18} // prefix for provider earned fees
 	OwnerEarnedFeesKey           = []byte{0x19} // prefix for owner earned fees
 	InternalCounterKey           = []byte{0x20} // prefix for internal counter key
+	ParamsKey                    = []byte{0x21} // prefix for the service params
 )
 
 // GetServiceDefinitionKey gets the key for the service definition with the specified service name
@@ -74,8 +75,16 @@ func GetServiceBindingKey(serviceName string, provider sdk.AccAddress) []byte {
 
 // GetOwnerServiceBindingKey gets the key for the service binding with the specified owner
 // VALUE: []byte{}
-func GetOwnerServiceBindingKey(owner sdk.AccAddress, serviceName string, provider sdk.AccAddress) []byte {
-	return append(append(append(append(OwnerServiceBindingKey, owner.Bytes()...), []byte(serviceName)...), Delimiter...), provider.Bytes()...)
+func GetOwnerServiceBindingKey(
+	owner sdk.AccAddress,
+	serviceName string,
+	provider sdk.AccAddress,
+) []byte {
+	return append(
+		append(
+			append(append(OwnerServiceBindingKey, owner.Bytes()...), []byte(serviceName)...),
+			Delimiter...),
+		provider.Bytes()...)
 }
 
 // GetOwnerKey gets the key for the specified provider
@@ -109,7 +118,9 @@ func GetBindingsSubspace(serviceName string) []byte {
 
 // GetOwnerBindingsSubspace gets the key prefix for iterating through all bindings of the specified service name and owner
 func GetOwnerBindingsSubspace(owner sdk.AccAddress, serviceName string) []byte {
-	return append(append(append(OwnerServiceBindingKey, owner.Bytes()...), []byte(serviceName)...), Delimiter...)
+	return append(
+		append(append(OwnerServiceBindingKey, owner.Bytes()...), []byte(serviceName)...),
+		Delimiter...)
 }
 
 // GetOwnerProvidersSubspace gets the key prefix for iterating through providers of the specified owner
@@ -124,13 +135,17 @@ func GetRequestContextKey(requestContextID []byte) []byte {
 
 // GetExpiredRequestBatchKey returns the key for the request batch expiration of the specified request context
 func GetExpiredRequestBatchKey(requestContextID []byte, batchExpirationHeight int64) []byte {
-	reqBatchExpiration := append(sdk.Uint64ToBigEndian(uint64(batchExpirationHeight)), requestContextID...)
+	reqBatchExpiration := append(
+		sdk.Uint64ToBigEndian(uint64(batchExpirationHeight)),
+		requestContextID...)
 	return append(ExpiredRequestBatchKey, reqBatchExpiration...)
 }
 
 // GetNewRequestBatchKey returns the key for the new batch request of the specified request context in the given height
 func GetNewRequestBatchKey(requestContextID []byte, requestBatchHeight int64) []byte {
-	newBatchRequest := append(sdk.Uint64ToBigEndian(uint64(requestBatchHeight)), requestContextID...)
+	newBatchRequest := append(
+		sdk.Uint64ToBigEndian(uint64(requestBatchHeight)),
+		requestContextID...)
 	return append(NewRequestBatchKey, newBatchRequest...)
 }
 
@@ -165,14 +180,25 @@ func GetRequestSubspaceByReqCtx(requestContextID []byte, batchCounter uint64) []
 }
 
 // GetActiveRequestKey returns the key for the active request with the specified request ID in the given height
-func GetActiveRequestKey(serviceName string, provider sdk.AccAddress, expirationHeight int64, requestID []byte) []byte {
-	activeRequest := append(append(append(getStringsKey([]string{serviceName, provider.String()}), Delimiter...), sdk.Uint64ToBigEndian(uint64(expirationHeight))...), requestID...)
+func GetActiveRequestKey(
+	serviceName string,
+	provider sdk.AccAddress,
+	expirationHeight int64,
+	requestID []byte,
+) []byte {
+	activeRequest := append(
+		append(
+			append(getStringsKey([]string{serviceName, provider.String()}), Delimiter...),
+			sdk.Uint64ToBigEndian(uint64(expirationHeight))...),
+		requestID...)
 	return append(ActiveRequestKey, activeRequest...)
 }
 
 // GetActiveRequestSubspace returns the key prefix for iterating through the active requests for the specified provider
 func GetActiveRequestSubspace(serviceName string, provider sdk.AccAddress) []byte {
-	return append(append(ActiveRequestKey, getStringsKey([]string{serviceName, provider.String()})...), Delimiter...)
+	return append(
+		append(ActiveRequestKey, getStringsKey([]string{serviceName, provider.String()})...),
+		Delimiter...)
 }
 
 // GetActiveRequestKeyByID returns the key for the active request with the specified request ID
@@ -182,12 +208,20 @@ func GetActiveRequestKeyByID(requestID []byte) []byte {
 
 // GetActiveRequestSubspaceByReqCtx returns the key prefix for iterating through the active requests for the specified request context
 func GetActiveRequestSubspaceByReqCtx(requestContextID []byte, batchCounter uint64) []byte {
-	return append(append(ActiveRequestByIDKey, requestContextID...), sdk.Uint64ToBigEndian(batchCounter)...)
+	return append(
+		append(ActiveRequestByIDKey, requestContextID...),
+		sdk.Uint64ToBigEndian(batchCounter)...)
 }
 
 // GetRequestVolumeKey returns the key for the request volume for the specified consumer and binding
-func GetRequestVolumeKey(consumer sdk.AccAddress, serviceName string, provider sdk.AccAddress) []byte {
-	return append(RequestVolumeKey, getStringsKey([]string{consumer.String(), serviceName, provider.String()})...)
+func GetRequestVolumeKey(
+	consumer sdk.AccAddress,
+	serviceName string,
+	provider sdk.AccAddress,
+) []byte {
+	return append(
+		RequestVolumeKey,
+		getStringsKey([]string{consumer.String(), serviceName, provider.String()})...)
 }
 
 // GetResponseKey returns the key for the response for the given request ID

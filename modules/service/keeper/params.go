@@ -4,94 +4,85 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/irisnet/irismod/modules/service/types"
 )
 
-// ParamKeyTable for service module
-func ParamKeyTable() paramstypes.KeyTable {
-	return paramstypes.NewKeyTable().RegisterParamSet(&types.Params{})
-}
-
 // MaxRequestTimeout returns the maximum request timeout
-func (k Keeper) MaxRequestTimeout(ctx sdk.Context) (res int64) {
-	k.paramSpace.Get(ctx, types.KeyMaxRequestTimeout, &res)
-	return
+func (k Keeper) MaxRequestTimeout(ctx sdk.Context) int64 {
+	return k.GetParams(ctx).MaxRequestTimeout
 }
 
 // MinDepositMultiple returns the minimum deposit multiple
-func (k Keeper) MinDepositMultiple(ctx sdk.Context) (res int64) {
-	k.paramSpace.Get(ctx, types.KeyMinDepositMultiple, &res)
-	return
+func (k Keeper) MinDepositMultiple(ctx sdk.Context) int64 {
+	return k.GetParams(ctx).MinDepositMultiple
 }
 
 // MinDeposit returns the minimum deposit
-func (k Keeper) MinDeposit(ctx sdk.Context) (res sdk.Coins) {
-	k.paramSpace.Get(ctx, types.KeyMinDeposit, &res)
-	return
+func (k Keeper) MinDeposit(ctx sdk.Context) sdk.Coins {
+	return k.GetParams(ctx).MinDeposit
 }
 
 // ServiceFeeTax returns the service fee tax
-func (k Keeper) ServiceFeeTax(ctx sdk.Context) (res sdk.Dec) {
-	k.paramSpace.Get(ctx, types.KeyServiceFeeTax, &res)
-	return
+func (k Keeper) ServiceFeeTax(ctx sdk.Context) sdk.Dec {
+	return k.GetParams(ctx).ServiceFeeTax
 }
 
 // SlashFraction returns the slashing fraction
-func (k Keeper) SlashFraction(ctx sdk.Context) (res sdk.Dec) {
-	k.paramSpace.Get(ctx, types.KeySlashFraction, &res)
-	return
+func (k Keeper) SlashFraction(ctx sdk.Context) sdk.Dec {
+	return k.GetParams(ctx).SlashFraction
 }
 
 // ComplaintRetrospect returns the complaint retrospect duration
-func (k Keeper) ComplaintRetrospect(ctx sdk.Context) (res time.Duration) {
-	k.paramSpace.Get(ctx, types.KeyComplaintRetrospect, &res)
-	return
+func (k Keeper) ComplaintRetrospect(ctx sdk.Context) time.Duration {
+	return k.GetParams(ctx).ComplaintRetrospect
 }
 
 // ArbitrationTimeLimit returns the arbitration time limit
-func (k Keeper) ArbitrationTimeLimit(ctx sdk.Context) (res time.Duration) {
-	k.paramSpace.Get(ctx, types.KeyArbitrationTimeLimit, &res)
-	return
+func (k Keeper) ArbitrationTimeLimit(ctx sdk.Context) time.Duration {
+	return k.GetParams(ctx).ArbitrationTimeLimit
 }
 
 // TxSizeLimit returns the tx size limit
-func (k Keeper) TxSizeLimit(ctx sdk.Context) (res uint64) {
-	k.paramSpace.Get(ctx, types.KeyTxSizeLimit, &res)
-	return
+func (k Keeper) TxSizeLimit(ctx sdk.Context) uint64 {
+	return k.GetParams(ctx).TxSizeLimit
 }
 
 // BaseDenom returns the base denom of service module
-func (k Keeper) BaseDenom(ctx sdk.Context) (res string) {
-	k.paramSpace.Get(ctx, types.KeyBaseDenom, &res)
-	return
+func (k Keeper) BaseDenom(ctx sdk.Context) string {
+	return k.GetParams(ctx).BaseDenom
 }
 
 // RestrictedServiceFeeDenom returns the boolean value which
 // indicates if the service fee only accepts the base denom
-func (k Keeper) RestrictedServiceFeeDenom(ctx sdk.Context) (res bool) {
-	k.paramSpace.Get(ctx, types.KeyRestrictedServiceFeeDenom, &res)
-	return
+func (k Keeper) RestrictedServiceFeeDenom(ctx sdk.Context) bool {
+	return k.GetParams(ctx).RestrictedServiceFeeDenom
 }
 
-// GetParams gets all parameteras as types.Params
-func (k Keeper) GetParams(ctx sdk.Context) types.Params {
-	return types.NewParams(
-		k.MaxRequestTimeout(ctx),
-		k.MinDepositMultiple(ctx),
-		k.MinDeposit(ctx),
-		k.ServiceFeeTax(ctx),
-		k.SlashFraction(ctx),
-		k.ComplaintRetrospect(ctx),
-		k.ArbitrationTimeLimit(ctx),
-		k.TxSizeLimit(ctx),
-		k.BaseDenom(ctx),
-		k.RestrictedServiceFeeDenom(ctx),
-	)
+// GetParams sets the farm module parameters.
+func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get([]byte(types.ParamsKey))
+	if bz == nil {
+		return params
+	}
+
+	k.cdc.MustUnmarshal(bz, &params)
+	return params
 }
 
-// SetParams sets the params to the store
-func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
+// SetParams sets the farm module parameters.
+func (k Keeper) SetParams(ctx sdk.Context, params types.Params) error {
+	if err := params.Validate(); err != nil {
+		return err
+	}
+
+	store := ctx.KVStore(k.storeKey)
+	bz, err := k.cdc.Marshal(&params)
+	if err != nil {
+		return err
+	}
+	store.Set(types.ParamsKey, bz)
+
+	return nil
 }

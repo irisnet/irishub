@@ -25,7 +25,11 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgBindService{}, "irismod/service/MsgBindService", nil)
 	cdc.RegisterConcrete(&MsgUpdateServiceBinding{}, "irismod/service/MsgUpdateServiceBinding", nil)
 	cdc.RegisterConcrete(&MsgSetWithdrawAddress{}, "irismod/service/MsgSetWithdrawAddress", nil)
-	cdc.RegisterConcrete(&MsgDisableServiceBinding{}, "irismod/service/MsgDisableServiceBinding", nil)
+	cdc.RegisterConcrete(
+		&MsgDisableServiceBinding{},
+		"irismod/service/MsgDisableServiceBinding",
+		nil,
+	)
 	cdc.RegisterConcrete(&MsgEnableServiceBinding{}, "irismod/service/MsgEnableServiceBinding", nil)
 	cdc.RegisterConcrete(&MsgRefundServiceDeposit{}, "irismod/service/MsgRefundServiceDeposit", nil)
 
@@ -36,6 +40,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgKillRequestContext{}, "irismod/service/MsgKillRequestContext", nil)
 	cdc.RegisterConcrete(&MsgUpdateRequestContext{}, "irismod/service/MsgUpdateRequestContext", nil)
 	cdc.RegisterConcrete(&MsgWithdrawEarnedFees{}, "irismod/service/MsgWithdrawEarnedFees", nil)
+	cdc.RegisterConcrete(&MsgUpdateParams{}, "irismod/service/MsgUpdateParams", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
@@ -54,6 +59,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgKillRequestContext{},
 		&MsgUpdateRequestContext{},
 		&MsgWithdrawEarnedFees{},
+		&MsgUpdateParams{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
