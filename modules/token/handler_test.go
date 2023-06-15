@@ -54,10 +54,11 @@ func (suite *HandlerSuite) SetupTest() {
 	suite.bk = app.BankKeeper
 
 	// set params
-	suite.keeper.SetParamSet(suite.ctx, v1.DefaultParams())
+	err := suite.keeper.SetParams(suite.ctx, v1.DefaultParams())
+	suite.NoError(err)
 
 	// init tokens to addr
-	err := suite.bk.MintCoins(suite.ctx, types.ModuleName, initCoin)
+	err = suite.bk.MintCoins(suite.ctx, types.ModuleName, initCoin)
 	suite.NoError(err)
 	err = suite.bk.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, owner, initCoin)
 	suite.NoError(err)

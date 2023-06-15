@@ -22,11 +22,17 @@ func (suite *KeeperTestSuite) TestGRPCQueryToken() {
 	_ = suite.app.TokenKeeper.AddToken(ctx, token)
 
 	// Query token
-	tokenResp1, err := queryClient.Token(gocontext.Background(), &v1.QueryTokenRequest{Denom: "btc"})
+	tokenResp1, err := queryClient.Token(
+		gocontext.Background(),
+		&v1.QueryTokenRequest{Denom: "btc"},
+	)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(tokenResp1)
 
-	tokenResp2, err := queryClient.Token(gocontext.Background(), &v1.QueryTokenRequest{Denom: "satoshi"})
+	tokenResp2, err := queryClient.Token(
+		gocontext.Background(),
+		&v1.QueryTokenRequest{Denom: "satoshi"},
+	)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(tokenResp2)
 
@@ -56,7 +62,7 @@ func (suite *KeeperTestSuite) TestGRPCQueryParams() {
 	queryClient := v1.NewQueryClient(queryHelper)
 
 	paramsResp, err := queryClient.Params(gocontext.Background(), &v1.QueryParamsRequest{})
-	params := app.TokenKeeper.GetParamSet(ctx)
+	params := app.TokenKeeper.GetParams(ctx)
 	suite.Require().NoError(err)
 	suite.Equal(params, paramsResp.Params)
 }

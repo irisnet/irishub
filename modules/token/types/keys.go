@@ -30,6 +30,7 @@ var (
 	PrefixTokens = []byte{0x03}
 	// PeffixBurnTokenAmt defines a prefix for the amount of token burnt
 	PeffixBurnTokenAmt = []byte{0x04}
+	ParamsKey          = []byte{0x05} // prefix for the token params
 )
 
 // KeySymbol returns the key of the token with the specified symbol

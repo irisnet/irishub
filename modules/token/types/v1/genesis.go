@@ -66,7 +66,7 @@ func GetNativeToken() Token {
 // ValidateGenesis validates the provided token genesis state to ensure the
 // expected invariants holds.
 func ValidateGenesis(data GenesisState) error {
-	if err := ValidateParams(data.Params); err != nil {
+	if err := data.Params.Validate(); err != nil {
 		return err
 	}
 

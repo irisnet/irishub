@@ -10,7 +10,6 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/irisnet/irismod/modules/token/types"
 	v1 "github.com/irisnet/irismod/modules/token/types/v1"
@@ -20,33 +19,28 @@ type Keeper struct {
 	storeKey         storetypes.StoreKey
 	cdc              codec.Codec
 	bankKeeper       types.BankKeeper
-	paramSpace       paramstypes.Subspace
 	blockedAddrs     map[string]bool
 	feeCollectorName string
+	authority        string
 	registry         v1.SwapRegistry
 }
 
 func NewKeeper(
 	cdc codec.Codec,
 	key storetypes.StoreKey,
-	paramSpace paramstypes.Subspace,
 	bankKeeper types.BankKeeper,
 	blockedAddrs map[string]bool,
 	feeCollectorName string,
+	authority string,
 ) Keeper {
-	// set KeyTable if it has not already been set
-	if !paramSpace.HasKeyTable() {
-		paramSpace = paramSpace.WithKeyTable(v1.ParamKeyTable())
-	}
-
 	return Keeper{
 		storeKey:         key,
 		cdc:              cdc,
-		paramSpace:       paramSpace,
 		bankKeeper:       bankKeeper,
 		feeCollectorName: feeCollectorName,
 		blockedAddrs:     blockedAddrs,
 		registry:         make(v1.SwapRegistry),
+		authority:        authority,
 	}
 }
 

@@ -77,9 +77,9 @@ func TestValidateParams(t *testing.T) {
 
 	for _, tc := range tests {
 		if tc.expectPass {
-			require.Nil(t, ValidateParams(tc.Params), "test: %v", tc.testCase)
+			require.Nil(t, tc.Params.Validate(), "test: %v", tc.testCase)
 		} else {
-			require.NotNil(t, ValidateParams(tc.Params), "test: %v", tc.testCase)
+			require.NotNil(t, tc.Params.Validate(), "test: %v", tc.testCase)
 		}
 	}
 }

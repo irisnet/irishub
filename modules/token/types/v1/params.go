@@ -4,25 +4,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
-
-var _ paramtypes.ParamSet = (*Params)(nil)
-
-// parameter keys
-var (
-	KeyTokenTaxRate      = []byte("TokenTaxRate")
-	KeyIssueTokenBaseFee = []byte("IssueTokenBaseFee")
-	KeyMintTokenFeeRatio = []byte("MintTokenFeeRatio")
-)
-
-func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
-	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(KeyTokenTaxRate, &p.TokenTaxRate, validateTaxRate),
-		paramtypes.NewParamSetPair(KeyIssueTokenBaseFee, &p.IssueTokenBaseFee, validateIssueTokenBaseFee),
-		paramtypes.NewParamSetPair(KeyMintTokenFeeRatio, &p.MintTokenFeeRatio, validateMintTokenFeeRatio),
-	}
-}
 
 // NewParams constructs a new Params instance
 func NewParams(tokenTaxRate sdk.Dec, issueTokenBaseFee sdk.Coin,
@@ -33,11 +15,6 @@ func NewParams(tokenTaxRate sdk.Dec, issueTokenBaseFee sdk.Coin,
 		IssueTokenBaseFee: issueTokenBaseFee,
 		MintTokenFeeRatio: mintTokenFeeRatio,
 	}
-}
-
-// ParamKeyTable returns the TypeTable for the token module
-func ParamKeyTable() paramtypes.KeyTable {
-	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
 // DefaultParams return the default params
@@ -51,7 +28,7 @@ func DefaultParams() Params {
 }
 
 // ValidateParams validates the given params
-func ValidateParams(p Params) error {
+func (p Params) Validate() error {
 	if err := validateTaxRate(p.TokenTaxRate); err != nil {
 		return err
 	}

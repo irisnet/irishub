@@ -76,7 +76,7 @@ func (k Keeper) Tokens(
 		pageRes, err = query.Paginate(
 			tokenStore,
 			shapePageRequest(req.Pagination),
-			func(key []byte, value []byte) error {
+			func(_ []byte, value []byte) error {
 				var token v1.Token
 				k.cdc.MustUnmarshal(value, &token)
 				tokens = append(tokens, &token)
@@ -88,7 +88,7 @@ func (k Keeper) Tokens(
 		}
 	} else {
 		tokenStore := prefix.NewStore(store, types.KeyTokens(owner, ""))
-		pageRes, err = query.Paginate(tokenStore, shapePageRequest(req.Pagination), func(key []byte, value []byte) error {
+		pageRes, err = query.Paginate(tokenStore, shapePageRequest(req.Pagination), func(_ []byte, value []byte) error {
 			var symbol gogotypes.StringValue
 			k.cdc.MustUnmarshal(value, &symbol)
 			token, err := k.GetToken(ctx, symbol.Value)
@@ -151,7 +151,7 @@ func (k Keeper) Params(
 	req *v1.QueryParamsRequest,
 ) (*v1.QueryParamsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
-	params := k.GetParamSet(ctx)
+	params := k.GetParams(ctx)
 
 	return &v1.QueryParamsResponse{Params: params}, nil
 }

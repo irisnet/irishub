@@ -29,6 +29,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgBurnToken{}, "irismod/token/v1/MsgBurnToken", nil)
 	cdc.RegisterConcrete(&MsgTransferTokenOwner{}, "irismod/token/v1/MsgTransferTokenOwner", nil)
 	cdc.RegisterConcrete(&MsgSwapFeeToken{}, "irismod/token/v1/MsgSwapFeeToken", nil)
+	cdc.RegisterConcrete(&MsgUpdateParams{}, "irismod/token/MsgUpdateParams", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
@@ -39,6 +40,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgBurnToken{},
 		&MsgTransferTokenOwner{},
 		&MsgSwapFeeToken{},
+		&MsgUpdateParams{},
 	)
 	registry.RegisterInterface(
 		"irismod.token.v1.TokenI",
