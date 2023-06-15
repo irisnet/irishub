@@ -63,7 +63,7 @@ func (k Keeper) GetTokenMintFee(ctx sdk.Context, symbol string) (sdk.Coin, error
 
 func (k Keeper) calcTokenIssueFee(ctx sdk.Context, symbol string) (sdk.Coin, v1.Params) {
 	// get params
-	params := k.GetParam(ctx)
+	params := k.GetParams(ctx)
 	issueTokenBaseFee := params.IssueTokenBaseFee
 
 	// compute the fee
@@ -76,7 +76,7 @@ func (k Keeper) calcTokenIssueFee(ctx sdk.Context, symbol string) (sdk.Coin, v1.
 
 // feeHandler handles the fee of token
 func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) error {
-	params := k.GetParam(ctx)
+	params := k.GetParams(ctx)
 	tokenTaxRate := params.TokenTaxRate
 
 	// compute community tax and burned coin

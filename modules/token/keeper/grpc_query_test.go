@@ -62,7 +62,7 @@ func (suite *KeeperTestSuite) TestGRPCQueryParams() {
 	queryClient := v1.NewQueryClient(queryHelper)
 
 	paramsResp, err := queryClient.Params(gocontext.Background(), &v1.QueryParamsRequest{})
-	params := app.TokenKeeper.GetParam(ctx)
+	params := app.TokenKeeper.GetParams(ctx)
 	suite.Require().NoError(err)
 	suite.Equal(params, paramsResp.Params)
 }

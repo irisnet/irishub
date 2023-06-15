@@ -151,7 +151,7 @@ func (k Keeper) Params(
 	req *v1.QueryParamsRequest,
 ) (*v1.QueryParamsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
-	params := k.GetParam(ctx)
+	params := k.GetParams(ctx)
 
 	return &v1.QueryParamsResponse{Params: params}, nil
 }

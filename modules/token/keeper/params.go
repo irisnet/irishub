@@ -3,17 +3,34 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/irisnet/irismod/modules/token/types"
 	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
-// GetParam returns token params from the global param store
-func (k Keeper) GetParam(ctx sdk.Context) v1.Params {
-	var p v1.Params
-	k.paramSpace.GetParamSet(ctx, &p)
-	return p
+// GetParams sets the token module parameters.
+func (k Keeper) GetParams(ctx sdk.Context) (params v1.Params) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get([]byte(types.ParamsKey))
+	if bz == nil {
+		return params
+	}
+
+	k.cdc.MustUnmarshal(bz, &params)
+	return params
 }
 
-// SetParam sets token params to the global param store
-func (k Keeper) SetParam(ctx sdk.Context, params v1.Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
+// SetParams sets the token module parameters.
+func (k Keeper) SetParams(ctx sdk.Context, params v1.Params) error {
+	if err := params.Validate(); err != nil {
+		return err
+	}
+
+	store := ctx.KVStore(k.storeKey)
+	bz, err := k.cdc.Marshal(&params)
+	if err != nil {
+		return err
+	}
+	store.Set(types.ParamsKey, bz)
+
+	return nil
 }
