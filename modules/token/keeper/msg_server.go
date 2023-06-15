@@ -291,9 +291,9 @@ func (m msgServer) UpdateParams(
 		)
 	}
 
-	// ctx := sdk.UnwrapSDKContext(goCtx)
-	// if err := m.k.SetParamSet(ctx, msg.Params); err != nil {
-	// 	return nil, err
-	// }
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := m.k.SetParams(ctx, msg.Params); err != nil {
+		return nil, err
+	}
 	return &v1.MsgUpdateParamsResponse{}, nil
 }
