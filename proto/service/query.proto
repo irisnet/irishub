@@ -3,6 +3,7 @@ package irismod.service;
 
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
+import "cosmos/query/v1/query.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "service/service.proto";
@@ -13,76 +14,82 @@ option go_package = "github.com/irisnet/irismod/modules/service/types";
 service Query {
   // Definition returns service definition
   rpc Definition(QueryDefinitionRequest) returns (QueryDefinitionResponse) {
-    option (google.api.http).get =
-        "/irismod/service/definitions/{service_name}";
+    option (cosmos.query.v1.module_query_safe) = true;
+    option (google.api.http).get = "/irismod/service/definitions/{service_name}";
   }
 
   // Binding returns service Binding with service name and provider
   rpc Binding(QueryBindingRequest) returns (QueryBindingResponse) {
-    option (google.api.http).get =
-        "/irismod/service/bindings/{service_name}/{provider}";
+    option (cosmos.query.v1.module_query_safe) = true;
+    option (google.api.http).get = "/irismod/service/bindings/{service_name}/{provider}";
   }
 
   // Bindings returns all service Bindings with service name and owner
   rpc Bindings(QueryBindingsRequest) returns (QueryBindingsResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
     option (google.api.http).get = "/irismod/service/bindings/{service_name}";
   }
 
   // WithdrawAddress returns the withdraw address of the binding owner
   rpc WithdrawAddress(QueryWithdrawAddressRequest)
       returns (QueryWithdrawAddressResponse) {
-    option (google.api.http).get =
-        "/irismod/service/owners/{owner}/withdraw-address";
+    option (cosmos.query.v1.module_query_safe) = true;     
+    option (google.api.http).get = "/irismod/service/owners/{owner}/withdraw-address";
   }
 
   // RequestContext returns the request context
   rpc RequestContext(QueryRequestContextRequest)
       returns (QueryRequestContextResponse) {
-    option (google.api.http).get =
-        "/irismod/service/contexts/{request_context_id}";
+    option (cosmos.query.v1.module_query_safe) = true;    
+    option (google.api.http).get = "/irismod/service/contexts/{request_context_id}";
   }
 
   // Request returns the request
   rpc Request(QueryRequestRequest) returns (QueryRequestResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;   
     option (google.api.http).get = "/irismod/service/requests/{request_id}";
   }
 
   // Request returns all requests of one service with provider
   rpc Requests(QueryRequestsRequest) returns (QueryRequestsResponse) {
-    option (google.api.http).get =
-        "/irismod/service/requests/{service_name}/{provider}";
+    option (cosmos.query.v1.module_query_safe) = true;   
+    option (google.api.http).get = "/irismod/service/requests/{service_name}/{provider}";
   }
 
   // RequestsByReqCtx returns all requests of one service call batch
   rpc RequestsByReqCtx(QueryRequestsByReqCtxRequest)
       returns (QueryRequestsByReqCtxResponse) {
-    option (google.api.http).get =
-        "/irismod/service/requests/contexts/{request_context_id}/{batch_counter}";
+    option (cosmos.query.v1.module_query_safe) = true;       
+    option (google.api.http).get = "/irismod/service/requests/contexts/{request_context_id}/{batch_counter}";
   }
 
   // Response returns the response of request
   rpc Response(QueryResponseRequest) returns (QueryResponseResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;   
     option (google.api.http).get = "/irismod/service/responses/{request_id}";
   }
 
   // Responses returns all responses of one service call batch
   rpc Responses(QueryResponsesRequest) returns (QueryResponsesResponse) {
-    option (google.api.http).get =
-        "/irismod/service/responses/{request_context_id}/{batch_counter}";
+    option (cosmos.query.v1.module_query_safe) = true;   
+    option (google.api.http).get = "/irismod/service/responses/{request_context_id}/{batch_counter}";
   }
 
   // EarnedFees returns the earned service fee of one provider
   rpc EarnedFees(QueryEarnedFeesRequest) returns (QueryEarnedFeesResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;   
     option (google.api.http).get = "/irismod/service/fees/{provider}";
   }
 
   // Schema returns the schema
   rpc Schema(QuerySchemaRequest) returns (QuerySchemaResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;   
     option (google.api.http).get = "/irismod/service/schemas/{schema_name}";
   }
 
   // Params queries the service parameters
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;   
     option (google.api.http).get = "/irismod/service/params";
   }
 }
@@ -192,8 +199,7 @@ message QueryEarnedFeesRequest { string provider = 1; }
 message QueryEarnedFeesResponse {
   repeated cosmos.base.v1beta1.Coin fees = 1 [
     (gogoproto.nullable) = false,
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
-    (gogoproto.moretags) = "yaml:\"service_fee\""
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
 }
 

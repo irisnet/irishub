@@ -13,7 +13,7 @@ import (
 )
 
 type msgServer struct {
-	Keeper
+	k Keeper
 }
 
 var _ types.MsgServer = msgServer{}
@@ -21,7 +21,7 @@ var _ types.MsgServer = msgServer{}
 // NewMsgServerImpl returns an implementation of the service MsgServer interface
 // for the provided Keeper.
 func NewMsgServerImpl(keeper Keeper) types.MsgServer {
-	return &msgServer{Keeper: keeper}
+	return &msgServer{k: keeper}
 }
 
 // DefineService handles MsgDefineService
@@ -35,7 +35,7 @@ func (m msgServer) DefineService(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.AddServiceDefinition(
+	if err := m.k.AddServiceDefinition(
 		ctx, msg.Name, msg.Description, msg.Tags, author,
 		msg.AuthorDescription, msg.Schemas,
 	); err != nil {
@@ -63,7 +63,7 @@ func (m msgServer) BindService(
 	goCtx context.Context,
 	msg *types.MsgBindService,
 ) (*types.MsgBindServiceResponse, error) {
-	if _, _, found := m.Keeper.GetModuleServiceByServiceName(msg.ServiceName); found {
+	if _, _, found := m.k.GetModuleServiceByServiceName(msg.ServiceName); found {
 		return nil, sdkerrors.Wrapf(
 			types.ErrBindModuleService,
 			"module service %s",
@@ -81,7 +81,7 @@ func (m msgServer) BindService(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.AddServiceBinding(
+	if err := m.k.AddServiceBinding(
 		ctx, msg.ServiceName, provider, msg.Deposit,
 		msg.Pricing, msg.QoS, msg.Options, owner,
 	); err != nil {
@@ -120,7 +120,7 @@ func (m msgServer) UpdateServiceBinding(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.UpdateServiceBinding(
+	if err := m.k.UpdateServiceBinding(
 		ctx, msg.ServiceName, provider, msg.Deposit,
 		msg.Pricing, msg.QoS, msg.Options, owner,
 	); err != nil {
@@ -158,7 +158,7 @@ func (m msgServer) SetWithdrawAddress(
 		return nil, err
 	}
 
-	if m.Keeper.blockedAddrs[msg.WithdrawAddress] {
+	if m.k.blockedAddrs[msg.WithdrawAddress] {
 		return nil, sdkerrors.Wrapf(
 			sdkerrors.ErrUnauthorized,
 			"%s is a module account",
@@ -167,7 +167,7 @@ func (m msgServer) SetWithdrawAddress(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	m.Keeper.SetWithdrawAddress(ctx, owner, withdrawAddress)
+	m.k.SetWithdrawAddress(ctx, owner, withdrawAddress)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
@@ -200,7 +200,7 @@ func (m msgServer) EnableServiceBinding(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.EnableServiceBinding(ctx, msg.ServiceName, provider, msg.Deposit, owner); err != nil {
+	if err := m.k.EnableServiceBinding(ctx, msg.ServiceName, provider, msg.Deposit, owner); err != nil {
 		return nil, err
 	}
 
@@ -236,7 +236,7 @@ func (m msgServer) DisableServiceBinding(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.DisableServiceBinding(ctx, msg.ServiceName, provider, owner); err != nil {
+	if err := m.k.DisableServiceBinding(ctx, msg.ServiceName, provider, owner); err != nil {
 		return nil, err
 	}
 
@@ -272,7 +272,7 @@ func (m msgServer) RefundServiceDeposit(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.RefundDeposit(ctx, msg.ServiceName, provider, owner); err != nil {
+	if err := m.k.RefundDeposit(ctx, msg.ServiceName, provider, owner); err != nil {
 		return nil, err
 	}
 
@@ -307,7 +307,7 @@ func (m msgServer) CallService(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	_, moduleService, found := m.Keeper.GetModuleServiceByServiceName(msg.ServiceName)
+	_, moduleService, found := m.k.GetModuleServiceByServiceName(msg.ServiceName)
 	if !found {
 		pds := make([]sdk.AccAddress, len(msg.Providers))
 		for i, provider := range msg.Providers {
@@ -318,7 +318,7 @@ func (m msgServer) CallService(
 			pds[i] = pd
 		}
 
-		if reqContextID, err = m.Keeper.CreateRequestContext(
+		if reqContextID, err = m.k.CreateRequestContext(
 			ctx, msg.ServiceName, pds, consumer,
 			msg.Input, msg.ServiceFeeCap, msg.Timeout,
 			msg.Repeated, msg.RepeatedFrequency,
@@ -327,14 +327,14 @@ func (m msgServer) CallService(
 			return nil, err
 		}
 	} else {
-		if reqContextID, err = m.Keeper.CreateRequestContext(
+		if reqContextID, err = m.k.CreateRequestContext(
 			ctx, msg.ServiceName, []sdk.AccAddress{moduleService.Provider}, consumer,
 			msg.Input, msg.ServiceFeeCap, 1, false, 0, 0, types.RUNNING, 0, "",
 		); err != nil {
 			return nil, err
 		}
 
-		if err := m.Keeper.RequestModuleService(ctx, moduleService, reqContextID, consumer, msg.Input); err != nil {
+		if err := m.k.RequestModuleService(ctx, moduleService, reqContextID, consumer, msg.Input); err != nil {
 			return nil, err
 		}
 	}
@@ -374,7 +374,7 @@ func (m msgServer) RespondService(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	request, _, err := m.Keeper.AddResponse(ctx, requestId, provider, msg.Result, msg.Output)
+	request, _, err := m.k.AddResponse(ctx, requestId, provider, msg.Result, msg.Output)
 	if err != nil {
 		return nil, err
 	}
@@ -413,11 +413,11 @@ func (m msgServer) PauseRequestContext(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.CheckAuthority(ctx, consumer, requestContextId, true); err != nil {
+	if err := m.k.CheckAuthority(ctx, consumer, requestContextId, true); err != nil {
 		return nil, err
 	}
 
-	if err := m.Keeper.PauseRequestContext(ctx, requestContextId, consumer); err != nil {
+	if err := m.k.PauseRequestContext(ctx, requestContextId, consumer); err != nil {
 		return nil, err
 	}
 
@@ -452,11 +452,11 @@ func (m msgServer) StartRequestContext(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.CheckAuthority(ctx, consumer, requestContextId, true); err != nil {
+	if err := m.k.CheckAuthority(ctx, consumer, requestContextId, true); err != nil {
 		return nil, err
 	}
 
-	if err := m.Keeper.StartRequestContext(ctx, requestContextId, consumer); err != nil {
+	if err := m.k.StartRequestContext(ctx, requestContextId, consumer); err != nil {
 		return nil, err
 	}
 
@@ -491,11 +491,11 @@ func (m msgServer) KillRequestContext(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.CheckAuthority(ctx, consumer, requestContextId, true); err != nil {
+	if err := m.k.CheckAuthority(ctx, consumer, requestContextId, true); err != nil {
 		return nil, err
 	}
 
-	if err := m.Keeper.KillRequestContext(ctx, requestContextId, consumer); err != nil {
+	if err := m.k.KillRequestContext(ctx, requestContextId, consumer); err != nil {
 		return nil, err
 	}
 
@@ -531,7 +531,7 @@ func (m msgServer) UpdateRequestContext(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.CheckAuthority(ctx, consumer, requestContextId, true); err != nil {
+	if err := m.k.CheckAuthority(ctx, consumer, requestContextId, true); err != nil {
 		return nil, err
 	}
 
@@ -544,7 +544,7 @@ func (m msgServer) UpdateRequestContext(
 		pds[i] = pd
 	}
 
-	if err := m.Keeper.UpdateRequestContext(
+	if err := m.k.UpdateRequestContext(
 		ctx, requestContextId, pds, 0, msg.ServiceFeeCap,
 		msg.Timeout, msg.RepeatedFrequency, msg.RepeatedTotal, consumer,
 	); err != nil {
@@ -582,7 +582,7 @@ func (m msgServer) WithdrawEarnedFees(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.WithdrawEarnedFees(ctx, owner, provider); err != nil {
+	if err := m.k.WithdrawEarnedFees(ctx, owner, provider); err != nil {
 		return nil, err
 	}
 
@@ -600,4 +600,24 @@ func (m msgServer) WithdrawEarnedFees(
 	})
 
 	return &types.MsgWithdrawEarnedFeesResponse{}, nil
+}
+
+func (m msgServer) UpdateParams(
+	goCtx context.Context,
+	msg *types.MsgUpdateParams,
+) (*types.MsgUpdateParamsResponse, error) {
+	if m.k.authority != msg.Authority {
+		return nil, sdkerrors.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"invalid authority; expected %s, got %s",
+			m.k.authority,
+			msg.Authority,
+		)
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := m.k.SetParams(ctx, msg.Params); err != nil {
+		return nil, err
+	}
+	return &types.MsgUpdateParamsResponse{}, nil
 }

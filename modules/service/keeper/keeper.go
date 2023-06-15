@@ -9,7 +9,6 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/irisnet/irismod/modules/service/types"
 )
@@ -20,9 +19,9 @@ type Keeper struct {
 	cdc              codec.Codec
 	accountKeeper    types.AccountKeeper
 	bankKeeper       types.BankKeeper
-	paramSpace       paramstypes.Subspace
 	blockedAddrs     map[string]bool
-	feeCollectorName string                            // name of the fee collector
+	feeCollectorName string
+	authority        string                            // name of the fee collector
 	respCallbacks    map[string]types.ResponseCallback // used to map the module name to response callback
 	stateCallbacks   map[string]types.StateCallback    // used to map the module name to state callback
 	moduleServices   map[string]*types.ModuleService   // used to map the module name to module service
@@ -34,9 +33,9 @@ func NewKeeper(
 	key storetypes.StoreKey,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-	paramSpace paramstypes.Subspace,
 	blockedAddrs map[string]bool,
 	feeCollectorName string,
+	authority string,
 ) Keeper {
 	// ensure service module accounts are set
 	if addr := accountKeeper.GetModuleAddress(types.DepositAccName); addr == nil {
@@ -47,19 +46,14 @@ func NewKeeper(
 		panic(fmt.Sprintf("%s module account has not been set", types.RequestAccName))
 	}
 
-	// set KeyTable if it has not already been set
-	if !paramSpace.HasKeyTable() {
-		paramSpace = paramSpace.WithKeyTable(ParamKeyTable())
-	}
-
 	keeper := Keeper{
 		storeKey:         key,
 		cdc:              cdc,
 		accountKeeper:    accountKeeper,
 		bankKeeper:       bankKeeper,
-		paramSpace:       paramSpace,
 		blockedAddrs:     blockedAddrs,
 		feeCollectorName: feeCollectorName,
+		authority:        authority,
 	}
 
 	keeper.respCallbacks = make(map[string]types.ResponseCallback)

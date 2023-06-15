@@ -475,9 +475,9 @@ func NewSimApp(
 		keys[servicetypes.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
-		app.GetSubspace(servicetypes.ModuleName),
 		app.ModuleAccountAddrs(),
 		servicetypes.FeeCollectorName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.OracleKeeper = oracleKeeper.NewKeeper(
@@ -634,7 +634,13 @@ func NewSimApp(
 			app.BankKeeper,
 			app.GetSubspace(coinswaptypes.ModuleName),
 		),
-		service.NewAppModule(appCodec, app.ServiceKeeper, app.AccountKeeper, app.BankKeeper),
+		service.NewAppModule(
+			appCodec,
+			app.ServiceKeeper,
+			app.AccountKeeper,
+			app.BankKeeper,
+			app.GetSubspace(servicetypes.ModuleName),
+		),
 		oracle.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper),
 		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
 		farm.NewAppModule(
@@ -1072,7 +1078,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(recordtypes.ModuleName)
 	paramsKeeper.Subspace(htlctypes.ModuleName).WithKeyTable(htlctypes.ParamKeyTable())
 	paramsKeeper.Subspace(coinswaptypes.ModuleName).WithKeyTable(coinswaptypes.ParamKeyTable())
-	paramsKeeper.Subspace(servicetypes.ModuleName)
+	paramsKeeper.Subspace(servicetypes.ModuleName).WithKeyTable(servicetypes.ParamKeyTable())
 	paramsKeeper.Subspace(farmtypes.ModuleName).WithKeyTable(farmtypes.ParamKeyTable())
 
 	return paramsKeeper
