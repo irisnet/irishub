@@ -622,7 +622,7 @@ func NewSimApp(
 			app.TokenKeeper,
 			app.AccountKeeper,
 			app.BankKeeper,
-			app.GetSubspace(stakingtypes.ModuleName),
+			app.GetSubspace(tokentypes.ModuleName),
 		),
 		record.NewAppModule(appCodec, app.RecordKeeper, app.AccountKeeper, app.BankKeeper),
 		nft.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
@@ -655,7 +655,7 @@ func NewSimApp(
 			app.FarmKeeper,
 			app.AccountKeeper,
 			app.BankKeeper,
-			app.GetSubspace(coinswaptypes.ModuleName),
+			app.GetSubspace(farmtypes.ModuleName),
 		),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 	)
