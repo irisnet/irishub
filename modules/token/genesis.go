@@ -15,7 +15,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data v1.GenesisState) {
 		panic(err.Error())
 	}
 
-	k.SetParamSet(ctx, data.Params)
+	k.SetParam(ctx, data.Params)
 
 	// init tokens
 	for _, token := range data.Tokens {
@@ -43,7 +43,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *v1.GenesisState {
 		tokens = append(tokens, *t)
 	}
 	return &v1.GenesisState{
-		Params:      k.GetParamSet(ctx),
+		Params:      k.GetParam(ctx),
 		Tokens:      tokens,
 		BurnedCoins: k.GetAllBurnCoin(ctx),
 	}

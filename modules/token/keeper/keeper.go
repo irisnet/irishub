@@ -23,6 +23,7 @@ type Keeper struct {
 	paramSpace       paramstypes.Subspace
 	blockedAddrs     map[string]bool
 	feeCollectorName string
+	authority        string
 	registry         v1.SwapRegistry
 }
 
@@ -33,6 +34,7 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	blockedAddrs map[string]bool,
 	feeCollectorName string,
+	authority string,
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !paramSpace.HasKeyTable() {
@@ -47,6 +49,7 @@ func NewKeeper(
 		feeCollectorName: feeCollectorName,
 		blockedAddrs:     blockedAddrs,
 		registry:         make(v1.SwapRegistry),
+		authority:        authority,
 	}
 }
 

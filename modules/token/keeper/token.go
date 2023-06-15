@@ -183,18 +183,6 @@ func (k Keeper) GetAllBurnCoin(ctx sdk.Context) []sdk.Coin {
 	return coins
 }
 
-// GetParamSet returns token params from the global param store
-func (k Keeper) GetParamSet(ctx sdk.Context) v1.Params {
-	var p v1.Params
-	k.paramSpace.GetParamSet(ctx, &p)
-	return p
-}
-
-// SetParamSet sets token params to the global param store
-func (k Keeper) SetParamSet(ctx sdk.Context, params v1.Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
-}
-
 func (k Keeper) setWithOwner(ctx sdk.Context, owner sdk.AccAddress, symbol string) {
 	store := ctx.KVStore(k.storeKey)
 

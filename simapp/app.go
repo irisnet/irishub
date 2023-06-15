@@ -436,6 +436,7 @@ func NewSimApp(
 		app.BankKeeper,
 		app.ModuleAccountAddrs(),
 		authtypes.FeeCollectorName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	app.RecordKeeper = recordkeeper.NewKeeper(appCodec, keys[recordtypes.StoreKey])
 

@@ -4,6 +4,7 @@ package irismod.token.v1;
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
+import "cosmos/query/v1/query.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
@@ -15,22 +16,27 @@ option go_package = "github.com/irisnet/irismod/modules/token/types/v1";
 service Query {
   // Token returns token with token name
   rpc Token(QueryTokenRequest) returns (QueryTokenResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
     option (google.api.http).get = "/irismod/token/v1/tokens/{denom}";
   }
   // Tokens returns the token list
   rpc Tokens(QueryTokensRequest) returns (QueryTokensResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
     option (google.api.http).get = "/irismod/token/v1/tokens";
   }
   // Fees returns the fees to issue or mint a token
   rpc Fees(QueryFeesRequest) returns (QueryFeesResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
     option (google.api.http).get = "/irismod/token/v1/tokens/{symbol}/fees";
   }
   // Params queries the token parameters
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
     option (google.api.http).get = "/irismod/token/v1/params";
   }
   // TotalBurn queries all the burnt coins
   rpc TotalBurn(QueryTotalBurnRequest) returns (QueryTotalBurnResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
     option (google.api.http).get = "/irismod/token/v1/total_burn";
   }
 }
@@ -40,8 +46,7 @@ message QueryTokenRequest { string denom = 1; }
 
 // QueryTokenResponse is response type for the Query/Token RPC method
 message QueryTokenResponse {
-  google.protobuf.Any Token = 1
-      [ (cosmos_proto.accepts_interface) = "ContentI" ];
+  google.protobuf.Any token = 1 [ (cosmos_proto.accepts_interface) = "ContentI" ];
 }
 
 // QueryTokensRequest is request type for the Query/Tokens RPC method
@@ -53,9 +58,7 @@ message QueryTokensRequest {
 
 // QueryTokensResponse is response type for the Query/Tokens RPC method
 message QueryTokensResponse {
-  repeated google.protobuf.Any Tokens = 1
-      [ (cosmos_proto.accepts_interface) = "ContentI" ];
-
+  repeated google.protobuf.Any tokens = 1 [ (cosmos_proto.accepts_interface) = "ContentI" ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

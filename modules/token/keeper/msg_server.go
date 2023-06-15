@@ -11,7 +11,7 @@ import (
 )
 
 type msgServer struct {
-	Keeper
+	k Keeper
 }
 
 var _ v1.MsgServer = msgServer{}
@@ -19,27 +19,30 @@ var _ v1.MsgServer = msgServer{}
 // NewMsgServerImpl returns an implementation of the token MsgServer interface
 // for the provided Keeper.
 func NewMsgServerImpl(keeper Keeper) v1.MsgServer {
-	return &msgServer{Keeper: keeper}
+	return &msgServer{k: keeper}
 }
 
-func (m msgServer) IssueToken(goCtx context.Context, msg *v1.MsgIssueToken) (*v1.MsgIssueTokenResponse, error) {
+func (m msgServer) IssueToken(
+	goCtx context.Context,
+	msg *v1.MsgIssueToken,
+) (*v1.MsgIssueTokenResponse, error) {
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
 		return nil, err
 	}
 
-	if m.Keeper.blockedAddrs[msg.Owner] {
+	if m.k.blockedAddrs[msg.Owner] {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.Owner)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// handle fee for token
-	if err := m.Keeper.DeductIssueTokenFee(ctx, owner, msg.Symbol); err != nil {
+	if err := m.k.DeductIssueTokenFee(ctx, owner, msg.Symbol); err != nil {
 		return nil, err
 	}
 
-	if err := m.Keeper.IssueToken(
+	if err := m.k.IssueToken(
 		ctx, msg.Symbol, msg.Name, msg.MinUnit, msg.Scale,
 		msg.InitialSupply, msg.MaxSupply, msg.Mintable, owner,
 	); err != nil {
@@ -62,7 +65,10 @@ func (m msgServer) IssueToken(goCtx context.Context, msg *v1.MsgIssueToken) (*v1
 	return &v1.MsgIssueTokenResponse{}, nil
 }
 
-func (m msgServer) EditToken(goCtx context.Context, msg *v1.MsgEditToken) (*v1.MsgEditTokenResponse, error) {
+func (m msgServer) EditToken(
+	goCtx context.Context,
+	msg *v1.MsgEditToken,
+) (*v1.MsgEditTokenResponse, error) {
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
 		return nil, err
@@ -70,7 +76,7 @@ func (m msgServer) EditToken(goCtx context.Context, msg *v1.MsgEditToken) (*v1.M
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if err := m.Keeper.EditToken(
+	if err := m.k.EditToken(
 		ctx, msg.Symbol, msg.Name,
 		msg.MaxSupply, msg.Mintable, owner,
 	); err != nil {
@@ -93,7 +99,10 @@ func (m msgServer) EditToken(goCtx context.Context, msg *v1.MsgEditToken) (*v1.M
 	return &v1.MsgEditTokenResponse{}, nil
 }
 
-func (m msgServer) MintToken(goCtx context.Context, msg *v1.MsgMintToken) (*v1.MsgMintTokenResponse, error) {
+func (m msgServer) MintToken(
+	goCtx context.Context,
+	msg *v1.MsgMintToken,
+) (*v1.MsgMintTokenResponse, error) {
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
 		return nil, err
@@ -110,21 +119,21 @@ func (m msgServer) MintToken(goCtx context.Context, msg *v1.MsgMintToken) (*v1.M
 		recipient = owner
 	}
 
-	if m.Keeper.blockedAddrs[recipient.String()] {
+	if m.k.blockedAddrs[recipient.String()] {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", recipient)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	symbol, err := m.Keeper.getSymbolByMinUnit(ctx, msg.Coin.Denom)
+	symbol, err := m.k.getSymbolByMinUnit(ctx, msg.Coin.Denom)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := m.Keeper.DeductMintTokenFee(ctx, owner, symbol); err != nil {
+	if err := m.k.DeductMintTokenFee(ctx, owner, symbol); err != nil {
 		return nil, err
 	}
 
-	if err := m.Keeper.MintToken(ctx, msg.Coin, recipient, owner); err != nil {
+	if err := m.k.MintToken(ctx, msg.Coin, recipient, owner); err != nil {
 		return nil, err
 	}
 
@@ -144,14 +153,17 @@ func (m msgServer) MintToken(goCtx context.Context, msg *v1.MsgMintToken) (*v1.M
 	return &v1.MsgMintTokenResponse{}, nil
 }
 
-func (m msgServer) BurnToken(goCtx context.Context, msg *v1.MsgBurnToken) (*v1.MsgBurnTokenResponse, error) {
+func (m msgServer) BurnToken(
+	goCtx context.Context,
+	msg *v1.MsgBurnToken,
+) (*v1.MsgBurnTokenResponse, error) {
 	owner, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.BurnToken(ctx, msg.Coin, owner); err != nil {
+	if err := m.k.BurnToken(ctx, msg.Coin, owner); err != nil {
 		return nil, err
 	}
 
@@ -170,7 +182,10 @@ func (m msgServer) BurnToken(goCtx context.Context, msg *v1.MsgBurnToken) (*v1.M
 	return &v1.MsgBurnTokenResponse{}, nil
 }
 
-func (m msgServer) TransferTokenOwner(goCtx context.Context, msg *v1.MsgTransferTokenOwner) (*v1.MsgTransferTokenOwnerResponse, error) {
+func (m msgServer) TransferTokenOwner(
+	goCtx context.Context,
+	msg *v1.MsgTransferTokenOwner,
+) (*v1.MsgTransferTokenOwnerResponse, error) {
 	srcOwner, err := sdk.AccAddressFromBech32(msg.SrcOwner)
 	if err != nil {
 		return nil, err
@@ -181,13 +196,17 @@ func (m msgServer) TransferTokenOwner(goCtx context.Context, msg *v1.MsgTransfer
 		return nil, err
 	}
 
-	if m.Keeper.blockedAddrs[msg.DstOwner] {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.DstOwner)
+	if m.k.blockedAddrs[msg.DstOwner] {
+		return nil, sdkerrors.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"%s is a module account",
+			msg.DstOwner,
+		)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if err := m.Keeper.TransferTokenOwner(ctx, msg.Symbol, srcOwner, dstOwner); err != nil {
+	if err := m.k.TransferTokenOwner(ctx, msg.Symbol, srcOwner, dstOwner); err != nil {
 		return nil, err
 	}
 
@@ -208,7 +227,10 @@ func (m msgServer) TransferTokenOwner(goCtx context.Context, msg *v1.MsgTransfer
 	return &v1.MsgTransferTokenOwnerResponse{}, nil
 }
 
-func (m msgServer) SwapFeeToken(goCtx context.Context, msg *v1.MsgSwapFeeToken) (*v1.MsgSwapFeeTokenResponse, error) {
+func (m msgServer) SwapFeeToken(
+	goCtx context.Context,
+	msg *v1.MsgSwapFeeToken,
+) (*v1.MsgSwapFeeTokenResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
@@ -221,13 +243,17 @@ func (m msgServer) SwapFeeToken(goCtx context.Context, msg *v1.MsgSwapFeeToken) 
 			return nil, err
 		}
 
-		if m.Keeper.blockedAddrs[msg.Recipient] {
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", recipient)
+		if m.k.blockedAddrs[msg.Recipient] {
+			return nil, sdkerrors.Wrapf(
+				sdkerrors.ErrUnauthorized,
+				"%s is a module account",
+				recipient,
+			)
 		}
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	feePaid, feeGot, err := m.Keeper.SwapFeeToken(ctx, msg.FeePaid, sender, recipient)
+	feePaid, feeGot, err := m.k.SwapFeeToken(ctx, msg.FeePaid, sender, recipient)
 	if err != nil {
 		return nil, err
 	}
@@ -250,4 +276,24 @@ func (m msgServer) SwapFeeToken(goCtx context.Context, msg *v1.MsgSwapFeeToken) 
 	return &v1.MsgSwapFeeTokenResponse{
 		FeeGot: feeGot,
 	}, nil
+}
+
+func (m msgServer) UpdateParams(
+	goCtx context.Context,
+	msg *v1.MsgUpdateParams,
+) (*v1.MsgUpdateParamsResponse, error) {
+	if m.k.authority != msg.Authority {
+		return nil, sdkerrors.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"invalid authority; expected %s, got %s",
+			m.k.authority,
+			msg.Authority,
+		)
+	}
+
+	// ctx := sdk.UnwrapSDKContext(goCtx)
+	// if err := m.k.SetParamSet(ctx, msg.Params); err != nil {
+	// 	return nil, err
+	// }
+	return &v1.MsgUpdateParamsResponse{}, nil
 }

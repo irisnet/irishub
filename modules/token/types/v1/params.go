@@ -19,8 +19,16 @@ var (
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(KeyTokenTaxRate, &p.TokenTaxRate, validateTaxRate),
-		paramtypes.NewParamSetPair(KeyIssueTokenBaseFee, &p.IssueTokenBaseFee, validateIssueTokenBaseFee),
-		paramtypes.NewParamSetPair(KeyMintTokenFeeRatio, &p.MintTokenFeeRatio, validateMintTokenFeeRatio),
+		paramtypes.NewParamSetPair(
+			KeyIssueTokenBaseFee,
+			&p.IssueTokenBaseFee,
+			validateIssueTokenBaseFee,
+		),
+		paramtypes.NewParamSetPair(
+			KeyMintTokenFeeRatio,
+			&p.MintTokenFeeRatio,
+			validateMintTokenFeeRatio,
+		),
 	}
 }
 
@@ -51,7 +59,7 @@ func DefaultParams() Params {
 }
 
 // ValidateParams validates the given params
-func ValidateParams(p Params) error {
+func (p Params) Validate() error {
 	if err := validateTaxRate(p.TokenTaxRate); err != nil {
 		return err
 	}
