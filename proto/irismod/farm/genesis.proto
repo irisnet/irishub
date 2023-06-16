@@ -1,0 +1,16 @@
+syntax = "proto3";
+package irismod.farm;
+
+import "gogoproto/gogo.proto";
+import "irismod/farm/farm.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/farm/types";
+
+// GenesisState defines the genesis information exported by the farm module
+message GenesisState {
+  Params params = 1 [ (gogoproto.nullable) = false ];
+  repeated FarmPool pools = 2 [ (gogoproto.nullable) = false ];
+  repeated FarmInfo farm_infos = 3 [ (gogoproto.nullable) = false ];
+  uint64 sequence = 4;
+  repeated EscrowInfo escrow = 5 [ (gogoproto.nullable) = false ];
+}

@@ -1,0 +1,313 @@
+syntax = "proto3";
+package irismod.service;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "irismod/service/service.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/service/types";
+option (gogoproto.goproto_getters_all) = false;
+
+// Msg defines the oracle Msg service
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // DefineService defines a method for define a new service
+  rpc DefineService(MsgDefineService) returns (MsgDefineServiceResponse);
+
+  // BindService defines a method for bind a server
+  rpc BindService(MsgBindService) returns (MsgBindServiceResponse);
+
+  // UpdateServiceBinding defines a method for update a service binding
+  rpc UpdateServiceBinding(MsgUpdateServiceBinding)
+      returns (MsgUpdateServiceBindingResponse);
+
+  // SetWithdrawAddress defines a method for setting a withdraw address
+  rpc SetWithdrawAddress(MsgSetWithdrawAddress)
+      returns (MsgSetWithdrawAddressResponse);
+
+  // EnableServiceBinding defines a method for enabling a service binding
+  rpc EnableServiceBinding(MsgEnableServiceBinding)
+      returns (MsgEnableServiceBindingResponse);
+
+  // DisableServiceBinding defines a method for disabling a service binding
+  rpc DisableServiceBinding(MsgDisableServiceBinding)
+      returns (MsgDisableServiceBindingResponse);
+
+  // RefundServiceDeposit defines a method for refunding a fee
+  rpc RefundServiceDeposit(MsgRefundServiceDeposit)
+      returns (MsgRefundServiceDepositResponse);
+
+  // CallService defines a method for calling a service
+  rpc CallService(MsgCallService) returns (MsgCallServiceResponse);
+
+  // RespondService defines a method for responding a service
+  rpc RespondService(MsgRespondService) returns (MsgRespondServiceResponse);
+
+  // PauseRequestContext defines a method for pausing a service call
+  rpc PauseRequestContext(MsgPauseRequestContext)
+      returns (MsgPauseRequestContextResponse);
+
+  // StartRequestContext defines a method for starting a service call
+  rpc StartRequestContext(MsgStartRequestContext)
+      returns (MsgStartRequestContextResponse);
+
+  // KillRequestContext defines a method for killing a service call
+  rpc KillRequestContext(MsgKillRequestContext)
+      returns (MsgKillRequestContextResponse);
+
+  // UpdateRequestContext defines a method for updating a service call
+  rpc UpdateRequestContext(MsgUpdateRequestContext)
+      returns (MsgUpdateRequestContextResponse);
+
+  // WithdrawEarnedFees defines a method for Withdrawing a earned fees
+  rpc WithdrawEarnedFees(MsgWithdrawEarnedFees)
+      returns (MsgWithdrawEarnedFeesResponse);
+
+  // UpdateParams defines a governance operation for updating the x/service
+  // module parameters. The authority is defined in the keeper.
+  //
+  // Since: cosmos-sdk 0.47
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+}
+
+// MsgDefineService defines an SDK message for defining a new service
+message MsgDefineService {
+  option (cosmos.msg.v1.signer) = "author";
+
+  string name = 1;
+  string description = 2;
+  repeated string tags = 3;
+  string author = 4 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string author_description = 5;
+  string schemas = 6;
+}
+
+// MsgDefineServiceResponse defines the Msg/DefineService response type
+message MsgDefineServiceResponse {}
+
+// MsgBindService defines an SDK message for binding to an existing service
+message MsgBindService {
+  option (cosmos.msg.v1.signer) = "owner";
+
+  string service_name = 1;
+  string provider = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  repeated cosmos.base.v1beta1.Coin deposit = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  string pricing = 4;
+  uint64 qos = 5 [ (gogoproto.customname) = "QoS" ];
+  string options = 6;
+  string owner = 7 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgBindServiceResponse defines the Msg/BindService response type
+message MsgBindServiceResponse {}
+
+// MsgUpdateServiceBinding defines an SDK message for updating an existing
+// service binding
+message MsgUpdateServiceBinding {
+  option (cosmos.msg.v1.signer) = "owner";
+
+  string service_name = 1;
+  string provider = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  repeated cosmos.base.v1beta1.Coin deposit = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  string pricing = 4;
+  uint64 qos = 5 [ (gogoproto.customname) = "QoS" ];
+  string options = 6;
+  string owner = 7 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgUpdateServiceBindingResponse defines the Msg/UpdateServiceBinding response
+// type
+message MsgUpdateServiceBindingResponse {}
+
+// MsgSetWithdrawAddress defines an SDK message to set the withdrawal address
+// for a provider
+message MsgSetWithdrawAddress {
+  option (cosmos.msg.v1.signer) = "owner";
+
+  string owner = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string withdraw_address = 2
+      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response
+// type
+message MsgSetWithdrawAddressResponse {}
+
+// MsgDisableServiceBinding defines an SDK message to disable a service binding
+message MsgDisableServiceBinding {
+  option (cosmos.msg.v1.signer) = "owner";
+
+  string service_name = 1;
+  string provider = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string owner = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgDisableServiceBindingResponse defines the Msg/DisableServiceBinding
+// response type
+message MsgDisableServiceBindingResponse {}
+
+// MsgEnableServiceBinding defines an SDK message to enable a service binding
+message MsgEnableServiceBinding {
+  option (cosmos.msg.v1.signer) = "owner";
+
+  string service_name = 1;
+  string provider = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  repeated cosmos.base.v1beta1.Coin deposit = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  string owner = 4 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgEnableServiceBindingResponse defines the Msg/EnableServiceBinding response
+// type
+message MsgEnableServiceBindingResponse {}
+
+// MsgRefundServiceDeposit defines an SDK message to refund deposit from a
+// service binding
+message MsgRefundServiceDeposit {
+  option (cosmos.msg.v1.signer) = "owner";
+
+  string service_name = 1;
+  string provider = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string owner = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgRefundServiceDepositResponse defines the Msg/RefundServiceDeposit response
+// type
+message MsgRefundServiceDepositResponse {}
+
+// MsgCallService defines an SDK message to initiate a service request context
+message MsgCallService {
+  option (cosmos.msg.v1.signer) = "consumer";
+
+  string service_name = 1;
+  repeated string providers = 2;
+  string consumer = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string input = 4;
+  repeated cosmos.base.v1beta1.Coin service_fee_cap = 5 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  int64 timeout = 6;
+  bool repeated = 7;
+  uint64 repeated_frequency = 8;
+  int64 repeated_total = 9;
+}
+
+// MsgCallServiceResponse defines the Msg/CallService response type
+message MsgCallServiceResponse { string request_context_id = 1; }
+
+// MsgRespondService defines an SDK message to respond a service request
+message MsgRespondService {
+  option (cosmos.msg.v1.signer) = "provider";
+
+  string request_id = 1;
+  string provider = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string result = 3;
+  string output = 4;
+}
+
+// MsgRespondServiceResponse defines the Msg/RespondService response type
+message MsgRespondServiceResponse {}
+
+// MsgPauseRequestContext defines an SDK message to pause a service request
+message MsgPauseRequestContext {
+  option (cosmos.msg.v1.signer) = "consumer";
+
+  string request_context_id = 1;
+  string consumer = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgPauseRequestContextResponse defines the Msg/PauseRequestContext response
+// type
+message MsgPauseRequestContextResponse {}
+
+// MsgStartRequestContext defines an SDK message to resume a service request
+message MsgStartRequestContext {
+  option (cosmos.msg.v1.signer) = "consumer";
+
+  string request_context_id = 1;
+  string consumer = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgStartRequestContextResponse defines the Msg/StartRequestContext response
+// type
+message MsgStartRequestContextResponse {}
+
+// MsgKillRequestContext defines an SDK message to terminate a service request
+message MsgKillRequestContext {
+  option (cosmos.msg.v1.signer) = "consumer";
+
+  string request_context_id = 1;
+  string consumer = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgKillRequestContextResponse defines the Msg/KillRequestContext response
+// type
+message MsgKillRequestContextResponse {}
+
+// MsgUpdateRequestContext defines an SDK message to update a service request
+// context
+message MsgUpdateRequestContext {
+  option (cosmos.msg.v1.signer) = "consumer";
+
+  string request_context_id = 1;
+  repeated string providers = 2;
+  string consumer = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  repeated cosmos.base.v1beta1.Coin service_fee_cap = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  int64 timeout = 5;
+  uint64 repeated_frequency = 6;
+  int64 repeated_total = 7;
+}
+
+// MsgUpdateRequestContextResponse defines the Msg/UpdateRequestContext response
+// type
+message MsgUpdateRequestContextResponse {}
+
+// MsgWithdrawEarnedFees defines an SDK message to withdraw the fees earned by
+// the provider or owner
+message MsgWithdrawEarnedFees {
+  option (cosmos.msg.v1.signer) = "owner";
+
+  string owner = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string provider = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgWithdrawEarnedFeesResponse defines the Msg/WithdrawEarnedFees response
+// type
+message MsgWithdrawEarnedFeesResponse {}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address that controls the module (defaults to x/service
+  // unless overwritten).
+  string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+
+  // params defines the x/service parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [ (gogoproto.nullable) = false ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParamsResponse {}

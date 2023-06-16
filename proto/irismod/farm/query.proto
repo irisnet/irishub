@@ -1,0 +1,110 @@
+syntax = "proto3";
+package irismod.farm;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "irismod/farm/farm.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/farm/types";
+
+// Query creates service with farm as rpc
+service Query {
+  // FarmPools returns all the farm pool
+  rpc FarmPools(QueryFarmPoolsRequest) returns (QueryFarmPoolsResponse) {
+    option (google.api.http).get = "/irismod/farm/pools";
+  }
+
+  // FarmPool returns the farm pool for the provided id
+  rpc FarmPool(QueryFarmPoolRequest) returns (QueryFarmPoolResponse) {
+    option (google.api.http).get = "/irismod/farm/pool/{id}";
+  }
+
+  // Farmer returns the farmer for the provided farmer address
+  rpc Farmer(QueryFarmerRequest) returns (QueryFarmerResponse) {
+    option (google.api.http).get = "/irismod/farm/farmers/{farmer}";
+  }
+
+  // Params queries the farm parameters
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/irismod/farm/params";
+  }
+}
+
+// QueryFarmPoolsRequest is request type for the Query/FarmPools RPC method
+message QueryFarmPoolsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
+}
+
+// FarmPoolEntry defines the properties of farm pool
+message FarmPoolEntry {
+  string id = 1;
+  string creator = 2;
+  string description = 3;
+  int64 start_height = 4;
+  int64 end_height = 5;
+  bool editable = 6;
+  bool expired = 7;
+  cosmos.base.v1beta1.Coin total_lpt_locked = 8 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+    (gogoproto.nullable) = false
+  ];
+  repeated cosmos.base.v1beta1.Coin total_reward = 9 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable) = false
+  ];
+  repeated cosmos.base.v1beta1.Coin remaining_reward = 10 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable) = false
+  ];
+  repeated cosmos.base.v1beta1.Coin reward_per_block = 11 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// QueryFarmPoolsResponse is response type for the Query/FarmPools RPC method
+message QueryFarmPoolsResponse {
+  repeated FarmPoolEntry pools = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryFarmPoolsRequest is request type for the Query/FarmPool RPC method
+message QueryFarmPoolRequest { string id = 1; }
+
+// QueryFarmPoolResponse is response type for the Query/FarmPool RPC method
+message QueryFarmPoolResponse { FarmPoolEntry pool = 1; }
+
+// QueryFarmerRequest is request type for the Query/Farmer RPC method
+message QueryFarmerRequest {
+  string farmer = 1;
+  string pool_id = 2;
+}
+
+// QueryFarmerResponse is response type for the Query/Farmer RPC method
+message QueryFarmerResponse {
+  repeated LockedInfo list = 1;
+  int64 height = 2;
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method
+message QueryParamsResponse {
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}
+
+// LockedInfo defines the information of the farmer's current pledge
+message LockedInfo {
+  string pool_id = 1;
+  cosmos.base.v1beta1.Coin locked = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+    (gogoproto.nullable) = false
+  ];
+  repeated cosmos.base.v1beta1.Coin pending_reward = 3 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable) = false
+  ];
+}
