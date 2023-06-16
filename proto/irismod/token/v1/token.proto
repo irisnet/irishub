@@ -1,0 +1,40 @@
+syntax = "proto3";
+package irismod.token.v1;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/token/types/v1";
+option (gogoproto.goproto_getters_all) = false;
+
+// Token defines a standard for the fungible token
+message Token {
+  option (gogoproto.goproto_getters) = false;
+
+  string symbol = 1;
+  string name = 2;
+  uint32 scale = 3;
+  string min_unit = 4;
+  uint64 initial_supply = 5;
+  uint64 max_supply = 6;
+  bool mintable = 7;
+  string owner = 8;
+}
+
+// Params defines token module's parameters
+message Params {
+  option (gogoproto.equal) = true;
+
+  string token_tax_rate = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  cosmos.base.v1beta1.Coin issue_token_base_fee = 2
+      [ (gogoproto.nullable) = false ];
+
+  string mint_token_fee_ratio = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+}

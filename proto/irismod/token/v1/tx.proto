@@ -1,0 +1,146 @@
+syntax = "proto3";
+package irismod.token.v1;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "irismod/token/v1/token.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/token/types/v1";
+option (gogoproto.goproto_getters_all) = false;
+
+// Msg defines the oracle Msg service
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // IssueToken defines a method for issuing a new token
+  rpc IssueToken(MsgIssueToken) returns (MsgIssueTokenResponse);
+
+  // EditToken defines a method for editing a token
+  rpc EditToken(MsgEditToken) returns (MsgEditTokenResponse);
+
+  // MintToken defines a method for minting some tokens
+  rpc MintToken(MsgMintToken) returns (MsgMintTokenResponse);
+
+  // BurnToken defines a method for burning some tokens
+  rpc BurnToken(MsgBurnToken) returns (MsgBurnTokenResponse);
+
+  // TransferTokenOwner defines a method for transfering token owner
+  rpc TransferTokenOwner(MsgTransferTokenOwner)
+      returns (MsgTransferTokenOwnerResponse);
+
+  // SwapFeeToken defines a method for swap some fee token
+  rpc SwapFeeToken(MsgSwapFeeToken) returns (MsgSwapFeeTokenResponse);
+
+  // UpdateParams defines a governance operation for updating the token
+  // module parameters. The authority is defined in the keeper.
+  //
+  // Since: cosmos-sdk 0.47
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+}
+
+// MsgIssueToken defines an SDK message for issuing a new token
+message MsgIssueToken {
+  option (cosmos.msg.v1.signer) = "owner";
+
+  string symbol = 1;
+  string name = 2;
+  uint32 scale = 3;
+  string min_unit = 4;
+  uint64 initial_supply = 5;
+  uint64 max_supply = 6;
+  bool mintable = 7;
+  string owner = 8 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgIssueTokenResponse defines the Msg/IssueToken response type
+message MsgIssueTokenResponse {}
+
+// MsgTransferTokenOwner defines an SDK message for transferring the token owner
+message MsgTransferTokenOwner {
+  option (cosmos.msg.v1.signer) = "src_owner";
+
+  string src_owner = 1;
+  string dst_owner = 2;
+  string symbol = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgTransferTokenOwnerResponse defines the Msg/TransferTokenOwner response
+// type
+message MsgTransferTokenOwnerResponse {}
+
+// MsgEditToken defines an SDK message for editing a new token
+message MsgEditToken {
+  option (cosmos.msg.v1.signer) = "owner";
+
+  string symbol = 1;
+  string name = 2;
+  uint64 max_supply = 3;
+  string mintable = 4
+      [ (gogoproto.casttype) =
+            "github.com/irisnet/irismod/modules/token/types.Bool" ];
+  string owner = 5 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgEditTokenResponse defines the Msg/EditToken response type
+message MsgEditTokenResponse {}
+
+// MsgMintToken defines an SDK message for minting a new token
+message MsgMintToken {
+  option (cosmos.msg.v1.signer) = "owner";
+
+  cosmos.base.v1beta1.Coin coin = 1 [ (gogoproto.nullable) = false ];
+  string to = 2;
+  string owner = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgMintTokenResponse defines the Msg/MintToken response type
+message MsgMintTokenResponse {}
+
+// MsgBurnToken defines an SDK message for burning some tokens
+message MsgBurnToken {
+  option (cosmos.msg.v1.signer) = "sender";
+
+  cosmos.base.v1beta1.Coin coin = 1 [ (gogoproto.nullable) = false ];
+  string sender = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgBurnTokenResponse defines the Msg/BurnToken response type
+message MsgBurnTokenResponse {}
+
+// MsgSwapFeeToken defines an SDK message for swap fee token
+message MsgSwapFeeToken {
+  option (cosmos.msg.v1.signer) = "sender";
+
+  cosmos.base.v1beta1.Coin fee_paid = 1 [ (gogoproto.nullable) = false ];
+  string recipient = 2;
+  string sender = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgSwapFeeTokenResponse defines the Msg/SwapFeeToken response type
+message MsgSwapFeeTokenResponse {
+  cosmos.base.v1beta1.Coin fee_got = 1 [ (gogoproto.nullable) = false ];
+}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address that controls the module (defaults to token unless
+  // overwritten).
+  string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+
+  // params defines the token parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [ (gogoproto.nullable) = false ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParamsResponse {}

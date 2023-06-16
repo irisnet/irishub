@@ -1,0 +1,119 @@
+syntax = "proto3";
+package irismod.mt;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "irismod/mt/mt.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/mt/types";
+
+// Query defines the gRPC querier service for MT module
+service Query {
+  // Supply queries the total supply of a given denom or owner
+  rpc Supply(QuerySupplyRequest) returns (QuerySupplyResponse) {
+    option (google.api.http).get = "/irismod/mt/denoms/supply";
+  }
+
+  // Denoms queries all the denoms
+  rpc Denoms(QueryDenomsRequest) returns (QueryDenomsResponse) {
+    option (google.api.http).get = "/irismod/mt/denoms";
+  }
+
+  // Denom queries the definition of a given denom ID
+  rpc Denom(QueryDenomRequest) returns (QueryDenomResponse) {
+    option (google.api.http).get = "/irismod/mt/denoms/{denom_id}";
+  }
+
+  // MTSupply queries the total supply of given denom and mt ID
+  rpc MTSupply(QueryMTSupplyRequest) returns (QueryMTSupplyResponse) {
+    option (google.api.http).get = "/irismod/mt/mts/{denom_id}/{mt_id}/supply";
+  }
+
+  // MTs queries all the MTs of a given denom ID
+  rpc MTs(QueryMTsRequest) returns (QueryMTsResponse) {
+    option (google.api.http).get = "/irismod/mt/mts/{denom_id}";
+  }
+
+  // MT queries the MT of the given denom and mt ID
+  rpc MT(QueryMTRequest) returns (QueryMTResponse) {
+    option (google.api.http).get = "/irismod/mt/mts/{denom_id}/{mt_id}";
+  }
+
+  // Balances queries the MT balances of a specified owner
+  rpc Balances(QueryBalancesRequest) returns (QueryBalancesResponse) {
+    option (google.api.http).get = "/irismod/mt/mts/{owner}/balances";
+  }
+}
+
+// QuerySupplyRequest is the request type for the Query RPC method
+message QuerySupplyRequest {
+  string denom_id = 1;
+  string owner = 2;
+}
+
+// QuerySupplyResponse is the response type for the Query/Supply RPC method
+message QuerySupplyResponse { uint64 amount = 1; }
+
+// QueryDenomsRequest is the request type for the Query/Denoms RPC method
+message QueryDenomsRequest {
+  // pagination defines an optional pagination for the request.
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryDenomsResponse is the response type for the Query/Denoms RPC method
+message QueryDenomsResponse {
+  repeated Denom denoms = 1 [ (gogoproto.nullable) = false ];
+
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryDenomRequest is the request type for the Query/Denom RPC method
+message QueryDenomRequest { string denom_id = 1; }
+
+// QueryDenomResponse is the response type for the Query/Denom RPC method
+message QueryDenomResponse { Denom denom = 1; }
+
+message QueryMTSupplyRequest {
+  string denom_id = 1;
+  string mt_id = 2;
+}
+
+message QueryMTSupplyResponse { uint64 amount = 1; }
+
+// QueryMTsRequest is the request type for the Query/MTs RPC method
+message QueryMTsRequest {
+  string denom_id = 1;
+  // pagination defines an optional pagination for the request.
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryMTsResponse is the response type for the Query/MTs RPC method
+message QueryMTsResponse {
+  repeated MT mts = 1 [ (gogoproto.nullable) = false ];
+
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryMTRequest is the request type for the Query/MT RPC method
+message QueryMTRequest {
+  string denom_id = 1;
+  string mt_id = 2;
+}
+
+// QueryMTResponse is the response type for the Query/MT RPC method
+message QueryMTResponse { MT mt = 1; }
+
+// QueryBalancesRequest is the request type for the Query/Balances RPC method
+message QueryBalancesRequest {
+  string owner = 1;
+  string denom_id = 2;
+  // pagination defines an optional pagination for the request.
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
+}
+
+// QueryBalancesResponse is the response type for the Query/Balances RPC method
+message QueryBalancesResponse {
+  repeated Balance balance = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

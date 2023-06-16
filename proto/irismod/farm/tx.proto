@@ -1,0 +1,200 @@
+syntax = "proto3";
+package irismod.farm;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "irismod/farm/farm.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/farm/types";
+option (gogoproto.goproto_getters_all) = false;
+
+// Msg defines the farm Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // CreatePool defines a method for creating a new farm pool
+  rpc CreatePool(MsgCreatePool) returns (MsgCreatePoolResponse);
+
+  // CreatePoolWithCommunityPool defines a method for creating a new farm pool
+  rpc CreatePoolWithCommunityPool(MsgCreatePoolWithCommunityPool)
+      returns (MsgCreatePoolWithCommunityPoolResponse);
+
+  // DestroyPool defines a method for destroying a existed farm pool
+  rpc DestroyPool(MsgDestroyPool) returns (MsgDestroyPoolResponse);
+
+  // AdjustPool defines a method for adjusting the farm pool params
+  rpc AdjustPool(MsgAdjustPool) returns (MsgAdjustPoolResponse);
+
+  // Stake defines a method for staking some lp token to a farm pool
+  rpc Stake(MsgStake) returns (MsgStakeResponse);
+
+  // Unstake defines a method for unstaking some lp token from a farm pool and
+  // withdraw some reward
+  rpc Unstake(MsgUnstake) returns (MsgUnstakeResponse);
+
+  // Harvest defines a method withdraw some reward from a farm pool
+  rpc Harvest(MsgHarvest) returns (MsgHarvestResponse);
+
+  // UpdateParams defines a governance operation for updating the x/coinswap
+  // module parameters. The authority is defined in the keeper.
+  //
+  // Since: cosmos-sdk 0.47
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+}
+
+// MsgCreatePool defines a msg for creating a new farm pool
+message MsgCreatePool {
+  option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "creator";
+
+  string description = 1;
+  string lpt_denom = 2;
+  int64 start_height = 3;
+  repeated cosmos.base.v1beta1.Coin reward_per_block = 4 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable) = false
+  ];
+  repeated cosmos.base.v1beta1.Coin total_reward = 5 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable) = false
+  ];
+  bool editable = 6;
+  string creator = 7 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgCreatePoolWithCommunityPool defines a msg for creating a new farm pool by
+// proposal
+message MsgCreatePoolWithCommunityPool {
+  option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "proposer";
+
+  CommunityPoolCreateFarmProposal content = 1 [ (gogoproto.nullable) = false ];
+  repeated cosmos.base.v1beta1.Coin initial_deposit = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  string proposer = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgDestroyPool defines a msg for destroying a existed farm pool
+message MsgDestroyPool {
+  option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "creator";
+
+  string pool_id = 1;
+  string creator = 2;
+}
+
+// MsgAdjustPool defines a msg for adjusting the farm pool params
+message MsgAdjustPool {
+  option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "creator";
+
+  string pool_id = 1;
+  repeated cosmos.base.v1beta1.Coin additional_reward = 2 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable) = false
+  ];
+  repeated cosmos.base.v1beta1.Coin reward_per_block = 3 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable) = false
+  ];
+  string creator = 4 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgStake defines a msg for staking some lp token to a farm pool
+message MsgStake {
+  option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string pool_id = 1;
+  cosmos.base.v1beta1.Coin amount = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+    (gogoproto.nullable) = false
+  ];
+  string sender = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgUnstake defines a msg for unstaking some lp token from a farm pool and
+// withdraw some reward
+message MsgUnstake {
+  option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string pool_id = 1;
+  cosmos.base.v1beta1.Coin amount = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+    (gogoproto.nullable) = false
+  ];
+  string sender = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgHarvest defines a msg withdraw some reward from a farm pool
+message MsgHarvest {
+  option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string pool_id = 1;
+  string sender = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgCreatePoolResponse defines the Msg/CreatePool response type
+message MsgCreatePoolResponse {}
+
+// MsgCreatePoolWithCommunityPoolResponse defines the
+// Msg/CreatePoolWithCommunityPool response type
+message MsgCreatePoolWithCommunityPoolResponse {}
+
+// MsgDestroyPoolResponse defines the Msg/DestroyPool response type
+message MsgDestroyPoolResponse {}
+
+// MsgAdjustPoolResponse defines the Msg/AdjustPool response type
+message MsgAdjustPoolResponse {}
+
+// MsgStakeResponse defines the Msg/Stake response type
+message MsgStakeResponse {
+  repeated cosmos.base.v1beta1.Coin reward = 2 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// MsgUnstakeResponse defines the Msg/Unstake response type
+message MsgUnstakeResponse {
+  repeated cosmos.base.v1beta1.Coin reward = 2 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// MsgHarvestResponse defines the Msg/Harvest response type
+message MsgHarvestResponse {
+  repeated cosmos.base.v1beta1.Coin reward = 2 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address that controls the module (defaults to x/gov unless
+  // overwritten).
+  string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+
+  // params defines the x/coinswap parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [ (gogoproto.nullable) = false ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParamsResponse {}
