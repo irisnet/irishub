@@ -42,7 +42,7 @@ service Query {
 
   // Balances queries the MT balances of a specified owner
   rpc Balances(QueryBalancesRequest) returns (QueryBalancesResponse) {
-    option (google.api.http).get = "/irismod/mt/mts/{owner}/balances";
+    option (google.api.http).get = "/irismod/mt/mts/{owner}/{denom_id}/balances";
   }
 }
 
