@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"math/rand"
 
-	simappparams "cosmossdk.io/simapp/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
@@ -77,7 +77,11 @@ func WeightedOperations(
 	}
 }
 
-func SimulateCreateFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
+func SimulateCreateFeed(
+	k keeper.Keeper,
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (
@@ -90,15 +94,33 @@ func SimulateCreateFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 		creator := simAccount.Address.String()
 		serviceName, owner, err := GenServiceDefinition(r, k.GetServiceKeeper(), accs, ctx)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreateFeed, "Failed to generate service definition"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgCreateFeed,
+				"Failed to generate service definition",
+			), nil, err
 		}
-		providers := GenServiceBindingsAndProviders(ctx, serviceName, owner, k.GetServiceKeeper(), accs, r, bk)
+		providers := GenServiceBindingsAndProviders(
+			ctx,
+			serviceName,
+			owner,
+			k.GetServiceKeeper(),
+			accs,
+			r,
+			bk,
+		)
 		if len(providers) == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreateFeed, "Failed to generate service bindings"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgCreateFeed,
+				"Failed to generate service bindings",
+			), nil, nil
 		}
 		input := `{"header":{},"body":{}}`
 		timeout := int64(simtypes.RandIntBetween(r, 10, 100))
-		srvFeeCap := sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(int64(simtypes.RandIntBetween(r, 2, 10))))}
+		srvFeeCap := sdk.Coins{
+			sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(int64(simtypes.RandIntBetween(r, 2, 10)))),
+		}
 		repeatedFrequency := uint64(100)
 		aggregateFunc := GenAggregateFunc(r)
 		valueJsonPath := `{"input":{"type":"object"},"output":{"type":"object"}}`
@@ -124,10 +146,14 @@ func SimulateCreateFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreateFeed, err.Error()), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgCreateFeed,
+				err.Error(),
+			), nil, err
 		}
 
-		txConfig := simappparams.MakeTestEncodingConfig().TxConfig
+		txConfig := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := irishelpers.GenTx(
 			r,
 			txConfig,
@@ -140,18 +166,30 @@ func SimulateCreateFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 			simAccount.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, nil
 		}
 
 		if _, _, err = app.SimDeliver(txConfig.TxEncoder(), tx); err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateFeed, err.Error()), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.EventTypeCreateFeed,
+				err.Error(),
+			), nil, nil
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
 	}
 }
 
-func SimulateStartFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
+func SimulateStartFeed(
+	k keeper.Keeper,
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (
@@ -159,16 +197,28 @@ func SimulateStartFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 	) {
 		feed := GenFeed(k, r, ctx)
 		if feed.Size() == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStartFeed, "feed not exist"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgStartFeed,
+				"feed not exist",
+			), nil, err
 		}
 
 		creator, err := sdk.AccAddressFromBech32(feed.Creator)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStartFeed, "creator invalid address"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgStartFeed,
+				"creator invalid address",
+			), nil, err
 		}
 		acc, found := simtypes.FindAccount(accs, creator)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgStartFeed, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgStartFeed,
+				"account not found",
+			), nil, nil
 		}
 		account := ak.GetAccount(ctx, acc.Address)
 
@@ -179,10 +229,14 @@ func SimulateStartFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 		}
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
-		txGen := simappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -195,7 +249,11 @@ func SimulateStartFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -206,7 +264,11 @@ func SimulateStartFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 	}
 }
 
-func SimulatePauseFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
+func SimulatePauseFeed(
+	k keeper.Keeper,
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (
@@ -215,16 +277,28 @@ func SimulatePauseFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 
 		feed := GenFeed(k, r, ctx)
 		if feed.Size() == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPauseFeed, "feed not exist"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgPauseFeed,
+				"feed not exist",
+			), nil, err
 		}
 
 		creator, err := sdk.AccAddressFromBech32(feed.Creator)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPauseFeed, "creator invalid address"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgPauseFeed,
+				"creator invalid address",
+			), nil, err
 		}
 		acc, found := simtypes.FindAccount(accs, creator)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPauseFeed, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgPauseFeed,
+				"account not found",
+			), nil, nil
 		}
 		account := ak.GetAccount(ctx, acc.Address)
 
@@ -236,10 +310,14 @@ func SimulatePauseFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 		}
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate fees",
+			), nil, err
 		}
 
-		txGen := simappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -252,7 +330,11 @@ func SimulatePauseFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, err
 		}
 
 		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
@@ -263,7 +345,11 @@ func SimulatePauseFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 	}
 }
 
-func SimulateEditFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
+func SimulateEditFeed(
+	k keeper.Keeper,
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (
@@ -271,23 +357,37 @@ func SimulateEditFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeep
 	) {
 		feed := GenFeed(k, r, ctx)
 		if feed.Size() == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgEditFeed, "feed not exist"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgEditFeed,
+				"feed not exist",
+			), nil, err
 		}
 
 		creator, err := sdk.AccAddressFromBech32(feed.Creator)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPauseFeed, "creator invalid address"), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgPauseFeed,
+				"creator invalid address",
+			), nil, err
 		}
 		acc, found := simtypes.FindAccount(accs, creator)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPauseFeed, "account not found"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgPauseFeed,
+				"account not found",
+			), nil, nil
 		}
 
 		description := simtypes.RandStringOfLength(r, 50)
 		latestHistory := uint64(simtypes.RandIntBetween(r, 1, 100))
 		providers := GenProviders(r, accs)
 		timeout := int64(simtypes.RandIntBetween(r, 10, 100))
-		srvFeeCap := sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(int64(simtypes.RandIntBetween(r, 2, 10))))}
+		srvFeeCap := sdk.Coins{
+			sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(int64(simtypes.RandIntBetween(r, 2, 10)))),
+		}
 		repeatedFrequency := uint64(100)
 		responseThreshold := uint32(simtypes.RandIntBetween(r, 1, len(providers)))
 
@@ -307,10 +407,14 @@ func SimulateEditFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeep
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreateFeed, err.Error()), nil, err
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgCreateFeed,
+				err.Error(),
+			), nil, err
 		}
 
-		txConfig := simappparams.MakeTestEncodingConfig().TxConfig
+		txConfig := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := irishelpers.GenTx(
 			r,
 			txConfig,
@@ -323,11 +427,19 @@ func SimulateEditFeed(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeep
 			acc.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				msg.Type(),
+				"unable to generate mock tx",
+			), nil, nil
 		}
 
 		if _, _, err = app.SimDeliver(txConfig.TxEncoder(), tx); err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateFeed, err.Error()), nil, nil
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.EventTypeCreateFeed,
+				err.Error(),
+			), nil, nil
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
@@ -340,7 +452,12 @@ func GenAggregateFunc(r *rand.Rand) string {
 	return slice[r.Intn(len(slice))]
 }
 
-func GenServiceDefinition(r *rand.Rand, sk types.ServiceKeeper, accs []simtypes.Account, ctx sdk.Context) (string, string, error) {
+func GenServiceDefinition(
+	r *rand.Rand,
+	sk types.ServiceKeeper,
+	accs []simtypes.Account,
+	ctx sdk.Context,
+) (string, string, error) {
 	simAccount, _ := simtypes.RandomAcc(r, accs)
 	serviceName := simtypes.RandStringOfLength(r, 20)
 	serviceDescription := simtypes.RandStringOfLength(r, 50)
@@ -353,7 +470,14 @@ func GenServiceDefinition(r *rand.Rand, sk types.ServiceKeeper, accs []simtypes.
 	return serviceName, simAccount.Address.String(), nil
 }
 
-func GenServiceBindingsAndProviders(ctx sdk.Context, serviceName, owner string, sk types.ServiceKeeper, accs []simtypes.Account, r *rand.Rand, bk types.BankKeeper) (providers []string) {
+func GenServiceBindingsAndProviders(
+	ctx sdk.Context,
+	serviceName, owner string,
+	sk types.ServiceKeeper,
+	accs []simtypes.Account,
+	r *rand.Rand,
+	bk types.BankKeeper,
+) (providers []string) {
 	ownerAddr, err := sdk.AccAddressFromBech32(owner)
 	if err != nil {
 		return
@@ -369,10 +493,23 @@ func GenServiceBindingsAndProviders(ctx sdk.Context, serviceName, owner string, 
 	for i := 0; i < 10; i++ {
 		provider, _ := simtypes.RandomAcc(r, accs)
 		deposit := sdk.NewCoins(sdk.NewCoin(token.Denom, simtypes.RandomAmount(r, token.Amount)))
-		pricing := fmt.Sprintf(`{"price":"%d%s"}`, simtypes.RandIntBetween(r, 100, 1000), sdk.DefaultBondDenom)
+		pricing := fmt.Sprintf(
+			`{"price":"%d%s"}`,
+			simtypes.RandIntBetween(r, 100, 1000),
+			sdk.DefaultBondDenom,
+		)
 		qos := uint64(simtypes.RandIntBetween(r, 10, 100))
 		options := "{}"
-		err := sk.AddServiceBinding(ctx, serviceName, provider.Address, deposit, pricing, qos, options, ownerAddr)
+		err := sk.AddServiceBinding(
+			ctx,
+			serviceName,
+			provider.Address,
+			deposit,
+			pricing,
+			qos,
+			options,
+			ownerAddr,
+		)
 		if err != nil {
 			providers = append(providers, provider.Address.String())
 		}
