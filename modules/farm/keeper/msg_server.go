@@ -81,11 +81,6 @@ func (m msgServer) CreatePool(
 			sdk.NewAttribute(types.AttributeValueCreator, msg.Creator),
 			sdk.NewAttribute(types.AttributeValuePoolId, pool.Id),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-		),
 	})
 	return &types.MsgCreatePoolResponse{}, nil
 }
@@ -143,7 +138,14 @@ func (m msgServer) CreatePoolWithCommunityPool(
 	}
 
 	//create new proposal given a content
-	proposal, err := m.k.gk.SubmitProposal(ctx, msgs, "")
+	proposal, err := m.k.gk.SubmitProposal(
+		ctx,
+		msgs,
+		"",
+		msg.Content.Title,
+		msg.Content.Description,
+		proposer,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -166,11 +168,6 @@ func (m msgServer) CreatePoolWithCommunityPool(
 			types.EventTypeCreatePoolWithCommunityPool,
 			sdk.NewAttribute(types.AttributeValueCreator, msg.Proposer),
 			sdk.NewAttribute(types.AttributeValueProposal, fmt.Sprintf("%d", proposal.Id)),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Proposer),
 		),
 	})
 	return &types.MsgCreatePoolWithCommunityPoolResponse{}, nil
@@ -197,11 +194,6 @@ func (m msgServer) DestroyPool(
 			sdk.NewAttribute(types.AttributeValueCreator, msg.Creator),
 			sdk.NewAttribute(types.AttributeValuePoolId, msg.PoolId),
 			sdk.NewAttribute(types.AttributeValueAmount, refundCoin.String()),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		),
 	})
 	return &types.MsgDestroyPoolResponse{}, nil
@@ -232,11 +224,6 @@ func (m msgServer) AdjustPool(
 			sdk.NewAttribute(types.AttributeValueCreator, msg.Creator),
 			sdk.NewAttribute(types.AttributeValuePoolId, msg.PoolId),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-		),
 	})
 	return &types.MsgAdjustPoolResponse{}, nil
 }
@@ -262,11 +249,6 @@ func (m msgServer) Stake(
 			sdk.NewAttribute(types.AttributeValuePoolId, msg.PoolId),
 			sdk.NewAttribute(types.AttributeValueAmount, msg.Amount.String()),
 			sdk.NewAttribute(types.AttributeValueReward, reward.String()),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	})
 	return &types.MsgStakeResponse{Reward: reward}, nil
@@ -294,11 +276,6 @@ func (m msgServer) Unstake(
 			sdk.NewAttribute(types.AttributeValueAmount, msg.Amount.String()),
 			sdk.NewAttribute(types.AttributeValueReward, reward.String()),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-		),
 	})
 	return &types.MsgUnstakeResponse{Reward: reward}, nil
 }
@@ -323,11 +300,6 @@ func (m msgServer) Harvest(
 			sdk.NewAttribute(types.AttributeValueCreator, msg.Sender),
 			sdk.NewAttribute(types.AttributeValuePoolId, msg.PoolId),
 			sdk.NewAttribute(types.AttributeValueReward, reward.String()),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	})
 	return &types.MsgHarvestResponse{Reward: reward}, nil

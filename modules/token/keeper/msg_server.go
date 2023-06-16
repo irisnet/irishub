@@ -55,11 +55,6 @@ func (m msgServer) IssueToken(
 			sdk.NewAttribute(types.AttributeKeySymbol, msg.Symbol),
 			sdk.NewAttribute(types.AttributeKeyCreator, msg.Owner),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
-		),
 	})
 
 	return &v1.MsgIssueTokenResponse{}, nil
@@ -88,11 +83,6 @@ func (m msgServer) EditToken(
 			types.EventTypeEditToken,
 			sdk.NewAttribute(types.AttributeKeySymbol, msg.Symbol),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Owner),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
 		),
 	})
 
@@ -143,11 +133,6 @@ func (m msgServer) MintToken(
 			sdk.NewAttribute(types.AttributeKeyAmount, msg.Coin.String()),
 			sdk.NewAttribute(types.AttributeKeyRecipient, recipient.String()),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
-		),
 	})
 
 	return &v1.MsgMintTokenResponse{}, nil
@@ -171,11 +156,7 @@ func (m msgServer) BurnToken(
 		sdk.NewEvent(
 			types.EventTypeBurnToken,
 			sdk.NewAttribute(types.AttributeKeyAmount, msg.Coin.String()),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
 		),
 	})
 
@@ -216,11 +197,6 @@ func (m msgServer) TransferTokenOwner(
 			sdk.NewAttribute(types.AttributeKeySymbol, msg.Symbol),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.SrcOwner),
 			sdk.NewAttribute(types.AttributeKeyDstOwner, msg.DstOwner),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.SrcOwner),
 		),
 	})
 
@@ -265,11 +241,6 @@ func (m msgServer) SwapFeeToken(
 			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
 			sdk.NewAttribute(types.AttributeKeyFeePaid, feePaid.String()),
 			sdk.NewAttribute(types.AttributeKeyFeeGot, feeGot.String()),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	})
 

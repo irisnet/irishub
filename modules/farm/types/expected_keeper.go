@@ -9,9 +9,24 @@ import (
 
 // BankKeeper defines the expected bank keeper (noalias)
 type BankKeeper interface {
-	SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error
-	SendCoinsFromModuleToModule(ctx sdk.Context, senderModule string, recipientModule string, amt sdk.Coins) error
-	SendCoinsFromAccountToModule(ctx sdk.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error
+	SendCoinsFromModuleToAccount(
+		ctx sdk.Context,
+		senderModule string,
+		recipientAddr sdk.AccAddress,
+		amt sdk.Coins,
+	) error
+	SendCoinsFromModuleToModule(
+		ctx sdk.Context,
+		senderModule string,
+		recipientModule string,
+		amt sdk.Coins,
+	) error
+	SendCoinsFromAccountToModule(
+		ctx sdk.Context,
+		senderAddr sdk.AccAddress,
+		recipientModule string,
+		amt sdk.Coins,
+	) error
 	GetAllBalances(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 	SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 	BurnCoins(ctx sdk.Context, name string, amt sdk.Coins) error
@@ -35,8 +50,19 @@ type DistrKeeper interface {
 
 // GovKeeper defines the expected gov keeper (noalias)
 type GovKeeper interface {
-	SubmitProposal(ctx sdk.Context, messages []sdk.Msg, metadata string) (v1.Proposal, error)
-	AddDeposit(ctx sdk.Context, proposalID uint64, depositorAddr sdk.AccAddress, depositAmount sdk.Coins) (bool, error)
+	SubmitProposal(
+		ctx sdk.Context,
+		messages []sdk.Msg,
+		metadata string,
+		title, summary string,
+		proposer sdk.AccAddress,
+	) (v1.Proposal, error)
+	AddDeposit(
+		ctx sdk.Context,
+		proposalID uint64,
+		depositorAddr sdk.AccAddress,
+		depositAmount sdk.Coins,
+	) (bool, error)
 	GetProposal(ctx sdk.Context, proposalID uint64) (v1.Proposal, bool)
 	GetGovernanceAccount(ctx sdk.Context) authtypes.ModuleAccountI
 }

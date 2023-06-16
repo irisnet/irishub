@@ -74,11 +74,6 @@ func (m msgServer) CreateHTLC(
 			sdk.NewAttribute(types.AttributeKeySenderOnOtherChain, msg.SenderOnOtherChain),
 			sdk.NewAttribute(types.AttributeKeyTransfer, strconv.FormatBool(msg.Transfer)),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-		),
 	})
 	return &types.MsgCreateHTLCResponse{
 		Id: id.String(),
@@ -114,11 +109,6 @@ func (m msgServer) ClaimHTLC(
 			sdk.NewAttribute(types.AttributeKeySecret, msg.Secret),
 			sdk.NewAttribute(types.AttributeKeyTransfer, strconv.FormatBool(transfer)),
 			sdk.NewAttribute(types.AttributeKeyDirection, direction.String()),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	})
 	return &types.MsgClaimHTLCResponse{}, nil

@@ -40,14 +40,6 @@ func (m msgServer) AddLiquidity(
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-		),
-	)
-
 	return &types.MsgAddLiquidityResponse{
 		MintToken: &mintToken,
 	}, nil
@@ -71,14 +63,6 @@ func (m msgServer) AddUnilateralLiquidity(
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-		),
-	)
-
 	return &types.MsgAddUnilateralLiquidityResponse{
 		MintToken: &mintToken,
 	}, nil
@@ -100,22 +84,8 @@ func (m msgServer) RemoveLiquidity(
 	if err != nil {
 		return nil, err
 	}
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-		),
-	)
-
-	var coins = make([]sdk.Coin, 0, withdrawCoins.Len())
-	for _, coin := range withdrawCoins {
-		coins = append(coins, coin)
-	}
-
 	return &types.MsgRemoveLiquidityResponse{
-		WithdrawCoins: coins,
+		WithdrawCoins: withdrawCoins,
 	}, nil
 }
 
@@ -136,21 +106,8 @@ func (m msgServer) RemoveUnilateralLiquidity(
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-		),
-	)
-
-	var coins = make([]sdk.Coin, 0, withdrawCoins.Len())
-	for _, coin := range withdrawCoins {
-		coins = append(coins, coin)
-	}
-
 	return &types.MsgRemoveUnilateralLiquidityResponse{
-		WithdrawCoins: coins,
+		WithdrawCoins: withdrawCoins,
 	}, nil
 }
 
@@ -175,14 +132,6 @@ func (m msgServer) SwapCoin(
 	if err := m.k.Swap(ctx, msg); err != nil {
 		return nil, err
 	}
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Input.Address),
-		),
-	)
 	return &types.MsgSwapCoinResponse{}, nil
 }
 

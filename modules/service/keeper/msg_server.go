@@ -48,11 +48,6 @@ func (m msgServer) DefineService(
 			sdk.NewAttribute(types.AttributeKeyServiceName, msg.Name),
 			sdk.NewAttribute(types.AttributeKeyAuthor, msg.Author),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Author),
-		),
 	})
 
 	return &types.MsgDefineServiceResponse{}, nil
@@ -95,11 +90,6 @@ func (m msgServer) BindService(
 			sdk.NewAttribute(types.AttributeKeyProvider, msg.Provider),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Owner),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
-		),
 	})
 
 	return &types.MsgBindServiceResponse{}, nil
@@ -133,11 +123,6 @@ func (m msgServer) UpdateServiceBinding(
 			sdk.NewAttribute(types.AttributeKeyServiceName, msg.ServiceName),
 			sdk.NewAttribute(types.AttributeKeyProvider, msg.Provider),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Owner),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
 		),
 	})
 
@@ -175,11 +160,6 @@ func (m msgServer) SetWithdrawAddress(
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Owner),
 			sdk.NewAttribute(types.AttributeKeyWithdrawAddress, msg.WithdrawAddress),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
-		),
 	})
 
 	return &types.MsgSetWithdrawAddressResponse{}, nil
@@ -210,11 +190,6 @@ func (m msgServer) EnableServiceBinding(
 			sdk.NewAttribute(types.AttributeKeyServiceName, msg.ServiceName),
 			sdk.NewAttribute(types.AttributeKeyProvider, msg.Provider),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Owner),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
 		),
 	})
 
@@ -247,11 +222,6 @@ func (m msgServer) DisableServiceBinding(
 			sdk.NewAttribute(types.AttributeKeyProvider, msg.Provider),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Owner),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
-		),
 	})
 
 	return &types.MsgDisableServiceBindingResponse{}, nil
@@ -282,11 +252,6 @@ func (m msgServer) RefundServiceDeposit(
 			sdk.NewAttribute(types.AttributeKeyServiceName, msg.ServiceName),
 			sdk.NewAttribute(types.AttributeKeyProvider, msg.Provider),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Owner),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
 		),
 	})
 
@@ -346,11 +311,6 @@ func (m msgServer) CallService(
 			sdk.NewAttribute(types.AttributeKeyServiceName, msg.ServiceName),
 			sdk.NewAttribute(types.AttributeKeyConsumer, msg.Consumer),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Consumer),
-		),
 	})
 
 	return &types.MsgCallServiceResponse{
@@ -388,11 +348,6 @@ func (m msgServer) RespondService(
 			sdk.NewAttribute(types.AttributeKeyProvider, request.Provider),
 			sdk.NewAttribute(types.AttributeKeyConsumer, request.Consumer),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Provider),
-		),
 	})
 
 	return &types.MsgRespondServiceResponse{}, nil
@@ -426,11 +381,6 @@ func (m msgServer) PauseRequestContext(
 			types.EventTypePauseContext,
 			sdk.NewAttribute(types.AttributeKeyRequestContextID, msg.RequestContextId),
 			sdk.NewAttribute(types.AttributeKeyConsumer, msg.Consumer),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Consumer),
 		),
 	})
 
@@ -466,11 +416,6 @@ func (m msgServer) StartRequestContext(
 			sdk.NewAttribute(types.AttributeKeyRequestContextID, msg.RequestContextId),
 			sdk.NewAttribute(types.AttributeKeyConsumer, msg.Consumer),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Consumer),
-		),
 	})
 
 	return &types.MsgStartRequestContextResponse{}, nil
@@ -504,11 +449,6 @@ func (m msgServer) KillRequestContext(
 			types.EventTypeKillContext,
 			sdk.NewAttribute(types.AttributeKeyRequestContextID, msg.RequestContextId),
 			sdk.NewAttribute(types.AttributeKeyConsumer, msg.Consumer),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Consumer),
 		),
 	})
 
@@ -557,11 +497,6 @@ func (m msgServer) UpdateRequestContext(
 			sdk.NewAttribute(types.AttributeKeyRequestContextID, msg.RequestContextId),
 			sdk.NewAttribute(types.AttributeKeyConsumer, msg.Consumer),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Consumer),
-		),
 	})
 
 	return &types.MsgUpdateRequestContextResponse{}, nil
@@ -591,11 +526,6 @@ func (m msgServer) WithdrawEarnedFees(
 			types.EventTypeWithdrawEarnedFees,
 			sdk.NewAttribute(types.AttributeKeyProvider, msg.Provider),
 			sdk.NewAttribute(types.AttributeKeyOwner, msg.Owner),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
 		),
 	})
 

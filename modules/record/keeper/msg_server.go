@@ -43,11 +43,6 @@ func (m msgServer) CreateRecord(
 			sdk.NewAttribute(types.AttributeKeyCreator, msg.Creator),
 			sdk.NewAttribute(types.AttributeKeyRecordID, hex.EncodeToString(recordId)),
 		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-		),
 	})
 
 	return &types.MsgCreateRecordResponse{
