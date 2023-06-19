@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 
-	simappparams "cosmossdk.io/simapp/params"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
@@ -31,7 +30,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"github.com/cosmos/cosmos-sdk/std"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -210,6 +208,7 @@ type SimApp struct {
 	*baseapp.BaseApp
 	legacyAmino       *codec.LegacyAmino
 	appCodec          codec.Codec
+	txConfig          client.TxConfig
 	interfaceRegistry types.InterfaceRegistry
 
 	// keys to access the substores
@@ -273,7 +272,7 @@ func NewSimApp(
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *SimApp {
-	encodingConfig := makeEncodingConfig()
+	encodingConfig := MakeTestEncodingConfig()
 
 	// TODO: Remove cdc in favor of appCodec once all modules are migrated.
 	appCodec := encodingConfig.Codec
@@ -307,6 +306,7 @@ func NewSimApp(
 		BaseApp:           bApp,
 		legacyAmino:       legacyAmino,
 		appCodec:          appCodec,
+		txConfig:          encodingConfig.TxConfig,
 		interfaceRegistry: interfaceRegistry,
 		keys:              keys,
 		tkeys:             tkeys,
@@ -924,6 +924,11 @@ func (app *SimApp) AppCodec() codec.Codec {
 	return app.appCodec
 }
 
+// TxConfig returns SimApp's TxConfig
+func (app *SimApp) TxConfig() client.TxConfig {
+	return app.txConfig
+}
+
 // InterfaceRegistry returns SimApp's InterfaceRegistry
 func (app *SimApp) InterfaceRegistry() types.InterfaceRegistry {
 	return app.interfaceRegistry
@@ -1054,14 +1059,14 @@ func BlockedAddresses() map[string]bool {
 	return modAccAddrs
 }
 
-func makeEncodingConfig() simappparams.EncodingConfig {
-	encodingConfig := simappparams.MakeTestEncodingConfig()
-	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	return encodingConfig
-}
+// func makeEncodingConfig() simappparams.EncodingConfig {
+// 	encodingConfig := simappparams.MakeTestEncodingConfig()
+// 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
+// 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+// 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
+// 	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+// 	return encodingConfig
+// }
 
 // initParamsKeeper init params keeper and its subspaces
 func initParamsKeeper(

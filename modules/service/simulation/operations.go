@@ -7,11 +7,11 @@ import (
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
-	cosmossimappparams "cosmossdk.io/simapp/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
@@ -276,7 +276,7 @@ func SimulateMsgDefineService(
 			), nil, err
 		}
 
-		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -425,7 +425,7 @@ func SimulateMsgBindService(
 			), nil, err
 		}
 
-		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -545,7 +545,7 @@ func SimulateMsgUpdateServiceBinding(
 			), nil, err
 		}
 
-		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -624,7 +624,7 @@ func SimulateMsgSetWithdrawAddress(
 			), nil, err
 		}
 
-		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -712,7 +712,7 @@ func SimulateMsgDisableServiceBinding(
 			), nil, err
 		}
 
-		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -828,7 +828,7 @@ func SimulateMsgEnableServiceBinding(
 			), nil, err
 		}
 
-		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -931,7 +931,7 @@ func SimulateMsgRefundServiceDeposit(
 			), nil, err
 		}
 
-		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -1029,10 +1029,10 @@ func SimulateMsgCallService(
 			), nil, err
 		}
 
-		txConfig := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := irishelpers.GenTx(
 			r,
-			txConfig,
+			txGen,
 			[]sdk.Msg{msg},
 			fees,
 			simtestutil.DefaultGenTxGas,
@@ -1049,7 +1049,7 @@ func SimulateMsgCallService(
 			), nil, err
 		}
 
-		if _, _, err := app.SimDeliver(txConfig.TxEncoder(), tx); err != nil {
+		if _, _, err := app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to deliver tx"), nil, err
 		}
 
@@ -1110,7 +1110,7 @@ func SimulateMsgRespondService(
 			), nil, err
 		}
 
-		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -1204,7 +1204,7 @@ func SimulateMsgPauseRequestContext(
 			), nil, err
 		}
 
-		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -1306,7 +1306,7 @@ func SimulateMsgStartRequestContext(
 			), nil, err
 		}
 
-		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -1407,7 +1407,7 @@ func SimulateMsgKillRequestContext(
 			), nil, err
 		}
 
-		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -1543,7 +1543,7 @@ func SimulateMsgUpdateRequestContext(
 			), nil, err
 		}
 
-		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -1621,7 +1621,7 @@ func SimulateMsgWithdrawEarnedFees(
 			), nil, err
 		}
 
-		txGen := cosmossimappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,

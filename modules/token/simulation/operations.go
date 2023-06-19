@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	sdkmath "cosmossdk.io/math"
-	simappparams "cosmossdk.io/simapp/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
@@ -148,7 +148,7 @@ func SimulateIssueToken(
 			), nil, err
 		}
 
-		txGen := simappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -228,7 +228,7 @@ func SimulateEditToken(
 			), nil, err
 		}
 
-		txGen := simappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -308,7 +308,7 @@ func SimulateMintToken(
 			), nil, err
 		}
 
-		txGen := simappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -391,7 +391,7 @@ func SimulateTransferTokenOwner(
 			), nil, err
 		}
 
-		txGen := simappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,
@@ -492,7 +492,7 @@ func SimulateBurnToken(
 			), nil, err
 		}
 
-		txGen := simappparams.MakeTestEncodingConfig().TxConfig
+		txGen := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, err := simtestutil.GenSignedMockTx(
 			r,
 			txGen,

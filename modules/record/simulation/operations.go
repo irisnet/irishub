@@ -6,11 +6,11 @@ import (
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
-	simappparams "cosmossdk.io/simapp/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
@@ -89,7 +89,7 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 				err.Error(),
 			), nil, err
 		}
-		txConfig := simappparams.MakeTestEncodingConfig().TxConfig
+		txConfig := moduletestutil.MakeTestEncodingConfig().TxConfig
 		tx, _ := irishelpers.GenTx(
 			r,
 			txConfig,
