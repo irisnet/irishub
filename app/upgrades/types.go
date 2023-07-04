@@ -56,3 +56,27 @@ type AppKeepers struct {
 	TokenKeeper     tokenkeeper.Keeper
 	ReaderWriter    ConsensusParamsReaderWriter
 }
+
+type upgradeRouter struct {
+	mu map[string]Upgrade
+}
+
+func NewUpgradeRouter() *upgradeRouter {
+	return &upgradeRouter{make(map[string]Upgrade)}
+}
+
+func (r *upgradeRouter) Register(u Upgrade) *upgradeRouter {
+	if _, has := r.mu[u.UpgradeName]; has {
+		panic(u.UpgradeName + " already registered")
+	}
+	r.mu[u.UpgradeName] = u
+	return r
+}
+
+func (r *upgradeRouter) Routers() map[string]Upgrade {
+	return r.mu
+}
+
+func (r *upgradeRouter) UpgradeInfo(planName string) Upgrade {
+	return r.mu[planName]
+}
