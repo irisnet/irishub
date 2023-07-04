@@ -16,11 +16,11 @@ import (
 type Keeper struct {
 	cdc                                 codec.Codec
 	storeKey                            storetypes.StoreKey
-	validateLPToken                     types.ValidateLPToken
 	bk                                  types.BankKeeper
 	ak                                  types.AccountKeeper
 	dk                                  types.DistrKeeper
 	gk                                  types.GovKeeper
+	ck                                  types.CoinswapKeeper
 	feeCollectorName, communityPoolName string // name of the fee collector
 	authority                           string
 }
@@ -32,7 +32,7 @@ func NewKeeper(
 	ak types.AccountKeeper,
 	dk types.DistrKeeper,
 	gk types.GovKeeper,
-	validateLPToken types.ValidateLPToken,
+	ck types.CoinswapKeeper,
 	feeCollectorName, communityPoolName, authority string,
 ) Keeper {
 	if addr := ak.GetModuleAddress(types.ModuleName); addr == nil {
@@ -51,7 +51,7 @@ func NewKeeper(
 		ak:                ak,
 		dk:                dk,
 		gk:                gk,
-		validateLPToken:   validateLPToken,
+		ck:                ck,
 		feeCollectorName:  feeCollectorName,
 		communityPoolName: communityPoolName,
 		authority:         authority,

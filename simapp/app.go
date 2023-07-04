@@ -1,3 +1,5 @@
+//go:build app_v1
+
 package simapp
 
 import (
@@ -245,7 +247,7 @@ type SimApp struct {
 	FarmKeeper     farmkeeper.Keeper
 
 	// the module manager
-	mm *module.Manager
+	ModuleManager *module.Manager
 
 	// simulation manager
 	sm *module.SimulationManager
@@ -434,7 +436,6 @@ func NewSimApp(
 		appCodec,
 		keys[tokentypes.StoreKey],
 		app.BankKeeper,
-		app.ModuleAccountAddrs(),
 		authtypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
@@ -457,7 +458,6 @@ func NewSimApp(
 		keys[htlctypes.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
-		app.ModuleAccountAddrs(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -466,7 +466,6 @@ func NewSimApp(
 		keys[coinswaptypes.StoreKey],
 		app.BankKeeper,
 		app.AccountKeeper,
-		app.ModuleAccountAddrs(),
 		authtypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
@@ -476,13 +475,12 @@ func NewSimApp(
 		keys[servicetypes.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
-		app.ModuleAccountAddrs(),
 		servicetypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.OracleKeeper = oracleKeeper.NewKeeper(
-		appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName),
+		appCodec, keys[oracletypes.StoreKey],
 		app.ServiceKeeper,
 	)
 
@@ -492,7 +490,7 @@ func NewSimApp(
 		app.AccountKeeper,
 		app.DistrKeeper,
 		app.GovKeeper,
-		func(ctx sdk.Context, lpTokenDenom string) error { return nil },
+		app.CoinswapKeeper,
 		authtypes.FeeCollectorName,
 		distrtypes.ModuleName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),

@@ -118,7 +118,7 @@ func TestFullAppSimulation(t *testing.T) {
 		AppStateFn(app.AppCodec(), app.SimulationManager()),
 		simtypes.RandomAccounts, // Replace with own random account function if using keys other than secp256k1
 		simtestutil.SimulationOperations(app, app.AppCodec(), config),
-		app.ModuleAccountAddrs(),
+		BlockedAddresses(),
 		config,
 		app.AppCodec(),
 	)
@@ -177,7 +177,7 @@ func TestAppImportExport(t *testing.T) {
 		AppStateFn(app.AppCodec(), app.SimulationManager()),
 		simtypes.RandomAccounts, // Replace with own random account function if using keys other than secp256k1
 		simtestutil.SimulationOperations(app, app.AppCodec(), config),
-		app.ModuleAccountAddrs(),
+		BlockedAddresses(),
 		config,
 		app.AppCodec(),
 	)
@@ -240,50 +240,50 @@ func TestAppImportExport(t *testing.T) {
 
 	ctxA := app.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
 	ctxB := newApp.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
-	newApp.mm.InitGenesis(ctxB, app.AppCodec(), genesisState)
+	newApp.ModuleManager.InitGenesis(ctxB, app.AppCodec(), genesisState)
 	newApp.StoreConsensusParams(ctxB, exported.ConsensusParams)
 
 	fmt.Printf("comparing stores...\n")
 
 	storeKeysPrefixes := []StoreKeysPrefixes{
-		{app.keys[authtypes.StoreKey], newApp.keys[authtypes.StoreKey], [][]byte{}},
-		{app.keys[stakingtypes.StoreKey], newApp.keys[stakingtypes.StoreKey],
+		{app.GetKey(authtypes.StoreKey), newApp.GetKey(authtypes.StoreKey), [][]byte{}},
+		{app.GetKey(stakingtypes.StoreKey), newApp.GetKey(stakingtypes.StoreKey),
 			[][]byte{
 				stakingtypes.UnbondingQueueKey, stakingtypes.RedelegationQueueKey,
 				stakingtypes.ValidatorQueueKey, stakingtypes.HistoricalInfoKey,
 			}}, // ordering may change but it doesn't matter
-		{app.keys[slashingtypes.StoreKey], newApp.keys[slashingtypes.StoreKey], [][]byte{}},
-		{app.keys[minttypes.StoreKey], newApp.keys[minttypes.StoreKey], [][]byte{}},
-		{app.keys[distrtypes.StoreKey], newApp.keys[distrtypes.StoreKey], [][]byte{}},
+		{app.GetKey(slashingtypes.StoreKey), newApp.GetKey(slashingtypes.StoreKey), [][]byte{}},
+		{app.GetKey(minttypes.StoreKey), newApp.GetKey(minttypes.StoreKey), [][]byte{}},
+		{app.GetKey(distrtypes.StoreKey), newApp.GetKey(distrtypes.StoreKey), [][]byte{}},
 		{
-			app.keys[banktypes.StoreKey],
-			newApp.keys[banktypes.StoreKey],
+			app.GetKey(banktypes.StoreKey),
+			newApp.GetKey(banktypes.StoreKey),
 			[][]byte{banktypes.BalancesPrefix},
 		},
-		{app.keys[paramtypes.StoreKey], newApp.keys[paramtypes.StoreKey], [][]byte{}},
-		{app.keys[govtypes.StoreKey], newApp.keys[govtypes.StoreKey], [][]byte{}},
-		{app.keys[evidencetypes.StoreKey], newApp.keys[evidencetypes.StoreKey], [][]byte{}},
-		{app.keys[capabilitytypes.StoreKey], newApp.keys[capabilitytypes.StoreKey], [][]byte{}},
+		{app.GetKey(paramtypes.StoreKey), newApp.GetKey(paramtypes.StoreKey), [][]byte{}},
+		{app.GetKey(govtypes.StoreKey), newApp.GetKey(govtypes.StoreKey), [][]byte{}},
+		{app.GetKey(evidencetypes.StoreKey), newApp.GetKey(evidencetypes.StoreKey), [][]byte{}},
+		{app.GetKey(capabilitytypes.StoreKey), newApp.GetKey(capabilitytypes.StoreKey), [][]byte{}},
 
 		// check irismod module
-		{app.keys[tokentypes.StoreKey], newApp.keys[tokentypes.StoreKey], [][]byte{}},
-		{app.keys[oracletypes.StoreKey], newApp.keys[oracletypes.StoreKey], [][]byte{}},
+		{app.GetKey(tokentypes.StoreKey), newApp.GetKey(tokentypes.StoreKey), [][]byte{}},
+		{app.GetKey(oracletypes.StoreKey), newApp.GetKey(oracletypes.StoreKey), [][]byte{}},
 		//mt.Supply is InitSupply, can be not equal to TotalSupply
-		{app.keys[mttypes.StoreKey], newApp.keys[mttypes.StoreKey], [][]byte{mttypes.PrefixMT}},
-		{app.keys[nfttypes.StoreKey], newApp.keys[nfttypes.StoreKey], [][]byte{{0x05}}},
+		{app.GetKey(mttypes.StoreKey), newApp.GetKey(mttypes.StoreKey), [][]byte{mttypes.PrefixMT}},
+		{app.GetKey(nfttypes.StoreKey), newApp.GetKey(nfttypes.StoreKey), [][]byte{{0x05}}},
 		{
-			app.keys[servicetypes.StoreKey],
-			newApp.keys[servicetypes.StoreKey],
+			app.GetKey(servicetypes.StoreKey),
+			newApp.GetKey(servicetypes.StoreKey),
 			[][]byte{servicetypes.InternalCounterKey},
 		},
 		{
-			app.keys[randomtypes.StoreKey],
-			newApp.keys[randomtypes.StoreKey],
+			app.GetKey(randomtypes.StoreKey),
+			newApp.GetKey(randomtypes.StoreKey),
 			[][]byte{randomtypes.RandomKey},
 		},
-		//{app.keys[recordtypes.StoreKey], newApp.keys[recordtypes.StoreKey], [][]byte{recordtypes.IntraTxCounterKey}},
-		{app.keys[htlctypes.StoreKey], newApp.keys[htlctypes.StoreKey], [][]byte{}},
-		{app.keys[coinswaptypes.StoreKey], newApp.keys[coinswaptypes.StoreKey], [][]byte{}},
+		//{app.keys[recordtypes.StoreKey), newApp.keys[recordtypes.StoreKey), [][]byte{recordtypes.IntraTxCounterKey}},
+		{app.GetKey(htlctypes.StoreKey), newApp.GetKey(htlctypes.StoreKey), [][]byte{}},
+		{app.GetKey(coinswaptypes.StoreKey), newApp.GetKey(coinswaptypes.StoreKey), [][]byte{}},
 	}
 
 	for _, skp := range storeKeysPrefixes {
@@ -360,7 +360,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		AppStateFn(app.AppCodec(), app.SimulationManager()),
 		simtypes.RandomAccounts, // Replace with own random account function if using keys other than secp256k1
 		simtestutil.SimulationOperations(app, app.AppCodec(), config),
-		app.ModuleAccountAddrs(),
+		BlockedAddresses(),
 		config,
 		app.AppCodec(),
 	)
@@ -421,7 +421,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		AppStateFn(app.AppCodec(), app.SimulationManager()),
 		simtypes.RandomAccounts, // Replace with own random account function if using keys other than secp256k1
 		simtestutil.SimulationOperations(newApp, newApp.AppCodec(), config),
-		app.ModuleAccountAddrs(),
+		BlockedAddresses(),
 		config,
 		app.AppCodec(),
 	)
@@ -484,7 +484,7 @@ func TestAppStateDeterminism(t *testing.T) {
 				AppStateFn(app.AppCodec(), app.SimulationManager()),
 				simtypes.RandomAccounts, // Replace with own random account function if using keys other than secp256k1
 				simtestutil.SimulationOperations(app, app.AppCodec(), config),
-				app.ModuleAccountAddrs(),
+				BlockedAddresses(),
 				config,
 				app.AppCodec(),
 			)

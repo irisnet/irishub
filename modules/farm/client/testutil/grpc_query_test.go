@@ -1,8 +1,10 @@
 package testutil_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/suite"
@@ -11,9 +13,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	farmcli "github.com/irisnet/irismod/modules/farm/client/cli"
 	farmtestutil "github.com/irisnet/irismod/modules/farm/client/testutil"
 	farmtypes "github.com/irisnet/irismod/modules/farm/types"
+	tokentypes "github.com/irisnet/irismod/modules/token/types/v1"
 	"github.com/irisnet/irismod/simapp"
 )
 
@@ -27,6 +31,9 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
 	s.network = simapp.SetupNetwork(s.T())
+	sdk.SetCoinDenomRegex(func() string {
+		return `[a-zA-Z][a-zA-Z0-9/\-]{2,127}`
+	})
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -43,13 +50,15 @@ func (s *IntegrationTestSuite) TestRest() {
 	clientCtx := val.ClientCtx
 	baseURL := val.APIAddress
 
+	s.Init()
+
 	// ---------------------------------------------------------------------------
 
 	creator := val.Address
 	description := "iris-atom farm pool"
 	startHeight := s.LatestHeight() + 1
 	rewardPerBlock := sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10)))
-	lpTokenDenom := s.network.BondDenom
+	lpTokenDenom := "lpt-1"
 	totalReward := sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(1000)))
 	editable := true
 
@@ -80,6 +89,7 @@ func (s *IntegrationTestSuite) TestRest() {
 		creator.String(),
 		args...,
 	)
+	s.Require().EqualValues(txResult.Code, 0, txResult.Log)
 
 	poolId := s.network.GetAttribute(
 		farmtypes.EventTypeCreatePool,
@@ -113,7 +123,7 @@ func (s *IntegrationTestSuite) TestRest() {
 	s.Require().NoError(err)
 	s.network.WaitForNextBlock()
 
-	lpToken := sdk.NewCoin(s.network.BondDenom, sdk.NewInt(100))
+	lpToken := sdk.NewCoin(lpTokenDenom, sdk.NewInt(100))
 	txResult = farmtestutil.StakeExec(
 		s.T(),
 		s.network,
@@ -123,6 +133,7 @@ func (s *IntegrationTestSuite) TestRest() {
 		lpToken.String(),
 		globalFlags...,
 	)
+	s.Require().Equal(uint32(0), txResult.Code, txResult.Log)
 
 	expectFarmer := farmtypes.LockedInfo{
 		PoolId:        poolId,
@@ -149,4 +160,48 @@ func (s *IntegrationTestSuite) LatestHeight() int64 {
 	height, err := s.network.LatestHeight()
 	s.Require().NoError(err)
 	return height
+}
+
+func (s *IntegrationTestSuite) Init() {
+
+	val := s.network.Validators[0]
+	clientCtx := val.ClientCtx
+
+	from := val.Address
+	symbol := "kitty"
+	name := "Kitty Token"
+	minUnit := "kitty"
+	scale := uint32(0)
+	initialSupply := uint64(100000000)
+	maxSupply := uint64(200000000)
+	mintable := true
+
+	// issue token
+	msgIssueToken := &tokentypes.MsgIssueToken{
+		Symbol:        symbol,
+		Name:          name,
+		Scale:         scale,
+		MinUnit:       minUnit,
+		InitialSupply: initialSupply,
+		MaxSupply:     maxSupply,
+		Mintable:      mintable,
+		Owner:         from.String(),
+	}
+	res := s.network.BlockSendMsgs(s.T(), msgIssueToken)
+	s.Require().Equal(uint32(0), res.Code, res.Log)
+
+	// add liquidity
+	status, err := clientCtx.Client.Status(context.Background())
+	s.Require().NoError(err)
+	deadline := status.SyncInfo.LatestBlockTime.Add(time.Minute)
+
+	msgAddLiquidity := &coinswaptypes.MsgAddLiquidity{
+		MaxToken:         sdk.NewCoin(symbol, sdk.NewInt(1000)),
+		ExactStandardAmt: sdk.NewInt(1000),
+		MinLiquidity:     sdk.NewInt(1000),
+		Deadline:         deadline.Unix(),
+		Sender:           val.Address.String(),
+	}
+	res = s.network.BlockSendMsgs(s.T(), msgAddLiquidity)
+	s.Require().Equal(uint32(0), res.Code, res.Log)
 }

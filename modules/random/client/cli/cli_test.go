@@ -76,10 +76,19 @@ func (s *IntegrationTestSuite) TestRandom() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	txResult := servicetestutil.BindServiceExec(s.T(), s.network, clientCtx, provider.String(), args...)
+	txResult := servicetestutil.BindServiceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		provider.String(),
+		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	// ------test GetCmdRequestRandom()-------------
@@ -90,7 +99,11 @@ func (s *IntegrationTestSuite) TestRandom() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
 	txResult = randomtestutil.RequestRandomExec(s.T(), s.network, clientCtx, from.String(), args...)
@@ -100,12 +113,20 @@ func (s *IntegrationTestSuite) TestRandom() {
 	requestHeight := gjson.Get(txResult.Log, "0.events.1.attributes.2.value").Int()
 
 	// ------test GetCmdQueryRandomRequestQueue()-------------
-	qrrResp := randomtestutil.QueryRandomRequestQueueExec(s.T(), s.network, clientCtx, fmt.Sprintf("%d", requestHeight))
+	qrrResp := randomtestutil.QueryRandomRequestQueueExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		fmt.Sprintf("%d", requestHeight),
+	)
 	s.Require().Len(qrrResp.Requests, 1)
 
 	// ------get service request-------------
 	requestHeight = requestHeight + 1
-	_, err := s.network.WaitForHeightWithTimeout(requestHeight, time.Duration(int64(blockInterval+2)*int64(s.network.TimeoutCommit)))
+	_, err := s.network.WaitForHeightWithTimeout(
+		requestHeight,
+		time.Duration(int64(blockInterval+5)*int64(s.network.TimeoutCommit)),
+	)
 	s.Require().NoError(err)
 
 	blockResult, err := val.RPCClient.BlockResults(context.Background(), &requestHeight)
@@ -141,10 +162,19 @@ func (s *IntegrationTestSuite) TestRandom() {
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	txResult = servicetestutil.RespondServiceExec(s.T(), s.network, clientCtx, provider.String(), args...)
+	txResult = servicetestutil.RespondServiceExec(
+		s.T(),
+		s.network,
+		clientCtx,
+		provider.String(),
+		args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	generateHeight := txResult.Height
@@ -157,6 +187,8 @@ func (s *IntegrationTestSuite) TestRandom() {
 	s.Require().NoError(err)
 	seed, err := hex.DecodeString(seedStr)
 	s.Require().NoError(err)
-	random := randomtypes.MakePRNG(generateBLock.Block.LastBlockID.Hash, generateBLock.Block.Header.Time.Unix(), from, seed, true).GetRand().FloatString(randomtypes.RandPrec)
+	random := randomtypes.MakePRNG(generateBLock.Block.LastBlockID.Hash, generateBLock.Block.Header.Time.Unix(), from, seed, true).
+		GetRand().
+		FloatString(randomtypes.RandPrec)
 	s.Require().Equal(random, randomResp.Value)
 }

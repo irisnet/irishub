@@ -1,17 +1,21 @@
 package cli_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/suite"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	farmcli "github.com/irisnet/irismod/modules/farm/client/cli"
 	"github.com/irisnet/irismod/modules/farm/client/testutil"
 	farmtypes "github.com/irisnet/irismod/modules/farm/types"
+	tokentypes "github.com/irisnet/irismod/modules/token/types/v1"
 	"github.com/irisnet/irismod/simapp"
 )
 
@@ -25,6 +29,9 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
 	s.network = simapp.SetupNetwork(s.T())
+	sdk.SetCoinDenomRegex(func() string {
+		return `[a-zA-Z][a-zA-Z0-9/\-]{2,127}`
+	})
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -40,26 +47,33 @@ func (s *IntegrationTestSuite) TestFarm() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
 
+	s.Init()
+
 	// ---------------------------------------------------------------------------
 
 	creator := val.Address
 	description := "iris-atom farm pool"
-	startHeight := s.LatestHeight() + 1
+	startHeight := s.LatestHeight() + 2
 	rewardPerBlock := sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10)))
 	totalReward := sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(1000)))
 	editable := true
+	lptDenom := "lpt-1"
 
 	globalFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
 	args := []string{
 		fmt.Sprintf("--%s=%s", farmcli.FlagDescription, description),
 		fmt.Sprintf("--%s=%d", farmcli.FlagStartHeight, startHeight),
 		fmt.Sprintf("--%s=%s", farmcli.FlagRewardPerBlock, rewardPerBlock),
-		fmt.Sprintf("--%s=%s", farmcli.FlagLPTokenDenom, s.network.BondDenom),
+		fmt.Sprintf("--%s=%s", farmcli.FlagLPTokenDenom, lptDenom),
 		fmt.Sprintf("--%s=%s", farmcli.FlagTotalReward, totalReward),
 		fmt.Sprintf("--%s=%v", farmcli.FlagEditable, editable),
 	}
@@ -72,8 +86,13 @@ func (s *IntegrationTestSuite) TestFarm() {
 		creator.String(),
 		args...,
 	)
+	s.Require().EqualValues(txResult.Code, 0, txResult.Log)
 
-	poolId := s.network.GetAttribute(farmtypes.EventTypeCreatePool, farmtypes.AttributeValuePoolId, txResult.Events)
+	poolId := s.network.GetAttribute(
+		farmtypes.EventTypeCreatePool,
+		farmtypes.AttributeValuePoolId,
+		txResult.Events,
+	)
 	expectedContents := &farmtypes.FarmPoolEntry{
 		Id:              poolId,
 		Creator:         creator.String(),
@@ -82,7 +101,7 @@ func (s *IntegrationTestSuite) TestFarm() {
 		EndHeight:       startHeight + 100,
 		Editable:        editable,
 		Expired:         false,
-		TotalLptLocked:  sdk.NewCoin(s.network.BondDenom, sdk.ZeroInt()),
+		TotalLptLocked:  sdk.NewCoin(lptDenom, sdk.ZeroInt()),
 		TotalReward:     totalReward,
 		RemainingReward: totalReward,
 		RewardPerBlock:  rewardPerBlock,
@@ -104,8 +123,9 @@ func (s *IntegrationTestSuite) TestFarm() {
 		poolId,
 		args...,
 	)
+	s.Require().EqualValues(txResult.Code, 0, txResult.Log)
 
-	lpToken := sdk.NewCoin(s.network.BondDenom, sdk.NewInt(100))
+	lpToken := sdk.NewCoin(lptDenom, sdk.NewInt(100))
 	txResult = testutil.StakeExec(
 		s.T(),
 		s.network,
@@ -115,9 +135,10 @@ func (s *IntegrationTestSuite) TestFarm() {
 		lpToken.String(),
 		globalFlags...,
 	)
+	s.Require().EqualValues(txResult.Code, 0, txResult.Log)
 	beginHeight := txResult.Height
 
-	unstakeLPToken := sdk.NewCoin(s.network.BondDenom, sdk.NewInt(50))
+	unstakeLPToken := sdk.NewCoin(lptDenom, sdk.NewInt(50))
 	txResult = testutil.UnstakeExec(
 		s.T(),
 		s.network,
@@ -127,9 +148,14 @@ func (s *IntegrationTestSuite) TestFarm() {
 		unstakeLPToken.String(),
 		globalFlags...,
 	)
+	s.Require().EqualValues(txResult.Code, 0, txResult.Log)
 	endHeight := txResult.Height
 
-	rewardGot := s.network.GetAttribute(farmtypes.EventTypeUnstake, farmtypes.AttributeValueReward, txResult.Events)
+	rewardGot := s.network.GetAttribute(
+		farmtypes.EventTypeUnstake,
+		farmtypes.AttributeValueReward,
+		txResult.Events,
+	)
 	expectedReward := rewardPerBlock.MulInt(sdk.NewInt(endHeight - beginHeight))
 	s.Require().Equal(expectedReward.String(), rewardGot)
 
@@ -141,9 +167,14 @@ func (s *IntegrationTestSuite) TestFarm() {
 		poolId,
 		globalFlags...,
 	)
+	s.Require().EqualValues(txResult.Code, 0, txResult.Log)
 	endHeight1 := txResult.Height
 
-	rewardGot = s.network.GetAttribute(farmtypes.EventTypeHarvest, farmtypes.AttributeValueReward, txResult.Events)
+	rewardGot = s.network.GetAttribute(
+		farmtypes.EventTypeHarvest,
+		farmtypes.AttributeValueReward,
+		txResult.Events,
+	)
 	expectedReward = rewardPerBlock.MulInt(sdk.NewInt(endHeight1 - endHeight))
 	s.Require().Equal(expectedReward.String(), rewardGot)
 
@@ -166,10 +197,55 @@ func (s *IntegrationTestSuite) TestFarm() {
 		poolId,
 		globalFlags...,
 	)
+	s.Require().EqualValues(txResult.Code, 0, txResult.Log)
 }
 
 func (s *IntegrationTestSuite) LatestHeight() int64 {
 	height, err := s.network.LatestHeight()
 	s.Require().NoError(err)
 	return height
+}
+
+func (s *IntegrationTestSuite) Init() {
+
+	val := s.network.Validators[0]
+	clientCtx := val.ClientCtx
+
+	from := val.Address
+	symbol := "kitty"
+	name := "Kitty Token"
+	minUnit := "kitty"
+	scale := uint32(0)
+	initialSupply := uint64(100000000)
+	maxSupply := uint64(200000000)
+	mintable := true
+
+	// issue token
+	msgIssueToken := &tokentypes.MsgIssueToken{
+		Symbol:        symbol,
+		Name:          name,
+		Scale:         scale,
+		MinUnit:       minUnit,
+		InitialSupply: initialSupply,
+		MaxSupply:     maxSupply,
+		Mintable:      mintable,
+		Owner:         from.String(),
+	}
+	res := s.network.BlockSendMsgs(s.T(), msgIssueToken)
+	s.Require().Equal(uint32(0), res.Code, res.Log)
+
+	// add liquidity
+	status, err := clientCtx.Client.Status(context.Background())
+	s.Require().NoError(err)
+	deadline := status.SyncInfo.LatestBlockTime.Add(time.Minute)
+
+	msgAddLiquidity := &coinswaptypes.MsgAddLiquidity{
+		MaxToken:         sdk.NewCoin(symbol, sdk.NewInt(1000)),
+		ExactStandardAmt: sdk.NewInt(1000),
+		MinLiquidity:     sdk.NewInt(1000),
+		Deadline:         deadline.Unix(),
+		Sender:           val.Address.String(),
+	}
+	res = s.network.BlockSendMsgs(s.T(), msgAddLiquidity)
+	s.Require().Equal(uint32(0), res.Code, res.Log)
 }

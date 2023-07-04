@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package irismod.token.module.v1;
+
+import "cosmos/app/v1alpha1/module.proto";
+
+// Module is the config object of the bank module.
+message Module {
+  option (cosmos.app.v1alpha1.module) = {
+    go_import: "github.com/irisnet/irismod/modules/token"
+  };
+
+  string fee_collector_name = 1;
+
+  // authority defines the custom module authority. If not set, defaults to the governance module.
+  string authority = 2;
+}

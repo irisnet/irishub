@@ -66,3 +66,8 @@ type GovKeeper interface {
 	GetProposal(ctx sdk.Context, proposalID uint64) (v1.Proposal, bool)
 	GetGovernanceAccount(ctx sdk.Context) authtypes.ModuleAccountI
 }
+
+// CoinswapKeeper defines the expected coinswap keeper (noalias)
+type CoinswapKeeper interface {
+	ValidatePool(ctx sdk.Context, lptDenom string) error
+}

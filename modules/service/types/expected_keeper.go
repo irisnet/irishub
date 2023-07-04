@@ -13,11 +13,26 @@ type BankKeeper interface {
 	GetSupply(ctx sdk.Context, denom string) sdk.Coin
 	GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin
 
-	SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error
-	SendCoinsFromAccountToModule(ctx sdk.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error
-	SendCoinsFromModuleToModule(ctx sdk.Context, senderModule, recipientModule string, amt sdk.Coins) error
+	SendCoinsFromModuleToAccount(
+		ctx sdk.Context,
+		senderModule string,
+		recipientAddr sdk.AccAddress,
+		amt sdk.Coins,
+	) error
+	SendCoinsFromAccountToModule(
+		ctx sdk.Context,
+		senderAddr sdk.AccAddress,
+		recipientModule string,
+		amt sdk.Coins,
+	) error
+	SendCoinsFromModuleToModule(
+		ctx sdk.Context,
+		senderModule, recipientModule string,
+		amt sdk.Coins,
+	) error
 
 	SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
+	GetBlockedAddresses() map[string]bool
 }
 
 // AccountKeeper defines the expected account keeper (noalias)

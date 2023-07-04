@@ -9,9 +9,13 @@ import (
 	abci "github.com/cometbft/cometbft/abci/types"
 	coretypes "github.com/cometbft/cometbft/rpc/core/types"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	clienttx "github.com/cosmos/cosmos-sdk/client/tx"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
 	"github.com/cosmos/gogoproto/proto"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
@@ -133,4 +137,44 @@ func (n Network) GetAttribute(typ, key string, events []abci.Event) string {
 		}
 	}
 	return ""
+}
+
+func (n Network) SendMsgs(
+	t *testing.T,
+	msgs ...sdk.Msg,
+) *sdk.TxResponse {
+	val := n.Validators[0]
+	client := val.ClientCtx.WithBroadcastMode(flags.BroadcastSync)
+
+	// prepare txBuilder with msg
+	txBuilder := client.TxConfig.NewTxBuilder()
+	err := txBuilder.SetMsgs(msgs...)
+	require.NoError(t, err, "txBuilder.SetMsgs failed")
+
+	txBuilder.SetFeeAmount(sdk.Coins{sdk.NewInt64Coin(n.BondDenom, 10)})
+	txBuilder.SetGasLimit(1000000)
+	// setup txFactory
+	txFactory := clienttx.Factory{}.
+		WithChainID(client.ChainID).
+		WithKeybase(client.Keyring).
+		WithTxConfig(client.TxConfig).
+		WithSignMode(signing.SignMode_SIGN_MODE_DIRECT)
+
+	// Sign Tx.
+	err = authclient.SignTx(txFactory, client, val.Moniker, txBuilder, false, true)
+	require.NoError(t, err, "authclient.SignTx failed")
+
+	txBytes, err := client.TxConfig.TxEncoder()(txBuilder.GetTx())
+	require.NoError(t, err, "TxConfig.TxEncoder failed")
+	res, err := client.BroadcastTx(txBytes)
+	require.NoError(t, err, "BroadcastTx failed")
+	require.Equal(t, uint32(0), res.Code, res.RawLog)
+	n.WaitForNBlock(2)
+	return res
+}
+
+func (n Network) BlockSendMsgs(t *testing.T,
+	msgs ...sdk.Msg) *ResponseTx {
+	response := n.SendMsgs(t, msgs...)
+	return n.QueryTx(t, n.Validators[0].ClientCtx, response.TxHash)
 }

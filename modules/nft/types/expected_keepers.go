@@ -7,6 +7,7 @@ import (
 
 // AccountKeeper defines the expected account keeper for query account
 type AccountKeeper interface {
+	GetModuleAddress(name string) sdk.AccAddress
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
 }
 

@@ -56,7 +56,6 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.keeper = keeper.NewKeeper(
 		app.AppCodec(),
 		app.GetKey(types.StoreKey),
-		app.GetSubspace(types.ModuleName),
 		NewMockServiceKeeper(),
 	)
 }

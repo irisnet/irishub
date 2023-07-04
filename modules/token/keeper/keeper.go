@@ -29,7 +29,6 @@ func NewKeeper(
 	cdc codec.Codec,
 	key storetypes.StoreKey,
 	bankKeeper types.BankKeeper,
-	blockedAddrs map[string]bool,
 	feeCollectorName string,
 	authority string,
 ) Keeper {
@@ -38,7 +37,7 @@ func NewKeeper(
 		cdc:              cdc,
 		bankKeeper:       bankKeeper,
 		feeCollectorName: feeCollectorName,
-		blockedAddrs:     blockedAddrs,
+		blockedAddrs:     bankKeeper.GetBlockedAddresses(),
 		registry:         make(v1.SwapRegistry),
 		authority:        authority,
 	}

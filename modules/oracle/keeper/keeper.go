@@ -14,7 +14,6 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/irisnet/irismod/modules/oracle/types"
 	serviceexported "github.com/irisnet/irismod/modules/service/exported"
@@ -22,24 +21,21 @@ import (
 
 // Keeper defines a struct for the oracle keeper
 type Keeper struct {
-	cdc        codec.Codec
-	storeKey   storetypes.StoreKey
-	sk         types.ServiceKeeper
-	paramSpace paramtypes.Subspace
+	cdc      codec.Codec
+	storeKey storetypes.StoreKey
+	sk       types.ServiceKeeper
 }
 
 // NewKeeper returns an instance of the oracle Keeper
 func NewKeeper(
 	cdc codec.Codec,
 	storeKey storetypes.StoreKey,
-	paramSpace paramtypes.Subspace,
 	sk types.ServiceKeeper,
 ) Keeper {
 	keeper := Keeper{
-		storeKey:   storeKey,
-		cdc:        cdc,
-		sk:         sk,
-		paramSpace: paramSpace,
+		storeKey: storeKey,
+		cdc:      cdc,
+		sk:       sk,
 	}
 
 	_ = sk.RegisterResponseCallback(types.ModuleName, keeper.HandlerResponse)

@@ -33,7 +33,6 @@ func NewKeeper(
 	key storetypes.StoreKey,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-	blockedAddrs map[string]bool,
 	feeCollectorName string,
 	authority string,
 ) Keeper {
@@ -51,7 +50,7 @@ func NewKeeper(
 		cdc:              cdc,
 		accountKeeper:    accountKeeper,
 		bankKeeper:       bankKeeper,
-		blockedAddrs:     blockedAddrs,
+		blockedAddrs:     bankKeeper.GetBlockedAddresses(),
 		feeCollectorName: feeCollectorName,
 		authority:        authority,
 	}

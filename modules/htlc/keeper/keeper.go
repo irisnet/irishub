@@ -29,7 +29,6 @@ func NewKeeper(
 	key storetypes.StoreKey,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-	blockedAddrs map[string]bool,
 	authority string,
 ) Keeper {
 	// ensure the HTLC module account is set
@@ -42,7 +41,7 @@ func NewKeeper(
 		cdc:           cdc,
 		accountKeeper: accountKeeper,
 		bankKeeper:    bankKeeper,
-		blockedAddrs:  blockedAddrs,
+		blockedAddrs:  bankKeeper.GetBlockedAddresses(),
 		authority:     authority,
 	}
 }
