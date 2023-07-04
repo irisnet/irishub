@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Bug Fixes
+* (IRISHub) [\#2852](https://github.com/irisnet/irishub/pull/2852) refactor: fix eip712 signature and inject ParseChainID method
+
 ## 2.0.0
 
 ### State Machine Breaking
