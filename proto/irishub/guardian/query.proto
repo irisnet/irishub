@@ -2,7 +2,7 @@ syntax = "proto3";
 package irishub.guardian;
 
 import "gogoproto/gogo.proto";
-import "guardian/guardian.proto";
+import "irishub/guardian/guardian.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 

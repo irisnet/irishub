@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/tendermint/tendermint/crypto"
+	"github.com/cometbft/cometbft/crypto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -31,5 +31,10 @@ func Migrate(ctx sdk.Context, k servicekeeper.Keeper, bk bankkeeper.Keeper) erro
 	)
 
 	k.SetParams(ctx, params)
-	return bk.SendCoinsFromAccountToModule(ctx, oldAcc, servicetypes.FeeCollectorName, bk.GetAllBalances(ctx, oldAcc))
+	return bk.SendCoinsFromAccountToModule(
+		ctx,
+		oldAcc,
+		servicetypes.FeeCollectorName,
+		bk.GetAllBalances(ctx, oldAcc),
+	)
 }

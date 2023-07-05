@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -85,7 +85,10 @@ func (suite *KeeperTestSuite) TestAddCollectedFees() {
 	coins = suite.app.BankKeeper.GetAllBalances(suite.ctx, acc.GetAddress())
 	require.True(suite.T(), coins.Empty())
 
-	feeCollectorTotalBalance := suite.app.BankKeeper.GetAllBalances(suite.ctx, feeCollector.GetAddress())
+	feeCollectorTotalBalance := suite.app.BankKeeper.GetAllBalances(
+		suite.ctx,
+		feeCollector.GetAddress(),
+	)
 	expectedCollectedFees := feeCollectorTotalBalance.Sub(feeCollectorBalance...)
 	require.Equal(suite.T(), expectedCollectedFees, mintCoins)
 

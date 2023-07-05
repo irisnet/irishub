@@ -2,7 +2,7 @@ syntax = "proto3";
 package irishub.mint;
 
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "mint/mint.proto";
+import "irishub/mint/mint.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 

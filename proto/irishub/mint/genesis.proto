@@ -1,7 +1,7 @@
 syntax = "proto3";
 package irishub.mint;
 
-import "mint/mint.proto";
+import "irishub/mint/mint.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/irisnet/irishub/modules/mint/types";

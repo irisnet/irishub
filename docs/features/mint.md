@@ -12,7 +12,7 @@ The reward is composed by two parts, one is the collected transaction fee from t
 
 ### Block Time
 
-The block time is not the machine time, because different machines may not have exactly the same time. They must have some deviation more or less which will result in non-deterministic. So here the block time is the BFT time. Please refer to this [tendermint bft-time](https://github.com/tendermint/tendermint/blob/master/docs/spec/consensus/bft-time.md) for detailed description.
+The block time is not the machine time, because different machines may not have exactly the same time. They must have some deviation more or less which will result in non-deterministic. So here the block time is the BFT time. Please refer to this [tendermint bft-time](https://github.com/cometbft/cometbft/blob/master/docs/spec/consensus/bft-time.md) for detailed description.
 
 ### Inflation Rate
 

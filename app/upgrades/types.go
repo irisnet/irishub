@@ -1,7 +1,7 @@
 package upgrades
 
 import (
-	abci "github.com/tendermint/tendermint/abci/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	store "github.com/cosmos/cosmos-sdk/store/types"
@@ -38,8 +38,8 @@ type Upgrade struct {
 }
 
 type ConsensusParamsReaderWriter interface {
-	StoreConsensusParams(ctx sdk.Context, cp *abci.ConsensusParams)
-	GetConsensusParams(ctx sdk.Context) *abci.ConsensusParams
+	StoreConsensusParams(ctx sdk.Context, cp *tmproto.ConsensusParams)
+	GetConsensusParams(ctx sdk.Context) *tmproto.ConsensusParams
 }
 
 type AppKeepers struct {

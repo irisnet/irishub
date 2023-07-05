@@ -3,7 +3,7 @@ package htlc
 import (
 	"time"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -14,7 +14,13 @@ import (
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 )
 
-func Migrate(ctx sdk.Context, cdc codec.Codec, k htlckeeper.Keeper, bk bankkeeper.Keeper, key *storetypes.KVStoreKey) error {
+func Migrate(
+	ctx sdk.Context,
+	cdc codec.Codec,
+	k htlckeeper.Keeper,
+	bk bankkeeper.Keeper,
+	key *storetypes.KVStoreKey,
+) error {
 	if err := k.EnsureModuleAccountPermissions(ctx); err != nil {
 		return err
 	}

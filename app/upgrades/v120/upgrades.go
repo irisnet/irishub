@@ -24,8 +24,7 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-
-	ibchost "github.com/cosmos/ibc-go/v5/modules/core/24-host"
+	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	farmtypes "github.com/irisnet/irismod/modules/farm/types"
@@ -61,11 +60,20 @@ var Upgrade = upgrades.Upgrade{
 	UpgradeName:               "v1.2",
 	UpgradeHandlerConstructor: upgradeHandlerConstructor,
 	StoreUpgrades: &store.StoreUpgrades{
-		Added: []string{farmtypes.StoreKey, feegrant.StoreKey, tibchost.StoreKey, tibcnfttypes.StoreKey},
+		Added: []string{
+			farmtypes.StoreKey,
+			feegrant.StoreKey,
+			tibchost.StoreKey,
+			tibcnfttypes.StoreKey,
+		},
 	},
 }
 
-func upgradeHandlerConstructor(m *module.Manager, c module.Configurator, app upgrades.AppKeepers) upgradetypes.UpgradeHandler {
+func upgradeHandlerConstructor(
+	m *module.Manager,
+	c module.Configurator,
+	app upgrades.AppKeepers,
+) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		// init farm params
 		amount := sdkmath.NewIntWithDecimal(1000, int(types.NativeToken.Scale))
@@ -93,7 +101,7 @@ func upgradeHandlerConstructor(m *module.Manager, c module.Configurator, app upg
 		fromVM[distrtypes.ModuleName] = 1
 		fromVM[slashingtypes.ModuleName] = 1
 		fromVM[coinswaptypes.ModuleName] = 1
-		fromVM[ibchost.ModuleName] = 1
+		fromVM[ibcexported.ModuleName] = 1
 		fromVM[capabilitytypes.ModuleName] = capability.AppModule{}.ConsensusVersion()
 		fromVM[genutiltypes.ModuleName] = genutil.AppModule{}.ConsensusVersion()
 		fromVM[minttypes.ModuleName] = mint.AppModule{}.ConsensusVersion()

@@ -6,11 +6,10 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
-	abci "github.com/tendermint/tendermint/abci/types"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -88,21 +87,6 @@ func (suite *KeeperTestSuite) TestDeleteSuper() {
 
 	_, found = suite.keeper.GetSuper(suite.ctx, addrs[0])
 	suite.False(found)
-}
-
-func (suite *KeeperTestSuite) TestQuerySupers() {
-	super := types.NewSuper("test", types.Genesis, addrs[0], addrs[1])
-	suite.keeper.AddSuper(suite.ctx, super)
-
-	var supers []types.Super
-	querier := keeper.NewQuerier(suite.keeper, suite.cdc)
-	res, sdkErr := querier(suite.ctx, []string{types.QuerySupers}, abci.RequestQuery{})
-	suite.NoError(sdkErr)
-
-	err := suite.cdc.UnmarshalJSON(res, &supers)
-	suite.NoError(err)
-	suite.Len(supers, 1)
-	suite.Contains(supers, super)
 }
 
 func newPubKey(pk string) (res cryptotypes.PubKey) {
