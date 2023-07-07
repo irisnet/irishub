@@ -30,7 +30,9 @@ func Migrate(ctx sdk.Context, k servicekeeper.Keeper, bk bankkeeper.Keeper) erro
 		false,
 	)
 
-	k.SetParams(ctx, params)
+	if err := k.SetParams(ctx, params); err != nil {
+		return err
+	}
 	return bk.SendCoinsFromAccountToModule(
 		ctx,
 		oldAcc,

@@ -31,7 +31,7 @@ func mergeGenesisCmd(encodingConfig params.EncodingConfig) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "merge-genesis",
 		Short: "merge genesis with testnet and mainnet",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			testnetGenesisPath, err := cmd.Flags().GetString(testnetFile)
 			if err != nil {
 				return err

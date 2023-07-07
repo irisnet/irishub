@@ -9,7 +9,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/irisnet/irishub/types"
 	iristypes "github.com/irisnet/irishub/types"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
@@ -101,10 +100,6 @@ func TestFullAppSimulation(t *testing.T) {
 		db,
 		nil,
 		true,
-		map[int64]bool{},
-		types.DefaultNodeHome,
-		simcli.FlagPeriodValue,
-		MakeEncodingConfig(),
 		EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
@@ -160,10 +155,6 @@ func TestAppImportExport(t *testing.T) {
 		db,
 		nil,
 		true,
-		map[int64]bool{},
-		types.DefaultNodeHome,
-		simcli.FlagPeriodValue,
-		MakeEncodingConfig(),
 		EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
@@ -217,10 +208,6 @@ func TestAppImportExport(t *testing.T) {
 		newDB,
 		nil,
 		true,
-		map[int64]bool{},
-		types.DefaultNodeHome,
-		simcli.FlagPeriodValue,
-		MakeEncodingConfig(),
 		EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
@@ -344,10 +331,6 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		db,
 		nil,
 		true,
-		map[int64]bool{},
-		types.DefaultNodeHome,
-		simcli.FlagPeriodValue,
-		MakeEncodingConfig(),
 		EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
@@ -406,10 +389,6 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		newDB,
 		nil,
 		true,
-		map[int64]bool{},
-		types.DefaultNodeHome,
-		simcli.FlagPeriodValue,
-		MakeEncodingConfig(),
 		EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
@@ -468,10 +447,6 @@ func TestAppStateDeterminism(t *testing.T) {
 				db,
 				nil,
 				true,
-				map[int64]bool{},
-				types.DefaultNodeHome,
-				simcli.FlagPeriodValue,
-				MakeEncodingConfig(),
 				EmptyAppOptions{},
 				interBlockCacheOpt(),
 			)

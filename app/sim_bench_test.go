@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	"github.com/irisnet/irishub/types"
 
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -49,10 +48,6 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 		db,
 		nil,
 		true,
-		map[int64]bool{},
-		types.DefaultNodeHome,
-		simcli.FlagPeriodValue,
-		MakeEncodingConfig(),
 		EmptyAppOptions{},
 		interBlockCacheOpt(),
 	)
@@ -117,10 +112,6 @@ func BenchmarkInvariants(b *testing.B) {
 		db,
 		nil,
 		true,
-		map[int64]bool{},
-		types.DefaultNodeHome,
-		simcli.FlagPeriodValue,
-		MakeEncodingConfig(),
 		EmptyAppOptions{},
 		interBlockCacheOpt(),
 	)

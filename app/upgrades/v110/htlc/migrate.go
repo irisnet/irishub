@@ -94,9 +94,7 @@ func Migrate(
 	}
 
 	// Set default params
-	k.SetParams(ctx, PresetHTLTParams())
-
-	return nil
+	return k.SetParams(ctx, PresetHTLTParams())
 }
 
 func PresetHTLTParams() htlctypes.Params {
