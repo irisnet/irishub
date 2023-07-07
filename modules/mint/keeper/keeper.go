@@ -3,7 +3,7 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
+	"github.com/cometbft/cometbft/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -80,7 +80,12 @@ func (k Keeper) MintCoins(ctx sdk.Context, newCoins sdk.Coins) error {
 // AddCollectedFees implements an alias call to the underlying supply keeper's
 // AddCollectedFees to be used in BeginBlocker.
 func (k Keeper) AddCollectedFees(ctx sdk.Context, coins sdk.Coins) error {
-	return k.bankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, k.feeCollectorName, coins)
+	return k.bankKeeper.SendCoinsFromModuleToModule(
+		ctx,
+		types.ModuleName,
+		k.feeCollectorName,
+		coins,
+	)
 }
 
 // GetParamSet returns inflation params from the global param store

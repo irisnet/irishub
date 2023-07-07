@@ -8532,7 +8532,7 @@ paths:
 
                   Tendermint sha256 hash of the transaction bytes. See
 
-                  https://github.com/tendermint/tendermint/issues/6539 for
+                  https://github.com/cometbft/cometbft/issues/6539 for
                   reference
               logs:
                 type: array
@@ -57586,7 +57586,7 @@ definitions:
 
           Tendermint sha256 hash of the transaction bytes. See
 
-          https://github.com/tendermint/tendermint/issues/6539 for reference
+          https://github.com/cometbft/cometbft/issues/6539 for reference
       logs:
         type: array
         items:

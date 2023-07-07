@@ -1,7 +1,7 @@
 syntax = "proto3";
 package irishub.guardian;
 
-import "guardian/guardian.proto";
+import "irishub/guardian/guardian.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/irisnet/irishub/modules/guardian/types";

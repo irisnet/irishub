@@ -5,20 +5,34 @@ import (
 	"os"
 	"testing"
 
-	"github.com/irisnet/irishub/types"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	"github.com/cosmos/cosmos-sdk/simapp"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
+	simcli "github.com/cosmos/cosmos-sdk/x/simulation/client/cli"
 )
 
 // Profile with:
 // /usr/local/go/bin/go test -benchmem -run=^$ github.com/irisnet/app -bench ^BenchmarkFullAppSimulation$ -Commit=true -cpuprofile cpu.out
 func BenchmarkFullAppSimulation(b *testing.B) {
-	config, db, dir, logger, _, err := simapp.SetupSimulation("goleveldb-app-sim", "Simulation")
+	b.ReportAllocs()
+
+	config := simcli.NewConfigFromFlags()
+	config.ChainID = AppChainID
+
+	db, dir, logger, skip, err := simtestutil.SetupSimulation(
+		config,
+		"goleveldb-app-sim",
+		"Simulation",
+		simcli.FlagVerboseValue,
+		simcli.FlagEnabledValue,
+	)
 	if err != nil {
 		b.Fatalf("simulation setup failed: %s", err.Error())
+	}
+	if skip {
+		b.Skip("skipping benchmark application simulation")
 	}
 
 	defer func() {
@@ -29,23 +43,30 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 		}
 	}()
 
-	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, types.DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, interBlockCacheOpt())
+	app := NewIrisApp(
+		logger,
+		db,
+		nil,
+		true,
+		EmptyAppOptions{},
+		interBlockCacheOpt(),
+	)
 
 	// run randomized simulation
 	_, simParams, simErr := simulation.SimulateFromSeed(
 		b,
 		os.Stdout,
 		app.BaseApp,
-		simapp.AppStateFn(app.AppCodec(), app.SimulationManager()),
+		simtestutil.AppStateFn(app.AppCodec(), app.SimulationManager(), app.DefaultGenesis()),
 		simtypes.RandomAccounts, // Replace with own random account function if using keys other than secp256k1
-		simapp.SimulationOperations(app, app.AppCodec(), config),
+		simtestutil.SimulationOperations(app, app.AppCodec(), config),
 		app.ModuleAccountAddrs(),
 		config,
 		app.AppCodec(),
 	)
 
 	// export state and simParams before the simulation error is checked
-	if err = simapp.CheckExportSimulation(app, config, simParams); err != nil {
+	if err = simtestutil.CheckExportSimulation(app, config, simParams); err != nil {
 		b.Fatal(err)
 	}
 
@@ -54,14 +75,26 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 	}
 
 	if config.Commit {
-		simapp.PrintStats(db)
+		simtestutil.PrintStats(db)
 	}
 }
 
 func BenchmarkInvariants(b *testing.B) {
-	config, db, dir, logger, _, err := simapp.SetupSimulation("leveldb-app-invariant-bench", "Simulation")
+	config := simcli.NewConfigFromFlags()
+	config.ChainID = AppChainID
+
+	db, dir, logger, skip, err := simtestutil.SetupSimulation(
+		config,
+		"goleveldb-app-sim",
+		"Simulation",
+		simcli.FlagVerboseValue,
+		simcli.FlagEnabledValue,
+	)
 	if err != nil {
 		b.Fatalf("simulation setup failed: %s", err.Error())
+	}
+	if skip {
+		b.Skip("skipping benchmark application simulation")
 	}
 
 	config.AllInvariants = false
@@ -74,23 +107,30 @@ func BenchmarkInvariants(b *testing.B) {
 		}
 	}()
 
-	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, types.DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, interBlockCacheOpt())
+	app := NewIrisApp(
+		logger,
+		db,
+		nil,
+		true,
+		EmptyAppOptions{},
+		interBlockCacheOpt(),
+	)
 
 	// run randomized simulation
 	_, simParams, simErr := simulation.SimulateFromSeed(
 		b,
 		os.Stdout,
 		app.BaseApp,
-		simapp.AppStateFn(app.AppCodec(), app.SimulationManager()),
+		simtestutil.AppStateFn(app.AppCodec(), app.SimulationManager(), app.DefaultGenesis()),
 		simtypes.RandomAccounts, // Replace with own random account function if using keys other than secp256k1
-		simapp.SimulationOperations(app, app.AppCodec(), config),
+		simtestutil.SimulationOperations(app, app.AppCodec(), config),
 		app.ModuleAccountAddrs(),
 		config,
 		app.AppCodec(),
 	)
 
 	// export state and simParams before the simulation error is checked
-	if err = simapp.CheckExportSimulation(app, config, simParams); err != nil {
+	if err = simtestutil.CheckExportSimulation(app, config, simParams); err != nil {
 		b.Fatal(err)
 	}
 
@@ -99,7 +139,7 @@ func BenchmarkInvariants(b *testing.B) {
 	}
 
 	if config.Commit {
-		simapp.PrintStats(db)
+		simtestutil.PrintStats(db)
 	}
 
 	ctx := app.NewContext(true, tmproto.Header{Height: app.LastBlockHeight() + 1})

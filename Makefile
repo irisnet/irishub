@@ -10,6 +10,7 @@ SDK_PACK := $(shell go list -m github.com/cosmos/cosmos-sdk | sed  's/ /\@/g')
 NetworkType := $(shell if [ -z ${NetworkType} ]; then echo "mainnet"; else echo ${NetworkType}; fi)
 CURRENT_DIR = $(shell pwd)
 PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
+DOCKER := $(shell which docker)
 
 # default mainnet EVM_CHAIN_ID
 EVM_CHAIN_ID ?= 6688
@@ -141,21 +142,25 @@ distclean: clean
 ###                                Protobuf                                 ###
 ###############################################################################
 
-protoVer=v0.7
-protoImageName=tendermintdev/sdk-proto-gen:$(protoVer)
-containerProtoGen=$(PROJECT_NAME)-proto-gen-$(protoVer)
-containerProtoGenAny=$(PROJECT_NAME)-proto-gen-any-$(protoVer)
-containerProtoGenSwagger=$(PROJECT_NAME)-proto-gen-swagger-$(protoVer)
-containerProtoFmt=$(PROJECT_NAME)-proto-fmt-$(protoVer)
-proto-all: proto-tools proto-gen proto-swagger-gen
+protoVer=0.13.0
+protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
+protoImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(protoImageName)
+
+proto-all: proto-format proto-lint proto-gen
 
 proto-gen:
-	@./scripts/protocgen.sh
+	@echo "Generating Protobuf files"
+	@$(protoImage) sh ./scripts/protocgen.sh
 
 proto-swagger-gen:
 	@echo "Generating Protobuf Swagger"
-	@if docker ps -a --format '{{.Names}}' | grep -Eq "^${containerProtoGenSwagger}$$"; then docker start -a $(containerProtoGenSwagger); else docker run --name $(containerProtoGenSwagger) -v $(CURDIR):/workspace --workdir /workspace $(protoImageName) \
-		sh ./scripts/protoc-swagger-gen.sh; fi
+	@$(protoImage) sh ./scripts/protoc-swagger-gen.sh
+
+proto-format:
+	@$(protoImage) find ./ -name "*.proto" -exec clang-format -i {} \;
+
+proto-lint:
+	@$(protoImage) buf lint --error-format=json
 
 ########################################
 ### Testing

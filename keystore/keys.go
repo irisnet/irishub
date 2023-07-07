@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	tmcrypto "github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
+	tmcrypto "github.com/cometbft/cometbft/crypto"
+	"github.com/cometbft/cometbft/crypto/secp256k1"
 
 	"github.com/cosmos/cosmos-sdk/crypto"
 	sdksecp256k1 "github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"

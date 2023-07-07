@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	tmjson "github.com/tendermint/tendermint/libs/json"
-	"github.com/tendermint/tendermint/types"
+	tmjson "github.com/cometbft/cometbft/libs/json"
+	"github.com/cometbft/cometbft/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -31,7 +31,7 @@ func mergeGenesisCmd(encodingConfig params.EncodingConfig) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "merge-genesis",
 		Short: "merge genesis with testnet and mainnet",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			testnetGenesisPath, err := cmd.Flags().GetString(testnetFile)
 			if err != nil {
 				return err
