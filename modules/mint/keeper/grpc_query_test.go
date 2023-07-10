@@ -18,5 +18,5 @@ func (suite *KeeperTestSuite) TestGRPCQueryPoolParameters() {
 	// Query Params
 	resp, err := queryClient.Params(gocontext.Background(), &types.QueryParamsRequest{})
 	suite.NoError(err)
-	suite.Equal(app.MintKeeper.GetParamSet(ctx), resp.Params)
+	suite.Equal(app.MintKeeper.GetParams(ctx), resp.Params)
 }

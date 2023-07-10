@@ -20,7 +20,7 @@ func TestBeginBlocker(t *testing.T) {
 
 	mint.BeginBlocker(ctx, app.MintKeeper)
 	minter := app.MintKeeper.GetMinter(ctx)
-	param := app.MintKeeper.GetParamSet(ctx)
+	param := app.MintKeeper.GetParams(ctx)
 	mintCoins := minter.BlockProvision(param)
 
 	acc1 := app.AccountKeeper.GetModuleAccount(ctx, "fee_collector")
@@ -33,7 +33,7 @@ func createTestApp(t *testing.T, isCheckTx bool) (*simapp.SimApp, sdk.Context) {
 	app := simapp.Setup(t, false)
 
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: 2})
-	app.MintKeeper.SetParamSet(ctx, types.NewParams(
+	app.MintKeeper.SetParams(ctx, types.NewParams(
 		sdk.DefaultBondDenom,
 		sdk.NewDecWithPrec(4, 2),
 	))

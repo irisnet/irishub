@@ -209,7 +209,11 @@ func appModules(
 			app.BankKeeper,
 			app.GetSubspace(govtypes.ModuleName),
 		),
-		mint.NewAppModule(appCodec, app.MintKeeper),
+		mint.NewAppModule(
+			appCodec,
+			app.MintKeeper,
+			app.GetSubspace(minttypes.ModuleName),
+		),
 		slashing.NewAppModule(
 			appCodec,
 			app.SlashingKeeper,
@@ -338,7 +342,7 @@ func simulationModules(
 			app.BankKeeper,
 			app.GetSubspace(govtypes.ModuleName),
 		),
-		mint.NewAppModule(appCodec, app.MintKeeper),
+		mint.NewAppModule(appCodec, app.MintKeeper, app.GetSubspace(minttypes.ModuleName)),
 		feegrantmodule.NewAppModule(
 			appCodec,
 			app.AccountKeeper,

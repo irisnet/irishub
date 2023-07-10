@@ -8,7 +8,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/irisnet/irishub/modules/mint/types"
 )
@@ -17,15 +16,19 @@ import (
 type Keeper struct {
 	cdc              codec.Codec
 	storeKey         storetypes.StoreKey
-	paramSpace       paramtypes.Subspace
 	bankKeeper       types.BankKeeper
 	feeCollectorName string
+	authority        string
 }
 
 // NewKeeper returns a mint keeper
-func NewKeeper(cdc codec.Codec, key storetypes.StoreKey,
-	paramSpace paramtypes.Subspace, ak types.AccountKeeper, bk types.BankKeeper,
-	feeCollectorName string) Keeper {
+func NewKeeper(
+	cdc codec.Codec,
+	key storetypes.StoreKey,
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	feeCollectorName, authority string,
+) Keeper {
 
 	// ensure mint module account is set
 	if addr := ak.GetModuleAddress(types.ModuleName); addr == nil {
@@ -35,9 +38,9 @@ func NewKeeper(cdc codec.Codec, key storetypes.StoreKey,
 	keeper := Keeper{
 		storeKey:         key,
 		cdc:              cdc,
-		paramSpace:       paramSpace.WithKeyTable(types.ParamKeyTable()),
 		bankKeeper:       bk,
 		feeCollectorName: feeCollectorName,
+		authority:        authority,
 	}
 	return keeper
 }
@@ -86,16 +89,4 @@ func (k Keeper) AddCollectedFees(ctx sdk.Context, coins sdk.Coins) error {
 		k.feeCollectorName,
 		coins,
 	)
-}
-
-// GetParamSet returns inflation params from the global param store
-func (k Keeper) GetParamSet(ctx sdk.Context) types.Params {
-	var params types.Params
-	k.paramSpace.GetParamSet(ctx, &params)
-	return params
-}
-
-// SetParamSet set inflation params from the global param store
-func (k Keeper) SetParamSet(ctx sdk.Context, params types.Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
 }
