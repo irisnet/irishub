@@ -29,7 +29,7 @@ blockInflationAmount = AnnualInflationAmount * blockCostTime / (year)
 ```
 
 The value of `inflationBasement` is specified in genesis file. By default its value `2000000000iris`(2 billion iris, `1 iris` equals `1*10^6 uiris`), and its value will never be changed.
-Suppose `blockCostTime` is 5000 millisecond, and `inflationRate` is `4%`, then the inflation amount will be `12675235uiris` (`12.675235iris`)
+Suppose `blockCostTime` is 5000 millisecond, and `inflationRate` is `4%`, then the inflation amount will be `12683917uiris` (`12.683917iris`)
 
 ## Impact to users
 
