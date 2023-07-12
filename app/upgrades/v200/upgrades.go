@@ -36,12 +36,17 @@ func upgradeHandlerConstructor(
 	c module.Configurator,
 	app upgrades.AppKeepers,
 ) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+	return func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		fromVM[evmtypes.ModuleName] = irisevm.AppModule{}.ConsensusVersion()
 		fromVM[feemarkettypes.ModuleName] = feemarket.AppModule{}.ConsensusVersion()
 
-		app.EvmKeeper.SetParams(ctx, evmParams)
-		app.FeeMarketKeeper.SetParams(ctx, generateFeemarketParams(ctx.BlockHeight()))
+		if err := app.EvmKeeper.SetParams(ctx, evmParams); err != nil {
+			return nil, err
+		}
+
+		if err := app.FeeMarketKeeper.SetParams(ctx, generateFeemarketParams(ctx.BlockHeight())); err != nil {
+			return nil, err
+		}
 
 		//transfer token ownership
 		owner, err := sdk.AccAddressFromBech32(evmToken.Owner)

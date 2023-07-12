@@ -333,10 +333,10 @@ func NewSimApp(
 	app.MintKeeper = mintkeeper.NewKeeper(
 		appCodec,
 		keys[minttypes.StoreKey],
-		app.GetSubspace(minttypes.ModuleName),
 		app.AccountKeeper,
 		app.BankKeeper,
 		authtypes.FeeCollectorName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.DistrKeeper = distrkeeper.NewKeeper(
@@ -410,7 +410,7 @@ func NewSimApp(
 			skipGenesisInvariants,
 			app.GetSubspace(crisistypes.ModuleName),
 		),
-		mint.NewAppModule(appCodec, app.MintKeeper),
+		mint.NewAppModule(appCodec, app.MintKeeper, app.GetSubspace(minttypes.ModuleName)),
 		slashing.NewAppModule(
 			appCodec,
 			app.SlashingKeeper,
@@ -529,7 +529,7 @@ func NewSimApp(
 			app.GetSubspace(banktypes.ModuleName),
 		),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
-		mint.NewAppModule(appCodec, app.MintKeeper),
+		mint.NewAppModule(appCodec, app.MintKeeper, app.GetSubspace(minttypes.ModuleName)),
 		staking.NewAppModule(
 			appCodec,
 			app.StakingKeeper,

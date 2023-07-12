@@ -31,7 +31,8 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.app = app
 
-	app.MintKeeper.SetParamSet(suite.ctx, types.DefaultParams())
+	err := app.MintKeeper.SetParams(suite.ctx, types.DefaultParams())
+	require.NoError(suite.T(), err)
 	app.MintKeeper.SetMinter(suite.ctx, types.DefaultMinter())
 }
 
@@ -48,9 +49,10 @@ func (suite *KeeperTestSuite) TestSetGetMinter() {
 }
 
 func (suite *KeeperTestSuite) TestSetGetParamSet() {
-	suite.app.MintKeeper.SetParamSet(suite.ctx, types.DefaultParams())
-	expParamSet := suite.app.MintKeeper.GetParamSet(suite.ctx)
+	err := suite.app.MintKeeper.SetParams(suite.ctx, types.DefaultParams())
+	require.NoError(suite.T(), err)
 
+	expParamSet := suite.app.MintKeeper.GetParams(suite.ctx)
 	require.Equal(suite.T(), types.DefaultParams(), expParamSet)
 }
 

@@ -10,6 +10,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	consensuskeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
+	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
@@ -43,18 +45,20 @@ type ConsensusParamsReaderWriter interface {
 }
 
 type AppKeepers struct {
-	AppCodec        codec.Codec
-	HTLCKeeper      htlckeeper.Keeper
-	AccountKeeper   authkeeper.AccountKeeper
-	BankKeeper      bankkeeper.Keeper
-	ServiceKeeper   servicekeeper.Keeper
-	GetKey          func(moduleName string) *storetypes.KVStoreKey
-	ModuleManager   *module.Manager
-	TIBCkeeper      *tibckeeper.Keeper
-	EvmKeeper       *evmkeeper.Keeper
-	FeeMarketKeeper feemarketkeeper.Keeper
-	TokenKeeper     tokenkeeper.Keeper
-	ReaderWriter    ConsensusParamsReaderWriter
+	AppCodec              codec.Codec
+	HTLCKeeper            htlckeeper.Keeper
+	AccountKeeper         authkeeper.AccountKeeper
+	BankKeeper            bankkeeper.Keeper
+	ServiceKeeper         servicekeeper.Keeper
+	GetKey                func(moduleName string) *storetypes.KVStoreKey
+	ModuleManager         *module.Manager
+	TIBCkeeper            *tibckeeper.Keeper
+	EvmKeeper             *evmkeeper.Keeper
+	FeeMarketKeeper       feemarketkeeper.Keeper
+	TokenKeeper           tokenkeeper.Keeper
+	ReaderWriter          ConsensusParamsReaderWriter
+	ConsensusParamsKeeper consensuskeeper.Keeper
+	ParamsKeeper          paramskeeper.Keeper
 }
 
 type upgradeRouter struct {
