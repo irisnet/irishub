@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.4
+
+### Security
+
+* (IRISHub) [\#2860](https://github.com/irisnet/irishub/pull/2860) Disable the vesting account creation to prevent contract address front-running.
+
 ## 2.0.3
 
 ### Improvements
