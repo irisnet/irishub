@@ -72,6 +72,7 @@ func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
 		NewValidateServiceDecorator(),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
+		NewRejectVestingDecorator(),
 	)
 }
 
