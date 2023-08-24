@@ -99,6 +99,10 @@ import (
 	tibcroutingtypes "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing/types"
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
 
+	nfttransfer "github.com/bianjieai/nft-transfer"
+	ibcnfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
+	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
+
 	"github.com/evmos/ethermint/ethereum/eip712"
 	srvflags "github.com/evmos/ethermint/server/flags"
 	ethermint "github.com/evmos/ethermint/types"
@@ -113,6 +117,7 @@ import (
 	"github.com/irisnet/irishub/lite"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
+	"github.com/irisnet/irishub/modules/internft"
 	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
 	iristypes "github.com/irisnet/irishub/types"
@@ -156,8 +161,9 @@ type IrisApp struct {
 	ConsensusParamsKeeper consensuskeeper.Keeper
 
 	//ibc
-	IBCKeeper         *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	IBCTransferKeeper ibctransferkeeper.Keeper
+	IBCKeeper            *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	IBCTransferKeeper    ibctransferkeeper.Keeper
+	IBCNFTTransferKeeper ibcnfttransferkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	scopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -193,9 +199,10 @@ type IrisApp struct {
 	// simulation manager
 	sm *module.SimulationManager
 
-	transferModule    transfer.AppModule
-	nfttransferModule tibcnfttransfer.AppModule
-	mttransferModule  tibcmttransfer.AppModule
+	transferModule       transfer.AppModule
+	nfttransferModule    tibcnfttransfer.AppModule
+	mttransferModule     tibcmttransfer.AppModule
+	ibcnfttransferModule nfttransfer.AppModule
 }
 
 // NewIrisApp returns a reference to an initialized IrisApp.
@@ -237,6 +244,7 @@ func NewIrisApp(
 		consensustypes.StoreKey,
 		evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey,
+		ibcnfttransfertypes.StoreKey,
 		capabilitytypes.StoreKey,
 		guardiantypes.StoreKey,
 		tokentypes.StoreKey,
@@ -306,6 +314,7 @@ func NewIrisApp(
 	)
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibcexported.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	scopedNFTTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibcnfttransfertypes.ModuleName)
 
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec,
@@ -468,10 +477,25 @@ func NewIrisApp(
 	app.transferModule = transfer.NewAppModule(app.IBCTransferKeeper)
 	transferIBCModule := transfer.NewIBCModule(app.IBCTransferKeeper)
 
+	app.IBCNFTTransferKeeper = ibcnfttransferkeeper.NewKeeper(
+		appCodec,
+		keys[ibcnfttransfertypes.StoreKey],
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		internft.NewInterNftKeeper(appCodec, app.NFTKeeper, app.AccountKeeper),
+		scopedNFTTransferKeeper,
+	)
+	app.ibcnfttransferModule = nfttransfer.NewAppModule(app.IBCNFTTransferKeeper)
+	nfttransferIBCModule := nfttransfer.NewIBCModule(app.IBCNFTTransferKeeper)
+
 	// routerModule := router.NewAppModule(app.RouterKeeper, transferIBCModule)
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
+		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule)
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	app.nfttransferModule = tibcnfttransfer.NewAppModule(app.TIBCNFTTransferKeeper)

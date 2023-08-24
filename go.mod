@@ -3,6 +3,7 @@ module github.com/irisnet/irishub
 go 1.19
 
 require (
+	github.com/bianjieai/nft-transfer v1.1.2-beta.0.20230824091700-ad134c96cf57
 	github.com/bianjieai/tibc-go v0.4.4-0.20230824091732-bbd58021f825
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cometbft/cometbft-db v0.8.0
@@ -59,7 +60,6 @@ require (
 	github.com/cosmos/rosetta-sdk-go v0.10.0 // indirect
 	github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91 // indirect
 	github.com/dop251/goja v0.0.0-20220405120441-9037c2b61cbf // indirect
-	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/gogo/googleapis v1.4.1 // indirect
 	github.com/golang/mock v1.6.0 // indirect

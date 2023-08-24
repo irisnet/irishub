@@ -1,6 +1,7 @@
 package app
 
 import (
+	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -74,6 +75,8 @@ import (
 	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
 	tibccli "github.com/bianjieai/tibc-go/modules/tibc/core/client/cli"
 
+	nfttransfer "github.com/bianjieai/nft-transfer"
+
 	"github.com/evmos/ethermint/x/evm"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	"github.com/evmos/ethermint/x/feemarket"
@@ -138,6 +141,7 @@ var (
 		tibcnfttransfer.AppModuleBasic{},
 		tibcmttransfer.AppModuleBasic{},
 		mt.AppModuleBasic{},
+		nfttransfer.AppModuleBasic{},
 
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
@@ -257,6 +261,7 @@ func appModules(
 		ibc.NewAppModule(app.IBCKeeper), tibc.NewAppModule(app.TIBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		app.transferModule,
+		app.ibcnfttransferModule,
 		app.nfttransferModule,
 		app.mttransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
@@ -384,6 +389,7 @@ func simulationModules(
 		),
 		ibc.NewAppModule(app.IBCKeeper),
 		app.transferModule,
+		app.ibcnfttransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
 		token.NewAppModule(
 			appCodec,
@@ -488,6 +494,8 @@ func orderBeginBlockers() []string {
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+
+		ibcnfttransfertypes.ModuleName,
 	}
 }
 
@@ -538,6 +546,8 @@ func orderEndBlockers() []string {
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+
+		ibcnfttransfertypes.ModuleName,
 	}
 }
 
@@ -592,5 +602,7 @@ func orderInitBlockers() []string {
 		guardiantypes.ModuleName,
 		// NOTE: crisis module must go at the end to check for invariants on each module
 		crisistypes.ModuleName,
+
+		ibcnfttransfertypes.ModuleName,
 	}
 }
