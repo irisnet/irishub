@@ -3,15 +3,15 @@ module github.com/irisnet/irishub
 go 1.19
 
 require (
-	github.com/bianjieai/tibc-go v0.4.4-0.20230703020917-f2c4f40e4f3f
+	github.com/bianjieai/tibc-go v0.4.4-0.20230824091732-bbd58021f825
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cometbft/cometbft-db v0.8.0
 	github.com/cosmos/cosmos-sdk v0.47.4
 	github.com/cosmos/gogoproto v1.4.10
 	github.com/cosmos/iavl v0.20.0 // indirect
-	github.com/cosmos/ibc-go/v7 v7.2.0
-	github.com/evmos/ethermint v0.20.0
-	github.com/irisnet/irismod v1.7.4-0.20230704022721-11481f2b93ed
+	github.com/cosmos/ibc-go/v7 v7.3.0-rc0
+	github.com/evmos/ethermint v0.22.0
+	github.com/irisnet/irismod v1.7.4-0.20230824074533-5f40ba1bd410
 )
 
 require (
