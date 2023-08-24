@@ -420,7 +420,8 @@ func NewIrisApp(
 	app.TIBCKeeper = tibckeeper.NewKeeper(
 		appCodec,
 		keys[tibchost.StoreKey],
-		app.GetSubspace(tibchost.ModuleName), app.StakingKeeper,
+		app.StakingKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.NFTKeeper = nftkeeper.NewKeeper(
