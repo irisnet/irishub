@@ -740,7 +740,30 @@ func (app *IrisApp) BeginBlocker(
 	ctx sdk.Context,
 	req abci.RequestBeginBlock,
 ) abci.ResponseBeginBlock {
+	// NOTE: if we can't get conParmas from x/consensus, we go for the default x/params
+	// WARNING: this line of code must be removed once the x/params is deprecated
+	ctx = app.getConsensusParams(ctx)
 	return app.mm.BeginBlock(ctx, req)
+}
+
+// getConsensusParams gets the consensus parameters from the x/consensus module or the x/params module
+// Note: some modules require consensus params from the sdk.Context.
+// By default, baseapp.BeginBlock accesses the consensus params from x/consensus
+// module before calling each module's BeginBlock. However, for the first time of
+// consensus params migration, it will only get an empty value until we finalize
+// the upgrade block. So we must access the consensus params from the legacy x/params
+// module instead for that case.
+func (app *IrisApp) getConsensusParams(ctx sdk.Context) sdk.Context {
+	consParams := ctx.ConsensusParams()
+	if consParams.Block == nil && consParams.Evidence == nil && consParams.Validator == nil {
+		baseAppLegacySS, ok := app.ParamsKeeper.GetSubspace(baseapp.Paramspace)
+		if !ok {
+			panic("cannot get param subspace")
+		}
+		consParams = baseapp.GetConsensusParams(ctx, baseAppLegacySS)
+		return ctx.WithConsensusParams(consParams)
+	}
+	return ctx
 }
 
 // EndBlocker application updates every end block
@@ -904,27 +927,28 @@ func initParamsKeeper(
 ) paramskeeper.Keeper {
 	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 
-	paramsKeeper.Subspace(authtypes.ModuleName)
-	paramsKeeper.Subspace(banktypes.ModuleName)
-	paramsKeeper.Subspace(stakingtypes.ModuleName)
-	paramsKeeper.Subspace(minttypes.ModuleName)
-	paramsKeeper.Subspace(distrtypes.ModuleName)
-	paramsKeeper.Subspace(slashingtypes.ModuleName)
+	paramsKeeper.Subspace(authtypes.ModuleName).WithKeyTable(authtypes.ParamKeyTable())
+	paramsKeeper.Subspace(banktypes.ModuleName).WithKeyTable(banktypes.ParamKeyTable())
+	paramsKeeper.Subspace(stakingtypes.ModuleName).WithKeyTable(stakingtypes.ParamKeyTable())
+	paramsKeeper.Subspace(minttypes.ModuleName).WithKeyTable(minttypes.ParamKeyTable())
+	paramsKeeper.Subspace(distrtypes.ModuleName).WithKeyTable(distrtypes.ParamKeyTable())
+	paramsKeeper.Subspace(slashingtypes.ModuleName).WithKeyTable(slashingtypes.ParamKeyTable())
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())
-	paramsKeeper.Subspace(crisistypes.ModuleName)
+	paramsKeeper.Subspace(crisistypes.ModuleName).WithKeyTable(crisistypes.ParamKeyTable())
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
-	paramsKeeper.Subspace(tokentypes.ModuleName)
+	paramsKeeper.Subspace(tokentypes.ModuleName).WithKeyTable(tokenv1.ParamKeyTable())
 	paramsKeeper.Subspace(recordtypes.ModuleName)
-	paramsKeeper.Subspace(htlctypes.ModuleName)
-	paramsKeeper.Subspace(coinswaptypes.ModuleName)
-	paramsKeeper.Subspace(servicetypes.ModuleName)
+	paramsKeeper.Subspace(htlctypes.ModuleName).WithKeyTable(htlctypes.ParamKeyTable())
+	paramsKeeper.Subspace(coinswaptypes.ModuleName).WithKeyTable(coinswaptypes.ParamKeyTable())
+	paramsKeeper.Subspace(servicetypes.ModuleName).WithKeyTable(servicetypes.ParamKeyTable())
 	paramsKeeper.Subspace(ibcexported.ModuleName)
-	paramsKeeper.Subspace(farmtypes.ModuleName)
+	paramsKeeper.Subspace(farmtypes.ModuleName).WithKeyTable(farmtypes.ParamKeyTable())
 	paramsKeeper.Subspace(tibchost.ModuleName)
+	paramsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
 
 	// ethermint subspaces
-	paramsKeeper.Subspace(evmtypes.ModuleName)
-	paramsKeeper.Subspace(feemarkettypes.ModuleName)
+	paramsKeeper.Subspace(evmtypes.ModuleName).WithKeyTable(evmtypes.ParamKeyTable())
+	paramsKeeper.Subspace(feemarkettypes.ModuleName).WithKeyTable(feemarkettypes.ParamKeyTable())
 
 	return paramsKeeper
 }

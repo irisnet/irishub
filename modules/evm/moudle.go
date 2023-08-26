@@ -17,7 +17,8 @@ var (
 // AppModule implements an application module for the evm module.
 type AppModule struct {
 	ethermint.AppModule
-	k *Keeper
+	k  *Keeper
+	ss types.Subspace
 }
 
 // NewAppModule creates a new AppModule object
@@ -30,6 +31,7 @@ func NewAppModule(
 	return AppModule{
 		AppModule: ethermint.NewAppModule(k, ak, ss),
 		k:         &Keeper{k, bankKeeper, false},
+		ss:        ss,
 	}
 }
 
@@ -38,4 +40,14 @@ func NewAppModule(
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), am.k)
 	types.RegisterQueryServer(cfg.QueryServer(), am.k.evmkeeper)
+
+	m := keeper.NewMigrator(*am.k.evmkeeper, am.ss)
+
+	if err := cfg.RegisterMigration(types.ModuleName, 3, m.Migrate3to4); err != nil {
+		panic(err)
+	}
+
+	if err := cfg.RegisterMigration(types.ModuleName, 4, m.Migrate4to5); err != nil {
+		panic(err)
+	}
 }
