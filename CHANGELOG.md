@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### API Breaking
+
+* (Auth) Query for BaseAccount type account is no longer supported and is replaced by EthAccount type. 
+
 ### State Machine Breaking
 
 * (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Bump up tibc-go version to xxx
