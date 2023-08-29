@@ -67,6 +67,7 @@ import (
 	"github.com/irisnet/irismod/modules/token"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
+	nfttransfer "github.com/bianjieai/nft-transfer"
 	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
 	tibcmttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/types"
 	tibcnfttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer"
@@ -74,8 +75,6 @@ import (
 	tibc "github.com/bianjieai/tibc-go/modules/tibc/core"
 	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
 	tibccli "github.com/bianjieai/tibc-go/modules/tibc/core/client/cli"
-
-	nfttransfer "github.com/bianjieai/nft-transfer"
 
 	"github.com/evmos/ethermint/x/evm"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
