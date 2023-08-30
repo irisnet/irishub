@@ -1,4 +1,4 @@
-module github.com/irisnet/irishub
+module github.com/irisnet/irishub/v2
 
 go 1.19
 

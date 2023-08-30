@@ -5,13 +5,13 @@ import (
 
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	"github.com/irisnet/irishub/app/upgrades"
-	v110 "github.com/irisnet/irishub/app/upgrades/v110"
-	v120 "github.com/irisnet/irishub/app/upgrades/v120"
-	v130 "github.com/irisnet/irishub/app/upgrades/v130"
-	v140 "github.com/irisnet/irishub/app/upgrades/v140"
-	v200 "github.com/irisnet/irishub/app/upgrades/v200"
-	v210 "github.com/irisnet/irishub/app/upgrades/v210"
+	"github.com/irisnet/irishub/v2/app/upgrades"
+	v110 "github.com/irisnet/irishub/v2/app/upgrades/v110"
+	v120 "github.com/irisnet/irishub/v2/app/upgrades/v120"
+	v130 "github.com/irisnet/irishub/v2/app/upgrades/v130"
+	v140 "github.com/irisnet/irishub/v2/app/upgrades/v140"
+	v200 "github.com/irisnet/irishub/v2/app/upgrades/v200"
+	v210 "github.com/irisnet/irishub/v2/app/upgrades/v210"
 )
 
 var (

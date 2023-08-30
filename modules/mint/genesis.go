@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/irisnet/irishub/modules/mint/keeper"
-	"github.com/irisnet/irishub/modules/mint/types"
+	"github.com/irisnet/irishub/v2/modules/mint/keeper"
+	"github.com/irisnet/irishub/v2/modules/mint/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

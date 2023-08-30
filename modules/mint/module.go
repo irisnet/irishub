@@ -19,10 +19,10 @@ import (
 
 	"github.com/irisnet/irismod/types/exported"
 
-	"github.com/irisnet/irishub/modules/mint/client/cli"
-	"github.com/irisnet/irishub/modules/mint/keeper"
-	"github.com/irisnet/irishub/modules/mint/simulation"
-	"github.com/irisnet/irishub/modules/mint/types"
+	"github.com/irisnet/irishub/v2/modules/mint/client/cli"
+	"github.com/irisnet/irishub/v2/modules/mint/keeper"
+	"github.com/irisnet/irishub/v2/modules/mint/simulation"
+	"github.com/irisnet/irishub/v2/modules/mint/types"
 )
 
 // ConsensusVersion defines the current mint module consensus version.

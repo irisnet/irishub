@@ -112,15 +112,15 @@ import (
 	feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	"github.com/irisnet/irishub/address"
-	irishubante "github.com/irisnet/irishub/ante"
-	"github.com/irisnet/irishub/lite"
-	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
-	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
-	"github.com/irisnet/irishub/modules/internft"
-	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
-	minttypes "github.com/irisnet/irishub/modules/mint/types"
-	iristypes "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/v2/address"
+	irishubante "github.com/irisnet/irishub/v2/ante"
+	"github.com/irisnet/irishub/v2/lite"
+	guardiankeeper "github.com/irisnet/irishub/v2/modules/guardian/keeper"
+	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
+	"github.com/irisnet/irishub/v2/modules/internft"
+	mintkeeper "github.com/irisnet/irishub/v2/modules/mint/keeper"
+	minttypes "github.com/irisnet/irishub/v2/modules/mint/types"
+	iristypes "github.com/irisnet/irishub/v2/types"
 )
 
 var (

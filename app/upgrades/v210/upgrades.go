@@ -11,7 +11,7 @@ import (
 
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
-	"github.com/irisnet/irishub/app/upgrades"
+	"github.com/irisnet/irishub/v2/app/upgrades"
 )
 
 var Upgrade = upgrades.Upgrade{

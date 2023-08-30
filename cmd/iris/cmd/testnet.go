@@ -41,8 +41,8 @@ import (
 
 	servercfg "github.com/evmos/ethermint/server/config"
 
-	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
-	iristypes "github.com/irisnet/irishub/types"
+	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
+	iristypes "github.com/irisnet/irishub/v2/types"
 	randomtypes "github.com/irisnet/irismod/modules/random/types"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
 	tokentypesv1 "github.com/irisnet/irismod/modules/token/types/v1"

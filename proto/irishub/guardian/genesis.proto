@@ -4,7 +4,7 @@ package irishub.guardian;
 import "irishub/guardian/guardian.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/irisnet/irishub/modules/guardian/types";
+option go_package = "github.com/irisnet/irishub/v2/modules/guardian/types";
 
 // GenesisState defines the guardian module's genesis state
 message GenesisState {
