@@ -30,7 +30,7 @@ A [Swagger](https://swagger.io/) (or OpenAPIv2) specification file is exposed un
 
 Enabling the `/swagger` endpoint is configurable inside `~/.iris/config/app.toml` via the `api.swagger` field, which is set to true by default.
 
-For application developers, you may want to generate your own Swagger definitions based on your custom modules. The IRIShub's [Swagger generation script](https://github.com/irisnet/irishub/v2/blob/master/scripts/protoc-swagger-gen.sh) is a good place to start.
+For application developers, you may want to generate your own Swagger definitions based on your custom modules. The IRIShub's [Swagger generation script](https://github.com/irisnet/irishub/blob/master/scripts/protoc-swagger-gen.sh) is a good place to start.
 
 ## API Endpoints
 

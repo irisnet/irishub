@@ -13,7 +13,7 @@ order: 3
 ### Start node from genesis
 
 :::tip
-**We recommend running a full node via state sync** (see the next subsection). But if you want to start from genesis, you must use irishub [v1.0.1](https://github.com/irisnet/irishub/v2/releases/tag/v1.0.1) to initialize your node.
+**We recommend running a full node via state sync** (see the next subsection). But if you want to start from genesis, you must use irishub [v1.0.1](https://github.com/irisnet/irishub/releases/tag/v1.0.1) to initialize your node.
 :::
 
 ```bash
@@ -30,14 +30,14 @@ iris start
 
 Next, your node will process all chain upgrades. Between each upgrade, you must use the specified version to catch up with the block. Don't worry about using the old version at the upgrade height, the node will be halted automatically.
 
-| Proposal                                               | Start height | Upgrade height | irishub version                                                                                                                          |
-| ------------------------------------------------------ | ------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| genesis                                                | 9146456      | 9593205        | [v1.0.1](https://github.com/irisnet/irishub/v2/releases/tag/v1.0.1)                                                                      |
-| [#1](https://irishub.iobscan.io/#/ProposalsDetail/1)   | 9593206      |                | [v1.1.0](https://github.com/irisnet/irishub/v2/releases/tag/v1.1.0), [v1.1.1](https://github.com/irisnet/irishub/v2/releases/tag/v1.1.1) |
-| [#8](https://irishub.iobscan.io/#/ProposalsDetail/8)   | 12393048     | 12534300       | [v1.2.0](https://github.com/irisnet/irishub/v2/releases/tag/v1.2.0), [v1.2.1](https://github.com/irisnet/irishub/v2/releases/tag/v1.2.1) |
-| [#11](https://irishub.iobscan.io/#/ProposalsDetail/11) | 14166918     | 14301916       | [v1.3.0](https://github.com/irisnet/irishub/v2/releases/tag/v1.3.0)                                                                      |
-| [#19](https://irishub.iobscan.io/#/gov/proposals/19)   |              | 17685953       | [v1.4.1](https://github.com/irisnet/irishub/v2/releases/tag/v1.4.1)                                                                      |
-| [#39](https://irishub.iobscan.io/#/gov/proposals/39)   |              | 19514010       | [v2.0.0](https://github.com/irisnet/irishub/v2/releases/tag/v2.0.0)                                                                      |
+| Proposal                                               | Start height | Upgrade height | irishub version                                                                                                                    |
+| ------------------------------------------------------ | ------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| genesis                                                | 9146456      | 9593205        | [v1.0.1](https://github.com/irisnet/irishub/releases/tag/v1.0.1)                                                                   |
+| [#1](https://irishub.iobscan.io/#/ProposalsDetail/1)   | 9593206      |                | [v1.1.0](https://github.com/irisnet/irishub/releases/tag/v1.1.0), [v1.1.1](https://github.com/irisnet/irishub/releases/tag/v1.1.1) |
+| [#8](https://irishub.iobscan.io/#/ProposalsDetail/8)   | 12393048     | 12534300       | [v1.2.0](https://github.com/irisnet/irishub/releases/tag/v1.2.0), [v1.2.1](https://github.com/irisnet/irishub/releases/tag/v1.2.1) |
+| [#11](https://irishub.iobscan.io/#/ProposalsDetail/11) | 14166918     | 14301916       | [v1.3.0](https://github.com/irisnet/irishub/releases/tag/v1.3.0)                                                                   |
+| [#19](https://irishub.iobscan.io/#/gov/proposals/19)   |              | 17685953       | [v1.4.1](https://github.com/irisnet/irishub/releases/tag/v1.4.1)                                                                   |
+| [#39](https://irishub.iobscan.io/#/gov/proposals/39)   |              | 19514010       | [v2.0.0](https://github.com/irisnet/irishub/releases/tag/v2.0.0)                                                                   |
 
 :::tip
 You may see some connection errors, it does not matter, the P2P network is trying to find available connections
