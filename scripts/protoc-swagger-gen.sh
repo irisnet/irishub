@@ -7,7 +7,7 @@ rm -rf ./tmp-swagger-gen ./tmp && mkdir -p ./tmp-swagger-gen ./tmp/proto ./tmp/t
 chmod a+x ./scripts/protoc-swagger-gen-ibc.sh
 ./scripts/protoc-swagger-gen-ibc.sh
 
-SDK_VERSION=v0.46.5
+SDK_VERSION=v0.46.7
 IRISMOD_VERSION=v1.7.2
 
 go mod download github.com/cosmos/cosmos-sdk@${SDK_VERSION}
