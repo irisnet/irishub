@@ -3,14 +3,14 @@ module github.com/irisnet/irishub/v2
 go 1.19
 
 require (
-	github.com/bianjieai/nft-transfer v1.1.2-beta.0.20230824091700-ad134c96cf57
+	github.com/bianjieai/nft-transfer v1.1.2-ibc-v6.1.0.0.20230911023600-fa7bd3f3cb1e
 	github.com/bianjieai/tibc-go v0.4.4-0.20230824091732-bbd58021f825
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cometbft/cometbft-db v0.8.0
 	github.com/cosmos/cosmos-sdk v0.47.4
 	github.com/cosmos/gogoproto v1.4.10
 	github.com/cosmos/iavl v0.20.0 // indirect
-	github.com/cosmos/ibc-go/v7 v7.3.0-rc0
+	github.com/cosmos/ibc-go/v7 v7.3.0
 	github.com/evmos/ethermint v0.22.0
 	github.com/irisnet/irismod v1.7.4-0.20230911084856-6d945c211c37
 )
