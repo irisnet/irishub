@@ -25,7 +25,7 @@
 
 ### Security
 
-* (IRISHub) [\#2865](https://github.com/irisnet/irishub/pull/2860) Disable the vesting account creation to prevent contract address front-running.
+* (IRISHub) [\#2865](https://github.com/irisnet/irishub/pull/2865) Disable the vesting account creation to prevent contract address front-running.
 
 ## 2.0.0
 
