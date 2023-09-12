@@ -23,6 +23,10 @@
 * (IRISHub) [\#2852](https://github.com/irisnet/irishub/pull/2852) refactor: fix eip712 signature and inject ParseChainID method
 * (IRISMod) [irismod \#367](https://github.com/irisnet/irismod/pull/367) Fix rest uri conflict in mt module
 
+### Security
+
+* (IRISHub) [\#2865](https://github.com/irisnet/irishub/pull/2860) Disable the vesting account creation to prevent contract address front-running.
+
 ## 2.0.0
 
 ### State Machine Breaking
