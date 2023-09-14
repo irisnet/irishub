@@ -99,10 +99,6 @@ import (
 	tibcroutingtypes "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing/types"
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
 
-	nfttransfer "github.com/bianjieai/nft-transfer"
-	ibcnfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
-	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
-
 	"github.com/evmos/ethermint/ethereum/eip712"
 	srvflags "github.com/evmos/ethermint/server/flags"
 	ethermint "github.com/evmos/ethermint/types"
@@ -111,6 +107,10 @@ import (
 	"github.com/evmos/ethermint/x/evm/vm/geth"
 	feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
+
+	nfttransfer "github.com/bianjieai/nft-transfer"
+	ibcnfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
+	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
 	"github.com/irisnet/irishub/v2/address"
 	irishubante "github.com/irisnet/irishub/v2/ante"
@@ -740,30 +740,7 @@ func (app *IrisApp) BeginBlocker(
 	ctx sdk.Context,
 	req abci.RequestBeginBlock,
 ) abci.ResponseBeginBlock {
-	// NOTE: if we can't get conParmas from x/consensus, we go for the default x/params
-	// WARNING: this line of code must be removed once the x/params is deprecated
-	ctx = app.getConsensusParams(ctx)
 	return app.mm.BeginBlock(ctx, req)
-}
-
-// getConsensusParams gets the consensus parameters from the x/consensus module or the x/params module
-// Note: some modules require consensus params from the sdk.Context.
-// By default, baseapp.BeginBlock accesses the consensus params from x/consensus
-// module before calling each module's BeginBlock. However, for the first time of
-// consensus params migration, it will only get an empty value until we finalize
-// the upgrade block. So we must access the consensus params from the legacy x/params
-// module instead for that case.
-func (app *IrisApp) getConsensusParams(ctx sdk.Context) sdk.Context {
-	consParams := ctx.ConsensusParams()
-	if consParams.Block == nil && consParams.Evidence == nil && consParams.Validator == nil {
-		baseAppLegacySS, ok := app.ParamsKeeper.GetSubspace(baseapp.Paramspace)
-		if !ok {
-			panic("cannot get param subspace")
-		}
-		consParams = baseapp.GetConsensusParams(ctx, baseAppLegacySS)
-		return ctx.WithConsensusParams(consParams)
-	}
-	return ctx
 }
 
 // EndBlocker application updates every end block
@@ -944,7 +921,6 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(ibcexported.ModuleName)
 	paramsKeeper.Subspace(farmtypes.ModuleName).WithKeyTable(farmtypes.ParamKeyTable())
 	paramsKeeper.Subspace(tibchost.ModuleName)
-	paramsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
 
 	// ethermint subspaces
 	paramsKeeper.Subspace(evmtypes.ModuleName).WithKeyTable(evmtypes.ParamKeyTable())

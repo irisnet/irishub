@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	consensustypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
@@ -41,10 +42,8 @@ func upgradeHandlerConstructor(
 
 		// Migrate Tendermint consensus parameters from x/params module to a
 		// dedicated x/consensus module.
-		baseAppLegacySS, ok := app.ParamsKeeper.GetSubspace(baseapp.Paramspace)
-		if !ok {
-			panic("failed to get legacy param subspace")
-		}
+		baseAppLegacySS := app.ParamsKeeper.Subspace(baseapp.Paramspace).
+			WithKeyTable(paramstypes.ConsensusParamsKeyTable())
 		baseapp.MigrateParams(ctx, baseAppLegacySS, &app.ConsensusParamsKeeper)
 		return app.ModuleManager.RunMigrations(ctx, c, fromVM)
 	}

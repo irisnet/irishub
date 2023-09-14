@@ -1,7 +1,6 @@
 package app
 
 import (
-	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -68,7 +67,6 @@ import (
 	"github.com/irisnet/irismod/modules/token"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
-	nfttransfer "github.com/bianjieai/nft-transfer"
 	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
 	tibcmttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/types"
 	tibcnfttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer"
@@ -81,6 +79,9 @@ import (
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	"github.com/evmos/ethermint/x/feemarket"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
+
+	nfttransfer "github.com/bianjieai/nft-transfer"
+	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
 	irisappparams "github.com/irisnet/irishub/v2/app/params"
 	irisevm "github.com/irisnet/irishub/v2/modules/evm"
