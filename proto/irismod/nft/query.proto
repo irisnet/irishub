@@ -22,12 +22,12 @@ service Query {
 
   // Collection queries the NFTs of the specified denom
   rpc Collection(QueryCollectionRequest) returns (QueryCollectionResponse) {
-    option (google.api.http).get = "/irismod/nft/collections/{denom_id}";
+    option (google.api.http).get = "/irismod/nft/collections/{denom_id=**}";
   }
 
   // Denom queries the definition of a given denom
   rpc Denom(QueryDenomRequest) returns (QueryDenomResponse) {
-    option (google.api.http).get = "/irismod/nft/denoms/{denom_id}";
+    option (google.api.http).get = "/irismod/nft/denoms/{denom_id=**}";
   }
 
   // Denoms queries all the denoms
