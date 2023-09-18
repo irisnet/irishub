@@ -51,24 +51,31 @@ import (
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	"github.com/cosmos/cosmos-sdk/x/params"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/cosmos/ibc-go/v7/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v7/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	ibcclient "github.com/cosmos/ibc-go/v7/modules/core/02-client"
+	ibcclienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	porttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 
 	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
+	"github.com/irisnet/irismod/modules/farm"
 	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
 	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
@@ -97,6 +104,7 @@ import (
 	tibcnfttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/types"
 	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
 	tibcroutingtypes "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing/types"
+	tibccli "github.com/bianjieai/tibc-go/modules/tibc/core/client/cli"
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
 
 	"github.com/evmos/ethermint/ethereum/eip712"
@@ -591,6 +599,15 @@ func NewIrisApp(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
+	// register the proposal types
+	govRouter := govv1beta1.NewRouter()
+	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
+		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
+		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
+		AddRoute(tibchost.RouterKey, tibccli.NewProposalHandler(app.TIBCKeeper)).
+		AddRoute(farmtypes.RouterKey, farm.NewCommunityPoolCreateFarmProposalHandler(app.FarmKeeper))
+
 	govConfig := govtypes.DefaultConfig()
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec,
@@ -606,6 +623,8 @@ func NewIrisApp(
 	app.GovKeeper.SetHooks(govtypes.NewMultiGovHooks(
 		farmkeeper.NewGovHook(app.FarmKeeper),
 	))
+
+	app.GovKeeper.SetLegacyRouter(govRouter)
 
 	tracer := cast.ToString(appOpts.Get(srvflags.EVMTracer))
 

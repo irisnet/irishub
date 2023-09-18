@@ -12,7 +12,7 @@ require (
 	github.com/cosmos/iavl v0.20.0 // indirect
 	github.com/cosmos/ibc-go/v7 v7.3.0
 	github.com/evmos/ethermint v0.22.0
-	github.com/irisnet/irismod v1.7.4-0.20230911084856-6d945c211c37
+	github.com/irisnet/irismod v1.7.4-0.20230918025622-758eede499a1
 )
 
 require (
