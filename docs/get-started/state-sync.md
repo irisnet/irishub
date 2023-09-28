@@ -12,7 +12,7 @@ If you want to quickly start the node and join IRIS Hub without historical data,
 2. Check the block height of the current snapshot, and select the latest height.
 
 ```bash
-curl http://34.82.96.8:26658/
+curl http://sentry-0.mainnet.irisnet.org:26658/
 ```
 
 3. Modify the `config.toml`.
@@ -20,7 +20,7 @@ curl http://34.82.96.8:26658/
 ```toml
 [statesync]
 enable = true # whether enable stat_sync; set true
-rpc_servers = "34.82.96.8:26657,34.77.68.145:26657" # RPC server address which the node connects to
+rpc_servers = "sentry-0.mainnet.irisnet.org:26657,sentry-1.mainnet.irisnet.org:26657" # RPC server address which the node connects to
 trust_height = # Set to the block height of the latest snapshot
 trust_hash = "" #Set to the hash corresponding to the latest snapshot block height (trust height), which can be checked via https://irishub.iobscan.io/#/block/<trust_height>.
 trust_period = "168h0m0s"
