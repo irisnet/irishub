@@ -41,7 +41,7 @@ Specify the nft Denom (nft classification) and metadata JSON Schema to issue nft
 `CLI`
 
 ```bash
-iris tx nft issue <denom-id> --from=<key-name> --name=<denom-name> --schema=<schema-content or path/to/schema.json> --symbol=<denom-symbol> --mint-restricted=<mint-restricted>  --update-restricted=<update-restricted> --chain-id=<chain-id> --fees=<fee>
+iris tx nft issue <denom-id> --name=<denom-name> --schema=<schema-content or path/to/schema.json> --symbol=<denom-symbol> --mint-restricted=<mint-restricted> --update-restricted=<update-restricted> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### transfer denom
@@ -51,7 +51,7 @@ The owner of the NFT classification can transfer the ownership of the NFT classi
 `CLI`
 
 ```bash
-iris tx nft transfer-denom <recipient> <denom-id>
+iris tx nft transfer-denom <recipient> <denom-id> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### Additional issuance
@@ -81,7 +81,7 @@ Transfer designated nft.
 `CLI`
 
 ```bash
-iris tx nft transfer <recipient-address> <denom-id> <token-id>
+iris tx nft transfer <recipient-address> <denom-id> <token-id> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### Destroy
