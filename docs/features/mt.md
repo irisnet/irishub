@@ -26,7 +26,7 @@ An asset class can be created by specifying the DenomName and the creator.
 `CLI`
 
 ```plain
-iris tx mt issue --name=<denom-name> --from=<sender-address>
+iris tx mt issue --name=<denom-name> --from=<sender-address> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### Production
@@ -36,7 +36,7 @@ After issuing an asset class, a specific asset of that class can be created, dur
 `CLI`
 
 ```plain
-iris tx mt mint <denom-id> --amount=<amount> --data=<data> --from=<sender-address> --recipient=<recipient-address>
+iris tx mt mint <denom-id> --amount=<amount> --data=<data> --from=<sender-address> --recipient=<recipient-address> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### Increase of Issuance
@@ -46,7 +46,7 @@ After issuing a specific asset, the owner of the asset class can also choose to 
 `CLI`
 
 ```plain
-iris tx mt mint <denom-id> --mt-id=<mt-id> --amount=<amount> --from=<sender-address> --recipient=<recipient-address>
+iris tx mt mint <denom-id> --mt-id=<mt-id> --amount=<amount> --from=<sender-address> --recipient=<recipient-address> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### Editing
@@ -56,7 +56,7 @@ Updates can be made to the metadata of a specified asset.
 `CLI`
 
 ```plain
-iris tx mt edit <denom-id> <mt-id> --data=<data> --from=<sender-address>
+iris tx mt edit <denom-id> <mt-id> --data=<data> --from=<sender-address> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### Transfer
@@ -67,7 +67,7 @@ Assets can be transferred. The amount of assets to be transferred can be specifi
 `CLI`
 
 ```plain
-iris tx mt transfer <sender> <recipient> <denom-id> <mt-id> <amount>
+iris tx mt transfer <sender> <recipient> <denom-id> <mt-id> <amount> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### Burn
@@ -77,7 +77,7 @@ Assets can be burned. The amount of assets to be burned can be specified.
 `CLI`
 
 ```plain
-iris tx mt burn <denom-id> <mt-id> <amount> --from=<sender-address>
+iris tx mt burn <denom-id> <mt-id> <amount> --from=<sender-address> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### Query a specified asset class
