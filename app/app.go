@@ -229,13 +229,7 @@ func NewIrisApp(
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
 	// Setup Mempool
-	baseAppOptions = append(baseAppOptions, func(app *baseapp.BaseApp) {
-		memPool := mempool.NoOpMempool{}
-		app.SetMempool(memPool)
-		handler := baseapp.NewDefaultProposalHandler(memPool, app)
-		app.SetPrepareProposal(handler.PrepareProposalHandler())
-		app.SetProcessProposal(handler.ProcessProposalHandler())
-	})
+	baseAppOptions = append(baseAppOptions, NoOpMempoolOption())
 
 	bApp := baseapp.NewBaseApp(
 		iristypes.AppName,
@@ -956,4 +950,14 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(feemarkettypes.ModuleName).WithKeyTable(feemarkettypes.ParamKeyTable())
 
 	return paramsKeeper
+}
+
+func NoOpMempoolOption() func(*baseapp.BaseApp) {
+	return func(app *baseapp.BaseApp) {
+		memPool := mempool.NoOpMempool{}
+		app.SetMempool(memPool)
+		handler := baseapp.NewDefaultProposalHandler(memPool, app)
+		app.SetPrepareProposal(handler.PrepareProposalHandler())
+		app.SetProcessProposal(handler.ProcessProposalHandler())
+	}
 }
