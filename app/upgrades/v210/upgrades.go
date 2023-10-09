@@ -9,6 +9,7 @@ import (
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"github.com/cosmos/ibc-go/v7/modules/core/exported"
 
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
@@ -39,6 +40,12 @@ func upgradeHandlerConstructor(
 		// 	app.AppCodec,
 		// 	proposals,
 		// )
+
+		// Enable 09-localhost type in allowed clients according to
+		// https://github.com/cosmos/ibc-go/blob/v7.3.0/docs/migrations/v7-to-v7_1.md
+		params := app.IBCKeeper.ClientKeeper.GetParams(ctx)
+		params.AllowedClients = append(params.AllowedClients, exported.Localhost)
+		app.IBCKeeper.ClientKeeper.SetParams(ctx, params)
 
 		// Migrate Tendermint consensus parameters from x/params module to a
 		// dedicated x/consensus module.

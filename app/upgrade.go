@@ -40,6 +40,7 @@ func (app *IrisApp) appKeepers() upgrades.AppKeepers {
 		GetKey:                app.GetKey,
 		ModuleManager:         app.mm,
 		TIBCkeeper:            app.TIBCKeeper,
+		IBCKeeper:             app.IBCKeeper,
 		EvmKeeper:             app.EvmKeeper,
 		FeeMarketKeeper:       app.FeeMarketKeeper,
 		TokenKeeper:           app.TokenKeeper,
