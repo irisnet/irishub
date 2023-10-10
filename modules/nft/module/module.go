@@ -16,7 +16,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	sdkbftsim "github.com/cosmos/cosmos-sdk/x/nft/simulation"
+	sdknfttypes "github.com/cosmos/cosmos-sdk/x/nft"
+	sdknftsim "github.com/cosmos/cosmos-sdk/x/nft/simulation"
 
 	"github.com/irisnet/irismod/modules/nft/client/cli"
 	"github.com/irisnet/irismod/modules/nft/keeper"
@@ -65,6 +66,7 @@ func (AppModuleBasic) ValidateGenesis(
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the NFT module.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
 	_ = types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
+	_ = sdknfttypes.RegisterQueryHandlerClient(context.Background(), mux, sdknfttypes.NewQueryClient(clientCtx))
 }
 
 // GetTxCmd returns the root tx command for the NFT module.
@@ -115,6 +117,7 @@ func (AppModule) Name() string { return types.ModuleName }
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), am.keeper)
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+	sdknfttypes.RegisterQueryServer(cfg.QueryServer(), am.keeper.NFTkeeper())
 
 	m := keeper.NewMigrator(am.keeper)
 	if err := cfg.RegisterMigration(types.ModuleName, 1, m.Migrate1to2); err != nil {
@@ -162,7 +165,7 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 
 // RegisterStoreDecoder registers a decoder for NFT module's types
 func (am AppModule) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
-	sdr[types.StoreKey] = sdkbftsim.NewDecodeStore(am.cdc)
+	sdr[types.StoreKey] = sdknftsim.NewDecodeStore(am.cdc)
 }
 
 // WeightedOperations returns the all the NFT module operations with their respective weights.

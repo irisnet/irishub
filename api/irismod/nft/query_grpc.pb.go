@@ -22,8 +22,8 @@ const (
 	Query_Supply_FullMethodName      = "/irismod.nft.Query/Supply"
 	Query_NFTsOfOwner_FullMethodName = "/irismod.nft.Query/NFTsOfOwner"
 	Query_Collection_FullMethodName  = "/irismod.nft.Query/Collection"
-	Query_Denom_FullMethodName       = "/irismod.nft.Query/Denom"
 	Query_Denoms_FullMethodName      = "/irismod.nft.Query/Denoms"
+	Query_Denom_FullMethodName       = "/irismod.nft.Query/Denom"
 	Query_NFT_FullMethodName         = "/irismod.nft.Query/NFT"
 )
 
@@ -37,10 +37,10 @@ type QueryClient interface {
 	NFTsOfOwner(ctx context.Context, in *QueryNFTsOfOwnerRequest, opts ...grpc.CallOption) (*QueryNFTsOfOwnerResponse, error)
 	// Collection queries the NFTs of the specified denom
 	Collection(ctx context.Context, in *QueryCollectionRequest, opts ...grpc.CallOption) (*QueryCollectionResponse, error)
-	// Denom queries the definition of a given denom
-	Denom(ctx context.Context, in *QueryDenomRequest, opts ...grpc.CallOption) (*QueryDenomResponse, error)
 	// Denoms queries all the denoms
 	Denoms(ctx context.Context, in *QueryDenomsRequest, opts ...grpc.CallOption) (*QueryDenomsResponse, error)
+	// Denom queries the definition of a given denom
+	Denom(ctx context.Context, in *QueryDenomRequest, opts ...grpc.CallOption) (*QueryDenomResponse, error)
 	// NFT queries the NFT for the given denom and token ID
 	NFT(ctx context.Context, in *QueryNFTRequest, opts ...grpc.CallOption) (*QueryNFTResponse, error)
 }
@@ -80,18 +80,18 @@ func (c *queryClient) Collection(ctx context.Context, in *QueryCollectionRequest
 	return out, nil
 }
 
-func (c *queryClient) Denom(ctx context.Context, in *QueryDenomRequest, opts ...grpc.CallOption) (*QueryDenomResponse, error) {
-	out := new(QueryDenomResponse)
-	err := c.cc.Invoke(ctx, Query_Denom_FullMethodName, in, out, opts...)
+func (c *queryClient) Denoms(ctx context.Context, in *QueryDenomsRequest, opts ...grpc.CallOption) (*QueryDenomsResponse, error) {
+	out := new(QueryDenomsResponse)
+	err := c.cc.Invoke(ctx, Query_Denoms_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *queryClient) Denoms(ctx context.Context, in *QueryDenomsRequest, opts ...grpc.CallOption) (*QueryDenomsResponse, error) {
-	out := new(QueryDenomsResponse)
-	err := c.cc.Invoke(ctx, Query_Denoms_FullMethodName, in, out, opts...)
+func (c *queryClient) Denom(ctx context.Context, in *QueryDenomRequest, opts ...grpc.CallOption) (*QueryDenomResponse, error) {
+	out := new(QueryDenomResponse)
+	err := c.cc.Invoke(ctx, Query_Denom_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -117,10 +117,10 @@ type QueryServer interface {
 	NFTsOfOwner(context.Context, *QueryNFTsOfOwnerRequest) (*QueryNFTsOfOwnerResponse, error)
 	// Collection queries the NFTs of the specified denom
 	Collection(context.Context, *QueryCollectionRequest) (*QueryCollectionResponse, error)
-	// Denom queries the definition of a given denom
-	Denom(context.Context, *QueryDenomRequest) (*QueryDenomResponse, error)
 	// Denoms queries all the denoms
 	Denoms(context.Context, *QueryDenomsRequest) (*QueryDenomsResponse, error)
+	// Denom queries the definition of a given denom
+	Denom(context.Context, *QueryDenomRequest) (*QueryDenomResponse, error)
 	// NFT queries the NFT for the given denom and token ID
 	NFT(context.Context, *QueryNFTRequest) (*QueryNFTResponse, error)
 	mustEmbedUnimplementedQueryServer()
@@ -139,11 +139,11 @@ func (UnimplementedQueryServer) NFTsOfOwner(context.Context, *QueryNFTsOfOwnerRe
 func (UnimplementedQueryServer) Collection(context.Context, *QueryCollectionRequest) (*QueryCollectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Collection not implemented")
 }
-func (UnimplementedQueryServer) Denom(context.Context, *QueryDenomRequest) (*QueryDenomResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Denom not implemented")
-}
 func (UnimplementedQueryServer) Denoms(context.Context, *QueryDenomsRequest) (*QueryDenomsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Denoms not implemented")
+}
+func (UnimplementedQueryServer) Denom(context.Context, *QueryDenomRequest) (*QueryDenomResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Denom not implemented")
 }
 func (UnimplementedQueryServer) NFT(context.Context, *QueryNFTRequest) (*QueryNFTResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NFT not implemented")
@@ -215,24 +215,6 @@ func _Query_Collection_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_Denom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryDenomRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).Denom(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Query_Denom_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Denom(ctx, req.(*QueryDenomRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Query_Denoms_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QueryDenomsRequest)
 	if err := dec(in); err != nil {
@@ -247,6 +229,24 @@ func _Query_Denoms_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).Denoms(ctx, req.(*QueryDenomsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_Denom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryDenomRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Denom(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_Denom_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Denom(ctx, req.(*QueryDenomRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -289,12 +289,12 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Query_Collection_Handler,
 		},
 		{
-			MethodName: "Denom",
-			Handler:    _Query_Denom_Handler,
-		},
-		{
 			MethodName: "Denoms",
 			Handler:    _Query_Denoms_Handler,
+		},
+		{
+			MethodName: "Denom",
+			Handler:    _Query_Denom_Handler,
 		},
 		{
 			MethodName: "NFT",

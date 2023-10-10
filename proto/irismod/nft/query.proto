@@ -12,7 +12,7 @@ option go_package = "github.com/irisnet/irismod/modules/nft/types";
 service Query {
   // Supply queries the total supply of a given denom or owner
   rpc Supply(QuerySupplyRequest) returns (QuerySupplyResponse) {
-    option (google.api.http).get = "/irismod/nft/collections/{denom_id}/supply";
+    option (google.api.http).get = "/irismod/nft/collections/{denom_id=**}/supply";
   }
 
   // NFTsOfOwner queries the NFTs of the specified owner
@@ -22,12 +22,7 @@ service Query {
 
   // Collection queries the NFTs of the specified denom
   rpc Collection(QueryCollectionRequest) returns (QueryCollectionResponse) {
-    option (google.api.http).get = "/irismod/nft/collections/{denom_id}";
-  }
-
-  // Denom queries the definition of a given denom
-  rpc Denom(QueryDenomRequest) returns (QueryDenomResponse) {
-    option (google.api.http).get = "/irismod/nft/denoms/{denom_id}";
+    option (google.api.http).get = "/irismod/nft/collections/{denom_id=**}";
   }
 
   // Denoms queries all the denoms
@@ -35,9 +30,14 @@ service Query {
     option (google.api.http).get = "/irismod/nft/denoms";
   }
 
+  // Denom queries the definition of a given denom
+  rpc Denom(QueryDenomRequest) returns (QueryDenomResponse) {
+    option (google.api.http).get = "/irismod/nft/denoms/{denom_id=**}";
+  }
+
   // NFT queries the NFT for the given denom and token ID
   rpc NFT(QueryNFTRequest) returns (QueryNFTResponse) {
-    option (google.api.http).get = "/irismod/nft/nfts/{denom_id}/{token_id}";
+    option (google.api.http).get = "/irismod/nft/nfts/{denom_id=**}/{token_id}";
   }
 }
 
