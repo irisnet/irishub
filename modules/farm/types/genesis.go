@@ -75,7 +75,17 @@ func ValidateGenesis(data GenesisState) error {
 				return fmt.Errorf("rewardPerBlock must be positive, but got %s", r.RewardPerBlock.String())
 			}
 
+			// If the unexpired pool rule has been updated, rewardPerShare will not be zero.
 			if !r.RewardPerShare.IsPositive() {
+				// No reward has ever been distributed.
+				if r.RemainingReward.Equal(r.TotalReward) {
+					continue
+				}
+				// The pool is expired and the reward is refund to the creator
+				if !r.RemainingReward.Equal(r.TotalReward) && pool.EndHeight == pool.LastHeightDistrRewards {
+					continue
+				}
+
 				return fmt.Errorf("rewardPerShare must be positive, but got %s", r.RewardPerShare.String())
 			}
 		}
