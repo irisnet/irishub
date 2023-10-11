@@ -82,7 +82,7 @@ func ValidateGenesis(data GenesisState) error {
 					continue
 				}
 				// The pool is expired and the reward is refund to the creator
-				if !r.RemainingReward.Equal(r.TotalReward) && pool.EndHeight == pool.LastHeightDistrRewards {
+				if pool.EndHeight == pool.LastHeightDistrRewards {
 					continue
 				}
 
