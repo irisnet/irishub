@@ -31,9 +31,9 @@ import (
 	ethermintserver "github.com/evmos/ethermint/server"
 	servercfg "github.com/evmos/ethermint/server/config"
 
-	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/app/params"
-	iristypes "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/v2/app"
+	"github.com/irisnet/irishub/v2/app/params"
+	iristypes "github.com/irisnet/irishub/v2/types"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the

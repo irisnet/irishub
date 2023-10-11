@@ -10,8 +10,8 @@ package rest_test
 // 	"github.com/cosmos/cosmos-sdk/testutil/network"
 // 	"github.com/cosmos/cosmos-sdk/types/rest"
 
-// 	minttypes "github.com/irisnet/irishub/modules/mint/types"
-// 	"github.com/irisnet/irishub/simapp"
+// 	minttypes "github.com/irisnet/irishub/v2/modules/mint/types"
+// 	"github.com/irisnet/irishub/v2/simapp"
 // )
 
 // type IntegrationTestSuite struct {

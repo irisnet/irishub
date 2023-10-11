@@ -47,13 +47,13 @@ import (
 	tibcclienttypes "github.com/bianjieai/tibc-go/modules/tibc/core/02-client/types"
 	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
 
-	"github.com/irisnet/irishub/app/upgrades"
-	"github.com/irisnet/irishub/app/upgrades/v120/tibc"
-	"github.com/irisnet/irishub/modules/guardian"
-	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
-	"github.com/irisnet/irishub/modules/mint"
-	minttypes "github.com/irisnet/irishub/modules/mint/types"
-	"github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/v2/app/upgrades"
+	"github.com/irisnet/irishub/v2/app/upgrades/v120/tibc"
+	"github.com/irisnet/irishub/v2/modules/guardian"
+	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
+	"github.com/irisnet/irishub/v2/modules/mint"
+	minttypes "github.com/irisnet/irishub/v2/modules/mint/types"
+	"github.com/irisnet/irishub/v2/types"
 )
 
 var Upgrade = upgrades.Upgrade{

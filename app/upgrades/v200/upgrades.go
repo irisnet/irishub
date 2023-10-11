@@ -18,8 +18,8 @@ import (
 	"github.com/evmos/ethermint/x/feemarket"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	"github.com/irisnet/irishub/app/upgrades"
-	irisevm "github.com/irisnet/irishub/modules/evm"
+	"github.com/irisnet/irishub/v2/app/upgrades"
+	irisevm "github.com/irisnet/irishub/v2/modules/evm"
 )
 
 var Upgrade = upgrades.Upgrade{

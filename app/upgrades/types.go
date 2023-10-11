@@ -13,6 +13,7 @@ import (
 	consensuskeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
 
@@ -53,6 +54,7 @@ type AppKeepers struct {
 	GetKey                func(moduleName string) *storetypes.KVStoreKey
 	ModuleManager         *module.Manager
 	TIBCkeeper            *tibckeeper.Keeper
+	IBCKeeper             *ibckeeper.Keeper
 	EvmKeeper             *evmkeeper.Keeper
 	FeeMarketKeeper       feemarketkeeper.Keeper
 	TokenKeeper           tokenkeeper.Keeper

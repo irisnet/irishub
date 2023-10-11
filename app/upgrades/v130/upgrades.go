@@ -10,8 +10,8 @@ import (
 
 	mttypes "github.com/irisnet/irismod/modules/mt/types"
 
-	"github.com/irisnet/irishub/app/upgrades"
-	"github.com/irisnet/irishub/app/upgrades/v130/tibc"
+	"github.com/irisnet/irishub/v2/app/upgrades"
+	"github.com/irisnet/irishub/v2/app/upgrades/v130/tibc"
 )
 
 var Upgrade = upgrades.Upgrade{

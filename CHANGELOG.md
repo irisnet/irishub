@@ -2,8 +2,30 @@
 
 ## [Unreleased]
 
+### API Breaking
+
+* (Auth) Query for BaseAccount type account is no longer supported and is replaced by EthAccount type. 
+
+### State Machine Breaking
+
+* (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Bump up tibc-go version to xxx
+* (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Bump up irismod version to xxx
+* (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Bump up ethermint version to v0.22.0
+* (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Bump up ibc-go version to v7.3.0
+* (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Bump up cosmos-sdk to v0.47.4
+* (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Bump up cometbft to v0.37.2
+
+### Features
+
+* (NFT-Transfer) [\#2863](https://github.com/irisnet/irishub/pull/2863) Feat: support inter nft-transfer module
+
 ### Bug Fixes
 * (IRISHub) [\#2852](https://github.com/irisnet/irishub/pull/2852) refactor: fix eip712 signature and inject ParseChainID method
+* (IRISMod) [irismod \#367](https://github.com/irisnet/irismod/pull/367) Fix rest uri conflict in mt module
+
+### Security
+
+* (IRISHub) [\#2865](https://github.com/irisnet/irishub/pull/2865) Disable the vesting account creation to prevent contract address front-running.
 
 ## 2.0.0
 

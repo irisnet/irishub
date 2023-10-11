@@ -44,6 +44,7 @@ import (
 	ibc "github.com/cosmos/ibc-go/v7/modules/core"
 	ibcclientclient "github.com/cosmos/ibc-go/v7/modules/core/02-client/client"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
+	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 
 	"github.com/irisnet/irismod/modules/coinswap"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
@@ -79,12 +80,15 @@ import (
 	"github.com/evmos/ethermint/x/feemarket"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	irisappparams "github.com/irisnet/irishub/app/params"
-	irisevm "github.com/irisnet/irishub/modules/evm"
-	"github.com/irisnet/irishub/modules/guardian"
-	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
-	"github.com/irisnet/irishub/modules/mint"
-	minttypes "github.com/irisnet/irishub/modules/mint/types"
+	nfttransfer "github.com/bianjieai/nft-transfer"
+	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
+
+	irisappparams "github.com/irisnet/irishub/v2/app/params"
+	irisevm "github.com/irisnet/irishub/v2/modules/evm"
+	"github.com/irisnet/irishub/v2/modules/guardian"
+	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
+	"github.com/irisnet/irishub/v2/modules/mint"
+	minttypes "github.com/irisnet/irishub/v2/modules/mint/types"
 )
 
 var (
@@ -103,7 +107,9 @@ var (
 	ModuleBasics = module.NewBasicManager(
 		auth.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
-		genutil.AppModuleBasic{},
+		genutil.AppModuleBasic{
+			GenTxValidator: genutiltypes.DefaultMessageValidator,
+		},
 		bank.AppModuleBasic{},
 		capability.AppModuleBasic{},
 		staking.AppModuleBasic{},
@@ -116,6 +122,7 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		ibc.AppModuleBasic{},
+		ibctm.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
@@ -138,6 +145,7 @@ var (
 		tibcnfttransfer.AppModuleBasic{},
 		tibcmttransfer.AppModuleBasic{},
 		mt.AppModuleBasic{},
+		nfttransfer.AppModuleBasic{},
 
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
@@ -257,6 +265,7 @@ func appModules(
 		ibc.NewAppModule(app.IBCKeeper), tibc.NewAppModule(app.TIBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		app.transferModule,
+		app.ibcnfttransferModule,
 		app.nfttransferModule,
 		app.mttransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
@@ -384,6 +393,7 @@ func simulationModules(
 		),
 		ibc.NewAppModule(app.IBCKeeper),
 		app.transferModule,
+		app.ibcnfttransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
 		token.NewAppModule(
 			appCodec,
@@ -488,6 +498,8 @@ func orderBeginBlockers() []string {
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+
+		ibcnfttransfertypes.ModuleName,
 	}
 }
 
@@ -538,6 +550,8 @@ func orderEndBlockers() []string {
 		tibcnfttypes.ModuleName,
 		tibcmttypes.ModuleName,
 		guardiantypes.ModuleName,
+
+		ibcnfttransfertypes.ModuleName,
 	}
 }
 
@@ -592,5 +606,7 @@ func orderInitBlockers() []string {
 		guardiantypes.ModuleName,
 		// NOTE: crisis module must go at the end to check for invariants on each module
 		crisistypes.ModuleName,
+
+		ibcnfttransfertypes.ModuleName,
 	}
 }

@@ -18,9 +18,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irishub/modules/guardian/client/cli"
-	"github.com/irisnet/irishub/modules/guardian/keeper"
-	"github.com/irisnet/irishub/modules/guardian/types"
+	"github.com/irisnet/irishub/v2/modules/guardian/client/cli"
+	"github.com/irisnet/irishub/v2/modules/guardian/keeper"
+	"github.com/irisnet/irishub/v2/modules/guardian/types"
 )
 
 var (

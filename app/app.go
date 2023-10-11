@@ -26,6 +26,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/store/streaming"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/mempool"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -51,24 +52,31 @@ import (
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	"github.com/cosmos/cosmos-sdk/x/params"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/cosmos/ibc-go/v7/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v7/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	ibcclient "github.com/cosmos/ibc-go/v7/modules/core/02-client"
+	ibcclienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	porttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 
 	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
+	"github.com/irisnet/irismod/modules/farm"
 	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
 	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
@@ -97,6 +105,7 @@ import (
 	tibcnfttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/types"
 	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
 	tibcroutingtypes "github.com/bianjieai/tibc-go/modules/tibc/core/26-routing/types"
+	tibccli "github.com/bianjieai/tibc-go/modules/tibc/core/client/cli"
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
 
 	"github.com/evmos/ethermint/ethereum/eip712"
@@ -108,14 +117,19 @@ import (
 	feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	"github.com/irisnet/irishub/address"
-	irishubante "github.com/irisnet/irishub/ante"
-	"github.com/irisnet/irishub/lite"
-	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
-	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
-	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
-	minttypes "github.com/irisnet/irishub/modules/mint/types"
-	iristypes "github.com/irisnet/irishub/types"
+	nfttransfer "github.com/bianjieai/nft-transfer"
+	ibcnfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
+	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
+
+	"github.com/irisnet/irishub/v2/address"
+	irishubante "github.com/irisnet/irishub/v2/ante"
+	"github.com/irisnet/irishub/v2/lite"
+	guardiankeeper "github.com/irisnet/irishub/v2/modules/guardian/keeper"
+	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
+	"github.com/irisnet/irishub/v2/modules/internft"
+	mintkeeper "github.com/irisnet/irishub/v2/modules/mint/keeper"
+	minttypes "github.com/irisnet/irishub/v2/modules/mint/types"
+	iristypes "github.com/irisnet/irishub/v2/types"
 )
 
 var (
@@ -156,8 +170,9 @@ type IrisApp struct {
 	ConsensusParamsKeeper consensuskeeper.Keeper
 
 	//ibc
-	IBCKeeper         *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	IBCTransferKeeper ibctransferkeeper.Keeper
+	IBCKeeper            *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	IBCTransferKeeper    ibctransferkeeper.Keeper
+	IBCNFTTransferKeeper ibcnfttransferkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	scopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -193,9 +208,10 @@ type IrisApp struct {
 	// simulation manager
 	sm *module.SimulationManager
 
-	transferModule    transfer.AppModule
-	nfttransferModule tibcnfttransfer.AppModule
-	mttransferModule  tibcmttransfer.AppModule
+	transferModule       transfer.AppModule
+	nfttransferModule    tibcnfttransfer.AppModule
+	mttransferModule     tibcmttransfer.AppModule
+	ibcnfttransferModule nfttransfer.AppModule
 }
 
 // NewIrisApp returns a reference to an initialized IrisApp.
@@ -211,6 +227,9 @@ func NewIrisApp(
 	appCodec := encodingConfig.Marshaler
 	legacyAmino := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
+
+	// Setup Mempool
+	baseAppOptions = append(baseAppOptions, NoOpMempoolOption())
 
 	bApp := baseapp.NewBaseApp(
 		iristypes.AppName,
@@ -237,6 +256,7 @@ func NewIrisApp(
 		consensustypes.StoreKey,
 		evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey,
+		ibcnfttransfertypes.StoreKey,
 		capabilitytypes.StoreKey,
 		guardiantypes.StoreKey,
 		tokentypes.StoreKey,
@@ -306,6 +326,7 @@ func NewIrisApp(
 	)
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibcexported.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	scopedNFTTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibcnfttransfertypes.ModuleName)
 
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec,
@@ -420,7 +441,8 @@ func NewIrisApp(
 	app.TIBCKeeper = tibckeeper.NewKeeper(
 		appCodec,
 		keys[tibchost.StoreKey],
-		app.GetSubspace(tibchost.ModuleName), app.StakingKeeper,
+		app.StakingKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.NFTKeeper = nftkeeper.NewKeeper(
@@ -467,10 +489,25 @@ func NewIrisApp(
 	app.transferModule = transfer.NewAppModule(app.IBCTransferKeeper)
 	transferIBCModule := transfer.NewIBCModule(app.IBCTransferKeeper)
 
+	app.IBCNFTTransferKeeper = ibcnfttransferkeeper.NewKeeper(
+		appCodec,
+		keys[ibcnfttransfertypes.StoreKey],
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		internft.NewInterNftKeeper(appCodec, app.NFTKeeper, app.AccountKeeper),
+		scopedNFTTransferKeeper,
+	)
+	app.ibcnfttransferModule = nfttransfer.NewAppModule(app.IBCNFTTransferKeeper)
+	nfttransferIBCModule := nfttransfer.NewIBCModule(app.IBCNFTTransferKeeper)
+
 	// routerModule := router.NewAppModule(app.RouterKeeper, transferIBCModule)
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
+		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule)
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	app.nfttransferModule = tibcnfttransfer.NewAppModule(app.TIBCNFTTransferKeeper)
@@ -554,18 +591,6 @@ func NewIrisApp(
 		app.ServiceKeeper,
 	)
 
-	app.FarmKeeper = farmkeeper.NewKeeper(appCodec,
-		keys[farmtypes.StoreKey],
-		app.BankKeeper,
-		app.AccountKeeper,
-		app.DistrKeeper,
-		app.GovKeeper,
-		app.CoinswapKeeper,
-		authtypes.FeeCollectorName,
-		distrtypes.ModuleName,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-	)
-
 	govConfig := govtypes.DefaultConfig()
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec,
@@ -578,9 +603,32 @@ func NewIrisApp(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
+	app.FarmKeeper = farmkeeper.NewKeeper(appCodec,
+		keys[farmtypes.StoreKey],
+		app.BankKeeper,
+		app.AccountKeeper,
+		app.DistrKeeper,
+		app.GovKeeper,
+		app.CoinswapKeeper,
+		authtypes.FeeCollectorName,
+		distrtypes.ModuleName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	// register the proposal types
+	govRouter := govv1beta1.NewRouter()
+	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
+		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
+		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
+		AddRoute(tibchost.RouterKey, tibccli.NewProposalHandler(app.TIBCKeeper)).
+		AddRoute(farmtypes.RouterKey, farm.NewCommunityPoolCreateFarmProposalHandler(app.FarmKeeper))
+
 	app.GovKeeper.SetHooks(govtypes.NewMultiGovHooks(
 		farmkeeper.NewGovHook(app.FarmKeeper),
 	))
+
+	app.GovKeeper.SetLegacyRouter(govRouter)
 
 	tracer := cast.ToString(appOpts.Get(srvflags.EVMTracer))
 
@@ -879,27 +927,37 @@ func initParamsKeeper(
 ) paramskeeper.Keeper {
 	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 
-	paramsKeeper.Subspace(authtypes.ModuleName)
-	paramsKeeper.Subspace(banktypes.ModuleName)
-	paramsKeeper.Subspace(stakingtypes.ModuleName)
-	paramsKeeper.Subspace(minttypes.ModuleName)
-	paramsKeeper.Subspace(distrtypes.ModuleName)
-	paramsKeeper.Subspace(slashingtypes.ModuleName)
+	paramsKeeper.Subspace(authtypes.ModuleName).WithKeyTable(authtypes.ParamKeyTable())
+	paramsKeeper.Subspace(banktypes.ModuleName).WithKeyTable(banktypes.ParamKeyTable())
+	paramsKeeper.Subspace(stakingtypes.ModuleName).WithKeyTable(stakingtypes.ParamKeyTable())
+	paramsKeeper.Subspace(minttypes.ModuleName).WithKeyTable(minttypes.ParamKeyTable())
+	paramsKeeper.Subspace(distrtypes.ModuleName).WithKeyTable(distrtypes.ParamKeyTable())
+	paramsKeeper.Subspace(slashingtypes.ModuleName).WithKeyTable(slashingtypes.ParamKeyTable())
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())
-	paramsKeeper.Subspace(crisistypes.ModuleName)
+	paramsKeeper.Subspace(crisistypes.ModuleName).WithKeyTable(crisistypes.ParamKeyTable())
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
-	paramsKeeper.Subspace(tokentypes.ModuleName)
+	paramsKeeper.Subspace(tokentypes.ModuleName).WithKeyTable(tokenv1.ParamKeyTable())
 	paramsKeeper.Subspace(recordtypes.ModuleName)
-	paramsKeeper.Subspace(htlctypes.ModuleName)
-	paramsKeeper.Subspace(coinswaptypes.ModuleName)
-	paramsKeeper.Subspace(servicetypes.ModuleName)
+	paramsKeeper.Subspace(htlctypes.ModuleName).WithKeyTable(htlctypes.ParamKeyTable())
+	paramsKeeper.Subspace(coinswaptypes.ModuleName).WithKeyTable(coinswaptypes.ParamKeyTable())
+	paramsKeeper.Subspace(servicetypes.ModuleName).WithKeyTable(servicetypes.ParamKeyTable())
 	paramsKeeper.Subspace(ibcexported.ModuleName)
-	paramsKeeper.Subspace(farmtypes.ModuleName)
+	paramsKeeper.Subspace(farmtypes.ModuleName).WithKeyTable(farmtypes.ParamKeyTable())
 	paramsKeeper.Subspace(tibchost.ModuleName)
 
 	// ethermint subspaces
-	paramsKeeper.Subspace(evmtypes.ModuleName)
-	paramsKeeper.Subspace(feemarkettypes.ModuleName)
+	paramsKeeper.Subspace(evmtypes.ModuleName).WithKeyTable(evmtypes.ParamKeyTable())
+	paramsKeeper.Subspace(feemarkettypes.ModuleName).WithKeyTable(feemarkettypes.ParamKeyTable())
 
 	return paramsKeeper
+}
+
+func NoOpMempoolOption() func(*baseapp.BaseApp) {
+	return func(app *baseapp.BaseApp) {
+		memPool := mempool.NoOpMempool{}
+		app.SetMempool(memPool)
+		handler := baseapp.NewDefaultProposalHandler(memPool, app)
+		app.SetPrepareProposal(handler.PrepareProposalHandler())
+		app.SetProcessProposal(handler.ProcessProposalHandler())
+	}
 }

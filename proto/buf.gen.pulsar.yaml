@@ -8,7 +8,7 @@ managed:
       - buf.build/cosmos/gogo-proto
       - buf.build/cosmos/cosmos-proto
     override:
-      buf.build/irisnet/irishub: github.com/irisnet/irishub/api
+      buf.build/irisnet/irishub: github.com/irisnet/irishub/v2/api
 plugins:
   - name: go-pulsar
     out: ../api

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	iristypes "github.com/irisnet/irishub/types"
+	iristypes "github.com/irisnet/irishub/v2/types"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	mttypes "github.com/irisnet/irismod/modules/mt/types"

@@ -6,9 +6,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	"github.com/irisnet/irishub/app/upgrades"
-	"github.com/irisnet/irishub/app/upgrades/v110/htlc"
-	"github.com/irisnet/irishub/app/upgrades/v110/service"
+	"github.com/irisnet/irishub/v2/app/upgrades"
+	"github.com/irisnet/irishub/v2/app/upgrades/v110/htlc"
+	"github.com/irisnet/irishub/v2/app/upgrades/v110/service"
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 )
 
