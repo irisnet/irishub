@@ -6,20 +6,12 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/irisnet/irishub/v2/app/upgrades"
-	v110 "github.com/irisnet/irishub/v2/app/upgrades/v110"
-	v120 "github.com/irisnet/irishub/v2/app/upgrades/v120"
-	v130 "github.com/irisnet/irishub/v2/app/upgrades/v130"
-	v140 "github.com/irisnet/irishub/v2/app/upgrades/v140"
 	v200 "github.com/irisnet/irishub/v2/app/upgrades/v200"
 	v210 "github.com/irisnet/irishub/v2/app/upgrades/v210"
 )
 
 var (
 	router = upgrades.NewUpgradeRouter().
-		Register(v110.Upgrade).
-		Register(v120.Upgrade).
-		Register(v130.Upgrade).
-		Register(v140.Upgrade).
 		Register(v200.Upgrade).
 		Register(v210.Upgrade)
 )
