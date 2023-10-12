@@ -30,17 +30,6 @@ func upgradeHandlerConstructor(
 	app upgrades.AppKeepers,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		// this migration is optional
-		// add proposal ids with proposers which are active (deposit or voting period)
-		// proposals := make(map[uint64]string)
-		// proposals[1] = "cosmos1luyncewxk4lm24k6gqy8y5dxkj0klr4tu0lmnj"
-		// v4.AddProposerAddressToProposal(
-		// 	ctx,
-		// 	sdk.NewKVStoreKey(v4.ModuleName),
-		// 	app.AppCodec,
-		// 	proposals,
-		// )
-
 		// Enable 09-localhost type in allowed clients according to
 		// https://github.com/cosmos/ibc-go/blob/v7.3.0/docs/migrations/v7-to-v7_1.md
 		params := app.IBCKeeper.ClientKeeper.GetParams(ctx)
