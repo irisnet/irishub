@@ -129,6 +129,7 @@ import (
 	"github.com/irisnet/irishub/v2/modules/internft"
 	mintkeeper "github.com/irisnet/irishub/v2/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/v2/modules/mint/types"
+	"github.com/irisnet/irishub/v2/rpc"
 	iristypes "github.com/irisnet/irishub/v2/types"
 )
 
@@ -689,7 +690,8 @@ func NewIrisApp(
 	)
 	app.mm.RegisterInvariants(app.CrisisKeeper)
 	// app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
-	app.mm.RegisterServices(app.configurator)
+	// app.mm.RegisterServices(app.configurator)
+	app.RegisterServices()
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	//
@@ -880,6 +882,27 @@ func (app *IrisApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APICo
 	// register swagger API from root so that other applications can override easily
 	if apiConfig.Swagger {
 		lite.RegisterSwaggerAPI(clientCtx, apiSvr.Router)
+	}
+}
+
+// RegisterServices implements the Application.RegisterTxService method.
+func (app *IrisApp) RegisterServices() {
+	for _, mod := range app.mm.Modules {
+		m, ok := mod.(module.AppModule)
+		if !ok {
+			panic("unable to cast mod into AppModule")
+		}
+
+		if m.Name() == authtypes.ModuleName {
+			rpc.RegisterAuthServices(app.configurator,
+				app.GetKey(authtypes.StoreKey),
+				app.AccountKeeper,
+				app.GetSubspace(authtypes.ModuleName))
+		} else {
+			if mod, ok := mod.(module.HasServices); ok {
+				mod.RegisterServices(app.configurator)
+			}
+		}
 	}
 }
 
