@@ -1,0 +1,18 @@
+{
+  "type": "cosmos",
+  "value": {
+    "key": "test-2",
+    "chain-id": "test-2",
+    "rpc-addr": "http://127.0.0.1:26657",
+    "account-prefix": "iaa",
+    "keyring-backend": "test",
+    "gas-adjustment": 1.5,
+    "gas-prices": "0.025uiris",
+    "debug": true,
+    "timeout": "10s",
+    "output-format": "json",
+    "sign-mode": "direct",
+    "extra-codecs": ["ethermint"]
+  }
+}
+
