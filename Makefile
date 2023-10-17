@@ -230,3 +230,25 @@ testnet-stop:
 testnet-clean:
 	docker-compose down
 	sudo rm -rf build/*
+
+
+########################################
+### Test ibc nft-transfer
+init-golang-rly: kill-dev install
+	@echo "Initializing both blockchains..."
+	./network/init.sh
+	./network/start.sh
+	@echo "Initializing relayer..."
+	./network/relayer/interchain-nft-config/rly.sh
+
+start: 
+	@echo "Starting up test network"
+	./network/start.sh
+
+start-rly:
+	./network/hermes/start.sh
+
+kill-dev:
+	@echo "Killing nftd and removing previous data"
+	-@rm -rf ./data
+	-@killall nftd 2>/dev/null
