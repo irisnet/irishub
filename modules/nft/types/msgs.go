@@ -3,6 +3,8 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	errormod "cosmossdk.io/errors"
 	"github.com/tidwall/gjson"
 )
 
@@ -58,11 +60,11 @@ func (msg MsgIssueDenom) ValidateBasic() error {
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errormod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	if len(msg.Data) != 0 && !gjson.Valid(msg.Data) {
-		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "invalid data, must be a JSON string or empty")
+		return errormod.Wrap(sdkerrors.ErrJSONUnmarshal, "invalid data, must be a JSON string or empty")
 	}
 	return ValidateKeywords(msg.Id)
 }
@@ -111,15 +113,15 @@ func (msg MsgTransferNFT) ValidateBasic() error {
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errormod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
+		return errormod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
 
 	if len(msg.Data) != 0 && Modified(msg.Data) && !gjson.Valid(msg.Data) {
-		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "invalid data, must be a JSON string or empty")
+		return errormod.Wrap(sdkerrors.ErrJSONUnmarshal, "invalid data, must be a JSON string or empty")
 	}
 	return ValidateTokenID(msg.Id)
 }
@@ -163,7 +165,7 @@ func (msg MsgEditNFT) Type() string { return TypeMsgEditNFT }
 // ValidateBasic Implements Msg.
 func (msg MsgEditNFT) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errormod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	if err := ValidateDenomID(msg.DenomId); err != nil {
@@ -175,7 +177,7 @@ func (msg MsgEditNFT) ValidateBasic() error {
 	}
 
 	if len(msg.Data) != 0 && Modified(msg.Data) && !gjson.Valid(msg.Data) {
-		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "invalid data, must be a JSON string or empty")
+		return errormod.Wrap(sdkerrors.ErrJSONUnmarshal, "invalid data, must be a JSON string or empty")
 	}
 	return ValidateTokenID(msg.Id)
 }
@@ -220,10 +222,13 @@ func (msg MsgMintNFT) Type() string { return TypeMsgMintNFT }
 // ValidateBasic Implements Msg.
 func (msg MsgMintNFT) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errormod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receipt address (%s)", err)
+		return errormod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receipt address (%s)", err)
+	}
+	if IsIBCDenom(msg.DenomId){
+		return errormod.Wrapf(sdkerrors.ErrInvalidRequest, "can not mint nft in denom (%s)", msg.DenomId)
 	}
 	if err := ValidateDenomID(msg.DenomId); err != nil {
 		return err
@@ -232,7 +237,7 @@ func (msg MsgMintNFT) ValidateBasic() error {
 		return err
 	}
 	if len(msg.Data) != 0 && !gjson.Valid(msg.Data) {
-		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "invalid data, must be a JSON string or empty")
+		return errormod.Wrap(sdkerrors.ErrJSONUnmarshal, "invalid data, must be a JSON string or empty")
 	}
 	return ValidateTokenID(msg.Id)
 }
@@ -270,7 +275,7 @@ func (msg MsgBurnNFT) Type() string { return TypeMsgBurnNFT }
 // ValidateBasic Implements Msg.
 func (msg MsgBurnNFT) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errormod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	if err := ValidateDenomID(msg.DenomId); err != nil {
 		return err
@@ -311,10 +316,10 @@ func (msg MsgTransferDenom) Type() string { return TypeMsgTransferDenom }
 // ValidateBasic Implements Msg.
 func (msg MsgTransferDenom) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errormod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
+		return errormod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
 	if err := ValidateDenomID(msg.Id); err != nil {
 		return err
