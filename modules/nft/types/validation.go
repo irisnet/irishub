@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errormod "cosmossdk.io/errors"
 )
 
 const (
@@ -34,7 +34,7 @@ var (
 func ValidateDenomID(denomID string) error {
 	boolPrifix := strings.HasPrefix(denomID, "tibc-")
 	if !regexpID(denomID) && !boolPrifix {
-		return sdkerrors.Wrapf(ErrInvalidDenom, "denomID can only accept characters that match the regular expression: (%s),but got (%s)", idString, denomID)
+		return errormod.Wrapf(ErrInvalidDenom, "denomID can only accept characters that match the regular expression: (%s),but got (%s)", idString, denomID)
 	}
 	return nil
 }
@@ -42,7 +42,7 @@ func ValidateDenomID(denomID string) error {
 // ValidateTokenID verify that the tokenID is legal
 func ValidateTokenID(tokenID string) error {
 	if !regexpID(tokenID) {
-		return sdkerrors.Wrapf(ErrInvalidDenom, "tokenID can only accept characters that match the regular expression: (%s),but got (%s)", idString, tokenID)
+		return errormod.Wrapf(ErrInvalidDenom, "tokenID can only accept characters that match the regular expression: (%s),but got (%s)", idString, tokenID)
 	}
 	return nil
 }
@@ -50,7 +50,7 @@ func ValidateTokenID(tokenID string) error {
 // ValidateTokenURI verify that the tokenURI is legal
 func ValidateTokenURI(tokenURI string) error {
 	if len(tokenURI) > MaxTokenURILen {
-		return sdkerrors.Wrapf(ErrInvalidTokenURI, "the length of nft uri(%s) only accepts value [0, %d]", tokenURI, MaxTokenURILen)
+		return errormod.Wrapf(ErrInvalidTokenURI, "the length of nft uri(%s) only accepts value [0, %d]", tokenURI, MaxTokenURILen)
 	}
 	return nil
 }
@@ -70,7 +70,7 @@ func Modify(origin, target string) string {
 // ValidateKeywords checks if the given denomId begins with `DenomKeywords`
 func ValidateKeywords(denomId string) error {
 	if regexpKeyword(denomId) {
-		return sdkerrors.Wrapf(ErrInvalidDenom, "invalid denomId: %s, can not begin with keyword: (%s)", denomId, keywords)
+		return errormod.Wrapf(ErrInvalidDenom, "invalid denomId: %s, can not begin with keyword: (%s)", denomId, keywords)
 	}
 	return nil
 }
