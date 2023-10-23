@@ -13,27 +13,27 @@ The Interchain NFT module is now maintained within the `nft-transfer` repository
 
 1. Clone this repository and build the application binary
 
-```bash
-git clone https://github.com/irisnet/irishub.git
-cd irishub
+    ```bash
+    git clone https://github.com/irisnet/irishub.git
+    cd irishub
 
-make install 
-```
+    make install 
+    ```
 
 2. Compile and install an IBC relayer.
 
-```bash
-git clone https://github.com/cosmos/relayer.git
-cd relayer
-git checkout v2.4.2
-make install
-```
+    ```bash
+    git clone https://github.com/cosmos/relayer.git
+    cd relayer
+    git checkout v2.4.2
+    make install
+    ```
 
 3. Bootstrap two chains and create an IBC connection and start the relayer
 
-```bash
-make init-golang-rly
-```
+    ```bash
+    make init-golang-rly
+    ```
 
 ## Demo
 
@@ -41,8 +41,8 @@ make init-golang-rly
 
 ```bash
 # Store the following account addresses within the current shell env
-export DEMOWALLET_1=$(nftd keys show demowallet1 -a --keyring-backend test --home ./data/test-1) && echo $DEMOWALLET_1;
-export DEMOWALLET_2=$(nftd keys show demowallet2 -a --keyring-backend test --home ./data/test-2) && echo $DEMOWALLET_2;
+export DEMOWALLET_1=$(iris keys show demowallet1 -a --keyring-backend test --home ./data/test-1) && echo $DEMOWALLET_1;
+export DEMOWALLET_2=$(iris keys show demowallet2 -a --keyring-backend test --home ./data/test-2) && echo $DEMOWALLET_2;
 ```
 
 ### Issue an nft class on the `test-1` chain
