@@ -293,8 +293,8 @@ github.com/bgentry/speakeasy v0.1.1-0.20220910012023-760eaf8b6816 h1:41iFGWnSlI2
 github.com/bgentry/speakeasy v0.1.1-0.20220910012023-760eaf8b6816/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
 github.com/bianjieai/ethermint v0.6.1-0.20230914085944-3cc455cce3d4 h1:M3LU8I+hB9vqsK4oRFq0GxD+6Pzs48eWejvYuebtweQ=
 github.com/bianjieai/ethermint v0.6.1-0.20230914085944-3cc455cce3d4/go.mod h1:JEhGmVj5rZX5bTfOqh3nltE2N6+qMI4HVNV2vW6PpOQ=
-github.com/bianjieai/nft-transfer v1.1.2-ibc-v6.1.0.0.20230911023600-fa7bd3f3cb1e h1:6XiMxCG7DpIOBjqw2rGtZgMIOgS/0KsbU6m84BQ0mfo=
-github.com/bianjieai/nft-transfer v1.1.2-ibc-v6.1.0.0.20230911023600-fa7bd3f3cb1e/go.mod h1:u2PNH4v8CD4AWU4Rf7yt8/qqQtrrwwHiw03qQSKERhg=
+github.com/bianjieai/nft-transfer v1.1.2-ibc-v6.1.0.0.20231023013626-e1cc238c3b00 h1:cRzXLdDq5yGtkS3+k2T4snSaTEw/IxKPEpUQqNjku30=
+github.com/bianjieai/nft-transfer v1.1.2-ibc-v6.1.0.0.20231023013626-e1cc238c3b00/go.mod h1:u2PNH4v8CD4AWU4Rf7yt8/qqQtrrwwHiw03qQSKERhg=
 github.com/bianjieai/tibc-go v0.4.4-0.20230824091732-bbd58021f825 h1:+/6FK0V7uXouVYigb1EvPGuDN1ZDPfBnvzOUbTRe4rg=
 github.com/bianjieai/tibc-go v0.4.4-0.20230824091732-bbd58021f825/go.mod h1:OBT3OZWqF8eTyQNGOvHycGg+pkhWWm5RwELT/NRZM9k=
 github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40/go.mod h1:8rLXio+WjiTceGBHIoTvn60HIbs7Hm7bcHjyrSqYB9c=
@@ -816,8 +816,8 @@ github.com/influxdata/promql/v2 v2.12.0/go.mod h1:fxOPu+DY0bqCTCECchSRtWfc+0X19y
 github.com/influxdata/roaring v0.4.13-0.20180809181101-fc520f41fab6/go.mod h1:bSgUQ7q5ZLSO+bKBGqJiCBGAl+9DxyW63zLTujjUlOE=
 github.com/influxdata/tdigest v0.0.0-20181121200506-bf2b5ad3c0a9/go.mod h1:Js0mqiSBE6Ffsg94weZZ2c+v/ciT8QRHFOap7EKDrR0=
 github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368/go.mod h1:Wbbw6tYNvwa5dlB6304Sd+82Z3f7PmVZHVKU637d4po=
-github.com/irisnet/irismod v1.7.4-0.20231010070045-9304e04cfc25 h1:Q9d9JpHkMNlKgqJSKM8iCsOClUw+K2L0iejCjyQRNd8=
-github.com/irisnet/irismod v1.7.4-0.20231010070045-9304e04cfc25/go.mod h1:6APlocacyWrjIK8YwrKK/jn3u5pJktppITU938rfc10=
+github.com/irisnet/irismod v1.7.4-0.20231020012541-015d2c01fd9e h1:R3XQ5HehAoJy1XczDDIEh4FIEB14NR5WE+LYEn1Qegg=
+github.com/irisnet/irismod v1.7.4-0.20231020012541-015d2c01fd9e/go.mod h1:6APlocacyWrjIK8YwrKK/jn3u5pJktppITU938rfc10=
 github.com/jackpal/go-nat-pmp v1.0.2 h1:KzKSgb7qkJvOUTqYl9/Hg/me3pWgBmERKrTGD7BdWus=
 github.com/jackpal/go-nat-pmp v1.0.2/go.mod h1:QPH045xvCAeXUZOxsnwmrtiCoxIr9eob+4orBN1SBKc=
 github.com/jedisct1/go-minisign v0.0.0-20190909160543-45766022959e/go.mod h1:G1CVv03EnqU1wYL2dFwXxW2An0az9JTl/ZsqXQeBlkU=
