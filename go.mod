@@ -3,7 +3,7 @@ module github.com/irisnet/irishub/v2
 go 1.19
 
 require (
-	github.com/bianjieai/nft-transfer v1.1.2-ibc-v6.1.0.0.20231023013626-e1cc238c3b00
+	github.com/bianjieai/nft-transfer v1.1.2-ibc-v6.1.0.0.20231027024800-d841419984f1
 	github.com/bianjieai/tibc-go v0.4.4-0.20230824091732-bbd58021f825
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cometbft/cometbft-db v0.8.0
