@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	"github.com/tendermint/tendermint/libs/cli"
+	"github.com/cometbft/cometbft/libs/cli"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -135,7 +135,9 @@ func (it *coinConverter) registerCmdWithFlag(parentCmd, cmd, flagNm string) *coi
 	return it
 }
 
-func (it *coinConverter) registerCmdForResponse(parentCmd, cmd, jsonPath, typ string) *coinConverter {
+func (it *coinConverter) registerCmdForResponse(
+	parentCmd, cmd, jsonPath, typ string,
+) *coinConverter {
 	commands, ok := it.cmds[cmd]
 	if !ok {
 		commands = command{
@@ -150,7 +152,10 @@ func (it *coinConverter) registerCmdForResponse(parentCmd, cmd, jsonPath, typ st
 	return it
 }
 
-func (it *coinConverter) registerCmdForResponses(parentCmd, cmd string, fields ...field) *coinConverter {
+func (it *coinConverter) registerCmdForResponses(
+	parentCmd, cmd string,
+	fields ...field,
+) *coinConverter {
 	commands, ok := it.cmds[cmd]
 	if !ok {
 		commands = command{
@@ -307,7 +312,10 @@ func (it coinConverter) resolvePath(cfg *config.Config, path string) (paths []st
 	return paths
 }
 
-func (it *coinConverter) queryToken(cmd *cobra.Command, denom string) (ft tokenv1.TokenI, err error) {
+func (it *coinConverter) queryToken(
+	cmd *cobra.Command,
+	denom string,
+) (ft tokenv1.TokenI, err error) {
 	if ft, ok := it.tokens[denom]; ok {
 		return ft, nil
 	}
@@ -387,7 +395,10 @@ func (it *coinConverter) handleMap(cmd *cobra.Command, cfg *config.Config, path 
 	_ = cfg.Set(path, dstCoin)
 }
 
-func (it *coinConverter) convertCoins(cmd *cobra.Command, coinsStr string) (dstCoinsStr string, err error) {
+func (it *coinConverter) convertCoins(
+	cmd *cobra.Command,
+	coinsStr string,
+) (dstCoinsStr string, err error) {
 	cs, err := it.parseCoins(coinsStr)
 	if err != nil {
 		return coinsStr, err
@@ -404,7 +415,10 @@ func (it *coinConverter) convertCoins(cmd *cobra.Command, coinsStr string) (dstC
 	return dstCoins.String(), nil
 }
 
-func (it *coinConverter) convertToMinCoin(cmd *cobra.Command, srcCoin sdk.DecCoin) (coin sdk.Coin, err error) {
+func (it *coinConverter) convertToMinCoin(
+	cmd *cobra.Command,
+	srcCoin sdk.DecCoin,
+) (coin sdk.Coin, err error) {
 	ft, err := it.queryToken(cmd, srcCoin.Denom)
 	if err != nil {
 		return coin, err
@@ -412,7 +426,10 @@ func (it *coinConverter) convertToMinCoin(cmd *cobra.Command, srcCoin sdk.DecCoi
 	return ft.ToMinCoin(srcCoin)
 }
 
-func (it *coinConverter) convertToMainCoin(cmd *cobra.Command, srcCoin sdk.Coin) (coin sdk.DecCoin, err error) {
+func (it *coinConverter) convertToMainCoin(
+	cmd *cobra.Command,
+	srcCoin sdk.Coin,
+) (coin sdk.DecCoin, err error) {
 	ft, err := it.queryToken(cmd, srcCoin.Denom)
 	if err != nil {
 		return coin, err

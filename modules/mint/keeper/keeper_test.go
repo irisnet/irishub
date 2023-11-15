@@ -7,13 +7,13 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/modules/mint/types"
-	"github.com/irisnet/irishub/simapp"
+	"github.com/irisnet/irishub/v2/modules/mint/types"
+	"github.com/irisnet/irishub/v2/simapp"
 )
 
 type KeeperTestSuite struct {
@@ -31,7 +31,8 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.app = app
 
-	app.MintKeeper.SetParamSet(suite.ctx, types.DefaultParams())
+	err := app.MintKeeper.SetParams(suite.ctx, types.DefaultParams())
+	require.NoError(suite.T(), err)
 	app.MintKeeper.SetMinter(suite.ctx, types.DefaultMinter())
 }
 
@@ -48,9 +49,10 @@ func (suite *KeeperTestSuite) TestSetGetMinter() {
 }
 
 func (suite *KeeperTestSuite) TestSetGetParamSet() {
-	suite.app.MintKeeper.SetParamSet(suite.ctx, types.DefaultParams())
-	expParamSet := suite.app.MintKeeper.GetParamSet(suite.ctx)
+	err := suite.app.MintKeeper.SetParams(suite.ctx, types.DefaultParams())
+	require.NoError(suite.T(), err)
 
+	expParamSet := suite.app.MintKeeper.GetParams(suite.ctx)
 	require.Equal(suite.T(), types.DefaultParams(), expParamSet)
 }
 
@@ -85,7 +87,10 @@ func (suite *KeeperTestSuite) TestAddCollectedFees() {
 	coins = suite.app.BankKeeper.GetAllBalances(suite.ctx, acc.GetAddress())
 	require.True(suite.T(), coins.Empty())
 
-	feeCollectorTotalBalance := suite.app.BankKeeper.GetAllBalances(suite.ctx, feeCollector.GetAddress())
+	feeCollectorTotalBalance := suite.app.BankKeeper.GetAllBalances(
+		suite.ctx,
+		feeCollector.GetAddress(),
+	)
 	expectedCollectedFees := feeCollectorTotalBalance.Sub(feeCollectorBalance...)
 	require.Equal(suite.T(), expectedCollectedFees, mintCoins)
 

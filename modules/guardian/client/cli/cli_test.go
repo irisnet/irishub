@@ -10,15 +10,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/client/testutil"
+	bankcli "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
 
-	guardiancli "github.com/irisnet/irishub/modules/guardian/client/cli"
-	guardiantestutil "github.com/irisnet/irishub/modules/guardian/client/testutil"
-	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
-	"github.com/irisnet/irishub/simapp"
+	guardiancli "github.com/irisnet/irishub/v2/modules/guardian/client/cli"
+	guardiantestutil "github.com/irisnet/irishub/v2/modules/guardian/client/testutil"
+	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
+	"github.com/irisnet/irishub/v2/simapp"
 )
 
 var privKey cryptotypes.PrivKey
@@ -74,15 +74,24 @@ func (s *IntegrationTestSuite) TestGuardian() {
 	clientCtx.Keyring.ImportPrivKey(addr.String(), privKeyStr, "")
 	pubKeyStr := cosmoscrypto.ArmorPubKeyBytes(pubKey.Bytes(), "")
 	clientCtx.Keyring.ImportPubKey(addr.String(), pubKeyStr)
+	expectedCode := uint32(0)
 
 	amount := sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(100000000))
 	args := []string{
+		from.String(),
+		addr.String(),
+		amount.String(),
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
-	_, err := banktestutil.MsgSendExec(clientCtx, from, addr, amount, args...)
-	s.Require().NoError(err)
+
+	result := simapp.ExecTxCmdWithResult(s.T(), s.network, clientCtx, bankcli.NewSendTxCmd(), args)
+	s.Require().Equal(uint32(0), result.TxResult.Code, result.TxResult.Log)
 
 	//------test GetCmdQuerySupers()-------------
 	respType := proto.Message(&guardiantypes.QuerySupersResponse{})
@@ -98,18 +107,20 @@ func (s *IntegrationTestSuite) TestGuardian() {
 		fmt.Sprintf("--%s=%s", guardiancli.FlagDescription, description),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	respType = proto.Message(&sdk.TxResponse{})
-	expectedCode := uint32(0)
-
-	bz, err = guardiantestutil.CreateSuperExec(val.ClientCtx, addr.String(), args...)
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp := respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
+	result = guardiantestutil.CreateSuperExec(
+		s.T(),
+		s.network,
+		val.ClientCtx, addr.String(), args...,
+	)
+	s.Require().Equal(expectedCode, result.TxResult.Code, result.TxResult.Log)
 
 	respType = proto.Message(&guardiantypes.QuerySupersResponse{})
 	bz, err = guardiantestutil.QuerySupersExec(clientCtx)
@@ -123,17 +134,19 @@ func (s *IntegrationTestSuite) TestGuardian() {
 		fmt.Sprintf("--%s=%s", guardiancli.FlagAddress, from.String()),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf(
+			"--%s=%s",
+			flags.FlagFees,
+			sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String(),
+		),
 	}
 
-	respType = proto.Message(&sdk.TxResponse{})
-
-	bz, err = guardiantestutil.DeleteSuperExec(val.ClientCtx, addr.String(), args...)
-	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	txResp = respType.(*sdk.TxResponse)
-	s.Require().Equal(expectedCode, txResp.Code)
+	result = guardiantestutil.DeleteSuperExec(
+		s.T(),
+		s.network,
+		val.ClientCtx, addr.String(), args...)
+	s.Require().Equal(expectedCode, result.TxResult.Code, result.TxResult.Log)
 
 	respType = proto.Message(&guardiantypes.QuerySupersResponse{})
 	bz, err = guardiantestutil.QuerySupersExec(clientCtx)

@@ -15,7 +15,6 @@ import (
 // default paramspace for params keeper
 const (
 	DefaultParamSpace = "mint"
-	MintDenom         = sdk.DefaultBondDenom
 )
 
 // Parameter store key
@@ -23,6 +22,7 @@ var (
 	// params store for inflation params
 	KeyInflation = []byte("Inflation")
 	KeyMintDenom = []byte("MintDenom")
+	MintDenom    = sdk.DefaultBondDenom
 )
 
 // ParamTable for mint module
@@ -67,10 +67,18 @@ func (p *Params) GetParamSpace() string {
 // Validate returns err if the Params is invalid
 func (p Params) Validate() error {
 	if p.Inflation.GT(sdk.NewDecWithPrec(2, 1)) || p.Inflation.LT(sdk.ZeroDec()) {
-		return sdkerrors.Wrapf(ErrInvalidMintInflation, "Mint inflation [%s] should be between [0, 0.2] ", p.Inflation.String())
+		return sdkerrors.Wrapf(
+			ErrInvalidMintInflation,
+			"Mint inflation [%s] should be between [0, 0.2] ",
+			p.Inflation.String(),
+		)
 	}
 	if len(p.MintDenom) == 0 {
-		return sdkerrors.Wrapf(ErrInvalidMintDenom, "Mint denom [%s] should not be empty", p.MintDenom)
+		return sdkerrors.Wrapf(
+			ErrInvalidMintDenom,
+			"Mint denom [%s] should not be empty",
+			p.MintDenom,
+		)
 	}
 	return nil
 }

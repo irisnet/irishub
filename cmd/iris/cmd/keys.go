@@ -12,13 +12,13 @@ import (
 	clientkeys "github.com/evmos/ethermint/client/keys"
 	"github.com/spf13/cobra"
 
+	"github.com/cometbft/cometbft/libs/cli"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/keys"
-	"github.com/tendermint/tendermint/libs/cli"
 
-	"github.com/irisnet/irishub/keystore"
+	"github.com/irisnet/irishub/v2/keystore"
 )
 
 // Commands registers a sub-tree of commands to interact with
@@ -54,7 +54,7 @@ The pass backend requires GnuPG: https://gnupg.org/
 	addCmd := keys.AddKeyCommand()
 
 	// update the default signing algorithm value to "secp256k1"
-	algoFlag := addCmd.Flag(flags.FlagKeyAlgorithm)
+	algoFlag := addCmd.Flag(flags.FlagKeyType)
 	algoFlag.DefValue = string(cosmoshd.Secp256k1Type)
 	err := algoFlag.Value.Set(string(cosmoshd.Secp256k1Type))
 	if err != nil {
@@ -79,8 +79,10 @@ The pass backend requires GnuPG: https://gnupg.org/
 	)
 
 	cmd.PersistentFlags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
-	cmd.PersistentFlags().String(flags.FlagKeyringDir, "", "The client Keyring directory; if omitted, the default 'home' directory will be used")
-	cmd.PersistentFlags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
+	cmd.PersistentFlags().
+		String(flags.FlagKeyringDir, "", "The client Keyring directory; if omitted, the default 'home' directory will be used")
+	cmd.PersistentFlags().
+		String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
 	cmd.PersistentFlags().String(cli.OutputFlag, "text", "Output format (text|json)")
 
 	return cmd
@@ -126,7 +128,8 @@ func getArmor(privBytes []byte, passphrase string) (string, error) {
 }
 
 func runAddCmd(cmd *cobra.Command, args []string) error {
-	clientCtx := client.GetClientContextFromCmd(cmd).WithKeyringOptions(etherminthd.EthSecp256k1Option())
+	clientCtx := client.GetClientContextFromCmd(cmd).
+		WithKeyringOptions(etherminthd.EthSecp256k1Option())
 	clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
 	if err != nil {
 		return err

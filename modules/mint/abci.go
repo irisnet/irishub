@@ -3,8 +3,8 @@ package mint
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/modules/mint/keeper"
-	"github.com/irisnet/irishub/modules/mint/types"
+	"github.com/irisnet/irishub/v2/modules/mint/keeper"
+	"github.com/irisnet/irishub/v2/modules/mint/types"
 )
 
 // BeginBlocker handles block beginning logic for mint
@@ -20,8 +20,14 @@ func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 	}
 
 	// Calculate block mint amount
-	params := k.GetParamSet(ctx)
-	logger.Info("Mint parameters", "inflation_rate", params.Inflation.String(), "mint_denom", params.MintDenom)
+	params := k.GetParams(ctx)
+	logger.Info(
+		"Mint parameters",
+		"inflation_rate",
+		params.Inflation.String(),
+		"mint_denom",
+		params.MintDenom,
+	)
 
 	mintedCoin := minter.BlockProvision(params)
 	logger.Info("Mint result", "block_provisions", mintedCoin.String(), "time", blockTime.String())
