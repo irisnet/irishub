@@ -17,6 +17,6 @@
     "vuepress": "^1.9.7"
   },
   "dependencies": {
-    "axios": "^0.26.0"
+    "axios": "^1.6.0"
   }
 }
