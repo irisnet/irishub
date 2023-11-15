@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	ibctransfertypes "github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
@@ -28,7 +28,12 @@ func NewValidateTokenDecorator(tk tokenkeeper.Keeper) ValidateTokenDecorator {
 }
 
 // AnteHandle checks the transaction
-func (vtd ValidateTokenDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
+func (vtd ValidateTokenDecorator) AnteHandle(
+	ctx sdk.Context,
+	tx sdk.Tx,
+	simulate bool,
+	next sdk.AnteHandler,
+) (sdk.Context, error) {
 	for _, msg := range tx.GetMsgs() {
 		switch msg := msg.(type) {
 		case *ibctransfertypes.MsgTransfer:
@@ -65,7 +70,12 @@ func NewValidateServiceDecorator() ValidateServiceDecorator {
 }
 
 // AnteHandle checks the transaction
-func (vsd ValidateServiceDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
+func (vsd ValidateServiceDecorator) AnteHandle(
+	ctx sdk.Context,
+	tx sdk.Tx,
+	simulate bool,
+	next sdk.AnteHandler,
+) (sdk.Context, error) {
 	for _, msg := range tx.GetMsgs() {
 		switch msg := msg.(type) {
 		case *servicetypes.MsgCallService:

@@ -5,21 +5,15 @@ import (
 
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	"github.com/irisnet/irishub/app/upgrades"
-	v110 "github.com/irisnet/irishub/app/upgrades/v110"
-	v120 "github.com/irisnet/irishub/app/upgrades/v120"
-	v130 "github.com/irisnet/irishub/app/upgrades/v130"
-	v140 "github.com/irisnet/irishub/app/upgrades/v140"
-	v200 "github.com/irisnet/irishub/app/upgrades/v200"
+	"github.com/irisnet/irishub/v2/app/upgrades"
+	v200 "github.com/irisnet/irishub/v2/app/upgrades/v200"
+	v210 "github.com/irisnet/irishub/v2/app/upgrades/v210"
 )
 
 var (
 	router = upgrades.NewUpgradeRouter().
-		Register(v110.Upgrade).
-		Register(v120.Upgrade).
-		Register(v130.Upgrade).
-		Register(v140.Upgrade).
-		Register(v200.Upgrade)
+		Register(v200.Upgrade).
+		Register(v210.Upgrade)
 )
 
 // RegisterUpgradePlans register a handler of upgrade plan
@@ -30,18 +24,21 @@ func (app *IrisApp) RegisterUpgradePlans() {
 
 func (app *IrisApp) appKeepers() upgrades.AppKeepers {
 	return upgrades.AppKeepers{
-		AppCodec:        app.AppCodec(),
-		HTLCKeeper:      app.HTLCKeeper,
-		BankKeeper:      app.BankKeeper,
-		AccountKeeper:   app.AccountKeeper,
-		ServiceKeeper:   app.ServiceKeeper,
-		GetKey:          app.GetKey,
-		ModuleManager:   app.mm,
-		TIBCkeeper:      app.TIBCKeeper,
-		EvmKeeper:       app.EvmKeeper,
-		FeeMarketKeeper: app.FeeMarketKeeper,
-		TokenKeeper:     app.TokenKeeper,
-		ReaderWriter:    app,
+		AppCodec:              app.AppCodec(),
+		HTLCKeeper:            app.HTLCKeeper,
+		BankKeeper:            app.BankKeeper,
+		AccountKeeper:         app.AccountKeeper,
+		ServiceKeeper:         app.ServiceKeeper,
+		GetKey:                app.GetKey,
+		ModuleManager:         app.mm,
+		TIBCkeeper:            app.TIBCKeeper,
+		IBCKeeper:             app.IBCKeeper,
+		EvmKeeper:             app.EvmKeeper,
+		FeeMarketKeeper:       app.FeeMarketKeeper,
+		TokenKeeper:           app.TokenKeeper,
+		ReaderWriter:          app,
+		ConsensusParamsKeeper: app.ConsensusParamsKeeper,
+		ParamsKeeper:          app.ParamsKeeper,
 	}
 }
 

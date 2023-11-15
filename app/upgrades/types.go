@@ -1,7 +1,7 @@
 package upgrades
 
 import (
-	abci "github.com/tendermint/tendermint/abci/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	store "github.com/cosmos/cosmos-sdk/store/types"
@@ -10,7 +10,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	consensuskeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
+	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
 
@@ -38,23 +41,26 @@ type Upgrade struct {
 }
 
 type ConsensusParamsReaderWriter interface {
-	StoreConsensusParams(ctx sdk.Context, cp *abci.ConsensusParams)
-	GetConsensusParams(ctx sdk.Context) *abci.ConsensusParams
+	StoreConsensusParams(ctx sdk.Context, cp *tmproto.ConsensusParams)
+	GetConsensusParams(ctx sdk.Context) *tmproto.ConsensusParams
 }
 
 type AppKeepers struct {
-	AppCodec        codec.Codec
-	HTLCKeeper      htlckeeper.Keeper
-	AccountKeeper   authkeeper.AccountKeeper
-	BankKeeper      bankkeeper.Keeper
-	ServiceKeeper   servicekeeper.Keeper
-	GetKey          func(moduleName string) *storetypes.KVStoreKey
-	ModuleManager   *module.Manager
-	TIBCkeeper      *tibckeeper.Keeper
-	EvmKeeper       *evmkeeper.Keeper
-	FeeMarketKeeper feemarketkeeper.Keeper
-	TokenKeeper     tokenkeeper.Keeper
-	ReaderWriter    ConsensusParamsReaderWriter
+	AppCodec              codec.Codec
+	HTLCKeeper            htlckeeper.Keeper
+	AccountKeeper         authkeeper.AccountKeeper
+	BankKeeper            bankkeeper.Keeper
+	ServiceKeeper         servicekeeper.Keeper
+	GetKey                func(moduleName string) *storetypes.KVStoreKey
+	ModuleManager         *module.Manager
+	TIBCkeeper            *tibckeeper.Keeper
+	IBCKeeper             *ibckeeper.Keeper
+	EvmKeeper             *evmkeeper.Keeper
+	FeeMarketKeeper       feemarketkeeper.Keeper
+	TokenKeeper           tokenkeeper.Keeper
+	ReaderWriter          ConsensusParamsReaderWriter
+	ConsensusParamsKeeper consensuskeeper.Keeper
+	ParamsKeeper          paramskeeper.Keeper
 }
 
 type upgradeRouter struct {

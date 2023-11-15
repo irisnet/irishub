@@ -1,0 +1,13 @@
+syntax = "proto3";
+package irishub.mint;
+
+import "irishub/mint/mint.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/irisnet/irishub/v2/modules/mint/types";
+
+// GenesisState defines the mint module's genesis state
+message GenesisState {
+    Minter minter = 1 [ (gogoproto.nullable) = false ];
+    Params params = 2 [ (gogoproto.nullable) = false ];
+}

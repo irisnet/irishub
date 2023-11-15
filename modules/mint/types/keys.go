@@ -22,4 +22,5 @@ const (
 var (
 	// use for the keeper store
 	MinterKey = []byte{0x00}
+	ParamsKey = []byte{0x01}
 )

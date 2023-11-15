@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	enccodec "github.com/evmos/ethermint/encoding/codec"
 
-	"github.com/irisnet/irishub/app/params"
+	"github.com/irisnet/irishub/v2/app/params"
 )
 
 // MakeEncodingConfig creates an EncodingConfig for testing

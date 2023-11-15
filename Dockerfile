@@ -1,7 +1,7 @@
 #
-# Build image: docker build -t irisnet/irishub:v2.0.0 --build-arg EVM_CHAIN_ID=6688 .
+# Build image: docker build -t irisnet/irishub:v2.1.0 --build-arg EVM_CHAIN_ID=6688 .
 #
-FROM golang:1.18-alpine3.16 as builder
+FROM golang:1.19.13-alpine3.18 as builder
 
 ARG EVM_CHAIN_ID
 

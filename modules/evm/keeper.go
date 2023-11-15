@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strconv"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	tmtypes "github.com/tendermint/tendermint/types"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
+	tmtypes "github.com/cometbft/cometbft/types"
 
 	errorsmod "cosmossdk.io/errors"
 	"github.com/armon/go-metrics"
@@ -30,7 +30,10 @@ var _ types.MsgServer = &Keeper{}
 // executed (i.e applied) against the go-ethereum EVM. The provided SDK Context is set to the Keeper
 // so that it can implements and call the StateDB methods without receiving it as a function
 // parameter.
-func (k *Keeper) EthereumTx(goCtx context.Context, msg *types.MsgEthereumTx) (*types.MsgEthereumTxResponse, error) {
+func (k *Keeper) EthereumTx(
+	goCtx context.Context,
+	msg *types.MsgEthereumTx,
+) (*types.MsgEthereumTxResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	sender := msg.From
@@ -100,7 +103,10 @@ func (k *Keeper) EthereumTx(goCtx context.Context, msg *types.MsgEthereumTx) (*t
 	}
 
 	if response.Failed() {
-		attrs = append(attrs, sdk.NewAttribute(types.AttributeKeyEthereumTxFailed, response.VmError))
+		attrs = append(
+			attrs,
+			sdk.NewAttribute(types.AttributeKeyEthereumTxFailed, response.VmError),
+		)
 	}
 
 	txLogAttrs := make([]sdk.Attribute, len(response.Logs))
@@ -140,4 +146,11 @@ func (k *Keeper) SetHooks(eh types.EvmHooks) *Keeper {
 		evmkeeper: k.evmkeeper.SetHooks(eh),
 		hasHook:   true,
 	}
+}
+
+func (k *Keeper) UpdateParams(
+	goCtx context.Context,
+	msg *types.MsgUpdateParams,
+) (*types.MsgUpdateParamsResponse, error) {
+	return k.evmkeeper.UpdateParams(goCtx, msg)
 }

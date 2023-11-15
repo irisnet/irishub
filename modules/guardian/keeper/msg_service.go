@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irishub/modules/guardian/types"
+	"github.com/irisnet/irishub/v2/modules/guardian/types"
 )
 
 type msgServer struct {

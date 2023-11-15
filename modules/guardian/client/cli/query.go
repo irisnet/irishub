@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"github.com/irisnet/irishub/modules/guardian/types"
+	"github.com/irisnet/irishub/v2/modules/guardian/types"
 )
 
 // GetQueryCmd returns the cli query commands for the guardian module.

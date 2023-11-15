@@ -6,7 +6,7 @@ import (
 	etherminttypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	"github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/v2/types"
 )
 
 // NOTE: Before the release of irishub 2.0.0, the configuration in this file must be modified
