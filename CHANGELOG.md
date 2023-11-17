@@ -37,6 +37,34 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ## [Unreleased]
 
+### Improvements
+
+* [\#382](https://github.com/irisnet/irismod/pull/382) Fix dependabot alerts.
+* [\#381](https://github.com/irisnet/irismod/pull/381) Forbidden to mint nft under ibc class.
+* [\#378](https://github.com/irisnet/irismod/pull/378) Support cosmos-sdk `x/nft` api.
+* [\#376](https://github.com/irisnet/irismod/pull/376) Bump up cosmos-sdk to v0.47.4.
+* [\#374](https://github.com/irisnet/irismod/pull/374) Move proto file to irismod directory.
+* [\#369](https://github.com/irisnet/irismod/pull/369) Support cosmos depinject.
+* [\#368](https://github.com/irisnet/irismod/pull/368) Remove sdk simapp dep.
+* [\#367](https://github.com/irisnet/irismod/pull/367) Lint proto.
+* [\#365](https://github.com/irisnet/irismod/pull/365) Remove duplicate events.
+* [\#364](https://github.com/irisnet/irismod/pull/364) Migrate token params.
+* [\#363](https://github.com/irisnet/irismod/pull/363) Migrate service params.
+* [\#362](https://github.com/irisnet/irismod/pull/362) Migrate htlc params.
+* [\#361](https://github.com/irisnet/irismod/pull/361) Migrate farm params.
+* [\#360](https://github.com/irisnet/irismod/pull/360) Migrate coinswap params.
+
+### Bug Fixes
+
+* [\#380](https://github.com/irisnet/irismod/pull/380) Fix farm genesis validation.
+* [\#367](https://github.com/irisnet/irismod/pull/367) Fix `mt` module rest url conflict.
+* [\#356](https://github.com/irisnet/irismod/pull/356) Replace base64.StdEncoding with base64.RawStdEncoding.
+* [\#351](https://github.com/irisnet/irismod/pull/351) Fix wrong addr length of the service module.
+
+### API Breaking Changes
+
+* [\#353](https://github.com/irisnet/irismod/pull/353) The commands of the token module only supports the main unit coin
+
 ## [v1.7.3]
 
 ### Improvements
