@@ -10,13 +10,16 @@
   "author": "IRISnet Dev Team",
   "license": "ISC",
   "devDependencies": {
-    "@vuepress/plugin-search": "^1.9.7",
+    "@vuepress/client": "^2.0.0-rc.0",
+    "@vuepress/plugin-search": "^2.0.0-rc.0",
+    "axios": "^1.6.2",
     "lodash": "^4.17.21",
     "markdown-it": "^12.3.2",
     "markdown-it-meta": "^0.0.1",
-    "vuepress": "^1.9.7"
+    "vue": "^3.3.8",
+    "vuepress": "2.0.0-rc.0"
   },
   "dependencies": {
-    "axios": "^0.26.0"
+    "glob": "^7.2.0"
   }
 }
