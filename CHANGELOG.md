@@ -9,9 +9,9 @@
 
 ### State Machine Breaking
 
-* (IRISHub) [\#2883](https://github.com/irisnet/irishub/pull/2883) Add nft-transfer module with version v1.1.3-ibc-v7.3.0
-* (IRISHub) [\#2883](https://github.com/irisnet/irishub/pull/2883) Bump up tibc-go version to v0.5.0
-* (IRISHub) [\#2883](https://github.com/irisnet/irishub/pull/2863) Bump up irismod version to v1.8.0
+* (IRISHub) [\#2884](https://github.com/irisnet/irishub/pull/2884) Add nft-transfer module with version v1.1.3-ibc-v7.3.0
+* (IRISHub) [\#2884](https://github.com/irisnet/irishub/pull/2884) Bump up tibc-go version to v0.5.0
+* (IRISHub) [\#2884](https://github.com/irisnet/irishub/pull/2884) Bump up irismod version to v1.8.0
 * (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Add consensus module.
 * (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Bump up ethermint version to v0.22.0
 * (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Bump up ibc-go version to v7.3.0
