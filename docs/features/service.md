@@ -56,7 +56,7 @@ Any user can define services on the blockchain. The interface of a service must 
 
 ```bash
 # create a new service definition
-iris tx service define --name=<service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...>
+iris tx service define --name=<service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...> --from=<key-name> --chain-id=<chain-id>
 
 # query service definition
 iris q service definition <service-name>
@@ -112,22 +112,22 @@ Service bindings can be updated at any time by their owners to adjust pricing, i
 
 ```bash
 # create a new service binding
-iris tx service bind <service-name> <provider-address> --deposit=<deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json>
+iris tx service bind <service-name> <provider-address> --deposit=<deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json> --from=<key-name> --chain-id=<chain-id>
 
 # update a service binding
-iris tx service update-binding <service-name> <provider-address> --deposit=<added-deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json>
+iris tx service update-binding <service-name> <provider-address> --deposit=<added-deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json> --from=<key-name> --chain-id=<chain-id>
 
 # enable an inactive service binding
-iris tx service enable <service-name> <provider-address> --deposit=<added-deposit>
+iris tx service enable <service-name> <provider-address> --deposit=<added-deposit> --from=<key-name> --chain-id=<chain-id>
 
 # disable an active service binding
-iris tx service disable <service-name> <provider-address>
+iris tx service disable <service-name> <provider-address> --from=<key-name> --chain-id=<chain-id>
 
 # request refund of service binding deposit
-iris tx service refund-deposit <service-name> <provider-address>
+iris tx service refund-deposit <service-name> <provider-address> --from=<key-name> --chain-id=<chain-id>
 
 # list all the bindings of a service
-iris tx service bindings <service-name>
+iris tx service bindings <service-name> --from=<key-name> --chain-id=<chain-id>
 
 # list all the bindings of a service, owned by a given account
 iris q service bindings service bindings <service-name> --owner <address>
@@ -181,19 +181,19 @@ When a request context is successfully created, a `context id` is returned to th
 
 ```bash
 # create a repeated request context, with no callback
-iris tx service call --service-name=<service name> --data=<request input> --providers=<provider list> --service-fee-cap=1iris --timeout 50 --repeated --frequency=50 --total=100
+iris tx service call --service-name=<service name> --data=<request input> --providers=<provider list> --service-fee-cap=1iris --timeout 50 --repeated --frequency=50 --total=100 --from=<key-name> --chain-id=<chain-id>
 
 # update an existing request context
-iris tx service update <request-context-id> --frequency=20 --total=200
+iris tx service update <request-context-id> --frequency=20 --total=200 --from=<key-name> --chain-id=<chain-id>
 
 # pause a running request context
-iris tx service pause <request-context-id>
+iris tx service pause <request-context-id> --from=<key-name> --chain-id=<chain-id>
 
 # start a paused request context
-iris tx service start <request-context-id>
+iris tx service start <request-context-id> --from=<key-name> --chain-id=<chain-id>
 
 # permanently kill a request context
-iris tx service kill <request-context-id>
+iris tx service kill <request-context-id> --from=<key-name> --chain-id=<chain-id>
 
 # query a previously created request context by its id
 iris q service request-context <request-context-id>
@@ -237,7 +237,7 @@ iris q service requests <service-name> <provider>
 iris q service request <request-id>
 
 # send a response back, matching a specific request
-iris tx service respond --request-id=<request-id> --result='{"code":200,"message":"success"}' --data=<response output>
+iris tx service respond --request-id=<request-id> --result='{"code":200,"message":"success"}' --data=<response output> --from=<key-name> --chain-id=<chain-id>
 
 # query the result schema
 iris q service schema result
@@ -261,7 +261,7 @@ Right before a service fee is paid to a provider, a _tax_, in the amount of `Ser
 
 ```bash
 # set withdrawal address
-iris tx service set-withdraw-addr <withdrawal-address>
+iris tx service set-withdraw-addr <withdrawal-address> --from=<key-name> --chain-id=<chain-id>
 
 # query withdrawal address of a given account
 iris q service withdraw-addr <address>
@@ -270,10 +270,10 @@ iris q service withdraw-addr <address>
 iris q service fees <provider-address>
 
 # withdraw earned fees from all providers
-iris tx service withdraw-fees
+iris tx service withdraw-fees --from=<key-name> --chain-id=<chain-id>
 
 # withdraw earned fees from a given provider
-iris tx service withdraw-fees <provider-address>
+iris tx service withdraw-fees <provider-address> --from=<key-name> --chain-id=<chain-id>
 ```
 
 ## Service Governance (TODO)
