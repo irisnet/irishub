@@ -1,9 +1,9 @@
-const glob = require("glob");
-const markdownIt = require("markdown-it");
-const meta = require("markdown-it-meta");
-const fs = require("fs");
-const _ = require("lodash");
-
+import glob  from 'glob';
+import markdownIt from 'markdown-it'
+import meta from 'markdown-it-meta'
+import fs from 'fs'
+import _ from 'lodash'
+import { searchPlugin } from '@vuepress/plugin-search'
 const sidebar = (directory, array) => {
     return array.map(i => {
         const children = _.sortBy(
@@ -20,22 +20,27 @@ const sidebar = (directory, array) => {
                 .filter(f => f.order !== false),
             ["order", "path"]
         )
-            .map(f => f.path)
+            .map(f => f.path.slice(1))
             .filter(f => !f.match("README"));
-
         return {
-            title: i[0],
-            children
+            text: i[0],
+            children,
+            collapsible:true
         };
     });
 };
-
-module.exports = {
+import{defineUserConfig } from 'vuepress'
+import { defaultTheme } from 'vuepress'
+export default defineUserConfig( {
     base: "/docs/",
     plugins: [
-        ['@vuepress/search', {
-            searchMaxSuggestions: 10
-        }]
+        searchPlugin({
+            locales: {
+                '/': {
+                    placeholder: 'Search',
+                },
+            }
+        }),
     ],
     locales: {
         "/": {
@@ -44,16 +49,16 @@ module.exports = {
             description: "IRISnet Documents",
         }
     },
-    themeConfig: {
+    theme: defaultTheme({
         repo: "irisnet/irishub",
         docsDir: "docs",
         editLinks: true,
-        docsBranch: "master",
+        docsBranch: "main",
         editLinkText: 'Help us improve this page!',
         locales: {
             "/": {
                 editLinkText: 'Help us improve this page!',
-                nav: [
+                navbar: [
                     {
                         text: 'Back to IRISnet',
                         link: 'https://www.irisnet.org'
@@ -69,8 +74,8 @@ module.exports = {
                     ["Tools", "tools"],
                     ["Migration", "migration"],
                     ["Resources", "resources"]
-                ])
+                ]),
             }
         },
-    }
-};
+    }),
+});
