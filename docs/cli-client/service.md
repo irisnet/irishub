@@ -2,7 +2,7 @@
 
 Service module allows you to define, bind, invoke services on the IRIS Hub. [Read more about iService](../features/service.md).
 
-## 可用命令
+## Available Commands
 
 | Name                                                    | Description                                                        |
 | ------------------------------------------------------- | ------------------------------------------------------------------ |
