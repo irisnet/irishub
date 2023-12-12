@@ -53,6 +53,7 @@ export default defineUserConfig( {
         repo: "irisnet/irishub",
         docsDir: "docs",
         editLinks: true,
+        contributors: false,
         docsBranch: "main",
         editLinkText: 'Help us improve this page!',
         locales: {
