@@ -11,15 +11,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	icahosttypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/types"
+	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/types"
 
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	"github.com/evmos/ethermint/x/feemarket"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	"github.com/irisnet/irishub/app/upgrades"
-	irisevm "github.com/irisnet/irishub/modules/evm"
+	"github.com/irisnet/irishub/v2/app/upgrades"
+	irisevm "github.com/irisnet/irishub/v2/modules/evm"
 )
 
 var Upgrade = upgrades.Upgrade{
@@ -31,13 +31,22 @@ var Upgrade = upgrades.Upgrade{
 	},
 }
 
-func upgradeHandlerConstructor(m *module.Manager, c module.Configurator, app upgrades.AppKeepers) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+func upgradeHandlerConstructor(
+	m *module.Manager,
+	c module.Configurator,
+	app upgrades.AppKeepers,
+) upgradetypes.UpgradeHandler {
+	return func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		fromVM[evmtypes.ModuleName] = irisevm.AppModule{}.ConsensusVersion()
 		fromVM[feemarkettypes.ModuleName] = feemarket.AppModule{}.ConsensusVersion()
 
-		app.EvmKeeper.SetParams(ctx, evmParams)
-		app.FeeMarketKeeper.SetParams(ctx, generateFeemarketParams(ctx.BlockHeight()))
+		if err := app.EvmKeeper.SetParams(ctx, evmParams); err != nil {
+			return nil, err
+		}
+
+		if err := app.FeeMarketKeeper.SetParams(ctx, generateFeemarketParams(ctx.BlockHeight())); err != nil {
+			return nil, err
+		}
 
 		//transfer token ownership
 		owner, err := sdk.AccAddressFromBech32(evmToken.Owner)

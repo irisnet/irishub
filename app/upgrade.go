@@ -5,22 +5,15 @@ import (
 
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	"github.com/irisnet/irishub/app/upgrades"
-	v110 "github.com/irisnet/irishub/app/upgrades/v110"
-	v120 "github.com/irisnet/irishub/app/upgrades/v120"
-	v130 "github.com/irisnet/irishub/app/upgrades/v130"
-	v140 "github.com/irisnet/irishub/app/upgrades/v140"
-	v200 "github.com/irisnet/irishub/app/upgrades/v200"
+	"github.com/irisnet/irishub/v2/app/upgrades"
+	v200 "github.com/irisnet/irishub/v2/app/upgrades/v200"
+	v210 "github.com/irisnet/irishub/v2/app/upgrades/v210"
 )
 
 var (
-	plans = []upgrades.Upgrade{
-		v110.Upgrade,
-		v120.Upgrade,
-		v130.Upgrade,
-		v140.Upgrade,
-		v200.Upgrade,
-	}
+	router = upgrades.NewUpgradeRouter().
+		Register(v200.Upgrade).
+		Register(v210.Upgrade)
 )
 
 // RegisterUpgradePlans register a handler of upgrade plan
@@ -31,18 +24,21 @@ func (app *IrisApp) RegisterUpgradePlans() {
 
 func (app *IrisApp) appKeepers() upgrades.AppKeepers {
 	return upgrades.AppKeepers{
-		AppCodec:        app.AppCodec(),
-		HTLCKeeper:      app.HTLCKeeper,
-		BankKeeper:      app.BankKeeper,
-		AccountKeeper:   app.AccountKeeper,
-		ServiceKeeper:   app.ServiceKeeper,
-		GetKey:          app.GetKey,
-		ModuleManager:   app.mm,
-		TIBCkeeper:      app.TIBCKeeper,
-		EvmKeeper:       app.EvmKeeper,
-		FeeMarketKeeper: app.FeeMarketKeeper,
-		TokenKeeper:     app.TokenKeeper,
-		ReaderWriter:    app,
+		AppCodec:              app.AppCodec(),
+		HTLCKeeper:            app.HTLCKeeper,
+		BankKeeper:            app.BankKeeper,
+		AccountKeeper:         app.AccountKeeper,
+		ServiceKeeper:         app.ServiceKeeper,
+		GetKey:                app.GetKey,
+		ModuleManager:         app.mm,
+		TIBCkeeper:            app.TIBCKeeper,
+		IBCKeeper:             app.IBCKeeper,
+		EvmKeeper:             app.EvmKeeper,
+		FeeMarketKeeper:       app.FeeMarketKeeper,
+		TokenKeeper:           app.TokenKeeper,
+		ReaderWriter:          app,
+		ConsensusParamsKeeper: app.ConsensusParamsKeeper,
+		ParamsKeeper:          app.ParamsKeeper,
 	}
 }
 
@@ -57,17 +53,18 @@ func (app *IrisApp) setupUpgradeStoreLoaders() {
 		return
 	}
 
-	for _, upgrade := range plans {
-		if upgradeInfo.Name == upgrade.UpgradeName {
-			app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, upgrade.StoreUpgrades))
-		}
-	}
+	app.SetStoreLoader(
+		upgradetypes.UpgradeStoreLoader(
+			upgradeInfo.Height,
+			router.UpgradeInfo(upgradeInfo.Name).StoreUpgrades,
+		),
+	)
 }
 
 func (app *IrisApp) setupUpgradeHandlers() {
-	for _, upgrade := range plans {
+	for upgradeName, upgrade := range router.Routers() {
 		app.UpgradeKeeper.SetUpgradeHandler(
-			upgrade.UpgradeName,
+			upgradeName,
 			upgrade.UpgradeHandlerConstructor(
 				app.mm,
 				app.configurator,

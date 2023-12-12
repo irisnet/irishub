@@ -12,7 +12,7 @@ The reward is composed by two parts, one is the collected transaction fee from t
 
 ### Block Time
 
-The block time is not the machine time, because different machines may not have exactly the same time. They must have some deviation more or less which will result in non-deterministic. So here the block time is the BFT time. Please refer to this [tendermint bft-time](https://github.com/tendermint/tendermint/blob/master/docs/spec/consensus/bft-time.md) for detailed description.
+The block time is not the machine time, because different machines may not have exactly the same time. They must have some deviation more or less which will result in non-deterministic. So here the block time is the BFT time. Please refer to this [tendermint bft-time](https://github.com/cometbft/cometbft/blob/master/docs/spec/consensus/bft-time.md) for detailed description.
 
 ### Inflation Rate
 
@@ -28,8 +28,8 @@ AnnualInflationAmount = inflationBasement * inflationRate
 blockInflationAmount = AnnualInflationAmount * blockCostTime / (year)
 ```
 
-The value of `inflationBasement` is specified in genesis file. By default its value `2000000000iris`(2 billion iris, `1 iris` equals `1*10^18 uiris`), and its value will never be changed.
-Suppose `blockCostTime` is 5000 millisecond, and `inflationRate` is `4%`, then the inflation amount will be `12675235125611580094uiris` (`12.675235125611580094iris`)
+The value of `inflationBasement` is specified in genesis file. By default its value `2000000000iris`(2 billion iris, `1 iris` equals `1*10^6 uiris`), and its value will never be changed.
+Suppose `blockCostTime` is 5000 millisecond, and `inflationRate` is `4%`, then the inflation amount will be `12683917uiris` (`12.683917iris`)
 
 ## Impact to users
 

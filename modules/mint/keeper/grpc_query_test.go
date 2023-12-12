@@ -5,7 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 
-	"github.com/irisnet/irishub/modules/mint/types"
+	"github.com/irisnet/irishub/v2/modules/mint/types"
 )
 
 func (suite *KeeperTestSuite) TestGRPCQueryPoolParameters() {
@@ -18,5 +18,5 @@ func (suite *KeeperTestSuite) TestGRPCQueryPoolParameters() {
 	// Query Params
 	resp, err := queryClient.Params(gocontext.Background(), &types.QueryParamsRequest{})
 	suite.NoError(err)
-	suite.Equal(app.MintKeeper.GetParamSet(ctx), resp.Params)
+	suite.Equal(app.MintKeeper.GetParams(ctx), resp.Params)
 }

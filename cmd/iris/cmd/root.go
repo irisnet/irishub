@@ -5,28 +5,22 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 
-	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 
-	tmcfg "github.com/tendermint/tendermint/config"
-	tmcli "github.com/tendermint/tendermint/libs/cli"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
+	dbm "github.com/cometbft/cometbft-db"
+	tmcfg "github.com/cometbft/cometbft/config"
+	tmcli "github.com/cometbft/cometbft/libs/cli"
+	"github.com/cometbft/cometbft/libs/log"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/pruning"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/server"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"github.com/cosmos/cosmos-sdk/snapshots"
-	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
-	"github.com/cosmos/cosmos-sdk/store"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -35,12 +29,12 @@ import (
 
 	ethermintdebug "github.com/evmos/ethermint/client/debug"
 	etherminthd "github.com/evmos/ethermint/crypto/hd"
+	ethermintserver "github.com/evmos/ethermint/server"
 	servercfg "github.com/evmos/ethermint/server/config"
 
-	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/app/params"
-	irisserver "github.com/irisnet/irishub/server"
-	iristypes "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/v2/app"
+	"github.com/irisnet/irishub/v2/app/params"
+	iristypes "github.com/irisnet/irishub/v2/types"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
@@ -54,7 +48,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithLegacyAmino(encodingConfig.Amino).
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
-		WithBroadcastMode(flags.BroadcastBlock).
+		WithBroadcastMode(flags.BroadcastSync).
 		WithHomeDir(iristypes.DefaultNodeHome).
 		WithKeyringOptions(etherminthd.EthSecp256k1Option()).
 		WithViper("")
@@ -81,7 +75,12 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 
 			customTemplate, customIRISHubConfig := initAppConfig()
 			customTMConfig := initTendermintConfig()
-			return server.InterceptConfigsPreRunHandler(cmd, customTemplate, customIRISHubConfig, customTMConfig)
+			return server.InterceptConfigsPreRunHandler(
+				cmd,
+				customTemplate,
+				customIRISHubConfig,
+				customTMConfig,
+			)
 		},
 		PersistentPostRun: func(cmd *cobra.Command, _ []string) {
 			converter.handlePostRun(cmd)
@@ -121,10 +120,12 @@ func initAppConfig() (string, interface{}) {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
+	ac := appCreator{
+		encCfg: encodingConfig,
+	}
+
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(app.ModuleBasics, iristypes.DefaultNodeHome),
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, iristypes.DefaultNodeHome),
-		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, iristypes.DefaultNodeHome),
 		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
 		AddGenesisAccountCmd(iristypes.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
@@ -132,21 +133,45 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		ethermintdebug.Cmd(),
 		config.Cmd(),
 		mergeGenesisCmd(encodingConfig),
+		pruning.PruningCmd(ac.newApp),
 	)
 
-	ac := appCreator{
-		encCfg: encodingConfig,
-	}
-
-	irisserver.AddCommands(rootCmd, iristypes.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
+	ethermintserver.AddCommands(
+		rootCmd,
+		ethermintserver.NewDefaultStartOptions(ac.newApp, iristypes.DefaultNodeHome),
+		ac.appExport,
+		addModuleInitFlags,
+	)
+	// server.AddCommands(
+	// 	rootCmd,
+	// 	iristypes.DefaultNodeHome,
+	// 	ac.newApp,
+	// 	ac.appExport,
+	// 	addModuleInitFlags,
+	// )
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
+		genesisCommand(encodingConfig),
 		queryCommand(),
 		txCommand(),
 		Commands(iristypes.DefaultNodeHome),
 	)
+}
+
+// genesisCommand builds genesis-related `simd genesis` command. Users may provide application specific commands as a parameter
+func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
+	cmd := genutilcli.GenesisCoreCommand(
+		encodingConfig.TxConfig,
+		app.ModuleBasics,
+		iristypes.DefaultNodeHome,
+	)
+
+	for _, sub_cmd := range cmds {
+		cmd.AddCommand(sub_cmd)
+	}
+	return cmd
 }
 
 func addModuleInitFlags(rootCmd *cobra.Command) {
@@ -207,54 +232,17 @@ type appCreator struct {
 	encCfg params.EncodingConfig
 }
 
-func (ac appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
-	var cache sdk.MultiStorePersistentCache
-
-	if cast.ToBool(appOpts.Get(server.FlagInterBlockCache)) {
-		cache = store.NewCommitKVStoreCacheManager()
-	}
-
-	skipUpgradeHeights := make(map[int64]bool)
-	for _, h := range cast.ToIntSlice(appOpts.Get(server.FlagUnsafeSkipUpgrades)) {
-		skipUpgradeHeights[int64(h)] = true
-	}
-
-	pruningOpts, err := server.GetPruningOptionsFromFlags(appOpts)
-	if err != nil {
-		panic(err)
-	}
-
-	snapshotDir := filepath.Join(cast.ToString(appOpts.Get(flags.FlagHome)), "data", "snapshots")
-	snapshotDB, err := sdk.NewLevelDB("metadata", snapshotDir)
-	if err != nil {
-		panic(err)
-	}
-	snapshotStore, err := snapshots.NewStore(snapshotDB, snapshotDir)
-	if err != nil {
-		panic(err)
-	}
-	snapshotOptions := snapshottypes.NewSnapshotOptions(
-		cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotInterval)),
-		cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent)),
-	)
-
+func (ac appCreator) newApp(
+	logger log.Logger,
+	db dbm.DB,
+	traceStore io.Writer,
+	appOpts servertypes.AppOptions,
+) servertypes.Application {
+	baseappOptions := server.DefaultBaseappOptions(appOpts)
 	return app.NewIrisApp(
-		logger, db, traceStore, true, skipUpgradeHeights,
-		cast.ToString(appOpts.Get(flags.FlagHome)),
-		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		ac.encCfg, // Ideally, we would reuse the one created by NewRootCmd.
+		logger, db, traceStore, true,
 		appOpts,
-		baseapp.SetPruning(pruningOpts),
-		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
-		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
-		baseapp.SetHaltTime(cast.ToUint64(appOpts.Get(server.FlagHaltTime))),
-		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
-		baseapp.SetInterBlockCache(cache),
-		baseapp.SetTrace(cast.ToBool(appOpts.Get(server.FlagTrace))),
-		baseapp.SetIndexEvents(cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents))),
-		baseapp.SetSnapshot(snapshotStore, snapshotOptions),
-		baseapp.SetIAVLCacheSize(cast.ToInt(appOpts.Get(server.FlagIAVLCacheSize))),
-		baseapp.SetIAVLDisableFastNode(cast.ToBool(appOpts.Get(server.FlagDisableIAVLFastNode))),
+		baseappOptions...,
 	)
 }
 
@@ -267,9 +255,8 @@ func (ac appCreator) appExport(
 	forZeroHeight bool,
 	jailAllowedAddrs []string,
 	appOpts servertypes.AppOptions,
-) (
-	servertypes.ExportedApp, error,
-) {
+	modulesToExport []string,
+) (servertypes.ExportedApp, error) {
 	homePath, ok := appOpts.Get(flags.FlagHome).(string)
 	if !ok || homePath == "" {
 		return servertypes.ExportedApp{}, errors.New("application home is not set")
@@ -285,10 +272,6 @@ func (ac appCreator) appExport(
 		db,
 		traceStore,
 		loadLatest,
-		map[int64]bool{},
-		homePath,
-		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		ac.encCfg,
 		appOpts,
 	)
 
@@ -298,5 +281,5 @@ func (ac appCreator) appExport(
 		}
 	}
 
-	return irisApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
+	return irisApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
 }

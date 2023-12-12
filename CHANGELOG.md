@@ -1,5 +1,50 @@
 # Changelog
 
+## 2.1.0
+
+### API Breaking
+
+* (NFT) [irismod \#378](https://github.com/irisnet/irismod/pull/378) Support x/nft API query.
+* (NFT) [irismod \#378](https://github.com/irisnet/irismod/pull/378) Support irismod/nft API query on IBC denom.
+
+### State Machine Breaking
+
+* (IRISHub) [\#2884](https://github.com/irisnet/irishub/pull/2884) Add nft-transfer module with version v1.1.3-ibc-v7.3.0
+* (IRISHub) [\#2884](https://github.com/irisnet/irishub/pull/2884) Bump up tibc-go version to v0.5.0
+* (IRISHub) [\#2884](https://github.com/irisnet/irishub/pull/2884) Bump up irismod version to v1.8.0
+* (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Add consensus module.
+* (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Bump up ethermint version to v0.22.0
+* (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Bump up ibc-go version to v7.3.0
+* (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Bump up cosmos-sdk to v0.47.4
+* (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Bump up cometbft to v0.37.2
+
+### Features
+
+* (NFT-Transfer) [\#2863](https://github.com/irisnet/irishub/pull/2863) IRISHub now integrates the functionality of interchain nft-transfer, allowing you to transfer NFTs to other chains.
+
+### Improvements
+
+* (IRISHub) [\#2858](https://github.com/irisnet/irishub/pull/2858) Migrate mint params.
+* (IRISHub) [irismod \#381](https://github.com/irisnet/irismod/pull/381) Forbidden to mint nft under ibc class.
+* (IRISMod) [irismod \#364](https://github.com/irisnet/irismod/pull/364) Migrate token params.
+* (IRISMod) [irismod \#363](https://github.com/irisnet/irismod/pull/363) Migrate service params.
+* (IRISMod) [irismod \#362](https://github.com/irisnet/irismod/pull/362) Migrate htlc params.
+* (IRISMod) [irismod \#361](https://github.com/irisnet/irismod/pull/361) Migrate farm params.
+* (IRISMod) [irismod \#360](https://github.com/irisnet/irismod/pull/360) Migrate coinswap params.
+
+### Bug Fixes
+
+* (IRISHub) [\#2863](https://github.com/irisnet/irishub/pull/2863) Fix collect-gentxs command.
+* (IRISHub) [\#2852](https://github.com/irisnet/irishub/pull/2852) Fix eip712 signature and inject ParseChainID method
+* (IRISMod) [irismod \#380](https://github.com/irisnet/irismod/pull/380) Fix farm genesis validation.
+* (IRISMod) [irismod \#367](https://github.com/irisnet/irismod/pull/367) Fix mt module rest url conflict.
+* (IRISMod) [irismod \#356](https://github.com/irisnet/irismod/pull/356) Replace base64.StdEncoding with base64.RawStdEncoding.
+* (IRISMod) [irismod \#351](https://github.com/irisnet/irismod/pull/351) Fix wrong addr length of the service module.
+
+### Security
+
+* (IRISHub) [\#2865](https://github.com/irisnet/irishub/pull/2865) Disable the vesting account creation to prevent contract address front-running.
+
 ## 2.0.0
 
 ### State Machine Breaking

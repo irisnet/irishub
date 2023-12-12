@@ -31,7 +31,7 @@ By default, the reward will be paid to the wallet address which send the delegat
 The delegator could set a new wallet as reward paid address. To set another wallet(marked as `B`) as the paid address, delegator need to send another transaction from wallet `A`.
 
 ```bash
-iris tx distribution set-withdraw-addr [withdraw-addr] [flags]
+iris tx distribution set-withdraw-addr [withdraw-addr] [flags] --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```  
 
 ### Withdraw rewards

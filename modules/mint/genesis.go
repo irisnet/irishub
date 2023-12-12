@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/irisnet/irishub/modules/mint/keeper"
-	"github.com/irisnet/irishub/modules/mint/types"
+	"github.com/irisnet/irishub/v2/modules/mint/keeper"
+	"github.com/irisnet/irishub/v2/modules/mint/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -16,13 +16,15 @@ func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data types.GenesisState)
 		panic(fmt.Errorf("failed to initialize mint genesis state: %s", err.Error()))
 	}
 	keeper.SetMinter(ctx, data.Minter)
-	keeper.SetParamSet(ctx, data.Params)
+	if err := keeper.SetParams(ctx, data.Params); err != nil {
+		panic(fmt.Errorf("failed to set mint genesis state: %s", err.Error()))
+	}
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper.
 func ExportGenesis(ctx sdk.Context, keeper keeper.Keeper) *types.GenesisState {
 	minter := keeper.GetMinter(ctx)
-	params := keeper.GetParamSet(ctx)
+	params := keeper.GetParams(ctx)
 	return types.NewGenesisState(minter, params)
 }
 

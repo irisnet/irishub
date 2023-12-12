@@ -3,13 +3,13 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
+	"github.com/cometbft/cometbft/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/modules/guardian/types"
+	"github.com/irisnet/irishub/v2/modules/guardian/types"
 )
 
 // Keeper of the guardian store

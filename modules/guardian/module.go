@@ -4,13 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	abci "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/cometbft/cometbft/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -19,9 +18,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irishub/modules/guardian/client/cli"
-	"github.com/irisnet/irishub/modules/guardian/keeper"
-	"github.com/irisnet/irishub/modules/guardian/types"
+	"github.com/irisnet/irishub/v2/modules/guardian/client/cli"
+	"github.com/irisnet/irishub/v2/modules/guardian/keeper"
+	"github.com/irisnet/irishub/v2/modules/guardian/types"
 )
 
 var (
@@ -50,7 +49,11 @@ func (AppModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 }
 
 // ValidateGenesis performs genesis state validation for the guardian module.
-func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncodingConfig, bz json.RawMessage) error {
+func (AppModuleBasic) ValidateGenesis(
+	cdc codec.JSONCodec,
+	config client.TxEncodingConfig,
+	bz json.RawMessage,
+) error {
 	var data types.GenesisState
 	if err := cdc.UnmarshalJSON(bz, &data); err != nil {
 		return fmt.Errorf("failed to unmarshal %s genesis state: %w", types.ModuleName, err)
@@ -113,22 +116,16 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
 }
 
-// Route returns the message routing key for the guardian module.
-func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
-}
-
 // QuerierRoute returns the guardian module's querier route name.
 func (AppModule) QuerierRoute() string { return types.RouterKey }
 
-// LegacyQuerierHandler returns the guardian module sdk.Querier.
-func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return keeper.NewQuerier(am.keeper, legacyQuerierCdc)
-}
-
 // InitGenesis performs genesis initialization for the guardian module. It returns
 // no validator updates.
-func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.RawMessage) []abci.ValidatorUpdate {
+func (am AppModule) InitGenesis(
+	ctx sdk.Context,
+	cdc codec.JSONCodec,
+	data json.RawMessage,
+) []abci.ValidatorUpdate {
 	var genesisState types.GenesisState
 
 	cdc.MustUnmarshalJSON(data, &genesisState)
@@ -169,21 +166,13 @@ func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.Validato
 func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 }
 
-// ProposalContents doesn't return any content functions for governance proposals.
-func (AppModule) ProposalContents(simState module.SimulationState) []simtypes.WeightedProposalContent {
-	return nil
-}
-
-// RandomizedParams creates randomized guardian param changes for the simulator.
-func (AppModule) RandomizedParams(r *rand.Rand) []simtypes.ParamChange {
-	return nil
-}
-
 // RegisterStoreDecoder registers a decoder for guardian module's types
 func (am AppModule) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
 }
 
 // WeightedOperations returns the all the guardian module operations with their respective weights.
-func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
+func (am AppModule) WeightedOperations(
+	simState module.SimulationState,
+) []simtypes.WeightedOperation {
 	return []simtypes.WeightedOperation{}
 }

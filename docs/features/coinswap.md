@@ -1,4 +1,4 @@
-# Coinswap Token Exchange
+# Coinswap
 
 ## Summary
 
@@ -64,4 +64,4 @@ Use a constant product as the market making formula: `x * y = k`,  `x` represent
 
 ## Additional information
 
-This module does not provide a command entry but the relevant REST interfaces, through which you can initiate the above transactions. Here we provide a **Demo** [Coinswap](https://github.com/zhiqiang-bianjie/coinswap) front-end interface. See instructions for the specific usage.
+This module does not provide a command entry but the relevant REST interfaces, through which you can initiate the above transactions.
