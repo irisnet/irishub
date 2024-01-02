@@ -20,7 +20,7 @@ RUN EVM_CHAIN_ID=$EVM_CHAIN_ID make build
 
 # ----------------------------
 
-FROM alpine:3.16
+FROM alpine:3.18
 
 # p2p port
 EXPOSE 26656
