@@ -6,7 +6,7 @@ FROM golang:1.19.13-alpine3.18 as builder
 ARG EVM_CHAIN_ID
 
 # Set up dependencies
-ENV PACKAGES make gcc git libc-dev bash linux-headers eudev-dev
+ENV PACKAGES make gcc git libc-dev bash linux-headers eudev-dev build-base
 
 WORKDIR /irishub
 
@@ -20,7 +20,7 @@ RUN EVM_CHAIN_ID=$EVM_CHAIN_ID make build
 
 # ----------------------------
 
-FROM alpine:3.16
+FROM alpine:3.18
 
 # p2p port
 EXPOSE 26656

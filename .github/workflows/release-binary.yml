@@ -13,7 +13,7 @@ jobs:
       - name: build binary by using docker
         run: |
           sed "s/make build/make build-all-binary/g" Dockerfile | tee Dockerfile.all-binary
-          docker build -t build:all-binary -f Dockerfile.all-binary .
+          docker build -t build:all-binary -f Dockerfile.all-binary --build-arg EVM_CHAIN_ID=6688 .
           docker run -itd --name iris-all-binary build:all-binary tail -f /dev/null
           mkdir -p build/
       - name: tar linux amd64 binary
