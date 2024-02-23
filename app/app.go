@@ -74,6 +74,11 @@ import (
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 
+	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
+	icahost "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host"
+	icahostkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/keeper"
+	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
+
 	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	"github.com/irisnet/irismod/modules/farm"
@@ -170,10 +175,11 @@ type IrisApp struct {
 	AuthzKeeper           authzkeeper.Keeper
 	ConsensusParamsKeeper consensuskeeper.Keeper
 
-	//ibc
+	// ibc
 	IBCKeeper            *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	IBCTransferKeeper    ibctransferkeeper.Keeper
 	IBCNFTTransferKeeper ibcnfttransferkeeper.Keeper
+	ICAHostKeeper        icahostkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	scopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -210,6 +216,7 @@ type IrisApp struct {
 	sm *module.SimulationManager
 
 	transferModule       transfer.AppModule
+	icaModule            ica.AppModule
 	nfttransferModule    tibcnfttransfer.AppModule
 	mttransferModule     tibcmttransfer.AppModule
 	ibcnfttransferModule nfttransfer.AppModule
@@ -258,6 +265,7 @@ func NewIrisApp(
 		evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey,
 		ibcnfttransfertypes.StoreKey,
+		icahosttypes.StoreKey,
 		capabilitytypes.StoreKey,
 		guardiantypes.StoreKey,
 		tokentypes.StoreKey,
@@ -328,6 +336,7 @@ func NewIrisApp(
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibcexported.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedNFTTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibcnfttransfertypes.ModuleName)
+	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
 
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec,
@@ -438,6 +447,20 @@ func NewIrisApp(
 		scopedIBCKeeper,
 	)
 
+	app.ICAHostKeeper = icahostkeeper.NewKeeper(
+		appCodec,
+		keys[icahosttypes.StoreKey],
+		app.GetSubspace(icahosttypes.SubModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		scopedICAHostKeeper,
+		app.MsgServiceRouter(),
+	)
+	app.icaModule = ica.NewAppModule(nil, &app.ICAHostKeeper)
+	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
+
 	// register the proposal types
 	app.TIBCKeeper = tibckeeper.NewKeeper(
 		appCodec,
@@ -508,7 +531,8 @@ func NewIrisApp(
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
-		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule)
+		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule).
+		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule)
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	app.nfttransferModule = tibcnfttransfer.NewAppModule(app.TIBCNFTTransferKeeper)
@@ -658,7 +682,7 @@ func NewIrisApp(
 	)
 
 	/****  Module Options ****/
-	var skipGenesisInvariants = false
+	skipGenesisInvariants := false
 	opt := appOpts.Get(crisis.FlagSkipGenesisInvariants)
 	if opt, ok := opt.(bool); ok {
 		skipGenesisInvariants = opt
