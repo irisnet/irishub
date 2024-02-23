@@ -950,6 +950,9 @@ func (app *IrisApp) RegisterTendermintService(clientCtx client.Context) {
 	)
 }
 
+// RegisterNodeService registers the node service.
+//
+// It takes a client context as a parameter and does not return anything.
 func (app *IrisApp) RegisterNodeService(clientCtx client.Context) {
 	nodeservice.RegisterNodeService(clientCtx, app.GRPCQueryRouter())
 }
@@ -991,6 +994,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(ibcexported.ModuleName)
 	paramsKeeper.Subspace(farmtypes.ModuleName).WithKeyTable(farmtypes.ParamKeyTable())
 	paramsKeeper.Subspace(tibchost.ModuleName)
+	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 
 	// ethermint subspaces
 	paramsKeeper.Subspace(evmtypes.ModuleName).WithKeyTable(evmtypes.ParamKeyTable())
@@ -999,6 +1003,9 @@ func initParamsKeeper(
 	return paramsKeeper
 }
 
+// NoOpMempoolOption returns a function that sets up a no-op mempool for the given BaseApp.
+//
+// The function takes a pointer to a BaseApp as a parameter and returns nothing.
 func NoOpMempoolOption() func(*baseapp.BaseApp) {
 	return func(app *baseapp.BaseApp) {
 		memPool := mempool.NoOpMempool{}
