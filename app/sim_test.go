@@ -9,7 +9,6 @@ import (
 	"strings"
 	"testing"
 
-	iristypes "github.com/irisnet/irishub/v2/types"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	mttypes "github.com/irisnet/irismod/modules/mt/types"
@@ -19,6 +18,8 @@ import (
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	"github.com/stretchr/testify/require"
+
+	iristypes "github.com/irisnet/irishub/v2/types"
 
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"

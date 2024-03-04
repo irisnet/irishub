@@ -41,6 +41,7 @@ func (app *IrisApp) appKeepers() upgrades.AppKeepers {
 		ReaderWriter:          app,
 		ConsensusParamsKeeper: app.ConsensusParamsKeeper,
 		ParamsKeeper:          app.ParamsKeeper,
+		StakingKeeper:         app.StakingKeeper,
 	}
 }
 

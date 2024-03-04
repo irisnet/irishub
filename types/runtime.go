@@ -11,9 +11,10 @@ import (
 
 	etherminttypes "github.com/evmos/ethermint/types"
 
-	"github.com/irisnet/irishub/v2/address"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
+
+	"github.com/irisnet/irishub/v2/address"
 )
 
 const (

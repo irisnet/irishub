@@ -12,6 +12,7 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	consensuskeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 
@@ -61,6 +62,7 @@ type AppKeepers struct {
 	ReaderWriter          ConsensusParamsReaderWriter
 	ConsensusParamsKeeper consensuskeeper.Keeper
 	ParamsKeeper          paramskeeper.Keeper
+	StakingKeeper         *stakingkeeper.Keeper
 }
 
 type upgradeRouter struct {
