@@ -3,10 +3,12 @@ package simulation
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
+
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+
 	mt "github.com/irisnet/irismod/modules/mt/types"
-	"math/rand"
 )
 
 const (

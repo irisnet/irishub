@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"time"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // NewServiceBinding creates a new ServiceBinding instance
@@ -77,12 +77,12 @@ func GetDiscountByVolume(pricing Pricing, volume uint64) sdk.Dec {
 func ParsePricing(pricing string) (p Pricing, err error) {
 	var rawPricing RawPricing
 	if err := json.Unmarshal([]byte(pricing), &rawPricing); err != nil {
-		return p, sdkerrors.Wrapf(ErrInvalidPricing, "failed to unmarshal the pricing: %s", err.Error())
+		return p, errorsmod.Wrapf(ErrInvalidPricing, "failed to unmarshal the pricing: %s", err.Error())
 	}
 
 	priceCoin, err := sdk.ParseCoinNormalized(rawPricing.Price)
 	if err != nil {
-		return p, sdkerrors.Wrapf(ErrInvalidPricing, "invalid price: %s", err.Error())
+		return p, errorsmod.Wrapf(ErrInvalidPricing, "invalid price: %s", err.Error())
 	}
 
 	p.Price = sdk.Coins{priceCoin}
@@ -99,7 +99,7 @@ func CheckPricing(pricing Pricing) error {
 	// p[i].StartTime >= p[i-1].EndTime
 	for i, p := range pricing.PromotionsByTime {
 		if !p.EndTime.After(p.StartTime) || (i > 0 && p.StartTime.Before(pricing.PromotionsByTime[i-1].EndTime)) {
-			return sdkerrors.Wrapf(ErrInvalidPricing, "invalid timing promotion %d", i)
+			return errorsmod.Wrapf(ErrInvalidPricing, "invalid timing promotion %d", i)
 		}
 	}
 
@@ -107,7 +107,7 @@ func CheckPricing(pricing Pricing) error {
 	// p[i].Volume > p[i-1].Volume
 	for i, p := range pricing.PromotionsByVolume {
 		if i > 0 && p.Volume < pricing.PromotionsByVolume[i-1].Volume {
-			return sdkerrors.Wrapf(ErrInvalidPricing, "invalid volume promotion %d", i)
+			return errorsmod.Wrapf(ErrInvalidPricing, "invalid volume promotion %d", i)
 		}
 	}
 

@@ -1,6 +1,7 @@
 package types
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -94,10 +95,10 @@ func (msg MsgCreatePoolWithCommunityPool) Type() string { return TypeMsgCreatePr
 // ValidateBasic implements Msg
 func (msg MsgCreatePoolWithCommunityPool) ValidateBasic() error {
 	if !msg.InitialDeposit.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.InitialDeposit.String())
+		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, msg.InitialDeposit.String())
 	}
 	if msg.InitialDeposit.IsAnyNegative() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.InitialDeposit.String())
+		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, msg.InitialDeposit.String())
 	}
 	if err := ValidateAddress(msg.Proposer); err != nil {
 		return err
@@ -165,7 +166,7 @@ func (msg MsgAdjustPool) ValidateBasic() error {
 	}
 
 	if msg.AdditionalReward == nil && msg.RewardPerBlock == nil {
-		return sdkerrors.Wrap(ErrAllEmpty, "AdditionalReward and RewardPerBlock")
+		return errorsmod.Wrap(ErrAllEmpty, "AdditionalReward and RewardPerBlock")
 	}
 
 	if msg.AdditionalReward != nil {
@@ -318,7 +319,7 @@ func (m *MsgUpdateParams) GetSignBytes() []byte {
 // ValidateBasic executes sanity validation on the provided data
 func (m *MsgUpdateParams) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(m.Authority); err != nil {
-		return sdkerrors.Wrap(err, "invalid authority address")
+		return errorsmod.Wrap(err, "invalid authority address")
 	}
 	return m.Params.Validate()
 }

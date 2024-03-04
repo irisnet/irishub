@@ -3,6 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
+
 	"github.com/irisnet/irismod/modules/coinswap/types"
 )
 

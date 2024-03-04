@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/hex"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -27,7 +28,7 @@ const (
 // ValidateReceiverOnOtherChain verifies if the receiver on the other chain is legal
 func ValidateReceiverOnOtherChain(receiverOnOtherChain string) error {
 	if len(receiverOnOtherChain) > MaxLengthForAddressOnOtherChain {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "length of the receiver on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "length of the receiver on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain)
 	}
 	return nil
 }
@@ -35,7 +36,7 @@ func ValidateReceiverOnOtherChain(receiverOnOtherChain string) error {
 // ValidateSenderOnOtherChain verifies if the receiver on the other chain is legal
 func ValidateSenderOnOtherChain(senderOnOtherChain string) error {
 	if len(senderOnOtherChain) > MaxLengthForAddressOnOtherChain {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "length of the sender on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "length of the sender on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain)
 	}
 	return nil
 }
@@ -43,10 +44,10 @@ func ValidateSenderOnOtherChain(senderOnOtherChain string) error {
 // ValidateAmount verifies whether the given amount is legal
 func ValidateAmount(transfer bool, amount sdk.Coins) error {
 	if transfer && len(amount) != 1 {
-		return sdkerrors.Wrapf(ErrInvalidAmount, "amount %s must contain exactly one coin", amount.String())
+		return errorsmod.Wrapf(ErrInvalidAmount, "amount %s must contain exactly one coin", amount.String())
 	}
 	if !(amount.IsValid() && amount.IsAllPositive()) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "the transferred amount must be valid")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, "the transferred amount must be valid")
 	}
 	return nil
 }
@@ -54,10 +55,10 @@ func ValidateAmount(transfer bool, amount sdk.Coins) error {
 // ValidateID verifies whether the given ID lock is legal
 func ValidateID(id string) error {
 	if len(id) != HTLCIDLength {
-		return sdkerrors.Wrapf(ErrInvalidID, "length of the htlc id must be %d", HTLCIDLength)
+		return errorsmod.Wrapf(ErrInvalidID, "length of the htlc id must be %d", HTLCIDLength)
 	}
 	if _, err := hex.DecodeString(id); err != nil {
-		return sdkerrors.Wrapf(ErrInvalidID, "id must be a hex encoded string")
+		return errorsmod.Wrapf(ErrInvalidID, "id must be a hex encoded string")
 	}
 	return nil
 }
@@ -65,10 +66,10 @@ func ValidateID(id string) error {
 // ValidateHashLock verifies whether the given hash lock is legal
 func ValidateHashLock(hashLock string) error {
 	if len(hashLock) != HashLockLength {
-		return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d", HashLockLength)
+		return errorsmod.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d", HashLockLength)
 	}
 	if _, err := hex.DecodeString(hashLock); err != nil {
-		return sdkerrors.Wrapf(ErrInvalidHashLock, "hash lock must be a hex encoded string")
+		return errorsmod.Wrapf(ErrInvalidHashLock, "hash lock must be a hex encoded string")
 	}
 	return nil
 }
@@ -76,7 +77,7 @@ func ValidateHashLock(hashLock string) error {
 // ValidateTimeLock verifies whether the given time lock is legal
 func ValidateTimeLock(timeLock uint64) error {
 	if timeLock < MinTimeLock || timeLock > MaxTimeLock {
-		return sdkerrors.Wrapf(ErrInvalidTimeLock, "the time lock must be between [%d,%d]", MinTimeLock, MaxTimeLock)
+		return errorsmod.Wrapf(ErrInvalidTimeLock, "the time lock must be between [%d,%d]", MinTimeLock, MaxTimeLock)
 	}
 	return nil
 }
@@ -84,10 +85,10 @@ func ValidateTimeLock(timeLock uint64) error {
 // ValidateSecret verifies whether the given secret is legal
 func ValidateSecret(secret string) error {
 	if len(secret) != SecretLength {
-		return sdkerrors.Wrapf(ErrInvalidSecret, "length of the secret must be %d", SecretLength)
+		return errorsmod.Wrapf(ErrInvalidSecret, "length of the secret must be %d", SecretLength)
 	}
 	if _, err := hex.DecodeString(secret); err != nil {
-		return sdkerrors.Wrapf(ErrInvalidSecret, "secret must be a hex encoded string")
+		return errorsmod.Wrapf(ErrInvalidSecret, "secret must be a hex encoded string")
 	}
 	return nil
 }

@@ -10,10 +10,10 @@ import (
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/oracle/types"
 	serviceexported "github.com/irisnet/irismod/modules/service/exported"
@@ -55,7 +55,7 @@ func NewKeeper(
 // CreateFeed creates a stopped feed
 func (k Keeper) CreateFeed(ctx sdk.Context, msg *types.MsgCreateFeed) error {
 	if _, found := k.GetFeed(ctx, msg.FeedName); found {
-		return sdkerrors.Wrapf(types.ErrExistedFeedName, msg.FeedName)
+		return errorsmod.Wrapf(types.ErrExistedFeedName, msg.FeedName)
 	}
 
 	providers := make([]sdk.AccAddress, len(msg.Providers))
@@ -102,24 +102,24 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg *types.MsgCreateFeed) error {
 func (k Keeper) StartFeed(ctx sdk.Context, msg *types.MsgStartFeed) error {
 	feed, found := k.GetFeed(ctx, msg.FeedName)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
+		return errorsmod.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
 	}
 
 	requestContextID, _ := hex.DecodeString(feed.RequestContextID)
 	creator, _ := sdk.AccAddressFromBech32(msg.Creator)
 
 	if msg.Creator != feed.Creator {
-		return sdkerrors.Wrapf(types.ErrUnauthorized, msg.Creator)
+		return errorsmod.Wrapf(types.ErrUnauthorized, msg.Creator)
 	}
 
 	reqCtx, existed := k.sk.GetRequestContext(ctx, requestContextID)
 	if !existed {
-		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
+		return errorsmod.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
 	}
 
 	// Can not start feed in "running" state
 	if reqCtx.State == serviceexported.RUNNING {
-		return sdkerrors.Wrapf(types.ErrInvalidFeedState, msg.FeedName)
+		return errorsmod.Wrapf(types.ErrInvalidFeedState, msg.FeedName)
 	}
 
 	if err := k.sk.StartRequestContext(ctx, requestContextID, creator); err != nil {
@@ -134,24 +134,24 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg *types.MsgStartFeed) error {
 func (k Keeper) PauseFeed(ctx sdk.Context, msg *types.MsgPauseFeed) error {
 	feed, found := k.GetFeed(ctx, msg.FeedName)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
+		return errorsmod.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
 	}
 
 	requestContextID, _ := hex.DecodeString(feed.RequestContextID)
 	creator, _ := sdk.AccAddressFromBech32(msg.Creator)
 
 	if msg.Creator != feed.Creator {
-		return sdkerrors.Wrapf(types.ErrUnauthorized, msg.Creator)
+		return errorsmod.Wrapf(types.ErrUnauthorized, msg.Creator)
 	}
 
 	reqCtx, existed := k.sk.GetRequestContext(ctx, requestContextID)
 	if !existed {
-		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
+		return errorsmod.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
 	}
 
 	// Can only pause feed in "running" state
 	if reqCtx.State != serviceexported.RUNNING {
-		return sdkerrors.Wrapf(types.ErrInvalidFeedState, msg.FeedName)
+		return errorsmod.Wrapf(types.ErrInvalidFeedState, msg.FeedName)
 	}
 
 	if err := k.sk.PauseRequestContext(ctx, requestContextID, creator); err != nil {
@@ -166,11 +166,11 @@ func (k Keeper) PauseFeed(ctx sdk.Context, msg *types.MsgPauseFeed) error {
 func (k Keeper) EditFeed(ctx sdk.Context, msg *types.MsgEditFeed) error {
 	feed, found := k.GetFeed(ctx, msg.FeedName)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
+		return errorsmod.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
 	}
 
 	if msg.Creator != feed.Creator {
-		return sdkerrors.Wrapf(types.ErrUnauthorized, msg.Creator)
+		return errorsmod.Wrapf(types.ErrUnauthorized, msg.Creator)
 	}
 
 	requestContextID, _ := hex.DecodeString(feed.RequestContextID)

@@ -4,7 +4,7 @@ import (
 	fmt "fmt"
 	time "time"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errorsmod "cosmossdk.io/errors"
 )
 
 // NewGenesisState constructs a new GenesisState instance
@@ -40,7 +40,7 @@ func ValidateGenesis(data GenesisState) error {
 		}
 
 		if htlc.State != Open {
-			return sdkerrors.Wrap(ErrHTLCNotOpen, htlc.Id)
+			return errorsmod.Wrap(ErrHTLCNotOpen, htlc.Id)
 		}
 
 		if err := htlc.Validate(); err != nil {

@@ -1,6 +1,7 @@
 package v1
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -59,7 +60,7 @@ func (msg MsgIssueToken) Type() string { return TypeMsgIssueToken }
 func (msg MsgIssueToken) ValidateBasic() error {
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	return NewToken(
@@ -124,7 +125,7 @@ func (msg MsgTransferTokenOwner) GetSigners() []sdk.AccAddress {
 func (msg MsgTransferTokenOwner) ValidateBasic() error {
 	srcOwner, err := sdk.AccAddressFromBech32(msg.SrcOwner)
 	if err != nil {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			sdkerrors.ErrInvalidAddress,
 			"invalid source owner address (%s)",
 			err,
@@ -133,7 +134,7 @@ func (msg MsgTransferTokenOwner) ValidateBasic() error {
 
 	dstOwner, err := sdk.AccAddressFromBech32(msg.DstOwner)
 	if err != nil {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			sdkerrors.ErrInvalidAddress,
 			"invalid destination owner address (%s)",
 			err,
@@ -204,7 +205,7 @@ func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
 func (msg MsgEditToken) ValidateBasic() error {
 	// check owner
 	if _, err := sdk.AccAddressFromBech32(msg.Owner); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	if err := tokentypes.ValidateName(msg.Name); err != nil {
@@ -242,13 +243,13 @@ func (msg MsgMintToken) GetSigners() []sdk.AccAddress {
 func (msg MsgMintToken) ValidateBasic() error {
 	// check the owner
 	if _, err := sdk.AccAddressFromBech32(msg.Owner); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	// check the reception
 	if len(msg.To) > 0 {
 		if _, err := sdk.AccAddressFromBech32(msg.To); err != nil {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				sdkerrors.ErrInvalidAddress,
 				"invalid mint reception address (%s)",
 				err,
@@ -287,7 +288,7 @@ func (msg MsgBurnToken) GetSigners() []sdk.AccAddress {
 func (msg MsgBurnToken) ValidateBasic() error {
 	// check the owner
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	return tokentypes.ValidateCoin(msg.Coin)
@@ -315,12 +316,12 @@ func (msg MsgSwapFeeToken) GetSignBytes() []byte {
 func (msg MsgSwapFeeToken) ValidateBasic() error {
 	// check the Sender
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	if len(msg.Recipient) != 0 {
 		if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				sdkerrors.ErrInvalidAddress,
 				"invalid recipient address (%s)",
 				err,
@@ -341,7 +342,7 @@ func (m *MsgUpdateParams) GetSignBytes() []byte {
 // ValidateBasic executes sanity validation on the provided data
 func (m *MsgUpdateParams) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(m.Authority); err != nil {
-		return sdkerrors.Wrap(err, "invalid authority address")
+		return errorsmod.Wrap(err, "invalid authority address")
 	}
 	return m.Params.Validate()
 }

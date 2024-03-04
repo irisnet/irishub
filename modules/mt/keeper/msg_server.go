@@ -5,8 +5,10 @@ import (
 	"strconv"
 	"strings"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	"github.com/irisnet/irismod/modules/mt/types"
 )
 
@@ -81,7 +83,7 @@ func (m msgServer) MintMT(
 	// if user inputs an MT ID, then mint amounts to the MT, else issue a new MT
 	if len(mtID) > 0 {
 		if !m.Keeper.HasMT(ctx, msg.DenomId, mtID) {
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrNotFound, "mt not found (%s)", mtID)
+			return nil, errorsmod.Wrapf(sdkerrors.ErrNotFound, "mt not found (%s)", mtID)
 		}
 
 		if err := m.Keeper.MintMT(ctx, msg.DenomId, mtID, msg.Amount, recipient); err != nil {

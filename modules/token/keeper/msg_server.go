@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -32,7 +33,7 @@ func (m msgServer) IssueToken(
 	}
 
 	if m.k.blockedAddrs[msg.Owner] {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.Owner)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.Owner)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -110,7 +111,7 @@ func (m msgServer) MintToken(
 	}
 
 	if m.k.blockedAddrs[recipient.String()] {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", recipient)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", recipient)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -178,7 +179,7 @@ func (m msgServer) TransferTokenOwner(
 	}
 
 	if m.k.blockedAddrs[msg.DstOwner] {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrUnauthorized,
 			"%s is a module account",
 			msg.DstOwner,
@@ -220,7 +221,7 @@ func (m msgServer) SwapFeeToken(
 		}
 
 		if m.k.blockedAddrs[msg.Recipient] {
-			return nil, sdkerrors.Wrapf(
+			return nil, errorsmod.Wrapf(
 				sdkerrors.ErrUnauthorized,
 				"%s is a module account",
 				recipient,
@@ -254,7 +255,7 @@ func (m msgServer) UpdateParams(
 	msg *v1.MsgUpdateParams,
 ) (*v1.MsgUpdateParamsResponse, error) {
 	if m.k.authority != msg.Authority {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrUnauthorized,
 			"invalid authority; expected %s, got %s",
 			m.k.authority,

@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"strconv"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -44,7 +45,7 @@ func (m msgServer) CreateHTLC(
 	}
 
 	if m.k.blockedAddrs[msg.To] {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.To)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.To)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -119,7 +120,7 @@ func (m msgServer) UpdateParams(
 	msg *types.MsgUpdateParams,
 ) (*types.MsgUpdateParamsResponse, error) {
 	if m.k.authority != msg.Authority {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrUnauthorized,
 			"invalid authority; expected %s, got %s",
 			m.k.authority,

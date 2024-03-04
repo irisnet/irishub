@@ -1,8 +1,10 @@
 package mt
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	"github.com/irisnet/irismod/modules/mt/keeper"
 	"github.com/irisnet/irismod/modules/mt/types"
 )
@@ -40,7 +42,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	for _, o := range data.Owners {
 		addr, err := sdk.AccAddressFromBech32(o.Address)
 		if err != nil {
-			panic(sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", addr))
+			panic(errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", addr))
 		}
 
 		for _, d := range o.Denoms {

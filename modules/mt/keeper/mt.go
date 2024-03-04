@@ -3,6 +3,8 @@ package keeper
 import (
 	"crypto/sha256"
 	"fmt"
+
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -27,7 +29,7 @@ func (k Keeper) GetMT(ctx sdk.Context, denomID, mtID string) (mt exported.MT, er
 
 	bz := store.Get(types.KeyMT(denomID, mtID))
 	if bz == nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrNotFound, "mt not found (%s)", mtID)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrNotFound, "mt not found (%s)", mtID)
 	}
 
 	var baseMT types.MT
@@ -61,11 +63,11 @@ func (k Keeper) GetMTs(ctx sdk.Context, denomID string) (mts []exported.MT) {
 func (k Keeper) Authorize(ctx sdk.Context, denomID string, owner sdk.AccAddress) error {
 	denom, found := k.GetDenom(ctx, denomID)
 	if !found {
-		return sdkerrors.Wrapf(sdkerrors.ErrNotFound, "denom not found (%s)", denomID)
+		return errorsmod.Wrapf(sdkerrors.ErrNotFound, "denom not found (%s)", denomID)
 	}
 
 	if owner.String() != denom.Owner {
-		return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, owner.String())
+		return errorsmod.Wrap(sdkerrors.ErrUnauthorized, owner.String())
 	}
 
 	return nil

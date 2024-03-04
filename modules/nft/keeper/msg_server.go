@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -71,7 +72,7 @@ func (k Keeper) MintNFT(
 	}
 
 	if denom.MintRestricted && denom.Creator != sender.String() {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrUnauthorized,
 			"%s is not allowed to mint NFT of denom %s",
 			sender,

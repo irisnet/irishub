@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -29,7 +30,7 @@ func (m msgServer) AddLiquidity(
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			types.ErrInvalidDeadline,
 			"deadline has passed for MsgAddLiquidity",
 		)
@@ -52,7 +53,7 @@ func (m msgServer) AddUnilateralLiquidity(
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			types.ErrInvalidDeadline,
 			"deadline has passed for MsgAddUnilateralLiquidity",
 		)
@@ -75,7 +76,7 @@ func (m msgServer) RemoveLiquidity(
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			types.ErrInvalidDeadline,
 			"deadline has passed for MsgRemoveLiquidity",
 		)
@@ -96,7 +97,7 @@ func (m msgServer) RemoveUnilateralLiquidity(
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			types.ErrInvalidDeadline,
 			"deadline has passed for MsgRemoveLiquidity",
 		)
@@ -118,11 +119,11 @@ func (m msgServer) SwapCoin(
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDeadline, "deadline has passed for MsgSwapOrder")
+		return nil, errorsmod.Wrap(types.ErrInvalidDeadline, "deadline has passed for MsgSwapOrder")
 	}
 
 	if m.k.blockedAddrs[msg.Output.Address] {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrUnauthorized,
 			"%s is not allowed to receive external funds",
 			msg.Output.Address,
@@ -140,7 +141,7 @@ func (m msgServer) UpdateParams(
 	msg *types.MsgUpdateParams,
 ) (*types.MsgUpdateParamsResponse, error) {
 	if m.k.authority != msg.Authority {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrUnauthorized,
 			"invalid authority; expected %s, got %s",
 			m.k.authority,

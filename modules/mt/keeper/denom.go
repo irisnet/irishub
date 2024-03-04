@@ -3,6 +3,8 @@ package keeper
 import (
 	"crypto/sha256"
 	"fmt"
+
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -63,7 +65,7 @@ func (k Keeper) GetDenoms(ctx sdk.Context) (denoms []types.Denom) {
 // UpdateDenom is responsible for updating the definition of denom
 func (k Keeper) UpdateDenom(ctx sdk.Context, denom types.Denom) error {
 	if !k.HasDenom(ctx, denom.Id) {
-		return sdkerrors.Wrapf(sdkerrors.ErrNotFound, "denom not found (%s)", denom.Id)
+		return errorsmod.Wrapf(sdkerrors.ErrNotFound, "denom not found (%s)", denom.Id)
 	}
 
 	store := ctx.KVStore(k.storeKey)

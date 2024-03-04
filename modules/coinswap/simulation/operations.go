@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
+	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
@@ -972,7 +972,7 @@ func doubleSwapBill(
 	outputReserve := reservePool.AmountOf(outputCoin.Denom)
 	inputReserve := reservePool.AmountOf(standardDenom)
 	if outputCoin.Amount.GTE(outputReserve) {
-		return sdk.Coin{}, sdk.Coin{}, sdkerrors.Wrap(
+		return sdk.Coin{}, sdk.Coin{}, errorsmod.Wrap(
 			types.ErrConstraintNotMet,
 			fmt.Sprintf(
 				"insufficient amount of %s, user expected: %s, actual: %s",
