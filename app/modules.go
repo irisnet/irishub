@@ -39,6 +39,8 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
+	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
+	icatypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/types"
 	"github.com/cosmos/ibc-go/v7/modules/apps/transfer"
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v7/modules/core"
@@ -130,6 +132,7 @@ var (
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		consensus.AppModuleBasic{},
+		ica.AppModuleBasic{},
 
 		guardian.AppModuleBasic{},
 		token.AppModuleBasic{},
@@ -172,6 +175,7 @@ var (
 		tibcnfttypes.ModuleName:        nil,
 		tibcmttypes.ModuleName:         nil,
 		nfttypes.ModuleName:            nil,
+		icatypes.ModuleName:            nil,
 		evmtypes.ModuleName: {
 			authtypes.Minter,
 			authtypes.Burner,
@@ -266,6 +270,7 @@ func appModules(
 		params.NewAppModule(app.ParamsKeeper),
 		app.transferModule,
 		app.ibcnfttransferModule,
+		app.icaModule,
 		app.nfttransferModule,
 		app.mttransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
@@ -481,6 +486,7 @@ func orderBeginBlockers() []string {
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
+		icatypes.ModuleName,
 		consensustypes.ModuleName,
 
 		//self module
@@ -533,6 +539,7 @@ func orderEndBlockers() []string {
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
+		icatypes.ModuleName,
 		consensustypes.ModuleName,
 
 		//self module
@@ -586,6 +593,7 @@ func orderInitBlockers() []string {
 		feemarkettypes.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
+		icatypes.ModuleName,
 		consensustypes.ModuleName,
 
 		//self module
