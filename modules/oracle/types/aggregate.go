@@ -7,7 +7,7 @@ import (
 
 	"github.com/tidwall/gjson"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errorsmod "cosmossdk.io/errors"
 )
 
 var (
@@ -28,7 +28,7 @@ func init() {
 func GetAggregateFunc(methodNm string) (Aggregate, error) {
 	fun, ok := router[methodNm]
 	if !ok {
-		return nil, sdkerrors.Wrapf(ErrNotRegisterFunc, methodNm)
+		return nil, errorsmod.Wrapf(ErrNotRegisterFunc, methodNm)
 	}
 	return fun, nil
 }

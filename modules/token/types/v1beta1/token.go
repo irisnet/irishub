@@ -6,8 +6,10 @@ import (
 	"github.com/cosmos/gogoproto/proto"
 	"gopkg.in/yaml.v2"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 )
 
@@ -114,7 +116,7 @@ func (t Token) ToMainCoin(coin sdk.Coin) (sdk.DecCoin, error) {
 		return sdk.NewDecCoinFromDec(
 				coin.Denom,
 				sdk.ZeroDec(),
-			), sdkerrors.Wrapf(
+			), errorsmod.Wrapf(
 				tokentypes.ErrTokenNotExists,
 				"token not match",
 			)
@@ -136,7 +138,7 @@ func (t Token) ToMinCoin(coin sdk.DecCoin) (newCoin sdk.Coin, err error) {
 		return sdk.NewCoin(
 				coin.Denom,
 				sdk.ZeroInt(),
-			), sdkerrors.Wrapf(
+			), errorsmod.Wrapf(
 				tokentypes.ErrTokenNotExists,
 				"token not match",
 			)
@@ -156,7 +158,7 @@ func (t Token) ToMinCoin(coin sdk.DecCoin) (newCoin sdk.Coin, err error) {
 func (t Token) Validate() error {
 	if len(t.Owner) > 0 {
 		if _, err := sdk.AccAddressFromBech32(t.Owner); err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 		}
 	}
 	if err := tokentypes.ValidateName(t.Name); err != nil {
@@ -172,7 +174,7 @@ func (t Token) Validate() error {
 		return err
 	}
 	if t.MaxSupply < t.InitialSupply {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			tokentypes.ErrInvalidMaxSupply,
 			"invalid token max supply %d, only accepts value [%d, %d]",
 			t.MaxSupply,

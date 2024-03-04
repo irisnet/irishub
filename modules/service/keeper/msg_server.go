@@ -6,6 +6,7 @@ import (
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -59,7 +60,7 @@ func (m msgServer) BindService(
 	msg *types.MsgBindService,
 ) (*types.MsgBindServiceResponse, error) {
 	if _, _, found := m.k.GetModuleServiceByServiceName(msg.ServiceName); found {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrBindModuleService,
 			"module service %s",
 			msg.ServiceName,
@@ -144,7 +145,7 @@ func (m msgServer) SetWithdrawAddress(
 	}
 
 	if m.k.blockedAddrs[msg.WithdrawAddress] {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrUnauthorized,
 			"%s is a module account",
 			msg.WithdrawAddress,
@@ -537,7 +538,7 @@ func (m msgServer) UpdateParams(
 	msg *types.MsgUpdateParams,
 ) (*types.MsgUpdateParamsResponse, error) {
 	if m.k.authority != msg.Authority {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrUnauthorized,
 			"invalid authority; expected %s, got %s",
 			m.k.authority,

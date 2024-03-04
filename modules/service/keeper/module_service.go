@@ -3,6 +3,7 @@ package keeper
 import (
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -12,7 +13,7 @@ import (
 // RegisterModuleService registers a module service
 func (k Keeper) RegisterModuleService(moduleName string, moduleService *types.ModuleService) error {
 	if _, ok := k.moduleServices[moduleName]; ok {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrModuleServiceRegistered,
 			"%s already registered for module %s",
 			"module service",
@@ -57,7 +58,7 @@ func (k Keeper) RequestModuleService(
 ) error {
 	requestContext, found := k.GetRequestContext(ctx, reqContextID)
 	if !found {
-		return sdkerrors.Wrap(types.ErrUnknownRequestContext, reqContextID.String())
+		return errorsmod.Wrap(types.ErrUnknownRequestContext, reqContextID.String())
 	}
 
 	requestContextConsumer, _ := sdk.AccAddressFromBech32(requestContext.Consumer)
@@ -66,7 +67,7 @@ func (k Keeper) RequestModuleService(
 	for i, provider := range requestContext.Providers {
 		pd, err := sdk.AccAddressFromBech32(provider)
 		if err != nil {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				sdkerrors.ErrInvalidAddress,
 				"invalid provider address: %s",
 				provider,

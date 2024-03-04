@@ -6,9 +6,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
 	"github.com/irisnet/irismod/modules/coinswap/types"
@@ -28,7 +28,7 @@ func (k Keeper) LiquidityPool(
 	ctx := sdk.UnwrapSDKContext(c)
 	pool, exists := k.GetPoolByLptDenom(ctx, req.LptDenom)
 	if !exists {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrReservePoolNotExists,
 			"liquidity pool token: %s",
 			req.LptDenom,

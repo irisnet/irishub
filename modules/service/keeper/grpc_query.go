@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -30,7 +31,7 @@ func (k Keeper) Definition(
 	ctx := sdk.UnwrapSDKContext(c)
 	definition, found := k.GetServiceDefinition(ctx, req.ServiceName)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrUnknownServiceDefinition, req.ServiceName)
+		return nil, errorsmod.Wrap(types.ErrUnknownServiceDefinition, req.ServiceName)
 	}
 
 	return &types.QueryDefinitionResponse{ServiceDefinition: &definition}, nil
@@ -46,7 +47,7 @@ func (k Keeper) Binding(
 
 	provider, err := sdk.AccAddressFromBech32(req.Provider)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrInvalidAddress,
 			"invalid provider address (%s)",
 			err,
@@ -57,7 +58,7 @@ func (k Keeper) Binding(
 
 	binding, found := k.GetServiceBinding(ctx, req.ServiceName, provider)
 	if !found {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrUnknownServiceBinding,
 			"service: %s, provider: %s",
 			req.ServiceName,
@@ -99,7 +100,7 @@ func (k Keeper) Bindings(
 	} else {
 		owner, err := sdk.AccAddressFromBech32(req.Owner)
 		if err != nil {
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+			return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 		}
 		bindingStore := prefix.NewStore(store, types.GetOwnerBindingsSubspace(owner, req.ServiceName))
 		pageRes, err = query.Paginate(bindingStore, shapePageRequest(req.Pagination), func(key []byte, value []byte) error {
@@ -128,7 +129,7 @@ func (k Keeper) WithdrawAddress(
 
 	owner, err := sdk.AccAddressFromBech32(req.Owner)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
@@ -147,7 +148,7 @@ func (k Keeper) RequestContext(
 	}
 
 	if len(req.RequestContextId) != types.ContextIDLen {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidRequestContextID,
 			"length of the request context ID must be %d in bytes",
 			types.ContextIDLen,
@@ -155,7 +156,7 @@ func (k Keeper) RequestContext(
 	}
 	requestContextId, err := hex.DecodeString(req.RequestContextId)
 	if err != nil {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			types.ErrInvalidRequestContextID,
 			"request context ID must be a hex encoded string",
 		)
@@ -177,7 +178,7 @@ func (k Keeper) Request(
 	}
 
 	if len(req.RequestId) != types.RequestIDLen {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidRequestID,
 			"invalid length, expected: %d, got: %d",
 			types.RequestIDLen, len(req.RequestId),
@@ -186,7 +187,7 @@ func (k Keeper) Request(
 
 	requestId, err := hex.DecodeString(req.RequestId)
 	if err != nil {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			types.ErrInvalidRequestContextID,
 			"request ID must be a hex encoded string",
 		)
@@ -208,7 +209,7 @@ func (k Keeper) Requests(
 
 	provider, err := sdk.AccAddressFromBech32(req.Provider)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrInvalidAddress,
 			"invalid provider address (%s)",
 			err,
@@ -249,7 +250,7 @@ func (k Keeper) RequestsByReqCtx(
 	}
 
 	if len(req.RequestContextId) != types.ContextIDLen {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidRequestContextID,
 			"length of the request context ID must be %d in bytes",
 			types.ContextIDLen,
@@ -257,7 +258,7 @@ func (k Keeper) RequestsByReqCtx(
 	}
 	requestContextId, err := hex.DecodeString(req.RequestContextId)
 	if err != nil {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			types.ErrInvalidRequestContextID,
 			"request context ID must be a hex encoded string",
 		)
@@ -299,7 +300,7 @@ func (k Keeper) Response(
 
 	ctx := sdk.UnwrapSDKContext(c)
 	if len(req.RequestId) != types.RequestIDLen {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidRequestID,
 			"invalid length, expected: %d, got: %d",
 			types.RequestIDLen, len(req.RequestId),
@@ -308,7 +309,7 @@ func (k Keeper) Response(
 
 	requestId, err := hex.DecodeString(req.RequestId)
 	if err != nil {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			types.ErrInvalidRequestContextID,
 			"request ID must be a hex encoded string",
 		)
@@ -327,7 +328,7 @@ func (k Keeper) Responses(
 	}
 
 	if len(req.RequestContextId) != types.ContextIDLen {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidRequestContextID,
 			"length of the request context ID must be %d in bytes",
 			types.ContextIDLen,
@@ -335,7 +336,7 @@ func (k Keeper) Responses(
 	}
 	requestContextId, err := hex.DecodeString(req.RequestContextId)
 	if err != nil {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			types.ErrInvalidRequestContextID,
 			"request context ID must be a hex encoded string",
 		)
@@ -376,7 +377,7 @@ func (k Keeper) EarnedFees(
 
 	provider, err := sdk.AccAddressFromBech32(req.Provider)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrInvalidAddress,
 			"invalid provider address (%s)",
 			err,
@@ -386,7 +387,7 @@ func (k Keeper) EarnedFees(
 	ctx := sdk.UnwrapSDKContext(c)
 	fees, found := k.GetEarnedFees(ctx, provider)
 	if !found {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrNoEarnedFees, "no earned fees for %s", req.Provider,
 		)
 	}
@@ -409,7 +410,7 @@ func (k Keeper) Schema(
 	case "result":
 		schema = types.ResultSchema
 	default:
-		return nil, sdkerrors.Wrap(types.ErrInvalidSchemaName, schema)
+		return nil, errorsmod.Wrap(types.ErrInvalidSchemaName, schema)
 	}
 
 	return &types.QuerySchemaResponse{Schema: schema}, nil

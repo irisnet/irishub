@@ -6,8 +6,8 @@ import (
 
 	gogotypes "github.com/cosmos/gogoproto/types"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	v1 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v1"
 
 	"github.com/irisnet/irismod/modules/service/types"
@@ -25,16 +25,16 @@ func (k Keeper) AddServiceBinding(
 	owner sdk.AccAddress,
 ) error {
 	if _, found := k.GetServiceDefinition(ctx, serviceName); !found {
-		return sdkerrors.Wrap(types.ErrUnknownServiceDefinition, serviceName)
+		return errorsmod.Wrap(types.ErrUnknownServiceDefinition, serviceName)
 	}
 
 	if _, found := k.GetServiceBinding(ctx, serviceName, provider); found {
-		return sdkerrors.Wrap(types.ErrServiceBindingExists, "")
+		return errorsmod.Wrap(types.ErrServiceBindingExists, "")
 	}
 
 	currentOwner, found := k.GetOwner(ctx, provider)
 	if found && !owner.Equals(currentOwner) {
-		return sdkerrors.Wrap(types.ErrNotAuthorized, "owner not matching")
+		return errorsmod.Wrap(types.ErrNotAuthorized, "owner not matching")
 	}
 
 	if err := k.validateDeposit(ctx, deposit); err != nil {
@@ -43,7 +43,7 @@ func (k Keeper) AddServiceBinding(
 
 	maxReqTimeout := k.MaxRequestTimeout(ctx)
 	if qos > uint64(maxReqTimeout) {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidQoS,
 			"QoS [%d] must not be greater than maximum request timeout [%d]",
 			qos, maxReqTimeout,
@@ -61,11 +61,11 @@ func (k Keeper) AddServiceBinding(
 
 	minDeposit, err := k.GetMinDeposit(ctx, parsedPricing)
 	if err != nil {
-		return sdkerrors.Wrapf(types.ErrInvalidMinDeposit, "%s", err)
+		return errorsmod.Wrapf(types.ErrInvalidMinDeposit, "%s", err)
 	}
 
 	if !deposit.IsAllGTE(minDeposit) {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidDeposit,
 			"insufficient deposit: minimum deposit %s, %s got",
 			minDeposit, deposit,
@@ -146,7 +146,7 @@ func (k Keeper) UpdateServiceBinding(
 ) error {
 	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
-		return sdkerrors.Wrap(types.ErrUnknownServiceBinding, "")
+		return errorsmod.Wrap(types.ErrUnknownServiceBinding, "")
 	}
 
 	bindingOwner, err := sdk.AccAddressFromBech32(binding.Owner)
@@ -155,7 +155,7 @@ func (k Keeper) UpdateServiceBinding(
 	}
 
 	if !owner.Equals(bindingOwner) {
-		return sdkerrors.Wrap(types.ErrNotAuthorized, "owner not matching")
+		return errorsmod.Wrap(types.ErrNotAuthorized, "owner not matching")
 	}
 
 	updated := false
@@ -163,7 +163,7 @@ func (k Keeper) UpdateServiceBinding(
 	if qos != 0 {
 		maxReqTimeout := k.MaxRequestTimeout(ctx)
 		if qos > uint64(maxReqTimeout) {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				types.ErrInvalidQoS,
 				"QoS [%d] must not be greater than maximum request timeout [%d]",
 				qos, maxReqTimeout,
@@ -212,11 +212,11 @@ func (k Keeper) UpdateServiceBinding(
 	if binding.Available && updated {
 		minDeposit, err := k.GetMinDeposit(ctx, parsedPricing)
 		if err != nil {
-			return sdkerrors.Wrapf(types.ErrInvalidMinDeposit, "%s", err)
+			return errorsmod.Wrapf(types.ErrInvalidMinDeposit, "%s", err)
 		}
 
 		if !binding.Deposit.IsAllGTE(minDeposit) {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				types.ErrInvalidDeposit,
 				"insufficient deposit: minimum deposit %s, %s got",
 				minDeposit, binding.Deposit,
@@ -247,7 +247,7 @@ func (k Keeper) DisableServiceBinding(
 ) error {
 	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
-		return sdkerrors.Wrap(types.ErrUnknownServiceBinding, "")
+		return errorsmod.Wrap(types.ErrUnknownServiceBinding, "")
 	}
 
 	bindingOwner, err := sdk.AccAddressFromBech32(binding.Owner)
@@ -256,11 +256,11 @@ func (k Keeper) DisableServiceBinding(
 	}
 
 	if !owner.Equals(bindingOwner) {
-		return sdkerrors.Wrap(types.ErrNotAuthorized, "owner not matching")
+		return errorsmod.Wrap(types.ErrNotAuthorized, "owner not matching")
 	}
 
 	if !binding.Available {
-		return sdkerrors.Wrap(types.ErrServiceBindingUnavailable, "")
+		return errorsmod.Wrap(types.ErrServiceBindingUnavailable, "")
 	}
 
 	binding.Available = false
@@ -281,7 +281,7 @@ func (k Keeper) EnableServiceBinding(
 ) error {
 	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
-		return sdkerrors.Wrap(types.ErrUnknownServiceBinding, "")
+		return errorsmod.Wrap(types.ErrUnknownServiceBinding, "")
 	}
 
 	bindingOwner, err := sdk.AccAddressFromBech32(binding.Owner)
@@ -290,11 +290,11 @@ func (k Keeper) EnableServiceBinding(
 	}
 
 	if !owner.Equals(bindingOwner) {
-		return sdkerrors.Wrap(types.ErrNotAuthorized, "owner not matching")
+		return errorsmod.Wrap(types.ErrNotAuthorized, "owner not matching")
 	}
 
 	if binding.Available {
-		return sdkerrors.Wrap(types.ErrServiceBindingAvailable, "")
+		return errorsmod.Wrap(types.ErrServiceBindingAvailable, "")
 	}
 
 	// add the deposit
@@ -308,11 +308,11 @@ func (k Keeper) EnableServiceBinding(
 
 	minDeposit, err := k.GetMinDeposit(ctx, k.GetPricing(ctx, serviceName, provider))
 	if err != nil {
-		return sdkerrors.Wrapf(types.ErrInvalidMinDeposit, "%s", err)
+		return errorsmod.Wrapf(types.ErrInvalidMinDeposit, "%s", err)
 	}
 
 	if !binding.Deposit.IsAllGTE(minDeposit) {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidDeposit,
 			"insufficient deposit: minimum deposit %s, %s got",
 			minDeposit, binding.Deposit,
@@ -344,7 +344,7 @@ func (k Keeper) RefundDeposit(
 ) error {
 	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
-		return sdkerrors.Wrap(types.ErrUnknownServiceBinding, "")
+		return errorsmod.Wrap(types.ErrUnknownServiceBinding, "")
 	}
 
 	bindingOwner, err := sdk.AccAddressFromBech32(binding.Owner)
@@ -353,15 +353,15 @@ func (k Keeper) RefundDeposit(
 	}
 
 	if !owner.Equals(bindingOwner) {
-		return sdkerrors.Wrap(types.ErrNotAuthorized, "owner not matching")
+		return errorsmod.Wrap(types.ErrNotAuthorized, "owner not matching")
 	}
 
 	if binding.Available {
-		return sdkerrors.Wrap(types.ErrServiceBindingAvailable, "")
+		return errorsmod.Wrap(types.ErrServiceBindingAvailable, "")
 	}
 
 	if binding.Deposit.IsZero() {
-		return sdkerrors.Wrap(types.ErrInvalidDeposit, "the deposit of the service binding is zero")
+		return errorsmod.Wrap(types.ErrInvalidDeposit, "the deposit of the service binding is zero")
 	}
 
 	refundableTime := binding.DisabledTime.Add(k.ArbitrationTimeLimit(ctx)).
@@ -369,7 +369,7 @@ func (k Keeper) RefundDeposit(
 
 	currentTime := ctx.BlockHeader().Time
 	if currentTime.Before(refundableTime) {
-		return sdkerrors.Wrapf(types.ErrIncorrectRefundTime, "%v", refundableTime)
+		return errorsmod.Wrapf(types.ErrIncorrectRefundTime, "%v", refundableTime)
 	}
 
 	// Send coins from the deposit module account to the owner's account
@@ -658,7 +658,7 @@ func (k Keeper) validateDeposit(ctx sdk.Context, deposit sdk.Coins) error {
 	baseDenom := k.BaseDenom(ctx)
 
 	if len(deposit) != 1 || deposit[0].Denom != baseDenom {
-		return sdkerrors.Wrapf(types.ErrInvalidDeposit, "deposit only accepts %s", baseDenom)
+		return errorsmod.Wrapf(types.ErrInvalidDeposit, "deposit only accepts %s", baseDenom)
 	}
 
 	return nil
@@ -672,7 +672,7 @@ func (k Keeper) validatePricing(ctx sdk.Context, pricing types.Pricing) error {
 		baseDenom := k.BaseDenom(ctx)
 
 		if priceDenom != baseDenom {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				types.ErrInvalidPricing,
 				"invalid denom: %s, service fee only accepts %s",
 				priceDenom,
@@ -682,7 +682,7 @@ func (k Keeper) validatePricing(ctx sdk.Context, pricing types.Pricing) error {
 	}
 
 	if supply := k.bankKeeper.GetSupply(ctx, priceDenom).Amount; !supply.IsPositive() {
-		return sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid denom: %s", priceDenom)
+		return errorsmod.Wrapf(types.ErrInvalidPricing, "invalid denom: %s", priceDenom)
 	}
 
 	return nil

@@ -7,6 +7,7 @@ import (
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -55,10 +56,10 @@ func (h HTLC) Validate() error {
 		return err
 	}
 	if _, err := sdk.AccAddressFromBech32(h.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	if _, err := sdk.AccAddressFromBech32(h.To); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
 	if err := ValidateReceiverOnOtherChain(h.ReceiverOnOtherChain); err != nil {
 		return err
@@ -67,34 +68,34 @@ func (h HTLC) Validate() error {
 		return err
 	}
 	if h.ExpirationHeight == 0 {
-		return sdkerrors.Wrapf(ErrInvalidExpirationHeight, "expire height cannot be 0")
+		return errorsmod.Wrapf(ErrInvalidExpirationHeight, "expire height cannot be 0")
 	}
 	if h.Timestamp == 0 {
-		return sdkerrors.Wrapf(ErrInvalidTimestamp, "timestamp cannot be 0")
+		return errorsmod.Wrapf(ErrInvalidTimestamp, "timestamp cannot be 0")
 	}
 	if err := ValidateAmount(h.Transfer, h.Amount); err != nil {
 		return err
 	}
 	if h.State > Refunded {
-		return sdkerrors.Wrapf(ErrInvalidState, "invalid htlc status")
+		return errorsmod.Wrapf(ErrInvalidState, "invalid htlc status")
 	}
 	if h.State == Completed && h.ClosedBlock == 0 {
-		return sdkerrors.Wrapf(ErrInvalidClosedBlock, "closed block cannot be 0")
+		return errorsmod.Wrapf(ErrInvalidClosedBlock, "closed block cannot be 0")
 	}
 	if !h.Transfer && h.Direction != 0 {
-		return sdkerrors.Wrapf(ErrInvalidDirection, "invalid htlc direction")
+		return errorsmod.Wrapf(ErrInvalidDirection, "invalid htlc direction")
 	}
 	if h.Transfer && (h.Direction < Incoming || h.Direction > Outgoing) {
-		return sdkerrors.Wrapf(ErrInvalidDirection, "invalid htlt direction")
+		return errorsmod.Wrapf(ErrInvalidDirection, "invalid htlt direction")
 	}
 	if h.State != Completed && len(h.Secret) > 0 {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			ErrInvalidSecret,
 			"secret must be empty when the HTLC has not be claimed",
 		)
 	}
 	if h.State == Completed && len(h.Secret) != SecretLength {
-		return sdkerrors.Wrapf(ErrInvalidSecret, "length of the secret must be %d", SecretLength)
+		return errorsmod.Wrapf(ErrInvalidSecret, "length of the secret must be %d", SecretLength)
 	}
 	return nil
 }
@@ -124,16 +125,16 @@ func DefaultAssetSupplies() []AssetSupply {
 // Validate performs a basic validation of an asset supply fields.
 func (a AssetSupply) Validate() error {
 	if !a.IncomingSupply.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "incoming supply %s", a.IncomingSupply)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "incoming supply %s", a.IncomingSupply)
 	}
 	if !a.OutgoingSupply.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "outgoing supply %s", a.OutgoingSupply)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "outgoing supply %s", a.OutgoingSupply)
 	}
 	if !a.CurrentSupply.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "current supply %s", a.CurrentSupply)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "current supply %s", a.CurrentSupply)
 	}
 	if !a.TimeLimitedCurrentSupply.IsValid() {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			sdkerrors.ErrInvalidCoins,
 			"time-limited current supply %s",
 			a.CurrentSupply,

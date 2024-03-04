@@ -8,6 +8,7 @@ import (
 	"github.com/cometbft/cometbft/crypto/tmhash"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 )
 

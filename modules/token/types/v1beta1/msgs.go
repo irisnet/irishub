@@ -1,8 +1,10 @@
 package v1beta1
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 )
 
@@ -56,7 +58,7 @@ func (msg MsgIssueToken) Type() string { return TypeMsgIssueToken }
 func (msg MsgIssueToken) ValidateBasic() error {
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	return NewToken(
@@ -121,12 +123,12 @@ func (msg MsgTransferTokenOwner) GetSigners() []sdk.AccAddress {
 func (msg MsgTransferTokenOwner) ValidateBasic() error {
 	srcOwner, err := sdk.AccAddressFromBech32(msg.SrcOwner)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid source owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid source owner address (%s)", err)
 	}
 
 	dstOwner, err := sdk.AccAddressFromBech32(msg.DstOwner)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid destination owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid destination owner address (%s)", err)
 	}
 
 	// check if the `DstOwner` is same as the original owner
@@ -188,7 +190,7 @@ func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
 func (msg MsgEditToken) ValidateBasic() error {
 	// check owner
 	if _, err := sdk.AccAddressFromBech32(msg.Owner); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	if err := tokentypes.ValidateName(msg.Name); err != nil {
@@ -236,13 +238,13 @@ func (msg MsgMintToken) GetSigners() []sdk.AccAddress {
 func (msg MsgMintToken) ValidateBasic() error {
 	// check the owner
 	if _, err := sdk.AccAddressFromBech32(msg.Owner); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	// check the reception
 	if len(msg.To) > 0 {
 		if _, err := sdk.AccAddressFromBech32(msg.To); err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid mint reception address (%s)", err)
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid mint reception address (%s)", err)
 		}
 	}
 
@@ -290,7 +292,7 @@ func (msg MsgBurnToken) GetSigners() []sdk.AccAddress {
 func (msg MsgBurnToken) ValidateBasic() error {
 	// check the owner
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	if err := tokentypes.ValidateAmount(msg.Amount); err != nil {

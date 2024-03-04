@@ -3,6 +3,7 @@ package keeper
 import (
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -36,20 +37,20 @@ func (k Keeper) CreatePool(
 func (k Keeper) DestroyPool(ctx sdk.Context, poolId string, creator sdk.AccAddress) (sdk.Coins, error) {
 	pool, exist := k.GetPool(ctx, poolId)
 	if !exist {
-		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, poolId)
+		return nil, errorsmod.Wrapf(types.ErrPoolNotFound, poolId)
 	}
 
 	if creator.String() != pool.Creator {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "creator [%s] is not the creator of the pool", creator.String())
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "creator [%s] is not the creator of the pool", creator.String())
 	}
 
 	if !pool.Editable {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidOperate, "pool [%s] is not editable", poolId)
 	}
 
 	if k.Expired(ctx, pool) {
-		return nil, sdkerrors.Wrapf(types.ErrPoolExpired,
+		return nil, errorsmod.Wrapf(types.ErrPoolExpired,
 			"pool [%s] has expired at height [%d], current [%d]",
 			poolId,
 			pool.EndHeight,
@@ -70,22 +71,22 @@ func (k Keeper) AdjustPool(
 	pool, exist := k.GetPool(ctx, poolId)
 	//check if the liquidity pool exists
 	if !exist {
-		return sdkerrors.Wrapf(types.ErrPoolNotFound, poolId)
+		return errorsmod.Wrapf(types.ErrPoolNotFound, poolId)
 	}
 
 	if !pool.Editable {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidOperate, "pool [%s] is not editable", poolId)
 	}
 
 	//check permissions
 	if creator.String() != pool.Creator {
-		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "creator [%s] is not the creator of the pool", creator.String())
+		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "creator [%s] is not the creator of the pool", creator.String())
 	}
 
 	//check for expiration
 	if k.Expired(ctx, pool) {
-		return sdkerrors.Wrapf(types.ErrPoolExpired,
+		return errorsmod.Wrapf(types.ErrPoolExpired,
 			"pool [%s] has expired at height[%d], current [%d]",
 			poolId,
 			pool.EndHeight,
@@ -96,11 +97,11 @@ func (k Keeper) AdjustPool(
 	pool.Rules = k.GetRewardRules(ctx, pool.Id)
 	rules := types.RewardRules(pool.Rules)
 	if rewardPerBlock != nil && !rewardPerBlock.DenomsSubsetOf(rules.RewardsPerBlock()) {
-		return sdkerrors.Wrapf(types.ErrInvalidAppend, "rewardPerBlock: %s", rewardPerBlock.String())
+		return errorsmod.Wrapf(types.ErrInvalidAppend, "rewardPerBlock: %s", rewardPerBlock.String())
 	}
 
 	if reward != nil && !rules.Contains(reward) {
-		return sdkerrors.Wrapf(types.ErrInvalidAppend, reward.String())
+		return errorsmod.Wrapf(types.ErrInvalidAppend, reward.String())
 	}
 
 	startHeight := pool.StartHeight
@@ -228,7 +229,7 @@ func (k Keeper) updatePool(
 ) (types.FarmPool, sdk.Coins, error) {
 	height := ctx.BlockHeight()
 	if height < pool.LastHeightDistrRewards {
-		return pool, nil, sdkerrors.Wrapf(
+		return pool, nil, errorsmod.Wrapf(
 			types.ErrExpiredHeight,
 			"invalid height: [%d], last distribution height: [%d]",
 			height, pool.LastHeightDistrRewards,
@@ -237,7 +238,7 @@ func (k Keeper) updatePool(
 
 	rules := k.GetRewardRules(ctx, pool.Id)
 	if len(rules) == 0 {
-		return pool, nil, sdkerrors.Wrapf(types.ErrPoolNotFound, pool.Id)
+		return pool, nil, errorsmod.Wrapf(types.ErrPoolNotFound, pool.Id)
 	}
 	var rewardTotal sdk.Coins
 	//when there are multiple farm operations in the same block, the value needs to be updated once
@@ -254,7 +255,7 @@ func (k Keeper) updatePool(
 					"remainingReward", rules[i].RemainingReward.String(),
 					"rewardCollected", rewardCollected.String(),
 				)
-				return pool, nil, sdkerrors.Wrapf(
+				return pool, nil, errorsmod.Wrapf(
 					sdkerrors.ErrInsufficientFunds,
 					"the remaining reward of the pool [%s] is [%s], but got [%s]",
 					pool.Id, sdk.NewCoin(rules[i].Reward, rules[i].RemainingReward).String(), coinCollected,

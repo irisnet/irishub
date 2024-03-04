@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -26,11 +27,11 @@ func (dtf ValidateOracleAuthDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, si
 		case *types.MsgCreateFeed:
 			creator, err := sdk.AccAddressFromBech32(msg.Creator)
 			if err != nil {
-				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "invalid creator")
+				return ctx, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "invalid creator")
 			}
 
 			if !dtf.ak.Authorized(ctx, creator) {
-				return ctx, sdkerrors.Wrapf(types.ErrUnauthorized, msg.Creator)
+				return ctx, errorsmod.Wrapf(types.ErrUnauthorized, msg.Creator)
 			}
 		}
 	}

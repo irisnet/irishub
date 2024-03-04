@@ -1,7 +1,8 @@
 package types
 
 import (
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errorsmod "cosmossdk.io/errors"
+
 	"github.com/irisnet/irismod/modules/mt/exported"
 )
 
@@ -45,7 +46,7 @@ func ValidateGenesis(data GenesisState) error {
 			denomMap2[d.DenomId] = true
 
 			if _, ok := denomMap1[d.DenomId]; !ok {
-				return sdkerrors.Wrapf(sdkerrors.ErrPanic, "unknown mt denom, (%s)", d.DenomId)
+				return errorsmod.Wrapf(errorsmod.ErrPanic, "unknown mt denom, (%s)", d.DenomId)
 			}
 			for _, b := range d.Balances {
 				mtMap2[d.DenomId+b.MtId] = mtMap2[d.DenomId+b.MtId] + b.Amount
@@ -57,13 +58,13 @@ func ValidateGenesis(data GenesisState) error {
 	mtCount2 := len(mtMap2)
 
 	if mtCount1 != mtCount2 {
-		return sdkerrors.Wrapf(sdkerrors.ErrPanic, "mt count mismatch, (%d, %d)", mtCount1, mtCount2)
+		return errorsmod.Wrapf(errorsmod.ErrPanic, "mt count mismatch, (%d, %d)", mtCount1, mtCount2)
 	}
 
 	for id1, supply1 := range mtMap1 {
 		supply2 := mtMap2[id1]
 		if supply1 != supply2 {
-			return sdkerrors.Wrapf(sdkerrors.ErrPanic, "mt supply mismatch, id: %s (%d, %d)", id1, supply1, mtCount2)
+			return errorsmod.Wrapf(errorsmod.ErrPanic, "mt supply mismatch, id: %s (%d, %d)", id1, supply1, mtCount2)
 		}
 	}
 

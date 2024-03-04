@@ -5,8 +5,8 @@ import (
 
 	gogotypes "github.com/cosmos/gogoproto/types"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/htlc/types"
 )
@@ -15,7 +15,7 @@ import (
 func (k Keeper) IncrementCurrentAssetSupply(ctx sdk.Context, coin sdk.Coin) error {
 	supply, found := k.GetAssetSupply(ctx, coin.Denom)
 	if !found {
-		return sdkerrors.Wrap(types.ErrAssetNotSupported, coin.Denom)
+		return errorsmod.Wrap(types.ErrAssetNotSupported, coin.Denom)
 	}
 
 	limit, err := k.GetSupplyLimit(ctx, coin.Denom)
@@ -26,7 +26,7 @@ func (k Keeper) IncrementCurrentAssetSupply(ctx sdk.Context, coin sdk.Coin) erro
 
 	// Resulting current supply must be under asset's limit
 	if supplyLimit.IsLT(supply.CurrentSupply.Add(coin)) {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrExceedsSupplyLimit,
 			"increase %s, asset supply %s, limit %s",
 			coin, supply.CurrentSupply, supplyLimit,
@@ -36,7 +36,7 @@ func (k Keeper) IncrementCurrentAssetSupply(ctx sdk.Context, coin sdk.Coin) erro
 	if limit.TimeLimited {
 		timeBasedSupplyLimit := sdk.NewCoin(coin.Denom, limit.TimeBasedLimit)
 		if timeBasedSupplyLimit.IsLT(supply.TimeLimitedCurrentSupply.Add(coin)) {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				types.ErrExceedsTimeBasedSupplyLimit,
 				"increase %s, current time-based asset supply %s, limit %s",
 				coin, supply.TimeLimitedCurrentSupply, timeBasedSupplyLimit,
@@ -54,13 +54,13 @@ func (k Keeper) IncrementCurrentAssetSupply(ctx sdk.Context, coin sdk.Coin) erro
 func (k Keeper) DecrementCurrentAssetSupply(ctx sdk.Context, coin sdk.Coin) error {
 	supply, found := k.GetAssetSupply(ctx, coin.Denom)
 	if !found {
-		return sdkerrors.Wrap(types.ErrAssetNotSupported, coin.Denom)
+		return errorsmod.Wrap(types.ErrAssetNotSupported, coin.Denom)
 	}
 
 	// Resulting current supply must be greater than or equal to 0
 	// Use sdk.Int instead of sdk.Coin to prevent panic if true
 	if supply.CurrentSupply.Amount.Sub(coin.Amount).IsNegative() {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidCurrentSupply,
 			"decrease %s, asset supply %s",
 			coin,
@@ -77,7 +77,7 @@ func (k Keeper) DecrementCurrentAssetSupply(ctx sdk.Context, coin sdk.Coin) erro
 func (k Keeper) IncrementIncomingAssetSupply(ctx sdk.Context, coin sdk.Coin) error {
 	supply, found := k.GetAssetSupply(ctx, coin.Denom)
 	if !found {
-		return sdkerrors.Wrap(types.ErrAssetNotSupported, coin.Denom)
+		return errorsmod.Wrap(types.ErrAssetNotSupported, coin.Denom)
 	}
 
 	// 	Result of (current + incoming + amount) must be under asset's limit
@@ -89,7 +89,7 @@ func (k Keeper) IncrementIncomingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 	}
 	supplyLimit := sdk.NewCoin(coin.Denom, limit.Limit)
 	if supplyLimit.IsLT(totalSupply.Add(coin)) {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrExceedsSupplyLimit,
 			"increase %s, asset supply %s, limit %s",
 			coin,
@@ -102,7 +102,7 @@ func (k Keeper) IncrementIncomingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 		timeLimitedTotalSupply := supply.TimeLimitedCurrentSupply.Add(supply.IncomingSupply)
 		timeBasedSupplyLimit := sdk.NewCoin(coin.Denom, limit.TimeBasedLimit)
 		if timeBasedSupplyLimit.IsLT(timeLimitedTotalSupply.Add(coin)) {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				types.ErrExceedsTimeBasedSupplyLimit,
 				"increase %s, time-based asset supply %s, limit %s",
 				coin, supply.TimeLimitedCurrentSupply, timeBasedSupplyLimit,
@@ -119,13 +119,13 @@ func (k Keeper) IncrementIncomingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 func (k Keeper) DecrementIncomingAssetSupply(ctx sdk.Context, coin sdk.Coin) error {
 	supply, found := k.GetAssetSupply(ctx, coin.Denom)
 	if !found {
-		return sdkerrors.Wrap(types.ErrAssetNotSupported, coin.Denom)
+		return errorsmod.Wrap(types.ErrAssetNotSupported, coin.Denom)
 	}
 
 	// Resulting incoming supply must be greater than or equal to 0
 	// Use sdk.Int instead of sdk.Coin to prevent panic if true
 	if supply.IncomingSupply.Amount.Sub(coin.Amount).IsNegative() {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidIncomingSupply,
 			"decrease %s, incoming supply %s",
 			coin,
@@ -142,12 +142,12 @@ func (k Keeper) DecrementIncomingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 func (k Keeper) IncrementOutgoingAssetSupply(ctx sdk.Context, coin sdk.Coin) error {
 	supply, found := k.GetAssetSupply(ctx, coin.Denom)
 	if !found {
-		return sdkerrors.Wrap(types.ErrAssetNotSupported, coin.Denom)
+		return errorsmod.Wrap(types.ErrAssetNotSupported, coin.Denom)
 	}
 
 	// Result of (outgoing + amount) must be less than current supply
 	if supply.CurrentSupply.IsLT(supply.OutgoingSupply.Add(coin)) {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrExceedsAvailableSupply,
 			"swap amount %s, available supply %s",
 			coin, supply.CurrentSupply.Amount.Sub(supply.OutgoingSupply.Amount),
@@ -163,13 +163,13 @@ func (k Keeper) IncrementOutgoingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 func (k Keeper) DecrementOutgoingAssetSupply(ctx sdk.Context, coin sdk.Coin) error {
 	supply, found := k.GetAssetSupply(ctx, coin.Denom)
 	if !found {
-		return sdkerrors.Wrap(types.ErrAssetNotSupported, coin.Denom)
+		return errorsmod.Wrap(types.ErrAssetNotSupported, coin.Denom)
 	}
 
 	// Resulting outgoing supply must be greater than or equal to 0
 	// Use sdk.Int instead of sdk.Coin to prevent panic if true
 	if supply.OutgoingSupply.Amount.Sub(coin.Amount).IsNegative() {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidOutgoingSupply,
 			"decrease %s, outgoing supply %s",
 			coin,

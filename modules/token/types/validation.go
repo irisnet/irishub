@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -54,7 +55,7 @@ var (
 // ValidateInitialSupply verifies whether the initial supply is legal
 func ValidateInitialSupply(initialSupply uint64) error {
 	if initialSupply > MaximumInitSupply {
-		return sdkerrors.Wrapf(ErrInvalidInitSupply, "invalid token initial supply %d, only accepts value [0, %d]", initialSupply, MaximumInitSupply)
+		return errorsmod.Wrapf(ErrInvalidInitSupply, "invalid token initial supply %d, only accepts value [0, %d]", initialSupply, MaximumInitSupply)
 	}
 	return nil
 }
@@ -62,7 +63,7 @@ func ValidateInitialSupply(initialSupply uint64) error {
 // ValidateName verifies whether the given name is legal
 func ValidateName(name string) error {
 	if len(name) == 0 || len(name) > MaximumNameLen {
-		return sdkerrors.Wrapf(ErrInvalidName, "invalid token name %s, only accepts length (0, %d]", name, MaximumNameLen)
+		return errorsmod.Wrapf(ErrInvalidName, "invalid token name %s, only accepts length (0, %d]", name, MaximumNameLen)
 	}
 	return nil
 }
@@ -70,7 +71,7 @@ func ValidateName(name string) error {
 // ValidateScale verifies whether the given scale is legal
 func ValidateScale(scale uint32) error {
 	if scale > MaximumScale {
-		return sdkerrors.Wrapf(ErrInvalidScale, "invalid token scale %d, only accepts value [0, %d]", scale, MaximumScale)
+		return errorsmod.Wrapf(ErrInvalidScale, "invalid token scale %d, only accepts value [0, %d]", scale, MaximumScale)
 	}
 	return nil
 }
@@ -78,7 +79,7 @@ func ValidateScale(scale uint32) error {
 // ValidateMinUnit checks if the given min unit is valid
 func ValidateMinUnit(minUnit string) error {
 	if !regexpMinUint(minUnit) {
-		return sdkerrors.Wrapf(ErrInvalidMinUnit, "invalid minUnit: %s, only accepts english lowercase letters and numbers, length [%d, %d], and begin with an english letter, regexp: %s", minUnit, MinimumMinUnitLen, MaximumMinUnitLen, regexpMinUintFmt)
+		return errorsmod.Wrapf(ErrInvalidMinUnit, "invalid minUnit: %s, only accepts english lowercase letters and numbers, length [%d, %d], and begin with an english letter, regexp: %s", minUnit, MinimumMinUnitLen, MaximumMinUnitLen, regexpMinUintFmt)
 	}
 	return ValidateKeywords(minUnit)
 }
@@ -86,7 +87,7 @@ func ValidateMinUnit(minUnit string) error {
 // ValidateSymbol checks if the given symbol is valid
 func ValidateSymbol(symbol string) error {
 	if !regexpSymbol(symbol) {
-		return sdkerrors.Wrapf(ErrInvalidSymbol, "invalid symbol: %s, only accepts english lowercase letters and numbers, length [%d, %d], and begin with an english letter, regexp: %s", symbol, MinimumSymbolLen, MaximumSymbolLen, regexpSymbolFmt)
+		return errorsmod.Wrapf(ErrInvalidSymbol, "invalid symbol: %s, only accepts english lowercase letters and numbers, length [%d, %d], and begin with an english letter, regexp: %s", symbol, MinimumSymbolLen, MaximumSymbolLen, regexpSymbolFmt)
 	}
 	return ValidateKeywords(symbol)
 }
@@ -94,7 +95,7 @@ func ValidateSymbol(symbol string) error {
 // ValidateKeywords checks if the given denom begins with `TokenKeywords`
 func ValidateKeywords(denom string) error {
 	if regexpKeyword(denom) {
-		return sdkerrors.Wrapf(ErrInvalidSymbol, "invalid token: %s, can not begin with keyword: (%s)", denom, keywords)
+		return errorsmod.Wrapf(ErrInvalidSymbol, "invalid token: %s, can not begin with keyword: (%s)", denom, keywords)
 	}
 	return nil
 }
@@ -102,7 +103,7 @@ func ValidateKeywords(denom string) error {
 // ValidateAmount checks if the given denom begins with `TokenKeywords`
 func ValidateAmount(amount uint64) error {
 	if amount == 0 {
-		return sdkerrors.Wrapf(ErrInvalidMaxSupply, "invalid token amount %d, only accepts value (0, %d]", amount, uint64(MaximumMaxSupply))
+		return errorsmod.Wrapf(ErrInvalidMaxSupply, "invalid token amount %d, only accepts value (0, %d]", amount, uint64(MaximumMaxSupply))
 	}
 	return nil
 }
@@ -110,7 +111,7 @@ func ValidateAmount(amount uint64) error {
 // ValidateCoin checks if the given coin
 func ValidateCoin(coin sdk.Coin) error {
 	if !coin.IsPositive() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid coin (%s)", coin.String())
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "invalid coin (%s)", coin.String())
 	}
 	return ValidateMinUnit(coin.Denom)
 }

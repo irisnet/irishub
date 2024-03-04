@@ -5,11 +5,11 @@ import (
 
 	"github.com/cometbft/cometbft/libs/log"
 
+	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/token/types"
 	v1 "github.com/irisnet/irismod/modules/token/types/v1"
@@ -107,7 +107,7 @@ func (k Keeper) EditToken(
 	}
 
 	if owner.String() != token.Owner {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidOwner,
 			"the address %s is not the owner of the token %s",
 			owner,
@@ -120,7 +120,7 @@ func (k Keeper) EditToken(
 		issuedMainUnitAmt := issuedAmt.Quo(sdkmath.NewIntWithDecimal(1, int(token.Scale)))
 
 		if sdk.NewIntFromUint64(maxSupply).LT(issuedMainUnitAmt) {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				types.ErrInvalidMaxSupply,
 				"max supply must not be less than %s",
 				issuedMainUnitAmt,
@@ -161,7 +161,7 @@ func (k Keeper) TransferTokenOwner(
 	}
 
 	if srcOwner.String() != token.Owner {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidOwner,
 			"the address %s is not the owner of the token %s",
 			srcOwner,
@@ -195,7 +195,7 @@ func (k Keeper) MintToken(
 	}
 
 	if owner.String() != token.Owner {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidOwner,
 			"the address %s is not the owner of the token %s",
 			owner,
@@ -204,7 +204,7 @@ func (k Keeper) MintToken(
 	}
 
 	if !token.Mintable {
-		return sdkerrors.Wrapf(types.ErrNotMintable, "%s", token.Symbol)
+		return errorsmod.Wrapf(types.ErrNotMintable, "%s", token.Symbol)
 	}
 
 	supply := k.getTokenSupply(ctx, token.MinUnit)
@@ -212,7 +212,7 @@ func (k Keeper) MintToken(
 	mintableAmt := sdk.NewIntFromUint64(token.MaxSupply).Mul(precision).Sub(supply)
 
 	if coinMinted.Amount.GT(mintableAmt) {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidAmount,
 			"the amount exceeds the mintable token amount; expected (0, %d], got %d",
 			mintableAmt, coinMinted.Amount,

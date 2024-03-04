@@ -5,8 +5,8 @@ import (
 
 	"github.com/tidwall/gjson"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/service/types"
 )
@@ -50,7 +50,7 @@ func (k Keeper) GetExchangedPrice(
 func (k Keeper) GetExchangeRate(ctx sdk.Context, quoteDenom, baseDenom string) (sdk.Dec, error) {
 	exchangeRateSvc, exist := k.GetModuleServiceByModuleName(types.RegisterModuleName)
 	if !exist {
-		return sdk.Dec{}, sdkerrors.Wrapf(types.ErrInvalidModuleService, "module service does not exist: %s", types.RegisterModuleName)
+		return sdk.Dec{}, errorsmod.Wrapf(types.ErrInvalidModuleService, "module service does not exist: %s", types.RegisterModuleName)
 	}
 
 	inputBody := fmt.Sprintf(`{"pair":"%s-%s"}`, quoteDenom, baseDenom)
@@ -61,7 +61,7 @@ func (k Keeper) GetExchangeRate(ctx sdk.Context, quoteDenom, baseDenom string) (
 
 	result, output := exchangeRateSvc.ReuquestService(ctx, input)
 	if code, msg := CheckResult(result); code != types.ResultOK {
-		return sdk.Dec{}, sdkerrors.Wrapf(types.ErrInvalidModuleService, msg)
+		return sdk.Dec{}, errorsmod.Wrapf(types.ErrInvalidModuleService, msg)
 	}
 
 	outputBody := gjson.Get(output, types.PATH_BODY).String()
@@ -75,7 +75,7 @@ func (k Keeper) GetExchangeRate(ctx sdk.Context, quoteDenom, baseDenom string) (
 	}
 
 	if rate.IsZero() {
-		return sdk.Dec{}, sdkerrors.Wrapf(types.ErrInvalidResponseOutputBody, "rate can not be zero")
+		return sdk.Dec{}, errorsmod.Wrapf(types.ErrInvalidResponseOutputBody, "rate can not be zero")
 	}
 
 	return rate, nil

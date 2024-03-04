@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -40,11 +41,11 @@ func GenerateRequestID(r Request) []byte {
 // CheckReqID checks if the given request id is valid
 func CheckReqID(reqID string) error {
 	if len(reqID) != 64 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid request id: %s", reqID))
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid request id: %s", reqID))
 	}
 
 	if _, err := hex.DecodeString(reqID); err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid request id: %s", reqID))
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid request id: %s", reqID))
 	}
 
 	return nil

@@ -22,7 +22,7 @@ func NewGovHook(k Keeper) GovHook {
 	return GovHook{k}
 }
 
-//AfterProposalFailedMinDeposit callback when the proposal is deleted due to insufficient collateral
+// AfterProposalFailedMinDeposit callback when the proposal is deleted due to insufficient collateral
 func (h GovHook) AfterProposalFailedMinDeposit(ctx sdk.Context, proposalID uint64) error {
 	info, has := h.k.GetEscrowInfo(ctx, proposalID)
 	if !has {
@@ -33,8 +33,8 @@ func (h GovHook) AfterProposalFailedMinDeposit(ctx sdk.Context, proposalID uint6
 	return nil
 }
 
-//AfterProposalVotingPeriodEnded callback when proposal voting is complete
-func (h GovHook) AfterProposalVotingPeriodEnded(ctx sdk.Context, proposalID uint64) error{
+// AfterProposalVotingPeriodEnded callback when proposal voting is complete
+func (h GovHook) AfterProposalVotingPeriodEnded(ctx sdk.Context, proposalID uint64) error {
 	info, has := h.k.GetEscrowInfo(ctx, proposalID)
 	if !has {
 		return types.ErrEscrowInfoNotFound
@@ -61,9 +61,10 @@ func (h GovHook) AfterProposalVotingPeriodEnded(ctx sdk.Context, proposalID uint
 //
 // Takes in sdk.Context and uint64 as parameters.
 // Returns an error.
-func (h GovHook) AfterProposalSubmission(ctx sdk.Context, proposalID uint64) error{
+func (h GovHook) AfterProposalSubmission(ctx sdk.Context, proposalID uint64) error {
 	return nil
 }
+
 // AfterProposalDeposit is a function that...
 //
 // takes in ctx sdk.Context, proposalID uint64, depositorAddr sdk.AccAddress.
@@ -71,10 +72,11 @@ func (h GovHook) AfterProposalSubmission(ctx sdk.Context, proposalID uint64) err
 func (h GovHook) AfterProposalDeposit(ctx sdk.Context, proposalID uint64, depositorAddr sdk.AccAddress) error {
 	return nil
 }
+
 // AfterProposalVote is a Go function.
 //
 // It takes parameters ctx sdk.Context, proposalID uint64, voterAddr sdk.AccAddress.
 // It returns an error.
-func (h GovHook) AfterProposalVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.AccAddress) error{
+func (h GovHook) AfterProposalVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.AccAddress) error {
 	return nil
 }

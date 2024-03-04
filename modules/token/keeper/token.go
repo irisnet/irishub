@@ -5,8 +5,8 @@ import (
 
 	gogotypes "github.com/cosmos/gogoproto/types"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
 	"github.com/irisnet/irismod/modules/token/types"
@@ -59,13 +59,13 @@ func (k Keeper) GetToken(ctx sdk.Context, denom string) (v1.TokenI, error) {
 		return &token, nil
 	}
 
-	return nil, sdkerrors.Wrapf(types.ErrTokenNotExists, "token: %s does not exist", denom)
+	return nil, errorsmod.Wrapf(types.ErrTokenNotExists, "token: %s does not exist", denom)
 }
 
 // AddToken saves a new token
 func (k Keeper) AddToken(ctx sdk.Context, token v1.Token) error {
 	if k.HasToken(ctx, token.Symbol) {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrSymbolAlreadyExists,
 			"symbol already exists: %s",
 			token.Symbol,
@@ -73,7 +73,7 @@ func (k Keeper) AddToken(ctx sdk.Context, token v1.Token) error {
 	}
 
 	if k.HasToken(ctx, token.MinUnit) {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrMinUnitAlreadyExists,
 			"min-unit already exists: %s",
 			token.MinUnit,
@@ -155,7 +155,7 @@ func (k Keeper) GetBurnCoin(ctx sdk.Context, minUint string) (sdk.Coin, error) {
 	bz := store.Get(key)
 
 	if len(bz) == 0 {
-		return sdk.Coin{}, sdkerrors.Wrapf(
+		return sdk.Coin{}, errorsmod.Wrapf(
 			types.ErrNotFoundTokenAmt,
 			"not found symbol: %s",
 			minUint,
@@ -211,7 +211,7 @@ func (k Keeper) getTokenBySymbol(ctx sdk.Context, symbol string) (token v1.Token
 
 	bz := store.Get(types.KeySymbol(symbol))
 	if bz == nil {
-		return token, sdkerrors.Wrap(
+		return token, errorsmod.Wrap(
 			types.ErrTokenNotExists,
 			fmt.Sprintf("token symbol %s does not exist", symbol),
 		)
@@ -226,7 +226,7 @@ func (k Keeper) getTokenByMinUnit(ctx sdk.Context, minUnit string) (token v1.Tok
 
 	bz := store.Get(types.KeyMinUint(minUnit))
 	if bz == nil {
-		return token, sdkerrors.Wrap(
+		return token, errorsmod.Wrap(
 			types.ErrTokenNotExists,
 			fmt.Sprintf("token minUnit %s does not exist", minUnit),
 		)
@@ -248,7 +248,7 @@ func (k Keeper) getSymbolByMinUnit(ctx sdk.Context, minUnit string) (string, err
 
 	bz := store.Get(types.KeyMinUint(minUnit))
 	if bz == nil {
-		return "", sdkerrors.Wrap(
+		return "", errorsmod.Wrap(
 			types.ErrTokenNotExists,
 			fmt.Sprintf("token minUnit %s does not exist", minUnit),
 		)

@@ -337,7 +337,7 @@ func (suite *TestSuite) TestLiquidity2() {
 	suite.Equal(
 		"14135062787267695755",
 		suite.app.BankKeeper.GetSupply(suite.ctx, pool.LptDenom).Amount.String(),
-	) // todo theoretical lpt ammount
+	) // todo theoretical lpt amount
 
 	// 2.2 poolBalances
 	expCoins = sdk.NewCoins(

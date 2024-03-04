@@ -10,6 +10,7 @@ import (
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -22,7 +23,7 @@ func (k Keeper) RegisterResponseCallback(
 	respCallback types.ResponseCallback,
 ) error {
 	if _, ok := k.respCallbacks[moduleName]; ok {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrCallbackRegistered,
 			"%s already registered for module %s",
 			"response callback",
@@ -38,7 +39,7 @@ func (k Keeper) RegisterResponseCallback(
 // RegisterStateCallback registers a module callback for state handling
 func (k Keeper) RegisterStateCallback(moduleName string, stateCallback types.StateCallback) error {
 	if _, ok := k.stateCallbacks[moduleName]; ok {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrCallbackRegistered,
 			"%s already registered for module %s",
 			"state callback",
@@ -86,7 +87,7 @@ func (k Keeper) CreateRequestContext(
 		}
 
 		if responseThreshold < 1 || int(responseThreshold) > len(providers) {
-			return nil, sdkerrors.Wrapf(
+			return nil, errorsmod.Wrapf(
 				types.ErrInvalidResponseThreshold,
 				"response threshold [%d] must be between [1,%d]",
 				responseThreshold,
@@ -97,7 +98,7 @@ func (k Keeper) CreateRequestContext(
 
 	_, found := k.GetServiceDefinition(ctx, serviceName)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrUnknownServiceDefinition, serviceName)
+		return nil, errorsmod.Wrap(types.ErrUnknownServiceDefinition, serviceName)
 	}
 
 	if err := types.ValidateRequestInput(input); err != nil {
@@ -110,7 +111,7 @@ func (k Keeper) CreateRequestContext(
 
 	maxRequestTimeout := k.MaxRequestTimeout(ctx)
 	if timeout > maxRequestTimeout {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidTimeout,
 			"timeout [%d] must not be greater than the max request timeout [%d]",
 			timeout,
@@ -168,7 +169,7 @@ func (k Keeper) UpdateRequestContext(
 	}
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return sdkerrors.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
+		return errorsmod.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
 	}
 
 	// check authority when called by module
@@ -196,7 +197,7 @@ func (k Keeper) UpdateRequestContext(
 		}
 
 		if respThreshold > uint32(len(pds)) {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				types.ErrInvalidResponseThreshold,
 				"response threshold [%d] must be between [1,%d]",
 				respThreshold,
@@ -219,7 +220,7 @@ func (k Keeper) UpdateRequestContext(
 
 	maxRequestTimeout := k.MaxRequestTimeout(ctx)
 	if timeout > maxRequestTimeout {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidTimeout,
 			"timeout [%d] must not be greater than the max request timeout [%d]",
 			timeout,
@@ -236,7 +237,7 @@ func (k Keeper) UpdateRequestContext(
 	}
 
 	if repeatedFreq < uint64(timeout) {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidRepeatedFreq,
 			"repeated frequency [%d] must not be less than the timeout [%d]",
 			repeatedFreq,
@@ -245,7 +246,7 @@ func (k Keeper) UpdateRequestContext(
 	}
 
 	if repeatedTotal >= 1 && repeatedTotal < int64(requestContext.BatchCounter) {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidRepeatedTotal,
 			"updated repeated total [%d] must not be less than the current batch counter [%d]",
 			repeatedTotal,
@@ -282,7 +283,7 @@ func (k Keeper) PauseRequestContext(
 ) error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return sdkerrors.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
+		return errorsmod.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
 	}
 
 	// check authority when called by module
@@ -314,7 +315,7 @@ func (k Keeper) StartRequestContext(
 ) error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return sdkerrors.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
+		return errorsmod.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
 	}
 
 	// check authority when called by module
@@ -348,7 +349,7 @@ func (k Keeper) KillRequestContext(
 ) error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return sdkerrors.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
+		return errorsmod.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
 	}
 
 	// check authority when called by module
@@ -1013,24 +1014,24 @@ func (k Keeper) AddResponse(
 ) {
 	request, found := k.GetRequest(ctx, requestID)
 	if !found {
-		return request, response, sdkerrors.Wrap(types.ErrUnknownRequest, requestID.String())
+		return request, response, errorsmod.Wrap(types.ErrUnknownRequest, requestID.String())
 	}
 
 	requestProvider, _ := sdk.AccAddressFromBech32(request.Provider)
 	if !provider.Equals(requestProvider) {
-		return request, response, sdkerrors.Wrap(
+		return request, response, errorsmod.Wrap(
 			types.ErrInvalidResponse,
 			"provider does not match",
 		)
 	}
 
 	if !k.IsRequestActive(ctx, requestID) {
-		return request, response, sdkerrors.Wrap(types.ErrInvalidResponse, "request is not active")
+		return request, response, errorsmod.Wrap(types.ErrInvalidResponse, "request is not active")
 	}
 
 	if len(output) > 0 {
 		if err := types.ValidateResponseOutput(output); err != nil {
-			return request, response, sdkerrors.Wrap(types.ErrInvalidResponseOutput, err.Error())
+			return request, response, errorsmod.Wrap(types.ErrInvalidResponseOutput, err.Error())
 		}
 	}
 
@@ -1235,7 +1236,7 @@ func (k Keeper) Slash(ctx sdk.Context, requestID tmbytes.HexBytes) error {
 
 	deposit, hasNeg := binding.Deposit.SafeSub(slashedCoins...)
 	if hasNeg {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			sdkerrors.ErrInsufficientFunds,
 			"%s is less than %s",
 			binding.Deposit.String(),
@@ -1279,15 +1280,15 @@ func (k Keeper) CheckAuthority(
 ) error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return sdkerrors.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
+		return errorsmod.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
 	}
 
 	if consumer.String() != requestContext.Consumer {
-		return sdkerrors.Wrapf(types.ErrNotAuthorized, "consumer not matching")
+		return errorsmod.Wrapf(types.ErrNotAuthorized, "consumer not matching")
 	}
 
 	if checkModule && len(requestContext.ModuleName) > 0 {
-		return sdkerrors.Wrapf(types.ErrNotAuthorized, "not authorized operation")
+		return errorsmod.Wrapf(types.ErrNotAuthorized, "not authorized operation")
 	}
 
 	return nil
@@ -1297,7 +1298,7 @@ func (k Keeper) CheckAuthority(
 func (k Keeper) GetResponseCallback(moduleName string) (types.ResponseCallback, error) {
 	respCallback, ok := k.respCallbacks[moduleName]
 	if !ok {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrCallbackNotRegistered,
 			"%s not registered for module %s",
 			"response callback",
@@ -1312,7 +1313,7 @@ func (k Keeper) GetResponseCallback(moduleName string) (types.ResponseCallback, 
 func (k Keeper) GetStateCallback(moduleName string) (types.StateCallback, error) {
 	stateCallback, ok := k.stateCallbacks[moduleName]
 	if !ok {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrCallbackNotRegistered,
 			"%s not registered for module %s",
 			"state callback",
@@ -1347,7 +1348,7 @@ func (k Keeper) validateServiceFeeCap(ctx sdk.Context, serviceFeeCap sdk.Coins) 
 	baseDenom := k.BaseDenom(ctx)
 
 	if len(serviceFeeCap) != 1 || serviceFeeCap[0].Denom != baseDenom {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			types.ErrInvalidServiceFeeCap,
 			"service fee cap only accepts %s",
 			baseDenom,

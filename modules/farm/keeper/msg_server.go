@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -36,7 +37,7 @@ func (m msgServer) CreatePool(
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	//check valid begin height
 	if ctx.BlockHeight() > int64(msg.StartHeight) {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrExpiredHeight,
 			"The current block height[%d] is greater than StartHeight[%d]",
 			ctx.BlockHeight(), msg.StartHeight,
@@ -46,7 +47,7 @@ func (m msgServer) CreatePool(
 	if maxRewardCategories := m.k.MaxRewardCategories(ctx); uint32(
 		len(msg.TotalReward),
 	) > maxRewardCategories {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidRewardRule,
 			"the max reward category num is [%d], but got [%d]",
 			maxRewardCategories, len(msg.TotalReward),
@@ -55,7 +56,7 @@ func (m msgServer) CreatePool(
 
 	//check valid lp token denom
 	if err := m.k.ck.ValidatePool(ctx, msg.LptDenom); err != nil {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidLPToken,
 			"The lp token denom[%s] is not exist",
 			msg.LptDenom,
@@ -98,7 +99,7 @@ func (m msgServer) CreatePoolWithCommunityPool(
 	totalReward := sdk.NewCoins(msg.Content.FundApplied...).Add(msg.Content.FundSelfBond...)
 	maxRewardCategories := m.k.MaxRewardCategories(ctx)
 	if uint32(len(totalReward)) > maxRewardCategories {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidRewardRule,
 			"the max reward category num is [%d], but got [%d]",
 			maxRewardCategories, len(totalReward),
@@ -107,7 +108,7 @@ func (m msgServer) CreatePoolWithCommunityPool(
 
 	//check valid lp token denom
 	if err := m.k.ck.ValidatePool(ctx, msg.Content.LptDenom); err != nil {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidLPToken,
 			"The lp token denom[%s] is not exist",
 			msg.Content.LptDenom,
@@ -310,7 +311,7 @@ func (m msgServer) UpdateParams(
 	msg *types.MsgUpdateParams,
 ) (*types.MsgUpdateParamsResponse, error) {
 	if m.k.authority != msg.Authority {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrUnauthorized,
 			"invalid authority; expected %s, got %s",
 			m.k.authority,

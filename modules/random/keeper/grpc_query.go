@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -65,11 +66,11 @@ func (k Keeper) RandomRequestQueue(c context.Context, req *types.QueryRandomRequ
 func queryRandomRequestQueue(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var params types.QueryRandomRequestQueueParams
 	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+		return nil, errorsmod.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	if params.Height < 0 {
-		return nil, sdkerrors.Wrap(types.ErrInvalidHeight, string(rune(params.Height)))
+		return nil, errorsmod.Wrap(types.ErrInvalidHeight, string(rune(params.Height)))
 	}
 
 	var requests []types.Request
@@ -84,7 +85,7 @@ func queryRandomRequestQueue(ctx sdk.Context, req abci.RequestQuery, k Keeper, l
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, requests)
 	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+		return nil, errorsmod.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 
 	return bz, nil

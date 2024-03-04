@@ -1,6 +1,7 @@
 package types
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -37,7 +38,7 @@ func (msg MsgRequestRandom) Type() string { return TypeMsgRequestRandom }
 // ValidateBasic implements Msg.
 func (msg MsgRequestRandom) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Consumer); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid consumer address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid consumer address (%s)", err)
 	}
 	return ValidateServiceFeeCap(msg.ServiceFeeCap)
 }

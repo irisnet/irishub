@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -26,7 +27,7 @@ func ValidatepPoolId(poolId string) (uint64, error) {
 // ValidateDescription validates the pool name
 func ValidateDescription(description string) error {
 	if len(description) > MaxDescriptionLength {
-		return sdkerrors.Wrap(ErrInvalidDescription, description)
+		return errorsmod.Wrap(ErrInvalidDescription, description)
 	}
 	return nil
 }
@@ -39,7 +40,7 @@ func ValidateLpTokenDenom(denom string) error {
 // ValidateCoins validates the coin
 func ValidateCoins(field string, coins ...sdk.Coin) error {
 	if len(coins) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "The %s should be greater than zero", field)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "The %s should be greater than zero", field)
 	}
 	return sdk.NewCoins(coins...).Validate()
 }
@@ -53,21 +54,21 @@ func ValidateAddress(sender string) error {
 // ValidateReward validates the coin
 func ValidateReward(rewardPerBlock, totalReward sdk.Coins) error {
 	if len(rewardPerBlock) != len(totalReward) {
-		return sdkerrors.Wrapf(ErrNotMatch, "The length of rewardPerBlock and totalReward must be the same")
+		return errorsmod.Wrapf(ErrNotMatch, "The length of rewardPerBlock and totalReward must be the same")
 	}
 
 	if !rewardPerBlock.DenomsSubsetOf(totalReward) {
-		return sdkerrors.Wrapf(ErrInvalidRewardRule, "rewardPerBlock and totalReward token types must be the same")
+		return errorsmod.Wrapf(ErrInvalidRewardRule, "rewardPerBlock and totalReward token types must be the same")
 	}
 
 	for i := range totalReward {
 		if !totalReward[i].IsGTE(rewardPerBlock[i]) {
-			return sdkerrors.Wrapf(ErrNotMatch, "The totalReward should be greater than or equal to rewardPerBlock")
+			return errorsmod.Wrapf(ErrNotMatch, "The totalReward should be greater than or equal to rewardPerBlock")
 		}
 		//uint64 overflow check
 		h := totalReward[i].Amount.Quo(rewardPerBlock[i].Amount)
 		if !h.IsInt64() {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "Can not convert to int64, overflow")
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "Can not convert to int64, overflow")
 		}
 	}
 	return nil
@@ -79,12 +80,12 @@ func ValidateFund(rewardPerBlock, fundApplied, fundSelfBond []sdk.Coin) error {
 	}
 
 	if err := sdk.NewCoins(fundSelfBond...).Validate(); err != nil {
-		return sdkerrors.Wrapf(err, "The fundSelfBond is invalid coin")
+		return errorsmod.Wrapf(err, "The fundSelfBond is invalid coin")
 	}
 
 	total := sdk.NewCoins(fundApplied...).Add(fundSelfBond...)
 	if len(fundApplied)+len(fundSelfBond) != total.Len() {
-		return sdkerrors.Wrapf(ErrInvalidProposal, "the type of The token bond by the user cannot be the same as the one applied for community pool")
+		return errorsmod.Wrapf(ErrInvalidProposal, "the type of The token bond by the user cannot be the same as the one applied for community pool")
 	}
 	return ValidateReward(rewardPerBlock, total)
 }
