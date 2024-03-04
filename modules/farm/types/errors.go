@@ -23,4 +23,5 @@ var (
 	ErrBadDistribution    = sdkerrors.Register(ModuleName, 16, "community pool does not have sufficient coins to distribute")
 	ErrInvalidRefund      = sdkerrors.Register(ModuleName, 17, "invalid refund amount")
 	ErrInvalidProposal    = sdkerrors.Register(ModuleName, 18, "invalid proposal")
+	ErrEscrowInfoNotFound = sdkerrors.Register(ModuleName, 19, "the escrow information does not exist")
 )
