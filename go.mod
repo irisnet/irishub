@@ -12,7 +12,7 @@ require (
 	github.com/cosmos/iavl v0.20.1 // indirect
 	github.com/cosmos/ibc-go/v7 v7.3.0
 	github.com/evmos/ethermint v0.22.0
-	github.com/irisnet/irismod v1.8.1-0.20240304025645-05f8f91d5438
+	github.com/irisnet/irismod v1.8.1-0.20240304075720-718d99d97674 //release/v1.8.0-lsm
 )
 
 require (
@@ -232,6 +232,6 @@ require (
 replace github.com/zondax/hid => github.com/zondax/hid v0.9.0
 
 // use bianjieai fork of ethermint
-replace github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.22.0-irishub-20231207.0.20240304055900-69d5cc57579a
+replace github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.22.0-irishub-20231207.0.20240304055900-69d5cc57579a //release/v0.22.0-irishub-20231207-lsm
 
 replace github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
