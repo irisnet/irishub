@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/irisnet/irishub/v2/app/upgrades"
@@ -24,24 +23,13 @@ func (app *IrisApp) RegisterUpgradePlans() {
 	app.setupUpgradeHandlers()
 }
 
-func (app *IrisApp) appKeepers() upgrades.AppKeepers {
-	return upgrades.AppKeepers{
-		AppCodec:              app.AppCodec(),
-		HTLCKeeper:            app.HTLCKeeper,
-		BankKeeper:            app.BankKeeper,
-		AccountKeeper:         app.AccountKeeper,
-		ServiceKeeper:         app.ServiceKeeper,
-		GetKey:                app.GetKey,
-		ModuleManager:         app.mm,
-		TIBCkeeper:            app.TIBCKeeper,
-		IBCKeeper:             app.IBCKeeper,
-		EvmKeeper:             app.EvmKeeper,
-		FeeMarketKeeper:       app.FeeMarketKeeper,
-		TokenKeeper:           app.TokenKeeper,
-		ReaderWriter:          app,
-		ConsensusParamsKeeper: app.ConsensusParamsKeeper,
-		ParamsKeeper:          app.ParamsKeeper,
-		StakingKeeper:         app.StakingKeeper,
+func (app *IrisApp) upgradeTools() upgrades.Tools {
+	return upgrades.Tools{
+		AppCodec:      app.AppCodec(),
+		GetKey:        app.GetKey,
+		ModuleManager: app.mm,
+		ReaderWriter:  app,
+		AppKeepers:    app.AppKeepers,
 	}
 }
 
@@ -65,13 +53,14 @@ func (app *IrisApp) setupUpgradeStoreLoaders() {
 }
 
 func (app *IrisApp) setupUpgradeHandlers() {
+	tools := app.upgradeTools()
 	for upgradeName, upgrade := range router.Routers() {
 		app.UpgradeKeeper.SetUpgradeHandler(
 			upgradeName,
 			upgrade.UpgradeHandlerConstructor(
 				app.mm,
 				app.configurator,
-				app.appKeepers(),
+				tools,
 			),
 		)
 	}

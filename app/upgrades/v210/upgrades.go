@@ -27,7 +27,7 @@ var Upgrade = upgrades.Upgrade{
 func upgradeHandlerConstructor(
 	m *module.Manager,
 	c module.Configurator,
-	app upgrades.AppKeepers,
+	app upgrades.Tools,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		// Enable 09-localhost type in allowed clients according to

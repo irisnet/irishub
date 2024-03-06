@@ -6,6 +6,6 @@ import (
 
 // NewDefaultGenesisState generates the default state for the application.
 func NewDefaultGenesisState() types.GenesisState {
-	encCfg := MakeEncodingConfig()
+	encCfg := RegisterEncodingConfig()
 	return ModuleBasics.DefaultGenesis(encCfg.Marshaler)
 }

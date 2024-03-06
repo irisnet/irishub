@@ -8,22 +8,9 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	consensuskeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
-	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
-	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 
-	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
-
-	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
-	feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
-
-	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
-	servicekeeper "github.com/irisnet/irismod/modules/service/keeper"
-	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
+	"github.com/irisnet/irishub/v2/app/keepers"
 )
 
 // Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal
@@ -35,7 +22,7 @@ type Upgrade struct {
 	UpgradeName string
 
 	// UpgradeHandlerConstructor defines the function that creates an upgrade handler
-	UpgradeHandlerConstructor func(*module.Manager, module.Configurator, AppKeepers) upgradetypes.UpgradeHandler
+	UpgradeHandlerConstructor func(*module.Manager, module.Configurator, Tools) upgradetypes.UpgradeHandler
 
 	// Store upgrades, should be used for any new modules introduced, new modules deleted, or store names renamed.
 	StoreUpgrades *store.StoreUpgrades
@@ -46,23 +33,12 @@ type ConsensusParamsReaderWriter interface {
 	GetConsensusParams(ctx sdk.Context) *tmproto.ConsensusParams
 }
 
-type AppKeepers struct {
-	AppCodec              codec.Codec
-	HTLCKeeper            htlckeeper.Keeper
-	AccountKeeper         authkeeper.AccountKeeper
-	BankKeeper            bankkeeper.Keeper
-	ServiceKeeper         servicekeeper.Keeper
-	GetKey                func(moduleName string) *storetypes.KVStoreKey
-	ModuleManager         *module.Manager
-	TIBCkeeper            *tibckeeper.Keeper
-	IBCKeeper             *ibckeeper.Keeper
-	EvmKeeper             *evmkeeper.Keeper
-	FeeMarketKeeper       feemarketkeeper.Keeper
-	TokenKeeper           tokenkeeper.Keeper
-	ReaderWriter          ConsensusParamsReaderWriter
-	ConsensusParamsKeeper consensuskeeper.Keeper
-	ParamsKeeper          paramskeeper.Keeper
-	StakingKeeper         *stakingkeeper.Keeper
+type Tools struct {
+	AppCodec      codec.Codec
+	GetKey        func(moduleName string) *storetypes.KVStoreKey
+	ModuleManager *module.Manager
+	ReaderWriter  ConsensusParamsReaderWriter
+	keepers.AppKeepers
 }
 
 type upgradeRouter struct {
