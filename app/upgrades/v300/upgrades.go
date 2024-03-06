@@ -4,6 +4,7 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
@@ -30,21 +31,30 @@ func upgradeHandlerConstructor(
 ) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		// initialize ICS27 module
-		initICAModule(ctx,m, fromVM)
+		initICAModule(ctx, m, fromVM)
+
+		// merge liquid staking module
+		mergeLSModule(ctx, app)
 		return app.ModuleManager.RunMigrations(ctx, c, fromVM)
 	}
 }
 
-func initICAModule(ctx sdk.Context,m *module.Manager, fromVM module.VersionMap) {
+func initICAModule(ctx sdk.Context, m *module.Manager, fromVM module.VersionMap) {
 	icaModule := m.Modules[icatypes.ModuleName].(ica.AppModule)
 	fromVM[icatypes.ModuleName] = icaModule.ConsensusVersion()
 	controllerParams := icacontrollertypes.Params{}
 	hostParams := icahosttypes.Params{
-		HostEnabled: true,
+		HostEnabled:   true,
 		AllowMessages: allowMessages,
 	}
 
-	ctx.Logger().Info("start to init interchainaccount module...")
+	ctx.Logger().Info("start to run ica migrations...")
 	icaModule.InitModule(ctx, controllerParams, hostParams)
-	ctx.Logger().Info("start to run module migrations...")
+}
+
+func mergeLSModule(ctx sdk.Context, app upgrades.AppKeepers) {
+	ctx.Logger().Info("start to run lsm module migrations...")
+
+	storeKey := app.GetKey(stakingtypes.StoreKey)
+	MigrateStore(ctx, storeKey, app.AppCodec, app.StakingKeeper)
 }

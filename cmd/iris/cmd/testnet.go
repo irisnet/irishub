@@ -41,11 +41,12 @@ import (
 
 	servercfg "github.com/evmos/ethermint/server/config"
 
-	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
-	iristypes "github.com/irisnet/irishub/v2/types"
 	randomtypes "github.com/irisnet/irismod/modules/random/types"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
 	tokentypesv1 "github.com/irisnet/irismod/modules/token/types/v1"
+
+	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
+	iristypes "github.com/irisnet/irishub/v2/types"
 )
 
 var (
@@ -273,7 +274,6 @@ func InitTestnet(
 			sdk.NewCoin(sdk.DefaultBondDenom, valTokens),
 			stakingtypes.NewDescription(nodeDirName, "", "", "", ""),
 			stakingtypes.NewCommissionRates(sdk.OneDec(), sdk.OneDec(), sdk.OneDec()),
-			sdk.OneInt(),
 		)
 		if err != nil {
 			return err
