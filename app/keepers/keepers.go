@@ -114,8 +114,9 @@ import (
 	iristypes "github.com/irisnet/irishub/v2/types"
 )
 
+// AppKeepers defines a structure used to consolidate all
+// the keepers needed to run an iris app.
 type AppKeepers struct {
-
 	// keys to access the substores
 	keys    map[string]*storetypes.KVStoreKey
 	tkeys   map[string]*storetypes.TransientStoreKey
@@ -180,6 +181,10 @@ type AppKeepers struct {
 	IBCNftTransferModule nfttransfer.AppModule
 }
 
+// New initializes a new instance of AppKeepers.
+//
+// It takes in various parameters including appCodec, bApp, legacyAmino, maccPerms, modAccAddrs, blockedAddress, skipUpgradeHeights, homePath, invCheckPeriod, logger, and appOpts.
+// It returns an instance of AppKeepers.
 func New(
 	appCodec codec.Codec,
 	bApp *baseapp.BaseApp,

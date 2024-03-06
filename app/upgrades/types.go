@@ -5,7 +5,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	store "github.com/cosmos/cosmos-sdk/store/types"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
@@ -28,14 +27,15 @@ type Upgrade struct {
 	StoreUpgrades *store.StoreUpgrades
 }
 
+// ConsensusParamsReaderWriter defines the interface for reading and writing consensus params
 type ConsensusParamsReaderWriter interface {
 	StoreConsensusParams(ctx sdk.Context, cp *tmproto.ConsensusParams)
 	GetConsensusParams(ctx sdk.Context) *tmproto.ConsensusParams
 }
 
+// Tools contains all the modules necessary for an upgrade
 type Tools struct {
 	AppCodec      codec.Codec
-	GetKey        func(moduleName string) *storetypes.KVStoreKey
 	ModuleManager *module.Manager
 	ReaderWriter  ConsensusParamsReaderWriter
 	keepers.AppKeepers
@@ -45,6 +45,10 @@ type upgradeRouter struct {
 	mu map[string]Upgrade
 }
 
+// NewUpgradeRouter creates a new upgrade router.
+//
+// No parameters.
+// Returns a pointer to upgradeRouter.
 func NewUpgradeRouter() *upgradeRouter {
 	return &upgradeRouter{make(map[string]Upgrade)}
 }

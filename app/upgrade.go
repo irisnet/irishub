@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/irisnet/irishub/v2/app/upgrades"
@@ -26,7 +27,6 @@ func (app *IrisApp) RegisterUpgradePlans() {
 func (app *IrisApp) upgradeTools() upgrades.Tools {
 	return upgrades.Tools{
 		AppCodec:      app.AppCodec(),
-		GetKey:        app.GetKey,
 		ModuleManager: app.mm,
 		ReaderWriter:  app,
 		AppKeepers:    app.AppKeepers,

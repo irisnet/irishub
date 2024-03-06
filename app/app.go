@@ -23,7 +23,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/mempool"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -33,9 +32,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
-	"github.com/evmos/ethermint/ethereum/eip712"
 	srvflags "github.com/evmos/ethermint/server/flags"
 
 	irishubante "github.com/irisnet/irishub/v2/ante"
@@ -92,7 +89,8 @@ func NewIrisApp(
 		logger,
 		db,
 		encodingConfig.TxConfig.TxDecoder(),
-		baseAppOptions...)
+		baseAppOptions...,
+	)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
@@ -197,7 +195,7 @@ func NewIrisApp(
 		},
 	)
 
-	app.Inject()
+	app.Init()
 	app.SetAnteHandler(anteHandler)
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
@@ -296,35 +294,6 @@ func (app *IrisApp) InterfaceRegistry() types.InterfaceRegistry {
 	return app.interfaceRegistry
 }
 
-// GetKey returns the KVStoreKey for the provided store key.
-//
-// NOTE: This is solely to be used for testing purposes.
-func (app *IrisApp) GetKey(storeKey string) *storetypes.KVStoreKey {
-	return app.KvStoreKeys()[storeKey]
-}
-
-// GetTKey returns the TransientStoreKey for the provided store key.
-//
-// NOTE: This is solely to be used for testing purposes.
-func (app *IrisApp) GetTKey(storeKey string) *storetypes.TransientStoreKey {
-	return app.TransientStoreKeys()[storeKey]
-}
-
-// GetMemKey returns the MemStoreKey for the provided mem key.
-//
-// NOTE: This is solely used for testing purposes.
-func (app *IrisApp) GetMemKey(storeKey string) *storetypes.MemoryStoreKey {
-	return app.MemoryStoreKeys()[storeKey]
-}
-
-// GetSubspace returns a param subspace for a given module name.
-//
-// NOTE: This is solely to be used for testing purposes.
-func (app *IrisApp) GetSubspace(moduleName string) paramstypes.Subspace {
-	subspace, _ := app.ParamsKeeper.GetSubspace(moduleName)
-	return subspace
-}
-
 // SimulationManager implements the SimulationApp interface
 func (app *IrisApp) SimulationManager() *module.SimulationManager {
 	return app.sm
@@ -401,11 +370,10 @@ func (app *IrisApp) DefaultGenesis() map[string]json.RawMessage {
 	return ModuleBasics.DefaultGenesis(app.AppCodec())
 }
 
-func (app *IrisApp) Inject() {
-	eip712.InjectCodec(eip712.Codec{
-		InterfaceRegistry: app.interfaceRegistry,
-		Amino:             app.legacyAmino,
-	})
+// Init initializes the IrisApp.
+//
+func (app *IrisApp) Init() {
+	iristypes.Init(app.legacyAmino, app.interfaceRegistry)
 }
 
 // NoOpMempoolOption returns a function that sets up a no-op mempool for the given BaseApp.

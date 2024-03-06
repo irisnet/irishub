@@ -99,14 +99,26 @@ func (appKeepers *AppKeepers) genStoreKeys() {
 
 }
 
+// KvStoreKeys returns the map of string to KVStoreKey.
+//
+// None.
+// map[string]*storetypes.KVStoreKey.
 func (appKeepers *AppKeepers) KvStoreKeys() map[string]*storetypes.KVStoreKey {
 	return appKeepers.keys
 }
 
+// TransientStoreKeys returns the map of transient store keys.
+//
+// No parameters.
+// Returns a map[string]*storetypes.TransientStoreKey.
 func (appKeepers *AppKeepers) TransientStoreKeys() map[string]*storetypes.TransientStoreKey {
 	return appKeepers.tkeys
 }
 
+// MemoryStoreKeys returns the map of type map[string]*storetypes.MemoryStoreKey.
+//
+// No parameters.
+// Returns a map of type map[string]*storetypes.MemoryStoreKey.
 func (appKeepers *AppKeepers) MemoryStoreKeys() map[string]*storetypes.MemoryStoreKey {
 	return appKeepers.memKeys
 }
