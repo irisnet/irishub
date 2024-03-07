@@ -1,9 +1,10 @@
 package keepers
 
 import (
+	"github.com/spf13/cast"
+
 	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
-	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -30,6 +31,7 @@ import (
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
@@ -56,8 +58,6 @@ import (
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	"github.com/evmos/ethermint/x/evm/vm/geth"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
-
-	"github.com/spf13/cast"
 
 	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
 	icahostkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/keeper"
@@ -121,7 +121,14 @@ type AppKeepers struct {
 	tkeys   map[string]*storetypes.TransientStoreKey
 	memKeys map[string]*storetypes.MemoryStoreKey
 
-	// cosmos
+	scopedIBCKeeper         capabilitykeeper.ScopedKeeper
+	scopedTransferKeeper    capabilitykeeper.ScopedKeeper
+	scopedIBCMockKeeper     capabilitykeeper.ScopedKeeper
+	scopedNFTTransferKeeper capabilitykeeper.ScopedKeeper
+	scopedICAHostKeeper     capabilitykeeper.ScopedKeeper
+	scopedTIBCKeeper        capabilitykeeper.ScopedKeeper
+	scopedTIBCMockKeeper    capabilitykeeper.ScopedKeeper
+
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	AccountKeeper         authkeeper.AccountKeeper
 	BankKeeper            bankkeeper.Keeper
@@ -137,23 +144,10 @@ type AppKeepers struct {
 	EvidenceKeeper        *evidencekeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	ConsensusParamsKeeper consensuskeeper.Keeper
-
-	// ibc
-	IBCKeeper            *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	IBCTransferKeeper    ibctransferkeeper.Keeper
-	IBCNFTTransferKeeper ibcnfttransferkeeper.Keeper
-	ICAHostKeeper        icahostkeeper.Keeper
-
-	// make scoped keepers public for test purposes
-	scopedIBCKeeper         capabilitykeeper.ScopedKeeper
-	scopedTransferKeeper    capabilitykeeper.ScopedKeeper
-	scopedIBCMockKeeper     capabilitykeeper.ScopedKeeper
-	scopedNFTTransferKeeper capabilitykeeper.ScopedKeeper
-	scopedICAHostKeeper     capabilitykeeper.ScopedKeeper
-	// tibc
-	scopedTIBCKeeper     capabilitykeeper.ScopedKeeper
-	scopedTIBCMockKeeper capabilitykeeper.ScopedKeeper
-
+	IBCKeeper             *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	IBCTransferKeeper     ibctransferkeeper.Keeper
+	IBCNFTTransferKeeper  ibcnfttransferkeeper.Keeper
+	ICAHostKeeper         icahostkeeper.Keeper
 	GuardianKeeper        guardiankeeper.Keeper
 	TokenKeeper           tokenkeeper.Keeper
 	RecordKeeper          recordkeeper.Keeper
@@ -168,10 +162,8 @@ type AppKeepers struct {
 	TIBCKeeper            *tibckeeper.Keeper
 	TIBCNFTTransferKeeper tibcnfttransferkeeper.Keeper
 	TIBCMTTransferKeeper  tibcmttransferkeeper.Keeper
-
-	// Ethermint keepers
-	EvmKeeper       *evmkeeper.Keeper
-	FeeMarketKeeper feemarketkeeper.Keeper
+	EvmKeeper             *evmkeeper.Keeper
+	FeeMarketKeeper       feemarketkeeper.Keeper
 
 	TransferModule       transfer.AppModule
 	ICAModule            ica.AppModule
