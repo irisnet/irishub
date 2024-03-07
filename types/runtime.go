@@ -25,21 +25,14 @@ const (
 
 var (
 	// NativeToken represents the native token
-	NativeToken     tokenv1.Token
+	NativeToken tokenv1.Token
 	// EvmToken represents the EVM token
-	EvmToken        tokenv1.Token
+	EvmToken tokenv1.Token
 	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome string
 )
 
-// Init initializes the legacyAmino and interfaceRegistry.
-// Parameters: legacyAmino *codec.LegacyAmino, interfaceRegistry types.InterfaceRegistry.
-func Init(legacyAmino *codec.LegacyAmino, interfaceRegistry types.InterfaceRegistry) {
-	initApp()
-	initEVM(legacyAmino, interfaceRegistry)
-}
-
-func initApp() {
+func init() {
 	// set bech32 prefix
 	ConfigureBech32Prefix()
 
@@ -92,10 +85,12 @@ func initApp() {
 		NativeToken.Mintable,
 		owner,
 	)
+
+	etherminttypes.InjectChainIDParser(parseChainID)
 }
 
-func initEVM(legacyAmino *codec.LegacyAmino, interfaceRegistry types.InterfaceRegistry) {
-	etherminttypes.InjectChainIDParser(parseChainID)
+// InjectCodec injects an app codec
+func InjectCodec(legacyAmino *codec.LegacyAmino, interfaceRegistry types.InterfaceRegistry) {
 	eip712.InjectCodec(eip712.Codec{
 		InterfaceRegistry: interfaceRegistry,
 		Amino:             legacyAmino,

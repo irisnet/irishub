@@ -200,8 +200,6 @@ func NewIrisApp(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
-
-	// Set software upgrade execution logic
 	app.RegisterUpgradePlans()
 
 	if loadLatest {
@@ -372,7 +370,7 @@ func (app *IrisApp) DefaultGenesis() map[string]json.RawMessage {
 
 // Init initializes the IrisApp.
 func (app *IrisApp) Init() {
-	iristypes.Init(app.legacyAmino, app.interfaceRegistry)
+	iristypes.InjectCodec(app.legacyAmino, app.interfaceRegistry)
 }
 
 // NoOpMempoolOption returns a function that sets up a no-op mempool for the given BaseApp.
