@@ -16,9 +16,10 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	ethermint "github.com/evmos/ethermint/types"
+
+	"github.com/irisnet/irishub/v2/app/keepers"
 )
 
 var _ authtypes.QueryServer = authQueryServer{}
@@ -28,16 +29,16 @@ type authQueryServer struct {
 	k   authkeeper.AccountKeeper
 }
 
-// OverrideAuthServices overrides auth query service
-func OverrideAuthServices(cfg module.Configurator,
-	key storetypes.StoreKey,
-	k authkeeper.AccountKeeper,
-	ls paramstypes.Subspace,
-) {
+// overrideAuthServices overrides auth query service
+func overrideAuthServices(cfg module.Configurator, appKeepers keepers.AppKeepers) {
+	k := appKeepers.AccountKeeper
+	key := appKeepers.GetKey(authtypes.StoreKey)
+	ss := appKeepers.GetSubspace(authtypes.ModuleName)
+
 	types.RegisterMsgServer(cfg.MsgServer(), authkeeper.NewMsgServerImpl(k))
 	types.RegisterQueryServer(cfg.QueryServer(), authQueryServer{key, k})
 
-	m := authkeeper.NewMigrator(k, cfg.QueryServer(), ls)
+	m := authkeeper.NewMigrator(k, cfg.QueryServer(), ss)
 	if err := cfg.RegisterMigration(types.ModuleName, 3, m.Migrate3to4); err != nil {
 		panic(fmt.Sprintf("failed to migrate x/%s from version 3 to 4: %v", types.ModuleName, err))
 	}

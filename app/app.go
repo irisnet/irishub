@@ -322,17 +322,7 @@ func (app *IrisApp) RegisterServices() {
 		if !ok {
 			panic("unable to cast mod into AppModule")
 		}
-
-		if m.Name() == authtypes.ModuleName {
-			rpc.OverrideAuthServices(app.configurator,
-				app.GetKey(authtypes.StoreKey),
-				app.AccountKeeper,
-				app.GetSubspace(authtypes.ModuleName))
-		} else {
-			if mod, ok := mod.(module.HasServices); ok {
-				mod.RegisterServices(app.configurator)
-			}
-		}
+		rpc.RegisterService(m, app.configurator, app.AppKeepers)
 	}
 }
 
