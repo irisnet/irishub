@@ -3,12 +3,9 @@ package simapp
 import (
 	"encoding/json"
 	"io"
-	"os"
-	"path/filepath"
 
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
-	"github.com/cometbft/cometbft/crypto"
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
@@ -67,9 +64,6 @@ import (
 
 	simappparams "cosmossdk.io/simapp/params"
 
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
-	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
-
 	"github.com/irisnet/irishub/v2/client/lite"
 	"github.com/irisnet/irishub/v2/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/v2/modules/guardian/keeper"
@@ -86,14 +80,6 @@ import (
 const appName = "SimApp"
 
 var (
-	// DefaultNodeHome default home directories for the application daemon
-	DefaultNodeHome string
-
-	// Denominations can be 3 ~ 128 characters long and support letters, followed by either
-	// a letter, a number, ('-'), or a separator ('/').
-	// overwite sdk reDnmString
-	reDnmString = `[a-zA-Z][a-zA-Z0-9/-]{2,127}`
-
 	// ModuleBasics defines the module BasicManager is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
 	// and genesis verification.
@@ -123,7 +109,6 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 	}
 
-	nativeToken tokenv1.Token
 )
 
 var (
@@ -172,52 +157,6 @@ type SimApp struct {
 	transferModule    transfer.AppModule
 	nfttransferModule tibcnfttransfer.AppModule
 	mttransferModule  tibcmttransfer.AppModule
-}
-
-func init() {
-	// set bech32 prefix
-	iristypes.ConfigureBech32Prefix()
-
-	// set coin denom regexs
-	sdk.SetCoinDenomRegex(DefaultCoinDenomRegex)
-
-	nativeToken = tokenv1.Token{
-		Symbol:        "iris",
-		Name:          "Irishub staking token",
-		Scale:         6,
-		MinUnit:       "uiris",
-		InitialSupply: 2000000000,
-		MaxSupply:     10000000000,
-		Mintable:      true,
-		Owner:         sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))).String(),
-	}
-
-	userHomeDir, err := os.UserHomeDir()
-	if err != nil {
-		panic(err)
-	}
-
-	DefaultNodeHome = filepath.Join(userHomeDir, ".iris")
-	owner, err := sdk.AccAddressFromBech32(nativeToken.Owner)
-	if err != nil {
-		panic(err)
-	}
-
-	tokenv1.SetNativeToken(
-		nativeToken.Symbol,
-		nativeToken.Name,
-		nativeToken.MinUnit,
-		nativeToken.Scale,
-		nativeToken.InitialSupply,
-		nativeToken.MaxSupply,
-		nativeToken.Mintable,
-		owner,
-	)
-}
-
-// DefaultCoinDenomRegex returns the default regex string
-func DefaultCoinDenomRegex() string {
-	return reDnmString
 }
 
 // NewSimApp returns a reference to an initialized IrisApp.
