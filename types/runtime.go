@@ -16,8 +16,6 @@ import (
 
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
-
-	"github.com/irisnet/irishub/v2/address"
 )
 
 const (
@@ -43,7 +41,7 @@ func Init(legacyAmino *codec.LegacyAmino, interfaceRegistry types.InterfaceRegis
 
 func initApp() {
 	// set bech32 prefix
-	address.ConfigureBech32Prefix()
+	ConfigureBech32Prefix()
 
 	// set coin denom regexs
 	sdk.SetCoinDenomRegex(func() string {

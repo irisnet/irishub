@@ -105,7 +105,6 @@ import (
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
 
-	"github.com/irisnet/irishub/v2/address"
 	guardiankeeper "github.com/irisnet/irishub/v2/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
 	"github.com/irisnet/irishub/v2/modules/internft"
@@ -240,7 +239,7 @@ func New(
 		appKeepers.keys[authtypes.StoreKey],
 		ethermint.ProtoAccount,
 		maccPerms,
-		address.Bech32PrefixAccAddr,
+		iristypes.Bech32PrefixAccAddr,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 

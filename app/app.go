@@ -35,11 +35,11 @@ import (
 
 	srvflags "github.com/evmos/ethermint/server/flags"
 
-	irishubante "github.com/irisnet/irishub/v2/ante"
+	irishubante "github.com/irisnet/irishub/v2/app/ante"
 	"github.com/irisnet/irishub/v2/app/keepers"
 	"github.com/irisnet/irishub/v2/app/params"
-	"github.com/irisnet/irishub/v2/lite"
-	"github.com/irisnet/irishub/v2/rpc"
+	"github.com/irisnet/irishub/v2/app/rpc"
+	"github.com/irisnet/irishub/v2/client/lite"
 	iristypes "github.com/irisnet/irishub/v2/types"
 )
 
@@ -326,7 +326,7 @@ func (app *IrisApp) RegisterServices() {
 		}
 
 		if m.Name() == authtypes.ModuleName {
-			rpc.RegisterAuthServices(app.configurator,
+			rpc.OverrideAuthServices(app.configurator,
 				app.GetKey(authtypes.StoreKey),
 				app.AccountKeeper,
 				app.GetSubspace(authtypes.ModuleName))
@@ -371,7 +371,6 @@ func (app *IrisApp) DefaultGenesis() map[string]json.RawMessage {
 }
 
 // Init initializes the IrisApp.
-//
 func (app *IrisApp) Init() {
 	iristypes.Init(app.legacyAmino, app.interfaceRegistry)
 }

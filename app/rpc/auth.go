@@ -28,10 +28,12 @@ type authQueryServer struct {
 	k   authkeeper.AccountKeeper
 }
 
-func RegisterAuthServices(cfg module.Configurator,
+// OverrideAuthServices overrides auth query service
+func OverrideAuthServices(cfg module.Configurator,
 	key storetypes.StoreKey,
 	k authkeeper.AccountKeeper,
-	ls paramstypes.Subspace) {
+	ls paramstypes.Subspace,
+) {
 	types.RegisterMsgServer(cfg.MsgServer(), authkeeper.NewMsgServerImpl(k))
 	types.RegisterQueryServer(cfg.QueryServer(), authQueryServer{key, k})
 

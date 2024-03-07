@@ -70,14 +70,14 @@ import (
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
 
-	"github.com/irisnet/irishub/v2/address"
-	"github.com/irisnet/irishub/v2/lite"
+	"github.com/irisnet/irishub/v2/client/lite"
 	"github.com/irisnet/irishub/v2/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/v2/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
 	"github.com/irisnet/irishub/v2/modules/mint"
 	mintkeeper "github.com/irisnet/irishub/v2/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/v2/modules/mint/types"
+	iristypes "github.com/irisnet/irishub/v2/types"
 
 	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
 	tibcnfttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer"
@@ -176,7 +176,7 @@ type SimApp struct {
 
 func init() {
 	// set bech32 prefix
-	address.ConfigureBech32Prefix()
+	iristypes.ConfigureBech32Prefix()
 
 	// set coin denom regexs
 	sdk.SetCoinDenomRegex(DefaultCoinDenomRegex)
@@ -310,7 +310,7 @@ func NewSimApp(
 		keys[authtypes.StoreKey],
 		authtypes.ProtoBaseAccount,
 		maccPerms,
-		address.Bech32PrefixAccAddr,
+		iristypes.Bech32PrefixAccAddr,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -662,8 +662,8 @@ func (app *SimApp) TxConfig() client.TxConfig {
 }
 
 // DefaultGenesis returns a default genesis from the registered AppModuleBasic's.
-func (a *SimApp) DefaultGenesis() map[string]json.RawMessage {
-	return ModuleBasics.DefaultGenesis(a.AppCodec())
+func (app *SimApp) DefaultGenesis() map[string]json.RawMessage {
+	return ModuleBasics.DefaultGenesis(app.AppCodec())
 }
 
 // AppCodec returns IrisApp's app codec.
@@ -750,6 +750,7 @@ func (app *SimApp) RegisterTendermintService(clientCtx client.Context) {
 	)
 }
 
+// RegisterNodeService registers the node gRPC service.
 func (app *SimApp) RegisterNodeService(clientCtx client.Context) {
 	nodeservice.RegisterNodeService(clientCtx, app.GRPCQueryRouter())
 }

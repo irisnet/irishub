@@ -10,7 +10,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/v2/address"
+	"github.com/irisnet/irishub/v2/types"
 )
 
 // nolint: deadcode unused
@@ -24,7 +24,7 @@ var (
 )
 
 func init() {
-	address.ConfigureBech32Prefix()
+	types.ConfigureBech32Prefix()
 }
 
 // ----------------------------------------------
