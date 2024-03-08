@@ -105,6 +105,7 @@ import (
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
 
+	"github.com/irisnet/irishub/v2/modules/axelar"
 	guardiankeeper "github.com/irisnet/irishub/v2/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
 	"github.com/irisnet/irishub/v2/modules/internft"
@@ -395,7 +396,6 @@ func New(
 		appKeepers.scopedTransferKeeper,
 	)
 	appKeepers.TransferModule = transfer.NewAppModule(appKeepers.IBCTransferKeeper)
-	transferIBCModule := transfer.NewIBCModule(appKeepers.IBCTransferKeeper)
 
 	appKeepers.IBCNFTTransferKeeper = ibcnfttransferkeeper.NewKeeper(
 		appCodec,
@@ -411,10 +411,16 @@ func New(
 	appKeepers.IBCNftTransferModule = nfttransfer.NewAppModule(appKeepers.IBCNFTTransferKeeper)
 	nfttransferIBCModule := nfttransfer.NewIBCModule(appKeepers.IBCNFTTransferKeeper)
 
+
+	// create IBC module from bottom to top of stack
+	var transferStack porttypes.IBCModule
+	transferStack = transfer.NewIBCModule(appKeepers.IBCTransferKeeper)
+	transferStack = axelar.NewIBCMiddleware(transferStack,nil)
+
 	// routerModule := router.NewAppModule(app.RouterKeeper, transferIBCModule)
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter().
-		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
+		AddRoute(ibctransfertypes.ModuleName, transferStack).
 		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule).
 		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule)
 	appKeepers.IBCKeeper.SetRouter(ibcRouter)
