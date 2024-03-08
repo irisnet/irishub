@@ -21,7 +21,7 @@ type Upgrade struct {
 	UpgradeName string
 
 	// UpgradeHandlerConstructor defines the function that creates an upgrade handler
-	UpgradeHandlerConstructor func(*module.Manager, module.Configurator, Tools) upgradetypes.UpgradeHandler
+	UpgradeHandlerConstructor func(*module.Manager, module.Configurator, Toolbox) upgradetypes.UpgradeHandler
 
 	// Store upgrades, should be used for any new modules introduced, new modules deleted, or store names renamed.
 	StoreUpgrades *store.StoreUpgrades
@@ -33,8 +33,8 @@ type ConsensusParamsReaderWriter interface {
 	GetConsensusParams(ctx sdk.Context) *tmproto.ConsensusParams
 }
 
-// Tools contains all the modules necessary for an upgrade
-type Tools struct {
+// Toolbox contains all the modules necessary for an upgrade
+type Toolbox struct {
 	AppCodec      codec.Codec
 	ModuleManager *module.Manager
 	ReaderWriter  ConsensusParamsReaderWriter

@@ -24,8 +24,8 @@ func (app *IrisApp) RegisterUpgradePlans() {
 	app.setupUpgradeHandlers()
 }
 
-func (app *IrisApp) upgradeTools() upgrades.Tools {
-	return upgrades.Tools{
+func (app *IrisApp) toolbox() upgrades.Toolbox {
+	return upgrades.Toolbox{
 		AppCodec:      app.AppCodec(),
 		ModuleManager: app.mm,
 		ReaderWriter:  app,
@@ -53,14 +53,14 @@ func (app *IrisApp) setupUpgradeStoreLoaders() {
 }
 
 func (app *IrisApp) setupUpgradeHandlers() {
-	tools := app.upgradeTools()
+	box := app.toolbox()
 	for upgradeName, upgrade := range router.Routers() {
 		app.UpgradeKeeper.SetUpgradeHandler(
 			upgradeName,
 			upgrade.UpgradeHandlerConstructor(
 				app.mm,
 				app.configurator,
-				tools,
+				box,
 			),
 		)
 	}
