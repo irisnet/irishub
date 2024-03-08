@@ -22,6 +22,7 @@ import (
 	irisevm "github.com/irisnet/irishub/v2/modules/evm"
 )
 
+// Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal
 var Upgrade = upgrades.Upgrade{
 	UpgradeName:               "v2.0",
 	UpgradeHandlerConstructor: upgradeHandlerConstructor,
@@ -34,17 +35,17 @@ var Upgrade = upgrades.Upgrade{
 func upgradeHandlerConstructor(
 	m *module.Manager,
 	c module.Configurator,
-	app upgrades.AppKeepers,
+	box upgrades.Toolbox,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		fromVM[evmtypes.ModuleName] = irisevm.AppModule{}.ConsensusVersion()
 		fromVM[feemarkettypes.ModuleName] = feemarket.AppModule{}.ConsensusVersion()
 
-		if err := app.EvmKeeper.SetParams(ctx, evmParams); err != nil {
+		if err := box.EvmKeeper.SetParams(ctx, evmParams); err != nil {
 			return nil, err
 		}
 
-		if err := app.FeeMarketKeeper.SetParams(ctx, generateFeemarketParams(ctx.BlockHeight())); err != nil {
+		if err := box.FeeMarketKeeper.SetParams(ctx, generateFeemarketParams(ctx.BlockHeight())); err != nil {
 			return nil, err
 		}
 
@@ -53,29 +54,29 @@ func upgradeHandlerConstructor(
 		if err != nil {
 			return nil, err
 		}
-		if err := app.TokenKeeper.UnsafeTransferTokenOwner(ctx, evmToken.Symbol, owner); err != nil {
+		if err := box.TokenKeeper.UnsafeTransferTokenOwner(ctx, evmToken.Symbol, owner); err != nil {
 			return nil, err
 		}
 
 		//update consensusParams.Block.MaxGas
-		consensusParams := app.ReaderWriter.GetConsensusParams(ctx)
+		consensusParams := box.ReaderWriter.GetConsensusParams(ctx)
 		consensusParams.Block.MaxGas = maxBlockGas
-		app.ReaderWriter.StoreConsensusParams(ctx, consensusParams)
+		box.ReaderWriter.StoreConsensusParams(ctx, consensusParams)
 
 		//add Burner Permission for authtypes.FeeCollectorName
-		feeModuleAccount := app.AccountKeeper.GetModuleAccount(ctx, authtypes.FeeCollectorName)
+		feeModuleAccount := box.AccountKeeper.GetModuleAccount(ctx, authtypes.FeeCollectorName)
 		account, ok := feeModuleAccount.(*authtypes.ModuleAccount)
 		if !ok {
 			return nil, fmt.Errorf("feeCollector accountis not *authtypes.ModuleAccount")
 		}
 		account.Permissions = append(account.Permissions, authtypes.Burner)
-		app.AccountKeeper.SetModuleAccount(ctx, account)
+		box.AccountKeeper.SetModuleAccount(ctx, account)
 
 		// delete ica moudule version from upgrade moudule
-		store := ctx.KVStore(app.GetKey(upgradetypes.StoreKey))
+		store := ctx.KVStore(box.GetKey(upgradetypes.StoreKey))
 		versionStore := prefix.NewStore(store, []byte{types.VersionMapByte})
 		versionStore.Delete([]byte(icatypes.ModuleName))
 
-		return app.ModuleManager.RunMigrations(ctx, c, fromVM)
+		return box.ModuleManager.RunMigrations(ctx, c, fromVM)
 	}
 }

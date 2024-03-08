@@ -27,15 +27,15 @@ var Upgrade = upgrades.Upgrade{
 func upgradeHandlerConstructor(
 	m *module.Manager,
 	c module.Configurator,
-	app upgrades.AppKeepers,
+	box upgrades.Toolbox,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		// initialize ICS27 module
 		initICAModule(ctx, m, fromVM)
 
 		// merge liquid staking module
-		mergeLSModule(ctx, app)
-		return app.ModuleManager.RunMigrations(ctx, c, fromVM)
+		mergeLSModule(ctx, box)
+		return box.ModuleManager.RunMigrations(ctx, c, fromVM)
 	}
 }
 
@@ -52,9 +52,9 @@ func initICAModule(ctx sdk.Context, m *module.Manager, fromVM module.VersionMap)
 	icaModule.InitModule(ctx, controllerParams, hostParams)
 }
 
-func mergeLSModule(ctx sdk.Context, app upgrades.AppKeepers) {
+func mergeLSModule(ctx sdk.Context, box upgrades.Toolbox) {
 	ctx.Logger().Info("start to run lsm module migrations...")
 
-	storeKey := app.GetKey(stakingtypes.StoreKey)
-	MigrateStore(ctx, storeKey, app.AppCodec, app.StakingKeeper)
+	storeKey := box.GetKey(stakingtypes.StoreKey)
+	MigrateStore(ctx, storeKey, box.AppCodec, box.StakingKeeper)
 }

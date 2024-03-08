@@ -43,11 +43,14 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 		}
 	}()
 
+	encfg := RegisterEncodingConfig()
+
 	app := NewIrisApp(
 		logger,
 		db,
 		nil,
 		true,
+		encfg,
 		EmptyAppOptions{},
 		interBlockCacheOpt(),
 	)
@@ -107,11 +110,14 @@ func BenchmarkInvariants(b *testing.B) {
 		}
 	}()
 
+	encfg := RegisterEncodingConfig()
+
 	app := NewIrisApp(
 		logger,
 		db,
 		nil,
 		true,
+		encfg,
 		EmptyAppOptions{},
 		interBlockCacheOpt(),
 	)

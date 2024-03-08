@@ -39,7 +39,7 @@ import (
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
-	encodingConfig := app.MakeConfig(app.ModuleBasics)
+	encodingConfig := app.RegisterEncodingConfig()
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Marshaler).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
@@ -132,7 +132,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		ethermintdebug.Cmd(),
 		config.Cmd(),
 		mergeGenesisCmd(encodingConfig),
-		pruning.PruningCmd(ac.newApp),
+		pruning.Cmd(ac.newApp, iristypes.DefaultNodeHome),
 	)
 
 	ethermintserver.AddCommands(
@@ -167,8 +167,8 @@ func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command
 		iristypes.DefaultNodeHome,
 	)
 
-	for _, sub_cmd := range cmds {
-		cmd.AddCommand(sub_cmd)
+	for _, subCmd := range cmds {
+		cmd.AddCommand(subCmd)
 	}
 	return cmd
 }
@@ -188,7 +188,6 @@ func queryCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		authcmd.GetAccountCmd(),
 		rpc.ValidatorCommand(),
 		rpc.BlockCommand(),
 		authcmd.QueryTxsByEventsCmd(),
@@ -239,7 +238,11 @@ func (ac appCreator) newApp(
 ) servertypes.Application {
 	baseappOptions := server.DefaultBaseappOptions(appOpts)
 	return app.NewIrisApp(
-		logger, db, traceStore, true,
+		logger,
+		db,
+		traceStore,
+		true,
+		ac.encCfg,
 		appOpts,
 		baseappOptions...,
 	)
@@ -271,6 +274,7 @@ func (ac appCreator) appExport(
 		db,
 		traceStore,
 		loadLatest,
+		ac.encCfg,
 		appOpts,
 	)
 

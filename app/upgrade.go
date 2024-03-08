@@ -24,24 +24,12 @@ func (app *IrisApp) RegisterUpgradePlans() {
 	app.setupUpgradeHandlers()
 }
 
-func (app *IrisApp) appKeepers() upgrades.AppKeepers {
-	return upgrades.AppKeepers{
-		AppCodec:              app.AppCodec(),
-		HTLCKeeper:            app.HTLCKeeper,
-		BankKeeper:            app.BankKeeper,
-		AccountKeeper:         app.AccountKeeper,
-		ServiceKeeper:         app.ServiceKeeper,
-		GetKey:                app.GetKey,
-		ModuleManager:         app.mm,
-		TIBCkeeper:            app.TIBCKeeper,
-		IBCKeeper:             app.IBCKeeper,
-		EvmKeeper:             app.EvmKeeper,
-		FeeMarketKeeper:       app.FeeMarketKeeper,
-		TokenKeeper:           app.TokenKeeper,
-		ReaderWriter:          app,
-		ConsensusParamsKeeper: app.ConsensusParamsKeeper,
-		ParamsKeeper:          app.ParamsKeeper,
-		StakingKeeper:         app.StakingKeeper,
+func (app *IrisApp) toolbox() upgrades.Toolbox {
+	return upgrades.Toolbox{
+		AppCodec:      app.AppCodec(),
+		ModuleManager: app.mm,
+		ReaderWriter:  app,
+		AppKeepers:    app.AppKeepers,
 	}
 }
 
@@ -65,13 +53,14 @@ func (app *IrisApp) setupUpgradeStoreLoaders() {
 }
 
 func (app *IrisApp) setupUpgradeHandlers() {
+	box := app.toolbox()
 	for upgradeName, upgrade := range router.Routers() {
 		app.UpgradeKeeper.SetUpgradeHandler(
 			upgradeName,
 			upgrade.UpgradeHandlerConstructor(
 				app.mm,
 				app.configurator,
-				app.appKeepers(),
+				box,
 			),
 		)
 	}

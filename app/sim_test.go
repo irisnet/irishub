@@ -96,11 +96,14 @@ func TestFullAppSimulation(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
+	encfg := RegisterEncodingConfig()
+
 	app := NewIrisApp(
 		logger,
 		db,
 		nil,
 		true,
+		encfg,
 		EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
@@ -151,11 +154,13 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
+	encfg := RegisterEncodingConfig()
 	app := NewIrisApp(
 		logger,
 		db,
 		nil,
 		true,
+		encfg,
 		EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
@@ -209,6 +214,7 @@ func TestAppImportExport(t *testing.T) {
 		newDB,
 		nil,
 		true,
+		encfg,
 		EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
@@ -237,45 +243,45 @@ func TestAppImportExport(t *testing.T) {
 	fmt.Printf("comparing stores...\n")
 
 	storeKeysPrefixes := []StoreKeysPrefixes{
-		{app.keys[authtypes.StoreKey], newApp.keys[authtypes.StoreKey], [][]byte{}},
-		{app.keys[stakingtypes.StoreKey], newApp.keys[stakingtypes.StoreKey],
+		{app.AppKeepers.KvStoreKeys()[authtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[authtypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[stakingtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[stakingtypes.StoreKey],
 			[][]byte{
 				stakingtypes.UnbondingQueueKey, stakingtypes.RedelegationQueueKey, stakingtypes.ValidatorQueueKey,
 				stakingtypes.HistoricalInfoKey,
 			}}, // ordering may change but it doesn't matter
-		{app.keys[slashingtypes.StoreKey], newApp.keys[slashingtypes.StoreKey], [][]byte{}},
-		{app.keys[minttypes.StoreKey], newApp.keys[minttypes.StoreKey], [][]byte{}},
-		{app.keys[distrtypes.StoreKey], newApp.keys[distrtypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[slashingtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[slashingtypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[minttypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[minttypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[distrtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[distrtypes.StoreKey], [][]byte{}},
 		{
-			app.keys[banktypes.StoreKey],
-			newApp.keys[banktypes.StoreKey],
+			app.AppKeepers.KvStoreKeys()[banktypes.StoreKey],
+			newApp.AppKeepers.KvStoreKeys()[banktypes.StoreKey],
 			[][]byte{banktypes.BalancesPrefix},
 		},
-		{app.keys[paramtypes.StoreKey], newApp.keys[paramtypes.StoreKey], [][]byte{}},
-		{app.keys[govtypes.StoreKey], newApp.keys[govtypes.StoreKey], [][]byte{}},
-		{app.keys[evidencetypes.StoreKey], newApp.keys[evidencetypes.StoreKey], [][]byte{}},
-		{app.keys[capabilitytypes.StoreKey], newApp.keys[capabilitytypes.StoreKey], [][]byte{}},
-		{app.keys[ibcexported.StoreKey], newApp.keys[ibcexported.StoreKey], [][]byte{}},
-		{app.keys[ibctransfertypes.StoreKey], newApp.keys[ibctransfertypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[paramtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[paramtypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[govtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[govtypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[evidencetypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[evidencetypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[capabilitytypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[capabilitytypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[ibcexported.StoreKey], newApp.AppKeepers.KvStoreKeys()[ibcexported.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[ibctransfertypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[ibctransfertypes.StoreKey], [][]byte{}},
 
 		// check irismod module
-		{app.keys[tokentypes.StoreKey], newApp.keys[tokentypes.StoreKey], [][]byte{}},
-		{app.keys[oracletypes.StoreKey], newApp.keys[oracletypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[tokentypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[tokentypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[oracletypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[oracletypes.StoreKey], [][]byte{}},
 		//mt.Supply is InitSupply, can be not equal to TotalSupply
-		{app.keys[mttypes.StoreKey], newApp.keys[mttypes.StoreKey], [][]byte{mttypes.PrefixMT}},
-		{app.keys[nfttypes.StoreKey], newApp.keys[nfttypes.StoreKey], [][]byte{{0x05}}},
+		{app.AppKeepers.KvStoreKeys()[mttypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[mttypes.StoreKey], [][]byte{mttypes.PrefixMT}},
+		{app.AppKeepers.KvStoreKeys()[nfttypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[nfttypes.StoreKey], [][]byte{{0x05}}},
 		{
-			app.keys[servicetypes.StoreKey],
-			newApp.keys[servicetypes.StoreKey],
+			app.AppKeepers.KvStoreKeys()[servicetypes.StoreKey],
+			newApp.AppKeepers.KvStoreKeys()[servicetypes.StoreKey],
 			[][]byte{servicetypes.InternalCounterKey},
 		},
 		{
-			app.keys[randomtypes.StoreKey],
-			newApp.keys[randomtypes.StoreKey],
+			app.AppKeepers.KvStoreKeys()[randomtypes.StoreKey],
+			newApp.AppKeepers.KvStoreKeys()[randomtypes.StoreKey],
 			[][]byte{randomtypes.RandomKey},
 		},
-		{app.keys[htlctypes.StoreKey], newApp.keys[htlctypes.StoreKey], [][]byte{}},
-		{app.keys[coinswaptypes.StoreKey], newApp.keys[coinswaptypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[htlctypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[htlctypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[coinswaptypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[coinswaptypes.StoreKey], [][]byte{}},
 	}
 
 	for _, skp := range storeKeysPrefixes {
@@ -308,6 +314,7 @@ func TestAppImportExport(t *testing.T) {
 func TestAppSimulationAfterImport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
 	config.ChainID = AppChainID
+	encfg  := RegisterEncodingConfig()
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(
 		config,
@@ -332,6 +339,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		db,
 		nil,
 		true,
+		encfg,
 		EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
@@ -390,6 +398,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		newDB,
 		nil,
 		true,
+		encfg,
 		EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
@@ -430,6 +439,7 @@ func TestAppStateDeterminism(t *testing.T) {
 	numSeeds := 3
 	numTimesToRunPerSeed := 5
 	appHashList := make([]json.RawMessage, numTimesToRunPerSeed)
+	encfg  := RegisterEncodingConfig()
 
 	for i := 0; i < numSeeds; i++ {
 		config.Seed = rand.Int63()
@@ -448,6 +458,7 @@ func TestAppStateDeterminism(t *testing.T) {
 				db,
 				nil,
 				true,
+				encfg,
 				EmptyAppOptions{},
 				interBlockCacheOpt(),
 			)

@@ -107,7 +107,7 @@ check-evm-chain-id:
 	@echo "note: EVM_CHAIN_ID is $(EVM_CHAIN_ID)"
 
 update-swagger-docs: statik proto-swagger-gen
-	$(BINDIR)/statik -src=lite/swagger-ui -dest=lite -f -m
+	$(BINDIR)/statik -src=client/lite/swagger-ui -dest=lite -f -m
 	@if [ -n "$(git status --porcelain)" ]; then \
         echo "\033[91mSwagger docs are out of sync!!!\033[0m";\
         exit 1;\
