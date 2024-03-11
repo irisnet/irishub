@@ -13,7 +13,7 @@ import (
 
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
-	"github.com/irisnet/irishub/v2/app/upgrades"
+	"github.com/irisnet/irishub/v3/app/upgrades"
 )
 
 // Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal

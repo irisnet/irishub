@@ -43,8 +43,8 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	minttypes "github.com/irisnet/irishub/v2/modules/mint/types"
-	iristypes "github.com/irisnet/irishub/v2/types"
+	minttypes "github.com/irisnet/irishub/v3/modules/mint/types"
+	iristypes "github.com/irisnet/irishub/v3/types"
 )
 
 func setup(withGenesis bool, invCheckPeriod uint) (*SimApp, GenesisState) {

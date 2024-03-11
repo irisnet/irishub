@@ -64,14 +64,14 @@ import (
 
 	simappparams "cosmossdk.io/simapp/params"
 
-	"github.com/irisnet/irishub/v2/client/lite"
-	"github.com/irisnet/irishub/v2/modules/guardian"
-	guardiankeeper "github.com/irisnet/irishub/v2/modules/guardian/keeper"
-	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
-	"github.com/irisnet/irishub/v2/modules/mint"
-	mintkeeper "github.com/irisnet/irishub/v2/modules/mint/keeper"
-	minttypes "github.com/irisnet/irishub/v2/modules/mint/types"
-	iristypes "github.com/irisnet/irishub/v2/types"
+	"github.com/irisnet/irishub/v3/client/lite"
+	"github.com/irisnet/irishub/v3/modules/guardian"
+	guardiankeeper "github.com/irisnet/irishub/v3/modules/guardian/keeper"
+	guardiantypes "github.com/irisnet/irishub/v3/modules/guardian/types"
+	"github.com/irisnet/irishub/v3/modules/mint"
+	mintkeeper "github.com/irisnet/irishub/v3/modules/mint/keeper"
+	minttypes "github.com/irisnet/irishub/v3/modules/mint/types"
+	iristypes "github.com/irisnet/irishub/v3/types"
 
 	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
 	tibcnfttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer"
@@ -108,7 +108,6 @@ var (
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 	}
-
 )
 
 var (

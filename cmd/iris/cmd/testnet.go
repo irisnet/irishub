@@ -45,8 +45,8 @@ import (
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
 	tokentypesv1 "github.com/irisnet/irismod/modules/token/types/v1"
 
-	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
-	iristypes "github.com/irisnet/irishub/v2/types"
+	guardiantypes "github.com/irisnet/irishub/v3/modules/guardian/types"
+	iristypes "github.com/irisnet/irishub/v3/types"
 )
 
 var (

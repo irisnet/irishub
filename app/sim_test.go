@@ -19,7 +19,7 @@ import (
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	"github.com/stretchr/testify/require"
 
-	iristypes "github.com/irisnet/irishub/v2/types"
+	iristypes "github.com/irisnet/irishub/v3/types"
 
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -314,7 +314,7 @@ func TestAppImportExport(t *testing.T) {
 func TestAppSimulationAfterImport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
 	config.ChainID = AppChainID
-	encfg  := RegisterEncodingConfig()
+	encfg := RegisterEncodingConfig()
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(
 		config,
@@ -439,7 +439,7 @@ func TestAppStateDeterminism(t *testing.T) {
 	numSeeds := 3
 	numTimesToRunPerSeed := 5
 	appHashList := make([]json.RawMessage, numTimesToRunPerSeed)
-	encfg  := RegisterEncodingConfig()
+	encfg := RegisterEncodingConfig()
 
 	for i := 0; i < numSeeds; i++ {
 		config.Seed = rand.Int63()

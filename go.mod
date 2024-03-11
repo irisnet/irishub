@@ -1,6 +1,6 @@
-module github.com/irisnet/irishub/v2
+module github.com/irisnet/irishub/v3
 
-go 1.19
+go 1.21
 
 require (
 	github.com/bianjieai/nft-transfer v1.1.3-ibc-v7.3.0

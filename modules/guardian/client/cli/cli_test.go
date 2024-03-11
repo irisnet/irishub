@@ -15,10 +15,10 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
 
-	guardiancli "github.com/irisnet/irishub/v2/modules/guardian/client/cli"
-	guardiantestutil "github.com/irisnet/irishub/v2/modules/guardian/client/testutil"
-	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
-	"github.com/irisnet/irishub/v2/simapp"
+	guardiancli "github.com/irisnet/irishub/v3/modules/guardian/client/cli"
+	guardiantestutil "github.com/irisnet/irishub/v3/modules/guardian/client/testutil"
+	guardiantypes "github.com/irisnet/irishub/v3/modules/guardian/types"
+	"github.com/irisnet/irishub/v3/simapp"
 )
 
 var privKey cryptotypes.PrivKey

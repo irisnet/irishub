@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/v2/modules/mint/types"
+	"github.com/irisnet/irishub/v3/modules/mint/types"
 )
 
 // GetParams sets the mint module parameters.

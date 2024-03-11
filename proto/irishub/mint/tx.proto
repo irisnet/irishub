@@ -2,12 +2,11 @@ syntax = "proto3";
 package irishub.mint;
 
 import "irishub/mint/mint.proto";
-import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/irisnet/irishub/v2/modules/mint/types";
+option go_package = "github.com/irisnet/irishub/v3/modules/mint/types";
 option (gogoproto.goproto_getters_all) = false;
 
 // Msg defines the coinswap Msg service
