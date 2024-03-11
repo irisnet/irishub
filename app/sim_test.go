@@ -314,7 +314,7 @@ func TestAppImportExport(t *testing.T) {
 func TestAppSimulationAfterImport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
 	config.ChainID = AppChainID
-	encfg  := RegisterEncodingConfig()
+	encfg := RegisterEncodingConfig()
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(
 		config,
@@ -439,7 +439,7 @@ func TestAppStateDeterminism(t *testing.T) {
 	numSeeds := 3
 	numTimesToRunPerSeed := 5
 	appHashList := make([]json.RawMessage, numTimesToRunPerSeed)
-	encfg  := RegisterEncodingConfig()
+	encfg := RegisterEncodingConfig()
 
 	for i := 0; i < numSeeds; i++ {
 		config.Seed = rand.Int63()

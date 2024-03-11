@@ -22,6 +22,7 @@ var (
 	description    = "description"
 	nilDescription = ""
 )
+
 // ----------------------------------------------
 // test MsgAddSuper
 // ----------------------------------------------
