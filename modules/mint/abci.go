@@ -3,8 +3,8 @@ package mint
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/v2/modules/mint/keeper"
-	"github.com/irisnet/irishub/v2/modules/mint/types"
+	"github.com/irisnet/irishub/v3/modules/mint/keeper"
+	"github.com/irisnet/irishub/v3/modules/mint/types"
 )
 
 // BeginBlocker handles block beginning logic for mint

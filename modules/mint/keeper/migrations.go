@@ -5,7 +5,7 @@ import (
 
 	"github.com/irisnet/irismod/types/exported"
 
-	v2 "github.com/irisnet/irishub/v2/modules/mint/migrations/v2"
+	v2 "github.com/irisnet/irishub/v3/modules/mint/migrations/v2"
 )
 
 // Migrator is a struct for handling in-place store migrations.

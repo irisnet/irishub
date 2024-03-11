@@ -3,7 +3,7 @@ package irishub.guardian;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/irisnet/irishub/v2/modules/guardian/types";
+option go_package = "github.com/irisnet/irishub/v3/modules/guardian/types";
 
 // Super defines the super standard
 message Super {

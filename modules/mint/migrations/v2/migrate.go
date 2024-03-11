@@ -5,7 +5,7 @@ import (
 
 	"github.com/irisnet/irismod/types/exported"
 
-	"github.com/irisnet/irishub/v2/modules/mint/types"
+	"github.com/irisnet/irishub/v3/modules/mint/types"
 )
 
 // MintKeeper defines a interface for SetParams function

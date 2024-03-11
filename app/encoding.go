@@ -3,7 +3,7 @@ package app
 import (
 	enccodec "github.com/evmos/ethermint/encoding/codec"
 
-	"github.com/irisnet/irishub/v2/app/params"
+	"github.com/irisnet/irishub/v3/app/params"
 )
 
 // RegisterEncodingConfig registers concrete types on codec

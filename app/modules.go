@@ -85,12 +85,12 @@ import (
 	nfttransfer "github.com/bianjieai/nft-transfer"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
-	irisappparams "github.com/irisnet/irishub/v2/app/params"
-	irisevm "github.com/irisnet/irishub/v2/modules/evm"
-	"github.com/irisnet/irishub/v2/modules/guardian"
-	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
-	"github.com/irisnet/irishub/v2/modules/mint"
-	minttypes "github.com/irisnet/irishub/v2/modules/mint/types"
+	irisappparams "github.com/irisnet/irishub/v3/app/params"
+	irisevm "github.com/irisnet/irishub/v3/modules/evm"
+	"github.com/irisnet/irishub/v3/modules/guardian"
+	guardiantypes "github.com/irisnet/irishub/v3/modules/guardian/types"
+	"github.com/irisnet/irishub/v3/modules/mint"
+	minttypes "github.com/irisnet/irishub/v3/modules/mint/types"
 )
 
 var (

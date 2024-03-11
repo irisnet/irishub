@@ -18,8 +18,8 @@ import (
 	"github.com/evmos/ethermint/x/feemarket"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	"github.com/irisnet/irishub/v2/app/upgrades"
-	irisevm "github.com/irisnet/irishub/v2/modules/evm"
+	"github.com/irisnet/irishub/v3/app/upgrades"
+	irisevm "github.com/irisnet/irishub/v3/modules/evm"
 )
 
 // Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal
