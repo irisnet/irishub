@@ -9,10 +9,9 @@
 
 ### Improvements
 
-* (IRISHub) [\#2858](https://github.com/irisnet/irishub/pull/2858) Migrate mint params.
 * (IRISHub) [\#2910](https://github.com/irisnet/irishub/pull/2910) Improve code.
 * (IRISHub) [\#2910](https://github.com/irisnet/irishub/pull/2912) Change go path from v2 to v3.
-* (IRISMod) [\#385](https://github.com/irisnet/irismod/pull/385) Bump cosmos-sdk to v0.47.9-ics-lsm .
+* (IRISMod) [\#385](https://github.com/irisnet/irismod/pull/385) Bump cosmos-sdk to v0.47.9-ics-lsm.
 
 ## 2.1.0
 
@@ -66,7 +65,7 @@
 * (IRISHub) [\#2831](https://github.com/irisnet/irishub/pull/2831) Bump up tibc-go version to v0.4.3
 * (IRISHub) [\#2831](https://github.com/irisnet/irishub/pull/2831) Bump up irismod version to v1.7.3
 * (IRISHub) [\#2766](https://github.com/irisnet/irishub/pull/2766) Bump up cosmos sdk to v0.46.9
-* (IRISHub) [\#2822]( https://github.com/irisnet/irishub/pull/2822) Remove ICA module
+* (IRISHub) [\#2822](https://github.com/irisnet/irishub/pull/2822) Remove ICA module
 
 ### Features
 
