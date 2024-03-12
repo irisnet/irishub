@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.0.0
+
+### Features
+
+* (IRISHub) [\#2908](https://github.com/irisnet/irishub/pull/2908) Support ica module.
+* (IRISHub) [\#2909](https://github.com/irisnet/irishub/pull/2908) Support cosmos LSM.
+
+### Improvements
+
+* (IRISHub) [\#2858](https://github.com/irisnet/irishub/pull/2858) Migrate mint params.
+* (IRISHub) [\#2910](https://github.com/irisnet/irishub/pull/2910) Improve code.
+* (IRISHub) [\#2910](https://github.com/irisnet/irishub/pull/2912) Change go path from v2 to v3 .
+* (IRISMod) [\#385](https://github.com/irisnet/irismod/pull/385) Bump cosmos-sdk to v0.47.9-ics-lsm .
+
 ## 2.1.0
 
 ### API Breaking
@@ -89,6 +103,7 @@
 ## 1.4.0
 
 *November 15, 2022*
+
 ### Application
 
 * [\#2759](https://github.com/irisnet/irishub/pull/2759) Fix export error when with flag `--for-zero-height`
@@ -101,6 +116,7 @@
 ### API Breaking Changes
 
 * [irismod \#309](https://github.com/irisnet/irismod/pull/309) GRPC method `Owner` rename to `NFTsOfOwner`, Remove deprecated `Queries` api
+
 ### Bug Fixes
 
 * [irismod \#304](https://github.com/irisnet/irismod/pull/304) Fix nft module import error.
