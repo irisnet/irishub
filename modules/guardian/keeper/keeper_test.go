@@ -15,7 +15,7 @@ import (
 
 	"github.com/irisnet/irishub/v3/modules/guardian/keeper"
 	"github.com/irisnet/irishub/v3/modules/guardian/types"
-	"github.com/irisnet/irishub/v3/simapp"
+	"github.com/irisnet/irishub/v3/testutil"
 )
 
 var (
@@ -37,11 +37,11 @@ type KeeperTestSuite struct {
 	cdc    *codec.LegacyAmino
 	ctx    sdk.Context
 	keeper keeper.Keeper
-	app    *simapp.SimApp
+	app    *testutil.AppBuilder
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(suite.T(), false)
+	app := testutil.Setup(suite.T(), false)
 
 	suite.app = app
 	suite.cdc = app.LegacyAmino()

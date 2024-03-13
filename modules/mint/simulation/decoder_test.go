@@ -8,21 +8,22 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sdkmath "cosmossdk.io/math"
+
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
 	"github.com/irisnet/irishub/v3/modules/mint/simulation"
 	"github.com/irisnet/irishub/v3/modules/mint/types"
-	"github.com/irisnet/irishub/v3/simapp"
+	"github.com/irisnet/irishub/v3/testutil"
 )
 
 func TestDecodeStore(t *testing.T) {
 	minter := types.NewMinter(time.Now().UTC(), sdkmath.NewIntWithDecimal(2, 9))
-	cdc, _ := simapp.MakeCodecs()
-	dec := simulation.NewDecodeStore(cdc)
+	ec := testutil.MakeCodecs()
+	dec := simulation.NewDecodeStore(ec.Marshaler)
 
 	kvPairs := kv.Pairs{
 		Pairs: []kv.Pair{
-			{Key: types.MinterKey, Value: cdc.MustMarshal(&minter)},
+			{Key: types.MinterKey, Value: ec.Marshaler.MustMarshal(&minter)},
 			{Key: []byte{0x99}, Value: []byte{0x99}},
 		},
 	}

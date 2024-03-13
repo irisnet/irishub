@@ -13,7 +13,7 @@ import (
 	"github.com/irisnet/irishub/v3/modules/guardian"
 	"github.com/irisnet/irishub/v3/modules/guardian/keeper"
 	"github.com/irisnet/irishub/v3/modules/guardian/types"
-	"github.com/irisnet/irishub/v3/simapp"
+	"github.com/irisnet/irishub/v3/testutil"
 )
 
 type TestSuite struct {
@@ -25,7 +25,7 @@ type TestSuite struct {
 }
 
 func (suite *TestSuite) SetupTest() {
-	app := simapp.Setup(suite.T(), false)
+	app := testutil.Setup(suite.T(), false)
 
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})

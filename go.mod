@@ -39,7 +39,6 @@ require (
 )
 
 require (
-	cosmossdk.io/simapp v0.0.0-20230608160436-666c345ad23d
 	github.com/gogo/protobuf v1.3.2
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/pkg/errors v0.9.1
@@ -52,6 +51,7 @@ require (
 require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cosmossdk.io/log v1.3.1 // indirect
+	cosmossdk.io/simapp v0.0.0-20230608160436-666c345ad23d // indirect
 	cosmossdk.io/tools/rosetta v0.2.1 // indirect
 	github.com/btcsuite/btcd/btcutil v1.1.3 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.1 // indirect

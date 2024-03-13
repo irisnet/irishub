@@ -9,7 +9,7 @@ import (
 
 	minttestutil "github.com/irisnet/irishub/v3/modules/mint/client/testutil"
 	minttypes "github.com/irisnet/irishub/v3/modules/mint/types"
-	"github.com/irisnet/irishub/v3/simapp"
+	"github.com/irisnet/irishub/v3/testutil"
 )
 
 type IntegrationTestSuite struct {
@@ -22,7 +22,7 @@ type IntegrationTestSuite struct {
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	cfg := simapp.NewConfig()
+	cfg := testutil.NewConfig()
 	cfg.NumValidators = 1
 
 	var err error

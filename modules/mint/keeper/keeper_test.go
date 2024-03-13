@@ -13,7 +13,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/v3/modules/mint/types"
-	"github.com/irisnet/irishub/v3/simapp"
+	apptestutil "github.com/irisnet/irishub/v3/testutil"
 )
 
 type KeeperTestSuite struct {
@@ -21,11 +21,11 @@ type KeeperTestSuite struct {
 
 	cdc *codec.LegacyAmino
 	ctx sdk.Context
-	app *simapp.SimApp
+	app *apptestutil.AppBuilder
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(suite.T(), false)
+	app := apptestutil.Setup(suite.T(), false)
 
 	suite.cdc = app.LegacyAmino()
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})

@@ -1,13 +1,11 @@
-package simapp
+package testutil
 
 import (
-	"bytes"
 	"context"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -16,9 +14,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
 
-	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
-	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	coretypes "github.com/cometbft/cometbft/rpc/core/types"
 	tmtypes "github.com/cometbft/cometbft/types"
@@ -29,7 +25,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	pruningtypes "github.com/cosmos/cosmos-sdk/store/pruning/types"
@@ -43,32 +38,11 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	minttypes "github.com/irisnet/irishub/v3/modules/mint/types"
-	iristypes "github.com/irisnet/irishub/v3/types"
+	"github.com/irisnet/irishub/v3/app"
 )
 
-func setup(withGenesis bool, invCheckPeriod uint) (*SimApp, GenesisState) {
-	db := dbm.NewMemDB()
-	encCdc := MakeTestEncodingConfig()
-	app := NewSimApp(
-		log.NewNopLogger(),
-		db,
-		nil,
-		true,
-		map[int64]bool{},
-		iristypes.DefaultNodeHome,
-		invCheckPeriod,
-		encCdc,
-		EmptyAppOptions{},
-	)
-	if withGenesis {
-		return app, NewDefaultGenesisState(encCdc.Codec)
-	}
-	return app, GenesisState{}
-}
-
 // Setup initializes a new SimApp. A Nop logger is set in SimApp.
-func Setup(t *testing.T, _ bool) *SimApp {
+func Setup(t *testing.T, _ bool) *AppBuilder {
 	t.Helper()
 
 	privVal := mock.NewPV()
@@ -91,36 +65,26 @@ func Setup(t *testing.T, _ bool) *SimApp {
 		Address: acc.GetAddress().String(),
 		Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000000000000))),
 	}
-
-	app := SetupWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{acc}, balance)
-
-	return app
+	return SetupWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{acc}, balance)
 }
 
 // NewConfig returns a new app config
 func NewConfig() network.Config {
 	cfg := network.DefaultConfig(NewTestNetworkFixture)
-	encCfg := MakeTestEncodingConfig() // redundant
-	cfg.Codec = encCfg.Codec
+	encCfg := app.RegisterEncodingConfig()
+	cfg.Codec = encCfg.Marshaler
 	cfg.TxConfig = encCfg.TxConfig
 	cfg.LegacyAmino = encCfg.Amino
 	cfg.InterfaceRegistry = encCfg.InterfaceRegistry
 	cfg.AppConstructor = func(val network.ValidatorI) servertypes.Application {
-		return NewSimApp(
-			val.GetCtx().Logger,
-			dbm.NewMemDB(),
+		builder := &AppBuilder{}
+		return builder.build(
 			nil,
-			true,
-			nil,
-			iristypes.DefaultNodeHome,
-			0,
-			encCfg,
-			EmptyAppOptions{},
 			bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
 			bam.SetChainID(cfg.ChainID),
 		)
 	}
-	cfg.GenesisState = NewDefaultGenesisState(cfg.Codec)
+	cfg.GenesisState = app.ModuleBasics.DefaultGenesis(cfg.Codec)
 	return cfg
 }
 
@@ -133,16 +97,19 @@ func SetupWithGenesisValSet(
 	valSet *tmtypes.ValidatorSet,
 	genAccs []authtypes.GenesisAccount,
 	balances ...banktypes.Balance,
-) *SimApp {
+) *AppBuilder {
 	t.Helper()
 
-	app, genesisState := setup(true, 5)
+	builder := &AppBuilder{}
+	app := builder.build(nil)
+
 	genesisState, err := GenesisStateWithValSet(
 		app.AppCodec(),
-		genesisState,
+		app.DefaultGenesis(),
 		valSet,
 		genAccs,
-		balances...)
+		balances...,
+	)
 	require.NoError(t, err)
 
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
@@ -166,7 +133,7 @@ func SetupWithGenesisValSet(
 		NextValidatorsHash: valSet.Hash(),
 	}})
 
-	return app
+	return &AppBuilder{app}
 }
 
 // GenesisStateWithValSet returns a new genesis state with the validator set
@@ -256,95 +223,6 @@ func GenesisStateWithValSet(codec codec.Codec, genesisState map[string]json.RawM
 	return genesisState, nil
 }
 
-// GenerateAccountStrategy is a strategy used by addTestAddrs() in order to generated addresses in random order
-type GenerateAccountStrategy func(int) []sdk.AccAddress
-
-// createRandomAccounts is a strategy used by addTestAddrs() in order to generated addresses in random order.
-func createRandomAccounts(accNum int) []sdk.AccAddress {
-	testAddrs := make([]sdk.AccAddress, accNum)
-	for i := 0; i < accNum; i++ {
-		pk := ed25519.GenPrivKey().PubKey()
-		testAddrs[i] = sdk.AccAddress(pk.Address())
-	}
-
-	return testAddrs
-}
-
-// createIncrementalAccounts is a strategy used by addTestAddrs() in order to generated addresses in ascending order.
-func createIncrementalAccounts(accNum int) []sdk.AccAddress {
-	var addresses []sdk.AccAddress
-	var buffer bytes.Buffer
-
-	// start at 100 so we can make up to 999 test addresses with valid test addresses
-	for i := 100; i < (accNum + 100); i++ {
-		numString := strconv.Itoa(i)
-		buffer.WriteString("A58856F0FD53BF058B4909A21AEC019107BA6") //base address string
-
-		buffer.WriteString(numString) //adding on final two digits to make addresses unique
-		res, _ := sdk.AccAddressFromHexUnsafe(buffer.String())
-		bech := res.String()
-		addr, _ := TestAddr(buffer.String(), bech)
-
-		addresses = append(addresses, addr)
-		buffer.Reset()
-	}
-
-	return addresses
-}
-
-func addTestAddrs(
-	app *SimApp,
-	ctx sdk.Context,
-	accNum int,
-	accAmt sdk.Int,
-	strategy GenerateAccountStrategy,
-) []sdk.AccAddress {
-	testAddrs := strategy(accNum)
-
-	initCoins := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), accAmt))
-
-	// fill all the addresses with some coins, set the loose pool tokens simultaneously
-	for _, addr := range testAddrs {
-		saveAccount(app, ctx, addr, initCoins)
-	}
-
-	return testAddrs
-}
-
-// saveAccount saves the provided account into the simapp with balance based on initCoins.
-func saveAccount(app *SimApp, ctx sdk.Context, addr sdk.AccAddress, initCoins sdk.Coins) {
-	acc := app.AccountKeeper.NewAccountWithAddress(ctx, addr)
-	app.AccountKeeper.SetAccount(ctx, acc)
-	if err := app.BankKeeper.MintCoins(ctx, minttypes.ModuleName, initCoins); err != nil {
-		panic(err)
-	}
-	if err := app.BankKeeper.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, addr, initCoins); err != nil {
-		panic(err)
-	}
-}
-
-// TestAddr creates a test address
-func TestAddr(addr string, bech string) (sdk.AccAddress, error) {
-	res, err := sdk.AccAddressFromHexUnsafe(addr)
-	if err != nil {
-		return nil, err
-	}
-	bechexpected := res.String()
-	if bech != bechexpected {
-		return nil, fmt.Errorf("bech encoding doesn't match reference")
-	}
-
-	bechres, err := sdk.AccAddressFromBech32(bech)
-	if err != nil {
-		return nil, err
-	}
-	if !bytes.Equal(bechres, res) {
-		return nil, err
-	}
-
-	return res, nil
-}
-
 // EmptyAppOptions is a stub implementing AppOptions
 type EmptyAppOptions struct{}
 
@@ -361,45 +239,25 @@ func NewTestNetworkFixture() network.TestFixture {
 	}
 	defer os.RemoveAll(dir)
 
-	encodingConfig := MakeTestEncodingConfig()
-
-	app := NewSimApp(
-		log.NewNopLogger(),
-		dbm.NewMemDB(),
-		nil,
-		true,
-		nil,
-		iristypes.DefaultNodeHome,
-		0,
-		encodingConfig, // redundant
-		simtestutil.NewAppOptionsWithFlagHome(dir),
-	)
-
 	appCtr := func(val network.ValidatorI) servertypes.Application {
-		return NewSimApp(
-			val.GetCtx().Logger,
-			dbm.NewMemDB(),
-			nil,
-			true,
-			nil,
-			iristypes.DefaultNodeHome,
-			0,
-			encodingConfig, // redundant
+		builder := &AppBuilder{}
+		return builder.build(
 			simtestutil.NewAppOptionsWithFlagHome(val.GetCtx().Config.RootDir),
 			bam.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
 			bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
 			bam.SetChainID(val.GetCtx().Viper.GetString(flags.FlagChainID)),
 		)
 	}
+	ec := MakeCodecs()
 
 	return network.TestFixture{
 		AppConstructor: appCtr,
-		GenesisState:   app.DefaultGenesis(),
+		GenesisState:   DefaultGenesis(ec.Marshaler),
 		EncodingConfig: testutil.TestEncodingConfig{
-			InterfaceRegistry: app.InterfaceRegistry(),
-			Codec:             app.AppCodec(),
-			TxConfig:          app.TxConfig(),
-			Amino:             app.LegacyAmino(),
+			InterfaceRegistry: ec.InterfaceRegistry,
+			Codec:             ec.Marshaler,
+			TxConfig:          ec.TxConfig,
+			Amino:             ec.Amino,
 		},
 	}
 }
