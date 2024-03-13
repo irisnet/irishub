@@ -30,7 +30,7 @@ func CreateSuperExec(
 	}
 	args = append(args, extraArgs...)
 
-	return apptestutil.ExecTxCmdWithResult(t, network, clientCtx, guardiancli.GetCmdCreateSuper(), args)
+	return apptestutil.ExecCommand(t, network, clientCtx, guardiancli.GetCmdCreateSuper(), args)
 }
 
 // DeleteSuperExec deletes a super
@@ -46,7 +46,7 @@ func DeleteSuperExec(
 	}
 	args = append(args, extraArgs...)
 
-	return apptestutil.ExecTxCmdWithResult(t, network, clientCtx, guardiancli.GetCmdDeleteSuper(), args)
+	return apptestutil.ExecCommand(t, network, clientCtx, guardiancli.GetCmdDeleteSuper(), args)
 }
 
 // QuerySupersExec queries supers

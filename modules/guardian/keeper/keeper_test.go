@@ -9,6 +9,7 @@ import (
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -35,16 +36,16 @@ type KeeperTestSuite struct {
 	suite.Suite
 
 	cdc    *codec.LegacyAmino
+	ifr    codectypes.InterfaceRegistry
 	ctx    sdk.Context
 	keeper keeper.Keeper
-	app    *testutil.AppBuilder
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := testutil.Setup(suite.T(), false)
+	app := testutil.CreateApp(suite.T())
 
-	suite.app = app
 	suite.cdc = app.LegacyAmino()
+	suite.ifr = app.InterfaceRegistry()
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.keeper = app.GuardianKeeper
 }

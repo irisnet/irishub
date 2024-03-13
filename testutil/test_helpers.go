@@ -41,8 +41,8 @@ import (
 	"github.com/irisnet/irishub/v3/app"
 )
 
-// Setup initializes a new SimApp. A Nop logger is set in SimApp.
-func Setup(t *testing.T, _ bool) *AppBuilder {
+// CreateApp initializes a new SimApp. A Nop logger is set in SimApp.
+func CreateApp(t *testing.T) *AppWrapper {
 	t.Helper()
 
 	privVal := mock.NewPV()
@@ -65,7 +65,7 @@ func Setup(t *testing.T, _ bool) *AppBuilder {
 		Address: acc.GetAddress().String(),
 		Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000000000000))),
 	}
-	return SetupWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{acc}, balance)
+	return CreateAppWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{acc}, balance)
 }
 
 // NewConfig returns a new app config
@@ -77,8 +77,7 @@ func NewConfig() network.Config {
 	cfg.LegacyAmino = encCfg.Amino
 	cfg.InterfaceRegistry = encCfg.InterfaceRegistry
 	cfg.AppConstructor = func(val network.ValidatorI) servertypes.Application {
-		builder := &AppBuilder{}
-		return builder.build(
+		return setup(
 			nil,
 			bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
 			bam.SetChainID(cfg.ChainID),
@@ -88,22 +87,21 @@ func NewConfig() network.Config {
 	return cfg
 }
 
-// SetupWithGenesisValSet initializes a new SimApp with a validator set and genesis accounts
+// CreateAppWithGenesisValSet initializes a new SimApp with a validator set and genesis accounts
 // that also act as delegators. For simplicity, each validator is bonded with a delegation
 // of one consensus engine unit (10^6) in the default token of the simapp from first genesis
 // account. A Nop logger is set in SimApp.
-func SetupWithGenesisValSet(
+func CreateAppWithGenesisValSet(
 	t *testing.T,
 	valSet *tmtypes.ValidatorSet,
 	genAccs []authtypes.GenesisAccount,
 	balances ...banktypes.Balance,
-) *AppBuilder {
+) *AppWrapper {
 	t.Helper()
 
-	builder := &AppBuilder{}
-	app := builder.build(nil)
+	app := setup(nil)
 
-	genesisState, err := GenesisStateWithValSet(
+	genesisState, err := genesisStateWithValSet(
 		app.AppCodec(),
 		app.DefaultGenesis(),
 		valSet,
@@ -133,11 +131,11 @@ func SetupWithGenesisValSet(
 		NextValidatorsHash: valSet.Hash(),
 	}})
 
-	return &AppBuilder{app}
+	return app
 }
 
-// GenesisStateWithValSet returns a new genesis state with the validator set
-func GenesisStateWithValSet(codec codec.Codec, genesisState map[string]json.RawMessage,
+// genesisStateWithValSet returns a new genesis state with the validator set
+func genesisStateWithValSet(codec codec.Codec, genesisState map[string]json.RawMessage,
 	valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount,
 	balances ...banktypes.Balance,
 ) (map[string]json.RawMessage, error) {
@@ -240,8 +238,7 @@ func NewTestNetworkFixture() network.TestFixture {
 	defer os.RemoveAll(dir)
 
 	appCtr := func(val network.ValidatorI) servertypes.Application {
-		builder := &AppBuilder{}
-		return builder.build(
+		return setup(
 			simtestutil.NewAppOptionsWithFlagHome(val.GetCtx().Config.RootDir),
 			bam.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
 			bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
@@ -262,8 +259,8 @@ func NewTestNetworkFixture() network.TestFixture {
 	}
 }
 
-// ExecTxCmdWithResult executes a tx command and returns the result
-func ExecTxCmdWithResult(
+// ExecCommand executes a tx command and returns the result
+func ExecCommand(
 	t *testing.T,
 	network *network.Network,
 	clientCtx client.Context,

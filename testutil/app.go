@@ -16,21 +16,21 @@ import (
 )
 
 var (
-	_ runtime.AppI            = (*AppBuilder)(nil)
-	_ servertypes.Application = (*AppBuilder)(nil)
+	_ runtime.AppI            = (*AppWrapper)(nil)
+	_ servertypes.Application = (*AppWrapper)(nil)
 )
 
-// AppBuilder extends an ABCI application, but with most of its parameters exported.
+// AppWrapper extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
 // capabilities aren't needed for testing.
-type AppBuilder struct {
+type AppWrapper struct {
 	*app.IrisApp
 }
 
-func (ab AppBuilder) build(
+func setup(
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
-) *app.IrisApp {
+) *AppWrapper {
 	db := dbm.NewMemDB()
 	encCdc := app.RegisterEncodingConfig()
 	if appOpts == nil {
@@ -45,7 +45,7 @@ func (ab AppBuilder) build(
 		appOpts,
 		baseAppOptions...,
 	)
-	return app
+	return &AppWrapper{app}
 }
 
 // MakeCodecs returns the application codec and tx codec

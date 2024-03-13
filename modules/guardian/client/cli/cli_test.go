@@ -90,7 +90,7 @@ func (s *IntegrationTestSuite) TestGuardian() {
 		),
 	}
 
-	result := apptestutil.ExecTxCmdWithResult(s.T(), s.network, clientCtx, bankcli.NewSendTxCmd(), args)
+	result := apptestutil.ExecCommand(s.T(), s.network, clientCtx, bankcli.NewSendTxCmd(), args)
 	s.Require().Equal(uint32(0), result.TxResult.Code, result.TxResult.Log)
 
 	//------test GetCmdQuerySupers()-------------

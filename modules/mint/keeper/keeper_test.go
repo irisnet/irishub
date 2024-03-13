@@ -9,7 +9,6 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/v3/modules/mint/types"
@@ -19,15 +18,13 @@ import (
 type KeeperTestSuite struct {
 	suite.Suite
 
-	cdc *codec.LegacyAmino
 	ctx sdk.Context
-	app *apptestutil.AppBuilder
+	app *apptestutil.AppWrapper
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := apptestutil.Setup(suite.T(), false)
+	app := apptestutil.CreateApp(suite.T())
 
-	suite.cdc = app.LegacyAmino()
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.app = app
 

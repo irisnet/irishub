@@ -29,8 +29,8 @@ func TestBeginBlocker(t *testing.T) {
 }
 
 // returns context and an app with updated mint keeper
-func createTestApp(t *testing.T, isCheckTx bool) (*apptestutil.AppBuilder, sdk.Context) {
-	app := apptestutil.Setup(t, false)
+func createTestApp(t *testing.T, isCheckTx bool) (*apptestutil.AppWrapper, sdk.Context) {
+	app := apptestutil.CreateApp(t)
 
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: 2})
 	app.MintKeeper.SetParams(ctx, types.NewParams(
