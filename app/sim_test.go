@@ -19,6 +19,7 @@ import (
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	"github.com/stretchr/testify/require"
 
+	"github.com/irisnet/irishub/v3/app/params"
 	iristypes "github.com/irisnet/irishub/v3/types"
 
 	dbm "github.com/cometbft/cometbft-db"
@@ -98,15 +99,7 @@ func TestFullAppSimulation(t *testing.T) {
 
 	encfg := RegisterEncodingConfig()
 
-	app := NewIrisApp(
-		logger,
-		db,
-		nil,
-		true,
-		encfg,
-		EmptyAppOptions{},
-		fauxMerkleModeOpt,
-	)
+	app := createApp(logger, db, encfg, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", app.Name())
 
 	// run randomized simulation
@@ -136,6 +129,8 @@ func TestAppImportExport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
 	config.ChainID = AppChainID
 
+	sdk.DefaultBondDenom = iristypes.NativeToken.Symbol
+
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(
 		config,
 		"goleveldb-app-sim",
@@ -155,15 +150,7 @@ func TestAppImportExport(t *testing.T) {
 	}()
 
 	encfg := RegisterEncodingConfig()
-	app := NewIrisApp(
-		logger,
-		db,
-		nil,
-		true,
-		encfg,
-		EmptyAppOptions{},
-		fauxMerkleModeOpt,
-	)
+	app := createApp(logger, db, encfg, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
@@ -209,15 +196,7 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := NewIrisApp(
-		log.NewNopLogger(),
-		newDB,
-		nil,
-		true,
-		encfg,
-		EmptyAppOptions{},
-		fauxMerkleModeOpt,
-	)
+	newApp := createApp(logger, db, encfg, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", newApp.Name())
 
 	var genesisState iristypes.GenesisState
@@ -244,11 +223,13 @@ func TestAppImportExport(t *testing.T) {
 
 	storeKeysPrefixes := []StoreKeysPrefixes{
 		{app.AppKeepers.KvStoreKeys()[authtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[authtypes.StoreKey], [][]byte{}},
-		{app.AppKeepers.KvStoreKeys()[stakingtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[stakingtypes.StoreKey],
+		{
+			app.AppKeepers.KvStoreKeys()[stakingtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[stakingtypes.StoreKey],
 			[][]byte{
 				stakingtypes.UnbondingQueueKey, stakingtypes.RedelegationQueueKey, stakingtypes.ValidatorQueueKey,
 				stakingtypes.HistoricalInfoKey,
-			}}, // ordering may change but it doesn't matter
+			},
+		}, // ordering may change but it doesn't matter
 		{app.AppKeepers.KvStoreKeys()[slashingtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[slashingtypes.StoreKey], [][]byte{}},
 		{app.AppKeepers.KvStoreKeys()[minttypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[minttypes.StoreKey], [][]byte{}},
 		{app.AppKeepers.KvStoreKeys()[distrtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[distrtypes.StoreKey], [][]byte{}},
@@ -267,7 +248,7 @@ func TestAppImportExport(t *testing.T) {
 		// check irismod module
 		{app.AppKeepers.KvStoreKeys()[tokentypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[tokentypes.StoreKey], [][]byte{}},
 		{app.AppKeepers.KvStoreKeys()[oracletypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[oracletypes.StoreKey], [][]byte{}},
-		//mt.Supply is InitSupply, can be not equal to TotalSupply
+		// mt.Supply is InitSupply, can be not equal to TotalSupply
 		{app.AppKeepers.KvStoreKeys()[mttypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[mttypes.StoreKey], [][]byte{mttypes.PrefixMT}},
 		{app.AppKeepers.KvStoreKeys()[nfttypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[nfttypes.StoreKey], [][]byte{{0x05}}},
 		{
@@ -334,15 +315,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	app := NewIrisApp(
-		logger,
-		db,
-		nil,
-		true,
-		encfg,
-		EmptyAppOptions{},
-		fauxMerkleModeOpt,
-	)
+	app := createApp(logger, db, encfg, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
@@ -393,15 +366,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := NewIrisApp(
-		log.NewNopLogger(),
-		newDB,
-		nil,
-		true,
-		encfg,
-		EmptyAppOptions{},
-		fauxMerkleModeOpt,
-	)
+	newApp := createApp(logger, db, encfg, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", newApp.Name())
 
 	newApp.InitChain(abci.RequestInitChain{
@@ -428,6 +393,7 @@ func TestAppStateDeterminism(t *testing.T) {
 	if !simcli.FlagEnabledValue {
 		t.Skip("skipping application simulation")
 	}
+	sdk.DefaultBondDenom = iristypes.NativeToken.Symbol
 
 	config := simcli.NewConfigFromFlags()
 	config.InitialBlockHeight = 1
@@ -453,15 +419,7 @@ func TestAppStateDeterminism(t *testing.T) {
 			}
 
 			db := dbm.NewMemDB()
-			app := NewIrisApp(
-				logger,
-				db,
-				nil,
-				true,
-				encfg,
-				EmptyAppOptions{},
-				interBlockCacheOpt(),
-			)
+			app := createApp(logger, db, encfg, interBlockCacheOpt())
 
 			fmt.Printf(
 				"running non-determinism simulation; seed %d: %d/%d, attempt: %d/%d\n",
@@ -515,4 +473,25 @@ type EmptyAppOptions struct{}
 // Get implements AppOptions
 func (ao EmptyAppOptions) Get(o string) interface{} {
 	return nil
+}
+
+func createApp(
+	logger log.Logger,
+	db dbm.DB,
+	encodingConfig params.EncodingConfig,
+	baseAppOptions ...func(*baseapp.BaseApp),
+) *IrisApp {
+	if baseAppOptions == nil {
+		baseAppOptions = []func(*baseapp.BaseApp){}
+	}
+	baseAppOptions = append(baseAppOptions, baseapp.SetChainID(AppChainID))
+	return NewIrisApp(
+		logger,
+		db,
+		nil,
+		true,
+		encodingConfig,
+		EmptyAppOptions{},
+		baseAppOptions...,
+	)
 }
