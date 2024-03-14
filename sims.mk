@@ -4,7 +4,7 @@
 ### Simulations
 
 BINDIR ?= $(GOPATH)/bin
-SIMAPP = github.com/irisnet/irishub/v2/app
+SIMAPP = github.com/irisnet/irishub/v3/app
 
 test-sim-nondeterminism:
 	@echo "Running non-determinism test..."

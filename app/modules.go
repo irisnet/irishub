@@ -39,6 +39,8 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
+	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
+	icatypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/types"
 	"github.com/cosmos/ibc-go/v7/modules/apps/transfer"
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v7/modules/core"
@@ -83,12 +85,12 @@ import (
 	nfttransfer "github.com/bianjieai/nft-transfer"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
-	irisappparams "github.com/irisnet/irishub/v2/app/params"
-	irisevm "github.com/irisnet/irishub/v2/modules/evm"
-	"github.com/irisnet/irishub/v2/modules/guardian"
-	guardiantypes "github.com/irisnet/irishub/v2/modules/guardian/types"
-	"github.com/irisnet/irishub/v2/modules/mint"
-	minttypes "github.com/irisnet/irishub/v2/modules/mint/types"
+	irisappparams "github.com/irisnet/irishub/v3/app/params"
+	irisevm "github.com/irisnet/irishub/v3/modules/evm"
+	"github.com/irisnet/irishub/v3/modules/guardian"
+	guardiantypes "github.com/irisnet/irishub/v3/modules/guardian/types"
+	"github.com/irisnet/irishub/v3/modules/mint"
+	minttypes "github.com/irisnet/irishub/v3/modules/mint/types"
 )
 
 var (
@@ -130,6 +132,7 @@ var (
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		consensus.AppModuleBasic{},
+		ica.AppModuleBasic{},
 
 		guardian.AppModuleBasic{},
 		token.AppModuleBasic{},
@@ -172,6 +175,7 @@ var (
 		tibcnfttypes.ModuleName:        nil,
 		tibcmttypes.ModuleName:         nil,
 		nfttypes.ModuleName:            nil,
+		icatypes.ModuleName:            nil,
 		evmtypes.ModuleName: {
 			authtypes.Minter,
 			authtypes.Burner,
@@ -264,10 +268,11 @@ func appModules(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		ibc.NewAppModule(app.IBCKeeper), tibc.NewAppModule(app.TIBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
-		app.transferModule,
-		app.ibcnfttransferModule,
-		app.nfttransferModule,
-		app.mttransferModule,
+		app.TransferModule,
+		app.IBCNftTransferModule,
+		app.ICAModule,
+		app.NftTransferModule,
+		app.MtTransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
 		token.NewAppModule(
 			appCodec,
@@ -392,8 +397,8 @@ func simulationModules(
 			app.interfaceRegistry,
 		),
 		ibc.NewAppModule(app.IBCKeeper),
-		app.transferModule,
-		app.ibcnfttransferModule,
+		app.TransferModule,
+		app.IBCNftTransferModule,
 		guardian.NewAppModule(appCodec, app.GuardianKeeper),
 		token.NewAppModule(
 			appCodec,
@@ -481,6 +486,7 @@ func orderBeginBlockers() []string {
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
+		icatypes.ModuleName,
 		consensustypes.ModuleName,
 
 		//self module
@@ -533,6 +539,7 @@ func orderEndBlockers() []string {
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
+		icatypes.ModuleName,
 		consensustypes.ModuleName,
 
 		//self module
@@ -586,6 +593,7 @@ func orderInitBlockers() []string {
 		feemarkettypes.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
+		icatypes.ModuleName,
 		consensustypes.ModuleName,
 
 		//self module

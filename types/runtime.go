@@ -7,28 +7,34 @@ import (
 
 	"github.com/cometbft/cometbft/crypto"
 
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/evmos/ethermint/ethereum/eip712"
 	etherminttypes "github.com/evmos/ethermint/types"
 
-	"github.com/irisnet/irishub/v2/address"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
 const (
+	// AppName is the name of the app
 	AppName = "IrisApp"
 )
 
 var (
-	NativeToken     tokenv1.Token
-	EvmToken        tokenv1.Token
+	// NativeToken represents the native token
+	NativeToken tokenv1.Token
+	// EvmToken represents the EVM token
+	EvmToken tokenv1.Token
+	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome string
 )
 
 func init() {
 	// set bech32 prefix
-	address.ConfigureBech32Prefix()
+	ConfigureBech32Prefix()
 
 	// set coin denom regexs
 	sdk.SetCoinDenomRegex(func() string {
@@ -81,4 +87,12 @@ func init() {
 	)
 
 	etherminttypes.InjectChainIDParser(parseChainID)
+}
+
+// InjectCodec injects an app codec
+func InjectCodec(legacyAmino *codec.LegacyAmino, interfaceRegistry types.InterfaceRegistry) {
+	eip712.InjectCodec(eip712.Codec{
+		InterfaceRegistry: interfaceRegistry,
+		Amino:             legacyAmino,
+	})
 }

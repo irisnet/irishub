@@ -3,7 +3,7 @@ package cmd
 import (
 	"bufio"
 	"encoding/json"
-	"io/ioutil"
+	"os"
 
 	cosmoshd "github.com/cosmos/cosmos-sdk/crypto/hd"
 	etherminthd "github.com/evmos/ethermint/crypto/hd"
@@ -18,7 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/keys"
 
-	"github.com/irisnet/irishub/v2/keystore"
+	"github.com/irisnet/irishub/v3/client/keystore"
 )
 
 // Commands registers a sub-tree of commands to interact with
@@ -101,7 +101,7 @@ func importKeyCommand() *cobra.Command {
 				return err
 			}
 
-			bz, err := ioutil.ReadFile(args[1])
+			bz, err := os.ReadFile(args[1])
 			if err != nil {
 				return err
 			}

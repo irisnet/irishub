@@ -60,7 +60,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=iris \
 		  -X github.com/cosmos/cosmos-sdk/version.AppName=iris \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-		  -X github.com/irisnet/irishub/v2/types.EIP155ChainID=$(EVM_CHAIN_ID) \
+		  -X github.com/irisnet/irishub/v3/types.EIP155ChainID=$(EVM_CHAIN_ID) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
 
 ifeq ($(WITH_CLEVELDB),yes)
@@ -107,7 +107,7 @@ check-evm-chain-id:
 	@echo "note: EVM_CHAIN_ID is $(EVM_CHAIN_ID)"
 
 update-swagger-docs: statik proto-swagger-gen
-	$(BINDIR)/statik -src=lite/swagger-ui -dest=lite -f -m
+	$(BINDIR)/statik -src=client/lite/swagger-ui -dest=lite -f -m
 	@if [ -n "$(git status --porcelain)" ]; then \
         echo "\033[91mSwagger docs are out of sync!!!\033[0m";\
         exit 1;\
@@ -193,13 +193,13 @@ test-cover:
 
 lint: golangci-lint
 	golangci-lint run
-	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./lite/statik/statik.go" -not -path "*.pb.go" | xargs gofmt -d -s
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lite/statik/statik.go" -not -path "*.pb.go" | xargs gofmt -d -s
 	go mod verify
 
 format:
-	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./lite/statik/statik.go" -not -path "*.pb.go" | xargs gofmt -w -s
-	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./lite/statik/statik.go" -not -path "*.pb.go" | xargs misspell -w
-	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./lite/statik/statik.go" -not -path "*.pb.go" | xargs goimports -w -local github.com/irisnet/irishub/v2
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lite/statik/statik.go" -not -path "*.pb.go" | xargs gofmt -w -s
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lite/statik/statik.go" -not -path "*.pb.go" | xargs misspell -w
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lite/statik/statik.go" -not -path "*.pb.go" | xargs goimports -w -local github.com/irisnet/irishub/v3
 
 benchmark:
 	@go test -mod=readonly -bench=. ./...

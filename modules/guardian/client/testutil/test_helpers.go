@@ -13,8 +13,8 @@ import (
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 
-	guardiancli "github.com/irisnet/irishub/v2/modules/guardian/client/cli"
-	"github.com/irisnet/irishub/v2/simapp"
+	guardiancli "github.com/irisnet/irishub/v3/modules/guardian/client/cli"
+	"github.com/irisnet/irishub/v3/simapp"
 )
 
 // MsgRedelegateExec creates a redelegate message.

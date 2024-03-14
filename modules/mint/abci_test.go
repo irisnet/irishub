@@ -10,9 +10,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 
-	"github.com/irisnet/irishub/v2/modules/mint"
-	"github.com/irisnet/irishub/v2/modules/mint/types"
-	"github.com/irisnet/irishub/v2/simapp"
+	"github.com/irisnet/irishub/v3/modules/mint"
+	"github.com/irisnet/irishub/v3/modules/mint/types"
+	"github.com/irisnet/irishub/v3/simapp"
 )
 
 func TestBeginBlocker(t *testing.T) {

@@ -13,9 +13,10 @@ import (
 
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
-	"github.com/irisnet/irishub/v2/app/upgrades"
+	"github.com/irisnet/irishub/v3/app/upgrades"
 )
 
+// Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal
 var Upgrade = upgrades.Upgrade{
 	UpgradeName:               "v2.1",
 	UpgradeHandlerConstructor: upgradeHandlerConstructor,
@@ -27,20 +28,20 @@ var Upgrade = upgrades.Upgrade{
 func upgradeHandlerConstructor(
 	m *module.Manager,
 	c module.Configurator,
-	app upgrades.AppKeepers,
+	box upgrades.Toolbox,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		// Enable 09-localhost type in allowed clients according to
 		// https://github.com/cosmos/ibc-go/blob/v7.3.0/docs/migrations/v7-to-v7_1.md
-		params := app.IBCKeeper.ClientKeeper.GetParams(ctx)
+		params := box.IBCKeeper.ClientKeeper.GetParams(ctx)
 		params.AllowedClients = append(params.AllowedClients, exported.Localhost)
-		app.IBCKeeper.ClientKeeper.SetParams(ctx, params)
+		box.IBCKeeper.ClientKeeper.SetParams(ctx, params)
 
 		// Migrate Tendermint consensus parameters from x/params module to a
 		// dedicated x/consensus module.
-		baseAppLegacySS := app.ParamsKeeper.Subspace(baseapp.Paramspace).
+		baseAppLegacySS := box.ParamsKeeper.Subspace(baseapp.Paramspace).
 			WithKeyTable(paramstypes.ConsensusParamsKeyTable())
-		baseapp.MigrateParams(ctx, baseAppLegacySS, &app.ConsensusParamsKeeper)
-		return app.ModuleManager.RunMigrations(ctx, c, fromVM)
+		baseapp.MigrateParams(ctx, baseAppLegacySS, &box.ConsensusParamsKeeper)
+		return box.ModuleManager.RunMigrations(ctx, c, fromVM)
 	}
 }

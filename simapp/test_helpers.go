@@ -31,7 +31,6 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	pruningtypes "github.com/cosmos/cosmos-sdk/store/pruning/types"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
@@ -39,13 +38,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	minttypes "github.com/irisnet/irishub/v2/modules/mint/types"
+	minttypes "github.com/irisnet/irishub/v3/modules/mint/types"
+	iristypes "github.com/irisnet/irishub/v3/types"
 )
 
 func setup(withGenesis bool, invCheckPeriod uint) (*SimApp, GenesisState) {
@@ -57,7 +56,7 @@ func setup(withGenesis bool, invCheckPeriod uint) (*SimApp, GenesisState) {
 		nil,
 		true,
 		map[int64]bool{},
-		DefaultNodeHome,
+		iristypes.DefaultNodeHome,
 		invCheckPeriod,
 		encCdc,
 		EmptyAppOptions{},
@@ -98,6 +97,7 @@ func Setup(t *testing.T, _ bool) *SimApp {
 	return app
 }
 
+// NewConfig returns a new app config
 func NewConfig() network.Config {
 	cfg := network.DefaultConfig(NewTestNetworkFixture)
 	encCfg := MakeTestEncodingConfig() // redundant
@@ -112,7 +112,7 @@ func NewConfig() network.Config {
 			nil,
 			true,
 			nil,
-			DefaultNodeHome,
+			iristypes.DefaultNodeHome,
 			0,
 			encCfg,
 			EmptyAppOptions{},
@@ -122,14 +122,6 @@ func NewConfig() network.Config {
 	}
 	cfg.GenesisState = NewDefaultGenesisState(cfg.Codec)
 	return cfg
-}
-
-func SimAppConstructor(val network.Validator) servertypes.Application {
-	return NewSimApp(
-		val.Ctx.Logger, dbm.NewMemDB(), nil, true, make(map[int64]bool),
-		val.Ctx.Config.RootDir, 0, MakeTestEncodingConfig(), EmptyAppOptions{},
-		bam.SetMinGasPrices(val.AppConfig.MinGasPrices),
-	)
 }
 
 // SetupWithGenesisValSet initializes a new SimApp with a validator set and genesis accounts
@@ -264,6 +256,7 @@ func GenesisStateWithValSet(codec codec.Codec, genesisState map[string]json.RawM
 	return genesisState, nil
 }
 
+// GenerateAccountStrategy is a strategy used by addTestAddrs() in order to generated addresses in random order
 type GenerateAccountStrategy func(int) []sdk.AccAddress
 
 // createRandomAccounts is a strategy used by addTestAddrs() in order to generated addresses in random order.
@@ -299,37 +292,6 @@ func createIncrementalAccounts(accNum int) []sdk.AccAddress {
 	return addresses
 }
 
-// AddTestAddrsFromPubKeys adds the addresses into the SimApp providing only the public keys.
-func AddTestAddrsFromPubKeys(
-	app *SimApp,
-	ctx sdk.Context,
-	pubKeys []cryptotypes.PubKey,
-	accAmt sdk.Int,
-) {
-	initCoins := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), accAmt))
-	// fill all the addresses with some coins, set the loose pool tokens simultaneously
-	for _, pubKey := range pubKeys {
-		saveAccount(app, ctx, sdk.AccAddress(pubKey.Address()), initCoins)
-	}
-}
-
-// AddTestAddrs constructs and returns accNum amount of accounts with an
-// initial balance of accAmt in random order
-func AddTestAddrs(app *SimApp, ctx sdk.Context, accNum int, accAmt sdk.Int) []sdk.AccAddress {
-	return addTestAddrs(app, ctx, accNum, accAmt, createRandomAccounts)
-}
-
-// AddTestAddrsIncremental constructs and returns accNum amount of accounts with an
-// initial balance of accAmt in random order
-func AddTestAddrsIncremental(
-	app *SimApp,
-	ctx sdk.Context,
-	accNum int,
-	accAmt sdk.Int,
-) []sdk.AccAddress {
-	return addTestAddrs(app, ctx, accNum, accAmt, createIncrementalAccounts)
-}
-
 func addTestAddrs(
 	app *SimApp,
 	ctx sdk.Context,
@@ -361,17 +323,7 @@ func saveAccount(app *SimApp, ctx sdk.Context, addr sdk.AccAddress, initCoins sd
 	}
 }
 
-// ConvertAddrsToValAddrs converts the provided addresses to ValAddress.
-func ConvertAddrsToValAddrs(addrs []sdk.AccAddress) []sdk.ValAddress {
-	valAddrs := make([]sdk.ValAddress, len(addrs))
-
-	for i, addr := range addrs {
-		valAddrs[i] = sdk.ValAddress(addr)
-	}
-
-	return valAddrs
-}
-
+// TestAddr creates a test address
 func TestAddr(addr string, bech string) (sdk.AccAddress, error) {
 	res, err := sdk.AccAddressFromHexUnsafe(addr)
 	if err != nil {
@@ -391,39 +343,6 @@ func TestAddr(addr string, bech string) (sdk.AccAddress, error) {
 	}
 
 	return res, nil
-}
-
-// CreateTestPubKeys returns a total of numPubKeys public keys in ascending order.
-func CreateTestPubKeys(numPubKeys int) []cryptotypes.PubKey {
-	var publicKeys []cryptotypes.PubKey
-	var buffer bytes.Buffer
-
-	// start at 10 to avoid changing 1 to 01, 2 to 02, etc
-	for i := 100; i < (numPubKeys + 100); i++ {
-		numString := strconv.Itoa(i)
-		buffer.WriteString(
-			"0B485CFC0EECC619440448436F8FC9DF40566F2369E72400281454CB552AF",
-		) // base pubkey string
-		buffer.WriteString(
-			numString,
-		) // adding on final two digits to make pubkeys unique
-		publicKeys = append(publicKeys, NewPubKeyFromHex(buffer.String()))
-		buffer.Reset()
-	}
-
-	return publicKeys
-}
-
-// NewPubKeyFromHex returns a PubKey from a hex string.
-func NewPubKeyFromHex(pk string) (res cryptotypes.PubKey) {
-	pkBytes, err := hex.DecodeString(pk)
-	if err != nil {
-		panic(err)
-	}
-	if len(pkBytes) != ed25519.PubKeySize {
-		panic(errors.Wrap(errors.ErrInvalidPubKey, "invalid pubkey size"))
-	}
-	return &ed25519.PubKey{Key: pkBytes}
 }
 
 // EmptyAppOptions is a stub implementing AppOptions
@@ -450,7 +369,7 @@ func NewTestNetworkFixture() network.TestFixture {
 		nil,
 		true,
 		nil,
-		DefaultNodeHome,
+		iristypes.DefaultNodeHome,
 		0,
 		encodingConfig, // redundant
 		simtestutil.NewAppOptionsWithFlagHome(dir),
@@ -463,7 +382,7 @@ func NewTestNetworkFixture() network.TestFixture {
 			nil,
 			true,
 			nil,
-			DefaultNodeHome,
+			iristypes.DefaultNodeHome,
 			0,
 			encodingConfig, // redundant
 			simtestutil.NewAppOptionsWithFlagHome(val.GetCtx().Config.RootDir),
@@ -485,6 +404,7 @@ func NewTestNetworkFixture() network.TestFixture {
 	}
 }
 
+// ExecTxCmdWithResult executes a tx command and returns the result
 func ExecTxCmdWithResult(
 	t *testing.T,
 	network *network.Network,
@@ -504,6 +424,7 @@ func ExecTxCmdWithResult(
 	return WaitForTx(t, network, clientCtx, txResp.TxHash)
 }
 
+// WaitForTx waits for a tx to be included in a block
 func WaitForTx(
 	t *testing.T,
 	network *network.Network,
