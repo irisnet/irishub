@@ -14,10 +14,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 
 	guardiancli "github.com/irisnet/irishub/v3/modules/guardian/client/cli"
-	"github.com/irisnet/irishub/v3/simapp"
+	apptestutil "github.com/irisnet/irishub/v3/testutil"
 )
 
-// MsgRedelegateExec creates a redelegate message.
+// CreateSuperExec creates a new super
 func CreateSuperExec(
 	t *testing.T,
 	network *network.Network,
@@ -30,9 +30,10 @@ func CreateSuperExec(
 	}
 	args = append(args, extraArgs...)
 
-	return simapp.ExecTxCmdWithResult(t, network, clientCtx, guardiancli.GetCmdCreateSuper(), args)
+	return apptestutil.ExecCommand(t, network, clientCtx, guardiancli.GetCmdCreateSuper(), args)
 }
 
+// DeleteSuperExec deletes a super
 func DeleteSuperExec(
 	t *testing.T,
 	network *network.Network,
@@ -45,9 +46,10 @@ func DeleteSuperExec(
 	}
 	args = append(args, extraArgs...)
 
-	return simapp.ExecTxCmdWithResult(t, network, clientCtx, guardiancli.GetCmdDeleteSuper(), args)
+	return apptestutil.ExecCommand(t, network, clientCtx, guardiancli.GetCmdDeleteSuper(), args)
 }
 
+// QuerySupersExec queries supers
 func QuerySupersExec(clientCtx client.Context, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
