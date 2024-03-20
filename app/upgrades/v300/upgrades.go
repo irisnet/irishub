@@ -17,7 +17,7 @@ import (
 
 // Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal
 var Upgrade = upgrades.Upgrade{
-	UpgradeName:               "v3.0",
+	UpgradeName:               "v3",
 	UpgradeHandlerConstructor: upgradeHandlerConstructor,
 	StoreUpgrades: &storetypes.StoreUpgrades{
 		Added: []string{icahosttypes.StoreKey},
@@ -34,7 +34,9 @@ func upgradeHandlerConstructor(
 		initICAModule(ctx, m, fromVM)
 
 		// merge liquid staking module
-		mergeLSModule(ctx, box)
+		if err := mergeLSModule(ctx, box); err != nil {
+			return nil, err
+		}
 		return box.ModuleManager.RunMigrations(ctx, c, fromVM)
 	}
 }
@@ -52,9 +54,9 @@ func initICAModule(ctx sdk.Context, m *module.Manager, fromVM module.VersionMap)
 	icaModule.InitModule(ctx, controllerParams, hostParams)
 }
 
-func mergeLSModule(ctx sdk.Context, box upgrades.Toolbox) {
+func mergeLSModule(ctx sdk.Context, box upgrades.Toolbox) error {
 	ctx.Logger().Info("start to run lsm module migrations...")
 
 	storeKey := box.GetKey(stakingtypes.StoreKey)
-	MigrateStore(ctx, storeKey, box.AppCodec, box.StakingKeeper)
+	return migrateStore(ctx, storeKey, box.AppCodec, box.StakingKeeper)
 }
