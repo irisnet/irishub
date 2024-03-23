@@ -37,6 +37,7 @@ func TestChainUpgrade(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping in short mode")
 	}
+
 	t.Parallel()
 
 	irisChain, dockerClient, ctx := startChain(t)
