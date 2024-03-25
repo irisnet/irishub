@@ -11,7 +11,7 @@ package rest_test
 // 	"github.com/cosmos/cosmos-sdk/types/rest"
 
 // 	minttypes "github.com/irisnet/irishub/v3/modules/mint/types"
-// 	"github.com/irisnet/irishub/v3/simapp"
+// 	"github.com/irisnet/irishub/v3/testutil"
 // )
 
 // type IntegrationTestSuite struct {

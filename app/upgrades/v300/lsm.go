@@ -21,20 +21,20 @@ type keeper interface {
 	SetParams(ctx sdk.Context, params types.Params) error
 }
 
-// MigrateParamsStore migrates the params store to the latest version.
+// migrateParamsStore migrates the params store to the latest version.
 //
 // ctx - sdk context
 // k - keeper
-func MigrateParamsStore(ctx sdk.Context, k keeper) {
+func migrateParamsStore(ctx sdk.Context, k keeper) error {
 	params := k.GetParams(ctx)
 	params.ValidatorBondFactor = ValidatorBondFactor
 	params.ValidatorLiquidStakingCap = ValidatorLiquidStakingCap
 	params.GlobalLiquidStakingCap = GlobalLiquidStakingCap
-	k.SetParams(ctx, params)
+	return k.SetParams(ctx, params)
 }
 
-// MigrateValidators Set each validator's ValidatorBondShares and LiquidShares to 0
-func MigrateValidators(ctx sdk.Context, k keeper) {
+// migrateValidators Set each validator's ValidatorBondShares and LiquidShares to 0
+func migrateValidators(ctx sdk.Context, k keeper) {
 	for _, validator := range k.GetAllValidators(ctx) {
 		validator.ValidatorBondShares = sdk.ZeroDec()
 		validator.LiquidShares = sdk.ZeroDec()
@@ -42,8 +42,8 @@ func MigrateValidators(ctx sdk.Context, k keeper) {
 	}
 }
 
-// MigrateDelegations Set each delegation's ValidatorBond field to false
-func MigrateDelegations(ctx sdk.Context, k keeper) {
+// migrateDelegations Set each delegation's ValidatorBond field to false
+func migrateDelegations(ctx sdk.Context, k keeper) {
 	for _, delegation := range k.GetAllDelegations(ctx) {
 		delegation.ValidatorBond = false
 		k.SetDelegation(ctx, delegation)
@@ -52,7 +52,7 @@ func MigrateDelegations(ctx sdk.Context, k keeper) {
 
 // MigrateUBDEntries will remove the ubdEntries with same creation_height
 // and create a new ubdEntry with updated balance and initial_balance
-func MigrateUBDEntries(ctx sdk.Context, store storetypes.KVStore, cdc codec.BinaryCodec) error {
+func migrateUBDEntries(ctx sdk.Context, store storetypes.KVStore, cdc codec.BinaryCodec) error {
 	iterator := sdk.KVStorePrefixIterator(store, types.UnbondingDelegationKey)
 	defer iterator.Close()
 
@@ -108,25 +108,27 @@ func setUBDToStore(_ sdk.Context, store storetypes.KVStore, cdc codec.BinaryCode
 	store.Set(key, bz)
 }
 
-// MigrateStore performs the in-place store migration for adding LSM support to v0.45.16-ics, including:
+// migrateStore performs the in-place store migration for adding LSM support to v0.45.16-ics, including:
 //   - Adding params ValidatorBondFactor, GlobalLiquidStakingCap, ValidatorLiquidStakingCap
 //   - Setting each validator's ValidatorBondShares and LiquidShares to 0
 //   - Setting each delegation's ValidatorBond field to false
 //   - Calculating the total liquid staked by summing the delegations from ICA accounts
-func MigrateStore(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.BinaryCodec, k keeper) error {
+func migrateStore(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.BinaryCodec, k keeper) error {
 	store := ctx.KVStore(storeKey)
 
 	ctx.Logger().Info("Staking LSM Migration: Migrating param store")
-	MigrateParamsStore(ctx, k)
+	if err := migrateParamsStore(ctx, k); err != nil {
+		return err
+	}
 
 	ctx.Logger().Info("Staking LSM Migration: Migrating validators")
-	MigrateValidators(ctx, k)
+	migrateValidators(ctx, k)
 
 	ctx.Logger().Info("Staking LSM Migration: Migrating delegations")
-	MigrateDelegations(ctx, k)
+	migrateDelegations(ctx, k)
 
 	ctx.Logger().Info("Staking LSM Migration: Migrating UBD entries")
-	if err := MigrateUBDEntries(ctx, store, cdc); err != nil {
+	if err := migrateUBDEntries(ctx, store, cdc); err != nil {
 		return err
 	}
 

@@ -12,7 +12,7 @@ import (
 
 	"github.com/irisnet/irishub/v3/modules/mint"
 	"github.com/irisnet/irishub/v3/modules/mint/types"
-	"github.com/irisnet/irishub/v3/simapp"
+	apptestutil "github.com/irisnet/irishub/v3/testutil"
 )
 
 func TestBeginBlocker(t *testing.T) {
@@ -29,8 +29,8 @@ func TestBeginBlocker(t *testing.T) {
 }
 
 // returns context and an app with updated mint keeper
-func createTestApp(t *testing.T, isCheckTx bool) (*simapp.SimApp, sdk.Context) {
-	app := simapp.Setup(t, false)
+func createTestApp(t *testing.T, isCheckTx bool) (*apptestutil.AppWrapper, sdk.Context) {
+	app := apptestutil.CreateApp(t)
 
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: 2})
 	app.MintKeeper.SetParams(ctx, types.NewParams(

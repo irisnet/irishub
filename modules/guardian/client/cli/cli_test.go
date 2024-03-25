@@ -18,7 +18,7 @@ import (
 	guardiancli "github.com/irisnet/irishub/v3/modules/guardian/client/cli"
 	guardiantestutil "github.com/irisnet/irishub/v3/modules/guardian/client/testutil"
 	guardiantypes "github.com/irisnet/irishub/v3/modules/guardian/types"
-	"github.com/irisnet/irishub/v3/simapp"
+	apptestutil "github.com/irisnet/irishub/v3/testutil"
 )
 
 var privKey cryptotypes.PrivKey
@@ -35,7 +35,7 @@ type IntegrationTestSuite struct {
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	cfg := simapp.NewConfig()
+	cfg := apptestutil.NewConfig()
 	cfg.NumValidators = 1
 
 	privKey, pubKey, addr = testdata.KeyTestPubAddr()
@@ -90,7 +90,7 @@ func (s *IntegrationTestSuite) TestGuardian() {
 		),
 	}
 
-	result := simapp.ExecTxCmdWithResult(s.T(), s.network, clientCtx, bankcli.NewSendTxCmd(), args)
+	result := apptestutil.ExecCommand(s.T(), s.network, clientCtx, bankcli.NewSendTxCmd(), args)
 	s.Require().Equal(uint32(0), result.TxResult.Code, result.TxResult.Log)
 
 	//------test GetCmdQuerySupers()-------------
