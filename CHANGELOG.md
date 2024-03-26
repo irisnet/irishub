@@ -13,8 +13,8 @@
 * (IRISHub) [\#2912](https://github.com/irisnet/irishub/pull/2912) Change go path from v2 to v3.
 * (IRISHub) [\#2914](https://github.com/irisnet/irishub/pull/2914) Improve unit test.
 * (IRISHub) [\#2918](https://github.com/irisnet/irishub/pull/2918) Adjusting the parameters of the ica module.
+* (IRISHub) [\#2919](https://github.com/irisnet/irishub/pull/2919) Adjusting gov config.
 * (IRISMod) [\#385](https://github.com/irisnet/irismod/pull/385) Bump cosmos-sdk to v0.47.9-ics-lsm.
-
 
 ## 2.1.0
 
