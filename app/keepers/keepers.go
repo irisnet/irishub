@@ -500,7 +500,7 @@ func New(
 		appKeepers.ServiceKeeper,
 	)
 
-	govConfig := govtypes.DefaultConfig()
+	govConfig := govtypes.Config{MaxMetadataLen: 10000}
 	appKeepers.GovKeeper = govkeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[govtypes.StoreKey],
