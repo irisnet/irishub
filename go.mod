@@ -7,7 +7,7 @@ require (
 	github.com/bianjieai/tibc-go v0.5.0
 	github.com/cometbft/cometbft v0.37.4
 	github.com/cometbft/cometbft-db v0.8.0
-	github.com/cosmos/cosmos-sdk v0.47.10-ics-lsm
+	github.com/cosmos/cosmos-sdk v0.47.11-ics-lsm
 	github.com/cosmos/gogoproto v1.4.10
 	github.com/cosmos/iavl v0.20.1 // indirect
 	github.com/cosmos/ibc-go/v7 v7.3.0
