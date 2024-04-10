@@ -30,6 +30,9 @@ func upgradeHandlerConstructor(
 	box upgrades.Toolbox,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		if err := mergeEVM(ctx, box); err != nil {
+			return nil, err
+		}
 		// initialize ICS27 module
 		initICAModule(ctx, m, fromVM)
 
@@ -59,4 +62,12 @@ func mergeLSModule(ctx sdk.Context, box upgrades.Toolbox) error {
 
 	storeKey := box.GetKey(stakingtypes.StoreKey)
 	return migrateStore(ctx, storeKey, box.AppCodec, box.StakingKeeper)
+}
+
+func mergeEVM(ctx sdk.Context, box upgrades.Toolbox) error {
+	ctx.Logger().Info("start to run evm module migrations...")
+
+	params := box.EvmKeeper.GetParams(ctx)
+	params.AllowUnprotectedTxs = true
+	return box.EvmKeeper.SetParams(ctx, params)
 }
