@@ -15,6 +15,7 @@ type msgServer struct {
 	k Keeper
 }
 
+
 var _ v1.MsgServer = msgServer{}
 
 // NewMsgServerImpl returns an implementation of the token MsgServer interface
@@ -269,3 +270,19 @@ func (m msgServer) UpdateParams(
 	}
 	return &v1.MsgUpdateParamsResponse{}, nil
 }
+
+// DeployERC20 implements v1.MsgServer.
+func (m msgServer) DeployERC20(context.Context, *v1.MsgDeployERC20) (*v1.MsgDeployERC20Response, error) {
+	panic("unimplemented")
+}
+
+// SwapFromERC20 implements v1.MsgServer.
+func (m msgServer) SwapFromERC20(context.Context, *v1.MsgSwapFromERC20) (*v1.MsgSwapFromERC20Response, error) {
+	panic("unimplemented")
+}
+
+// SwapToERC20 implements v1.MsgServer.
+func (m msgServer) SwapToERC20(context.Context, *v1.MsgSwapToERC20) (*v1.MsgSwapToERC20Response, error) {
+	panic("unimplemented")
+}
+

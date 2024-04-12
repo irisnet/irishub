@@ -30,6 +30,9 @@ var (
 	_ sdk.Msg = &MsgTransferTokenOwner{}
 	_ sdk.Msg = &MsgSwapFeeToken{}
 	_ sdk.Msg = &MsgUpdateParams{}
+	_ sdk.Msg = &MsgDeployERC20{}
+	_ sdk.Msg = &MsgSwapFromERC20{}
+	_ sdk.Msg = &MsgSwapToERC20{}
 )
 
 // NewMsgIssueToken - construct token issue msg.
@@ -352,3 +355,40 @@ func (m *MsgUpdateParams) GetSigners() []sdk.AccAddress {
 	addr, _ := sdk.AccAddressFromBech32(m.Authority)
 	return []sdk.AccAddress{addr}
 }
+
+// ValidateBasic implements Msg
+func (m *MsgDeployERC20) ValidateBasic() error {
+	// TODO
+	return nil
+}
+
+// GetSigners returns the expected signers for a MsgDeployERC20 message
+func (m *MsgDeployERC20) GetSigners() []sdk.AccAddress {
+	addr, _ := sdk.AccAddressFromBech32(m.Authority)
+	return []sdk.AccAddress{addr}
+}
+
+// ValidateBasic implements Msg
+func (m *MsgSwapFromERC20) ValidateBasic() error {
+	// TODO
+	return nil
+}
+
+// GetSigners returns the expected signers for a MsgSwapFromERC20 message
+func (m *MsgSwapFromERC20) GetSigners() []sdk.AccAddress {
+	addr, _ := sdk.AccAddressFromBech32(m.Sender)
+	return []sdk.AccAddress{addr}
+}
+
+// ValidateBasic implements Msg
+func (m *MsgSwapToERC20) ValidateBasic() error {
+	// TODO
+	return nil
+}
+
+// GetSigners returns the expected signers for a MsgSwapToERC20 message
+func (m *MsgSwapToERC20) GetSigners() []sdk.AccAddress {
+	addr, _ := sdk.AccAddressFromBech32(m.Sender)
+	return []sdk.AccAddress{addr}
+}
+
