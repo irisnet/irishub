@@ -45,11 +45,11 @@ type MsgClient interface {
 	BurnToken(ctx context.Context, in *MsgBurnToken, opts ...grpc.CallOption) (*MsgBurnTokenResponse, error)
 	// TransferTokenOwner defines a method for transfering token owner
 	TransferTokenOwner(ctx context.Context, in *MsgTransferTokenOwner, opts ...grpc.CallOption) (*MsgTransferTokenOwnerResponse, error)
-	// SwapFeeToken defines a method for swaping some fee token
+	// SwapFeeToken defines a method for swapping some fee token
 	SwapFeeToken(ctx context.Context, in *MsgSwapFeeToken, opts ...grpc.CallOption) (*MsgSwapFeeTokenResponse, error)
-	// SwapToERC20 defines a method for swaping some erc20 token
+	// SwapToERC20 defines a method for swapping some erc20 token
 	SwapToERC20(ctx context.Context, in *MsgSwapToERC20, opts ...grpc.CallOption) (*MsgSwapToERC20Response, error)
-	// SwapFromERC20 defines a method for some native token
+	// SwapFromERC20 defines a method for swapping some native token
 	SwapFromERC20(ctx context.Context, in *MsgSwapFromERC20, opts ...grpc.CallOption) (*MsgSwapFromERC20Response, error)
 	// UpdateParams defines a governance operation for updating the token
 	// module parameters. The authority is defined in the keeper.
@@ -173,11 +173,11 @@ type MsgServer interface {
 	BurnToken(context.Context, *MsgBurnToken) (*MsgBurnTokenResponse, error)
 	// TransferTokenOwner defines a method for transfering token owner
 	TransferTokenOwner(context.Context, *MsgTransferTokenOwner) (*MsgTransferTokenOwnerResponse, error)
-	// SwapFeeToken defines a method for swaping some fee token
+	// SwapFeeToken defines a method for swapping some fee token
 	SwapFeeToken(context.Context, *MsgSwapFeeToken) (*MsgSwapFeeTokenResponse, error)
-	// SwapToERC20 defines a method for swaping some erc20 token
+	// SwapToERC20 defines a method for swapping some erc20 token
 	SwapToERC20(context.Context, *MsgSwapToERC20) (*MsgSwapToERC20Response, error)
-	// SwapFromERC20 defines a method for some native token
+	// SwapFromERC20 defines a method for swapping some native token
 	SwapFromERC20(context.Context, *MsgSwapFromERC20) (*MsgSwapFromERC20Response, error)
 	// UpdateParams defines a governance operation for updating the token
 	// module parameters. The authority is defined in the keeper.

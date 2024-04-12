@@ -680,6 +680,7 @@ var (
 	fd_EventSwapToERC20_amount   protoreflect.FieldDescriptor
 	fd_EventSwapToERC20_sender   protoreflect.FieldDescriptor
 	fd_EventSwapToERC20_receiver protoreflect.FieldDescriptor
+	fd_EventSwapToERC20_contract protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -688,6 +689,7 @@ func init() {
 	fd_EventSwapToERC20_amount = md_EventSwapToERC20.Fields().ByName("amount")
 	fd_EventSwapToERC20_sender = md_EventSwapToERC20.Fields().ByName("sender")
 	fd_EventSwapToERC20_receiver = md_EventSwapToERC20.Fields().ByName("receiver")
+	fd_EventSwapToERC20_contract = md_EventSwapToERC20.Fields().ByName("contract")
 }
 
 var _ protoreflect.Message = (*fastReflection_EventSwapToERC20)(nil)
@@ -773,6 +775,12 @@ func (x *fastReflection_EventSwapToERC20) Range(f func(protoreflect.FieldDescrip
 			return
 		}
 	}
+	if x.Contract != "" {
+		value := protoreflect.ValueOfString(x.Contract)
+		if !f(fd_EventSwapToERC20_contract, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -794,6 +802,8 @@ func (x *fastReflection_EventSwapToERC20) Has(fd protoreflect.FieldDescriptor) b
 		return x.Sender != ""
 	case "irismod.token.v1.EventSwapToERC20.receiver":
 		return x.Receiver != ""
+	case "irismod.token.v1.EventSwapToERC20.contract":
+		return x.Contract != ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: irismod.token.v1.EventSwapToERC20"))
@@ -816,6 +826,8 @@ func (x *fastReflection_EventSwapToERC20) Clear(fd protoreflect.FieldDescriptor)
 		x.Sender = ""
 	case "irismod.token.v1.EventSwapToERC20.receiver":
 		x.Receiver = ""
+	case "irismod.token.v1.EventSwapToERC20.contract":
+		x.Contract = ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: irismod.token.v1.EventSwapToERC20"))
@@ -840,6 +852,9 @@ func (x *fastReflection_EventSwapToERC20) Get(descriptor protoreflect.FieldDescr
 		return protoreflect.ValueOfString(value)
 	case "irismod.token.v1.EventSwapToERC20.receiver":
 		value := x.Receiver
+		return protoreflect.ValueOfString(value)
+	case "irismod.token.v1.EventSwapToERC20.contract":
+		value := x.Contract
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
@@ -867,6 +882,8 @@ func (x *fastReflection_EventSwapToERC20) Set(fd protoreflect.FieldDescriptor, v
 		x.Sender = value.Interface().(string)
 	case "irismod.token.v1.EventSwapToERC20.receiver":
 		x.Receiver = value.Interface().(string)
+	case "irismod.token.v1.EventSwapToERC20.contract":
+		x.Contract = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: irismod.token.v1.EventSwapToERC20"))
@@ -896,6 +913,8 @@ func (x *fastReflection_EventSwapToERC20) Mutable(fd protoreflect.FieldDescripto
 		panic(fmt.Errorf("field sender of message irismod.token.v1.EventSwapToERC20 is not mutable"))
 	case "irismod.token.v1.EventSwapToERC20.receiver":
 		panic(fmt.Errorf("field receiver of message irismod.token.v1.EventSwapToERC20 is not mutable"))
+	case "irismod.token.v1.EventSwapToERC20.contract":
+		panic(fmt.Errorf("field contract of message irismod.token.v1.EventSwapToERC20 is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: irismod.token.v1.EventSwapToERC20"))
@@ -915,6 +934,8 @@ func (x *fastReflection_EventSwapToERC20) NewField(fd protoreflect.FieldDescript
 	case "irismod.token.v1.EventSwapToERC20.sender":
 		return protoreflect.ValueOfString("")
 	case "irismod.token.v1.EventSwapToERC20.receiver":
+		return protoreflect.ValueOfString("")
+	case "irismod.token.v1.EventSwapToERC20.contract":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
@@ -997,6 +1018,10 @@ func (x *fastReflection_EventSwapToERC20) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
+		l = len(x.Contract)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -1025,6 +1050,13 @@ func (x *fastReflection_EventSwapToERC20) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.Contract) > 0 {
+			i -= len(x.Contract)
+			copy(dAtA[i:], x.Contract)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Contract)))
+			i--
+			dAtA[i] = 0x22
 		}
 		if len(x.Receiver) > 0 {
 			i -= len(x.Receiver)
@@ -1203,6 +1235,38 @@ func (x *fastReflection_EventSwapToERC20) ProtoMethods() *protoiface.Methods {
 				}
 				x.Receiver = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
+			case 4:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Contract = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -1239,20 +1303,20 @@ func (x *fastReflection_EventSwapToERC20) ProtoMethods() *protoiface.Methods {
 }
 
 var (
-	md_EventSwapFromERC20          protoreflect.MessageDescriptor
-	fd_EventSwapFromERC20_contract protoreflect.FieldDescriptor
-	fd_EventSwapFromERC20_amount   protoreflect.FieldDescriptor
-	fd_EventSwapFromERC20_sender   protoreflect.FieldDescriptor
-	fd_EventSwapFromERC20_receiver protoreflect.FieldDescriptor
+	md_EventSwapFromERC20               protoreflect.MessageDescriptor
+	fd_EventSwapFromERC20_wanted_amount protoreflect.FieldDescriptor
+	fd_EventSwapFromERC20_sender        protoreflect.FieldDescriptor
+	fd_EventSwapFromERC20_receiver      protoreflect.FieldDescriptor
+	fd_EventSwapFromERC20_contract      protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_irismod_token_v1_event_proto_init()
 	md_EventSwapFromERC20 = File_irismod_token_v1_event_proto.Messages().ByName("EventSwapFromERC20")
-	fd_EventSwapFromERC20_contract = md_EventSwapFromERC20.Fields().ByName("contract")
-	fd_EventSwapFromERC20_amount = md_EventSwapFromERC20.Fields().ByName("amount")
+	fd_EventSwapFromERC20_wanted_amount = md_EventSwapFromERC20.Fields().ByName("wanted_amount")
 	fd_EventSwapFromERC20_sender = md_EventSwapFromERC20.Fields().ByName("sender")
 	fd_EventSwapFromERC20_receiver = md_EventSwapFromERC20.Fields().ByName("receiver")
+	fd_EventSwapFromERC20_contract = md_EventSwapFromERC20.Fields().ByName("contract")
 }
 
 var _ protoreflect.Message = (*fastReflection_EventSwapFromERC20)(nil)
@@ -1320,15 +1384,9 @@ func (x *fastReflection_EventSwapFromERC20) Interface() protoreflect.ProtoMessag
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_EventSwapFromERC20) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Contract != "" {
-		value := protoreflect.ValueOfString(x.Contract)
-		if !f(fd_EventSwapFromERC20_contract, value) {
-			return
-		}
-	}
-	if x.Amount != int64(0) {
-		value := protoreflect.ValueOfInt64(x.Amount)
-		if !f(fd_EventSwapFromERC20_amount, value) {
+	if x.WantedAmount != nil {
+		value := protoreflect.ValueOfMessage(x.WantedAmount.ProtoReflect())
+		if !f(fd_EventSwapFromERC20_wanted_amount, value) {
 			return
 		}
 	}
@@ -1341,6 +1399,12 @@ func (x *fastReflection_EventSwapFromERC20) Range(f func(protoreflect.FieldDescr
 	if x.Receiver != "" {
 		value := protoreflect.ValueOfString(x.Receiver)
 		if !f(fd_EventSwapFromERC20_receiver, value) {
+			return
+		}
+	}
+	if x.Contract != "" {
+		value := protoreflect.ValueOfString(x.Contract)
+		if !f(fd_EventSwapFromERC20_contract, value) {
 			return
 		}
 	}
@@ -1359,14 +1423,14 @@ func (x *fastReflection_EventSwapFromERC20) Range(f func(protoreflect.FieldDescr
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_EventSwapFromERC20) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "irismod.token.v1.EventSwapFromERC20.contract":
-		return x.Contract != ""
-	case "irismod.token.v1.EventSwapFromERC20.amount":
-		return x.Amount != int64(0)
+	case "irismod.token.v1.EventSwapFromERC20.wanted_amount":
+		return x.WantedAmount != nil
 	case "irismod.token.v1.EventSwapFromERC20.sender":
 		return x.Sender != ""
 	case "irismod.token.v1.EventSwapFromERC20.receiver":
 		return x.Receiver != ""
+	case "irismod.token.v1.EventSwapFromERC20.contract":
+		return x.Contract != ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: irismod.token.v1.EventSwapFromERC20"))
@@ -1383,14 +1447,14 @@ func (x *fastReflection_EventSwapFromERC20) Has(fd protoreflect.FieldDescriptor)
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_EventSwapFromERC20) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "irismod.token.v1.EventSwapFromERC20.contract":
-		x.Contract = ""
-	case "irismod.token.v1.EventSwapFromERC20.amount":
-		x.Amount = int64(0)
+	case "irismod.token.v1.EventSwapFromERC20.wanted_amount":
+		x.WantedAmount = nil
 	case "irismod.token.v1.EventSwapFromERC20.sender":
 		x.Sender = ""
 	case "irismod.token.v1.EventSwapFromERC20.receiver":
 		x.Receiver = ""
+	case "irismod.token.v1.EventSwapFromERC20.contract":
+		x.Contract = ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: irismod.token.v1.EventSwapFromERC20"))
@@ -1407,17 +1471,17 @@ func (x *fastReflection_EventSwapFromERC20) Clear(fd protoreflect.FieldDescripto
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_EventSwapFromERC20) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "irismod.token.v1.EventSwapFromERC20.contract":
-		value := x.Contract
-		return protoreflect.ValueOfString(value)
-	case "irismod.token.v1.EventSwapFromERC20.amount":
-		value := x.Amount
-		return protoreflect.ValueOfInt64(value)
+	case "irismod.token.v1.EventSwapFromERC20.wanted_amount":
+		value := x.WantedAmount
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	case "irismod.token.v1.EventSwapFromERC20.sender":
 		value := x.Sender
 		return protoreflect.ValueOfString(value)
 	case "irismod.token.v1.EventSwapFromERC20.receiver":
 		value := x.Receiver
+		return protoreflect.ValueOfString(value)
+	case "irismod.token.v1.EventSwapFromERC20.contract":
+		value := x.Contract
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
@@ -1439,14 +1503,14 @@ func (x *fastReflection_EventSwapFromERC20) Get(descriptor protoreflect.FieldDes
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_EventSwapFromERC20) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "irismod.token.v1.EventSwapFromERC20.contract":
-		x.Contract = value.Interface().(string)
-	case "irismod.token.v1.EventSwapFromERC20.amount":
-		x.Amount = value.Int()
+	case "irismod.token.v1.EventSwapFromERC20.wanted_amount":
+		x.WantedAmount = value.Message().Interface().(*v1beta1.Coin)
 	case "irismod.token.v1.EventSwapFromERC20.sender":
 		x.Sender = value.Interface().(string)
 	case "irismod.token.v1.EventSwapFromERC20.receiver":
 		x.Receiver = value.Interface().(string)
+	case "irismod.token.v1.EventSwapFromERC20.contract":
+		x.Contract = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: irismod.token.v1.EventSwapFromERC20"))
@@ -1467,14 +1531,17 @@ func (x *fastReflection_EventSwapFromERC20) Set(fd protoreflect.FieldDescriptor,
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_EventSwapFromERC20) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "irismod.token.v1.EventSwapFromERC20.contract":
-		panic(fmt.Errorf("field contract of message irismod.token.v1.EventSwapFromERC20 is not mutable"))
-	case "irismod.token.v1.EventSwapFromERC20.amount":
-		panic(fmt.Errorf("field amount of message irismod.token.v1.EventSwapFromERC20 is not mutable"))
+	case "irismod.token.v1.EventSwapFromERC20.wanted_amount":
+		if x.WantedAmount == nil {
+			x.WantedAmount = new(v1beta1.Coin)
+		}
+		return protoreflect.ValueOfMessage(x.WantedAmount.ProtoReflect())
 	case "irismod.token.v1.EventSwapFromERC20.sender":
 		panic(fmt.Errorf("field sender of message irismod.token.v1.EventSwapFromERC20 is not mutable"))
 	case "irismod.token.v1.EventSwapFromERC20.receiver":
 		panic(fmt.Errorf("field receiver of message irismod.token.v1.EventSwapFromERC20 is not mutable"))
+	case "irismod.token.v1.EventSwapFromERC20.contract":
+		panic(fmt.Errorf("field contract of message irismod.token.v1.EventSwapFromERC20 is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: irismod.token.v1.EventSwapFromERC20"))
@@ -1488,13 +1555,14 @@ func (x *fastReflection_EventSwapFromERC20) Mutable(fd protoreflect.FieldDescrip
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_EventSwapFromERC20) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "irismod.token.v1.EventSwapFromERC20.contract":
-		return protoreflect.ValueOfString("")
-	case "irismod.token.v1.EventSwapFromERC20.amount":
-		return protoreflect.ValueOfInt64(int64(0))
+	case "irismod.token.v1.EventSwapFromERC20.wanted_amount":
+		m := new(v1beta1.Coin)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "irismod.token.v1.EventSwapFromERC20.sender":
 		return protoreflect.ValueOfString("")
 	case "irismod.token.v1.EventSwapFromERC20.receiver":
+		return protoreflect.ValueOfString("")
+	case "irismod.token.v1.EventSwapFromERC20.contract":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
@@ -1565,18 +1633,19 @@ func (x *fastReflection_EventSwapFromERC20) ProtoMethods() *protoiface.Methods {
 		var n int
 		var l int
 		_ = l
-		l = len(x.Contract)
-		if l > 0 {
+		if x.WantedAmount != nil {
+			l = options.Size(x.WantedAmount)
 			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.Amount != 0 {
-			n += 1 + runtime.Sov(uint64(x.Amount))
 		}
 		l = len(x.Sender)
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		l = len(x.Receiver)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.Contract)
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
@@ -1609,29 +1678,38 @@ func (x *fastReflection_EventSwapFromERC20) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
+		if len(x.Contract) > 0 {
+			i -= len(x.Contract)
+			copy(dAtA[i:], x.Contract)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Contract)))
+			i--
+			dAtA[i] = 0x22
+		}
 		if len(x.Receiver) > 0 {
 			i -= len(x.Receiver)
 			copy(dAtA[i:], x.Receiver)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Receiver)))
 			i--
-			dAtA[i] = 0x22
+			dAtA[i] = 0x1a
 		}
 		if len(x.Sender) > 0 {
 			i -= len(x.Sender)
 			copy(dAtA[i:], x.Sender)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Sender)))
 			i--
-			dAtA[i] = 0x1a
+			dAtA[i] = 0x12
 		}
-		if x.Amount != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.Amount))
-			i--
-			dAtA[i] = 0x10
-		}
-		if len(x.Contract) > 0 {
-			i -= len(x.Contract)
-			copy(dAtA[i:], x.Contract)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Contract)))
+		if x.WantedAmount != nil {
+			encoded, err := options.Marshal(x.WantedAmount)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			i--
 			dAtA[i] = 0xa
 		}
@@ -1686,9 +1764,9 @@ func (x *fastReflection_EventSwapFromERC20) ProtoMethods() *protoiface.Methods {
 			switch fieldNum {
 			case 1:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field WantedAmount", wireType)
 				}
-				var stringLen uint64
+				var msglen int
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -1698,44 +1776,29 @@ func (x *fastReflection_EventSwapFromERC20) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
+					msglen |= int(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
+				if msglen < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
-				postIndex := iNdEx + intStringLen
+				postIndex := iNdEx + msglen
 				if postIndex < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.Contract = string(dAtA[iNdEx:postIndex])
+				if x.WantedAmount == nil {
+					x.WantedAmount = &v1beta1.Coin{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.WantedAmount); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
 				iNdEx = postIndex
 			case 2:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
-				}
-				x.Amount = 0
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					x.Amount |= int64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-			case 3:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
 				}
@@ -1767,7 +1830,7 @@ func (x *fastReflection_EventSwapFromERC20) ProtoMethods() *protoiface.Methods {
 				}
 				x.Sender = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 4:
+			case 3:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Receiver", wireType)
 				}
@@ -1798,6 +1861,38 @@ func (x *fastReflection_EventSwapFromERC20) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				x.Receiver = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 4:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Contract = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
@@ -1924,6 +2019,7 @@ type EventSwapToERC20 struct {
 	Amount   *v1beta1.Coin `protobuf:"bytes,1,opt,name=amount,proto3" json:"amount,omitempty"`
 	Sender   string        `protobuf:"bytes,2,opt,name=sender,proto3" json:"sender,omitempty"`
 	Receiver string        `protobuf:"bytes,3,opt,name=receiver,proto3" json:"receiver,omitempty"`
+	Contract string        `protobuf:"bytes,4,opt,name=contract,proto3" json:"contract,omitempty"`
 }
 
 func (x *EventSwapToERC20) Reset() {
@@ -1967,16 +2063,23 @@ func (x *EventSwapToERC20) GetReceiver() string {
 	return ""
 }
 
+func (x *EventSwapToERC20) GetContract() string {
+	if x != nil {
+		return x.Contract
+	}
+	return ""
+}
+
 // EventSwapFromERC20 is an event emitted when swapping token from ERC20 to native token.
 type EventSwapFromERC20 struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Contract string `protobuf:"bytes,1,opt,name=contract,proto3" json:"contract,omitempty"`
-	Amount   int64  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	Sender   string `protobuf:"bytes,3,opt,name=sender,proto3" json:"sender,omitempty"`
-	Receiver string `protobuf:"bytes,4,opt,name=receiver,proto3" json:"receiver,omitempty"`
+	WantedAmount *v1beta1.Coin `protobuf:"bytes,1,opt,name=wanted_amount,json=wantedAmount,proto3" json:"wanted_amount,omitempty"`
+	Sender       string        `protobuf:"bytes,2,opt,name=sender,proto3" json:"sender,omitempty"`
+	Receiver     string        `protobuf:"bytes,3,opt,name=receiver,proto3" json:"receiver,omitempty"`
+	Contract     string        `protobuf:"bytes,4,opt,name=contract,proto3" json:"contract,omitempty"`
 }
 
 func (x *EventSwapFromERC20) Reset() {
@@ -1999,18 +2102,11 @@ func (*EventSwapFromERC20) Descriptor() ([]byte, []int) {
 	return file_irismod_token_v1_event_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *EventSwapFromERC20) GetContract() string {
+func (x *EventSwapFromERC20) GetWantedAmount() *v1beta1.Coin {
 	if x != nil {
-		return x.Contract
+		return x.WantedAmount
 	}
-	return ""
-}
-
-func (x *EventSwapFromERC20) GetAmount() int64 {
-	if x != nil {
-		return x.Amount
-	}
-	return 0
+	return nil
 }
 
 func (x *EventSwapFromERC20) GetSender() string {
@@ -2023,6 +2119,13 @@ func (x *EventSwapFromERC20) GetSender() string {
 func (x *EventSwapFromERC20) GetReceiver() string {
 	if x != nil {
 		return x.Receiver
+	}
+	return ""
+}
+
+func (x *EventSwapFromERC20) GetContract() string {
+	if x != nil {
+		return x.Contract
 	}
 	return ""
 }
@@ -2047,7 +2150,7 @@ var file_irismod_token_v1_event_proto_rawDesc = []byte{
 	0x75, 0x6e, 0x69, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x69, 0x6e, 0x55,
 	0x6e, 0x69, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74, 0x18,
 	0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74, 0x22,
-	0x99, 0x01, 0x0a, 0x10, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x53, 0x77, 0x61, 0x70, 0x54, 0x6f, 0x45,
+	0xb5, 0x01, 0x0a, 0x10, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x53, 0x77, 0x61, 0x70, 0x54, 0x6f, 0x45,
 	0x52, 0x43, 0x32, 0x30, 0x12, 0x37, 0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61,
 	0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42,
@@ -2056,31 +2159,35 @@ var file_irismod_token_v1_event_proto_rawDesc = []byte{
 	0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73,
 	0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x06, 0x73, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x12,
 	0x1a, 0x0a, 0x08, 0x72, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x08, 0x72, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x72, 0x22, 0xb0, 0x01, 0x0a, 0x12,
-	0x45, 0x76, 0x65, 0x6e, 0x74, 0x53, 0x77, 0x61, 0x70, 0x46, 0x72, 0x6f, 0x6d, 0x45, 0x52, 0x43,
-	0x32, 0x30, 0x12, 0x1a, 0x0a, 0x08, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74, 0x12, 0x16,
-	0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06,
-	0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x30, 0x0a, 0x06, 0x73, 0x65, 0x6e, 0x64, 0x65, 0x72,
-	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d,
-	0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67,
-	0x52, 0x06, 0x73, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x12, 0x34, 0x0a, 0x08, 0x72, 0x65, 0x63, 0x65,
-	0x69, 0x76, 0x65, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14,
-	0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74,
-	0x72, 0x69, 0x6e, 0x67, 0x52, 0x08, 0x72, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x72, 0x42, 0xc1,
-	0x01, 0xc8, 0xe1, 0x1e, 0x00, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x2e, 0x69, 0x72, 0x69, 0x73, 0x6d,
-	0x6f, 0x64, 0x2e, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x2e, 0x76, 0x31, 0x42, 0x0a, 0x45, 0x76, 0x65,
-	0x6e, 0x74, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x37, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x69, 0x72, 0x69, 0x73, 0x6e, 0x65, 0x74, 0x2f, 0x69, 0x72,
-	0x69, 0x73, 0x6d, 0x6f, 0x64, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x72, 0x69, 0x73, 0x6d, 0x6f,
-	0x64, 0x2f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x2f, 0x76, 0x31, 0x3b, 0x74, 0x6f, 0x6b, 0x65, 0x6e,
-	0x76, 0x31, 0xa2, 0x02, 0x03, 0x49, 0x54, 0x58, 0xaa, 0x02, 0x10, 0x49, 0x72, 0x69, 0x73, 0x6d,
-	0x6f, 0x64, 0x2e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x10, 0x49, 0x72,
-	0x69, 0x73, 0x6d, 0x6f, 0x64, 0x5c, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x5c, 0x56, 0x31, 0xe2, 0x02,
-	0x1c, 0x49, 0x72, 0x69, 0x73, 0x6d, 0x6f, 0x64, 0x5c, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x5c, 0x56,
-	0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x12,
-	0x49, 0x72, 0x69, 0x73, 0x6d, 0x6f, 0x64, 0x3a, 0x3a, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x3a, 0x3a,
-	0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x09, 0x52, 0x08, 0x72, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x72, 0x12, 0x1a, 0x0a, 0x08, 0x63,
+	0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63,
+	0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74, 0x22, 0xd8, 0x01, 0x0a, 0x12, 0x45, 0x76, 0x65, 0x6e,
+	0x74, 0x53, 0x77, 0x61, 0x70, 0x46, 0x72, 0x6f, 0x6d, 0x45, 0x52, 0x43, 0x32, 0x30, 0x12, 0x3e,
+	0x0a, 0x0d, 0x77, 0x61, 0x6e, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62,
+	0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e,
+	0x52, 0x0c, 0x77, 0x61, 0x6e, 0x74, 0x65, 0x64, 0x41, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x30,
+	0x0a, 0x06, 0x73, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18,
+	0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65,
+	0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x06, 0x73, 0x65, 0x6e, 0x64, 0x65, 0x72,
+	0x12, 0x34, 0x0a, 0x08, 0x72, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x72, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41,
+	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x08, 0x72, 0x65,
+	0x63, 0x65, 0x69, 0x76, 0x65, 0x72, 0x12, 0x1a, 0x0a, 0x08, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x61,
+	0x63, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x61,
+	0x63, 0x74, 0x42, 0xc1, 0x01, 0xc8, 0xe1, 0x1e, 0x00, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x2e, 0x69,
+	0x72, 0x69, 0x73, 0x6d, 0x6f, 0x64, 0x2e, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x2e, 0x76, 0x31, 0x42,
+	0x0a, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x37, 0x67,
+	0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x69, 0x72, 0x69, 0x73, 0x6e, 0x65,
+	0x74, 0x2f, 0x69, 0x72, 0x69, 0x73, 0x6d, 0x6f, 0x64, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x72,
+	0x69, 0x73, 0x6d, 0x6f, 0x64, 0x2f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x2f, 0x76, 0x31, 0x3b, 0x74,
+	0x6f, 0x6b, 0x65, 0x6e, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x49, 0x54, 0x58, 0xaa, 0x02, 0x10, 0x49,
+	0x72, 0x69, 0x73, 0x6d, 0x6f, 0x64, 0x2e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x2e, 0x56, 0x31, 0xca,
+	0x02, 0x10, 0x49, 0x72, 0x69, 0x73, 0x6d, 0x6f, 0x64, 0x5c, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x5c,
+	0x56, 0x31, 0xe2, 0x02, 0x1c, 0x49, 0x72, 0x69, 0x73, 0x6d, 0x6f, 0x64, 0x5c, 0x54, 0x6f, 0x6b,
+	0x65, 0x6e, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74,
+	0x61, 0xea, 0x02, 0x12, 0x49, 0x72, 0x69, 0x73, 0x6d, 0x6f, 0x64, 0x3a, 0x3a, 0x54, 0x6f, 0x6b,
+	0x65, 0x6e, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2104,11 +2211,12 @@ var file_irismod_token_v1_event_proto_goTypes = []interface{}{
 }
 var file_irismod_token_v1_event_proto_depIdxs = []int32{
 	3, // 0: irismod.token.v1.EventSwapToERC20.amount:type_name -> cosmos.base.v1beta1.Coin
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	3, // 1: irismod.token.v1.EventSwapFromERC20.wanted_amount:type_name -> cosmos.base.v1beta1.Coin
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_irismod_token_v1_event_proto_init() }

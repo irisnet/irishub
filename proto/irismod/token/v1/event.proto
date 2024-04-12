@@ -10,26 +10,27 @@ option (gogoproto.goproto_getters_all) = false;
 
 // EventDeployERC20 is an event emitted when deploying ERC20.
 message EventDeployERC20 {
-    string symbol = 1;
-    string name = 2;
-    uint32 scale = 3;
-    string min_unit = 4;
-    string contract = 5;
+  string symbol = 1;
+  string name = 2;
+  uint32 scale = 3;
+  string min_unit = 4;
+  string contract = 5;
 }
 
-// EventSwapToERC20 is an event emitted when swapping token from native token to ERC20.
+// EventSwapToERC20 is an event emitted when swapping token from native token to
+// ERC20.
 message EventSwapToERC20 {
-  cosmos.base.v1beta1.Coin amount = 1 [(gogoproto.nullable) = false];
+  cosmos.base.v1beta1.Coin amount = 1 [ (gogoproto.nullable) = false ];
   string sender = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
   string receiver = 3;
+  string contract = 4;
 }
 
-
-// EventSwapFromERC20 is an event emitted when swapping token from ERC20 to native token.
+// EventSwapFromERC20 is an event emitted when swapping token from ERC20 to
+// native token.
 message EventSwapFromERC20 {
-  string contract = 1;
-  int64 amount = 2;
-  string sender = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
-  string receiver = 4 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  cosmos.base.v1beta1.Coin wanted_amount = 1;
+  string sender = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string receiver = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string contract = 4;
 }
-

@@ -30,13 +30,13 @@ service Msg {
   rpc TransferTokenOwner(MsgTransferTokenOwner)
       returns (MsgTransferTokenOwnerResponse);
 
-  // SwapFeeToken defines a method for swaping some fee token
+  // SwapFeeToken defines a method for swapping some fee token
   rpc SwapFeeToken(MsgSwapFeeToken) returns (MsgSwapFeeTokenResponse);
 
-  // SwapToERC20 defines a method for swaping some erc20 token
+  // SwapToERC20 defines a method for swapping some erc20 token
   rpc SwapToERC20(MsgSwapToERC20) returns (MsgSwapToERC20Response);
 
-  // SwapFromERC20 defines a method for some native token
+  // SwapFromERC20 defines a method for swapping some native token
   rpc SwapFromERC20(MsgSwapFromERC20) returns (MsgSwapFromERC20Response);
 
   // UpdateParams defines a governance operation for updating the token
@@ -171,7 +171,7 @@ message MsgDeployERC20Response {}
 message MsgSwapToERC20 {
   option (cosmos.msg.v1.signer) = "sender";
 
-  cosmos.base.v1beta1.Coin amount = 1 [(gogoproto.nullable) = false];
+  cosmos.base.v1beta1.Coin amount = 1 [ (gogoproto.nullable) = false ];
   string sender = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
   string receiver = 3;
 }
@@ -183,8 +183,7 @@ message MsgSwapToERC20Response {}
 message MsgSwapFromERC20 {
   option (cosmos.msg.v1.signer) = "sender";
 
-  string contract = 1;
-  int64 amount = 2;
+  cosmos.base.v1beta1.Coin wanted_amount = 1 [ (gogoproto.nullable) = false ];
   string sender = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
   string receiver = 4 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 }
