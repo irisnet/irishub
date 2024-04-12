@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract Token is ERC20, ERC20Permit, Ownable, ReentrancyGuard {
-    event SwapToNative(string to, uint256 amount, bool isERIS);
+    event SwapToNative(string to, uint256 amount);
 
     uint8 private _scale;
 
@@ -66,18 +66,13 @@ contract Token is ERC20, ERC20Permit, Ownable, ReentrancyGuard {
      *
      * - `to` cannot be the zero address.
      * - `amount` caller must have a balance of at least `amount`.
-     * - `isERIS` whether to exchange for iris.
      */
     function swapToNative(
         string memory to,
-        uint256 amount,
-        bool isERIS
+        uint256 amount
     ) public nonReentrant {
-        require(msg.sender.code.length == 0, "only called by EOA address");
         require(bytes(to).length > 0, "to must be vaild iaa address");
-        isERIS
-            ? require(msg.sender.balance >= amount, "insufficient funds")
-            : _burn(msg.sender, amount);
-        emit SwapToNative(to, amount, isERIS);
+        _burn(msg.sender, amount);
+        emit SwapToNative(to, amount);
     }
 }
