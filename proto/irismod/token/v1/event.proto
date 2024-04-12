@@ -23,7 +23,7 @@ message EventSwapToERC20 {
   cosmos.base.v1beta1.Coin amount = 1 [ (gogoproto.nullable) = false ];
   string sender = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
   string receiver = 3;
-  string contract = 4;
+  string to_contract = 4;
 }
 
 // EventSwapFromERC20 is an event emitted when swapping token from ERC20 to
@@ -32,5 +32,5 @@ message EventSwapFromERC20 {
   cosmos.base.v1beta1.Coin wanted_amount = 1;
   string sender = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
   string receiver = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
-  string contract = 4;
+  string from_contract = 4;
 }

@@ -45,19 +45,18 @@ type MsgClient interface {
 	BurnToken(ctx context.Context, in *MsgBurnToken, opts ...grpc.CallOption) (*MsgBurnTokenResponse, error)
 	// TransferTokenOwner defines a method for transfering token owner
 	TransferTokenOwner(ctx context.Context, in *MsgTransferTokenOwner, opts ...grpc.CallOption) (*MsgTransferTokenOwnerResponse, error)
-	// SwapFeeToken defines a method for swapping some fee token
+	// SwapFeeToken defines a method for swapping between IRIS and ERIS
 	SwapFeeToken(ctx context.Context, in *MsgSwapFeeToken, opts ...grpc.CallOption) (*MsgSwapFeeTokenResponse, error)
-	// SwapToERC20 defines a method for swapping some erc20 token
+	// SwapToERC20 defines a method for swapping some native token to its ERC20 counterpart
 	SwapToERC20(ctx context.Context, in *MsgSwapToERC20, opts ...grpc.CallOption) (*MsgSwapToERC20Response, error)
-	// SwapFromERC20 defines a method for swapping some native token
+	// SwapFromERC20 defines a method for swapping some ERC20 token to its native counterpart
 	SwapFromERC20(ctx context.Context, in *MsgSwapFromERC20, opts ...grpc.CallOption) (*MsgSwapFromERC20Response, error)
 	// UpdateParams defines a governance operation for updating the token
 	// module parameters. The authority is defined in the keeper.
 	//
 	// Since: cosmos-sdk 0.47
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
-	// DeployERC20 defines a governance operation for deploying erc20 token for
-	// the native token
+	// DeployERC20 defines a governance operation for deploying an ERC20 contract that binds to a native token
 	DeployERC20(ctx context.Context, in *MsgDeployERC20, opts ...grpc.CallOption) (*MsgDeployERC20Response, error)
 }
 
@@ -173,19 +172,18 @@ type MsgServer interface {
 	BurnToken(context.Context, *MsgBurnToken) (*MsgBurnTokenResponse, error)
 	// TransferTokenOwner defines a method for transfering token owner
 	TransferTokenOwner(context.Context, *MsgTransferTokenOwner) (*MsgTransferTokenOwnerResponse, error)
-	// SwapFeeToken defines a method for swapping some fee token
+	// SwapFeeToken defines a method for swapping between IRIS and ERIS
 	SwapFeeToken(context.Context, *MsgSwapFeeToken) (*MsgSwapFeeTokenResponse, error)
-	// SwapToERC20 defines a method for swapping some erc20 token
+	// SwapToERC20 defines a method for swapping some native token to its ERC20 counterpart
 	SwapToERC20(context.Context, *MsgSwapToERC20) (*MsgSwapToERC20Response, error)
-	// SwapFromERC20 defines a method for swapping some native token
+	// SwapFromERC20 defines a method for swapping some ERC20 token to its native counterpart
 	SwapFromERC20(context.Context, *MsgSwapFromERC20) (*MsgSwapFromERC20Response, error)
 	// UpdateParams defines a governance operation for updating the token
 	// module parameters. The authority is defined in the keeper.
 	//
 	// Since: cosmos-sdk 0.47
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
-	// DeployERC20 defines a governance operation for deploying erc20 token for
-	// the native token
+	// DeployERC20 defines a governance operation for deploying an ERC20 contract that binds to a native token
 	DeployERC20(context.Context, *MsgDeployERC20) (*MsgDeployERC20Response, error)
 	mustEmbedUnimplementedMsgServer()
 }
