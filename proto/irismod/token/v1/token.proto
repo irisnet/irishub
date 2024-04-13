@@ -19,6 +19,7 @@ message Token {
   uint64 max_supply = 6;
   bool mintable = 7;
   string owner = 8;
+  string contract = 9;
 }
 
 // Params defines token module's parameters

@@ -30,14 +30,23 @@ service Msg {
   rpc TransferTokenOwner(MsgTransferTokenOwner)
       returns (MsgTransferTokenOwnerResponse);
 
-  // SwapFeeToken defines a method for swap some fee token
+  // SwapFeeToken defines a method for swapping between IRIS and ERIS
   rpc SwapFeeToken(MsgSwapFeeToken) returns (MsgSwapFeeTokenResponse);
+
+  // SwapToERC20 defines a method for swapping some native token to its ERC20 counterpart
+  rpc SwapToERC20(MsgSwapToERC20) returns (MsgSwapToERC20Response);
+
+  // SwapFromERC20 defines a method for swapping some ERC20 token to its native counterpart
+  rpc SwapFromERC20(MsgSwapFromERC20) returns (MsgSwapFromERC20Response);
 
   // UpdateParams defines a governance operation for updating the token
   // module parameters. The authority is defined in the keeper.
   //
   // Since: cosmos-sdk 0.47
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+
+  // DeployERC20 defines a governance operation for deploying an ERC20 contract that binds to a native token
+  rpc DeployERC20(MsgDeployERC20) returns (MsgDeployERC20Response);
 }
 
 // MsgIssueToken defines an SDK message for issuing a new token
@@ -144,3 +153,39 @@ message MsgUpdateParams {
 //
 // Since: cosmos-sdk 0.47
 message MsgUpdateParamsResponse {}
+
+// MsgDeployERC20 defines an SDK message for DeployERC20
+message MsgDeployERC20 {
+  string symbol = 1;
+  string name = 2;
+  uint32 scale = 3;
+  string min_unit = 4;
+  string authority = 5 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgDeployERC20Response defines the Msg/DeployERC20 response type
+message MsgDeployERC20Response {}
+
+// MsgSwapToERC20 defines an SDK message for SwapToERC20
+message MsgSwapToERC20 {
+  option (cosmos.msg.v1.signer) = "sender";
+
+  cosmos.base.v1beta1.Coin amount = 1 [ (gogoproto.nullable) = false ];
+  string sender = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string receiver = 3;
+}
+
+// MsgSwapToERC20Response defines the Msg/SwapToERC20 response type
+message MsgSwapToERC20Response {}
+
+// MsgSwapFromERC20 defines an SDK message for SwapFromERC20
+message MsgSwapFromERC20 {
+  option (cosmos.msg.v1.signer) = "sender";
+
+  cosmos.base.v1beta1.Coin wanted_amount = 1 [ (gogoproto.nullable) = false ];
+  string sender = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string receiver = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgSwapFromERC20Response defines the Msg/SwapFromERC20 response type
+message MsgSwapFromERC20Response {}
