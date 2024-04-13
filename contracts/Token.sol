@@ -71,7 +71,7 @@ contract Token is ERC20, ERC20Permit, Ownable, ReentrancyGuard {
         string memory to,
         uint256 amount
     ) public nonReentrant {
-        require(bytes(to).length > 0, "to must be vaild iaa address");
+        require(bytes(to).length > 0, "to must be a vaild iaa address");
         _burn(msg.sender, amount);
         emit SwapToNative(to, amount);
     }
