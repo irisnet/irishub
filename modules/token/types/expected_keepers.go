@@ -69,3 +69,4 @@ type EVMKeeper interface {
 type ICS20Keeper interface{
 	HasTrace(ctx sdk.Context, denom string) bool
 }
+

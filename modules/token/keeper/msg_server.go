@@ -272,48 +272,24 @@ func (m msgServer) UpdateParams(
 
 // DeployERC20 implements v1.MsgServer.
 func (m msgServer) DeployERC20(goCtx context.Context, msg *v1.MsgDeployERC20) (*v1.MsgDeployERC20Response, error) {
-	var (
-		ctx     = sdk.UnwrapSDKContext(goCtx)
-		name    = msg.Name
-		symbol  = msg.Symbol
-		scale   = msg.Scale
-		minUnit = msg.MinUnit
-		token   v1.Token
-		err     error
-	)
+	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if !m.k.HasMinUint(ctx, msg.MinUnit) {
-		if !m.k.ics20Keeper.HasTrace(ctx, msg.MinUnit) {
-			return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "token: %s not exist", msg.MinUnit)
-		}
-		token = v1.Token{
-			Symbol:   symbol,
-			Name:     name,
-			Scale:    scale,
-			MinUnit:  msg.MinUnit,
-			Mintable: true,
-			Owner:    m.k.accountKeeper.GetModuleAddress(types.ModuleName).String(),
-		}
-	} else {
-		token, err = m.k.getTokenByMinUnit(ctx, msg.MinUnit)
-		if err != nil {
-			return nil, err
-		}
-		if len(token.Contract) > 0 {
-			return nil, errorsmod.Wrapf(types.ErrERC20AlreadyExists, "token: %s already deployed erc20 contract: %s", token.Symbol, token.Contract)
-		}
-		name = token.Name
-		symbol = token.Symbol
-		scale = token.Scale
-		minUnit = token.MinUnit
-	}
-
-	contractAddr, err := m.k.DeployERC20(ctx, name, symbol, minUnit, int8(scale))
+	token, err := m.k.buildERC20Token(ctx, msg.Name, msg.Symbol, msg.MinUnit, msg.Scale)
 	if err != nil {
 		return nil, err
 	}
+
+	if len(token.Contract) > 0 {
+		return nil, errorsmod.Wrapf(types.ErrERC20AlreadyExists, "token: %s already deployed erc20 contract: %s", token.Symbol, token.Contract)
+	}
+
+	contractAddr, err := m.k.DeployERC20(ctx, token.Name, token.Symbol, token.MinUnit, int8(token.Scale))
+	if err != nil {
+		return nil, err
+	}
+
 	token.Contract = contractAddr.String()
-	m.k.upsertToken(ctx, token)
+	m.k.upsertToken(ctx, *token)
 	return &v1.MsgDeployERC20Response{}, nil
 }
 

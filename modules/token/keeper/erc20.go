@@ -3,6 +3,7 @@ package keeper
 import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
@@ -68,8 +69,35 @@ func (k Keeper) DeployERC20(
 	return contractAddr, nil
 }
 
-
 func (k Keeper) moduleAddress() common.Address {
 	moduleAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	return common.BytesToAddress(moduleAddr.Bytes())
+}
+
+func (k Keeper) buildERC20Token(
+	ctx sdk.Context,
+	name string,
+	symbol string,
+	minUnit string,
+	scale uint32,
+) (*v1.Token, error) {
+	if !k.HasMinUint(ctx, minUnit) {
+		if !k.ics20Keeper.HasTrace(ctx, minUnit) {
+			return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "token: %s does not exist", minUnit)
+		}
+		return &v1.Token{
+			Symbol:   symbol,
+			Name:     name,
+			Scale:    scale,
+			MinUnit:  minUnit,
+			Mintable: true,
+			Owner:    k.accountKeeper.GetModuleAddress(types.ModuleName).String(),
+		}, nil
+	}
+
+	token, err := k.getTokenByMinUnit(ctx, minUnit)
+	if err != nil {
+		return nil, err
+	}
+	return &token, nil
 }
