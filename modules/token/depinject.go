@@ -45,8 +45,10 @@ type TokenInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
-	EVMKeeper     types.EVMKeeper
-	ICS20Keeper   types.ICS20Keeper
+
+	// TODO: EVMKeeper and ICS20Keeper must be injected in the production environment, where `optional:"true"` is only used for testing.
+	EVMKeeper     types.EVMKeeper `optional:"true"`
+	ICS20Keeper   types.ICS20Keeper `optional:"true"`
 
 	// LegacySubspace is used solely for migration of x/params managed parameters
 	LegacySubspace exported.Subspace `optional:"true"`
