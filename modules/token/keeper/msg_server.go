@@ -15,7 +15,6 @@ type msgServer struct {
 	k Keeper
 }
 
-
 var _ v1.MsgServer = msgServer{}
 
 // NewMsgServerImpl returns an implementation of the token MsgServer interface
@@ -272,8 +271,50 @@ func (m msgServer) UpdateParams(
 }
 
 // DeployERC20 implements v1.MsgServer.
-func (m msgServer) DeployERC20(context.Context, *v1.MsgDeployERC20) (*v1.MsgDeployERC20Response, error) {
-	panic("unimplemented")
+func (m msgServer) DeployERC20(goCtx context.Context, msg *v1.MsgDeployERC20) (*v1.MsgDeployERC20Response, error) {
+	var (
+		ctx     = sdk.UnwrapSDKContext(goCtx)
+		name    = msg.Name
+		symbol  = msg.Symbol
+		scale   = msg.Scale
+		minUnit = msg.MinUnit
+		token   v1.Token
+		err     error
+	)
+
+	if !m.k.HasMinUint(ctx, msg.MinUnit) {
+		if !m.k.ics20Keeper.HasTrace(ctx, msg.MinUnit) {
+			return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "token: %s not exist", msg.MinUnit)
+		}
+		token = v1.Token{
+			Symbol:   symbol,
+			Name:     name,
+			Scale:    scale,
+			MinUnit:  msg.MinUnit,
+			Mintable: true,
+			Owner:    m.k.accountKeeper.GetModuleAddress(types.ModuleName).String(),
+		}
+	} else {
+		token, err = m.k.getTokenByMinUnit(ctx, msg.MinUnit)
+		if err != nil {
+			return nil, err
+		}
+		if len(token.Contract) > 0 {
+			return nil, errorsmod.Wrapf(types.ErrERC20AlreadyExists, "token: %s already deployed erc20 contract: %s", token.Symbol, token.Contract)
+		}
+		name = token.Name
+		symbol = token.Symbol
+		scale = token.Scale
+		minUnit = token.MinUnit
+	}
+
+	contractAddr, err := m.k.DeployERC20(ctx, name, symbol, minUnit, int8(scale))
+	if err != nil {
+		return nil, err
+	}
+	token.Contract = contractAddr.String()
+	m.k.upsertToken(ctx, token)
+	return &v1.MsgDeployERC20Response{}, nil
 }
 
 // SwapFromERC20 implements v1.MsgServer.
@@ -285,4 +326,3 @@ func (m msgServer) SwapFromERC20(context.Context, *v1.MsgSwapFromERC20) (*v1.Msg
 func (m msgServer) SwapToERC20(context.Context, *v1.MsgSwapToERC20) (*v1.MsgSwapToERC20Response, error) {
 	panic("unimplemented")
 }
-

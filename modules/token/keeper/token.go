@@ -114,14 +114,18 @@ func (k Keeper) HasSymbol(ctx sdk.Context, symbol string) bool {
 	return store.Has(types.KeySymbol(symbol))
 }
 
+// HasMinUint asserts a token exists by minUint
+func (k Keeper) HasMinUint(ctx sdk.Context, minUint string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.KeyMinUint(minUint))
+}
+
 // HasToken asserts a token exists
 func (k Keeper) HasToken(ctx sdk.Context, denom string) bool {
-	store := ctx.KVStore(k.storeKey)
 	if k.HasSymbol(ctx, denom) {
 		return true
 	}
-
-	return store.Has(types.KeyMinUint(denom))
+	return k.HasMinUint(ctx, denom)
 }
 
 // GetOwner returns the owner of the specified token
@@ -173,7 +177,7 @@ func (k Keeper) GetAllBurnCoin(ctx sdk.Context) []sdk.Coin {
 	store := ctx.KVStore(k.storeKey)
 
 	var coins []sdk.Coin
-	it := sdk.KVStorePrefixIterator(store, types.PeffixBurnTokenAmt)
+	it := sdk.KVStorePrefixIterator(store, types.PrefixBurnTokenAmt)
 	for ; it.Valid(); it.Next() {
 		var coin sdk.Coin
 		k.cdc.MustUnmarshal(it.Value(), &coin)
@@ -197,6 +201,14 @@ func (k Keeper) setWithMinUnit(ctx sdk.Context, minUnit, symbol string) {
 	bz := k.cdc.MustMarshal(&gogotypes.StringValue{Value: symbol})
 
 	store.Set(types.KeyMinUint(minUnit), bz)
+}
+
+func (k Keeper) setWithContract(ctx sdk.Context, contract, symbol string) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshal(&gogotypes.StringValue{Value: symbol})
+
+	store.Set(types.KeyContract(contract), bz)
 }
 
 func (k Keeper) setToken(ctx sdk.Context, token v1.Token) {
@@ -278,4 +290,24 @@ func (k Keeper) resetStoreKeyForQueryToken(
 // getTokenSupply queries the token supply from the total supply
 func (k Keeper) getTokenSupply(ctx sdk.Context, denom string) sdk.Int {
 	return k.bankKeeper.GetSupply(ctx, denom).Amount
+}
+
+
+// upsertToken updates or inserts a token into the database.
+//
+// ctx: the context in which the token is being upserted.
+// token: the token struct to be upserted.
+func (k Keeper) upsertToken(ctx sdk.Context, token v1.Token) {
+	// set token
+	k.setToken(ctx, token)
+	// set token to be prefixed with min unit
+	k.setWithMinUnit(ctx, token.MinUnit, token.Symbol)
+	if len(token.Owner) != 0 {
+		// set token to be prefixed with owner
+		k.setWithOwner(ctx, token.GetOwner(), token.Symbol)
+	}
+	if len(token.Contract) != 0 {
+		// set token to be prefixed with owner
+		k.setWithContract(ctx, token.Contract, token.Symbol)
+	}
 }
