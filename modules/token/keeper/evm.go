@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
@@ -14,6 +15,43 @@ import (
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	"github.com/irisnet/irismod/types"
 )
+
+// CallEVM calls the EVM with the provided contract ABI, sender and receiver addresses, method, and arguments.
+//
+// Parameters:
+//   - ctx: the context in which the EVM call is executed
+//   - contractABI: the ABI of the contract
+//   - from: the sender address
+//   - to: the receiver address
+//   - commit: boolean indicating whether the EVM call should be committed
+//   - method: the name of the method to be called
+//   - args: the arguments to be passed to the method
+//
+// Returns:
+//   - *types.Result: the result of the EVM call
+//   - error: an error if the EVM call encounters any issues
+func (k Keeper) CallEVM(
+	ctx sdk.Context,
+	contractABI abi.ABI,
+	from, to common.Address,
+	commit bool,
+	method string,
+	args ...interface{},
+) (*types.Result, error) {
+	data, err := contractABI.Pack(method, args...)
+	if err != nil {
+		return nil, errorsmod.Wrap(
+			tokentypes.ErrABIPack,
+			errorsmod.Wrap(err, "failed to create transaction data").Error(),
+		)
+	}
+
+	resp, err := k.CallEVMWithData(ctx, from, &to, data, commit)
+	if err != nil {
+		return nil, errorsmod.Wrapf(err, "contract call failed: method '%s', contract '%s'", method, to)
+	}
+	return resp, nil
+}
 
 // CallEVMWithData executes an Ethereum Virtual Machine (EVM) call with the provided data.
 //

@@ -9,6 +9,9 @@ import (
 
 const (
 	EventSwapToNative = "SwapToNative"
+	MethodMint        = "mint"
+	MethodBurn        = "burn"
+	MethodBalanceOf   = "balanceOf"
 )
 
 var (

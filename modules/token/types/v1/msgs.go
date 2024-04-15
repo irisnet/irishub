@@ -37,7 +37,6 @@ var (
 	_ sdk.Msg = &MsgSwapFromERC20{}
 	_ sdk.Msg = &MsgSwapToERC20{}
 
-
 	regexpERC20Fmt = fmt.Sprintf("^[a-z][a-z0-9/]{%d,%d}$", tokentypes.MinimumSymbolLen-1, tokentypes.MaximumSymbolLen-1)
 	regexpERC20    = regexp.MustCompile(regexpERC20Fmt).MatchString
 )
@@ -391,7 +390,23 @@ func (m *MsgDeployERC20) GetSigners() []sdk.AccAddress {
 
 // ValidateBasic implements Msg
 func (m *MsgSwapFromERC20) ValidateBasic() error {
-	// TODO
+	if _, err := sdk.AccAddressFromBech32(m.Sender); err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+	}
+
+	if len(m.Receiver) > 0 {
+		if _, err := sdk.AccAddressFromBech32(m.Receiver); err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+		}
+	}
+
+	if !m.WantedAmount.IsValid() {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, m.WantedAmount.String())
+	}
+
+	if !m.WantedAmount.IsPositive() {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, m.WantedAmount.String())
+	}
 	return nil
 }
 
@@ -413,20 +428,17 @@ func (m *MsgSwapToERC20) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{addr}
 }
 
-
-
 // ValidateERC20 validates ERC20 symbol or name
 func ValidateERC20(params string) error {
 	if !regexpERC20(params) {
 		return errorsmod.Wrapf(
-			tokentypes.ErrInvalidSymbol, 
-			"invalid symbol or name: %s, only accepts english lowercase letters, numbers or slash, length [%d, %d], and begin with an english letter, regexp: %s", 
-			params, 
-			tokentypes.MinimumSymbolLen, 
-			tokentypes.MaximumSymbolLen, 
+			tokentypes.ErrInvalidSymbol,
+			"invalid symbol or name: %s, only accepts english lowercase letters, numbers or slash, length [%d, %d], and begin with an english letter, regexp: %s",
+			params,
+			tokentypes.MinimumSymbolLen,
+			tokentypes.MaximumSymbolLen,
 			regexpERC20Fmt,
 		)
 	}
 	return nil
 }
-
