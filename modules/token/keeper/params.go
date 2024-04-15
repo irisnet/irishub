@@ -10,7 +10,7 @@ import (
 // GetParams sets the token module parameters.
 func (k Keeper) GetParams(ctx sdk.Context) (params v1.Params) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get([]byte(types.ParamsKey))
+	bz := store.Get([]byte(types.PrefixParamsKey))
 	if bz == nil {
 		return params
 	}
@@ -30,7 +30,7 @@ func (k Keeper) SetParams(ctx sdk.Context, params v1.Params) error {
 	if err != nil {
 		return err
 	}
-	store.Set(types.ParamsKey, bz)
+	store.Set(types.PrefixParamsKey, bz)
 
 	return nil
 }

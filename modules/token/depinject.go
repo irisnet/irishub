@@ -36,6 +36,7 @@ func (am AppModule) IsOnePerModuleType() {}
 // IsAppModule implements the appmodule.AppModule interface.
 func (am AppModule) IsAppModule() {}
 
+// TokenInputs is the input of the Token module
 type TokenInputs struct {
 	depinject.In
 
@@ -45,18 +46,25 @@ type TokenInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
+	EVMKeeper     types.EVMKeeper
+	ICS20Keeper   types.ICS20Keeper
 
 	// LegacySubspace is used solely for migration of x/params managed parameters
 	LegacySubspace exported.Subspace `optional:"true"`
 }
 
+// TokenOutputs is the output of the Token module
 type TokenOutputs struct {
 	depinject.Out
 
 	TokenKeeper keeper.Keeper
 	Module      appmodule.AppModule
+
 }
 
+// ProvideModule provides a module for the token with the given inputs and returns the token keeper and module.
+//
+// Takes TokenInputs as input parameters and returns TokenOutputs.
 func ProvideModule(in TokenInputs) TokenOutputs {
 	// default to governance authority if not provided
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
@@ -68,6 +76,9 @@ func ProvideModule(in TokenInputs) TokenOutputs {
 		in.Cdc,
 		in.Key,
 		in.BankKeeper,
+		in.AccountKeeper,
+		in.EVMKeeper,
+		in.ICS20Keeper,
 		in.Config.FeeCollectorName,
 		authority.String(),
 	)

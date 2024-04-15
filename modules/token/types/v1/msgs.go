@@ -1,6 +1,9 @@
 package v1
 
 import (
+	fmt "fmt"
+	"regexp"
+
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -33,6 +36,10 @@ var (
 	_ sdk.Msg = &MsgDeployERC20{}
 	_ sdk.Msg = &MsgSwapFromERC20{}
 	_ sdk.Msg = &MsgSwapToERC20{}
+
+
+	regexpERC20Fmt = fmt.Sprintf("^[a-z][a-z0-9/]{%d,%d}$", tokentypes.MinimumSymbolLen-1, tokentypes.MaximumSymbolLen-1)
+	regexpERC20    = regexp.MustCompile(regexpERC20Fmt).MatchString
 )
 
 // NewMsgIssueToken - construct token issue msg.
@@ -358,8 +365,22 @@ func (m *MsgUpdateParams) GetSigners() []sdk.AccAddress {
 
 // ValidateBasic implements Msg
 func (m *MsgDeployERC20) ValidateBasic() error {
-	// TODO
-	return nil
+	if _, err := sdk.AccAddressFromBech32(m.Authority); err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid authority address (%s)", err)
+	}
+
+	if err := tokentypes.ValidateName(m.Name); err != nil {
+		return err
+	}
+
+	if err := tokentypes.ValidateScale(m.Scale); err != nil {
+		return err
+	}
+
+	if err := ValidateERC20(m.MinUnit); err != nil {
+		return err
+	}
+	return ValidateERC20(m.Symbol)
 }
 
 // GetSigners returns the expected signers for a MsgDeployERC20 message
@@ -390,5 +411,22 @@ func (m *MsgSwapToERC20) ValidateBasic() error {
 func (m *MsgSwapToERC20) GetSigners() []sdk.AccAddress {
 	addr, _ := sdk.AccAddressFromBech32(m.Sender)
 	return []sdk.AccAddress{addr}
+}
+
+
+
+// ValidateERC20 validates ERC20 symbol or name
+func ValidateERC20(params string) error {
+	if !regexpERC20(params) {
+		return errorsmod.Wrapf(
+			tokentypes.ErrInvalidSymbol, 
+			"invalid symbol or name: %s, only accepts english lowercase letters, numbers or slash, length [%d, %d], and begin with an english letter, regexp: %s", 
+			params, 
+			tokentypes.MinimumSymbolLen, 
+			tokentypes.MaximumSymbolLen, 
+			regexpERC20Fmt,
+		)
+	}
+	return nil
 }
 

@@ -15,20 +15,39 @@ import (
 	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 )
 
+// Keeper of the token store
 type Keeper struct {
 	storeKey         storetypes.StoreKey
 	cdc              codec.Codec
 	bankKeeper       types.BankKeeper
+	accountKeeper    types.AccountKeeper
+	evmKeeper        types.EVMKeeper
+	ics20Keeper      types.ICS20Keeper
 	blockedAddrs     map[string]bool
 	feeCollectorName string
 	authority        string
 	registry         v1.SwapRegistry
 }
 
+// NewKeeper creates a new instance of Keeper.
+//
+// Parameters:
+//   cdc: codec to marshal/unmarshal binary encoding/decoding.
+//   key: store key for the module's store.
+//   bankKeeper: bank Keeper module for interacting with accounts.
+//   accountKeeper: Account Keeper for interacting with accounts.
+//   evmKeeper: EVM Keeper module for interacting with Ethereum Virtual Machine transactions.
+//   ics20Keeper: ICS20 Keeper module for interacting with ICS20 transactions.
+//   feeCollectorName: name of the fee collector.
+//   authority: authority string.
+// Return type: Keeper.
 func NewKeeper(
 	cdc codec.Codec,
 	key storetypes.StoreKey,
 	bankKeeper types.BankKeeper,
+	accountKeeper types.AccountKeeper,
+	evmKeeper types.EVMKeeper,
+	ics20Keeper types.ICS20Keeper,
 	feeCollectorName string,
 	authority string,
 ) Keeper {
@@ -36,6 +55,9 @@ func NewKeeper(
 		storeKey:         key,
 		cdc:              cdc,
 		bankKeeper:       bankKeeper,
+		accountKeeper:    accountKeeper,
+		evmKeeper:        evmKeeper,
+		ics20Keeper:      ics20Keeper,
 		feeCollectorName: feeCollectorName,
 		blockedAddrs:     bankKeeper.GetBlockedAddresses(),
 		registry:         make(v1.SwapRegistry),
@@ -294,6 +316,10 @@ func (k Keeper) SwapFeeToken(
 	)
 }
 
+// WithSwapRegistry sets the swap registry in the Keeper and returns the updated Keeper instance.
+//
+// registry: The swap registry to set.
+// Returns the updated Keeper instance.
 func (k Keeper) WithSwapRegistry(registry v1.SwapRegistry) Keeper {
 	k.registry = registry
 	return k

@@ -104,6 +104,8 @@ import (
 	"github.com/irisnet/irismod/modules/token"
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
+
+	"github.com/irisnet/irismod/simapp/mocks"
 )
 
 var (
@@ -277,6 +279,10 @@ func NewSimApp(
 				// For providing a custom inflation function for x/mint add here your
 				// custom function that implements the minttypes.InflationCalculationFn
 				// interface.
+
+				// For providing a mock evm function for token module
+				mocks.ProvideEVMKeeper(),
+				mocks.ProvideICS20Keeper(),
 			),
 		)
 	)
