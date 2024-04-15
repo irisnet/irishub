@@ -391,7 +391,21 @@ func (m *MsgDeployERC20) GetSigners() []sdk.AccAddress {
 
 // ValidateBasic implements Msg
 func (m *MsgSwapFromERC20) ValidateBasic() error {
-	// TODO
+	if _, err := sdk.AccAddressFromBech32(m.Sender); err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+	}
+
+	if _, err := sdk.AccAddressFromBech32(m.Receiver); err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
+	if !m.WantedAmount.IsValid() {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, m.WantedAmount.String())
+	}
+
+	if !m.WantedAmount.IsPositive() {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, m.WantedAmount.String())
+	}
 	return nil
 }
 

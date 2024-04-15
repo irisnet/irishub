@@ -6,6 +6,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/irisnet/irismod/modules/token/types"
 	v1 "github.com/irisnet/irismod/modules/token/types/v1"
@@ -302,8 +303,25 @@ func (m msgServer) DeployERC20(goCtx context.Context, msg *v1.MsgDeployERC20) (*
 }
 
 // SwapFromERC20 implements v1.MsgServer.
-func (m msgServer) SwapFromERC20(context.Context, *v1.MsgSwapFromERC20) (*v1.MsgSwapFromERC20Response, error) {
-	panic("unimplemented")
+func (m msgServer) SwapFromERC20(goCtx context.Context, msg *v1.MsgSwapFromERC20) (*v1.MsgSwapFromERC20Response, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	sender, err := sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return nil, err
+	}
+
+	receiver := sender
+	if len(msg.Receiver) > 0 {
+		receiver, err = sdk.AccAddressFromBech32(msg.Receiver)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if err := m.k.SwapFromERC20(ctx, common.BytesToAddress(sender.Bytes()), receiver, msg.WantedAmount); err != nil {
+		return nil, err
+	}
+	return &v1.MsgSwapFromERC20Response{}, nil
 }
 
 // SwapToERC20 implements v1.MsgServer.
