@@ -71,7 +71,7 @@ func (k Keeper) DeployERC20(
 	return contractAddr, nil
 }
 
-// SwapFromERC20 executes a swap from an ERC20 token to a native token.
+// SwapFromERC20 executes a swap from an ERC20 token to its native counterpart
 //
 // Parameters:
 //
@@ -156,7 +156,7 @@ func (k Keeper) BurnERC20(
 	expectBalance := big.NewInt(0).Sub(balanceBefore, amount)
 	if r := expectBalance.Cmp(balanceAfter); r != 0 {
 		return errorsmod.Wrapf(
-			types.ErrVMExecution, "failed to burn contract: %s, expect %d, actual %d, ",
+			types.ErrVMExecution, "failed to burn token correctly, expected after-burn amount is incorrect: %s, expected %d, actual %d",
 			contract.String(),
 			expectBalance.Int64(),
 			balanceAfter.Int64(),

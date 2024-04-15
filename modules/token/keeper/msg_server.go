@@ -305,7 +305,7 @@ func (m msgServer) DeployERC20(goCtx context.Context, msg *v1.MsgDeployERC20) (*
 // SwapFromERC20 implements v1.MsgServer.
 func (m msgServer) SwapFromERC20(goCtx context.Context, msg *v1.MsgSwapFromERC20) (*v1.MsgSwapFromERC20Response, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	sender, err := sdk.AccAddressFromBech32(msg.Receiver)
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
 	}
