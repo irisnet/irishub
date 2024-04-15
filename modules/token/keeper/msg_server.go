@@ -272,8 +272,16 @@ func (m msgServer) UpdateParams(
 
 // DeployERC20 implements v1.MsgServer.
 func (m msgServer) DeployERC20(goCtx context.Context, msg *v1.MsgDeployERC20) (*v1.MsgDeployERC20Response, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
+	if m.k.authority != msg.Authority {
+		return nil, errorsmod.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"invalid authority; expected %s, got %s",
+			m.k.authority,
+			msg.Authority,
+		)
+	}
 
+	ctx := sdk.UnwrapSDKContext(goCtx)
 	token, err := m.k.buildERC20Token(ctx, msg.Name, msg.Symbol, msg.MinUnit, msg.Scale)
 	if err != nil {
 		return nil, err
