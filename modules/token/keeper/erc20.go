@@ -82,6 +82,9 @@ func (k Keeper) buildERC20Token(
 	scale uint32,
 ) (*v1.Token, error) {
 	if !k.HasMinUint(ctx, minUnit) {
+		if k.HasSymbol(ctx, symbol) {
+			return nil, errorsmod.Wrapf(types.ErrSymbolAlreadyExists, "symbol already exists: %s", symbol)
+		}
 		if !k.ics20Keeper.HasTrace(ctx, minUnit) {
 			return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "token: %s does not exist", minUnit)
 		}
