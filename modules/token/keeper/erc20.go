@@ -96,17 +96,7 @@ func (k Keeper) SwapFromERC20(
 	}
 
 	contract := common.HexToAddress(token.Contract)
-	amount := wantedAmount.Amount.BigInt()
-	balance := k.BalanceOf(ctx, contract, sender)
-	if r := balance.Cmp(amount); r < 0 {
-		return errorsmod.Wrapf(
-			sdkerrors.ErrInsufficientFunds,
-			"balance: %d, swap: %d",
-			balance,
-			amount,
-		)
-	}
-	if err := k.BurnERC20(ctx, contract, sender, amount.Uint64()); err != nil {
+	if err := k.BurnERC20(ctx, contract, sender, wantedAmount.Amount.BigInt()); err != nil {
 		return err
 	}
 
@@ -140,9 +130,18 @@ func (k Keeper) SwapFromERC20(
 func (k Keeper) BurnERC20(
 	ctx sdk.Context,
 	contract, from common.Address,
-	amount uint64,
+	amount *big.Int,
 ) error {
 	balanceBefore := k.BalanceOf(ctx, contract, from)
+	if r := balanceBefore.Cmp(amount); r < 0 {
+		return errorsmod.Wrapf(
+			sdkerrors.ErrInsufficientFunds,
+			"balance: %d, swap: %d",
+			balanceBefore.Int64(),
+			amount,
+		)
+	}
+
 	abi := contracts.ERC20TokenContract.ABI
 	res, err := k.CallEVM(ctx, abi, k.moduleAddress(), contract, true, contracts.MethodBurn, from, amount)
 	if err != nil {
@@ -154,7 +153,7 @@ func (k Keeper) BurnERC20(
 	}
 
 	balanceAfter := k.BalanceOf(ctx, contract, from)
-	expectBalance := big.NewInt(0).Sub(balanceBefore, big.NewInt(int64(amount)))
+	expectBalance := big.NewInt(0).Sub(balanceBefore, amount)
 	if r := expectBalance.Cmp(balanceAfter); r != 0 {
 		return errorsmod.Wrapf(
 			types.ErrVMExecution, "failed to burn contract: %s, expect %d, actual %d, ",
