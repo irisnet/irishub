@@ -31,6 +31,7 @@ func (hook erc20Hook) PostTxProcessing(ctx sdk.Context, msg core.Message, receip
 	erc20 := contracts.ERC20TokenContract.ABI
 	for _, log := range receipt.Logs {
 		// Note: the `SwapToNative` event contains 1 topics
+		//  SwapToNative(address from, string to, uint256 amount)
 		if len(log.Topics) != 1 {
 			continue
 		}
@@ -59,15 +60,15 @@ func (hook erc20Hook) PostTxProcessing(ctx sdk.Context, msg core.Message, receip
 			return errorsmod.Wrap(types.ErrInvalidContract, "failed to unpack SwapToNative event")
 		}
 
-		if len(eventArgs) != 2 {
+		if len(eventArgs) != 3 {
 			return errorsmod.Wrapf(
 				types.ErrInvalidContract, 
-				"swapToNative event has wrong number of parameters, expected 2, actual: %d",
+				"swapToNative event has wrong number of parameters, expected 3, actual: %d",
 				len(eventArgs),
 			)
 		}
 
-		to, ok := eventArgs[0].(string)
+		to, ok := eventArgs[1].(string)
 		if !ok || len(to) == 0 {
 			return errorsmod.Wrap(
 				types.ErrInvalidContract, 
@@ -84,7 +85,7 @@ func (hook erc20Hook) PostTxProcessing(ctx sdk.Context, msg core.Message, receip
 			)
 		}
 
-		amount, ok := eventArgs[1].(*big.Int)
+		amount, ok := eventArgs[2].(*big.Int)
 		if !ok || amount.Cmp(big.NewInt(0)) == 0 {
 			return errorsmod.Wrap(
 				types.ErrInvalidContract, 
