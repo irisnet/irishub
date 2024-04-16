@@ -311,12 +311,9 @@ func (m msgServer) SwapFromERC20(goCtx context.Context, msg *v1.MsgSwapFromERC20
 		return nil, err
 	}
 
-	receiver := sender
-	if len(msg.Receiver) > 0 {
-		receiver, err = sdk.AccAddressFromBech32(msg.Receiver)
-		if err != nil {
-			return nil, err
-		}
+	receiver, err := sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := m.k.SwapFromERC20(ctx, common.BytesToAddress(sender.Bytes()), receiver, msg.WantedAmount); err != nil {
@@ -333,14 +330,11 @@ func (m msgServer) SwapToERC20(goCtx context.Context, msg *v1.MsgSwapToERC20) (*
 		return nil, err
 	}
 
-	receiver := common.BytesToAddress(sender.Bytes())
-	if len(msg.Receiver) > 0 {
-		bz, err := hex.DecodeString(msg.Receiver)
-		if err != nil {
-			return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "expecting a hex address of 0x, got %s", msg.Receiver)
-		}
-		receiver = common.BytesToAddress(bz)
+	bz, err := hex.DecodeString(msg.Receiver)
+	if err != nil {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "expecting a hex address of 0x, got %s", msg.Receiver)
 	}
+	receiver := common.BytesToAddress(bz)
 
 	if err := m.k.SwapToERC20(ctx, sender, receiver, msg.Amount); err != nil {
 		return nil, err
