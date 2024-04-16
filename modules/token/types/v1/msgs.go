@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"encoding/hex"
 	fmt "fmt"
 	"regexp"
 
@@ -421,8 +420,7 @@ func (m *MsgSwapToERC20) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
-	_, err := hex.DecodeString(m.Receiver)
-	if err != nil {
+	if tokentypes.IsValidEthAddress(m.Receiver) {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "expecting a hex address of 0x, got %s", m.Receiver)
 	}
 

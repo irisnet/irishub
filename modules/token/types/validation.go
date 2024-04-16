@@ -50,6 +50,11 @@ var (
 
 	regexpMinUintFmt = fmt.Sprintf("^[a-z][a-z0-9]{%d,%d}$", MinimumMinUnitLen-1, MaximumMinUnitLen-1)
 	regexpMinUint    = regexp.MustCompile(regexpMinUintFmt).MatchString
+
+	regexpEthAddressLowerStr = "^0x[0-9a-f]{40}$"
+	regexpEthAddressUpperStr = "^0x[0-9A-F]{40}$"
+	regexpEthAddressLower    = regexp.MustCompile(regexpEthAddressLowerStr).MatchString
+	regexpEthAddressUpper    = regexp.MustCompile(regexpEthAddressUpperStr).MatchString
 )
 
 // ValidateInitialSupply verifies whether the initial supply is legal
@@ -114,4 +119,10 @@ func ValidateCoin(coin sdk.Coin) error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "invalid coin (%s)", coin.String())
 	}
 	return ValidateMinUnit(coin.Denom)
+}
+
+// IsValidEthAddress checks if the given address is valid ethereum address
+func IsValidEthAddress(address string) bool {
+	address = strings.ToLower(address)
+	return regexpEthAddressLower(address) || regexpEthAddressUpper(address)
 }
