@@ -87,13 +87,6 @@ func (k Keeper) SwapFromERC20(
 	receiver sdk.AccAddress,
 	wantedAmount sdk.Coin,
 ) error {
-	senderAcc := k.accountKeeper.GetAccount(ctx, sdk.AccAddress(sender.Bytes()))
-	if senderAcc != nil {
-		if !k.evmKeeper.SupportedKey(senderAcc.GetPubKey()) {
-			return errorsmod.Wrapf(types.ErrUnsupportedKey, "key %s", senderAcc.GetPubKey())
-		}
-	}
-
 	token, err := k.getTokenByMinUnit(ctx, wantedAmount.Denom)
 	if err != nil {
 		return err
