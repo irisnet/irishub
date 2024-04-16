@@ -75,6 +75,11 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("irismod/%s", types.ModuleName))
 }
 
+// Hooks returns the keeper's Hooks struct.
+func (k Keeper) Hooks() types.Hook {
+	return erc20Hook{k}
+}
+
 // IssueToken issues a new token
 func (k Keeper) IssueToken(
 	ctx sdk.Context,

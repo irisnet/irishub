@@ -30,4 +30,5 @@ var (
 	ErrERC20AlreadyExists   = errorsmod.Register(ModuleName, 22, "erc20 contract already exists")
 	ErrERC20NotDeployed     = errorsmod.Register(ModuleName, 23, "erc20 contract not deployed")
 	ErrUnsupportedKey       = errorsmod.Register(ModuleName, 24, "evm not supported public key")
+	ErrInvalidContract      = errorsmod.Register(ModuleName, 25, "invalid contract")
 )
