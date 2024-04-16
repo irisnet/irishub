@@ -73,8 +73,9 @@ contract Token is ERC20, ERC20Permit, Ownable, ReentrancyGuard {
     {
         require(bytes(to).length > 0, "to must be vaild iaa address");
         
-        _burn(msg.sender, amount);
-        emit SwapToNative(msg.sender, to, amount);
+         address sender = _msgSender();
+        _burn(sender, amount);
+        emit SwapToNative(sender, to, amount);
     }
 
     /**

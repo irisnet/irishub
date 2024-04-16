@@ -45,7 +45,6 @@ func (hook erc20Hook) PostTxProcessing(ctx sdk.Context, msg core.Message, receip
 
 		// Check if event is a `SwapToNative` event.
 		if event.Name != contracts.EventSwapToNative {
-			hook.k.Logger(ctx).Info("emitted event", "name", event.Name, "signature", event.Sig)
 			continue
 		}
 
