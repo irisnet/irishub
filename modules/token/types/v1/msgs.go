@@ -394,10 +394,8 @@ func (m *MsgSwapFromERC20) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
-	if len(m.Receiver) > 0 {
-		if _, err := sdk.AccAddressFromBech32(m.Receiver); err != nil {
-			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
-		}
+	if _, err := sdk.AccAddressFromBech32(m.Receiver); err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
 	if !m.WantedAmount.IsValid() {
@@ -418,7 +416,21 @@ func (m *MsgSwapFromERC20) GetSigners() []sdk.AccAddress {
 
 // ValidateBasic implements Msg
 func (m *MsgSwapToERC20) ValidateBasic() error {
-	// TODO
+	if _, err := sdk.AccAddressFromBech32(m.Sender); err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+	}
+
+	if tokentypes.IsValidEthAddress(m.Receiver) {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "expecting a hex address of 0x, got %s", m.Receiver)
+	}
+
+	if !m.Amount.IsValid() {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, m.Amount.String())
+	}
+
+	if !m.Amount.IsPositive() {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, m.Amount.String())
+	}
 	return nil
 }
 

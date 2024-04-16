@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/hex"
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -310,12 +311,9 @@ func (m msgServer) SwapFromERC20(goCtx context.Context, msg *v1.MsgSwapFromERC20
 		return nil, err
 	}
 
-	receiver := sender
-	if len(msg.Receiver) > 0 {
-		receiver, err = sdk.AccAddressFromBech32(msg.Receiver)
-		if err != nil {
-			return nil, err
-		}
+	receiver, err := sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := m.k.SwapFromERC20(ctx, common.BytesToAddress(sender.Bytes()), receiver, msg.WantedAmount); err != nil {
@@ -325,6 +323,21 @@ func (m msgServer) SwapFromERC20(goCtx context.Context, msg *v1.MsgSwapFromERC20
 }
 
 // SwapToERC20 implements v1.MsgServer.
-func (m msgServer) SwapToERC20(context.Context, *v1.MsgSwapToERC20) (*v1.MsgSwapToERC20Response, error) {
-	panic("unimplemented")
+func (m msgServer) SwapToERC20(goCtx context.Context, msg *v1.MsgSwapToERC20) (*v1.MsgSwapToERC20Response, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	bz, err := hex.DecodeString(msg.Receiver)
+	if err != nil {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "expecting a hex address of 0x, got %s", msg.Receiver)
+	}
+	receiver := common.BytesToAddress(bz)
+
+	if err := m.k.SwapToERC20(ctx, sender, receiver, msg.Amount); err != nil {
+		return nil, err
+	}
+	return &v1.MsgSwapToERC20Response{}, nil
 }

@@ -118,6 +118,104 @@ func (k Keeper) SwapFromERC20(
 	return nil
 }
 
+// SwapToERC20 executes a swap from a native token to its ERC20 token counterpart
+//
+// Parameters:
+//   - ctx: the context
+//   - sender: the sender of the amount
+//   - receiver: the receiver of the erc20 token
+//   - amount:  the amount to be swapped
+//
+// Returns:
+//   - error: error if any.
+func (k Keeper) SwapToERC20(
+	ctx sdk.Context,
+	sender sdk.AccAddress,
+	receiver common.Address,
+	amount sdk.Coin,
+) error {
+	receiverAcc := k.accountKeeper.GetAccount(ctx, sdk.AccAddress(receiver.Bytes()))
+	if receiverAcc != nil {
+		if !k.evmKeeper.SupportedKey(receiverAcc.GetPubKey()) {
+			return errorsmod.Wrapf(types.ErrUnsupportedKey, "key %s", receiverAcc.GetPubKey())
+		}
+	}
+
+	token, err := k.getTokenByMinUnit(ctx, amount.Denom)
+	if err != nil {
+		return err
+	}
+	if len(token.Contract) == 0 {
+		return errorsmod.Wrapf(types.ErrERC20NotDeployed, "token: %s is not bound to the corresponding erc20 token", amount.Denom)
+	}
+	contract := common.HexToAddress(token.Contract)
+
+	amt := sdk.NewCoins(amount)
+	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, amt); err != nil {
+		return err
+	}
+
+	if err := k.bankKeeper.BurnCoins(ctx, types.ModuleName, amt); err != nil {
+		return err
+	}
+
+	if err := k.MintERC20(ctx, contract, receiver, amount.Amount.Uint64()); err != nil {
+		return err
+	}
+
+	ctx.EventManager().EmitTypedEvent(&v1.EventSwapToERC20{
+		Amount:     amount,
+		Sender:     sender.String(),
+		Receiver:   receiver.String(),
+		ToContract: token.Contract,
+	})
+	return nil
+}
+
+// MintERC20 mints ERC20 tokens to an account.
+//
+// Parameters:
+//   - ctx: the sdk.Context for the function
+//   - contract: the address of the contract
+//   - to: the address of the receiver
+//   - amount: the amount to mint
+//
+// Returns:
+//   - err : error if any
+func (k Keeper) MintERC20(
+	ctx sdk.Context,
+	contract, to common.Address,
+	amount uint64,
+) error {
+	balanceBefore := k.BalanceOf(ctx, contract, to)
+
+	abi := contracts.ERC20TokenContract.ABI
+	res, err := k.CallEVM(ctx, abi, k.moduleAddress(), contract, true, contracts.MethodMint, to, amount)
+	if err != nil {
+		return err
+	}
+
+	if res.Failed() {
+		return errorsmod.Wrapf(
+			types.ErrVMExecution, "failed to mint contract: %s, reason: %s",
+			contract.String(),
+			res.Revert(),
+		)
+	}
+
+	balanceAfter := k.BalanceOf(ctx, contract, to)
+	expectBalance := big.NewInt(0).Add(balanceBefore, big.NewInt(int64(amount)))
+	if r := expectBalance.Cmp(balanceAfter); r != 0 {
+		return errorsmod.Wrapf(
+			types.ErrVMExecution, "failed to mint token correctly, expected after-mint amount is incorrect: %s, expected %d, actual %d",
+			contract.String(),
+			expectBalance.Int64(),
+			balanceAfter.Int64(),
+		)
+	}
+	return nil
+}
+
 // BurnERC20 burns a specific amount of ERC20 tokens from a given contract and address.
 //
 // Parameters:
