@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract Token is ERC20, ERC20Permit, Ownable, ReentrancyGuard {
-    event SwapToNative(string to, uint256 amount);
+    event SwapToNative(address from, string to, uint256 amount);
 
     uint8 private _scale;
 
@@ -67,12 +67,36 @@ contract Token is ERC20, ERC20Permit, Ownable, ReentrancyGuard {
      * - `to` cannot be the zero address.
      * - `amount` caller must have a balance of at least `amount`.
      */
-    function swapToNative(
+    function swapToNative(string memory to, uint256 amount)
+        public
+        nonReentrant
+    {
+        require(bytes(to).length > 0, "to must be vaild iaa address");
+        
+         address sender = _msgSender();
+        _burn(sender, amount);
+        emit SwapToNative(sender, to, amount);
+    }
+
+    /**
+     *
+     * Requirements:
+     *
+     * - `from` authorizer address.
+     * - `to` cannot be the zero address.
+     * - `amount` from must have a balance of at least `amount`.
+     */
+    function swapToNativeFrom(
+        address from,
         string memory to,
         uint256 amount
     ) public nonReentrant {
-        require(bytes(to).length > 0, "to must be a vaild iaa address");
-        _burn(msg.sender, amount);
-        emit SwapToNative(to, amount);
+        require(bytes(to).length > 0, "to must be vaild iaa address");
+
+        address spender = _msgSender();
+        _spendAllowance(from, spender, amount);
+
+        _burn(from, amount);
+        emit SwapToNative(from, to, amount);
     }
 }

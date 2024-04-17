@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	gogotypes "github.com/cosmos/gogoproto/types"
+	"github.com/ethereum/go-ethereum/common"
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -241,6 +242,28 @@ func (k Keeper) getTokenByMinUnit(ctx sdk.Context, minUnit string) (token v1.Tok
 		return token, errorsmod.Wrap(
 			types.ErrTokenNotExists,
 			fmt.Sprintf("token minUnit %s does not exist", minUnit),
+		)
+	}
+
+	var symbol gogotypes.StringValue
+	k.cdc.MustUnmarshal(bz, &symbol)
+
+	token, err = k.getTokenBySymbol(ctx, symbol.Value)
+	if err != nil {
+		return token, err
+	}
+
+	return token, nil
+}
+
+func (k Keeper) getTokenByContract(ctx sdk.Context, contract common.Address) (token v1.Token, err error) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(types.KeyContract(contract.Hex()))
+	if bz == nil {
+		return token, errorsmod.Wrap(
+			types.ErrTokenNotExists,
+			fmt.Sprintf("token contract %s does not exist", contract),
 		)
 	}
 
