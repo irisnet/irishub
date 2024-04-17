@@ -31,8 +31,17 @@ func (k Keeper) DeployERC20(
 	name string,
 	symbol string,
 	minUnit string,
-	scale int8,
+	scale uint8,
 ) (common.Address, error) {
+	token, err := k.buildERC20Token(ctx, name, symbol, minUnit, uint32(scale))
+	if err != nil {
+		return common.Address{}, err
+	}
+
+	if len(token.Contract) > 0 {
+		return common.Address{}, errorsmod.Wrapf(types.ErrERC20AlreadyExists, "token: %s already deployed erc20 contract: %s", token.Symbol, token.Contract)
+	}
+
 	contractArgs, err := contracts.ERC20TokenContract.ABI.Pack(
 		"",
 		name,
@@ -60,6 +69,9 @@ func (k Keeper) DeployERC20(
 	if result.Failed() {
 		return common.Address{}, errorsmod.Wrapf(types.ErrVMExecution, "failed to deploy contract for %s, reason: %s", name, result.Revert())
 	}
+
+	token.Contract = contractAddr.String()
+	k.upsertToken(ctx, *token)
 
 	ctx.EventManager().EmitTypedEvent(&v1.EventDeployERC20{
 		Symbol:   symbol,
@@ -159,7 +171,7 @@ func (k Keeper) SwapToERC20(
 		return err
 	}
 
-	if err := k.MintERC20(ctx, contract, receiver, amount.Amount.Uint64()); err != nil {
+	if err := k.MintERC20(ctx, contract, receiver, amount.Amount.BigInt()); err != nil {
 		return err
 	}
 
@@ -185,9 +197,12 @@ func (k Keeper) SwapToERC20(
 func (k Keeper) MintERC20(
 	ctx sdk.Context,
 	contract, to common.Address,
-	amount uint64,
+	amount *big.Int,
 ) error {
-	balanceBefore := k.BalanceOf(ctx, contract, to)
+	balanceBefore, err := k.BalanceOf(ctx, contract, to)
+	if err != nil {
+		return err
+	}
 
 	abi := contracts.ERC20TokenContract.ABI
 	res, err := k.CallEVM(ctx, abi, k.moduleAddress(), contract, true, contracts.MethodMint, to, amount)
@@ -203,8 +218,11 @@ func (k Keeper) MintERC20(
 		)
 	}
 
-	balanceAfter := k.BalanceOf(ctx, contract, to)
-	expectBalance := big.NewInt(0).Add(balanceBefore, big.NewInt(int64(amount)))
+	balanceAfter, err := k.BalanceOf(ctx, contract, to)
+	if err != nil {
+		return err
+	}
+	expectBalance := big.NewInt(0).Add(balanceBefore, amount)
 	if r := expectBalance.Cmp(balanceAfter); r != 0 {
 		return errorsmod.Wrapf(
 			types.ErrVMExecution, "failed to mint token correctly, expected after-mint amount is incorrect: %s, expected %d, actual %d",
@@ -230,7 +248,11 @@ func (k Keeper) BurnERC20(
 	contract, from common.Address,
 	amount *big.Int,
 ) error {
-	balanceBefore := k.BalanceOf(ctx, contract, from)
+	balanceBefore, err := k.BalanceOf(ctx, contract, from)
+	if err != nil {
+		return err
+	}
+
 	if r := balanceBefore.Cmp(amount); r < 0 {
 		return errorsmod.Wrapf(
 			sdkerrors.ErrInsufficientFunds,
@@ -250,7 +272,10 @@ func (k Keeper) BurnERC20(
 		return errorsmod.Wrapf(types.ErrVMExecution, "failed to burn %d", amount)
 	}
 
-	balanceAfter := k.BalanceOf(ctx, contract, from)
+	balanceAfter, err := k.BalanceOf(ctx, contract, from)
+	if err != nil {
+		return err
+	}
 	expectBalance := big.NewInt(0).Sub(balanceBefore, amount)
 	if r := expectBalance.Cmp(balanceAfter); r != 0 {
 		return errorsmod.Wrapf(
@@ -275,24 +300,24 @@ func (k Keeper) BurnERC20(
 func (k Keeper) BalanceOf(
 	ctx sdk.Context,
 	contract, account common.Address,
-) *big.Int {
+) (*big.Int, error) {
 	abi := contracts.ERC20TokenContract.ABI
 	res, err := k.CallEVM(ctx, abi, k.moduleAddress(), contract, false, contracts.MethodBalanceOf, account)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	unpacked, err := abi.Unpack(contracts.MethodBalanceOf, res.Ret)
 	if err != nil || len(unpacked) == 0 {
-		return nil
+		return nil, err
 	}
 
 	balance, ok := unpacked[0].(*big.Int)
 	if !ok {
-		return nil
+		return nil, err
 	}
 
-	return balance
+	return balance, nil
 }
 
 func (k Keeper) moduleAddress() common.Address {

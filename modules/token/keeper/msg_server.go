@@ -284,22 +284,10 @@ func (m msgServer) DeployERC20(goCtx context.Context, msg *v1.MsgDeployERC20) (*
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	token, err := m.k.buildERC20Token(ctx, msg.Name, msg.Symbol, msg.MinUnit, msg.Scale)
+	_, err := m.k.DeployERC20(ctx, msg.Name, msg.Symbol, msg.MinUnit, uint8(msg.Scale))
 	if err != nil {
 		return nil, err
 	}
-
-	if len(token.Contract) > 0 {
-		return nil, errorsmod.Wrapf(types.ErrERC20AlreadyExists, "token: %s already deployed erc20 contract: %s", token.Symbol, token.Contract)
-	}
-
-	contractAddr, err := m.k.DeployERC20(ctx, token.Name, token.Symbol, token.MinUnit, int8(token.Scale))
-	if err != nil {
-		return nil, err
-	}
-
-	token.Contract = contractAddr.String()
-	m.k.upsertToken(ctx, *token)
 	return &v1.MsgDeployERC20Response{}, nil
 }
 
