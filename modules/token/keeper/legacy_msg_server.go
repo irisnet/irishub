@@ -64,7 +64,7 @@ func (m legacyMsgServer) MintToken(goCtx context.Context, msg *v1beta1.MsgMintTo
 	}
 	_, err = m.server.MintToken(goCtx, &v1.MsgMintToken{
 		Coin:  coin,
-		To:    msg.To,
+		Receiver:    msg.To,
 		Owner: msg.Owner,
 	})
 	return &v1beta1.MsgMintTokenResponse{}, err

@@ -103,8 +103,8 @@ func (m msgServer) MintToken(
 
 	var recipient sdk.AccAddress
 
-	if len(msg.To) != 0 {
-		recipient, err = sdk.AccAddressFromBech32(msg.To)
+	if len(msg.Receiver) != 0 {
+		recipient, err = sdk.AccAddressFromBech32(msg.Receiver)
 		if err != nil {
 			return nil, err
 		}
@@ -216,13 +216,13 @@ func (m msgServer) SwapFeeToken(
 	}
 
 	var recipient sdk.AccAddress
-	if len(msg.Recipient) > 0 {
-		recipient, err = sdk.AccAddressFromBech32(msg.Recipient)
+	if len(msg.Receiver) > 0 {
+		recipient, err = sdk.AccAddressFromBech32(msg.Receiver)
 		if err != nil {
 			return nil, err
 		}
 
-		if m.k.blockedAddrs[msg.Recipient] {
+		if m.k.blockedAddrs[msg.Receiver] {
 			return nil, errorsmod.Wrapf(
 				sdkerrors.ErrUnauthorized,
 				"%s is a module account",
@@ -241,7 +241,7 @@ func (m msgServer) SwapFeeToken(
 		sdk.NewEvent(
 			types.EventTypeSwapFeeToken,
 			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
-			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
+			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Receiver),
 			sdk.NewAttribute(types.AttributeKeyFeePaid, feePaid.String()),
 			sdk.NewAttribute(types.AttributeKeyFeeGot, feeGot.String()),
 		),

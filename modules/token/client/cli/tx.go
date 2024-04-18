@@ -108,7 +108,7 @@ func GetCmdIssueToken() *cobra.Command {
 				return err
 			}
 
-			var prompt = "The token issuance transaction will consume extra fee"
+			prompt := "The token issuance transaction will consume extra fee"
 
 			generateOnly, err := cmd.Flags().GetBool(flags.FlagGenerateOnly)
 			if err != nil {
@@ -235,16 +235,16 @@ func GetCmdMintToken() *cobra.Command {
 			}
 
 			msg := &v1.MsgMintToken{
-				Coin:  coin,
-				To:    addr,
-				Owner: owner,
+				Coin:     coin,
+				Receiver: addr,
+				Owner:    owner,
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
 
-			var prompt = "The token minting transaction will consume extra fee"
+			prompt := "The token minting transaction will consume extra fee"
 
 			generateOnly, err := cmd.Flags().GetBool(flags.FlagGenerateOnly)
 			if err != nil {
@@ -398,9 +398,9 @@ func GetCmdSwapFeeToken() *cobra.Command {
 			}
 
 			msg := &v1.MsgSwapFeeToken{
-				FeePaid:   coin,
-				Recipient: toAddr,
-				Sender:    sender,
+				FeePaid:  coin,
+				Receiver: toAddr,
+				Sender:   sender,
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
