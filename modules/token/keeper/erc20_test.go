@@ -92,7 +92,7 @@ func (suite *KeeperTestSuite) TestSwapToERC20() {
 	sender := token.GetOwner()
 	receiver := common.BytesToAddress(sender.Bytes())
 
-	balanceBefore := suite.bk.GetBalance(suite.ctx, sender,token.MinUnit)
+	balanceBefore := suite.bk.GetBalance(suite.ctx, sender, token.MinUnit)
 	suite.Run("swap to erc20", func() {
 		amount := sdk.NewCoin(token.MinUnit, sdk.NewInt(1e18))
 

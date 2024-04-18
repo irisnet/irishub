@@ -87,7 +87,6 @@ func (k Keeper) HasMinUint(ctx sdk.Context, minUint string) bool {
 	return store.Has(types.KeyMinUint(minUint))
 }
 
-
 // HasContract asserts a token exists by contract
 func (k Keeper) HasContract(ctx sdk.Context, contract string) bool {
 	store := ctx.KVStore(k.storeKey)
@@ -320,7 +319,7 @@ func (k Keeper) setDenomMetaData(ctx sdk.Context, token v1.Token) {
 	k.bankKeeper.SetDenomMetaData(ctx, denomMetaData)
 }
 
-func(k Keeper) assertTokenValid(ctx sdk.Context, token v1.Token) error {
+func (k Keeper) assertTokenValid(ctx sdk.Context, token v1.Token) error {
 	if k.HasSymbol(ctx, token.Symbol) {
 		return errorsmod.Wrapf(
 			types.ErrSymbolAlreadyExists,

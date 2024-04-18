@@ -65,12 +65,11 @@ type EVMKeeper interface {
 }
 
 // ICS20Keeper defines the expected keeper of ICS20
-type ICS20Keeper interface{
+type ICS20Keeper interface {
 	HasTrace(ctx sdk.Context, denom string) bool
 }
 
 // Hook defines the hook interface
 type Hook interface {
-	 PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *ethtypes.Receipt) error
+	PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *ethtypes.Receipt) error
 }
-

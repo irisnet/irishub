@@ -61,7 +61,7 @@ func (hook erc20Hook) PostTxProcessing(ctx sdk.Context, msg core.Message, receip
 
 		if len(eventArgs) != 3 {
 			return errorsmod.Wrapf(
-				types.ErrInvalidContract, 
+				types.ErrInvalidContract,
 				"swapToNative event has wrong number of parameters, expected 3, actual: %d",
 				len(eventArgs),
 			)
@@ -70,7 +70,7 @@ func (hook erc20Hook) PostTxProcessing(ctx sdk.Context, msg core.Message, receip
 		to, ok := eventArgs[1].(string)
 		if !ok || len(to) == 0 {
 			return errorsmod.Wrap(
-				types.ErrInvalidContract, 
+				types.ErrInvalidContract,
 				"swapToNative event `to` parameters is invalid, expected string",
 			)
 		}
@@ -78,7 +78,7 @@ func (hook erc20Hook) PostTxProcessing(ctx sdk.Context, msg core.Message, receip
 		receiver, err := sdk.AccAddressFromBech32(to)
 		if err != nil {
 			return errorsmod.Wrapf(
-				types.ErrInvalidContract, 
+				types.ErrInvalidContract,
 				"swapToNative event `to` parameters is invalid, expected iaa address, actual: %s",
 				to,
 			)
@@ -87,7 +87,7 @@ func (hook erc20Hook) PostTxProcessing(ctx sdk.Context, msg core.Message, receip
 		amount, ok := eventArgs[2].(*big.Int)
 		if !ok || amount.Cmp(big.NewInt(0)) == 0 {
 			return errorsmod.Wrap(
-				types.ErrInvalidContract, 
+				types.ErrInvalidContract,
 				"swapToNative event `amount` parameters is invalid, expected `*big.Int`",
 			)
 		}

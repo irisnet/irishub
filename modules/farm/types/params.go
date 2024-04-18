@@ -20,9 +20,9 @@ func NewParams(createPoolFee sdk.Coin, maxRewardCategories uint32, taxRate sdk.D
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
 	return NewParams(
-		sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000)), 
-		2, 
-		sdk.NewDecWithPrec(4, 1)  ,
+		sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000)),
+		2,
+		sdk.NewDecWithPrec(4, 1),
 	)
 }
 

@@ -38,7 +38,7 @@ func (k Keeper) CallEVM(
 	method string,
 	args ...interface{},
 ) (*types.Result, error) {
- 	data, err := contractABI.Pack(method, args...)
+	data, err := contractABI.Pack(method, args...)
 	if err != nil {
 		return nil, errorsmod.Wrap(
 			tokentypes.ErrABIPack,
