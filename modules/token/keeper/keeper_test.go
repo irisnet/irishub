@@ -65,7 +65,7 @@ func TestKeeperSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) setToken(token v1.Token) {
-	err := suite.keeper.AddToken(suite.ctx, token)
+	err := suite.keeper.AddToken(suite.ctx, token, true)
 	suite.NoError(err)
 }
 
@@ -241,7 +241,7 @@ func (suite *KeeperTestSuite) TestSwapFeeToken() {
 	amt = suite.bk.GetBalance(suite.ctx, token2.GetOwner(), token2.MinUnit)
 	suite.Equal("100000000000000000000t2min", amt.String())
 
-	//reverse test
+	// reverse test
 	_, feeGot, err = suite.keeper.SwapFeeToken(
 		suite.ctx,
 		feeGot,

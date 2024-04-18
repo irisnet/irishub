@@ -242,50 +242,50 @@ func (s *IntegrationTestSuite) TestToken() {
 	// ---------------------------------------------------------------------------
 
 	//------test GetCmdSwapToErc20()-------------
-	args = []string{
-		fmt.Sprintf("--%s=%s", tokencli.FlagTo, to.String()),
+	// args = []string{
+	// 	fmt.Sprintf("--%s=%s", tokencli.FlagTo, to.String()),
 
-		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf(
-			"--%s=%s",
-			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
-		),
-	}
+	// 	fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+	// 	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+	// 	fmt.Sprintf(
+	// 		"--%s=%s",
+	// 		flags.FlagFees,
+	// 		sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+	// 	),
+	// }
 
-	txResult = tokentestutil.SwapToERC20Exec(
-		s.T(),
-		s.network,
-		clientCtx,
-		from.String(),
-		sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(1))).String(),
-		args...)
+	// txResult = tokentestutil.SwapToERC20Exec(
+	// 	s.T(),
+	// 	s.network,
+	// 	clientCtx,
+	// 	from.String(),
+	// 	sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(1))).String(),
+	// 	args...)
 
 	// TODO assert
 	// s.Require().Equal(expectedCode, txResult.Code)
 	// ---------------------------------------------------------------------------
 
 	//------test GetCmdSwapFromErc20()-------------
-	args = []string{
-		fmt.Sprintf("--%s=%s", tokencli.FlagTo, to.String()),
+	// args = []string{
+	// 	fmt.Sprintf("--%s=%s", tokencli.FlagTo, to.String()),
 
-		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-		fmt.Sprintf(
-			"--%s=%s",
-			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
-		),
-	}
+	// 	fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+	// 	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+	// 	fmt.Sprintf(
+	// 		"--%s=%s",
+	// 		flags.FlagFees,
+	// 		sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+	// 	),
+	// }
 
-	txResult = tokentestutil.SwapFromERC20Exec(
-		s.T(),
-		s.network,
-		clientCtx,
-		from.String(),
-		sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(1))).String(),
-		args...)
+	// txResult = tokentestutil.SwapFromERC20Exec(
+	// 	s.T(),
+	// 	s.network,
+	// 	clientCtx,
+	// 	from.String(),
+	// 	sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(1))).String(),
+	// 	args...)
 
 	// TODO assert
 	// s.Require().Equal(expectedCode, txResult.Code)

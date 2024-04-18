@@ -29,6 +29,7 @@ func GetQueryCmd() *cobra.Command {
 		GetCmdQueryFee(),
 		GetCmdQueryTotalBurn(),
 		GetCmdQueryParams(),
+		GetCmdQueryBalances(),
 	)
 
 	return queryCmd
@@ -43,7 +44,6 @@ func GetCmdQueryToken() *cobra.Command {
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
-
 			if err != nil {
 				return err
 			}
@@ -57,7 +57,6 @@ func GetCmdQueryToken() *cobra.Command {
 			res, err := queryClient.Token(context.Background(), &v1.QueryTokenRequest{
 				Denom: args[0],
 			})
-
 			if err != nil {
 				return err
 			}
@@ -202,6 +201,35 @@ func GetCmdQueryTotalBurn() *cobra.Command {
 
 			queryClient := v1.NewQueryClient(clientCtx)
 			res, err := queryClient.TotalBurn(context.Background(), &v1.QueryTotalBurnRequest{})
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(res)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdQueryBalances return all the balances of an owner in special denom
+func GetCmdQueryBalances() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "balances [addr] [denom]",
+		Args:    cobra.ExactArgs(2),
+		Long:    "Query all the balances of an owner in special denom.",
+		Example: fmt.Sprintf("$ %s query token balances <addr> <denom>", version.AppName),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := v1.NewQueryClient(clientCtx)
+			res, err := queryClient.Balances(context.Background(), &v1.QueryBalancesRequest{
+				Address: args[0],
+				Denom:   args[1],
+			})
 			if err != nil {
 				return err
 			}

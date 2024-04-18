@@ -32,14 +32,16 @@ type Keeper struct {
 // NewKeeper creates a new instance of Keeper.
 //
 // Parameters:
-//   cdc: codec to marshal/unmarshal binary encoding/decoding.
-//   key: store key for the module's store.
-//   bankKeeper: bank Keeper module for interacting with accounts.
-//   accountKeeper: Account Keeper for interacting with accounts.
-//   evmKeeper: EVM Keeper module for interacting with Ethereum Virtual Machine transactions.
-//   ics20Keeper: ICS20 Keeper module for interacting with ICS20 transactions.
-//   feeCollectorName: name of the fee collector.
-//   authority: authority string.
+//
+//	cdc: codec to marshal/unmarshal binary encoding/decoding.
+//	key: store key for the module's store.
+//	bankKeeper: bank Keeper module for interacting with accounts.
+//	accountKeeper: Account Keeper for interacting with accounts.
+//	evmKeeper: EVM Keeper module for interacting with Ethereum Virtual Machine transactions.
+//	ics20Keeper: ICS20 Keeper module for interacting with ICS20 transactions.
+//	feeCollectorName: name of the fee collector.
+//	authority: authority string.
+//
 // Return type: Keeper.
 func NewKeeper(
 	cdc codec.Codec,
@@ -97,7 +99,7 @@ func (k Keeper) IssueToken(
 		maxSupply, mintable, owner,
 	)
 
-	if err := k.AddToken(ctx, token); err != nil {
+	if err := k.AddToken(ctx, token, true); err != nil {
 		return err
 	}
 
@@ -159,11 +161,11 @@ func (k Keeper) EditToken(
 
 	if name != v1.DoNotModify {
 		token.Name = name
-
-		metadata, _ := k.bankKeeper.GetDenomMetaData(ctx, token.MinUnit)
-		metadata.Description = name
-
-		k.bankKeeper.SetDenomMetaData(ctx, metadata)
+		metadata, exist := k.bankKeeper.GetDenomMetaData(ctx, token.MinUnit)
+		if exist {
+			metadata.Description = name
+			k.bankKeeper.SetDenomMetaData(ctx, metadata)
+		}
 	}
 
 	if mintable != types.Nil {

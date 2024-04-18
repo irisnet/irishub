@@ -21,7 +21,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data v1.GenesisState) {
 
 	// init tokens
 	for _, token := range data.Tokens {
-		if err := k.AddToken(ctx, token); err != nil {
+		if err := k.AddToken(ctx, token, false); err != nil {
 			panic(err.Error())
 		}
 	}
@@ -34,7 +34,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data v1.GenesisState) {
 	if !k.HasSymbol(ctx, data.Params.IssueTokenBaseFee.Denom) {
 		panic(fmt.Sprintf("Token %s does not exist", data.Params.IssueTokenBaseFee.Denom))
 	}
-
 }
 
 // ExportGenesis outputs the genesis state

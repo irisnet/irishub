@@ -65,7 +65,7 @@ func (suite *HandlerSuite) SetupTest() {
 }
 
 func (suite *HandlerSuite) issueToken(token v1.Token) {
-	err := suite.keeper.AddToken(suite.ctx, token)
+	err := suite.keeper.AddToken(suite.ctx, token, true)
 	suite.NoError(err)
 
 	mintCoins := sdk.NewCoins(

@@ -33,10 +33,12 @@ service Msg {
   // SwapFeeToken defines a method for swapping between IRIS and ERIS
   rpc SwapFeeToken(MsgSwapFeeToken) returns (MsgSwapFeeTokenResponse);
 
-  // SwapToERC20 defines a method for swapping some native token to its ERC20 counterpart
+  // SwapToERC20 defines a method for swapping some native token to its ERC20
+  // counterpart
   rpc SwapToERC20(MsgSwapToERC20) returns (MsgSwapToERC20Response);
 
-  // SwapFromERC20 defines a method for swapping some ERC20 token to its native counterpart
+  // SwapFromERC20 defines a method for swapping some ERC20 token to its native
+  // counterpart
   rpc SwapFromERC20(MsgSwapFromERC20) returns (MsgSwapFromERC20Response);
 
   // UpdateParams defines a governance operation for updating the token
@@ -45,7 +47,8 @@ service Msg {
   // Since: cosmos-sdk 0.47
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 
-  // DeployERC20 defines a governance operation for deploying an ERC20 contract that binds to a native token
+  // DeployERC20 defines a governance operation for deploying an ERC20 contract
+  // that binds to a native token
   rpc DeployERC20(MsgDeployERC20) returns (MsgDeployERC20Response);
 }
 

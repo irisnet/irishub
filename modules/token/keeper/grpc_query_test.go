@@ -19,7 +19,7 @@ func (suite *KeeperTestSuite) TestGRPCQueryToken() {
 	v1.RegisterQueryServer(queryHelper, app.TokenKeeper)
 	queryClient := v1.NewQueryClient(queryHelper)
 
-	_ = suite.app.TokenKeeper.AddToken(ctx, token)
+	_ = suite.app.TokenKeeper.AddToken(ctx, token, true)
 
 	// Query token
 	tokenResp1, err := queryClient.Token(
@@ -76,7 +76,7 @@ func (suite *KeeperTestSuite) TestGRPCQueryTotalBurn() {
 
 	_, _, addr := testdata.KeyTestPubAddr()
 	token := v1.NewToken("btc", "Bitcoin Token", "satoshi", 18, 21000000, 22000000, true, addr)
-	err := suite.app.TokenKeeper.AddToken(ctx, token)
+	err := suite.app.TokenKeeper.AddToken(ctx, token, true)
 	suite.Require().NoError(err)
 
 	buinCoin := sdk.NewInt64Coin("satoshi", 1000000000000000000)

@@ -49,7 +49,7 @@ func KeyMinUint(minUnit string) []byte {
 
 // KeyContract returns the key of the token with the specified contract
 func KeyContract(contract string) []byte {
-	bz := common.FromHex(contract)
+	bz := common.HexToAddress(contract).Bytes()
 	return append(PrefixTokenForContract, bz...)
 }
 
