@@ -22,7 +22,6 @@ var (
 	// params store for inflation params
 	KeyInflation = []byte("Inflation")
 	KeyMintDenom = []byte("MintDenom")
-	MintDenom    = sdk.DefaultBondDenom
 )
 
 // ParamTable for mint module
@@ -41,7 +40,7 @@ func NewParams(mintDenom string, inflation sdk.Dec) Params {
 func DefaultParams() Params {
 	return Params{
 		Inflation: sdk.NewDecWithPrec(4, 2),
-		MintDenom: MintDenom,
+		MintDenom: sdk.DefaultBondDenom,
 	}
 }
 

@@ -1,4 +1,4 @@
-package token
+package wrapper
 
 import (
 	"context"
@@ -27,11 +27,11 @@ var (
 	_ tokentypes.ICS20Keeper = (*ics20Keeper)(nil)
 )
 
-// WrapEVMKeeper wraps the given evmkeeper.Keeper and returns a new evmKeeper.
+// NewEVMKeeper wraps the given evmkeeper.Keeper and returns a new evmKeeper.
 //
 // ek: The evmkeeper.Keeper to be wrapped.
 // Returns a pointer to the wrapped evmKeeper.
-func WrapEVMKeeper(ek *evmkeeper.Keeper) tokentypes.EVMKeeper {
+func NewEVMKeeper(ek *evmkeeper.Keeper) tokentypes.EVMKeeper {
 	return &evmKeeper{ek: ek}
 }
 
@@ -79,14 +79,14 @@ func (e *evmKeeper) SupportedKey(pubKey cryptotypes.PubKey) bool {
 	return ok
 }
 
-// WrapICS20Keeper wraps the given ibctransferkeeper.Keeper into an ics20Keeper.
+// NewICS20Keeper wraps the given ibctransferkeeper.Keeper into an ics20Keeper.
 //
 // Parameters:
 // - ik: the ibctransferkeeper.Keeper to be wrapped.
 //
 // Return:
 // - *ics20Keeper: the wrapped ics20Keeper.
-func WrapICS20Keeper(ik ibctransferkeeper.Keeper) tokentypes.ICS20Keeper {
+func NewICS20Keeper(ik ibctransferkeeper.Keeper) tokentypes.ICS20Keeper {
 	return &ics20Keeper{ik: ik}
 }
 

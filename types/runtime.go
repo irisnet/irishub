@@ -62,6 +62,8 @@ func init() {
 		Mintable:      true,
 		Owner:         sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))).String(),
 	}
+	sdk.DefaultBondDenom = NativeToken.MinUnit
+
 
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {

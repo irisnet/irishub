@@ -110,8 +110,8 @@ import (
 	"github.com/irisnet/irishub/v3/modules/internft"
 	mintkeeper "github.com/irisnet/irishub/v3/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/v3/modules/mint/types"
-	iristoken "github.com/irisnet/irishub/v3/modules/token"
 	iristypes "github.com/irisnet/irishub/v3/types"
+	"github.com/irisnet/irishub/v3/wrapper"
 )
 
 // AppKeepers defines a structure used to consolidate all
@@ -518,7 +518,7 @@ func New(
 		AddRoute(farmtypes.RouterKey, farm.NewCommunityPoolCreateFarmProposalHandler(appKeepers.FarmKeeper))
 
 	appKeepers.GovKeeper.SetHooks(govtypes.NewMultiGovHooks(
-		farmkeeper.NewGovHook(appKeepers.FarmKeeper),
+		wrapper.NewFarmGovHook(farmkeeper.NewGovHook(appKeepers.FarmKeeper)),
 	))
 
 	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
@@ -551,8 +551,8 @@ func New(
 		appKeepers.keys[tokentypes.StoreKey],
 		appKeepers.BankKeeper,
 		appKeepers.AccountKeeper,
-		iristoken.WrapEVMKeeper(appKeepers.EvmKeeper),
-		iristoken.WrapICS20Keeper(appKeepers.IBCTransferKeeper),
+		wrapper.NewEVMKeeper(appKeepers.EvmKeeper),
+		wrapper.NewICS20Keeper(appKeepers.IBCTransferKeeper),
 		authtypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	).WithSwapRegistry(tokenv1.SwapRegistry{
