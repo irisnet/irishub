@@ -164,6 +164,5 @@ func (s *HexString) UnmarshalJSON(data []byte) error {
 // CompiledContract contains compiled bytecode and abi
 type CompiledContract struct {
 	ABI abi.ABI
-	Bin HexString 
+	Bin HexString
 }
-

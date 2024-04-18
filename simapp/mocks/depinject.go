@@ -12,8 +12,8 @@ import (
 // Returns a tokentypes.EVMKeeper.
 func ProvideEVMKeeper() tokentypes.EVMKeeper {
 	return &evm{
-			erc20s: make(map[common.Address]*erc20),
-		}
+		erc20s: make(map[common.Address]*erc20),
+	}
 }
 
 // ProvideICS20Keeper returns an instance of tokentypes.ICS20Keeper.

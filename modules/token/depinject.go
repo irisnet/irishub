@@ -59,7 +59,6 @@ type TokenOutputs struct {
 
 	TokenKeeper keeper.Keeper
 	Module      appmodule.AppModule
-
 }
 
 // ProvideModule provides a module for the token with the given inputs and returns the token keeper and module.

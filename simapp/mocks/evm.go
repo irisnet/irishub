@@ -50,7 +50,7 @@ func (e *evm) ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogge
 			balance: make(map[common.Address]*big.Int),
 		}
 		return &types.Result{
-			Hash:    contractAddr.Hex(),
+			Hash: contractAddr.Hex(),
 		}, nil
 	}
 
@@ -114,14 +114,14 @@ func (erc20 erc20) call(method *abi.Method, data []byte) ([]byte, error) {
 	case "decimals":
 		return method.Outputs.Pack(erc20.scale)
 	case "balanceOf":
-		balance,ok := erc20.balance[args[0].(common.Address)]
+		balance, ok := erc20.balance[args[0].(common.Address)]
 		if !ok {
 			return method.Outputs.Pack(big.NewInt(0))
 		}
 		return method.Outputs.Pack(balance)
 	case "mint":
 		to := args[0].(common.Address)
-		balance,ok := erc20.balance[args[0].(common.Address)]
+		balance, ok := erc20.balance[args[0].(common.Address)]
 		if !ok {
 			balance = big.NewInt(0)
 		}
