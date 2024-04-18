@@ -100,7 +100,7 @@ message MsgMintToken {
   option (cosmos.msg.v1.signer) = "owner";
 
   cosmos.base.v1beta1.Coin coin = 1 [ (gogoproto.nullable) = false ];
-  string to = 2;
+  string receiver = 2;
   string owner = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 }
 
@@ -123,7 +123,7 @@ message MsgSwapFeeToken {
   option (cosmos.msg.v1.signer) = "sender";
 
   cosmos.base.v1beta1.Coin fee_paid = 1 [ (gogoproto.nullable) = false ];
-  string recipient = 2;
+  string receiver = 2;
   string sender = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 }
 

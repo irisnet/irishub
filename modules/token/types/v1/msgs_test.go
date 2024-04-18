@@ -155,7 +155,7 @@ func TestMsgEditTokenRoute(t *testing.T) {
 func TestMsgEditTokenGetSignBytes(t *testing.T) {
 	mintable := tokentypes.False
 
-	var msg = MsgEditToken{
+	msg := MsgEditToken{
 		Name:      "BTC TOKEN",
 		Owner:     sdk.AccAddress(tmhash.SumTruncated([]byte("owner"))).String(),
 		Symbol:    "btc",
@@ -193,8 +193,8 @@ func TestMsgMintTokenValidateBasic(t *testing.T) {
 				Denom:  td.minUnit,
 				Amount: sdkmath.NewIntFromUint64(td.amount),
 			},
-			To:    td.to,
-			Owner: td.owner,
+			Receiver: td.to,
+			Owner:    td.owner,
 		}
 		if td.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", td.msg)

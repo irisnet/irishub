@@ -256,8 +256,8 @@ func (msg MsgMintToken) ValidateBasic() error {
 	}
 
 	// check the reception
-	if len(msg.To) > 0 {
-		if _, err := sdk.AccAddressFromBech32(msg.To); err != nil {
+	if len(msg.Receiver) > 0 {
+		if _, err := sdk.AccAddressFromBech32(msg.Receiver); err != nil {
 			return errorsmod.Wrapf(
 				sdkerrors.ErrInvalidAddress,
 				"invalid mint reception address (%s)",
@@ -328,8 +328,8 @@ func (msg MsgSwapFeeToken) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
-	if len(msg.Recipient) != 0 {
-		if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
+	if len(msg.Receiver) != 0 {
+		if _, err := sdk.AccAddressFromBech32(msg.Receiver); err != nil {
 			return errorsmod.Wrapf(
 				sdkerrors.ErrInvalidAddress,
 				"invalid recipient address (%s)",
