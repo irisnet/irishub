@@ -11,23 +11,13 @@ import (
 
 // Service params default values
 var (
-	DefaultMaxRequestTimeout  = int64(100)
-	DefaultMinDepositMultiple = int64(1000)
-	DefaultMinDeposit         = sdk.NewCoins(
-		sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000)),
-	) // 5000stake
-	DefaultServiceFeeTax = sdk.NewDecWithPrec(
-		5,
-		2,
-	) // 5%
-	DefaultSlashFraction = sdk.NewDecWithPrec(
-		1,
-		3,
-	) // 0.1%
-	DefaultComplaintRetrospect       = 15 * 24 * time.Hour // 15 days
-	DefaultArbitrationTimeLimit      = 5 * 24 * time.Hour  // 5 days
+	DefaultMaxRequestTimeout         = int64(100)
+	DefaultMinDepositMultiple        = int64(1000)
+	DefaultServiceFeeTax             = sdk.NewDecWithPrec(5, 2) // 5%
+	DefaultSlashFraction             = sdk.NewDecWithPrec(1, 3) // 0.1%
+	DefaultComplaintRetrospect       = 15 * 24 * time.Hour      // 15 days
+	DefaultArbitrationTimeLimit      = 5 * 24 * time.Hour       // 5 days
 	DefaultTxSizeLimit               = uint64(4000)
-	DefaultBaseDenom                 = sdk.DefaultBondDenom
 	DefaultRestrictedServiceFeeDenom = false
 )
 
@@ -63,13 +53,15 @@ func DefaultParams() Params {
 	return NewParams(
 		DefaultMaxRequestTimeout,
 		DefaultMinDepositMultiple,
-		DefaultMinDeposit,
+		sdk.NewCoins(
+			sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000)),
+		),
 		DefaultServiceFeeTax,
 		DefaultSlashFraction,
 		DefaultComplaintRetrospect,
 		DefaultArbitrationTimeLimit,
 		DefaultTxSizeLimit,
-		DefaultBaseDenom,
+		sdk.DefaultBondDenom,
 		DefaultRestrictedServiceFeeDenom,
 	)
 }

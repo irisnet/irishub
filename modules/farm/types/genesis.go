@@ -6,16 +6,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var (
-	defaultGenesisState = GenesisState{
-		Params: Params{
-			PoolCreationFee:     DefaultPoolCreationFee,
-			TaxRate:             DefaulttTaxRate,
-			MaxRewardCategories: DefaultMaxRewardCategories,
-		},
-	}
-)
-
 // NewGenesisState constructs a new GenesisState instance
 func NewGenesisState(params Params, pools []FarmPool, farmInfos []FarmInfo, sequence uint64, escrow []EscrowInfo) *GenesisState {
 	return &GenesisState{
@@ -25,11 +15,9 @@ func NewGenesisState(params Params, pools []FarmPool, farmInfos []FarmInfo, sequ
 
 // DefaultGenesisState gets the default genesis state for testing
 func DefaultGenesisState() *GenesisState {
-	return &defaultGenesisState
-}
-
-func SetDefaultGenesisState(state GenesisState) {
-	defaultGenesisState = state
+	return &GenesisState{
+		Params: DefaultParams(),
+	}
 }
 
 // ValidateGenesis validates the provided farm genesis state to ensure the
