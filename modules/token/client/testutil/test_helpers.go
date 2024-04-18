@@ -96,6 +96,38 @@ func TransferTokenOwnerExec(t *testing.T,
 	return network.ExecTxCmdWithResult(t, clientCtx, tokencli.GetCmdTransferTokenOwner(), args)
 }
 
+func SwapToERC20Exec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	coinStr string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
+	args := []string{
+		coinStr,
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}
+	args = append(args, extraArgs...)
+
+	return network.ExecTxCmdWithResult(t, clientCtx, tokencli.GetCmdSwapToErc20(), args)
+}
+
+func SwapFromERC20Exec(t *testing.T,
+	network simapp.Network,
+	clientCtx client.Context,
+	from string,
+	coinStr string,
+	extraArgs ...string,
+) *simapp.ResponseTx {
+	args := []string{
+		coinStr,
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}
+	args = append(args, extraArgs...)
+
+	return network.ExecTxCmdWithResult(t, clientCtx, tokencli.GetCmdSwapFromErc20(), args)
+}
+
 func QueryTokenExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,

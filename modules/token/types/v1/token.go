@@ -33,6 +33,7 @@ type TokenI interface {
 	GetMaxSupply() uint64
 	GetMintable() bool
 	GetOwner() sdk.AccAddress
+	GetContract() string
 
 	ToMainCoin(coin sdk.Coin) (sdk.DecCoin, error)
 	ToMinCoin(coin sdk.DecCoin) (sdk.Coin, error)
@@ -108,6 +109,10 @@ func (t Token) GetMintable() bool {
 func (t Token) GetOwner() sdk.AccAddress {
 	owner, _ := sdk.AccAddressFromBech32(t.Owner)
 	return owner
+}
+
+func (t Token) GetContract() string {
+	return t.Contract
 }
 
 // ToMainCoin returns the main denom coin from args

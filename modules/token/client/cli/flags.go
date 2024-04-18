@@ -25,6 +25,8 @@ var (
 	FsTransferTokenOwner = flag.NewFlagSet("", flag.ContinueOnError)
 	FsMintToken          = flag.NewFlagSet("", flag.ContinueOnError)
 	FsSwapFeeToken       = flag.NewFlagSet("", flag.ContinueOnError)
+	FsSwapToErc20        = flag.NewFlagSet("", flag.ContinueOnError)
+	FsSwapFromErc20      = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -42,5 +44,7 @@ func init() {
 
 	FsTransferTokenOwner.String(FlagTo, "", "The new owner")
 	FsMintToken.String(FlagTo, "", "Address to which the token is to be minted")
-	FsSwapFeeToken.String(FlagTo, "", "Address to which the token is to be receiver")
+	FsSwapFeeToken.String(FlagTo, "", "Address to which the token is to be received")
+	FsSwapToErc20.String(FlagTo, "", "Address to which the token is to be received")
+	FsSwapFromErc20.String(FlagTo, "", "Address to which the token is to be received")
 }
