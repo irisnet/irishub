@@ -249,17 +249,13 @@ func InitTestnet(
 			return err
 		}
 
-		accTokens := sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)
-		accStakingTokens := sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction)
-		accEvmTokens := sdk.TokensFromConsensusPower(5000, PowerReduction)
-		accIrisTokens := sdk.TokensFromConsensusPower(5000, sdk.DefaultPowerReduction)
+		accStakingTokens := sdk.TokensFromConsensusPower(15e8, sdk.DefaultPowerReduction)
+		accEvmTokens := sdk.TokensFromConsensusPower(5e8, PowerReduction)
 
-		coins := sdk.Coins{
-			sdk.NewCoin(fmt.Sprintf("%stoken", nodeDirName), accTokens),
+		coins := sdk.NewCoins(
 			sdk.NewCoin(sdk.DefaultBondDenom, accStakingTokens),
 			sdk.NewCoin(iristypes.EvmToken.MinUnit, accEvmTokens),
-			sdk.NewCoin(nativeIrisMinUnit, accIrisTokens),
-		}
+		)
 
 		genBalances = append(
 			genBalances,
