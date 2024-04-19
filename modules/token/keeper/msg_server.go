@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"encoding/hex"
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -318,12 +317,7 @@ func (m msgServer) SwapToERC20(goCtx context.Context, msg *v1.MsgSwapToERC20) (*
 		return nil, err
 	}
 
-	bz, err := hex.DecodeString(msg.Receiver)
-	if err != nil {
-		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "expecting a hex address of 0x, got %s", msg.Receiver)
-	}
-	receiver := common.BytesToAddress(bz)
-
+	receiver := common.HexToAddress(msg.Receiver)
 	if err := m.k.SwapToERC20(ctx, sender, receiver, msg.Amount); err != nil {
 		return nil, err
 	}

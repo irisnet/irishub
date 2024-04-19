@@ -244,7 +244,7 @@ func (k Keeper) Balances(c context.Context, req *v1.QueryBalancesRequest) (*v1.Q
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
-		balances = balances.Add(sdk.NewCoin(token.GetContract(), sdkmath.NewIntFromBigInt(erc20Balance)))
+		balances = balances.Add(sdk.NewCoin("erc20/"+token.GetContract(), sdkmath.NewIntFromBigInt(erc20Balance)))
 	}
 	return &v1.QueryBalancesResponse{Balances: balances}, nil
 }

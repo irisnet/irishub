@@ -7,6 +7,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/ethereum/go-ethereum/common"
 
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 )
@@ -420,8 +421,8 @@ func (m *MsgSwapToERC20) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
-	if tokentypes.IsValidEthAddress(m.Receiver) {
-		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "expecting a hex address of 0x, got %s", m.Receiver)
+	if !common.IsHexAddress(m.Receiver) {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "expecting a hex address, got %s", m.Receiver)
 	}
 
 	if !m.Amount.IsValid() {

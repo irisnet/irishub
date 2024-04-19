@@ -51,7 +51,7 @@ func (k Keeper) DeployERC20(
 	if err != nil {
 		return common.Address{}, errorsmod.Wrapf(types.ErrABIPack, "erc20 metadata is invalid %s: %s", name, err.Error())
 	}
-	deployer := k.moduleAddress()
+	deployer :=  k.getModuleEthAddress(ctx)
 
 	data := make([]byte, len(contracts.ERC20TokenContract.Bin)+len(contractArgs))
 	copy(data[:len(contracts.ERC20TokenContract.Bin)], contracts.ERC20TokenContract.Bin)
@@ -205,7 +205,7 @@ func (k Keeper) MintERC20(
 	}
 
 	abi := contracts.ERC20TokenContract.ABI
-	res, err := k.CallEVM(ctx, abi, k.moduleAddress(), contract, true, contracts.MethodMint, to, amount)
+	res, err := k.CallEVM(ctx, abi, k.getModuleEthAddress(ctx), contract, true, contracts.MethodMint, to, amount)
 	if err != nil {
 		return err
 	}
@@ -263,7 +263,7 @@ func (k Keeper) BurnERC20(
 	}
 
 	abi := contracts.ERC20TokenContract.ABI
-	res, err := k.CallEVM(ctx, abi, k.moduleAddress(), contract, true, contracts.MethodBurn, from, amount)
+	res, err := k.CallEVM(ctx, abi, k.getModuleEthAddress(ctx), contract, true, contracts.MethodBurn, from, amount)
 	if err != nil {
 		return err
 	}
@@ -302,7 +302,7 @@ func (k Keeper) BalanceOf(
 	contract, account common.Address,
 ) (*big.Int, error) {
 	abi := contracts.ERC20TokenContract.ABI
-	res, err := k.CallEVM(ctx, abi, k.moduleAddress(), contract, false, contracts.MethodBalanceOf, account)
+	res, err := k.CallEVM(ctx, abi, k.getModuleEthAddress(ctx), contract, false, contracts.MethodBalanceOf, account)
 	if err != nil {
 		return nil, err
 	}
@@ -320,9 +320,9 @@ func (k Keeper) BalanceOf(
 	return balance, nil
 }
 
-func (k Keeper) moduleAddress() common.Address {
-	moduleAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
-	return common.BytesToAddress(moduleAddr.Bytes())
+func (k Keeper) getModuleEthAddress(ctx sdk.Context) common.Address {
+	moduleAccount := k.accountKeeper.GetModuleAccount(ctx,types.ModuleName)
+	return common.BytesToAddress(moduleAccount.GetAddress().Bytes())
 }
 
 func (k Keeper) buildERC20Token(
