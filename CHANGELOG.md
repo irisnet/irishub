@@ -6,6 +6,7 @@
 
 * (IRISHub) [\#2908](https://github.com/irisnet/irishub/pull/2908) Add ICA module.
 * (IRISHub) [\#2909](https://github.com/irisnet/irishub/pull/2909) Add cosmos LSM.
+* (IRISHub) [\#2925](https://github.com/irisnet/irishub/pull/2925) Enhance token module.
 
 ### Improvements
 

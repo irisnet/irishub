@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/testutil/network"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
 
@@ -52,6 +53,6 @@ func (s *IntegrationTestSuite) TestMint() {
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.Codec.UnmarshalJSON(bz.Bytes(), respType))
 	params := respType.(*minttypes.Params)
-	s.Require().Equal("stake", params.MintDenom)
+	s.Require().Equal(sdk.DefaultBondDenom, params.MintDenom)
 	s.Require().Equal("0.040000000000000000", params.Inflation.String())
 }
