@@ -12,7 +12,7 @@ require (
 	github.com/cosmos/iavl v0.20.1 // indirect
 	github.com/cosmos/ibc-go/v7 v7.3.0
 	github.com/evmos/ethermint v0.22.0
-	github.com/irisnet/irismod v1.8.1-0.20240418095024-5fb0418185bd //release/v1.8.0-lsm
+	github.com/irisnet/irismod v1.8.1-0.20240419032051-734da9df7b72 //release/v1.8.0-lsm
 )
 
 require (
@@ -236,4 +236,4 @@ replace github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.22.0-iri
 
 replace github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
-replace github.com/irisnet/irismod => /Users/dreamer/workspace/github/irisnet/irismod
+// replace github.com/irisnet/irismod => /Users/dreamer/workspace/github/irisnet/irismod
