@@ -47,6 +47,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 * [\#402](https://github.com/irisnet/irismod/pull/402) Add cli for swap from/to ERC20.
 * [\#404](https://github.com/irisnet/irismod/pull/404) Implement token Balances api.
 * [\#405](https://github.com/irisnet/irismod/pull/405) Rolled back the cosmos-sdk version to v0.47.9.
+* [\#409](https://github.com/irisnet/irismod/pull/409) feat: add a switch for enabling erc20 swap function.
 
 ### Bug Fixes
 
