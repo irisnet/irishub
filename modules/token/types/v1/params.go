@@ -24,10 +24,11 @@ func DefaultParams() Params {
 		TokenTaxRate:      sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
 		IssueTokenBaseFee: sdk.NewCoin(defaultToken.Symbol, sdk.NewInt(60000)),
 		MintTokenFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
+		EnableErc20:       true,
 	}
 }
 
-// ValidateParams validates the given params
+// Validate validates the given params
 func (p Params) Validate() error {
 	if err := validateTaxRate(p.TokenTaxRate); err != nil {
 		return err

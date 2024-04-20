@@ -34,3 +34,9 @@ func (k Keeper) SetParams(ctx sdk.Context, params v1.Params) error {
 
 	return nil
 }
+
+// ERC20Enabled returns true if ERC20 is enabled
+func (k Keeper) ERC20Enabled(ctx sdk.Context) bool {
+	params := k.GetParams(ctx)
+	return params.EnableErc20
+}

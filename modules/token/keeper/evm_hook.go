@@ -28,6 +28,7 @@ type erc20Hook struct {
 //
 // Return type: error
 func (hook erc20Hook) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *ethtypes.Receipt) error {
+	disable := !hook.k.ERC20Enabled(ctx)
 	erc20 := contracts.ERC20TokenContract.ABI
 	for _, log := range receipt.Logs {
 		// Note: the `SwapToNative` event contains 1 topics
@@ -52,6 +53,10 @@ func (hook erc20Hook) PostTxProcessing(ctx sdk.Context, msg core.Message, receip
 		if err != nil {
 			hook.k.Logger(ctx).Error("invalid SwapToNative event", "contract", log.Address.Hex())
 			continue
+		}
+
+		if disable {
+			return types.ErrERC20Disabled
 		}
 
 		eventArgs, err := erc20.Unpack(event.Name, log.Data)
