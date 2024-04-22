@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"testing"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/cometbft/cometbft/crypto/tmhash"
@@ -29,6 +30,7 @@ var (
 	add2     = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest1")))
 	initAmt  = sdkmath.NewIntWithDecimal(100000000, int(6))
 	initCoin = sdk.Coins{sdk.NewCoin(denom, initAmt)}
+	beacon  = common.BytesToAddress(owner.Bytes())
 )
 
 type KeeperTestSuite struct {
@@ -51,7 +53,9 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.app = app
 
 	// set params
-	suite.keeper.SetParams(suite.ctx, v1.DefaultParams())
+	params := v1.DefaultParams()
+	params.Beacon = beacon.String()
+	suite.keeper.SetParams(suite.ctx, params)
 
 	// init tokens to addr
 	err := suite.bk.MintCoins(suite.ctx, types.ModuleName, initCoin)

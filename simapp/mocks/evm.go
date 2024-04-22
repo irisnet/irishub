@@ -34,14 +34,22 @@ func (e *evm) ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogge
 	if isCreate {
 		contractAddr := crypto.CreateAddress(msg.From(), msg.Nonce())
 
-		data := msg.Data()[len(contracts.ERC20TokenContract.Bin):]
-		argss, err := contracts.ERC20TokenContract.ABI.Constructor.Inputs.Unpack(data)
+		data := msg.Data()[len(contracts.TokenProxyContract.Bin):]
+		args, err := contracts.TokenProxyContract.ABI.Constructor.Inputs.Unpack(data)
 		if err != nil {
 			return nil, err
 		}
-		name, _ := argss[0].(string)
-		symbol, _ := argss[1].(string)
-		scale, _ := argss[2].(uint8)
+
+		data = args[1].([]byte)
+		data = data[4:]
+		args, err = contracts.ERC20TokenContract.ABI.Methods[contracts.MethodInitialize].Inputs.Unpack(data)
+		if err != nil {
+			return nil, err
+		}
+
+		name, _ := args[0].(string)
+		symbol, _ := args[1].(string)
+		scale, _ := args[2].(uint8)
 		e.erc20s[contractAddr] = &erc20{
 			address: contractAddr,
 			scale:   scale,

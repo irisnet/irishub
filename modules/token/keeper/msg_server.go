@@ -323,3 +323,22 @@ func (m msgServer) SwapToERC20(goCtx context.Context, msg *v1.MsgSwapToERC20) (*
 	}
 	return &v1.MsgSwapToERC20Response{}, nil
 }
+
+// UpgradeERC20 implements v1.MsgServer.
+func (m msgServer) UpgradeERC20(goCtx context.Context, msg *v1.MsgUpgradeERC20) (*v1.MsgUpgradeERC20Response, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if m.k.authority != msg.Authority {
+		return nil, errorsmod.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"invalid authority; expected %s, got %s",
+			m.k.authority,
+			msg.Authority,
+		)
+	}
+	
+	implementation := common.HexToAddress(msg.Implementation)
+	if err := m.k.UpgradeERC20(ctx, implementation); err != nil {
+		return nil, err
+	}
+	return &v1.MsgUpgradeERC20Response{}, nil
+}

@@ -30,6 +30,8 @@ func TestMigrate(t *testing.T) {
 	require.NoError(t, err)
 
 	expParams := app.TokenKeeper.GetParams(ctx)
+	// compatible with previous logic
+	expParams.EnableErc20 = true
 	require.Equal(t, expParams, params, "v2.Migrate failed")
 
 }

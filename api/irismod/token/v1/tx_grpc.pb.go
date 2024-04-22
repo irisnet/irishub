@@ -29,6 +29,7 @@ const (
 	Msg_SwapFromERC20_FullMethodName      = "/irismod.token.v1.Msg/SwapFromERC20"
 	Msg_UpdateParams_FullMethodName       = "/irismod.token.v1.Msg/UpdateParams"
 	Msg_DeployERC20_FullMethodName        = "/irismod.token.v1.Msg/DeployERC20"
+	Msg_UpgradeERC20_FullMethodName       = "/irismod.token.v1.Msg/UpgradeERC20"
 )
 
 // MsgClient is the client API for Msg service.
@@ -61,6 +62,8 @@ type MsgClient interface {
 	// DeployERC20 defines a governance operation for deploying an ERC20 contract
 	// that binds to a native token
 	DeployERC20(ctx context.Context, in *MsgDeployERC20, opts ...grpc.CallOption) (*MsgDeployERC20Response, error)
+	// UpgradeERC20 defines a governance operation for upgrading an ERC20 contract
+	UpgradeERC20(ctx context.Context, in *MsgUpgradeERC20, opts ...grpc.CallOption) (*MsgUpgradeERC20Response, error)
 }
 
 type msgClient struct {
@@ -161,6 +164,15 @@ func (c *msgClient) DeployERC20(ctx context.Context, in *MsgDeployERC20, opts ..
 	return out, nil
 }
 
+func (c *msgClient) UpgradeERC20(ctx context.Context, in *MsgUpgradeERC20, opts ...grpc.CallOption) (*MsgUpgradeERC20Response, error) {
+	out := new(MsgUpgradeERC20Response)
+	err := c.cc.Invoke(ctx, Msg_UpgradeERC20_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
@@ -191,6 +203,8 @@ type MsgServer interface {
 	// DeployERC20 defines a governance operation for deploying an ERC20 contract
 	// that binds to a native token
 	DeployERC20(context.Context, *MsgDeployERC20) (*MsgDeployERC20Response, error)
+	// UpgradeERC20 defines a governance operation for upgrading an ERC20 contract
+	UpgradeERC20(context.Context, *MsgUpgradeERC20) (*MsgUpgradeERC20Response, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -227,6 +241,9 @@ func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*
 }
 func (UnimplementedMsgServer) DeployERC20(context.Context, *MsgDeployERC20) (*MsgDeployERC20Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeployERC20 not implemented")
+}
+func (UnimplementedMsgServer) UpgradeERC20(context.Context, *MsgUpgradeERC20) (*MsgUpgradeERC20Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpgradeERC20 not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -421,6 +438,24 @@ func _Msg_DeployERC20_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_UpgradeERC20_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpgradeERC20)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpgradeERC20(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_UpgradeERC20_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpgradeERC20(ctx, req.(*MsgUpgradeERC20))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -467,6 +502,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeployERC20",
 			Handler:    _Msg_DeployERC20_Handler,
+		},
+		{
+			MethodName: "UpgradeERC20",
+			Handler:    _Msg_UpgradeERC20_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

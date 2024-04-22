@@ -144,6 +144,7 @@ contracts-clean:
 # Compile, filter out and format contracts into the following format.
 create-contracts-abi:
 	solc --combined-json abi,bin --evm-version paris --include-path node_modules --base-path $(CONTRACTS_DIR)/  $(CONTRACTS_DIR)/Token.sol | jq '.contracts["Token.sol:Token"]' > $(COMPILED_DIR)/Token.json \
-    && solc --combined-json abi,bin --evm-version paris --include-path node_modules --base-path $(CONTRACTS_DIR)/  $(CONTRACTS_DIR)/TokenProxy.sol | jq '.contracts["TokenProxy.sol:TokenProxy"]' > $(COMPILED_DIR)/TokenProxy.json
+    && solc --combined-json abi,bin --evm-version paris --include-path node_modules --base-path $(CONTRACTS_DIR)/  $(CONTRACTS_DIR)/TokenProxy.sol | jq '.contracts["TokenProxy.sol:TokenProxy"]' > $(COMPILED_DIR)/TokenProxy.json \
+	&& solc --combined-json abi,bin --evm-version paris --include-path node_modules --base-path $(CONTRACTS_DIR)/  $(CONTRACTS_DIR)/UpgradeableBeacon.sol | jq '.contracts["UpgradeableBeacon.sol:UpgradeableBeacon"]' > $(COMPILED_DIR)/UpgradeableBeacon.json \
 
 

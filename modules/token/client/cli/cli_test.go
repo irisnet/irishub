@@ -98,7 +98,7 @@ func (s *IntegrationTestSuite) TestToken() {
 
 	//------test GetCmdQueryParams()-------------
 	queryParamsResponse := tokentestutil.QueryParamsExec(s.T(), s.network, clientCtx)
-	expectedParams := "{\"token_tax_rate\":\"0.400000000000000000\",\"issue_token_base_fee\":{\"denom\":\"stake\",\"amount\":\"60000\"},\"mint_token_fee_ratio\":\"0.100000000000000000\"}"
+	expectedParams := "{\"token_tax_rate\":\"0.400000000000000000\",\"issue_token_base_fee\":{\"denom\":\"stake\",\"amount\":\"60000\"},\"mint_token_fee_ratio\":\"0.100000000000000000\",\"enable_erc20\":true}"
 	result, _ = json.Marshal(queryParamsResponse)
 	s.Require().Equal(expectedParams, string(result))
 

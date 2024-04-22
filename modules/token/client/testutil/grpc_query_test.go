@@ -123,7 +123,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(resp, respType))
 	paramsResp := respType.(*v1.QueryParamsResponse)
 	s.Require().NoError(err)
-	expectedParams := "{\"token_tax_rate\":\"0.400000000000000000\",\"issue_token_base_fee\":{\"denom\":\"stake\",\"amount\":\"60000\"},\"mint_token_fee_ratio\":\"0.100000000000000000\"}"
+	expectedParams := "{\"token_tax_rate\":\"0.400000000000000000\",\"issue_token_base_fee\":{\"denom\":\"stake\",\"amount\":\"60000\"},\"mint_token_fee_ratio\":\"0.100000000000000000\",\"enable_erc20\":true}"
 	result, _ = json.Marshal(paramsResp.Params)
 	s.Require().Equal(expectedParams, string(result))
 }

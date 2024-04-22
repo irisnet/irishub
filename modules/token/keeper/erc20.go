@@ -42,20 +42,40 @@ func (k Keeper) DeployERC20(
 		return common.Address{}, errorsmod.Wrapf(types.ErrERC20AlreadyExists, "token: %s already deployed erc20 contract: %s", token.Symbol, token.Contract)
 	}
 
-	contractArgs, err := contracts.ERC20TokenContract.ABI.Pack(
-		"",
+	params := k.GetParams(ctx)
+	if !params.EnableErc20 {
+		return common.Address{}, errorsmod.Wrapf(types.ErrERC20Disabled, "erc20 is disabled")
+	}
+
+	if len(params.Beacon) == 0 {
+		return common.Address{}, errorsmod.Wrapf(types.ErrBeaconNotSet, "beacon not set")
+	}
+
+	deployer := k.getModuleEthAddress(ctx)
+
+	initArgs, err := contracts.ERC20TokenContract.ABI.Pack(
+		contracts.MethodInitialize,
 		name,
 		symbol,
 		scale,
+		deployer,
+	)
+	if err != nil {
+		return common.Address{}, err
+	}
+
+	contractArgs, err := contracts.TokenProxyContract.ABI.Pack(
+		"",
+		common.HexToAddress(params.Beacon),
+		initArgs,
 	)
 	if err != nil {
 		return common.Address{}, errorsmod.Wrapf(types.ErrABIPack, "erc20 metadata is invalid %s: %s", name, err.Error())
 	}
-	deployer :=  k.getModuleEthAddress(ctx)
 
-	data := make([]byte, len(contracts.ERC20TokenContract.Bin)+len(contractArgs))
-	copy(data[:len(contracts.ERC20TokenContract.Bin)], contracts.ERC20TokenContract.Bin)
-	copy(data[len(contracts.ERC20TokenContract.Bin):], contractArgs)
+	data := make([]byte, len(contracts.TokenProxyContract.Bin)+len(contractArgs))
+	copy(data[:len(contracts.TokenProxyContract.Bin)], contracts.TokenProxyContract.Bin)
+	copy(data[len(contracts.TokenProxyContract.Bin):], contractArgs)
 
 	nonce, err := k.accountKeeper.GetSequence(ctx, sdk.AccAddress(deployer.Bytes()))
 	if err != nil {
@@ -102,7 +122,7 @@ func (k Keeper) SwapFromERC20(
 	if !k.ERC20Enabled(ctx) {
 		return types.ErrERC20Disabled
 	}
-	
+
 	token, err := k.getTokenByMinUnit(ctx, wantedAmount.Denom)
 	if err != nil {
 		return err
@@ -153,7 +173,7 @@ func (k Keeper) SwapToERC20(
 	if !k.ERC20Enabled(ctx) {
 		return types.ErrERC20Disabled
 	}
-	
+
 	receiverAcc := k.accountKeeper.GetAccount(ctx, sdk.AccAddress(receiver.Bytes()))
 	if receiverAcc != nil {
 		if !k.evmKeeper.SupportedKey(receiverAcc.GetPubKey()) {
@@ -296,6 +316,42 @@ func (k Keeper) BurnERC20(
 	return nil
 }
 
+// UpgradeERC20 upgrades the ERC20 contract to a new implementation.
+//
+// Parameters:
+// - ctx: the SDK context.
+// - implementation: the address of the new implementation contract.
+//
+// Returns:
+// - error: an error if the upgrade fails.
+func (k Keeper) UpgradeERC20(
+	ctx sdk.Context,
+	implementation common.Address,
+) error {
+	params := k.GetParams(ctx)
+	if !params.EnableErc20 {
+		return errorsmod.Wrapf(types.ErrERC20Disabled, "erc20 is disabled")
+	}
+
+	if len(params.Beacon) == 0 {
+		return errorsmod.Wrapf(types.ErrBeaconNotSet, "beacon not set")
+	}
+
+	beacon := common.HexToAddress(params.Beacon)
+	abi := contracts.BeaconContract.ABI
+	res, err := k.CallEVM(ctx, abi, k.getModuleEthAddress(ctx), beacon, true, contracts.MethodUpgradeTo, implementation)
+	if err != nil {
+		return err
+	}
+	if res.Failed() {
+		return errorsmod.Wrapf(
+			types.ErrVMExecution, "failed to upgrade contract reason: %s",
+			res.Revert(),
+		)
+	}
+	return nil
+}
+
 // BalanceOf retrieves the balance of a specific account in the contract.
 //
 // Parameters:
@@ -329,7 +385,7 @@ func (k Keeper) BalanceOf(
 }
 
 func (k Keeper) getModuleEthAddress(ctx sdk.Context) common.Address {
-	moduleAccount := k.accountKeeper.GetModuleAccount(ctx,types.ModuleName)
+	moduleAccount := k.accountKeeper.GetModuleAccount(ctx, types.ModuleName)
 	return common.BytesToAddress(moduleAccount.GetAddress().Bytes())
 }
 

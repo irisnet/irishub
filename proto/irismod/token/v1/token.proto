@@ -40,4 +40,5 @@ message Params {
   ];
 
   bool enable_erc20 = 4;
+  string beacon = 5;
 }
