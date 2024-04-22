@@ -44,7 +44,7 @@ func (k Keeper) DeployERC20(
 
 	params := k.GetParams(ctx)
 	if !params.EnableErc20 {
-		return common.Address{}, errorsmod.Wrapf(types.ErrERC20Disabled, "ERC20 is disabled")
+		return common.Address{}, errorsmod.Wrapf(types.ErrERC20Disabled, "erc20 is disabled")
 	}
 
 	if len(params.Beacon) == 0 {
@@ -311,6 +311,42 @@ func (k Keeper) BurnERC20(
 			contract.String(),
 			expectBalance.Int64(),
 			balanceAfter.Int64(),
+		)
+	}
+	return nil
+}
+
+// UpgradeERC20 upgrades the ERC20 contract to a new implementation.
+//
+// Parameters:
+// - ctx: the SDK context.
+// - implementation: the address of the new implementation contract.
+//
+// Returns:
+// - error: an error if the upgrade fails.
+func (k Keeper) UpgradeERC20(
+	ctx sdk.Context,
+	implementation common.Address,
+) error {
+	params := k.GetParams(ctx)
+	if !params.EnableErc20 {
+		return errorsmod.Wrapf(types.ErrERC20Disabled, "erc20 is disabled")
+	}
+
+	if len(params.Beacon) == 0 {
+		return errorsmod.Wrapf(types.ErrBeaconNotSet, "beacon not set")
+	}
+
+	beacon := common.HexToAddress(params.Beacon)
+	abi := contracts.BeaconContract.ABI
+	res, err := k.CallEVM(ctx, abi, k.getModuleEthAddress(ctx), beacon, true, contracts.MethodUpgradeTo, implementation)
+	if err != nil {
+		return err
+	}
+	if res.Failed() {
+		return errorsmod.Wrapf(
+			types.ErrVMExecution, "failed to upgrade contract reason: %s",
+			res.Revert(),
 		)
 	}
 	return nil

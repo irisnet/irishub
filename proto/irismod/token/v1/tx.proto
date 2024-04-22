@@ -50,6 +50,9 @@ service Msg {
   // DeployERC20 defines a governance operation for deploying an ERC20 contract
   // that binds to a native token
   rpc DeployERC20(MsgDeployERC20) returns (MsgDeployERC20Response);
+
+  // UpgradeERC20 defines a governance operation for upgrading an ERC20 contract
+  rpc UpgradeERC20(MsgUpgradeERC20) returns (MsgUpgradeERC20Response);
 }
 
 // MsgIssueToken defines an SDK message for issuing a new token
@@ -192,3 +195,15 @@ message MsgSwapFromERC20 {
 
 // MsgSwapFromERC20Response defines the Msg/SwapFromERC20 response type
 message MsgSwapFromERC20Response {}
+
+// MsgUpgradeERC20 defines an SDK message for UpgradeERC20
+message MsgUpgradeERC20 {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // implementation is the new erc20 contract address
+  string implementation = 1;
+  string authority = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// MsgUpgradeERC20Response defines the Msg/UpgradeERC20 response type
+message MsgUpgradeERC20Response {}
