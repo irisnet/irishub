@@ -66,7 +66,7 @@ func (k Keeper) DeployERC20(
 
 	contractArgs, err := contracts.TokenProxyContract.ABI.Pack(
 		"",
-		params.Beacon,
+		common.HexToAddress(params.Beacon),
 		initArgs,
 	)
 	if err != nil {
