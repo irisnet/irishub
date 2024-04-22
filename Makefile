@@ -135,14 +135,15 @@ contracts-compile: contracts-clean dep-install create-contracts-abi
 # Install openzeppelin solidity contracts
 dep-install:
 	@echo "Importing openzeppelin contracts..."
-	@cd $(CONTRACTS_DIR) && \
-	 npm install
-
+	@npm install
+	 
 # Clean tmp files
 contracts-clean:
-	@rm -rf $(CONTRACTS_DIR)/node_modules
+	@rm -rf node_modules
 
 # Compile, filter out and format contracts into the following format.
 create-contracts-abi:
-	solc --combined-json abi,bin --evm-version paris --include-path $(CONTRACTS_DIR)/node_modules --base-path ./contracts  ./contracts/Token.sol | jq '.contracts["Token.sol:Token"]' > $(COMPILED_DIR)/Token.json
+	solc --combined-json abi,bin --evm-version paris --include-path node_modules --base-path $(CONTRACTS_DIR)/  $(CONTRACTS_DIR)/Token.sol | jq '.contracts["Token.sol:Token"]' > $(COMPILED_DIR)/Token.json \
+    && solc --combined-json abi,bin --evm-version paris --include-path node_modules --base-path $(CONTRACTS_DIR)/  $(CONTRACTS_DIR)/TokenProxy.sol | jq '.contracts["TokenProxy.sol:TokenProxy"]' > $(COMPILED_DIR)/TokenProxy.json
+
 

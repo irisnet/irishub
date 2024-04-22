@@ -18,8 +18,14 @@ var (
 	//go:embed compiled_contracts/Token.json
 	ERC20JSON []byte //nolint: golint
 
+	//go:embed compiled_contracts/TokenProxy.json
+	TokenProxyJSON []byte //nolint: golint
+
 	// ERC20TokenContract is the compiled erc20 contract
 	ERC20TokenContract types.CompiledContract
+
+	// TokenProxyContract is the compiled erc20 contract proxy
+	TokenProxyContract types.CompiledContract
 )
 
 func init() {
@@ -28,7 +34,12 @@ func init() {
 		panic(err)
 	}
 
-	if len(ERC20TokenContract.Bin) == 0 {
-		panic("load contract failed")
+	err = json.Unmarshal(TokenProxyJSON, &TokenProxyContract)
+	if err != nil {
+		panic(err)
+	}
+
+	if len(TokenProxyContract.Bin) == 0 {
+		panic("load token proxy contract failed")
 	}
 }
