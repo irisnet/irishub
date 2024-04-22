@@ -33,6 +33,10 @@ func upgradeHandlerConstructor(
 		if err := mergeEVM(ctx, box); err != nil {
 			return nil, err
 		}
+		
+		if err := mergeToken(ctx, box); err != nil {
+			return nil, err
+		}
 		// initialize ICS27 module
 		initICAModule(ctx, m, fromVM)
 
