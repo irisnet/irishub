@@ -9,11 +9,11 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
-contract Token is ERC20, Ownable, ReentrancyGuard, Initializable, ERC165 {
+contract MockTokenV2 is ERC20, Ownable, ReentrancyGuard, Initializable, ERC165 {
     event SwapToNative(address from, string to, uint256 amount);
 
     uint8 private _scale;
-    uint8 public constant VERSION = 1;
+    uint8 public constant VERSION = 2;
 
     constructor(
         string memory name_,
