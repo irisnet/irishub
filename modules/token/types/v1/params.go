@@ -3,18 +3,22 @@ package v1
 import (
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 // NewParams constructs a new Params instance
 func NewParams(tokenTaxRate sdk.Dec, issueTokenBaseFee sdk.Coin,
-	mintTokenFeeRatio sdk.Dec, enableErc20 bool,
+	mintTokenFeeRatio sdk.Dec, enableErc20 bool, beacon string,
 ) Params {
 	return Params{
 		TokenTaxRate:      tokenTaxRate,
 		IssueTokenBaseFee: issueTokenBaseFee,
 		MintTokenFeeRatio: mintTokenFeeRatio,
 		EnableErc20:       enableErc20,
+		Beacon:            beacon,
 	}
 }
 
@@ -40,8 +44,7 @@ func (p Params) Validate() error {
 	if err := validateIssueTokenBaseFee(p.IssueTokenBaseFee); err != nil {
 		return err
 	}
-
-	return nil
+	return validateBeacon(p.Beacon)
 }
 
 func validateTaxRate(i interface{}) error {
@@ -74,6 +77,20 @@ func validateIssueTokenBaseFee(i interface{}) error {
 	}
 	if v.IsNegative() {
 		return fmt.Errorf("base fee for issuing token should not be negative")
+	}
+	return nil
+}
+
+func validateBeacon(i interface{}) error {
+	v, ok := i.(string)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	if len(v) == 0 {
+		return nil
+	}
+	if !common.IsHexAddress(v) {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "beacon expecting a hex address, got %s", v)
 	}
 	return nil
 }

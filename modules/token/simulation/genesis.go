@@ -19,7 +19,7 @@ const (
 	TokenTaxRate      = "token_tax_rate"
 	IssueTokenBaseFee = "issue_token_base_fee"
 	MintTokenFeeRatio = "mint_token_fee_ratio"
-	EnableErc20 = "enable_erc20"
+	EnableErc20       = "enable_erc20"
 )
 
 // RandomDec randomized sdk.RandomDec
@@ -34,7 +34,6 @@ func RandomInt(r *rand.Rand) sdk.Int {
 
 // RandomizedGenState generates a random GenesisState for bank
 func RandomizedGenState(simState *module.SimulationState) {
-
 	var tokenTaxRate sdk.Dec
 	var issueTokenBaseFee sdk.Int
 	var mintTokenFeeRatio sdk.Dec
@@ -65,13 +64,13 @@ func RandomizedGenState(simState *module.SimulationState) {
 
 	simState.AppParams.GetOrGenerate(
 		simState.Cdc, EnableErc20, &enableErc20, simState.Rand,
-		func(r *rand.Rand) {  
+		func(r *rand.Rand) {
 			enableErc20 = true
-		 },
+		},
 	)
 
 	tokenGenesis := v1.NewGenesisState(
-		v1.NewParams(tokenTaxRate, sdk.NewCoin(sdk.DefaultBondDenom, issueTokenBaseFee), mintTokenFeeRatio,enableErc20),
+		v1.NewParams(tokenTaxRate, sdk.NewCoin(sdk.DefaultBondDenom, issueTokenBaseFee), mintTokenFeeRatio, enableErc20, ""),
 		tokens,
 	)
 
