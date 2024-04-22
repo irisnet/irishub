@@ -49,6 +49,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 * [\#405](https://github.com/irisnet/irismod/pull/405) Rolled back the cosmos-sdk version to v0.47.9.
 * [\#409](https://github.com/irisnet/irismod/pull/409) Add a switch for enabling erc20 swap function.
 * [\#410](https://github.com/irisnet/irismod/pull/410) Implement upgradeable contract.
+* [\#411](https://github.com/irisnet/irismod/pull/411) Implement erc20 upgrade.
 
 ### Bug Fixes
 
