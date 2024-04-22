@@ -8,12 +8,13 @@ import (
 
 // NewParams constructs a new Params instance
 func NewParams(tokenTaxRate sdk.Dec, issueTokenBaseFee sdk.Coin,
-	mintTokenFeeRatio sdk.Dec,
+	mintTokenFeeRatio sdk.Dec, enableErc20 bool,
 ) Params {
 	return Params{
 		TokenTaxRate:      tokenTaxRate,
 		IssueTokenBaseFee: issueTokenBaseFee,
 		MintTokenFeeRatio: mintTokenFeeRatio,
+		EnableErc20:       enableErc20,
 	}
 }
 
