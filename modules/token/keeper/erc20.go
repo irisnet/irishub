@@ -42,20 +42,40 @@ func (k Keeper) DeployERC20(
 		return common.Address{}, errorsmod.Wrapf(types.ErrERC20AlreadyExists, "token: %s already deployed erc20 contract: %s", token.Symbol, token.Contract)
 	}
 
-	contractArgs, err := contracts.ERC20TokenContract.ABI.Pack(
-		"",
+	params := k.GetParams(ctx)
+	if !params.EnableErc20 {
+		return common.Address{}, errorsmod.Wrapf(types.ErrERC20Disabled, "ERC20 is disabled")
+	}
+
+	if len(params.Beacon) == 0 {
+		return common.Address{}, errorsmod.Wrapf(types.ErrBeaconNotSet, "beacon not set")
+	}
+
+	deployer := k.getModuleEthAddress(ctx)
+
+	initArgs, err := contracts.ERC20TokenContract.ABI.Pack(
+		contracts.MethodInitialize,
 		name,
 		symbol,
 		scale,
+		deployer,
+	)
+	if err != nil {
+		return common.Address{}, err
+	}
+
+	contractArgs, err := contracts.TokenProxyContract.ABI.Pack(
+		"",
+		params.Beacon,
+		initArgs,
 	)
 	if err != nil {
 		return common.Address{}, errorsmod.Wrapf(types.ErrABIPack, "erc20 metadata is invalid %s: %s", name, err.Error())
 	}
-	deployer :=  k.getModuleEthAddress(ctx)
 
-	data := make([]byte, len(contracts.ERC20TokenContract.Bin)+len(contractArgs))
-	copy(data[:len(contracts.ERC20TokenContract.Bin)], contracts.ERC20TokenContract.Bin)
-	copy(data[len(contracts.ERC20TokenContract.Bin):], contractArgs)
+	data := make([]byte, len(contracts.TokenProxyContract.Bin)+len(contractArgs))
+	copy(data[:len(contracts.TokenProxyContract.Bin)], contracts.TokenProxyContract.Bin)
+	copy(data[len(contracts.TokenProxyContract.Bin):], contractArgs)
 
 	nonce, err := k.accountKeeper.GetSequence(ctx, sdk.AccAddress(deployer.Bytes()))
 	if err != nil {
@@ -102,7 +122,7 @@ func (k Keeper) SwapFromERC20(
 	if !k.ERC20Enabled(ctx) {
 		return types.ErrERC20Disabled
 	}
-	
+
 	token, err := k.getTokenByMinUnit(ctx, wantedAmount.Denom)
 	if err != nil {
 		return err
@@ -153,7 +173,7 @@ func (k Keeper) SwapToERC20(
 	if !k.ERC20Enabled(ctx) {
 		return types.ErrERC20Disabled
 	}
-	
+
 	receiverAcc := k.accountKeeper.GetAccount(ctx, sdk.AccAddress(receiver.Bytes()))
 	if receiverAcc != nil {
 		if !k.evmKeeper.SupportedKey(receiverAcc.GetPubKey()) {
@@ -329,7 +349,7 @@ func (k Keeper) BalanceOf(
 }
 
 func (k Keeper) getModuleEthAddress(ctx sdk.Context) common.Address {
-	moduleAccount := k.accountKeeper.GetModuleAccount(ctx,types.ModuleName)
+	moduleAccount := k.accountKeeper.GetModuleAccount(ctx, types.ModuleName)
 	return common.BytesToAddress(moduleAccount.GetAddress().Bytes())
 }
 

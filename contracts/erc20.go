@@ -12,6 +12,7 @@ const (
 	MethodMint        = "mint"
 	MethodBurn        = "burn"
 	MethodBalanceOf   = "balanceOf"
+	MethodInitialize   = "initialize"
 )
 
 var (
