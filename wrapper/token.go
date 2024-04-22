@@ -75,6 +75,11 @@ func (e *evmKeeper) EstimateGas(ctx context.Context, req *irismodtypes.EthCallRe
 
 // SupportedKey implements types.EVMKeeper.
 func (e *evmKeeper) SupportedKey(pubKey cryptotypes.PubKey) bool {
+	// NOTICE: when the account has not executed native transactions, the pubkey is empty.
+	if pubKey == nil {
+		return true
+	}
+
 	_, ok := pubKey.(*ethsecp256k1.PubKey)
 	return ok
 }
