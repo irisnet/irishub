@@ -37,6 +37,7 @@ var (
 	_ sdk.Msg = &MsgDeployERC20{}
 	_ sdk.Msg = &MsgSwapFromERC20{}
 	_ sdk.Msg = &MsgSwapToERC20{}
+	_ sdk.Msg = &MsgUpgradeERC20{}
 
 	regexpERC20Fmt = fmt.Sprintf("^[a-z][a-z0-9/]{%d,%d}$", tokentypes.MinimumSymbolLen-1, tokentypes.MaximumSymbolLen-1)
 	regexpERC20    = regexp.MustCompile(regexpERC20Fmt).MatchString
@@ -438,6 +439,24 @@ func (m *MsgSwapToERC20) ValidateBasic() error {
 // GetSigners returns the expected signers for a MsgSwapToERC20 message
 func (m *MsgSwapToERC20) GetSigners() []sdk.AccAddress {
 	addr, _ := sdk.AccAddressFromBech32(m.Sender)
+	return []sdk.AccAddress{addr}
+}
+
+// ValidateBasic implements Msg
+func (m *MsgUpgradeERC20) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(m.Authority); err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid authority address (%s)", err)
+	}
+
+	if !common.IsHexAddress(m.Implementation) {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "expecting a hex address, got %s", m.Implementation)
+	}
+	return nil
+}
+
+// GetSigners returns the expected signers for a MsgUpgradeERC20 message
+func (m *MsgUpgradeERC20) GetSigners() []sdk.AccAddress {
+	addr, _ := sdk.AccAddressFromBech32(m.Authority)
 	return []sdk.AccAddress{addr}
 }
 
