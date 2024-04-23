@@ -32,7 +32,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 		func(r *rand.Rand) { inflation = GenInflation(r) },
 	)
 
-	params := types.Params{Inflation: inflation, MintDenom: types.MintDenom}
+	params := types.Params{Inflation: inflation, MintDenom: sdk.DefaultBondDenom}
 	mintGenesis := types.NewGenesisState(types.DefaultMinter(), params)
 
 	bz, err := json.MarshalIndent(&mintGenesis, "", " ")

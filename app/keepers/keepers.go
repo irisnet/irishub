@@ -111,6 +111,7 @@ import (
 	mintkeeper "github.com/irisnet/irishub/v3/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/v3/modules/mint/types"
 	iristypes "github.com/irisnet/irishub/v3/types"
+	"github.com/irisnet/irishub/v3/wrapper"
 )
 
 // AppKeepers defines a structure used to consolidate all
@@ -440,23 +441,6 @@ func New(
 		appKeepers.keys[guardiantypes.StoreKey],
 	)
 
-	appKeepers.TokenKeeper = tokenkeeper.NewKeeper(
-		appCodec,
-		appKeepers.keys[tokentypes.StoreKey],
-		appKeepers.BankKeeper,
-		authtypes.FeeCollectorName,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-	).WithSwapRegistry(tokenv1.SwapRegistry{
-		iristypes.NativeToken.MinUnit: tokenv1.SwapParams{
-			MinUnit: iristypes.EvmToken.MinUnit,
-			Ratio:   sdk.OneDec(),
-		},
-		iristypes.EvmToken.MinUnit: tokenv1.SwapParams{
-			MinUnit: iristypes.NativeToken.MinUnit,
-			Ratio:   sdk.OneDec(),
-		},
-	})
-
 	appKeepers.RecordKeeper = recordkeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[recordtypes.StoreKey],
@@ -534,7 +518,7 @@ func New(
 		AddRoute(farmtypes.RouterKey, farm.NewCommunityPoolCreateFarmProposalHandler(appKeepers.FarmKeeper))
 
 	appKeepers.GovKeeper.SetHooks(govtypes.NewMultiGovHooks(
-		farmkeeper.NewGovHook(appKeepers.FarmKeeper),
+		wrapper.NewFarmGovHook(farmkeeper.NewGovHook(appKeepers.FarmKeeper)),
 	))
 
 	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
@@ -561,6 +545,27 @@ func New(
 		cast.ToString(appOpts.Get(srvflags.EVMTracer)),
 		appKeepers.GetSubspace(evmtypes.ModuleName),
 	)
+
+	appKeepers.TokenKeeper = tokenkeeper.NewKeeper(
+		appCodec,
+		appKeepers.keys[tokentypes.StoreKey],
+		appKeepers.BankKeeper,
+		appKeepers.AccountKeeper,
+		wrapper.NewEVMKeeper(appKeepers.EvmKeeper),
+		wrapper.NewICS20Keeper(appKeepers.IBCTransferKeeper),
+		authtypes.FeeCollectorName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	).WithSwapRegistry(tokenv1.SwapRegistry{
+		iristypes.NativeToken.MinUnit: tokenv1.SwapParams{
+			MinUnit: iristypes.EvmToken.MinUnit,
+			Ratio:   sdk.OneDec(),
+		},
+		iristypes.EvmToken.MinUnit: tokenv1.SwapParams{
+			MinUnit: iristypes.NativeToken.MinUnit,
+			Ratio:   sdk.OneDec(),
+		},
+	})
+	appKeepers.EvmKeeper = appKeepers.EvmKeeper.SetHooks(appKeepers.TokenKeeper.Hooks())
 	return appKeepers
 }
 

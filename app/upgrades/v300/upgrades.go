@@ -33,6 +33,10 @@ func upgradeHandlerConstructor(
 		if err := mergeEVM(ctx, box); err != nil {
 			return nil, err
 		}
+		
+		if err := mergeToken(ctx, box); err != nil {
+			return nil, err
+		}
 		// initialize ICS27 module
 		initICAModule(ctx, m, fromVM)
 
@@ -70,4 +74,13 @@ func mergeEVM(ctx sdk.Context, box upgrades.Toolbox) error {
 	params := box.EvmKeeper.GetParams(ctx)
 	params.AllowUnprotectedTxs = true
 	return box.EvmKeeper.SetParams(ctx, params)
+}
+
+func mergeToken(ctx sdk.Context, box upgrades.Toolbox) error {
+	ctx.Logger().Info("start to run token module migrations...")
+
+	params := box.TokenKeeper.GetParams(ctx)
+	params.EnableErc20 = true
+	params.Beacon = BeaconContractAddress
+	return box.TokenKeeper.SetParams(ctx, params)
 }

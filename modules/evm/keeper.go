@@ -21,7 +21,6 @@ import (
 type Keeper struct {
 	evmkeeper  *evmkeeper.Keeper
 	bankKeeper types.BankKeeper
-	hasHook    bool
 }
 
 var _ types.MsgServer = &Keeper{}
@@ -139,15 +138,10 @@ func (k *Keeper) EthereumTx(
 	return response, nil
 }
 
-// SetHooks sets the hooks for the EVM module
-// It should be called only once during initialization, it panic if called more than once.
-func (k *Keeper) SetHooks(eh types.EvmHooks) *Keeper {
-	return &Keeper{
-		evmkeeper: k.evmkeeper.SetHooks(eh),
-		hasHook:   true,
-	}
-}
-
+// UpdateParams updates the parameters for the EVM module.
+//
+// It takes a context.Context object and a *types.MsgUpdateParams object as parameters.
+// The function returns a *types.MsgUpdateParamsResponse object and an error.
 func (k *Keeper) UpdateParams(
 	goCtx context.Context,
 	msg *types.MsgUpdateParams,

@@ -30,7 +30,7 @@ func NewAppModule(
 ) AppModule {
 	return AppModule{
 		AppModule: ethermint.NewAppModule(k, ak, ss),
-		k:         &Keeper{k, bankKeeper, false},
+		k:         &Keeper{k, bankKeeper},
 		ss:        ss,
 	}
 }

@@ -16,5 +16,8 @@ var (
 	// the portion of a chain's total stake can be liquid
 	GlobalLiquidStakingCap = sdk.MustNewDecFromStr("0.25") // 25%
 
+	// BeaconContractAddress is the address of the beacon contract
+	BeaconContractAddress = ""
+
 	allowMessages = []string{"*"}
 )

@@ -59,7 +59,7 @@ func (k *Keeper) ApplyTransaction(ctx sdk.Context, tx *ethtypes.Transaction, fee
 	// snapshot to contain the tx processing and post processing in same scope
 	var commit func()
 	tmpCtx := ctx
-	if k.hasHook {
+	if k.evmkeeper.Hooks() != nil {
 		// Create a cache context to revert state when tx hooks fails,
 		// the cache context is only committed when both tx and hooks executed successfully.
 		// Didn't use `Snapshot` because the context stack has exponential complexity on certain operations,
