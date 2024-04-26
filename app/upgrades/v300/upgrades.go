@@ -37,6 +37,10 @@ func upgradeHandlerConstructor(
 		if err := mergeToken(ctx, box); err != nil {
 			return nil, err
 		}
+		
+		if err := mergeGov(ctx, box); err != nil {
+			return nil, err
+		}
 		// initialize ICS27 module
 		initICAModule(ctx, m, fromVM)
 
