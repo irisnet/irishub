@@ -37,6 +37,10 @@ func upgradeHandlerConstructor(
 		if err := mergeToken(ctx, box); err != nil {
 			return nil, err
 		}
+		
+		if err := mergeGov(ctx, box); err != nil {
+			return nil, err
+		}
 		// initialize ICS27 module
 		initICAModule(ctx, m, fromVM)
 
@@ -83,4 +87,12 @@ func mergeToken(ctx sdk.Context, box upgrades.Toolbox) error {
 	params.EnableErc20 = true
 	params.Beacon = BeaconContractAddress
 	return box.TokenKeeper.SetParams(ctx, params)
+}
+
+func mergeGov(ctx sdk.Context, box upgrades.Toolbox) error {
+	ctx.Logger().Info("start to run gov module migrations...")
+
+	params := box.GovKeeper.GetParams(ctx)
+	params.MinDepositRatio = MinDepositRatio.String()
+	return box.GovKeeper.SetParams(ctx, params)
 }

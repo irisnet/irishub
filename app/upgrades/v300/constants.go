@@ -19,5 +19,8 @@ var (
 	// BeaconContractAddress is the address of the beacon contract
 	BeaconContractAddress = ""
 
+	// MinDepositRatio is the minimum deposit ratio
+	MinDepositRatio = sdk.MustNewDecFromStr("0.01")
+
 	allowMessages = []string{"*"}
 )
