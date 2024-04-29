@@ -259,3 +259,35 @@ func TestMsgTransferTokenOwnerValidation(t *testing.T) {
 		}
 	}
 }
+
+func TestMsgDeployERC20(t *testing.T) {
+	testData := []struct {
+		symbol     string
+		name       string
+		scale      uint32
+		minUnit    string
+		authority  string
+		expectPass bool
+	}{
+		{symbol: "btc", name: "BTC TOKEN", scale: 18, minUnit: "staoshi", authority: addr1, expectPass: true},
+		{symbol: "BTC", name: "BTC TOKEN", scale: 18, minUnit: "staoshi", authority: addr1, expectPass: false},
+		{symbol: "bTC", name: "BTC TOKEN", scale: 18, minUnit: "staoshi", authority: addr1, expectPass: true},
+		{symbol: "stake", name: "Stake Token", scale: 18, minUnit: "ibc/3C3D7B3BE4ECC85A0E5B52A3AEC3B7DFC2AA9CA47C37821E57020D6807043BE9", authority: addr1, expectPass: true},
+		{symbol: "ibc/3C3D7B3BE4ECC85A0E5B52A3AEC3B7DFC2AA9CA47C37821E57020D6807043BE9", name: "Stake Token", scale: 18, minUnit: "ibc/3C3D7B3BE4ECC85A0E5B52A3AEC3B7DFC2AA9CA47C37821E57020D6807043BE9", authority: addr1, expectPass: true},
+	}
+
+	for _, td := range testData {
+		msg := MsgDeployERC20{
+			Symbol:    td.symbol,
+			Name:      td.name,
+			Scale:     td.scale,
+			MinUnit:   td.minUnit,
+			Authority: td.authority,
+		}
+		if td.expectPass {
+			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
+		} else {
+			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.name)
+		}
+	}
+}
