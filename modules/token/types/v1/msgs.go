@@ -39,7 +39,7 @@ var (
 	_ sdk.Msg = &MsgSwapToERC20{}
 	_ sdk.Msg = &MsgUpgradeERC20{}
 
-	regexpERC20Fmt = fmt.Sprintf("^[a-z][a-z0-9/]{%d,%d}$", tokentypes.MinimumSymbolLen-1, tokentypes.MaximumSymbolLen-1)
+	regexpERC20Fmt = fmt.Sprintf("^[a-z][a-zA-Z0-9/]{%d,%d}$", tokentypes.MinimumSymbolLen-1, 100)
 	regexpERC20    = regexp.MustCompile(regexpERC20Fmt).MatchString
 )
 
