@@ -45,6 +45,7 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
+	icacontrollertypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/types"
 	icahost "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host"
 	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
@@ -60,6 +61,7 @@ import (
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
 	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
+	controllerkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/keeper"
 	icahostkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/keeper"
 	"github.com/cosmos/ibc-go/v7/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v7/modules/apps/transfer/keeper"
@@ -127,6 +129,7 @@ type AppKeepers struct {
 	scopedIBCMockKeeper     capabilitykeeper.ScopedKeeper
 	scopedNFTTransferKeeper capabilitykeeper.ScopedKeeper
 	scopedICAHostKeeper     capabilitykeeper.ScopedKeeper
+	scopedICAControllerKeeper     capabilitykeeper.ScopedKeeper
 	scopedTIBCKeeper        capabilitykeeper.ScopedKeeper
 	scopedTIBCMockKeeper    capabilitykeeper.ScopedKeeper
 
@@ -149,6 +152,7 @@ type AppKeepers struct {
 	IBCTransferKeeper     ibctransferkeeper.Keeper
 	IBCNFTTransferKeeper  ibcnfttransferkeeper.Keeper
 	ICAHostKeeper         icahostkeeper.Keeper
+	ControllerKeeper      controllerkeeper.Keeper
 	GuardianKeeper        guardiankeeper.Keeper
 	TokenKeeper           tokenkeeper.Keeper
 	RecordKeeper          recordkeeper.Keeper
@@ -226,6 +230,7 @@ func New(
 	appKeepers.scopedTransferKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	appKeepers.scopedNFTTransferKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibcnfttransfertypes.ModuleName)
 	appKeepers.scopedICAHostKeeper = appKeepers.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
+	appKeepers.scopedICAControllerKeeper = appKeepers.CapabilityKeeper.ScopeToModule(icacontrollertypes.SubModuleName)
 
 	appKeepers.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec,
@@ -332,6 +337,17 @@ func New(
 		appKeepers.scopedIBCKeeper,
 	)
 
+	appKeepers.ControllerKeeper = controllerkeeper.NewKeeper(
+		appCodec,
+		appKeepers.keys[icacontrollertypes.StoreKey],
+		appKeepers.GetSubspace(icacontrollertypes.SubModuleName),
+		appKeepers.IBCKeeper.ChannelKeeper,
+		appKeepers.IBCKeeper.ChannelKeeper,
+		&appKeepers.IBCKeeper.PortKeeper,
+		appKeepers.scopedICAControllerKeeper,
+		bApp.MsgServiceRouter(),
+	)
+
 	appKeepers.ICAHostKeeper = icahostkeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[icahosttypes.StoreKey],
@@ -343,7 +359,7 @@ func New(
 		appKeepers.scopedICAHostKeeper,
 		bApp.MsgServiceRouter(),
 	)
-	appKeepers.ICAModule = ica.NewAppModule(nil, &appKeepers.ICAHostKeeper)
+	appKeepers.ICAModule = ica.NewAppModule(&appKeepers.ControllerKeeper, &appKeepers.ICAHostKeeper)
 	icaHostIBCModule := icahost.NewIBCModule(appKeepers.ICAHostKeeper)
 
 	// register the proposal types
@@ -595,6 +611,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(farmtypes.ModuleName).WithKeyTable(farmtypes.ParamKeyTable())
 	paramsKeeper.Subspace(tibchost.ModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
+	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 
 	// ethermint subspaces
 	paramsKeeper.Subspace(evmtypes.ModuleName).WithKeyTable(evmtypes.ParamKeyTable())
