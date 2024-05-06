@@ -61,6 +61,7 @@ import (
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
 	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
+	icacontroller "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller"
 	controllerkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/keeper"
 	icahostkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/keeper"
 	"github.com/cosmos/ibc-go/v7/modules/apps/transfer"
@@ -347,6 +348,7 @@ func New(
 		appKeepers.scopedICAControllerKeeper,
 		bApp.MsgServiceRouter(),
 	)
+	icaControllerModule := icacontroller.NewIBCMiddleware(nil, appKeepers.ControllerKeeper)
 
 	appKeepers.ICAHostKeeper = icahostkeeper.NewKeeper(
 		appCodec,
@@ -433,6 +435,7 @@ func New(
 	ibcRouter := porttypes.NewRouter().
 		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
 		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule).
+		AddRoute(icacontrollertypes.SubModuleName, icaControllerModule).
 		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule)
 	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 
