@@ -598,7 +598,7 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Token_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"irismod", "token", "v1", "tokens", "denom"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Token_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 3, 0, 4, 1, 5, 4}, []string{"irismod", "token", "v1", "tokens", "denom"}, "", runtime.AssumeColonVerbOpt(false)))
 
 	pattern_Query_Tokens_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"irismod", "token", "v1", "tokens"}, "", runtime.AssumeColonVerbOpt(false)))
 
@@ -608,7 +608,7 @@ var (
 
 	pattern_Query_TotalBurn_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"irismod", "token", "v1", "total_burn"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_Balances_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"irismod", "token", "v1", "balances", "address", "denom"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Balances_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 3, 0, 4, 1, 5, 5}, []string{"irismod", "token", "v1", "balances", "address", "denom"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

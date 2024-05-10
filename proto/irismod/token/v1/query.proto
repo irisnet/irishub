@@ -18,7 +18,7 @@ service Query {
   // Token returns token with token name
   rpc Token(QueryTokenRequest) returns (QueryTokenResponse) {
     option (cosmos.query.v1.module_query_safe) = true;
-    option (google.api.http).get = "/irismod/token/v1/tokens/{denom}";
+    option (google.api.http).get = "/irismod/token/v1/tokens/{denom=**}";
   }
   // Tokens returns the token list
   rpc Tokens(QueryTokensRequest) returns (QueryTokensResponse) {
@@ -45,7 +45,7 @@ service Query {
   rpc Balances(QueryBalancesRequest) returns (QueryBalancesResponse) {
     option (cosmos.query.v1.module_query_safe) = true;
     option (google.api.http).get =
-        "/irismod/token/v1/balances/{address}/{denom}";
+        "/irismod/token/v1/balances/{address}/{denom=**}";
   }
 }
 
