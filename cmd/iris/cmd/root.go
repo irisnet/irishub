@@ -133,6 +133,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		config.Cmd(),
 		mergeGenesisCmd(encodingConfig),
 		pruning.Cmd(ac.newApp, iristypes.DefaultNodeHome),
+		ICACommands(),
 	)
 
 	ethermintserver.AddCommands(
