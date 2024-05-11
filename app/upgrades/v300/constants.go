@@ -17,7 +17,7 @@ var (
 	GlobalLiquidStakingCap = sdk.MustNewDecFromStr("0.25") // 25%
 
 	// BeaconContractAddress is the address of the beacon contract
-	BeaconContractAddress = ""
+	BeaconContractAddress = "0xce3d3e91a49ff35b316e7eb84d9fecb067611150"
 
 	// MinDepositRatio is the minimum deposit ratio
 	MinDepositRatio = sdk.MustNewDecFromStr("0.01")
