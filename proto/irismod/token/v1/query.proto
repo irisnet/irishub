@@ -15,16 +15,18 @@ option go_package = "github.com/irisnet/irismod/modules/token/types/v1";
 
 // Query creates service with token as RPC
 service Query {
-  // Token returns token with token name
-  rpc Token(QueryTokenRequest) returns (QueryTokenResponse) {
-    option (cosmos.query.v1.module_query_safe) = true;
-    option (google.api.http).get = "/irismod/token/v1/tokens/{denom=**}";
-  }
   // Tokens returns the token list
   rpc Tokens(QueryTokensRequest) returns (QueryTokensResponse) {
     option (cosmos.query.v1.module_query_safe) = true;
     option (google.api.http).get = "/irismod/token/v1/tokens";
   }
+  
+  // Token returns token with token name
+  rpc Token(QueryTokenRequest) returns (QueryTokenResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
+    option (google.api.http).get = "/irismod/token/v1/tokens/{denom=**}";
+  }
+  
   // Fees returns the fees to issue or mint a token
   rpc Fees(QueryFeesRequest) returns (QueryFeesResponse) {
     option (cosmos.query.v1.module_query_safe) = true;
@@ -50,7 +52,7 @@ service Query {
 }
 
 // QueryTokenRequest is request type for the Query/Token RPC method
-message QueryTokenRequest { string denom = 1; }
+message QueryTokenRequest { string denom = 1 ; }
 
 // QueryTokenResponse is response type for the Query/Token RPC method
 message QueryTokenResponse {
