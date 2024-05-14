@@ -3,8 +3,10 @@ package keeper
 import (
 	"context"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/irisnet/irismod/modules/token/types"
 	v1 "github.com/irisnet/irismod/modules/token/types/v1"
@@ -32,7 +34,7 @@ func (m msgServer) IssueToken(
 	}
 
 	if m.k.blockedAddrs[msg.Owner] {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.Owner)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", msg.Owner)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -100,8 +102,8 @@ func (m msgServer) MintToken(
 
 	var recipient sdk.AccAddress
 
-	if len(msg.To) != 0 {
-		recipient, err = sdk.AccAddressFromBech32(msg.To)
+	if len(msg.Receiver) != 0 {
+		recipient, err = sdk.AccAddressFromBech32(msg.Receiver)
 		if err != nil {
 			return nil, err
 		}
@@ -110,7 +112,7 @@ func (m msgServer) MintToken(
 	}
 
 	if m.k.blockedAddrs[recipient.String()] {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", recipient)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "%s is a module account", recipient)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -178,7 +180,7 @@ func (m msgServer) TransferTokenOwner(
 	}
 
 	if m.k.blockedAddrs[msg.DstOwner] {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrUnauthorized,
 			"%s is a module account",
 			msg.DstOwner,
@@ -213,14 +215,14 @@ func (m msgServer) SwapFeeToken(
 	}
 
 	var recipient sdk.AccAddress
-	if len(msg.Recipient) > 0 {
-		recipient, err = sdk.AccAddressFromBech32(msg.Recipient)
+	if len(msg.Receiver) > 0 {
+		recipient, err = sdk.AccAddressFromBech32(msg.Receiver)
 		if err != nil {
 			return nil, err
 		}
 
-		if m.k.blockedAddrs[msg.Recipient] {
-			return nil, sdkerrors.Wrapf(
+		if m.k.blockedAddrs[msg.Receiver] {
+			return nil, errorsmod.Wrapf(
 				sdkerrors.ErrUnauthorized,
 				"%s is a module account",
 				recipient,
@@ -238,7 +240,7 @@ func (m msgServer) SwapFeeToken(
 		sdk.NewEvent(
 			types.EventTypeSwapFeeToken,
 			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
-			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
+			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Receiver),
 			sdk.NewAttribute(types.AttributeKeyFeePaid, feePaid.String()),
 			sdk.NewAttribute(types.AttributeKeyFeeGot, feeGot.String()),
 		),
@@ -254,7 +256,7 @@ func (m msgServer) UpdateParams(
 	msg *v1.MsgUpdateParams,
 ) (*v1.MsgUpdateParamsResponse, error) {
 	if m.k.authority != msg.Authority {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrUnauthorized,
 			"invalid authority; expected %s, got %s",
 			m.k.authority,
@@ -267,4 +269,76 @@ func (m msgServer) UpdateParams(
 		return nil, err
 	}
 	return &v1.MsgUpdateParamsResponse{}, nil
+}
+
+// DeployERC20 implements v1.MsgServer.
+func (m msgServer) DeployERC20(goCtx context.Context, msg *v1.MsgDeployERC20) (*v1.MsgDeployERC20Response, error) {
+	if m.k.authority != msg.Authority {
+		return nil, errorsmod.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"invalid authority; expected %s, got %s",
+			m.k.authority,
+			msg.Authority,
+		)
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	_, err := m.k.DeployERC20(ctx, msg.Name, msg.Symbol, msg.MinUnit, uint8(msg.Scale))
+	if err != nil {
+		return nil, err
+	}
+	return &v1.MsgDeployERC20Response{}, nil
+}
+
+// SwapFromERC20 implements v1.MsgServer.
+func (m msgServer) SwapFromERC20(goCtx context.Context, msg *v1.MsgSwapFromERC20) (*v1.MsgSwapFromERC20Response, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	receiver, err := sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := m.k.SwapFromERC20(ctx, common.BytesToAddress(sender.Bytes()), receiver, msg.WantedAmount); err != nil {
+		return nil, err
+	}
+	return &v1.MsgSwapFromERC20Response{}, nil
+}
+
+// SwapToERC20 implements v1.MsgServer.
+func (m msgServer) SwapToERC20(goCtx context.Context, msg *v1.MsgSwapToERC20) (*v1.MsgSwapToERC20Response, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	receiver := common.HexToAddress(msg.Receiver)
+	if err := m.k.SwapToERC20(ctx, sender, receiver, msg.Amount); err != nil {
+		return nil, err
+	}
+	return &v1.MsgSwapToERC20Response{}, nil
+}
+
+// UpgradeERC20 implements v1.MsgServer.
+func (m msgServer) UpgradeERC20(goCtx context.Context, msg *v1.MsgUpgradeERC20) (*v1.MsgUpgradeERC20Response, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if m.k.authority != msg.Authority {
+		return nil, errorsmod.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"invalid authority; expected %s, got %s",
+			m.k.authority,
+			msg.Authority,
+		)
+	}
+	
+	implementation := common.HexToAddress(msg.Implementation)
+	if err := m.k.UpgradeERC20(ctx, implementation); err != nil {
+		return nil, err
+	}
+	return &v1.MsgUpgradeERC20Response{}, nil
 }

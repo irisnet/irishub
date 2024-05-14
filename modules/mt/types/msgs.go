@@ -1,9 +1,11 @@
 package types
 
 import (
+	"strings"
+
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"strings"
 )
 
 // constant used to indicate that some field should not be updated
@@ -46,11 +48,11 @@ func (msg MsgIssueDenom) Type() string { return TypeMsgIssueDenom }
 func (msg MsgIssueDenom) ValidateBasic() error {
 
 	if len(strings.TrimSpace(msg.Name)) <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "name is required")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "name is required")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
 }
@@ -92,23 +94,23 @@ func (msg MsgTransferMT) Type() string { return TypeMsgTransferMT }
 // ValidateBasic Implements Msg.
 func (msg MsgTransferMT) ValidateBasic() error {
 	if len(strings.TrimSpace(msg.Id)) <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "mt id is required")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "mt id is required")
 	}
 
 	if len(strings.TrimSpace(msg.DenomId)) <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
 	}
 
 	if msg.Amount <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "amount is required")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "amount is required")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
 	return nil
 }
@@ -149,15 +151,15 @@ func (msg MsgEditMT) Type() string { return TypeMsgEditMT }
 // ValidateBasic Implements Msg.
 func (msg MsgEditMT) ValidateBasic() error {
 	if len(strings.TrimSpace(msg.Id)) <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "mt id is required")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "mt id is required")
 	}
 
 	if len(strings.TrimSpace(msg.DenomId)) <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	return nil
@@ -202,24 +204,24 @@ func (msg MsgMintMT) Type() string { return TypeMsgMintMT }
 func (msg MsgMintMT) ValidateBasic() error {
 
 	if len(strings.TrimSpace(msg.DenomId)) <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
 	}
 
 	if msg.Amount <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "amount is required")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "amount is required")
 	}
 
 	if len(strings.TrimSpace(msg.Id)) > 0 && len(msg.Data) > 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "metadata can not be accepted while minting, use 'edit mt' instead")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "metadata can not be accepted while minting, use 'edit mt' instead")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	if len(strings.TrimSpace(msg.Recipient)) > 0 {
 		if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receipt address (%s)", err)
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receipt address (%s)", err)
 		}
 	}
 
@@ -260,19 +262,19 @@ func (msg MsgBurnMT) Type() string { return TypeMsgBurnMT }
 // ValidateBasic Implements Msg.
 func (msg MsgBurnMT) ValidateBasic() error {
 	if len(strings.TrimSpace(msg.Id)) <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "mt id is required")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "mt id is required")
 	}
 
 	if len(strings.TrimSpace(msg.DenomId)) <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
 	}
 
 	if msg.Amount <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "amount is required")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "amount is required")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	return nil
@@ -311,15 +313,15 @@ func (msg MsgTransferDenom) Type() string { return TypeMsgTransferDenom }
 // ValidateBasic Implements Msg.
 func (msg MsgTransferDenom) ValidateBasic() error {
 	if len(strings.TrimSpace(msg.Id)) <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
 
 	return nil

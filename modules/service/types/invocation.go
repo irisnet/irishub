@@ -10,8 +10,8 @@ import (
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // NewRequestContext creates a new RequestContext instance
@@ -196,7 +196,7 @@ func ParseResult(result string) (Result, error) {
 	var r Result
 
 	if err := json.Unmarshal([]byte(result), &r); err != nil {
-		return r, sdkerrors.Wrapf(
+		return r, errorsmod.Wrapf(
 			ErrInvalidResponseResult,
 			"failed to unmarshal the result: %s",
 			err,

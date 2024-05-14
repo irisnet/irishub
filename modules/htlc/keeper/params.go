@@ -1,8 +1,8 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/htlc/types"
 )
@@ -52,7 +52,7 @@ func (k Keeper) GetAsset(ctx sdk.Context, denom string) (types.AssetParam, error
 			return asset, nil
 		}
 	}
-	return types.AssetParam{}, sdkerrors.Wrap(types.ErrAssetNotSupported, denom)
+	return types.AssetParam{}, errorsmod.Wrap(types.ErrAssetNotSupported, denom)
 }
 
 // SetAsset sets an asset in the params
@@ -138,7 +138,7 @@ func (k Keeper) ValidateLiveAsset(ctx sdk.Context, coin sdk.Coin) error {
 		return err
 	}
 	if !asset.Active {
-		return sdkerrors.Wrap(types.ErrAssetNotActive, asset.Denom)
+		return errorsmod.Wrap(types.ErrAssetNotActive, asset.Denom)
 	}
 	return nil
 }

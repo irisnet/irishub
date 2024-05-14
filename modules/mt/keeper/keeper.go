@@ -5,6 +5,7 @@ import (
 
 	"github.com/cometbft/cometbft/libs/log"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -121,7 +122,7 @@ func (k Keeper) TransferOwner(ctx sdk.Context,
 
 	srcOwnerAmount := k.GetBalance(ctx, denomID, mtID, srcOwner)
 	if srcOwnerAmount < amount {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			sdkerrors.ErrInsufficientFunds,
 			"insufficient balance: %d",
 			srcOwnerAmount,
@@ -139,7 +140,7 @@ func (k Keeper) BurnMT(ctx sdk.Context,
 
 	srcOwnerAmount := k.GetBalance(ctx, denomID, mtID, owner)
 	if srcOwnerAmount < amount {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			sdkerrors.ErrInsufficientFunds,
 			"insufficient balance: %d",
 			srcOwnerAmount,

@@ -19,6 +19,7 @@ message Token {
   uint64 max_supply = 6;
   bool mintable = 7;
   string owner = 8;
+  string contract = 9;
 }
 
 // Params defines token module's parameters
@@ -37,4 +38,7 @@ message Params {
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
+
+  bool enable_erc20 = 4;
+  string beacon = 5;
 }

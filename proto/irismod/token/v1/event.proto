@@ -1,0 +1,36 @@
+syntax = "proto3";
+package irismod.token.v1;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/token/types/v1";
+option (gogoproto.goproto_getters_all) = false;
+
+// EventDeployERC20 is an event emitted when deploying ERC20.
+message EventDeployERC20 {
+  string symbol = 1;
+  string name = 2;
+  uint32 scale = 3;
+  string min_unit = 4;
+  string contract = 5;
+}
+
+// EventSwapToERC20 is an event emitted when swapping token from native token to
+// ERC20.
+message EventSwapToERC20 {
+  cosmos.base.v1beta1.Coin amount = 1 [ (gogoproto.nullable) = false ];
+  string sender = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string receiver = 3;
+  string to_contract = 4;
+}
+
+// EventSwapFromERC20 is an event emitted when swapping token from ERC20 to
+// native token.
+message EventSwapFromERC20 {
+  cosmos.base.v1beta1.Coin wanted_amount = 1;
+  string sender = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string receiver = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string from_contract = 4;
+}

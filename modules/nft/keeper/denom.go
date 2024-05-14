@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -58,7 +59,7 @@ func (k Keeper) TransferDenomOwner(
 
 	// authorize
 	if srcOwner.String() != denom.Creator {
-		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to transfer denom %s", srcOwner.String(), denomID)
+		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to transfer denom %s", srcOwner.String(), denomID)
 	}
 
 	denomMetadata := &types.DenomMetadata{
@@ -90,7 +91,7 @@ func (k Keeper) TransferDenomOwner(
 func (k Keeper) GetDenomInfo(ctx sdk.Context, denomID string) (*types.Denom, error) {
 	class, has := k.nk.GetClass(ctx, denomID)
 	if !has {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", denomID)
+		return nil, errorsmod.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", denomID)
 	}
 
 	var denomMetadata types.DenomMetadata

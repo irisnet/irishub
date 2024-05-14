@@ -1,9 +1,10 @@
 package keeper
 
 import (
+	"testing"
+
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 var ShapePageRequest = shapePageRequest

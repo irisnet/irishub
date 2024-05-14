@@ -1,6 +1,7 @@
 package types
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -37,11 +38,11 @@ func (msg MsgCreateRecord) GetSignBytes() []byte {
 // ValidateBasic implements Msg.
 func (msg MsgCreateRecord) ValidateBasic() error {
 	if len(msg.Contents) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "contents missing")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "contents missing")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Creator); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	return ValidateContents(msg.Contents...)

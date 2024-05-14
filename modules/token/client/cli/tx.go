@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -33,6 +34,8 @@ func NewTxCmd() *cobra.Command {
 		GetCmdBurnToken(),
 		GetCmdTransferTokenOwner(),
 		GetCmdSwapFeeToken(),
+		GetCmdSwapToErc20(),
+		GetCmdSwapFromErc20(),
 	)
 
 	return txCmd
@@ -108,7 +111,7 @@ func GetCmdIssueToken() *cobra.Command {
 				return err
 			}
 
-			var prompt = "The token issuance transaction will consume extra fee"
+			prompt := "The token issuance transaction will consume extra fee"
 
 			generateOnly, err := cmd.Flags().GetBool(flags.FlagGenerateOnly)
 			if err != nil {
@@ -235,16 +238,16 @@ func GetCmdMintToken() *cobra.Command {
 			}
 
 			msg := &v1.MsgMintToken{
-				Coin:  coin,
-				To:    addr,
-				Owner: owner,
+				Coin:     coin,
+				Receiver: addr,
+				Owner:    owner,
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
 
-			var prompt = "The token minting transaction will consume extra fee"
+			prompt := "The token minting transaction will consume extra fee"
 
 			generateOnly, err := cmd.Flags().GetBool(flags.FlagGenerateOnly)
 			if err != nil {
@@ -274,6 +277,12 @@ func GetCmdMintToken() *cobra.Command {
 	return cmd
 }
 
+// GetCmdBurnToken returns the command to burn tokens.
+//
+// This function handles the burning of tokens based on the provided coin input.
+// It constructs and validates a message to burn the specified tokens.
+// Returns an error if the operation encounters any issues.
+// Returns a *cobra.Command.
 func GetCmdBurnToken() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "burn [coin]",
@@ -398,9 +407,9 @@ func GetCmdSwapFeeToken() *cobra.Command {
 			}
 
 			msg := &v1.MsgSwapFeeToken{
-				FeePaid:   coin,
-				Recipient: toAddr,
-				Sender:    sender,
+				FeePaid:  coin,
+				Receiver: toAddr,
+				Sender:   sender,
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -413,5 +422,130 @@ func GetCmdSwapFeeToken() *cobra.Command {
 
 	cmd.Flags().AddFlagSet(FsSwapFeeToken)
 	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+// GetCmdSwapToErc20 implements the swap-to-erc20 command
+func GetCmdSwapToErc20() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "swap-to-erc20",
+		Long: "Swap native token to the corresponding ERC20 at 1:1.",
+		Example: fmt.Sprintf(
+			"$ %s tx token swap-to-erc20 [paid_amount]"+
+				"--to=\"0x0eeb8ec40c6705b669469346ff8f9ce5cad57ed5\" "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+	
+			paidAmount, token, err := parseMainCoin(clientCtx, args[0])
+			if err != nil {
+				return err
+			}
+			if len(token.GetContract()) <= 0 {
+				return fmt.Errorf("corresponding erc20 contract of %s does not exist", paidAmount.Denom)
+			}
+
+			receiver, err := cmd.Flags().GetString(FlagTo)
+			if err != nil {
+				return err
+			}
+
+			from := clientCtx.GetFromAddress()
+			if len(receiver) <= 0 {
+				// set default receiver
+				receiver = common.BytesToAddress(from.Bytes()).Hex()
+			}
+
+			msg := &v1.MsgSwapToERC20{
+				Amount:   paidAmount,
+				Sender:   from.String(),
+				Receiver: receiver,
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			prompt := fmt.Sprintf("Swapping native token to ERC20, sender: %s, receiver: %s, contract: %s, amount: %s", from, receiver, token.GetContract(), paidAmount)
+
+			fmt.Println(prompt)
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsSwapToErc20)
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdSwapFromErc20 implements the swap-from-erc20 command
+func GetCmdSwapFromErc20() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "swap-from-erc20",
+		Long: "Swap native token from the corresponding ERC20 at 1:1.",
+		Example: fmt.Sprintf(
+			"$ %s tx token swap-from-erc20 [wanted_amount]"+
+				"--to=\"iaaeeb8ec40c6705b669469346ff8f9ce5cad57ed5\" "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			from := clientCtx.GetFromAddress().String()
+			wantedAmount, token, err := parseMainCoin(clientCtx, args[0])
+			if err != nil {
+				return err
+			}
+			if len(token.GetContract()) <= 0 {
+				return fmt.Errorf("corresponding erc20 contract of %s does not exist", wantedAmount.Denom)
+			}
+
+			receiver, err := cmd.Flags().GetString(FlagTo)
+			if err != nil {
+				return err
+			}
+			if len(receiver) <= 0 {
+				// set default receiver
+				receiver = from
+			}
+
+			msg := &v1.MsgSwapFromERC20{
+				WantedAmount: wantedAmount,
+				Sender:       from,
+				Receiver:     receiver,
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			prompt := fmt.Sprintf("Swapping native token from ERC20, sender: %s, receiver: %s, contract: %s, amount: %s", from, receiver, token.GetContract(), wantedAmount)
+
+			fmt.Println(prompt)
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsSwapFromErc20)
+	flags.AddTxFlagsToCmd(cmd)
+
 	return cmd
 }

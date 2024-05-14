@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -30,7 +31,7 @@ func (dtf ValidateTokenFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 		case *v1.MsgIssueToken:
 			fee, err := dtf.k.GetTokenIssueFee(ctx, msg.Symbol)
 			if err != nil {
-				return ctx, sdkerrors.Wrap(types.ErrInvalidBaseFee, err.Error())
+				return ctx, errorsmod.Wrap(types.ErrInvalidBaseFee, err.Error())
 			}
 
 			if fe, ok := feeMap[msg.Owner]; ok {
@@ -46,7 +47,7 @@ func (dtf ValidateTokenFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 
 			fee, err := dtf.k.GetTokenMintFee(ctx, symbol)
 			if err != nil {
-				return ctx, sdkerrors.Wrap(types.ErrInvalidBaseFee, err.Error())
+				return ctx, errorsmod.Wrap(types.ErrInvalidBaseFee, err.Error())
 			}
 
 			if fe, ok := feeMap[msg.Owner]; ok {
@@ -61,7 +62,7 @@ func (dtf ValidateTokenFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 		owner, _ := sdk.AccAddressFromBech32(addr)
 		balance := dtf.bk.GetBalance(ctx, owner, fee.Denom)
 		if balance.IsLT(fee) {
-			return ctx, sdkerrors.Wrapf(
+			return ctx, errorsmod.Wrapf(
 				sdkerrors.ErrInsufficientFunds, "insufficient coins for token fee; %s < %s", balance, fee,
 			)
 		}

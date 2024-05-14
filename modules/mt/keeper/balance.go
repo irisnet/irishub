@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"math"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	"github.com/irisnet/irismod/modules/mt/types"
 )
 
@@ -17,7 +19,7 @@ func (k Keeper) AddBalance(ctx sdk.Context,
 
 	balance := k.GetBalance(ctx, denomID, mtID, addr)
 	if math.MaxUint64-balance < amount {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "overflow: max %d, got %d", math.MaxUint64-balance, amount)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "overflow: max %d, got %d", math.MaxUint64-balance, amount)
 	}
 	balance += amount
 
@@ -151,7 +153,7 @@ func (k Keeper) IncreaseDenomSupply(ctx sdk.Context, denomID string) {
 func (k Keeper) IncreaseMTSupply(ctx sdk.Context, denomID, mtID string, amount uint64) error {
 	supply := k.GetMTSupply(ctx, denomID, mtID)
 	if math.MaxUint64-supply < amount {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "overflow: max %d, got %d", math.MaxUint64-supply, amount)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "overflow: max %d, got %d", math.MaxUint64-supply, amount)
 	}
 	supply += amount
 

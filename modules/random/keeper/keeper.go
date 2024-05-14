@@ -5,10 +5,10 @@ import (
 
 	"github.com/cometbft/cometbft/libs/log"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/random/types"
 )
@@ -138,7 +138,7 @@ func (k Keeper) GetOracleRandRequest(
 
 	bz := store.Get(types.KeyOracleRandomRequest(requestContextID))
 	if bz == nil {
-		return types.Request{}, sdkerrors.Wrap(
+		return types.Request{}, errorsmod.Wrap(
 			types.ErrInvalidRequestContextID,
 			hex.EncodeToString(requestContextID),
 		)
@@ -162,7 +162,7 @@ func (k Keeper) GetRandom(ctx sdk.Context, reqID []byte) (types.Random, error) {
 
 	bz := store.Get(types.KeyRandom(reqID))
 	if bz == nil {
-		return types.Random{}, sdkerrors.Wrap(types.ErrInvalidReqID, hex.EncodeToString(reqID))
+		return types.Random{}, errorsmod.Wrap(types.ErrInvalidReqID, hex.EncodeToString(reqID))
 	}
 
 	var random types.Random

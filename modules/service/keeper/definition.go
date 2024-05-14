@@ -1,8 +1,8 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/service/types"
 )
@@ -18,7 +18,7 @@ func (k Keeper) AddServiceDefinition(
 	schemas string,
 ) error {
 	if _, found := k.GetServiceDefinition(ctx, name); found {
-		return sdkerrors.Wrap(types.ErrServiceDefinitionExists, name)
+		return errorsmod.Wrap(types.ErrServiceDefinitionExists, name)
 	}
 
 	svcDef := types.NewServiceDefinition(name, description, tags, author, authorDescription, schemas)

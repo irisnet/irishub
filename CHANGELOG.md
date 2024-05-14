@@ -35,6 +35,33 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 # Changelog
 
+## [v1.9.0]
+
+### Improvements
+
+* [\#387](https://github.com/irisnet/irismod/pull/387) Preparatory work for realizing erc20.
+* [\#393](https://github.com/irisnet/irismod/pull/393) Implement DeployERC20 by gov proposal .
+* [\#394](https://github.com/irisnet/irismod/pull/394) Support swap native token from erc20 token.
+* [\#395](https://github.com/irisnet/irismod/pull/395) Implement SwapToERC20.
+* [\#400](https://github.com/irisnet/irismod/pull/400) Implement swap native token from erc20 contract.
+* [\#402](https://github.com/irisnet/irismod/pull/402) Add cli for swap from/to ERC20.
+* [\#404](https://github.com/irisnet/irismod/pull/404) Implement token Balances api.
+* [\#405](https://github.com/irisnet/irismod/pull/405) Rolled back the cosmos-sdk version to v0.47.9.
+* [\#409](https://github.com/irisnet/irismod/pull/409) Add a switch for enabling erc20 swap function.
+* [\#410](https://github.com/irisnet/irismod/pull/410) Implement upgradeable contract.
+* [\#411](https://github.com/irisnet/irismod/pull/411) Implement erc20 upgrade.
+* [\#412](https://github.com/irisnet/irismod/pull/412) Optimize contract code
+* [\#417](https://github.com/irisnet/irismod/pull/417) Optimize token command line
+
+### Bug Fixes
+
+* [\#401](https://github.com/irisnet/irismod/pull/401) Add token test & fix error.
+* [\#407](https://github.com/irisnet/irismod/pull/407) Fix some bugs about erc20 in token module.
+
+### API Breaking Changes
+
+* [\#403](https://github.com/irisnet/irismod/pull/403) Standardized parameter naming
+
 ## [v1.8.0]
 
 ### Improvements

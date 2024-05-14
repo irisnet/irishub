@@ -5,6 +5,7 @@ import (
 
 	"github.com/cosmos/gogoproto/proto"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -32,6 +33,7 @@ type TokenI interface {
 	GetMaxSupply() uint64
 	GetMintable() bool
 	GetOwner() sdk.AccAddress
+	GetContract() string
 
 	ToMainCoin(coin sdk.Coin) (sdk.DecCoin, error)
 	ToMinCoin(coin sdk.DecCoin) (sdk.Coin, error)
@@ -109,13 +111,17 @@ func (t Token) GetOwner() sdk.AccAddress {
 	return owner
 }
 
+func (t Token) GetContract() string {
+	return t.Contract
+}
+
 // ToMainCoin returns the main denom coin from args
 func (t Token) ToMainCoin(coin sdk.Coin) (sdk.DecCoin, error) {
 	if t.MinUnit != coin.Denom {
 		return sdk.NewDecCoinFromDec(
 				coin.Denom,
 				sdk.ZeroDec(),
-			), sdkerrors.Wrapf(
+			), errorsmod.Wrapf(
 				tokentypes.ErrTokenNotExists,
 				"not the token min_unit",
 			)
@@ -133,7 +139,7 @@ func (t Token) ToMinCoin(coin sdk.DecCoin) (newCoin sdk.Coin, err error) {
 		return sdk.NewCoin(
 				coin.Denom,
 				sdk.ZeroInt(),
-			), sdkerrors.Wrapf(
+			), errorsmod.Wrapf(
 				tokentypes.ErrTokenNotExists,
 				"not the token symbol",
 			)
@@ -149,7 +155,7 @@ func (t Token) ToMinCoin(coin sdk.DecCoin) (newCoin sdk.Coin, err error) {
 func (t Token) Validate() error {
 	if len(t.Owner) > 0 {
 		if _, err := sdk.AccAddressFromBech32(t.Owner); err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 		}
 	}
 	if err := tokentypes.ValidateName(t.Name); err != nil {
@@ -165,7 +171,7 @@ func (t Token) Validate() error {
 		return err
 	}
 	if t.MaxSupply < t.InitialSupply {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			tokentypes.ErrInvalidMaxSupply,
 			"invalid token max supply %d, only accepts value [%d, %d]",
 			t.MaxSupply,

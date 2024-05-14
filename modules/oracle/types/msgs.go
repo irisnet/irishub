@@ -1,6 +1,7 @@
 package types
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -55,7 +56,7 @@ func (msg MsgCreateFeed) ValidateBasic() error {
 		return err
 	}
 	if len(msg.Providers) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "providers missing")
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "providers missing")
 	}
 
 	if err := ValidateAggregateFunc(msg.AggregateFunc); err != nil {
@@ -63,7 +64,7 @@ func (msg MsgCreateFeed) ValidateBasic() error {
 	}
 
 	if !msg.ServiceFeeCap.IsValid() {
-		return sdkerrors.Wrapf(ErrInvalidServiceFeeCap, msg.ServiceFeeCap.String())
+		return errorsmod.Wrapf(ErrInvalidServiceFeeCap, msg.ServiceFeeCap.String())
 	}
 
 	if err := ValidateCreator(msg.Creator); err != nil {

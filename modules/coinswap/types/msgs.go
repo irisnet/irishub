@@ -1,6 +1,7 @@
 package types
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -75,7 +76,7 @@ func (msg MsgSwapOrder) ValidateBasic() error {
 	}
 
 	if msg.Input.Coin.Denom == msg.Output.Coin.Denom {
-		return sdkerrors.Wrap(ErrEqualDenom, "invalid swap")
+		return errorsmod.Wrap(ErrEqualDenom, "invalid swap")
 	}
 
 	return ValidateDeadline(msg.Deadline)
@@ -142,7 +143,7 @@ func (msg MsgAddLiquidity) ValidateBasic() error {
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
 }
@@ -202,7 +203,7 @@ func (m MsgAddUnilateralLiquidity) ValidateBasic() error {
 	}
 
 	if _, err := sdk.AccAddressFromBech32(m.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
 }
@@ -265,7 +266,7 @@ func (msg MsgRemoveLiquidity) ValidateBasic() error {
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
 }
@@ -325,7 +326,7 @@ func (m MsgRemoveUnilateralLiquidity) ValidateBasic() error {
 	}
 
 	if _, err := sdk.AccAddressFromBech32(m.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
 }
@@ -352,7 +353,7 @@ func (m *MsgUpdateParams) GetSignBytes() []byte {
 // ValidateBasic executes sanity validation on the provided data
 func (m *MsgUpdateParams) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(m.Authority); err != nil {
-		return sdkerrors.Wrap(err, "invalid authority address")
+		return errorsmod.Wrap(err, "invalid authority address")
 	}
 	return m.Params.Validate()
 }

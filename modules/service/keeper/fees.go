@@ -3,6 +3,7 @@ package keeper
 import (
 	gogotypes "github.com/cosmos/gogoproto/types"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	v1 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v1"
@@ -40,7 +41,7 @@ func (k Keeper) AddEarnedFee(ctx sdk.Context, provider sdk.AccAddress, fee sdk.C
 
 	earnedFee, hasNeg := fee.SafeSub(taxCoins...)
 	if hasNeg {
-		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "%s is less than %s", fee, taxCoins)
+		return errorsmod.Wrapf(sdkerrors.ErrInsufficientFunds, "%s is less than %s", fee, taxCoins)
 	}
 
 	// add the provider's earned fees
@@ -138,13 +139,13 @@ func (k Keeper) WithdrawEarnedFees(ctx sdk.Context, owner, provider sdk.AccAddre
 	if !provider.Empty() {
 		providerOwner, _ := k.GetOwner(ctx, provider)
 		if !owner.Equals(providerOwner) {
-			return sdkerrors.Wrap(types.ErrNotAuthorized, "owner not matching")
+			return errorsmod.Wrap(types.ErrNotAuthorized, "owner not matching")
 		}
 	}
 
 	ownerEarnedFees, found := k.GetOwnerEarnedFees(ctx, owner)
 	if !found {
-		return sdkerrors.Wrap(types.ErrNoEarnedFees, owner.String())
+		return errorsmod.Wrap(types.ErrNoEarnedFees, owner.String())
 	}
 
 	var withdrawFees sdk.Coins
@@ -152,7 +153,7 @@ func (k Keeper) WithdrawEarnedFees(ctx sdk.Context, owner, provider sdk.AccAddre
 	if !provider.Empty() {
 		earnedFees, found := k.GetEarnedFees(ctx, provider)
 		if !found {
-			return sdkerrors.Wrap(types.ErrNoEarnedFees, provider.String())
+			return errorsmod.Wrap(types.ErrNoEarnedFees, provider.String())
 		}
 
 		k.DeleteEarnedFees(ctx, provider)
@@ -227,7 +228,7 @@ func (k Keeper) RefundServiceFees(ctx sdk.Context) error {
 
 		consumer, err := sdk.AccAddressFromBech32(request.Consumer)
 		if err != nil {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				sdkerrors.ErrInvalidAddress,
 				"invalid consumer address (%s)",
 				err,

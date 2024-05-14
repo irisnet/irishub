@@ -8,13 +8,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// Farm params default values
-var (
-	DefaultPoolCreationFee     = sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000)) // 5000stake
-	DefaulttTaxRate            = sdk.NewDecWithPrec(4, 1)                            // 0.4 (40%)
-	DefaultMaxRewardCategories = uint32(2)
-)
-
 // NewParams creates a new Params instance
 func NewParams(createPoolFee sdk.Coin, maxRewardCategories uint32, taxRate sdk.Dec) Params {
 	return Params{
@@ -26,7 +19,11 @@ func NewParams(createPoolFee sdk.Coin, maxRewardCategories uint32, taxRate sdk.D
 
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
-	return NewParams(DefaultPoolCreationFee, DefaultMaxRewardCategories, DefaulttTaxRate)
+	return NewParams(
+		sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5000)),
+		2,
+		sdk.NewDecWithPrec(4, 1),
+	)
 }
 
 // Validate validates a set of params

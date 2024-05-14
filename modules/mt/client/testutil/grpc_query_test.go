@@ -8,12 +8,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogoproto/proto"
+
 	mtcli "github.com/irisnet/irismod/modules/mt/client/cli"
 	mttestutil "github.com/irisnet/irismod/modules/mt/client/testutil"
 	mttypes "github.com/irisnet/irismod/modules/mt/types"
 
-	"github.com/irisnet/irismod/simapp"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/irisnet/irismod/simapp"
 )
 
 type IntegrationTestSuite struct {

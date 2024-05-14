@@ -9,6 +9,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 )
 
@@ -154,7 +155,7 @@ func TestMsgEditTokenRoute(t *testing.T) {
 func TestMsgEditTokenGetSignBytes(t *testing.T) {
 	mintable := tokentypes.False
 
-	var msg = MsgEditToken{
+	msg := MsgEditToken{
 		Name:      "BTC TOKEN",
 		Owner:     sdk.AccAddress(tmhash.SumTruncated([]byte("owner"))).String(),
 		Symbol:    "btc",
@@ -192,8 +193,8 @@ func TestMsgMintTokenValidateBasic(t *testing.T) {
 				Denom:  td.minUnit,
 				Amount: sdkmath.NewIntFromUint64(td.amount),
 			},
-			To:    td.to,
-			Owner: td.owner,
+			Receiver: td.to,
+			Owner:    td.owner,
 		}
 		if td.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", td.msg)
@@ -251,6 +252,38 @@ func TestMsgTransferTokenOwnerValidation(t *testing.T) {
 
 	for _, td := range testData {
 		msg := NewMsgTransferTokenOwner(td.srcOwner, td.dstOwner, td.symbol)
+		if td.expectPass {
+			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
+		} else {
+			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.name)
+		}
+	}
+}
+
+func TestMsgDeployERC20(t *testing.T) {
+	testData := []struct {
+		symbol     string
+		name       string
+		scale      uint32
+		minUnit    string
+		authority  string
+		expectPass bool
+	}{
+		{symbol: "btc", name: "BTC TOKEN", scale: 18, minUnit: "staoshi", authority: addr1, expectPass: true},
+		{symbol: "BTC", name: "BTC TOKEN", scale: 18, minUnit: "staoshi", authority: addr1, expectPass: false},
+		{symbol: "bTC", name: "BTC TOKEN", scale: 18, minUnit: "staoshi", authority: addr1, expectPass: true},
+		{symbol: "stake", name: "Stake Token", scale: 18, minUnit: "ibc/3C3D7B3BE4ECC85A0E5B52A3AEC3B7DFC2AA9CA47C37821E57020D6807043BE9", authority: addr1, expectPass: true},
+		{symbol: "ibc/3C3D7B3BE4ECC85A0E5B52A3AEC3B7DFC2AA9CA47C37821E57020D6807043BE9", name: "Stake Token", scale: 18, minUnit: "ibc/3C3D7B3BE4ECC85A0E5B52A3AEC3B7DFC2AA9CA47C37821E57020D6807043BE9", authority: addr1, expectPass: true},
+	}
+
+	for _, td := range testData {
+		msg := MsgDeployERC20{
+			Symbol:    td.symbol,
+			Name:      td.name,
+			Scale:     td.scale,
+			MinUnit:   td.minUnit,
+			Authority: td.authority,
+		}
 		if td.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
 		} else {

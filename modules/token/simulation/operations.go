@@ -281,8 +281,8 @@ func SimulateMintToken(
 				Denom:  token.GetMinUnit(),
 				Amount: sdkmath.NewIntWithDecimal(100, int(token.GetScale())),
 			},
-			To:    simToAccount.Address.String(),
-			Owner: token.GetOwner().String(),
+			Receiver: simToAccount.Address.String(),
+			Owner:    token.GetOwner().String(),
 		}
 
 		ownerAccount, found := simtypes.FindAccount(accs, token.GetOwner())

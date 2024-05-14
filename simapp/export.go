@@ -6,6 +6,7 @@ import (
 	"log"
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+
 	"github.com/irisnet/irismod/modules/htlc"
 	"github.com/irisnet/irismod/modules/oracle"
 	"github.com/irisnet/irismod/modules/random"

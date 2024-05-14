@@ -43,7 +43,7 @@ distclean: clean
 ###                                Protobuf                                 ###
 ###############################################################################
 
-protoVer=0.11.2
+protoVer=0.13.0
 protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
 protoImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(protoImageName)
 
@@ -116,7 +116,35 @@ lint: golangci-lint
 format:
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./lite/*/statik.go" -not -path "*.pb.go" | xargs gofmt -w -s
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./lite/*/statik.go" -not -path "*.pb.go" | xargs misspell -w
-	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./lite/*/statik.go" -not -path "*.pb.go" | xargs goimports -w -local github.com/irisnet/irismod
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./lite/*/statik.go" -not -path "*.pb.go" -not -path "*.pulsar.go" | xargs goimports -w -local github.com/irisnet/irismod
 
 benchmark:
 	@go test -mod=readonly -bench=. ./...
+
+###############################################################################
+###                        Compile Solidity Contracts                       ###
+###############################################################################
+
+CONTRACTS_DIR := contracts
+COMPILED_DIR := $(CONTRACTS_DIR)/compiled_contracts
+
+# Compile and format solidity contracts for the erc20 module. Also install
+# openzeppeling as the contracts are build on top of openzeppelin templates.
+contracts-compile: contracts-clean dep-install create-contracts-abi
+
+# Install openzeppelin solidity contracts
+dep-install:
+	@echo "Importing openzeppelin contracts..."
+	@npm install
+	 
+# Clean tmp files
+contracts-clean:
+	@rm -rf node_modules
+
+# Compile, filter out and format contracts into the following format.
+create-contracts-abi:
+	solc --combined-json abi,bin --optimize --optimize-runs 200 --evm-version paris --include-path node_modules --base-path $(CONTRACTS_DIR)/  $(CONTRACTS_DIR)/Token.sol | jq '.contracts["Token.sol:Token"]' > $(COMPILED_DIR)/Token.json \
+    && solc --combined-json abi,bin --optimize --optimize-runs 200 --evm-version paris --include-path node_modules --base-path $(CONTRACTS_DIR)/  $(CONTRACTS_DIR)/TokenProxy.sol | jq '.contracts["TokenProxy.sol:TokenProxy"]' > $(COMPILED_DIR)/TokenProxy.json \
+	&& solc --combined-json abi,bin --optimize --optimize-runs 200 --evm-version paris --include-path node_modules --base-path $(CONTRACTS_DIR)/  $(CONTRACTS_DIR)/UpgradeableBeacon.sol | jq '.contracts["UpgradeableBeacon.sol:UpgradeableBeacon"]' > $(COMPILED_DIR)/UpgradeableBeacon.json \
+
+

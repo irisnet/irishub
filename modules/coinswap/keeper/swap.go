@@ -3,9 +3,9 @@ package keeper
 import (
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/coinswap/types"
 )
@@ -28,7 +28,8 @@ func (k Keeper) swapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coi
 	return k.bk.SendCoins(ctx, poolAddr, recipient, sdk.NewCoins(coinBought))
 }
 
-/**
+/*
+*
 Calculate the amount of another token to be received based on the exact amount of tokens sold
 @param exactSoldCoin : sold coin
 @param soldTokenDenom : received token's denom
@@ -50,10 +51,10 @@ func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin,
 	outputReserve := reservePool.AmountOf(boughtTokenDenom)
 
 	if !inputReserve.IsPositive() {
-		return sdk.ZeroInt(), sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", inputReserve.String(), exactSoldCoin.Denom))
+		return sdk.ZeroInt(), errorsmod.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", inputReserve.String(), exactSoldCoin.Denom))
 	}
 	if !outputReserve.IsPositive() {
-		return sdk.ZeroInt(), sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", outputReserve.String(), boughtTokenDenom))
+		return sdk.ZeroInt(), errorsmod.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", outputReserve.String(), boughtTokenDenom))
 	}
 	param := k.GetParams(ctx)
 
@@ -61,7 +62,8 @@ func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin,
 	return boughtTokenAmt, nil
 }
 
-/**
+/*
+*
 Sell exact amount of a token for buying another, one of them must be standard token
 @param input: exact amount of the token to be sold
 @param output: min amount of the token to be bought
@@ -77,7 +79,7 @@ func (k Keeper) TradeExactInputForOutput(ctx sdk.Context, input types.Input, out
 	// assert that the calculated amount is more than the
 	// minimum amount the buyer is willing to buy.
 	if boughtTokenAmt.LT(output.Coin.Amount) {
-		return sdk.ZeroInt(), sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", output.Coin.Denom, output.Coin.Amount.String(), boughtTokenAmt.String()))
+		return sdk.ZeroInt(), errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", output.Coin.Denom, output.Coin.Amount.String(), boughtTokenAmt.String()))
 	}
 	boughtToken := sdk.NewCoin(output.Coin.Denom, boughtTokenAmt)
 
@@ -96,7 +98,8 @@ func (k Keeper) TradeExactInputForOutput(ctx sdk.Context, input types.Input, out
 	return boughtTokenAmt, nil
 }
 
-/**
+/*
+*
 Sell exact amount of a token for buying another, non of them are standard token
 @param input: exact amount of the token to be sold
 @param output: min amount of the token to be bought
@@ -133,7 +136,7 @@ func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Inpu
 	// assert that the calculated amount is less than the
 	// minimum amount the buyer is willing to buy.
 	if boughtAmt.LT(output.Coin.Amount) {
-		return sdk.ZeroInt(), sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", output.Coin.Denom, output.Coin.Amount.String(), boughtAmt.String()))
+		return sdk.ZeroInt(), errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", output.Coin.Denom, output.Coin.Amount.String(), boughtAmt.String()))
 	}
 
 	if err := k.swapCoins(ctx, inputAddress, outputAddress, standardCoin, boughtToken); err != nil {
@@ -142,7 +145,8 @@ func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Inpu
 	return boughtAmt, nil
 }
 
-/**
+/*
+*
 Calculate the amount of the token to be paid based on the exact amount of the token to be bought
 @param exactBoughtCoin
 @param soldTokenDenom
@@ -164,13 +168,13 @@ func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Co
 	inputReserve := reservePool.AmountOf(soldTokenDenom)
 
 	if !inputReserve.IsPositive() {
-		return sdk.ZeroInt(), sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("reserve pool insufficient balance: [%s%s]", inputReserve.String(), soldTokenDenom))
+		return sdk.ZeroInt(), errorsmod.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("reserve pool insufficient balance: [%s%s]", inputReserve.String(), soldTokenDenom))
 	}
 	if !outputReserve.IsPositive() {
-		return sdk.ZeroInt(), sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("reserve pool insufficient balance: [%s%s]", outputReserve.String(), exactBoughtCoin.Denom))
+		return sdk.ZeroInt(), errorsmod.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("reserve pool insufficient balance: [%s%s]", outputReserve.String(), exactBoughtCoin.Denom))
 	}
 	if exactBoughtCoin.Amount.GTE(outputReserve) {
-		return sdk.ZeroInt(), sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("reserve pool insufficient balance of %s, user expected: %s, actual: %s", exactBoughtCoin.Denom, exactBoughtCoin.Amount.String(), outputReserve.String()))
+		return sdk.ZeroInt(), errorsmod.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("reserve pool insufficient balance of %s, user expected: %s, actual: %s", exactBoughtCoin.Denom, exactBoughtCoin.Amount.String(), outputReserve.String()))
 	}
 	param := k.GetParams(ctx)
 
@@ -178,7 +182,8 @@ func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Co
 	return soldTokenAmt, nil
 }
 
-/**
+/*
+*
 Buy exact amount of a token by specifying the max amount of another token, one of them must be standard token
 @param input : max amount of the token to be paid
 @param output : exact amount of the token to be bought
@@ -194,7 +199,7 @@ func (k Keeper) TradeInputForExactOutput(ctx sdk.Context, input types.Input, out
 	// assert that the calculated amount is less than the
 	// max amount the buyer is willing to pay.
 	if soldTokenAmt.GT(input.Coin.Amount) {
-		return sdk.ZeroInt(), sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", input.Coin.Denom, input.Coin.Amount.String(), soldTokenAmt.String()))
+		return sdk.ZeroInt(), errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", input.Coin.Denom, input.Coin.Amount.String(), soldTokenAmt.String()))
 	}
 	soldToken := sdk.NewCoin(input.Coin.Denom, soldTokenAmt)
 
@@ -213,7 +218,8 @@ func (k Keeper) TradeInputForExactOutput(ctx sdk.Context, input types.Input, out
 	return soldTokenAmt, nil
 }
 
-/**
+/*
+*
 Buy exact amount of a token by specifying the max amount of another token, non of them are standard token
 @param input : max amount of the token to be paid
 @param output : exact amount of the token to be bought
@@ -238,7 +244,7 @@ func (k Keeper) doubleTradeInputForExactOutput(ctx sdk.Context, input types.Inpu
 	// assert that the calculated amount is less than the
 	// max amount the buyer is willing to sell.
 	if soldTokenAmt.GT(input.Coin.Amount) {
-		return sdk.ZeroInt(), sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", input.Coin.Denom, input.Coin.Amount.String(), soldTokenAmt.String()))
+		return sdk.ZeroInt(), errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", input.Coin.Denom, input.Coin.Amount.String(), soldTokenAmt.String()))
 	}
 
 	inputAddress, err := sdk.AccAddressFromBech32(input.Address)

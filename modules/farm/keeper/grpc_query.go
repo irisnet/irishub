@@ -3,12 +3,12 @@ package keeper
 import (
 	"context"
 
+	errorsmod "cosmossdk.io/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
 	"github.com/irisnet/irismod/modules/farm/types"
@@ -70,7 +70,7 @@ func (k Keeper) FarmPool(goctx context.Context,
 
 	pool, exist := k.GetPool(ctx, request.Id)
 	if !exist {
-		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, request.Id)
+		return nil, errorsmod.Wrapf(types.ErrPoolNotFound, request.Id)
 	}
 
 	var totalReward sdk.Coins
@@ -116,13 +116,13 @@ func (k Keeper) Farmer(goctx context.Context, request *types.QueryFarmerRequest)
 		}
 	}
 	if len(farmInfos) == 0 {
-		return nil, sdkerrors.Wrapf(types.ErrFarmerNotFound, "not found farmer: %s", request.Farmer)
+		return nil, errorsmod.Wrapf(types.ErrFarmerNotFound, "not found farmer: %s", request.Farmer)
 	}
 
 	for _, farmer := range farmInfos {
 		pool, exist := k.GetPool(cacheCtx, farmer.PoolId)
 		if !exist {
-			return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, farmer.PoolId)
+			return nil, errorsmod.Wrapf(types.ErrPoolNotFound, farmer.PoolId)
 		}
 
 		//The farm pool has not started, no reward

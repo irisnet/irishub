@@ -7,7 +7,7 @@ import (
 
 	"github.com/xeipuuv/gojsonschema"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errorsmod "cosmossdk.io/errors"
 )
 
 const PATH_BODY = "body"
@@ -21,7 +21,7 @@ type ServiceSchemas struct {
 // ValidateServiceSchemas validates the given service schemas
 func ValidateServiceSchemas(schemas string) error {
 	if len(schemas) == 0 {
-		return sdkerrors.Wrap(ErrInvalidSchemas, "schemas missing")
+		return errorsmod.Wrap(ErrInvalidSchemas, "schemas missing")
 	}
 
 	svcSchemas, err := parseServiceSchemas(schemas)
@@ -43,11 +43,11 @@ func ValidateServiceSchemas(schemas string) error {
 // ValidateBindingPricing validates the given pricing against the Pricing JSON Schema
 func ValidateBindingPricing(pricing string) error {
 	if len(pricing) == 0 {
-		return sdkerrors.Wrap(ErrInvalidPricing, "pricing missing")
+		return errorsmod.Wrap(ErrInvalidPricing, "pricing missing")
 	}
 
 	if err := validateDocument([]byte(PricingSchema), pricing); err != nil {
-		return sdkerrors.Wrap(ErrInvalidPricing, err.Error())
+		return errorsmod.Wrap(ErrInvalidPricing, err.Error())
 	}
 
 	return nil
@@ -56,7 +56,7 @@ func ValidateBindingPricing(pricing string) error {
 // ValidateRequestInput validates the request input against the input schema
 func ValidateRequestInput(input string) error {
 	if err := validateDocument([]byte(InputSchema), input); err != nil {
-		return sdkerrors.Wrap(ErrInvalidRequestInput, err.Error())
+		return errorsmod.Wrap(ErrInvalidRequestInput, err.Error())
 	}
 	return nil
 }
@@ -68,7 +68,7 @@ func ValidateRequestInputBody(schemas string, inputBody string) error {
 	}
 
 	if err := validateDocument(inputSchemaBz, inputBody); err != nil {
-		return sdkerrors.Wrap(ErrInvalidRequestInputBody, err.Error())
+		return errorsmod.Wrap(ErrInvalidRequestInputBody, err.Error())
 	}
 
 	return nil
@@ -77,11 +77,11 @@ func ValidateRequestInputBody(schemas string, inputBody string) error {
 // ValidateResponseResult validates the response result against the result schema
 func ValidateResponseResult(result string) error {
 	if len(result) == 0 {
-		return sdkerrors.Wrap(ErrInvalidResponseResult, "result missing")
+		return errorsmod.Wrap(ErrInvalidResponseResult, "result missing")
 	}
 
 	if err := validateDocument([]byte(ResultSchema), result); err != nil {
-		return sdkerrors.Wrap(ErrInvalidResponseResult, err.Error())
+		return errorsmod.Wrap(ErrInvalidResponseResult, err.Error())
 	}
 
 	return nil
@@ -90,7 +90,7 @@ func ValidateResponseResult(result string) error {
 // ValidateResponseOutput validates the response output against the output schema
 func ValidateResponseOutput(output string) error {
 	if err := validateDocument([]byte(OutputSchema), output); err != nil {
-		return sdkerrors.Wrap(ErrInvalidResponseOutput, err.Error())
+		return errorsmod.Wrap(ErrInvalidResponseOutput, err.Error())
 	}
 	return nil
 }
@@ -102,7 +102,7 @@ func ValidateResponseOutputBody(schemas string, outputBody string) error {
 	}
 
 	if err := validateDocument(outputSchemaBz, outputBody); err != nil {
-		return sdkerrors.Wrap(ErrInvalidResponseOutputBody, err.Error())
+		return errorsmod.Wrap(ErrInvalidResponseOutputBody, err.Error())
 	}
 
 	return nil
@@ -111,11 +111,11 @@ func ValidateResponseOutputBody(schemas string, outputBody string) error {
 func validateInputSchema(inputSchema map[string]interface{}) error {
 	inputSchemaBz, err := json.Marshal(inputSchema)
 	if err != nil {
-		return sdkerrors.Wrap(ErrInvalidSchemas, fmt.Sprintf("failed to marshal the input schema: %s", err))
+		return errorsmod.Wrap(ErrInvalidSchemas, fmt.Sprintf("failed to marshal the input schema: %s", err))
 	}
 
 	if _, err = gojsonschema.NewSchema(gojsonschema.NewBytesLoader(inputSchemaBz)); err != nil {
-		return sdkerrors.Wrap(ErrInvalidSchemas, fmt.Sprintf("invalid input schema: %s", err))
+		return errorsmod.Wrap(ErrInvalidSchemas, fmt.Sprintf("invalid input schema: %s", err))
 	}
 
 	return nil
@@ -124,11 +124,11 @@ func validateInputSchema(inputSchema map[string]interface{}) error {
 func validateOutputSchema(outputSchema map[string]interface{}) error {
 	outputSchemaBz, err := json.Marshal(outputSchema)
 	if err != nil {
-		return sdkerrors.Wrap(ErrInvalidSchemas, fmt.Sprintf("failed to marshal the output schema: %s", err))
+		return errorsmod.Wrap(ErrInvalidSchemas, fmt.Sprintf("failed to marshal the output schema: %s", err))
 	}
 
 	if _, err = gojsonschema.NewSchema(gojsonschema.NewBytesLoader(outputSchemaBz)); err != nil {
-		return sdkerrors.Wrap(ErrInvalidSchemas, fmt.Sprintf("invalid output schema: %s", err))
+		return errorsmod.Wrap(ErrInvalidSchemas, fmt.Sprintf("invalid output schema: %s", err))
 	}
 
 	return nil
@@ -138,7 +138,7 @@ func validateOutputSchema(outputSchema map[string]interface{}) error {
 func parseServiceSchemas(schemas string) (ServiceSchemas, error) {
 	var svcSchemas ServiceSchemas
 	if err := json.Unmarshal([]byte(schemas), &svcSchemas); err != nil {
-		return svcSchemas, sdkerrors.Wrap(ErrInvalidSchemas, fmt.Sprintf("failed to unmarshal the schemas: %s", err))
+		return svcSchemas, errorsmod.Wrap(ErrInvalidSchemas, fmt.Sprintf("failed to unmarshal the schemas: %s", err))
 	}
 
 	return svcSchemas, nil
@@ -153,7 +153,7 @@ func parseInputSchema(schemas string) ([]byte, error) {
 
 	inputSchemaBz, err := json.Marshal(svcSchemas.Input)
 	if err != nil {
-		return nil, sdkerrors.Wrap(ErrInvalidSchemas, fmt.Sprintf("failed to marshal the input schema: %s", err))
+		return nil, errorsmod.Wrap(ErrInvalidSchemas, fmt.Sprintf("failed to marshal the input schema: %s", err))
 	}
 
 	return inputSchemaBz, nil
@@ -168,7 +168,7 @@ func parseOutputSchema(schemas string) ([]byte, error) {
 
 	outputSchemaBz, err := json.Marshal(svcSchemas.Output)
 	if err != nil {
-		return nil, sdkerrors.Wrap(ErrInvalidSchemas, fmt.Sprintf("failed to marshal the output schema: %s", err))
+		return nil, errorsmod.Wrap(ErrInvalidSchemas, fmt.Sprintf("failed to marshal the output schema: %s", err))
 	}
 
 	return outputSchemaBz, nil

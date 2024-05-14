@@ -1,9 +1,19 @@
 package types
 
 import (
+	"context"
+	"math/big"
+
+	"github.com/ethereum/go-ethereum/core"
+	ethtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm"
+
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+
+	"github.com/irisnet/irismod/types"
 )
 
 // BankKeeper defines the expected bank keeper (noalias)
@@ -41,7 +51,26 @@ type BankKeeper interface {
 
 // AccountKeeper defines the expected account keeper
 type AccountKeeper interface {
-	GetAccount(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
-	GetModuleAddress(name string) sdk.AccAddress
-	GetModuleAccount(ctx sdk.Context, name string) authtypes.ModuleAccountI
+	GetModuleAddress(moduleName string) sdk.AccAddress
+	GetSequence(sdk.Context, sdk.AccAddress) (uint64, error)
+	GetAccount(sdk.Context, sdk.AccAddress) authtypes.AccountI
+	GetModuleAccount(ctx sdk.Context, moduleName string) authtypes.ModuleAccountI
+}
+
+// EVMKeeper defines the expected keeper of the evm module
+type EVMKeeper interface {
+	ChainID() *big.Int
+	SupportedKey(pubKey cryptotypes.PubKey) bool
+	EstimateGas(ctx context.Context, req *types.EthCallRequest) (uint64, error)
+	ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*types.Result, error)
+}
+
+// ICS20Keeper defines the expected keeper of ICS20
+type ICS20Keeper interface {
+	HasTrace(ctx sdk.Context, denom string) bool
+}
+
+// Hook defines the hook interface
+type Hook interface {
+	PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *ethtypes.Receipt) error
 }

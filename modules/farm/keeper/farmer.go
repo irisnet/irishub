@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -16,11 +17,11 @@ func (k Keeper) Stake(
 ) (reward sdk.Coins, err error) {
 	pool, exist := k.GetPool(ctx, poolId)
 	if !exist {
-		return reward, sdkerrors.Wrapf(types.ErrPoolNotFound, poolId)
+		return reward, errorsmod.Wrapf(types.ErrPoolNotFound, poolId)
 	}
 
 	if pool.StartHeight > ctx.BlockHeight() {
-		return reward, sdkerrors.Wrapf(
+		return reward, errorsmod.Wrapf(
 			types.ErrPoolNotStart,
 			"farm pool [%s] will start at height [%d], current [%d]",
 			poolId, pool.StartHeight, ctx.BlockHeight(),
@@ -28,7 +29,7 @@ func (k Keeper) Stake(
 	}
 
 	if k.Expired(ctx, pool) {
-		return reward, sdkerrors.Wrapf(
+		return reward, errorsmod.Wrapf(
 			types.ErrPoolExpired,
 			"pool [%s] has expired at height [%d], current [%d]",
 			poolId, pool.EndHeight, ctx.BlockHeight(),
@@ -36,7 +37,7 @@ func (k Keeper) Stake(
 	}
 
 	if lpToken.Denom != pool.TotalLptLocked.Denom {
-		return reward, sdkerrors.Wrapf(
+		return reward, errorsmod.Wrapf(
 			types.ErrNotMatch,
 			"pool [%s] only accept [%s] token, but got [%s]",
 			poolId, pool.TotalLptLocked.Denom, lpToken.Denom,
@@ -81,12 +82,12 @@ func (k Keeper) Stake(
 func (k Keeper) Unstake(ctx sdk.Context, poolId string, lpToken sdk.Coin, sender sdk.AccAddress) (_ sdk.Coins, err error) {
 	pool, exist := k.GetPool(ctx, poolId)
 	if !exist {
-		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, poolId)
+		return nil, errorsmod.Wrapf(types.ErrPoolNotFound, poolId)
 	}
 
 	//lpToken demon must be same as pool.TotalLptLocked.Denom
 	if lpToken.Denom != pool.TotalLptLocked.Denom {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrNotMatch,
 			"pool [%s] only accept [%s] token, but got [%s]",
 			poolId, pool.TotalLptLocked.Denom, lpToken.Denom,
@@ -96,7 +97,7 @@ func (k Keeper) Unstake(ctx sdk.Context, poolId string, lpToken sdk.Coin, sender
 	//farmInfo must be exist
 	farmInfo, exist := k.GetFarmInfo(ctx, poolId, sender.String())
 	if !exist {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrFarmerNotFound,
 			"farmer [%s] not found in pool [%s]",
 			sender.String(), poolId,
@@ -105,7 +106,7 @@ func (k Keeper) Unstake(ctx sdk.Context, poolId string, lpToken sdk.Coin, sender
 
 	//the lp token unstaked must be less than staked
 	if farmInfo.Locked.LT(lpToken.Amount) {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrInsufficientFunds,
 			"farmer locked lp token [%s], but unstake [%s]",
 			farmInfo.Locked.String(), lpToken.Amount.String(),
@@ -114,7 +115,7 @@ func (k Keeper) Unstake(ctx sdk.Context, poolId string, lpToken sdk.Coin, sender
 
 	//the lp token unstaked must be less than pool
 	if pool.TotalLptLocked.Amount.LT(lpToken.Amount) {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrInsufficientFunds,
 			"farmer locked lp token [%s], but farm pool total: [%s]",
 			farmInfo.Locked.String(), pool.TotalLptLocked.Amount.String(),
@@ -162,11 +163,11 @@ func (k Keeper) Unstake(ctx sdk.Context, poolId string, lpToken sdk.Coin, sender
 func (k Keeper) Harvest(ctx sdk.Context, poolId string, sender sdk.AccAddress) (sdk.Coins, error) {
 	pool, exist := k.GetPool(ctx, poolId)
 	if !exist {
-		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, poolId)
+		return nil, errorsmod.Wrapf(types.ErrPoolNotFound, poolId)
 	}
 
 	if k.Expired(ctx, pool) {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrPoolExpired,
 			"pool [%s] has expired at height [%d], current [%d]",
 			poolId, pool.EndHeight, ctx.BlockHeight(),
@@ -175,7 +176,7 @@ func (k Keeper) Harvest(ctx sdk.Context, poolId string, sender sdk.AccAddress) (
 
 	farmInfo, exist := k.GetFarmInfo(ctx, poolId, sender.String())
 	if !exist {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrFarmerNotFound,
 			"farmer [%s] not found in pool [%s]",
 			sender.String(), poolId,
@@ -224,7 +225,7 @@ func (k Keeper) Refund(ctx sdk.Context, pool types.FarmPool) (sdk.Coins, error) 
 	}
 
 	if !refundTotal.IsAllPositive() {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidRefund,
 			"pool [%s] has no remaining reward",
 			pool.Id,

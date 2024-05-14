@@ -8,8 +8,8 @@ import (
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irismod/modules/htlc/types"
 )
@@ -34,7 +34,7 @@ func (k Keeper) CreateHTLC(
 
 	// check if the HTLC already exists
 	if k.HasHTLC(ctx, id) {
-		return id, sdkerrors.Wrap(types.ErrHTLCExists, id.String())
+		return id, errorsmod.Wrap(types.ErrHTLCExists, id.String())
 	}
 
 	expirationHeight := uint64(ctx.BlockHeight()) + timeLock
@@ -97,7 +97,7 @@ func (k Keeper) createHTLT(
 	var direction types.SwapDirection
 
 	if len(amount) != 1 {
-		return direction, sdkerrors.Wrapf(
+		return direction, errorsmod.Wrapf(
 			types.ErrInvalidAmount,
 			"amount %s must contain exactly one coin",
 			amount.String(),
@@ -115,7 +115,7 @@ func (k Keeper) createHTLT(
 
 	// Swap amount must be within the specified swap amount limits
 	if amount[0].Amount.LT(asset.MinSwapAmount) || amount[0].Amount.GT(asset.MaxSwapAmount) {
-		return direction, sdkerrors.Wrapf(
+		return direction, errorsmod.Wrapf(
 			types.ErrInvalidAmount,
 			"amount %s outside range [%s, %s]",
 			amount[0].Amount,
@@ -128,7 +128,7 @@ func (k Keeper) createHTLT(
 	pastTimestampLimit := ctx.BlockTime().Add(-15 * time.Minute).Unix()
 	futureTimestampLimit := ctx.BlockTime().Add(30 * time.Minute).Unix()
 	if timestamp < uint64(pastTimestampLimit) || timestamp >= uint64(futureTimestampLimit) {
-		return direction, sdkerrors.Wrap(
+		return direction, errorsmod.Wrap(
 			types.ErrInvalidTimestamp,
 			fmt.Sprintf(
 				"timestamp can neither be 15 minutes ahead of the current time, nor 30 minutes later. block time: %s, timestamp: %s",
@@ -142,7 +142,7 @@ func (k Keeper) createHTLT(
 
 	if sender.Equals(deputyAddress) {
 		if to.Equals(deputyAddress) {
-			return direction, sdkerrors.Wrapf(
+			return direction, errorsmod.Wrapf(
 				types.ErrInvalidAccount,
 				"deputy cannot be both sender and receiver: %s",
 				asset.DeputyAddress,
@@ -151,7 +151,7 @@ func (k Keeper) createHTLT(
 		direction = types.Incoming
 	} else {
 		if !to.Equals(deputyAddress) {
-			return direction, sdkerrors.Wrapf(types.ErrInvalidAccount, "deputy must be recipient for outgoing account: %s", to)
+			return direction, errorsmod.Wrapf(types.ErrInvalidAccount, "deputy must be recipient for outgoing account: %s", to)
 		}
 		direction = types.Outgoing
 	}
@@ -172,7 +172,7 @@ func (k Keeper) createHTLT(
 	case types.Outgoing:
 		// Outgoing swaps must have a time lock within the accepted range
 		if timeLock < asset.MinBlockLock || timeLock > asset.MaxBlockLock {
-			return direction, sdkerrors.Wrapf(
+			return direction, errorsmod.Wrapf(
 				types.ErrInvalidTimeLock,
 				"time lock %d outside range [%d, %d]",
 				timeLock,
@@ -182,7 +182,7 @@ func (k Keeper) createHTLT(
 		}
 		// Amount in outgoing swaps must be able to pay the deputy's fixed fee.
 		if amount[0].Amount.LT(asset.FixedFee.Add(asset.MinSwapAmount)) {
-			return direction, sdkerrors.Wrapf(
+			return direction, errorsmod.Wrapf(
 				types.ErrInsufficientAmount,
 				"amount %s is less than fixed fee %s add min swap amount %s",
 				amount[0].String(), asset.FixedFee.String(), asset.MinSwapAmount.String(),
@@ -196,7 +196,7 @@ func (k Keeper) createHTLT(
 			return direction, err
 		}
 	default:
-		return direction, sdkerrors.Wrapf(types.ErrInvalidDirection, direction.String())
+		return direction, errorsmod.Wrapf(types.ErrInvalidDirection, direction.String())
 	}
 
 	return direction, nil
@@ -216,19 +216,19 @@ func (k Keeper) ClaimHTLC(
 	// query the HTLC
 	htlc, found := k.GetHTLC(ctx, id)
 	if !found {
-		return "", false, types.None, sdkerrors.Wrap(types.ErrUnknownHTLC, id.String())
+		return "", false, types.None, errorsmod.Wrap(types.ErrUnknownHTLC, id.String())
 	}
 
 	// check if the HTLC is open
 	if htlc.State != types.Open {
-		return "", false, types.None, sdkerrors.Wrap(types.ErrHTLCNotOpen, id.String())
+		return "", false, types.None, errorsmod.Wrap(types.ErrHTLCNotOpen, id.String())
 	}
 
 	hashLock, _ := hex.DecodeString(htlc.HashLock)
 
 	// check if the secret matches with the hash lock
 	if !bytes.Equal(types.GetHashLock(secret, htlc.Timestamp), hashLock) {
-		return "", false, types.None, sdkerrors.Wrap(types.ErrInvalidSecret, secret.String())
+		return "", false, types.None, errorsmod.Wrap(types.ErrInvalidSecret, secret.String())
 	}
 
 	to, err := sdk.AccAddressFromBech32(htlc.To)
@@ -292,7 +292,7 @@ func (k Keeper) claimHTLT(ctx sdk.Context, htlc types.HTLC) error {
 			return err
 		}
 	default:
-		return sdkerrors.Wrapf(types.ErrInvalidDirection, htlc.Direction.String())
+		return errorsmod.Wrapf(types.ErrInvalidDirection, htlc.Direction.String())
 	}
 
 	return nil

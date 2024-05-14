@@ -6,8 +6,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 
 	"github.com/irisnet/irismod/modules/nft/types"
@@ -167,12 +167,12 @@ func (k Keeper) NFT(c context.Context, request *types.QueryNFTRequest) (*types.Q
 
 	nft, err := k.GetNFT(ctx, request.DenomId, request.TokenId)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrUnknownNFT, "invalid NFT %s from collection %s", request.TokenId, request.DenomId)
+		return nil, errorsmod.Wrapf(types.ErrUnknownNFT, "invalid NFT %s from collection %s", request.TokenId, request.DenomId)
 	}
 
 	baseNFT, ok := nft.(types.BaseNFT)
 	if !ok {
-		return nil, sdkerrors.Wrapf(types.ErrUnknownNFT, "invalid type NFT %s from collection %s", request.TokenId, request.DenomId)
+		return nil, errorsmod.Wrapf(types.ErrUnknownNFT, "invalid type NFT %s from collection %s", request.TokenId, request.DenomId)
 	}
 
 	return &types.QueryNFTResponse{NFT: &baseNFT}, nil

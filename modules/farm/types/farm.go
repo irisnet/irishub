@@ -3,6 +3,7 @@ package types
 import (
 	math "math"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -20,7 +21,7 @@ func (pool FarmPool) ExpiredHeight() (int64, error) {
 		}
 	}
 	if int64(math.MaxInt64)-pool.StartHeight < targetInteval {
-		return 0, sdkerrors.Wrapf(sdkerrors.ErrInvalidHeight, "endheight overflow")
+		return 0, errorsmod.Wrapf(sdkerrors.ErrInvalidHeight, "endheight overflow")
 	}
 	return pool.StartHeight + targetInteval, nil
 }

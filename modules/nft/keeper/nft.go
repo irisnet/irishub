@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -52,7 +53,7 @@ func (k Keeper) UpdateNFT(ctx sdk.Context, denomID,
 
 	if denom.UpdateRestricted {
 		// if true , nobody can update the NFT under this denom
-		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "nobody can update the NFT under this denom %s", denomID)
+		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "nobody can update the NFT under this denom %s", denomID)
 	}
 
 	// just the owner of NFT can edit
@@ -69,7 +70,7 @@ func (k Keeper) UpdateNFT(ctx sdk.Context, denomID,
 
 	token, exist := k.nk.GetNFT(ctx, denomID, tokenID)
 	if !exist {
-		return sdkerrors.Wrapf(types.ErrUnknownNFT, "nft ID %s not exists", tokenID)
+		return errorsmod.Wrapf(types.ErrUnknownNFT, "nft ID %s not exists", tokenID)
 	}
 
 	token.Uri = types.Modify(token.Uri, tokenURI)
@@ -103,7 +104,7 @@ func (k Keeper) TransferOwnership(ctx sdk.Context, denomID,
 ) error {
 	token, exist := k.nk.GetNFT(ctx, denomID, tokenID)
 	if !exist {
-		return sdkerrors.Wrapf(types.ErrInvalidTokenID, "nft ID %s not exists", tokenID)
+		return errorsmod.Wrapf(types.ErrInvalidTokenID, "nft ID %s not exists", tokenID)
 	}
 
 	if err := k.Authorize(ctx, denomID, tokenID, srcOwner); err != nil {
@@ -119,7 +120,7 @@ func (k Keeper) TransferOwnership(ctx sdk.Context, denomID,
 	tokenMetadataChanged := types.Modified(tokenNm) || types.Modified(tokenData)
 
 	if denom.UpdateRestricted && (tokenChanged || tokenMetadataChanged) {
-		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "It is restricted to update NFT under this denom %s", denom.Id)
+		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "It is restricted to update NFT under this denom %s", denom.Id)
 	}
 
 	if !tokenChanged && !tokenMetadataChanged {
@@ -161,7 +162,7 @@ func (k Keeper) RemoveNFT(ctx sdk.Context, denomID, tokenID string, owner sdk.Ac
 func (k Keeper) GetNFT(ctx sdk.Context, denomID, tokenID string) (nft exported.NFT, err error) {
 	token, exist := k.nk.GetNFT(ctx, denomID, tokenID)
 	if !exist {
-		return nil, sdkerrors.Wrapf(types.ErrUnknownNFT, "not found NFT: %s", denomID)
+		return nil, errorsmod.Wrapf(types.ErrUnknownNFT, "not found NFT: %s", denomID)
 	}
 
 	nftMetadata, err := types.UnmarshalNFTMetadata(k.cdc, token.Data.GetValue())
@@ -204,7 +205,7 @@ func (k Keeper) GetNFTs(ctx sdk.Context, denom string) (nfts []exported.NFT, err
 // Return the NFT if true, an error otherwise
 func (k Keeper) Authorize(ctx sdk.Context, denomID, tokenID string, owner sdk.AccAddress) error {
 	if !owner.Equals(k.nk.GetOwner(ctx, denomID, tokenID)) {
-		return sdkerrors.Wrap(types.ErrUnauthorized, owner.String())
+		return errorsmod.Wrap(types.ErrUnauthorized, owner.String())
 	}
 	return nil
 }

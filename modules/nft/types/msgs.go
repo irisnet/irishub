@@ -227,7 +227,7 @@ func (msg MsgMintNFT) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
 		return errormod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receipt address (%s)", err)
 	}
-	if IsIBCDenom(msg.DenomId){
+	if IsIBCDenom(msg.DenomId) {
 		return errormod.Wrapf(sdkerrors.ErrInvalidRequest, "can not mint nft in denom (%s)", msg.DenomId)
 	}
 	if err := ValidateDenomID(msg.DenomId); err != nil {

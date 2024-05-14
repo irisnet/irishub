@@ -4,9 +4,10 @@ import (
 	"fmt"
 
 	gogotypes "github.com/cosmos/gogoproto/types"
+	"github.com/ethereum/go-ethereum/common"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
 	"github.com/irisnet/irismod/modules/token/types"
@@ -59,52 +60,18 @@ func (k Keeper) GetToken(ctx sdk.Context, denom string) (v1.TokenI, error) {
 		return &token, nil
 	}
 
-	return nil, sdkerrors.Wrapf(types.ErrTokenNotExists, "token: %s does not exist", denom)
+	return nil, errorsmod.Wrapf(types.ErrTokenNotExists, "token: %s does not exist", denom)
 }
 
 // AddToken saves a new token
-func (k Keeper) AddToken(ctx sdk.Context, token v1.Token) error {
-	if k.HasToken(ctx, token.Symbol) {
-		return sdkerrors.Wrapf(
-			types.ErrSymbolAlreadyExists,
-			"symbol already exists: %s",
-			token.Symbol,
-		)
+func (k Keeper) AddToken(ctx sdk.Context, token v1.Token, saveDenomMetaData bool) error {
+	if err := k.assertTokenValid(ctx, token); err != nil {
+		return err
 	}
-
-	if k.HasToken(ctx, token.MinUnit) {
-		return sdkerrors.Wrapf(
-			types.ErrMinUnitAlreadyExists,
-			"min-unit already exists: %s",
-			token.MinUnit,
-		)
+	k.upsertToken(ctx, token)
+	if saveDenomMetaData {
+		k.setDenomMetaData(ctx, token)
 	}
-
-	// set token
-	k.setToken(ctx, token)
-
-	// set token to be prefixed with min unit
-	k.setWithMinUnit(ctx, token.MinUnit, token.Symbol)
-
-	if len(token.Owner) != 0 {
-		// set token to be prefixed with owner
-		k.setWithOwner(ctx, token.GetOwner(), token.Symbol)
-	}
-
-	denomMetaData := banktypes.Metadata{
-		Description: token.Name,
-		Base:        token.MinUnit,
-		Display:     token.Symbol,
-		DenomUnits: []*banktypes.DenomUnit{
-			{Denom: token.MinUnit, Exponent: 0},
-			{Denom: token.Symbol, Exponent: token.Scale},
-		},
-	}
-	k.bankKeeper.SetDenomMetaData(ctx, denomMetaData)
-
-	// Set token to be prefixed with min_unit
-	k.setWithMinUnit(ctx, token.MinUnit, token.Symbol)
-
 	return nil
 }
 
@@ -114,14 +81,24 @@ func (k Keeper) HasSymbol(ctx sdk.Context, symbol string) bool {
 	return store.Has(types.KeySymbol(symbol))
 }
 
+// HasMinUint asserts a token exists by minUint
+func (k Keeper) HasMinUint(ctx sdk.Context, minUint string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.KeyMinUint(minUint))
+}
+
+// HasContract asserts a token exists by contract
+func (k Keeper) HasContract(ctx sdk.Context, contract string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.KeyContract(contract))
+}
+
 // HasToken asserts a token exists
 func (k Keeper) HasToken(ctx sdk.Context, denom string) bool {
-	store := ctx.KVStore(k.storeKey)
 	if k.HasSymbol(ctx, denom) {
 		return true
 	}
-
-	return store.Has(types.KeyMinUint(denom))
+	return k.HasMinUint(ctx, denom)
 }
 
 // GetOwner returns the owner of the specified token
@@ -136,7 +113,7 @@ func (k Keeper) GetOwner(ctx sdk.Context, denom string) (sdk.AccAddress, error) 
 
 // AddBurnCoin saves the total amount of the burned tokens
 func (k Keeper) AddBurnCoin(ctx sdk.Context, coin sdk.Coin) {
-	var total = coin
+	total := coin
 	if hasCoin, err := k.GetBurnCoin(ctx, coin.Denom); err == nil {
 		total = total.Add(hasCoin)
 	}
@@ -155,7 +132,7 @@ func (k Keeper) GetBurnCoin(ctx sdk.Context, minUint string) (sdk.Coin, error) {
 	bz := store.Get(key)
 
 	if len(bz) == 0 {
-		return sdk.Coin{}, sdkerrors.Wrapf(
+		return sdk.Coin{}, errorsmod.Wrapf(
 			types.ErrNotFoundTokenAmt,
 			"not found symbol: %s",
 			minUint,
@@ -173,7 +150,7 @@ func (k Keeper) GetAllBurnCoin(ctx sdk.Context) []sdk.Coin {
 	store := ctx.KVStore(k.storeKey)
 
 	var coins []sdk.Coin
-	it := sdk.KVStorePrefixIterator(store, types.PeffixBurnTokenAmt)
+	it := sdk.KVStorePrefixIterator(store, types.PrefixBurnTokenAmt)
 	for ; it.Valid(); it.Next() {
 		var coin sdk.Coin
 		k.cdc.MustUnmarshal(it.Value(), &coin)
@@ -199,6 +176,14 @@ func (k Keeper) setWithMinUnit(ctx sdk.Context, minUnit, symbol string) {
 	store.Set(types.KeyMinUint(minUnit), bz)
 }
 
+func (k Keeper) setWithContract(ctx sdk.Context, contract, symbol string) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshal(&gogotypes.StringValue{Value: symbol})
+
+	store.Set(types.KeyContract(contract), bz)
+}
+
 func (k Keeper) setToken(ctx sdk.Context, token v1.Token) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&token)
@@ -211,7 +196,7 @@ func (k Keeper) getTokenBySymbol(ctx sdk.Context, symbol string) (token v1.Token
 
 	bz := store.Get(types.KeySymbol(symbol))
 	if bz == nil {
-		return token, sdkerrors.Wrap(
+		return token, errorsmod.Wrap(
 			types.ErrTokenNotExists,
 			fmt.Sprintf("token symbol %s does not exist", symbol),
 		)
@@ -226,9 +211,31 @@ func (k Keeper) getTokenByMinUnit(ctx sdk.Context, minUnit string) (token v1.Tok
 
 	bz := store.Get(types.KeyMinUint(minUnit))
 	if bz == nil {
-		return token, sdkerrors.Wrap(
+		return token, errorsmod.Wrap(
 			types.ErrTokenNotExists,
 			fmt.Sprintf("token minUnit %s does not exist", minUnit),
+		)
+	}
+
+	var symbol gogotypes.StringValue
+	k.cdc.MustUnmarshal(bz, &symbol)
+
+	token, err = k.getTokenBySymbol(ctx, symbol.Value)
+	if err != nil {
+		return token, err
+	}
+
+	return token, nil
+}
+
+func (k Keeper) getTokenByContract(ctx sdk.Context, contract common.Address) (token v1.Token, err error) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(types.KeyContract(contract.Hex()))
+	if bz == nil {
+		return token, errorsmod.Wrap(
+			types.ErrTokenNotExists,
+			fmt.Sprintf("token contract %s does not exist", contract),
 		)
 	}
 
@@ -248,7 +255,7 @@ func (k Keeper) getSymbolByMinUnit(ctx sdk.Context, minUnit string) (string, err
 
 	bz := store.Get(types.KeyMinUint(minUnit))
 	if bz == nil {
-		return "", sdkerrors.Wrap(
+		return "", errorsmod.Wrap(
 			types.ErrTokenNotExists,
 			fmt.Sprintf("token minUnit %s does not exist", minUnit),
 		)
@@ -278,4 +285,75 @@ func (k Keeper) resetStoreKeyForQueryToken(
 // getTokenSupply queries the token supply from the total supply
 func (k Keeper) getTokenSupply(ctx sdk.Context, denom string) sdk.Int {
 	return k.bankKeeper.GetSupply(ctx, denom).Amount
+}
+
+// upsertToken updates or inserts a token into the database.
+//
+// ctx: the context in which the token is being upserted.
+// token: the token struct to be upserted.
+func (k Keeper) upsertToken(ctx sdk.Context, token v1.Token) {
+	// set token
+	k.setToken(ctx, token)
+	// set token to be prefixed with min unit
+	k.setWithMinUnit(ctx, token.MinUnit, token.Symbol)
+	if len(token.Owner) != 0 {
+		// set token to be prefixed with owner
+		k.setWithOwner(ctx, token.GetOwner(), token.Symbol)
+	}
+	if len(token.Contract) != 0 {
+		// set token to be prefixed with owner
+		k.setWithContract(ctx, token.Contract, token.Symbol)
+	}
+}
+
+func (k Keeper) setDenomMetaData(ctx sdk.Context, token v1.Token) {
+	denomMetaData := banktypes.Metadata{
+		Description: token.Name,
+		Base:        token.MinUnit,
+		Display:     token.Symbol,
+		DenomUnits: []*banktypes.DenomUnit{
+			{Denom: token.MinUnit, Exponent: 0},
+			{Denom: token.Symbol, Exponent: token.Scale},
+		},
+	}
+	k.bankKeeper.SetDenomMetaData(ctx, denomMetaData)
+}
+
+func (k Keeper) assertTokenValid(ctx sdk.Context, token v1.Token) error {
+	if k.HasSymbol(ctx, token.Symbol) {
+		return errorsmod.Wrapf(
+			types.ErrSymbolAlreadyExists,
+			"symbol already exists: %s",
+			token.Symbol,
+		)
+	}
+
+	if k.HasMinUint(ctx, token.MinUnit) {
+		return errorsmod.Wrapf(
+			types.ErrMinUnitAlreadyExists,
+			"min-unit already exists: %s",
+			token.MinUnit,
+		)
+	}
+
+	if len(token.Contract) == 0 {
+		return nil
+	}
+
+	if !common.IsHexAddress(token.Contract) {
+		return errorsmod.Wrapf(
+			types.ErrInvalidContract,
+			"invalid contract address: %s",
+			token.Contract,
+		)
+	}
+
+	if k.HasContract(ctx, token.Contract) {
+		return errorsmod.Wrapf(
+			types.ErrERC20AlreadyExists,
+			"contract already exists: %s",
+			token.Contract,
+		)
+	}
+	return nil
 }
