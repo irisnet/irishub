@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -276,6 +277,12 @@ func GetCmdMintToken() *cobra.Command {
 	return cmd
 }
 
+// GetCmdBurnToken returns the command to burn tokens.
+//
+// This function handles the burning of tokens based on the provided coin input.
+// It constructs and validates a message to burn the specified tokens.
+// Returns an error if the operation encounters any issues.
+// Returns a *cobra.Command.
 func GetCmdBurnToken() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "burn [coin]",
@@ -431,13 +438,13 @@ func GetCmdSwapToErc20() *cobra.Command {
 				"--fees=<fee>",
 			version.AppName,
 		),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-
-			from := clientCtx.GetFromAddress().String()
+	
 			paidAmount, token, err := parseMainCoin(clientCtx, args[0])
 			if err != nil {
 				return err
@@ -450,14 +457,16 @@ func GetCmdSwapToErc20() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			from := clientCtx.GetFromAddress()
 			if len(receiver) <= 0 {
 				// set default receiver
-				receiver = from
+				receiver = common.BytesToAddress(from.Bytes()).Hex()
 			}
 
 			msg := &v1.MsgSwapToERC20{
 				Amount:   paidAmount,
-				Sender:   from,
+				Sender:   from.String(),
 				Receiver: receiver,
 			}
 
@@ -465,7 +474,7 @@ func GetCmdSwapToErc20() *cobra.Command {
 				return err
 			}
 
-			var prompt = fmt.Sprintf("Swapping native token to ERC20, sender: %s, receiver: %s, contract: %s, amount: %s", from, receiver, token.GetContract(), paidAmount)
+			prompt := fmt.Sprintf("Swapping native token to ERC20, sender: %s, receiver: %s, contract: %s, amount: %s", from, receiver, token.GetContract(), paidAmount)
 
 			fmt.Println(prompt)
 
@@ -492,6 +501,7 @@ func GetCmdSwapFromErc20() *cobra.Command {
 				"--fees=<fee>",
 			version.AppName,
 		),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -526,7 +536,7 @@ func GetCmdSwapFromErc20() *cobra.Command {
 				return err
 			}
 
-			var prompt = fmt.Sprintf("Swapping native token from ERC20, sender: %s, receiver: %s, contract: %s, amount: %s", from, receiver, token.GetContract(), wantedAmount)
+			prompt := fmt.Sprintf("Swapping native token from ERC20, sender: %s, receiver: %s, contract: %s, amount: %s", from, receiver, token.GetContract(), wantedAmount)
 
 			fmt.Println(prompt)
 
