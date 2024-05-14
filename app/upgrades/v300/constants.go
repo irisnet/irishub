@@ -22,5 +22,8 @@ var (
 	// MinDepositRatio is the minimum deposit ratio
 	MinDepositRatio = sdk.MustNewDecFromStr("0.01")
 
+	// EvmMinGasPrice is the minimum gas price for the EVM
+	EvmMinGasPrice = sdk.NewDec(50000000000)
+
 	allowMessages = []string{"*"}
 )
