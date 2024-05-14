@@ -34,6 +34,10 @@ func upgradeHandlerConstructor(
 			return nil, err
 		}
 		
+		if err := mergeFeeMarket(ctx, box); err != nil {
+			return nil, err
+		}
+		
 		if err := mergeToken(ctx, box); err != nil {
 			return nil, err
 		}
@@ -78,6 +82,14 @@ func mergeEVM(ctx sdk.Context, box upgrades.Toolbox) error {
 	params := box.EvmKeeper.GetParams(ctx)
 	params.AllowUnprotectedTxs = true
 	return box.EvmKeeper.SetParams(ctx, params)
+}
+
+func mergeFeeMarket(ctx sdk.Context, box upgrades.Toolbox) error {
+	ctx.Logger().Info("start to run feeMarket module migrations...")
+
+	params := box.FeeMarketKeeper.GetParams(ctx)
+	params.MinGasPrice = EvmMinGasPrice
+	return box.FeeMarketKeeper.SetParams(ctx, params)
 }
 
 func mergeToken(ctx sdk.Context, box upgrades.Toolbox) error {
