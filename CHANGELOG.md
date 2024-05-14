@@ -51,6 +51,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 * [\#410](https://github.com/irisnet/irismod/pull/410) Implement upgradeable contract.
 * [\#411](https://github.com/irisnet/irismod/pull/411) Implement erc20 upgrade.
 * [\#412](https://github.com/irisnet/irismod/pull/412) Optimize contract code
+* [\#417](https://github.com/irisnet/irismod/pull/417) Optimize token command line
 
 ### Bug Fixes
 
