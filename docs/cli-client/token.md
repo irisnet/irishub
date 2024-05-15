@@ -183,7 +183,7 @@ iris tx token swap-from-erc20 [wanted_amount] [flags]
 ### Swap native token from erc20
 
 ```bash
-iris tx token burn <symbol> --amount=<amount> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
+iris tx token swap-from-erc20 <wanted_amount> --to=<eth_address> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ## iris tx token swap-to-erc20
@@ -203,7 +203,7 @@ iris tx token swap-to-erc20 [paid_amount] [flags]
 ### Swap native token to erc20
 
 ```bash
-iris tx token burn <symbol> --amount=<amount> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
+iris tx token swap-to-erc20 <paid_amount> --to=<eth_address> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ## iris query token token
