@@ -19,13 +19,11 @@ import (
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/irisnet/irishub/v3/app/params"
-	iristypes "github.com/irisnet/irishub/v3/types"
-
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	"github.com/irisnet/irishub/v3/app/params"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -129,7 +127,7 @@ func TestAppImportExport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
 	config.ChainID = AppChainID
 
-	sdk.DefaultBondDenom = iristypes.NativeToken.Symbol
+	sdk.DefaultBondDenom = params.BaseToken.Symbol
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(
 		config,
@@ -199,7 +197,7 @@ func TestAppImportExport(t *testing.T) {
 	newApp := createApp(logger, db, encfg, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", newApp.Name())
 
-	var genesisState iristypes.GenesisState
+	var genesisState GenesisState
 	err = json.Unmarshal(exported.AppState, &genesisState)
 	require.NoError(t, err)
 
@@ -393,7 +391,7 @@ func TestAppStateDeterminism(t *testing.T) {
 	if !simcli.FlagEnabledValue {
 		t.Skip("skipping application simulation")
 	}
-	sdk.DefaultBondDenom = iristypes.NativeToken.Symbol
+	sdk.DefaultBondDenom = params.BaseToken.Symbol
 
 	config := simcli.NewConfigFromFlags()
 	config.InitialBlockHeight = 1

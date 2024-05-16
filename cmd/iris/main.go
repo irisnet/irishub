@@ -5,16 +5,16 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/server"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
+	"github.com/irisnet/irishub/v3/app/params"
 
 	_ "github.com/irisnet/irishub/v3/client/lite/statik"
 	"github.com/irisnet/irishub/v3/cmd/iris/cmd"
-	"github.com/irisnet/irishub/v3/types"
 )
 
 func main() {
 	rootCmd, _ := cmd.NewRootCmd()
 
-	if err := svrcmd.Execute(rootCmd, "", types.DefaultNodeHome); err != nil {
+	if err := svrcmd.Execute(rootCmd, "", params.DefaultNodeHome); err != nil {
 		switch e := err.(type) {
 		case server.ErrorCode:
 			os.Exit(e.Code)
