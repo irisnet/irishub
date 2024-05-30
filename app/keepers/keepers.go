@@ -1,7 +1,6 @@
 package keepers
 
 import (
-	params2 "github.com/irisnet/irishub/v3/app/params"
 	"github.com/spf13/cast"
 
 	"github.com/cometbft/cometbft/libs/log"
@@ -106,6 +105,7 @@ import (
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
 
+	appparams "github.com/irisnet/irishub/v3/app/params"
 	guardiankeeper "github.com/irisnet/irishub/v3/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/v3/modules/guardian/types"
 	"github.com/irisnet/irishub/v3/modules/internft"
@@ -232,7 +232,7 @@ func New(
 		appKeepers.keys[authtypes.StoreKey],
 		ethermint.ProtoAccount,
 		maccPerms,
-		params2.Bech32PrefixAccAddr,
+		appparams.Bech32PrefixAccAddr,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -556,12 +556,12 @@ func New(
 		authtypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	).WithSwapRegistry(tokenv1.SwapRegistry{
-		params2.BaseToken.MinUnit: tokenv1.SwapParams{
-			MinUnit: params2.EvmToken.MinUnit,
+		appparams.BaseToken.MinUnit: tokenv1.SwapParams{
+			MinUnit: appparams.EvmToken.MinUnit,
 			Ratio:   sdk.OneDec(),
 		},
-		params2.EvmToken.MinUnit: tokenv1.SwapParams{
-			MinUnit: params2.BaseToken.MinUnit,
+		appparams.EvmToken.MinUnit: tokenv1.SwapParams{
+			MinUnit: appparams.BaseToken.MinUnit,
 			Ratio:   sdk.OneDec(),
 		},
 	})
