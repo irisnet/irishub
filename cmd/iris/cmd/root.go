@@ -69,8 +69,6 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 				return err
 			}
 
-			// converter.handlePreRun(cmd, args)
-
 			customTemplate, customIRISHubConfig := initAppConfig()
 			customTMConfig := initTendermintConfig()
 			return server.InterceptConfigsPreRunHandler(

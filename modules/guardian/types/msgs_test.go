@@ -9,8 +9,6 @@ import (
 	"github.com/cometbft/cometbft/crypto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	_ "github.com/irisnet/irishub/v3/types"
 )
 
 // nolint: deadcode unused
