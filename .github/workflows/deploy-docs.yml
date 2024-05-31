@@ -22,6 +22,8 @@ env:
   GKE_PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
   GKE_REGION: ${{ secrets.GKE_REGION }}
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   REPOSITORY: irisnet
   IMAGE: docs
 
@@ -45,8 +47,8 @@ jobs:
       uses: 'google-github-actions/auth@v0'
       with:
         token_format: 'access_token'
-        workload_identity_provider: '$GCP_WIP'
-        service_account: '$GCP_SA'
+        workload_identity_provider: $GCP_WIP
+        service_account: $GCP_SA
 
     # Alternative option - authentication via credentials json
     # - id: 'auth'
@@ -57,15 +59,15 @@ jobs:
     - name: Login to DockerHub
       uses: docker/login-action@v1
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: $DOCKER_USERNAME
+        password: $DOCKER_PASSWORD
         
     # Get the GKE credentials so we can deploy to the cluster
     - name: Set up GKE credentials
       uses: google-github-actions/get-gke-credentials@v0
       with:
-        cluster_name: ${{ secrets.GKE_CLUSTER }}
-        location: ${{ secrets.GKE_REGION }}
+        cluster_name: $GKE_CLUSTER
+        location: $GKE_REGION
 
     - name: Build and push docker image
       uses: docker/build-push-action@v2
@@ -77,6 +79,6 @@ jobs:
         
     - name: Deploy to GKE
       run: |
-        gcloud container clusters get-credentials app --region ${{ secrets.GKE_REGION }} --project ${{ secrets.GKE_PROJECT }}
+        gcloud container clusters get-credentials app --region $GKE_REGION --project $GKE_PROJECT
         kubectl set image -n irisnet deployment/irisnet-docs frontend=irisnet/docs:${{ github.sha }} 
         kubectl rollout status deployment/irisnet-docs
