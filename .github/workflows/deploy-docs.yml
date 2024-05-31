@@ -1,41 +1,82 @@
-name: Docker Image CI
+# This workflow will build a docker container, publish it to Google Container Registry, and deploy it to GKE when there is a push to the "master" branch.
+#
+# To configure this workflow:
+#
+# 1. Ensure that your repository contains the necessary configuration for your Google Kubernetes Engine cluster, including deployment.yml, kustomization.yml, service.yml, etc.
+#
+# 2. Create and configure a Workload Identity Provider for GitHub (https://github.com/google-github-actions/auth#setting-up-workload-identity-federation)
+#
+# 3. Change the values for the GAR_LOCATION, GKE_ZONE, GKE_CLUSTER, IMAGE, REPOSITORY and DEPLOYMENT_NAME environment variables (below).
+#
+# For more support on how to run the workflow, please visit https://github.com/google-github-actions/setup-gcloud/tree/master/example-workflows/gke-kustomize
+
+name: Build and Deploy Docs
 
 on:
   push:
     branches: [ "master" ]
-    
+
+env:
+  GCP_WIP: ${{ secrets.GCP_WORKLOAD_IDENDITY_PROVIDER }}
+  GCP_SA: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+  GKE_PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
+  GKE_REGION: ${{ secrets.GKE_REGION }}
+  REPOSITORY: irisnet
+  IMAGE: docs
+
 jobs:
-  build-and-deploy:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
     runs-on: ubuntu-latest
-    
+    environment: production
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-      
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Configure Workload Identity Federation and generate an access token.
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        token_format: 'access_token'
+        workload_identity_provider: '$GCP_WIP'
+        service_account: '$GCP_SA'
+
+    # Alternative option - authentication via credentials json
+    # - id: 'auth'
+    #   uses: 'google-github-actions/auth@v0'
+    #   with:
+    #     credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
     - name: Login to DockerHub
       uses: docker/login-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-      
-    - name: Build and push Docker image
+        
+    # Get the GKE credentials so we can deploy to the cluster
+    - name: Set up GKE credentials
+      uses: google-github-actions/get-gke-credentials@v0
+      with:
+        cluster_name: ${{ secrets.GKE_CLUSTER }}
+        location: ${{ secrets.GKE_REGION }}
+
+    - name: Build and push docker image
       uses: docker/build-push-action@v2
       with:
-        context: .
-        file: ./docs/Dockerfile
+        context: ./docs
+        file: ./Dockerfile
         push: true
-        tags: irisnet/docs:${{ github.sha }}
-      
-    - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v0.2.0
-      with:
-        service_account_key: ${{ secrets.GKE_SA_KEY }}
-        export_default_credentials: true
-      
+        tags: $REPOSITORY/$IMAGE:${{ github.sha }}
+        
     - name: Deploy to GKE
       run: |
         gcloud container clusters get-credentials app --region ${{ secrets.GKE_REGION }} --project ${{ secrets.GKE_PROJECT }}
         kubectl set image -n irisnet deployment/irisnet-docs frontend=irisnet/docs:${{ github.sha }} 
+        kubectl rollout status deployment/irisnet-docs
