@@ -16,17 +16,6 @@ on:
   push:
     branches: [ "master" ]
 
-env:
-  GCP_WIP: ${{ secrets.GCP_WORKLOAD_IDENDITY_PROVIDER }}
-  GCP_SA: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-  GKE_PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
-  GKE_REGION: ${{ secrets.GKE_REGION }}
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  REPOSITORY: irisnet
-  IMAGE: docs
-
 jobs:
   setup-build-publish-deploy:
     name: Setup, Build, Publish, and Deploy
@@ -60,15 +49,15 @@ jobs:
     - name: Login to DockerHub
       uses: docker/login-action@v1
       with:
-        username: $DOCKER_USERNAME
-        password: $DOCKER_PASSWORD
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
         
     # Get the GKE credentials so we can deploy to the cluster
     - name: Set up GKE credentials
       uses: google-github-actions/get-gke-credentials@v0
       with:
-        cluster_name: $GKE_CLUSTER
-        location: $GKE_REGION
+        cluster_name: ${{ secrets.GKE_CLUSTER }}
+        location: ${{ secrets.GKE_REGION }}
 
     - name: Build and push docker image
       uses: docker/build-push-action@v2
@@ -76,7 +65,7 @@ jobs:
         context: ./docs
         file: ./Dockerfile
         push: true
-        tags: $REPOSITORY/$IMAGE:${{ github.sha }}
+        tags: irisnet/docs:${{ github.sha }}
         
     - name: Deploy to GKE
       run: |
