@@ -48,6 +48,7 @@ jobs:
       with:
         project_id: $GKE_PROJECT_ID
         workload_identity_provider: $GCP_WIP
+        token_format: 'access_token'
 
     # Alternative option - authentication via credentials json
     # - id: 'auth'
