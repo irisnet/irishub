@@ -32,7 +32,6 @@ jobs:
       with:
         sparse-checkout: 'docs/'
         sparse-checkout-cone-mode: false
-        path: '../'
     - name: Test
       run: |
         ls -lah
@@ -66,7 +65,11 @@ jobs:
       with:
         cluster_name: ${{ secrets.GKE_CLUSTER }}
         location: ${{ secrets.GKE_REGION }}
-      
+
+    - name: Change to specified directory
+      working-directory: ./docs
+      run: |
+        echo "We are now in $(pwd)"
     - name: Build and Push Docker Image
       uses: docker/build-push-action@v2
       with:
