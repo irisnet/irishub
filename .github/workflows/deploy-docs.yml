@@ -63,7 +63,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: ./docs
-        file: ./Dockerfile
+        file: ./docs/Dockerfile
         push: true
         tags: irisnet/docs:${{ github.sha }}
         
