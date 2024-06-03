@@ -32,7 +32,11 @@ jobs:
       with:
         sparse-checkout: 'docs/'
         sparse-checkout-cone-mode: false
-
+    - name: Test
+      run: |
+        ls -lah
+        echo "We are now in $(pwd)"
+          
     # Configure Workload Identity Federation and generate an access token.
     - id: 'auth'
       name: 'Authenticate to Google Cloud'
