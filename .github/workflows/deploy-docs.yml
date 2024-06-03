@@ -32,6 +32,7 @@ jobs:
       with:
         sparse-checkout: 'docs/'
         sparse-checkout-cone-mode: false
+        path: './'
     - name: Test
       run: |
         ls -lah
