@@ -32,10 +32,6 @@ jobs:
       with:
         sparse-checkout: 'docs/'
         sparse-checkout-cone-mode: false
-    - name: Test
-      run: |
-        ls -lah
-        echo "We are now in $(pwd)"
           
     # Configure Workload Identity Federation and generate an access token.
     - id: 'auth'
@@ -66,15 +62,10 @@ jobs:
         cluster_name: ${{ secrets.GKE_CLUSTER }}
         location: ${{ secrets.GKE_REGION }}
 
-    - name: Change to specified directory
-      working-directory: ./docs
-      run: |
-        echo "We are now in $(pwd)"
     - name: Build and Push Docker Image
       uses: docker/build-push-action@v2
       with:
-        context: ./
-        file: ./Dockerfile
+        file: ./docs/Dockerfile
         push: true
         tags: irisnet/docs:${{ github.sha }}
       
