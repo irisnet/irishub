@@ -47,7 +47,7 @@ jobs:
       uses: 'google-github-actions/auth@v2'
       with:
         project_id: $GKE_PROJECT_ID
-        workload_identity_provider: $GCP_WIP
+        workload_identity_provider: 'projects/13343174159/locations/global/workloadIdentityPools/github-actions/providers/github'
         service_account: $GCP_SA
         token_format: 'access_token'
 
