@@ -59,16 +59,19 @@ jobs:
         cluster_name: ${{ secrets.GKE_CLUSTER }}
         location: ${{ secrets.GKE_REGION }}
 
-    - name: Build and push docker image
+    - name: Change Working Directory
+      working-directory: ./docs
+      
+    - name: Build and Push Docker Image
       uses: docker/build-push-action@v2
       with:
-        context: ./docs
-        file: ./docs/Dockerfile
+        context: ./
+        file: ./Dockerfile
         push: true
         tags: irisnet/docs:${{ github.sha }}
         
     - name: Deploy to GKE
       run: |
-        gcloud container clusters get-credentials app --region $GKE_REGION --project $GKE_PROJECT
+        gcloud container clusters get-credentials app --region ${{ secrets.GKE_REGION }} --project ${{ secrets.GKE_PROJECT }}
         kubectl set image -n irisnet deployment/irisnet-docs frontend=irisnet/docs:${{ github.sha }} 
         kubectl rollout status deployment/irisnet-docs
