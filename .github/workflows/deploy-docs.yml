@@ -81,4 +81,4 @@ jobs:
       run: |
         gcloud container clusters get-credentials app --region ${{ secrets.GKE_REGION }} --project ${{ secrets.GKE_PROJECT }}
         kubectl set image -n irisnet deployment/irisnet-docs frontend=irisnet/docs:${{ github.sha }} 
-        kubectl rollout status deployment/irisnet-docs
+        kubectl rollout status -n irisnet deployment/irisnet-docs
