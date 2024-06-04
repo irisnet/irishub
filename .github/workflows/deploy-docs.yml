@@ -58,7 +58,7 @@ jobs:
         version: '>= 363.0.0'
         
     - name: Set up Kubectl
-      uses: steebchen/kubectl@v3
+      uses: azure/setup-kubectl@v3
       with:
         version: 'v1.21.0'
 
