@@ -1,15 +1,14 @@
-name: TestUnit
+name: Run Unit Tests
 on: [pull_request]
 
 jobs:
   test-unit:
-    name: Test Units
-    #    runs-on: self-hosted
+    name: Run Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v1
-      - name: Setup go
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
         uses: actions/setup-go@v3
         with:
           go-version: '^1.21' # The Go version to download (if necessary) and use.
