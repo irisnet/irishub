@@ -21,13 +21,11 @@ jobs:
         run: |
           sudo apt-get install -y gcc-aarch64-linux-gnu
           make build-all-binaries
-          tar -czvf build/iris-linux-amd64-${ GITHUB_REF_NAME }.tar.gz build/iris-linux-amd64
-          tar -czvf build/iris-linux-arm64-${ GITHUB_REF_NAME }.tar.gz build/iris-linux-arm64
 
       - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
           body_path: RELEASE.md
           files: |
-            build/iris-linux-amd64-${ GITHUB_REF_NAME }.tar.gz
-            build/iris-linux-arm64-${ GITHUB_REF_NAME }.tar.gz
+            build/iris-linux-amd64
+            build/iris-linux-arm64
