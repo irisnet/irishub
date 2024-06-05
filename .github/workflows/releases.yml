@@ -5,30 +5,27 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
     
 jobs:
-  uploadAssets:
+  setup-build-publish:
+    name: Setup, Build and Publish
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Codes
         uses: actions/checkout@v4
         
-      - uses: actions/setup-go@v5
+      - name: Setup Golang
+        uses: actions/setup-go@v5
         with:
           go-version: '^1.21.0' # The Go version to download (if necessary) and use.
           
       - name: Build Binaries
         run: |
-          apt-get install -y gcc-aarch64-linux-gnu
-          make build-all-binary
-          tar -czvf build/iris-linux-amd64-${ github.ref }.tar.gz build/iris-linux-amd64
-          tar -czvf build/iris-linux-arm64-${ github.ref }.tar.gz build/iris-linux-arm64
-          mv build/iris-windows-amd64.exe build/iris-windows-amd64-${ github.ref }.exe
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+          make build-all-binaries
 
-      - name: Release
+      - name: Publish Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           body_path: RELEASE.md
           files: |
-            build/iris-linux-amd64-${ github.ref }.tar.gz
-            build/iris-linux-arm64-${ github.ref }.tar.gz
-            build/iris-windows-amd64-${ github.ref }.exe
+            build/iris-linux-amd64
+            build/iris-linux-arm64
