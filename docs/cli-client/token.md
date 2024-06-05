@@ -4,19 +4,22 @@ Token module allows you to manage assets on IRIS Hub
 
 ## Available Commands
 
-| Name                                       | Description                                |
-|--------------------------------------------|--------------------------------------------|
-| [issue](#iris-tx-token-issue)              | Issue a new token                          |
-| [edit](#iris-tx-token-edit)                | Edit an existing token                     |
-| [transfer](#iris-tx-token-transfer)        | Transfer the ownership of a token          |
-| [mint](#iris-tx-token-mint)                | Mint tokens to a specified address         |
-| [burn](#iris-tx-token-burn)                | Burn some tokens                           |
-| [swap-fee](#iris-tx-token-swap-fee)        | Swap one token with another token          |
-| [token](#iris-query-token-token)           | Query a token by symbol                    |
-| [tokens](#iris-query-token-tokens)         | Query tokens by owner                      |
-| [fee](#iris-query-token-fee)               | Query the token related fees               |
-| [params](#iris-query-token-params)         | Query the token related params             |
-| [total-burn](#iris-query-token-total-burn) | Query the total amount of all burn tokens. |
+| Name                                              | Description                                           |
+| ------------------------------------------------- | ----------------------------------------------------- |
+| [issue](#iris-tx-token-issue)                     | Issue a new token                                     |
+| [edit](#iris-tx-token-edit)                       | Edit an existing token                                |
+| [transfer](#iris-tx-token-transfer)               | Transfer the ownership of a token                     |
+| [mint](#iris-tx-token-mint)                       | Mint tokens to a specified address                    |
+| [burn](#iris-tx-token-burn)                       | Burn some tokens                                      |
+| [swap-fee](#iris-tx-token-swap-fee)               | Swap one token with another token                     |
+| [swap-from-erc20](#iris-tx-token-swap-from-erc20) | Swap native token from the corresponding ERC20 at 1:1 |
+| [swap-to-erc20](#iris-tx-token-swap-to-erc20)     | Swap native token to the corresponding ERC20 at 1:1   |
+| [token](#iris-query-token-token)                  | Query a token by symbol                               |
+| [tokens](#iris-query-token-tokens)                | Query tokens by owner                                 |
+| [fee](#iris-query-token-fee)                      | Query the token related fees                          |
+| [params](#iris-query-token-params)                | Query the token related params                        |
+| [total-burn](#iris-query-token-total-burn)        | Query the total amount of all burn tokens             |
+| [balances](#iris-query-token-balances)            | Query all the balances of an owner in special denom   |
 
 ## iris tx token issue
 
@@ -130,11 +133,12 @@ Swap one token with another token. For example, this feature can be used to exch
 ```bash
 iris tx token swap-fee [fee_paid] --to [reciever]
 ```
+
 **Flags:**
 
-| Name     | Type   | Required | Default | Description                               |
-| -------- | ------ |----------| ------- |-------------------------------------------|
-| --to     | string | Yes      |         | Address to which the token will be swaped |
+| Name | Type   | Required | Default | Description                               |
+| ---- | ------ | -------- | ------- | ----------------------------------------- |
+| --to | string | Yes      |         | Address to which the token will be swaped |
 
 ### Mint Token
 
@@ -160,6 +164,46 @@ iris tx token burn [symbol] [flags]
 
 ```bash
 iris tx token burn <symbol> --amount=<amount> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
+```
+
+## iris tx token swap-from-erc20
+
+Swap native token from the corresponding ERC20 at 1:1
+
+```bash
+iris tx token swap-from-erc20 [wanted_amount] [flags]
+```
+
+**Flags:**
+
+| Name | Type   | Required | Default | Description                                      |
+| ---- | ------ | -------- | ------- | ------------------------------------------------ |
+| --to | string | false    | ""      | Eth address to which the token is to be received |
+
+### Swap native token from erc20
+
+```bash
+iris tx token swap-from-erc20 <wanted_amount> --to=<eth_address> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
+```
+
+## iris tx token swap-to-erc20
+
+Swap native token to the corresponding ERC20 at 1:1
+
+```bash
+iris tx token swap-to-erc20 [paid_amount] [flags]
+```
+
+**Flags:**
+
+| Name | Type   | Required | Default | Description                                      |
+| ---- | ------ | -------- | ------- | ------------------------------------------------ |
+| --to | string | false    | ""      | Eth address to which the token is to be received |
+
+### Swap native token to erc20
+
+```bash
+iris tx token swap-to-erc20 <paid_amount> --to=<eth_address> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ## iris query token token
@@ -236,4 +280,18 @@ iris query token total-burn [flags]
 
 ```bash
 iris query token total-burn
+```
+
+## iris query token balances
+
+Query all the balances of an owner in special denom
+
+```bash
+iris query token balances [addr] [denom] [flags]
+```
+
+### Query all the balances of an owner in special denom
+
+```bash
+iris query token balances <owner> <denom> 
 ```
