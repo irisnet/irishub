@@ -33,7 +33,7 @@ jobs:
         
   deploy:
     name: Deploy
-    runs-on: arc-runner-set
+    runs-on: iris-runner-set
     environment: production
 
     permissions:
