@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.0
+
+### State Machine Breaking
+
+* (IRISHub) [\#2944](https://github.com/irisnet/irishub/pull/2944) Bump cosmos-sdk to v0.47.15-ics-lsm
+
 ## 3.0.0
 
 ### Features
