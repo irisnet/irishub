@@ -15,6 +15,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
+	"irismod.io/coinswap/keeper"
 	"irismod.io/coinswap/types"
 	"irismod.io/simapp"
 )
@@ -36,15 +37,16 @@ type TestSuite struct {
 
 	ctx         sdk.Context
 	app         *simapp.SimApp
+	keeper      keeper.Keeper
 	queryClient types.QueryClient
 }
 
 func (suite *TestSuite) SetupTest() {
-	app := setupWithGenesisAccounts(suite.T())
+	app := setupWithGenesisAccounts(suite.T(), &suite.keeper)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
-	types.RegisterQueryServer(queryHelper, app.CoinswapKeeper)
+	types.RegisterQueryServer(queryHelper, suite.keeper)
 	queryClient := types.NewQueryClient(queryHelper)
 
 	suite.app = app
@@ -67,14 +69,14 @@ func (suite *TestSuite) TestParams() {
 		{types.DefaultParams()},
 	}
 	for _, tc := range cases {
-		suite.app.CoinswapKeeper.SetParams(suite.ctx, tc.params)
+		suite.keeper.SetParams(suite.ctx, tc.params)
 
-		feeParam := suite.app.CoinswapKeeper.GetParams(suite.ctx)
+		feeParam := suite.keeper.GetParams(suite.ctx)
 		suite.Equal(tc.params.Fee, feeParam.Fee)
 	}
 }
 
-func setupWithGenesisAccounts(t *testing.T) *simapp.SimApp {
+func setupWithGenesisAccounts(t *testing.T, keeper *keeper.Keeper) *simapp.SimApp {
 	amountInitStandard, _ := sdkmath.NewIntFromString("30000000000000000000")
 	amountInitBTC, _ := sdkmath.NewIntFromString("3000000000")
 
@@ -103,8 +105,14 @@ func setupWithGenesisAccounts(t *testing.T) *simapp.SimApp {
 		Address: addrSender2.String(),
 	}
 
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{},
+		Consumers: []interface{}{keeper},
+	}
+
 	genAccs := []authtypes.GenesisAccount{acc1, acc2}
-	app := simapp.SetupWithGenesisAccounts(t, genAccs, acc1Balances, acc2Balances)
+	app := simapp.SetupWithGenesisAccounts(t, depInjectOptions, genAccs, acc1Balances, acc2Balances)
 	return app
 }
 
@@ -122,11 +130,11 @@ func (suite *TestSuite) TestLiquidity() {
 		deadline.Unix(),
 		addrSender1.String(),
 	)
-	_, err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
+	_, err := suite.keeper.AddLiquidity(suite.ctx, msg)
 	suite.NoError(err)
 
 	poolId := types.GetPoolId(denomBTC)
-	pool, has := suite.app.CoinswapKeeper.GetPool(suite.ctx, poolId)
+	pool, has := suite.keeper.GetPool(suite.ctx, poolId)
 	suite.Require().True(has)
 
 	poolAddr, err := sdk.AccAddressFromBech32(pool.EscrowAddress)
@@ -158,7 +166,7 @@ func (suite *TestSuite) TestLiquidity() {
 	suite.Equal(expCoins.Sort().String(), sender1Balances.Sort().String())
 
 	// test add liquidity (pool exists)
-	expLptDenom, _ := suite.app.CoinswapKeeper.GetLptDenomFromDenoms(
+	expLptDenom, _ := suite.keeper.GetLptDenomFromDenoms(
 		suite.ctx,
 		denomBTC,
 		denomStandard,
@@ -177,7 +185,7 @@ func (suite *TestSuite) TestLiquidity() {
 		deadline.Unix(),
 		addrSender2.String(),
 	)
-	_, err = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
+	_, err = suite.keeper.AddLiquidity(suite.ctx, msg)
 	suite.NoError(err)
 
 	reservePoolBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
@@ -210,7 +218,7 @@ func (suite *TestSuite) TestLiquidity() {
 		addrSender1.String(),
 	)
 
-	_, err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
+	_, err = suite.keeper.RemoveLiquidity(suite.ctx, msgRemove)
 	suite.NoError(err)
 
 	reservePoolBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
@@ -245,7 +253,7 @@ func (suite *TestSuite) TestLiquidity() {
 		addrSender2.String(),
 	)
 
-	_, err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
+	_, err = suite.keeper.RemoveLiquidity(suite.ctx, msgRemove)
 	suite.NoError(err)
 
 	reservePoolBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, poolAddr)
@@ -276,10 +284,10 @@ func (suite *TestSuite) TestLiquidity2() {
 		addrSender1.String(),
 	)
 
-	_, err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, initMsg)
+	_, err := suite.keeper.AddLiquidity(suite.ctx, initMsg)
 	suite.NoError(err)
 
-	pool, exist := suite.app.CoinswapKeeper.GetPool(suite.ctx, types.GetPoolId(denomBTC))
+	pool, exist := suite.keeper.GetPool(suite.ctx, types.GetPoolId(denomBTC))
 	suite.Require().True(exist)
 
 	poolAddr, err := sdk.AccAddressFromBech32(pool.EscrowAddress)
@@ -328,7 +336,7 @@ func (suite *TestSuite) TestLiquidity2() {
 		addrSender2.String(),
 	)
 
-	_, err = suite.app.CoinswapKeeper.AddUnilateralLiquidity(suite.ctx, addMsg)
+	_, err = suite.keeper.AddUnilateralLiquidity(suite.ctx, addMsg)
 	suite.NoError(err)
 
 	// 2.1 lptAmt
@@ -369,10 +377,10 @@ func (suite *TestSuite) TestLiquidity3() {
 		addrSender1.String(),
 	)
 
-	_, err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, initMsg)
+	_, err := suite.keeper.AddLiquidity(suite.ctx, initMsg)
 	suite.NoError(err)
 
-	pool, exist := suite.app.CoinswapKeeper.GetPool(suite.ctx, types.GetPoolId(denomBTC))
+	pool, exist := suite.keeper.GetPool(suite.ctx, types.GetPoolId(denomBTC))
 	suite.Require().True(exist)
 
 	poolAddr, err := sdk.AccAddressFromBech32(pool.EscrowAddress)
@@ -421,7 +429,7 @@ func (suite *TestSuite) TestLiquidity3() {
 		addrSender1.String(),
 	)
 
-	_, err = suite.app.CoinswapKeeper.RemoveUnilateralLiquidity(suite.ctx, removeMsg)
+	_, err = suite.keeper.RemoveUnilateralLiquidity(suite.ctx, removeMsg)
 	suite.NoError(err)
 
 	// 2.1 lptAmt
