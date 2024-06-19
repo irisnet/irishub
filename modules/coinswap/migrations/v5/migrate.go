@@ -3,8 +3,8 @@ package v5
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/coinswap/types"
 	"github.com/irisnet/irismod/types/exported"
+	"irismod.io/coinswap/types"
 )
 
 // CoinswapKeeper defines a interface for SetParams function

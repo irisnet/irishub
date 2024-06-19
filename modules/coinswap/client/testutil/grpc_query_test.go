@@ -12,9 +12,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	tokentypes "github.com/irisnet/irismod/modules/token/types/v1"
 	"github.com/irisnet/irismod/simapp"
+	coinswaptypes "irismod.io/coinswap/types"
 )
 
 type IntegrationTestSuite struct {

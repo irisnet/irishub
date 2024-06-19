@@ -12,9 +12,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	v2 "github.com/irisnet/irismod/modules/coinswap/migrations/v2"
-	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	"github.com/irisnet/irismod/simapp"
+	v2 "irismod.io/coinswap/migrations/v2"
+	coinswaptypes "irismod.io/coinswap/types"
 )
 
 const (

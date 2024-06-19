@@ -8,7 +8,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/coinswap/types"
+	"irismod.io/coinswap/types"
 )
 
 // CreatePool create a liquidity that saves relevant information about popular pool tokens

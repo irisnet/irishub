@@ -7,9 +7,9 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	v5 "github.com/irisnet/irismod/modules/coinswap/migrations/v5"
-	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 	"github.com/irisnet/irismod/simapp"
+	v5 "irismod.io/coinswap/migrations/v5"
+	coinswaptypes "irismod.io/coinswap/types"
 )
 
 func TestMigrate(t *testing.T) {
