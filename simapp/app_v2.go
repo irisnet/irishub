@@ -3,7 +3,6 @@
 package simapp
 
 import (
-	_ "embed"
 	"encoding/json"
 	"io"
 	"os"
@@ -13,7 +12,6 @@ import (
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
 
-	"cosmossdk.io/core/appconfig"
 	"cosmossdk.io/depinject"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -48,7 +46,6 @@ import (
 	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
-	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/evidence"
 	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
@@ -58,11 +55,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
@@ -71,41 +66,9 @@ import (
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
-
-	"github.com/irisnet/irismod/modules/coinswap"
-	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
-	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
-	"github.com/irisnet/irismod/modules/farm"
-	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
-	farmtypes "github.com/irisnet/irismod/modules/farm/types"
-	"github.com/irisnet/irismod/modules/htlc"
-	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
-	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
-	"github.com/irisnet/irismod/modules/mt"
-	mtkeeper "github.com/irisnet/irismod/modules/mt/keeper"
-	mttypes "github.com/irisnet/irismod/modules/mt/types"
-	nftkeeper "github.com/irisnet/irismod/modules/nft/keeper"
-	nft "github.com/irisnet/irismod/modules/nft/module"
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
-	"github.com/irisnet/irismod/modules/oracle"
-	oracleKeeper "github.com/irisnet/irismod/modules/oracle/keeper"
-	"github.com/irisnet/irismod/modules/random"
-	randomkeeper "github.com/irisnet/irismod/modules/random/keeper"
-	randomtypes "github.com/irisnet/irismod/modules/random/types"
-	"github.com/irisnet/irismod/modules/record"
-	recordkeeper "github.com/irisnet/irismod/modules/record/keeper"
-	"github.com/irisnet/irismod/modules/service"
-	servicekeeper "github.com/irisnet/irismod/modules/service/keeper"
-	servicetypes "github.com/irisnet/irismod/modules/service/types"
-	"github.com/irisnet/irismod/modules/token"
-	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
-
-	"github.com/irisnet/irismod/simapp/mocks"
 )
 
 var (
@@ -140,39 +103,7 @@ var (
 		groupmodule.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		consensus.AppModuleBasic{},
-
-		coinswap.AppModuleBasic{},
-		farm.AppModuleBasic{},
-		htlc.AppModuleBasic{},
-		mt.AppModuleBasic{},
-		nft.AppModuleBasic{},
-		oracle.AppModuleBasic{},
-		random.AppModuleBasic{},
-		record.AppModuleBasic{},
-		service.AppModuleBasic{},
-		token.AppModuleBasic{},
 	)
-
-	// module account permissions
-	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		distrtypes.ModuleName:          nil,
-		minttypes.ModuleName:           {authtypes.Minter},
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		tokentypes.ModuleName:          {authtypes.Minter, authtypes.Burner},
-		htlctypes.ModuleName:           {authtypes.Minter, authtypes.Burner},
-		coinswaptypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
-		servicetypes.DepositAccName:    {authtypes.Burner},
-		servicetypes.RequestAccName:    nil,
-		servicetypes.FeeCollectorName:  {authtypes.Burner},
-		farmtypes.ModuleName:           {authtypes.Burner},
-		farmtypes.RewardCollector:      nil,
-		farmtypes.EscrowCollector:      nil,
-		nfttypes.ModuleName:            nil,
-		mttypes.ModuleName:             nil,
-	}
 )
 
 var (
@@ -207,18 +138,6 @@ type SimApp struct {
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 
-	// make scoped keepers public for test purposes
-	TokenKeeper    tokenkeeper.Keeper
-	RecordKeeper   recordkeeper.Keeper
-	NFTKeeper      nftkeeper.Keeper
-	MTKeeper       mtkeeper.Keeper
-	HTLCKeeper     htlckeeper.Keeper
-	CoinswapKeeper coinswapkeeper.Keeper
-	ServiceKeeper  servicekeeper.Keeper
-	OracleKeeper   oracleKeeper.Keeper
-	RandomKeeper   randomkeeper.Keeper
-	FarmKeeper     farmkeeper.Keeper
-
 	// simulation manager
 	sm *module.SimulationManager
 }
@@ -232,17 +151,13 @@ func init() {
 	DefaultNodeHome = filepath.Join(userHomeDir, ".simapp")
 }
 
-//go:embed app.yaml
-var appConfigYaml []byte
-
-var AppConfig = appconfig.LoadYAML(appConfigYaml)
-
 // NewSimApp returns a reference to an initialized SimApp.
 func NewSimApp(
 	logger log.Logger,
 	db dbm.DB,
 	traceStore io.Writer,
 	loadLatest bool,
+	depInjectOptions DepinjectOptions,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *SimApp {
@@ -250,44 +165,44 @@ func NewSimApp(
 		app        = &SimApp{}
 		appBuilder *runtime.AppBuilder
 
+		providers = append(depInjectOptions.Providers[:], appOpts)
 		// merge the AppConfig and other configuration in one config
 		appConfig = depinject.Configs(
-			AppConfig,
+			depInjectOptions.Config,
 			depinject.Supply(
-				// supply the application options
-				appOpts,
+				providers...,
 
-				// ADVANCED CONFIGURATION
+			// ADVANCED CONFIGURATION
 
-				//
-				// AUTH
-				//
-				// For providing a custom function required in auth to generate custom account types
-				// add it below. By default the auth module uses simulation.RandomGenesisAccounts.
-				//
-				// authtypes.RandomGenesisAccountsFn(simulation.RandomGenesisAccounts),
+			//
+			// AUTH
+			//
+			// For providing a custom function required in auth to generate custom account types
+			// add it below. By default the auth module uses simulation.RandomGenesisAccounts.
+			//
+			// authtypes.RandomGenesisAccountsFn(simulation.RandomGenesisAccounts),
 
-				// For providing a custom a base account type add it below.
-				// By default the auth module uses authtypes.ProtoBaseAccount().
-				//
-				// func() authtypes.AccountI { return authtypes.ProtoBaseAccount() },
+			// For providing a custom a base account type add it below.
+			// By default the auth module uses authtypes.ProtoBaseAccount().
+			//
+			// func() authtypes.AccountI { return authtypes.ProtoBaseAccount() },
 
-				//
-				// MINT
-				//
+			//
+			// MINT
+			//
 
-				// For providing a custom inflation function for x/mint add here your
-				// custom function that implements the minttypes.InflationCalculationFn
-				// interface.
+			// For providing a custom inflation function for x/mint add here your
+			// custom function that implements the minttypes.InflationCalculationFn
+			// interface.
 
-				// For providing a mock evm function for token module
-				mocks.ProvideEVMKeeper(),
-				mocks.ProvideICS20Keeper(),
+			// For providing a mock evm function for token module
+			// mocks.ProvideEVMKeeper(),
+			// mocks.ProvideICS20Keeper(),
 			),
 		)
 	)
 
-	if err := depinject.Inject(appConfig,
+	consumer := append(depInjectOptions.Consumers[:],
 		&appBuilder,
 		&app.appCodec,
 		&app.legacyAmino,
@@ -308,17 +223,9 @@ func NewSimApp(
 		&app.EvidenceKeeper,
 		&app.FeeGrantKeeper,
 		&app.ConsensusParamsKeeper,
-		&app.TokenKeeper,
-		&app.RecordKeeper,
-		&app.NFTKeeper,
-		&app.MTKeeper,
-		&app.HTLCKeeper,
-		&app.CoinswapKeeper,
-		&app.ServiceKeeper,
-		&app.OracleKeeper,
-		&app.RandomKeeper,
-		&app.FarmKeeper,
-	); err != nil {
+	)
+
+	if err := depinject.Inject(appConfig, consumer...); err != nil {
 		panic(err)
 	}
 
@@ -356,14 +263,14 @@ func NewSimApp(
 		os.Exit(1)
 	}
 
-	//initParamsKeeper(app.ParamsKeeper)
+	// initParamsKeeper(app.ParamsKeeper)
 
 	/****  Module Options ****/
 
 	app.ModuleManager.RegisterInvariants(app.CrisisKeeper)
 
 	// RegisterUpgradeHandlers is used for registering any on-chain upgrades.
-	//app.RegisterUpgradeHandlers()
+	// app.RegisterUpgradeHandlers()
 
 	// add test gRPC service for testing gRPC queries in isolation
 	testdata_pulsar.RegisterQueryServer(app.GRPCQueryRouter(), testdata_pulsar.QueryImpl{})
@@ -410,23 +317,23 @@ func (app *SimApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.
 		panic(err)
 	}
 
-	// add system service at InitChainer, overwrite if it exists
-	var serviceGenState servicetypes.GenesisState
-	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.ModuleManager.GetVersionMap())
-	app.appCodec.MustUnmarshalJSON(genesisState[servicetypes.ModuleName], &serviceGenState)
-	serviceGenState.Definitions = append(
-		serviceGenState.Definitions,
-		servicetypes.GenOraclePriceSvcDefinition(),
-	)
-	serviceGenState.Bindings = append(
-		serviceGenState.Bindings,
-		servicetypes.GenOraclePriceSvcBinding(sdk.DefaultBondDenom),
-	)
-	serviceGenState.Definitions = append(
-		serviceGenState.Definitions,
-		randomtypes.GetSvcDefinition(),
-	)
-	genesisState[servicetypes.ModuleName] = app.appCodec.MustMarshalJSON(&serviceGenState)
+	// // add system service at InitChainer, overwrite if it exists
+	// var serviceGenState servicetypes.GenesisState
+	// app.UpgradeKeeper.SetModuleVersionMap(ctx, app.ModuleManager.GetVersionMap())
+	// app.appCodec.MustUnmarshalJSON(genesisState[servicetypes.ModuleName], &serviceGenState)
+	// serviceGenState.Definitions = append(
+	// 	serviceGenState.Definitions,
+	// 	servicetypes.GenOraclePriceSvcDefinition(),
+	// )
+	// serviceGenState.Bindings = append(
+	// 	serviceGenState.Bindings,
+	// 	servicetypes.GenOraclePriceSvcBinding(sdk.DefaultBondDenom),
+	// )
+	// serviceGenState.Definitions = append(
+	// 	serviceGenState.Definitions,
+	// 	randomtypes.GetSvcDefinition(),
+	// )
+	// genesisState[servicetypes.ModuleName] = app.appCodec.MustMarshalJSON(&serviceGenState)
 
 	return app.ModuleManager.InitGenesis(ctx, app.appCodec, genesisState)
 }
@@ -507,23 +414,23 @@ func (app *SimApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APICon
 }
 
 // GetMaccPerms returns a copy of the module account permissions
-func GetMaccPerms() map[string][]string {
-	dupMaccPerms := make(map[string][]string)
-	for k, v := range maccPerms {
-		dupMaccPerms[k] = v
-	}
-	return dupMaccPerms
-}
+// func GetMaccPerms() map[string][]string {
+// 	dupMaccPerms := make(map[string][]string)
+// 	for k, v := range maccPerms {
+// 		dupMaccPerms[k] = v
+// 	}
+// 	return dupMaccPerms
+// }
 
-// BlockedAddresses returns all the app's blocked account addresses.
-func BlockedAddresses() map[string]bool {
-	modAccAddrs := make(map[string]bool)
-	for acc := range GetMaccPerms() {
-		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
-	}
+// // BlockedAddresses returns all the app's blocked account addresses.
+// func BlockedAddresses() map[string]bool {
+// 	modAccAddrs := make(map[string]bool)
+// 	for acc := range GetMaccPerms() {
+// 		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
+// 	}
 
-	// allow the following addresses to receive funds
-	delete(modAccAddrs, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+// 	// allow the following addresses to receive funds
+// 	delete(modAccAddrs, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
-	return modAccAddrs
-}
+// 	return modAccAddrs
+// }

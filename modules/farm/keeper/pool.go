@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irismod/modules/farm/types"
+	"irismod.io/farm/types"
 )
 
 // CreatePool creates an new farm pool

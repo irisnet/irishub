@@ -9,9 +9,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-	servicecli "github.com/irisnet/irismod/modules/service/client/cli"
-	servicetypes "github.com/irisnet/irismod/modules/service/types"
 	"github.com/irisnet/irismod/simapp"
+	servicecli "irismod.io/service/client/cli"
+	servicetypes "irismod.io/service/types"
 )
 
 func DefineServiceExec(t *testing.T,

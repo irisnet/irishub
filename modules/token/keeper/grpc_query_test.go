@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	v1 "github.com/irisnet/irismod/modules/token/types/v1"
+	v1 "irismod.io/token/types/v1"
 )
 
 func (suite *KeeperTestSuite) TestGRPCQueryToken() {

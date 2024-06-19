@@ -15,13 +15,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	randomcli "github.com/irisnet/irismod/modules/random/client/cli"
-	randomtestutil "github.com/irisnet/irismod/modules/random/client/testutil"
-	randomtypes "github.com/irisnet/irismod/modules/random/types"
 	servicecli "github.com/irisnet/irismod/modules/service/client/cli"
 	servicetestutil "github.com/irisnet/irismod/modules/service/client/testutil"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
 	"github.com/irisnet/irismod/simapp"
+	randomcli "irismod.io/random/client/cli"
+	randomtestutil "irismod.io/random/client/testutil"
+	randomtypes "irismod.io/random/types"
 )
 
 type IntegrationTestSuite struct {

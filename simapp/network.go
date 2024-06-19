@@ -31,8 +31,8 @@ type ResponseTx struct {
 	Height int64
 }
 
-func SetupNetwork(t *testing.T) Network {
-	cfg := NewConfig()
+func SetupNetwork(t *testing.T, depInjectOptions DepinjectOptions) Network {
+	cfg := NewConfig(depInjectOptions)
 	cfg.NumValidators = 4
 
 	network, err := network.New(t, t.TempDir(), cfg)
@@ -174,7 +174,8 @@ func (n Network) SendMsgs(
 }
 
 func (n Network) BlockSendMsgs(t *testing.T,
-	msgs ...sdk.Msg) *ResponseTx {
+	msgs ...sdk.Msg,
+) *ResponseTx {
 	response := n.SendMsgs(t, msgs...)
 	return n.QueryTx(t, n.Validators[0].ClientCtx, response.TxHash)
 }

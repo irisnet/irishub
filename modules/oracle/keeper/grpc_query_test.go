@@ -7,8 +7,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 
-	"github.com/irisnet/irismod/modules/oracle/keeper"
-	"github.com/irisnet/irismod/modules/oracle/types"
+	"irismod.io/oracle/keeper"
+	"irismod.io/oracle/types"
 )
 
 func (suite *KeeperTestSuite) TestGRPCQueryFeed() {

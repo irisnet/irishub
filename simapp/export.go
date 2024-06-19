@@ -7,11 +7,6 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	"github.com/irisnet/irismod/modules/htlc"
-	"github.com/irisnet/irismod/modules/oracle"
-	"github.com/irisnet/irismod/modules/random"
-	"github.com/irisnet/irismod/modules/service"
-
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
@@ -214,8 +209,8 @@ func (app *SimApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []
 			return false
 		},
 	)
-	htlc.PrepForZeroHeightGenesis(ctx, app.HTLCKeeper)
-	random.PrepForZeroHeightGenesis(ctx, app.RandomKeeper)
-	oracle.PrepForZeroHeightGenesis(ctx, app.OracleKeeper)
-	service.PrepForZeroHeightGenesis(ctx, app.ServiceKeeper)
+	// htlc.PrepForZeroHeightGenesis(ctx, app.HTLCKeeper)
+	// random.PrepForZeroHeightGenesis(ctx, app.RandomKeeper)
+	// oracle.PrepForZeroHeightGenesis(ctx, app.OracleKeeper)
+	// service.PrepForZeroHeightGenesis(ctx, app.ServiceKeeper)
 }

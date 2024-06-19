@@ -7,7 +7,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 
-	"github.com/irisnet/irismod/modules/nft/types"
+	"irismod.io/nft/types"
 )
 
 // SaveDenom issues a denom according to the given params

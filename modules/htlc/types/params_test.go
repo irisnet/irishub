@@ -8,7 +8,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/htlc/types"
+	"irismod.io/htlc/types"
 )
 
 type ParamsTestSuite struct {

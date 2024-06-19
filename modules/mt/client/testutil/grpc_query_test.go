@@ -9,9 +9,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogoproto/proto"
 
-	mtcli "github.com/irisnet/irismod/modules/mt/client/cli"
-	mttestutil "github.com/irisnet/irismod/modules/mt/client/testutil"
-	mttypes "github.com/irisnet/irismod/modules/mt/types"
+	mtcli "irismod.io/mt/client/cli"
+	mttestutil "irismod.io/mt/client/testutil"
+	mttypes "irismod.io/mt/types"
 
 	"github.com/stretchr/testify/suite"
 

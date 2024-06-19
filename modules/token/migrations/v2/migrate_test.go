@@ -7,10 +7,10 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	v2 "github.com/irisnet/irismod/modules/token/migrations/v2"
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
-	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 	"github.com/irisnet/irismod/simapp"
+	v2 "irismod.io/token/migrations/v2"
+	tokentypes "irismod.io/token/types"
+	v1 "irismod.io/token/types/v1"
 )
 
 func TestMigrate(t *testing.T) {

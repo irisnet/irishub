@@ -16,11 +16,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	servicecli "github.com/irisnet/irismod/modules/service/client/cli"
-	servicetestutil "github.com/irisnet/irismod/modules/service/client/testutil"
-	"github.com/irisnet/irismod/modules/service/types"
-	servicetypes "github.com/irisnet/irismod/modules/service/types"
 	"github.com/irisnet/irismod/simapp"
+	servicecli "irismod.io/service/client/cli"
+	servicetestutil "irismod.io/service/client/testutil"
+	"irismod.io/service/types"
+	servicetypes "irismod.io/service/types"
 )
 
 type IntegrationTestSuite struct {

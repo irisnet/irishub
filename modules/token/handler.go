@@ -5,8 +5,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irismod/modules/token/keeper"
-	v1 "github.com/irisnet/irismod/modules/token/types/v1"
+	"irismod.io/token/keeper"
+	v1 "irismod.io/token/types/v1"
 )
 
 // NewHandler handles all "token" type messages.

@@ -9,9 +9,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-	oraclecli "github.com/irisnet/irismod/modules/oracle/client/cli"
-	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
 	"github.com/irisnet/irismod/simapp"
+	oraclecli "irismod.io/oracle/client/cli"
+	oracletypes "irismod.io/oracle/types"
 )
 
 // MsgRedelegateExec creates a redelegate message.

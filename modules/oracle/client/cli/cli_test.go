@@ -12,12 +12,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	oraclecli "github.com/irisnet/irismod/modules/oracle/client/cli"
-	oracletestutil "github.com/irisnet/irismod/modules/oracle/client/testutil"
 	servicecli "github.com/irisnet/irismod/modules/service/client/cli"
 	servicetestutil "github.com/irisnet/irismod/modules/service/client/testutil"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
 	"github.com/irisnet/irismod/simapp"
+	oraclecli "irismod.io/oracle/client/cli"
+	oracletestutil "irismod.io/oracle/client/testutil"
 )
 
 type IntegrationTestSuite struct {

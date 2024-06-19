@@ -4,7 +4,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/farm/types"
+	"irismod.io/farm/types"
 )
 
 // DeductPoolCreationFee performs fee handling for creating farm pool

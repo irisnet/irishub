@@ -9,10 +9,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	recordcli "github.com/irisnet/irismod/modules/record/client/cli"
-	recordtestutil "github.com/irisnet/irismod/modules/record/client/testutil"
-	recordtypes "github.com/irisnet/irismod/modules/record/types"
 	"github.com/irisnet/irismod/simapp"
+	recordcli "irismod.io/record/client/cli"
+	recordtestutil "irismod.io/record/client/testutil"
+	recordtypes "irismod.io/record/types"
 )
 
 type IntegrationTestSuite struct {

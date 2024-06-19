@@ -11,10 +11,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	nftcli "github.com/irisnet/irismod/modules/nft/client/cli"
-	nfttestutil "github.com/irisnet/irismod/modules/nft/client/testutil"
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
 	"github.com/irisnet/irismod/simapp"
+	nftcli "irismod.io/nft/client/cli"
+	nfttestutil "irismod.io/nft/client/testutil"
+	nfttypes "irismod.io/nft/types"
 )
 
 type IntegrationTestSuite struct {

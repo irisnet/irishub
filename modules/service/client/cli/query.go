@@ -15,8 +15,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"github.com/irisnet/irismod/modules/service/client/utils"
-	"github.com/irisnet/irismod/modules/service/types"
+	"irismod.io/service/client/utils"
+	"irismod.io/service/types"
 )
 
 // GetQueryCmd returns the cli query commands for the module.

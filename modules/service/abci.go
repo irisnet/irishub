@@ -8,8 +8,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/service/keeper"
-	"github.com/irisnet/irismod/modules/service/types"
+	"irismod.io/service/keeper"
+	"irismod.io/service/types"
 )
 
 // BeginBlocker handles block beginning logic for service

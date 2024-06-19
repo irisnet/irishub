@@ -11,9 +11,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/record/keeper"
-	"github.com/irisnet/irismod/modules/record/types"
 	"github.com/irisnet/irismod/simapp"
+	"irismod.io/record/keeper"
+	"irismod.io/record/types"
 )
 
 var (

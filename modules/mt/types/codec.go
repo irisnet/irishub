@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 	gogotypes "github.com/cosmos/gogoproto/types"
 
-	"github.com/irisnet/irismod/modules/mt/exported"
+	"irismod.io/mt/exported"
 )
 
 var (

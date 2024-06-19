@@ -11,9 +11,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"github.com/irisnet/irismod/modules/random/simulation"
-	"github.com/irisnet/irismod/modules/random/types"
 	"github.com/irisnet/irismod/simapp"
+	"irismod.io/random/simulation"
+	"irismod.io/random/types"
 )
 
 func TestDecodeStore(t *testing.T) {

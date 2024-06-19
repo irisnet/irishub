@@ -11,13 +11,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	oraclecli "github.com/irisnet/irismod/modules/oracle/client/cli"
-	oracletestutil "github.com/irisnet/irismod/modules/oracle/client/testutil"
-	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
 	servicecli "github.com/irisnet/irismod/modules/service/client/cli"
 	servicetestutil "github.com/irisnet/irismod/modules/service/client/testutil"
 	servicetypes "github.com/irisnet/irismod/modules/service/types"
 	"github.com/irisnet/irismod/simapp"
+	oraclecli "irismod.io/oracle/client/cli"
+	oracletestutil "irismod.io/oracle/client/testutil"
+	oracletypes "irismod.io/oracle/types"
 )
 
 type IntegrationTestSuite struct {

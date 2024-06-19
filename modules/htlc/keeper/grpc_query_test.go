@@ -15,9 +15,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/htlc/keeper"
-	"github.com/irisnet/irismod/modules/htlc/types"
 	"github.com/irisnet/irismod/simapp"
+	"irismod.io/htlc/keeper"
+	"irismod.io/htlc/types"
 )
 
 type QueryTestSuite struct {

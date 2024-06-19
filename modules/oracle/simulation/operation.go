@@ -12,9 +12,9 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"github.com/irisnet/irismod/modules/oracle/keeper"
-	"github.com/irisnet/irismod/modules/oracle/types"
 	irishelpers "github.com/irisnet/irismod/simapp/helpers"
+	"irismod.io/oracle/keeper"
+	"irismod.io/oracle/types"
 )
 
 const (

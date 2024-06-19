@@ -11,8 +11,8 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"github.com/irisnet/irismod/modules/mt/keeper"
-	mt "github.com/irisnet/irismod/modules/mt/types"
+	"irismod.io/mt/keeper"
+	mt "irismod.io/mt/types"
 )
 
 // Simulation operation weights constants

@@ -11,7 +11,7 @@ import (
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/irisnet/irismod/contracts"
-	"github.com/irisnet/irismod/modules/token/types"
+	"irismod.io/token/types"
 )
 
 type erc20Hook struct {

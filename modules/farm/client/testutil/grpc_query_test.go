@@ -14,11 +14,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
-	farmcli "github.com/irisnet/irismod/modules/farm/client/cli"
-	farmtestutil "github.com/irisnet/irismod/modules/farm/client/testutil"
-	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 	tokentypes "github.com/irisnet/irismod/modules/token/types/v1"
 	"github.com/irisnet/irismod/simapp"
+	farmcli "irismod.io/farm/client/cli"
+	farmtestutil "irismod.io/farm/client/testutil"
+	farmtypes "irismod.io/farm/types"
 )
 
 type IntegrationTestSuite struct {

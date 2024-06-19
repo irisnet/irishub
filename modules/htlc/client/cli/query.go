@@ -13,7 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"github.com/irisnet/irismod/modules/htlc/types"
+	"irismod.io/htlc/types"
 )
 
 // GetQueryCmd returns the cli query commands for the module.

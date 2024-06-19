@@ -9,9 +9,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-	farmcli "github.com/irisnet/irismod/modules/farm/client/cli"
-	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 	"github.com/irisnet/irismod/simapp"
+	farmcli "irismod.io/farm/client/cli"
+	farmtypes "irismod.io/farm/types"
 )
 
 // CreateFarmPoolExec creates a redelegate message.

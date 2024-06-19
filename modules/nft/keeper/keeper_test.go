@@ -13,9 +13,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/nft/keeper"
-	"github.com/irisnet/irismod/modules/nft/types"
 	"github.com/irisnet/irismod/simapp"
+	"irismod.io/nft/keeper"
+	"irismod.io/nft/types"
 )
 
 var (

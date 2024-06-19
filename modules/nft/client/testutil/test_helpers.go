@@ -9,9 +9,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-	nftcli "github.com/irisnet/irismod/modules/nft/client/cli"
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
 	"github.com/irisnet/irismod/simapp"
+	nftcli "irismod.io/nft/client/cli"
+	nfttypes "irismod.io/nft/types"
 )
 
 // IssueDenomExec creates a redelegate message.

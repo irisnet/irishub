@@ -8,7 +8,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/random/types"
+	"irismod.io/random/types"
 )
 
 type msgServer struct {

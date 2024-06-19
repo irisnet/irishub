@@ -11,10 +11,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	tokencli "github.com/irisnet/irismod/modules/token/client/cli"
-	tokentestutil "github.com/irisnet/irismod/modules/token/client/testutil"
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	"github.com/irisnet/irismod/simapp"
+	tokencli "irismod.io/token/client/cli"
+	tokentestutil "irismod.io/token/client/testutil"
+	tokentypes "irismod.io/token/types"
 )
 
 type IntegrationTestSuite struct {

@@ -14,10 +14,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	htlccli "github.com/irisnet/irismod/modules/htlc/client/cli"
-	htlctestutil "github.com/irisnet/irismod/modules/htlc/client/testutil"
-	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	"github.com/irisnet/irismod/simapp"
+	htlccli "irismod.io/htlc/client/cli"
+	htlctestutil "irismod.io/htlc/client/testutil"
+	htlctypes "irismod.io/htlc/types"
 )
 
 const (

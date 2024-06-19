@@ -11,9 +11,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	v2 "github.com/irisnet/irismod/modules/htlc/migrations/v2"
-	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	"github.com/irisnet/irismod/simapp"
+	v2 "irismod.io/htlc/migrations/v2"
+	htlctypes "irismod.io/htlc/types"
 )
 
 func TestMigrate(t *testing.T) {

@@ -7,9 +7,9 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	v3 "github.com/irisnet/irismod/modules/farm/migrations/v3"
-	farmtypes "github.com/irisnet/irismod/modules/farm/types"
 	"github.com/irisnet/irismod/simapp"
+	v3 "irismod.io/farm/migrations/v3"
+	farmtypes "irismod.io/farm/types"
 )
 
 func TestMigrate(t *testing.T) {

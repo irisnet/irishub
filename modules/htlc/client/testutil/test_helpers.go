@@ -9,9 +9,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-	htlccli "github.com/irisnet/irismod/modules/htlc/client/cli"
-	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	"github.com/irisnet/irismod/simapp"
+	htlccli "irismod.io/htlc/client/cli"
+	htlctypes "irismod.io/htlc/types"
 )
 
 // MsgRedelegateExec creates a redelegate message.

@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
-	"github.com/irisnet/irismod/modules/farm/types"
+	"irismod.io/farm/types"
 )
 
 var _ types.QueryServer = Keeper{}

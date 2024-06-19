@@ -18,11 +18,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irismod/modules/farm/client/cli"
-	"github.com/irisnet/irismod/modules/farm/keeper"
-	"github.com/irisnet/irismod/modules/farm/simulation"
-	"github.com/irisnet/irismod/modules/farm/types"
 	"github.com/irisnet/irismod/types/exported"
+	"irismod.io/farm/client/cli"
+	"irismod.io/farm/keeper"
+	"irismod.io/farm/simulation"
+	"irismod.io/farm/types"
 )
 
 // ConsensusVersion defines the current farm module consensus version.

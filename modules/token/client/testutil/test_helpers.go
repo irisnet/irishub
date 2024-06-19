@@ -13,9 +13,9 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 
-	tokencli "github.com/irisnet/irismod/modules/token/client/cli"
-	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 	"github.com/irisnet/irismod/simapp"
+	tokencli "irismod.io/token/client/cli"
+	v1 "irismod.io/token/types/v1"
 )
 
 func IssueTokenExec(t *testing.T,

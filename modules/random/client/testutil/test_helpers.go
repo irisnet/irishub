@@ -9,9 +9,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-	randomcli "github.com/irisnet/irismod/modules/random/client/cli"
-	randomtypes "github.com/irisnet/irismod/modules/random/types"
 	"github.com/irisnet/irismod/simapp"
+	randomcli "irismod.io/random/client/cli"
+	randomtypes "irismod.io/random/types"
 )
 
 // MsgRedelegateExec creates a redelegate message.

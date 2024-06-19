@@ -14,10 +14,10 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
 	tokenmodule "github.com/irisnet/irismod/modules/token"
-	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
-	"github.com/irisnet/irismod/modules/token/types"
-	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 	"github.com/irisnet/irismod/simapp"
+	tokenkeeper "irismod.io/token/keeper"
+	"irismod.io/token/types"
+	v1 "irismod.io/token/types/v1"
 )
 
 const (

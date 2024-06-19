@@ -13,7 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/nft"
 	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 
-	"github.com/irisnet/irismod/modules/nft/types"
+	"irismod.io/nft/types"
 )
 
 type keeper struct {

@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irismod/modules/nft/types"
+	"irismod.io/nft/types"
 )
 
 var _ types.MsgServer = Keeper{}

@@ -10,8 +10,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-	recordcli "github.com/irisnet/irismod/modules/record/client/cli"
 	"github.com/irisnet/irismod/simapp"
+	recordcli "irismod.io/record/client/cli"
 )
 
 // CreateRecordExec creates a redelegate message.

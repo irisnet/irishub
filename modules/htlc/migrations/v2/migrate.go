@@ -3,8 +3,8 @@ package v2
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/htlc/types"
 	"github.com/irisnet/irismod/types/exported"
+	"irismod.io/htlc/types"
 )
 
 // HTLCKeeper defines a interface for SetParams function

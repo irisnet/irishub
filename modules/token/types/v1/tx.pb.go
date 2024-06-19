@@ -12,7 +12,7 @@ import (
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
-	github_com_irisnet_irismod_modules_token_types "github.com/irisnet/irismod/modules/token/types"
+	github_com_irisnet_irismod_modules_token_types "irismod.io/token/types"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -197,7 +197,7 @@ type MsgEditToken struct {
 	Symbol    string                                              `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`
 	Name      string                                              `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	MaxSupply uint64                                              `protobuf:"varint,3,opt,name=max_supply,json=maxSupply,proto3" json:"max_supply,omitempty"`
-	Mintable  github_com_irisnet_irismod_modules_token_types.Bool `protobuf:"bytes,4,opt,name=mintable,proto3,casttype=github.com/irisnet/irismod/modules/token/types.Bool" json:"mintable,omitempty"`
+	Mintable  github_com_irisnet_irismod_modules_token_types.Bool `protobuf:"bytes,4,opt,name=mintable,proto3,casttype=irismod.io/token/types.Bool" json:"mintable,omitempty"`
 	Owner     string                                              `protobuf:"bytes,5,opt,name=owner,proto3" json:"owner,omitempty"`
 }
 

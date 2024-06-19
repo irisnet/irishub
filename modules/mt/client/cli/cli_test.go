@@ -11,10 +11,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	mtcli "github.com/irisnet/irismod/modules/mt/client/cli"
-	mttestutil "github.com/irisnet/irismod/modules/mt/client/testutil"
-	mttypes "github.com/irisnet/irismod/modules/mt/types"
 	"github.com/irisnet/irismod/simapp"
+	mtcli "irismod.io/mt/client/cli"
+	mttestutil "irismod.io/mt/client/testutil"
+	mttypes "irismod.io/mt/types"
 )
 
 type IntegrationTestSuite struct {

@@ -10,9 +10,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-	mtcli "github.com/irisnet/irismod/modules/mt/client/cli"
-	mttypes "github.com/irisnet/irismod/modules/mt/types"
 	"github.com/irisnet/irismod/simapp"
+	mtcli "irismod.io/mt/client/cli"
+	mttypes "irismod.io/mt/types"
 )
 
 // IssueDenomExec creates a redelegate message.

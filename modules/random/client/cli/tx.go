@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"github.com/irisnet/irismod/modules/random/types"
+	"irismod.io/random/types"
 )
 
 // NewTxCmd returns the transaction commands for the random module.

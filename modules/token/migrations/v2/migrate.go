@@ -3,8 +3,8 @@ package v2
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	v1 "github.com/irisnet/irismod/modules/token/types/v1"
 	"github.com/irisnet/irismod/types/exported"
+	v1 "irismod.io/token/types/v1"
 )
 
 // TokenKeeper defines a interface for SetParams function

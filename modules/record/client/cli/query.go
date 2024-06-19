@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-	"github.com/irisnet/irismod/modules/record/types"
+	"irismod.io/record/types"
 )
 
 // GetQueryCmd returns the cli query commands for the record module.

@@ -3,8 +3,8 @@ package farm
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/farm/keeper"
-	"github.com/irisnet/irismod/modules/farm/types"
+	"irismod.io/farm/keeper"
+	"irismod.io/farm/types"
 )
 
 // InitGenesis stores the genesis state

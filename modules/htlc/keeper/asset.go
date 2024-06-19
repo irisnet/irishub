@@ -8,7 +8,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/htlc/types"
+	"irismod.io/htlc/types"
 )
 
 // IncrementCurrentAssetSupply increments an asset's supply by the coin
