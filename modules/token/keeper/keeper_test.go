@@ -1,16 +1,9 @@
 package keeper_test
 
 import (
-	"context"
-	"fmt"
-	"math/big"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/cometbft/cometbft/crypto/tmhash"
@@ -18,14 +11,10 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
-	"github.com/irisnet/irismod/contracts"
-	"github.com/irisnet/irismod/simapp"
-	"github.com/irisnet/irismod/types"
-
+	"irismod.io/simapp"
 	"irismod.io/token/keeper"
 	tokentypes "irismod.io/token/types"
 	v1 "irismod.io/token/types/v1"
@@ -55,11 +44,19 @@ type KeeperTestSuite struct {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(suite.T(), isCheckTx)
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{
+			ProvideEVMKeeper(),
+			ProvideICS20Keeper(),
+		},
+		Consumers: []interface{}{&suite.keeper},
+	}
+
+	app := simapp.Setup(suite.T(), isCheckTx,depInjectOptions)
 
 	suite.legacyAmino = app.LegacyAmino()
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
-	suite.keeper = app.TokenKeeper
 	suite.bk = app.BankKeeper
 	suite.app = app
 
@@ -69,9 +66,9 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.keeper.SetParams(suite.ctx, params)
 
 	// init tokens to addr
-	err := suite.bk.MintCoins(suite.ctx, types.ModuleName, initCoin)
+	err := suite.bk.MintCoins(suite.ctx, tokentypes.ModuleName, initCoin)
 	suite.NoError(err)
-	err = suite.bk.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, owner, initCoin)
+	err = suite.bk.SendCoinsFromModuleToAccount(suite.ctx, tokentypes.ModuleName, owner, initCoin)
 	suite.NoError(err)
 }
 
@@ -94,10 +91,10 @@ func (suite *KeeperTestSuite) issueToken(token v1.Token) {
 		),
 	)
 
-	err := suite.bk.MintCoins(suite.ctx, types.ModuleName, mintCoins)
+	err := suite.bk.MintCoins(suite.ctx, tokentypes.ModuleName, mintCoins)
 	suite.NoError(err)
 
-	err = suite.bk.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, owner, mintCoins)
+	err = suite.bk.SendCoinsFromModuleToAccount(suite.ctx, tokentypes.ModuleName, owner, mintCoins)
 	suite.NoError(err)
 }
 
@@ -128,7 +125,7 @@ func (suite *KeeperTestSuite) TestEditToken() {
 
 	symbol := "btc"
 	name := "Bitcoin Token"
-	mintable := types.True
+	mintable := tokentypes.True
 	maxSupply := uint64(22000000)
 
 	err := suite.keeper.EditToken(suite.ctx, symbol, name, maxSupply, mintable, owner)
@@ -272,155 +269,3 @@ func (suite *KeeperTestSuite) TestSwapFeeToken() {
 	amt = suite.bk.GetBalance(suite.ctx, token2.GetOwner(), token2.MinUnit)
 	suite.Equal("0t2min", amt.String())
 }
-
-var (
-	_ tokentypes.EVMKeeper   = (*evm)(nil)
-	_ tokentypes.ICS20Keeper = (*transferKeeper)(nil)
-)
-
-
-// ProvideEVMKeeper returns an instance of tokentypes.EVMKeeper.
-//
-// No parameters.
-// Returns a tokentypes.EVMKeeper.
-func ProvideEVMKeeper() tokentypes.EVMKeeper {
-	return &evm{
-		erc20s: make(map[common.Address]*erc20),
-	}
-}
-
-// ProvideICS20Keeper returns an instance of tokentypes.ICS20Keeper.
-//
-// No parameters.
-// Returns a tokentypes.ICS20Keeper.
-func ProvideICS20Keeper() tokentypes.ICS20Keeper {
-	return &transferKeeper{}
-}
-
-type evm struct {
-	erc20s map[common.Address]*erc20
-}
-
-// ApplyMessage implements types.EVMKeeper.
-func (e *evm) ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*types.Result, error) {
-	isCreate := msg.To() == nil
-	if isCreate {
-		contractAddr := crypto.CreateAddress(msg.From(), msg.Nonce())
-
-		data := msg.Data()[len(contracts.TokenProxyContract.Bin):]
-		args, err := contracts.TokenProxyContract.ABI.Constructor.Inputs.Unpack(data)
-		if err != nil {
-			return nil, err
-		}
-
-		data = args[1].([]byte)
-		data = data[4:]
-		args, err = contracts.ERC20TokenContract.ABI.Methods[contracts.MethodInitialize].Inputs.Unpack(data)
-		if err != nil {
-			return nil, err
-		}
-
-		name, _ := args[0].(string)
-		symbol, _ := args[1].(string)
-		scale, _ := args[2].(uint8)
-		e.erc20s[contractAddr] = &erc20{
-			address: contractAddr,
-			scale:   scale,
-			name:    name,
-			symbol:  symbol,
-			balance: make(map[common.Address]*big.Int),
-		}
-		return &types.Result{
-			Hash: contractAddr.Hex(),
-		}, nil
-	}
-
-	erc20Contract, ok := e.erc20s[*msg.To()]
-	if !ok {
-		return nil, fmt.Errorf("erc20 contract not found")
-	}
-	return e.dispatch(erc20Contract, msg.Data())
-}
-
-// ChainID implements types.EVMKeeper.
-func (e *evm) ChainID() *big.Int {
-	return big.NewInt(16688)
-}
-
-// EstimateGas implements types.EVMKeeper.
-func (e *evm) EstimateGas(ctx context.Context, req *types.EthCallRequest) (uint64, error) {
-	return 3000000, nil
-}
-
-// SupportedKey implements types.EVMKeeper.
-func (e *evm) SupportedKey(pubKey cryptotypes.PubKey) bool {
-	return true
-}
-
-func (e *evm) dispatch(contract *erc20, data []byte) (*types.Result, error) {
-	method, err := contracts.ERC20TokenContract.ABI.MethodById(data[0:4])
-	if err != nil {
-		return nil, err
-	}
-
-	ret, err := contract.call(method, data[4:])
-	if err != nil {
-		return nil, err
-	}
-	return &types.Result{
-		Hash: contract.address.Hex(),
-		Ret:  ret,
-	}, nil
-}
-
-type erc20 struct {
-	address      common.Address
-	scale        uint8
-	name, symbol string
-
-	balance map[common.Address]*big.Int
-}
-
-func (erc20 erc20) call(method *abi.Method, data []byte) ([]byte, error) {
-	args, err := method.Inputs.Unpack(data)
-	if err != nil {
-		return nil, err
-	}
-
-	switch method.Name {
-	case "name":
-		return method.Outputs.Pack(erc20.name)
-	case "symbol":
-		return method.Outputs.Pack(erc20.symbol)
-	case "decimals":
-		return method.Outputs.Pack(erc20.scale)
-	case "balanceOf":
-		balance, ok := erc20.balance[args[0].(common.Address)]
-		if !ok {
-			return method.Outputs.Pack(big.NewInt(0))
-		}
-		return method.Outputs.Pack(balance)
-	case "mint":
-		to := args[0].(common.Address)
-		balance, ok := erc20.balance[args[0].(common.Address)]
-		if !ok {
-			balance = big.NewInt(0)
-		}
-		erc20.balance[to] = new(big.Int).Add(balance, args[1].(*big.Int))
-		return nil, nil
-	case "burn":
-		from := args[0].(common.Address)
-		erc20.balance[from] = new(big.Int).Sub(erc20.balance[from], args[1].(*big.Int))
-		return nil, nil
-	default:
-		return nil, fmt.Errorf("unknown method %s", method.Name)
-	}
-}
-
-type transferKeeper struct{}
-
-// HasTrace implements types.ICS20Keeper.
-func (t *transferKeeper) HasTrace(ctx sdk.Context, denom string) bool {
-	return true
-}
-
