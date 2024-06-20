@@ -10,9 +10,9 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/irisnet/irismod/simapp"
 	"irismod.io/farm/keeper"
 	"irismod.io/farm/types"
+	"irismod.io/simapp"
 )
 
 var (
@@ -39,7 +39,7 @@ type KeeperTestSuite struct {
 
 	cdc    codec.BinaryCodec
 	ctx    sdk.Context
-	keeper *keeper.Keeper
+	keeper keeper.Keeper
 	app    *simapp.SimApp
 }
 
@@ -48,11 +48,15 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(suite.T(), isCheckTx)
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{},
+		Consumers: []interface{}{&suite.keeper},
+	}
+	app := simapp.Setup(suite.T(), isCheckTx,depInjectOptions)
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: 1})
 	suite.app = app
-	suite.keeper = &app.FarmKeeper
 	suite.keeper.SetParams(suite.ctx, types.DefaultParams())
 	suite.setTestAddrs()
 }

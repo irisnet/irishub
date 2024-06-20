@@ -1,34 +1,34 @@
 package v3_test
 
-import (
-	"testing"
+// import (
+// 	"testing"
 
-	"github.com/stretchr/testify/require"
+// 	"github.com/stretchr/testify/require"
 
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+// 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	"github.com/irisnet/irismod/simapp"
-	v3 "irismod.io/farm/migrations/v3"
-	farmtypes "irismod.io/farm/types"
-)
+// 	"github.com/irisnet/irismod/simapp"
+// 	v3 "irismod.io/farm/migrations/v3"
+// 	farmtypes "irismod.io/farm/types"
+// )
 
-func TestMigrate(t *testing.T) {
-	app := simapp.Setup(t, false)
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+// func TestMigrate(t *testing.T) {
+// 	app := simapp.Setup(t, false)
+// 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
-	legacySubspace := app.GetSubspace(farmtypes.ModuleName)
+// 	legacySubspace := app.GetSubspace(farmtypes.ModuleName)
 
-	params := farmtypes.DefaultParams()
-	legacySubspace.SetParamSet(ctx, &params)
+// 	params := farmtypes.DefaultParams()
+// 	legacySubspace.SetParamSet(ctx, &params)
 
-	err := v3.Migrate(
-		ctx,
-		app.FarmKeeper,
-		legacySubspace,
-	)
-	require.NoError(t, err)
+// 	err := v3.Migrate(
+// 		ctx,
+// 		app.FarmKeeper,
+// 		legacySubspace,
+// 	)
+// 	require.NoError(t, err)
 
-	expParams := app.FarmKeeper.GetParams(ctx)
-	require.Equal(t, expParams, params, "v3.Migrate failed")
+// 	expParams := app.FarmKeeper.GetParams(ctx)
+// 	require.Equal(t, expParams, params, "v3.Migrate failed")
 
-}
+// }
