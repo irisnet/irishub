@@ -4,7 +4,7 @@ package irismod.farm;
 import "gogoproto/gogo.proto";
 import "irismod/farm/farm.proto";
 
-option go_package = "github.com/irisnet/irismod/modules/farm/types";
+option go_package = "irismod.io/farm/types";
 
 // GenesisState defines the genesis information exported by the farm module
 message GenesisState {

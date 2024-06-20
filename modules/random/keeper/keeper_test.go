@@ -14,9 +14,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/simapp"
 	"irismod.io/random/keeper"
 	"irismod.io/random/types"
+	"irismod.io/simapp"
 )
 
 // define testing variables
@@ -42,12 +42,17 @@ type KeeperTestSuite struct {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(suite.T(), false)
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{},
+		Consumers: []interface{}{&suite.keeper},
+	}
+
+	app := simapp.Setup(suite.T(), false, depInjectOptions)
 
 	suite.app = app
 	suite.cdc = app.LegacyAmino()
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
-	suite.keeper = app.RandomKeeper
 }
 
 func TestKeeperTestSuite(t *testing.T) {
@@ -55,7 +60,6 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestSetRandom() {
-
 	random := types.NewRandom(
 		hex.EncodeToString(types.SHA256(testTxBytes)),
 		testHeight,

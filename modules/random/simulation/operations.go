@@ -10,9 +10,9 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	irishelpers "github.com/irisnet/irismod/simapp/helpers"
 	"irismod.io/random/keeper"
 	"irismod.io/random/types"
+	irishelpers "irismod.io/simapp/helpers"
 )
 
 // WeightedOperations generates a MsgRequestRandom with random values.

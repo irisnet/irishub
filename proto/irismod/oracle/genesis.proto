@@ -5,7 +5,7 @@ import "irismod/oracle/oracle.proto";
 import "irismod/service/service.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/irisnet/irismod/modules/oracle/types";
+option go_package = "irismod.io/oracle/types";
 
 // GenesisState defines the oracle module's genesis state
 message GenesisState {

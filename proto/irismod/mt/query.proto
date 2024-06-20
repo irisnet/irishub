@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "irismod/mt/mt.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 
-option go_package = "github.com/irisnet/irismod/modules/mt/types";
+option go_package = "irismod.io/mt/types";
 
 // Query defines the gRPC querier service for MT module
 service Query {

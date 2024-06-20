@@ -6,7 +6,7 @@ import "gogoproto/gogo.proto";
 import "cosmos/query/v1/query.proto";
 import "irismod/htlc/htlc.proto";
 
-option go_package = "github.com/irisnet/irismod/modules/htlc/types";
+option go_package = "irismod.io/htlc/types";
 
 // Query provides defines the gRPC querier service
 service Query {

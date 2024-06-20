@@ -4,7 +4,7 @@ package irismod.service;
 import "gogoproto/gogo.proto";
 import "irismod/service/service.proto";
 
-option go_package = "github.com/irisnet/irismod/modules/service/types";
+option go_package = "irismod.io/service/types";
 
 // GenesisState defines the service module's genesis state
 message GenesisState {

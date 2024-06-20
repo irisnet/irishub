@@ -17,17 +17,17 @@ func (suite *KeeperTestSuite) TestGRPCQueryRandom() {
 	random := types.NewRandom(hex.EncodeToString(reqID), 1, "test")
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
-	types.RegisterQueryServer(queryHelper, app.RandomKeeper)
+	types.RegisterQueryServer(queryHelper, suite.keeper)
 	queryClient := types.NewQueryClient(queryHelper)
 
 	_, err := queryClient.Random(gocontext.Background(), &types.QueryRandomRequest{ReqId: hex.EncodeToString(reqID)})
 	suite.Require().Error(err)
 
-	app.RandomKeeper.SetRandom(ctx, reqID, random)
+	suite.keeper.SetRandom(ctx, reqID, random)
 
 	randomResp, err := queryClient.Random(gocontext.Background(), &types.QueryRandomRequest{ReqId: hex.EncodeToString(reqID)})
 	suite.Require().NoError(err)
-	expected, _ := app.RandomKeeper.GetRandom(ctx, reqID)
+	expected, _ := suite.keeper.GetRandom(ctx, reqID)
 	suite.Equal(expected, *randomResp.Random)
 }
 
@@ -39,19 +39,19 @@ func (suite *KeeperTestSuite) TestGRPCRandomRequestQueue() {
 	request := types.NewRequest(1, addr.String(), string(txHash), false, sdk.NewCoins(), "")
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
-	types.RegisterQueryServer(queryHelper, app.RandomKeeper)
+	types.RegisterQueryServer(queryHelper, suite.keeper)
 	queryClient := types.NewQueryClient(queryHelper)
 
 	_, err := queryClient.RandomRequestQueue(gocontext.Background(), &types.QueryRandomRequestQueueRequest{Height: 1})
 	suite.Require().NoError(err)
 
-	app.RandomKeeper.EnqueueRandomRequest(ctx, 1, reqID, request)
+	suite.keeper.EnqueueRandomRequest(ctx, 1, reqID, request)
 
 	randomResp, err := queryClient.RandomRequestQueue(gocontext.Background(), &types.QueryRandomRequestQueueRequest{Height: 1})
 	suite.Require().NoError(err)
 	var requests = make([]types.Request, 0)
 
-	app.RandomKeeper.IterateRandomRequestQueue(ctx, func(h int64, reqID []byte, r types.Request) (stop bool) {
+	suite.keeper.IterateRandomRequestQueue(ctx, func(h int64, reqID []byte, r types.Request) (stop bool) {
 		requests = append(requests, r)
 		return false
 	})
