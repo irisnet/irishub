@@ -15,9 +15,9 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	irishelpers "github.com/irisnet/irismod/simapp/helpers"
 	"irismod.io/service/keeper"
 	"irismod.io/service/types"
+	irishelpers "irismod.io/simapp/helpers"
 )
 
 // Simulation operation weights constants
