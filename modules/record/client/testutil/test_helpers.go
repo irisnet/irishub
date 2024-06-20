@@ -11,7 +11,7 @@ package testutil
 // 	"github.com/cosmos/cosmos-sdk/client/flags"
 
 // 	"github.com/irisnet/irismod/simapp"
-// 	recordcli "irismod.io/record/client/cli"
+// 	recordcli "github.com/irisnet/irismod/record/client/cli"
 // )
 
 // // CreateRecordExec creates a redelegate message.

@@ -6,8 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	service "irismod.io/service/exported"
-	servicetypes "irismod.io/service/types"
+	service "github.com/irisnet/irismod/service/exported"
+	servicetypes "github.com/irisnet/irismod/service/types"
 )
 
 // accountKeeper defines the expected account keeper used for simulations (noalias)

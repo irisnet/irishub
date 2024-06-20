@@ -23,7 +23,7 @@ cd ..
 # rm -rf github.com
 
 # move proto files to the right places
-cp -r irismod.io/* ./modules/
-rm -rf irismod.io
+cp -r github.com/irisnet/irismod/* ./modules/
+rm -rf github.com/irisnet/irismod
 
 ./scripts/protocgen-pulsar.sh

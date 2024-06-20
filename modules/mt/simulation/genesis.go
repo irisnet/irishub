@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	mt "irismod.io/mt/types"
+	mt "github.com/irisnet/irismod/mt/types"
 )
 
 const (

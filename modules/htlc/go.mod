@@ -1,4 +1,4 @@
-module irismod.io/htlc
+module github.com/irisnet/irismod/htlc
 
 go 1.19
 

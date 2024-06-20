@@ -1,4 +1,4 @@
-module irismod.io/token
+module github.com/irisnet/irismod/token
 
 go 1.19
 

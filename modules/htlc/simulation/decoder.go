@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"irismod.io/htlc/types"
+	"github.com/irisnet/irismod/htlc/types"
 )
 
 // NewDecodeStore unmarshals the KVPair's Value to the corresponding HTLC type

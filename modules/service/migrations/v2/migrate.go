@@ -3,8 +3,8 @@ package v2
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/irisnet/irismod/service/types"
 	"github.com/irisnet/irismod/types/exported"
-	"irismod.io/service/types"
 )
 
 // ServiceKeeper defines a interface for SetParams function

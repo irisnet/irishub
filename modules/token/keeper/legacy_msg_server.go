@@ -6,8 +6,8 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	v1 "irismod.io/token/types/v1"
-	"irismod.io/token/types/v1beta1"
+	v1 "github.com/irisnet/irismod/token/types/v1"
+	"github.com/irisnet/irismod/token/types/v1beta1"
 )
 
 type legacyMsgServer struct {

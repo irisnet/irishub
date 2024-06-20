@@ -7,7 +7,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "irismod/farm/farm.proto";
 
-option go_package = "irismod.io/farm/types";
+option go_package = "github.com/irisnet/irismod/farm/types";
 
 // Query creates service with farm as rpc
 service Query {

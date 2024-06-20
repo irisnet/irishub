@@ -13,7 +13,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"irismod.io/random/types"
+	"github.com/irisnet/irismod/random/types"
 )
 
 var _ types.QueryServer = Keeper{}

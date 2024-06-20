@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"irismod.io/oracle/types"
+	"github.com/irisnet/irismod/oracle/types"
 )
 
 // GetQueryCmd returns the cli query commands for the oracle module.

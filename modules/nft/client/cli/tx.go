@@ -13,7 +13,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"irismod.io/nft/types"
+	"github.com/irisnet/irismod/nft/types"
 )
 
 // NewTxCmd returns the transaction commands for this module

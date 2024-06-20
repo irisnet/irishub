@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"irismod.io/oracle/types"
+	"github.com/irisnet/irismod/oracle/types"
 )
 
 type ValidateOracleAuthDecorator struct {

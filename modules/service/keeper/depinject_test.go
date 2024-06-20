@@ -47,8 +47,8 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	servicemodule "github.com/irisnet/irismod/api/irismod/service/module/v1"
-	_ "irismod.io/service"
-	servicetypes "irismod.io/service/types"
+	_ "github.com/irisnet/irismod/service"
+	servicetypes "github.com/irisnet/irismod/service/types"
 )
 
 var (

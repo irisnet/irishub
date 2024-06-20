@@ -18,13 +18,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
+	"github.com/irisnet/irismod/token/client/cli"
+	"github.com/irisnet/irismod/token/keeper"
+	"github.com/irisnet/irismod/token/simulation"
+	"github.com/irisnet/irismod/token/types"
+	v1 "github.com/irisnet/irismod/token/types/v1"
+	"github.com/irisnet/irismod/token/types/v1beta1"
 	"github.com/irisnet/irismod/types/exported"
-	"irismod.io/token/client/cli"
-	"irismod.io/token/keeper"
-	"irismod.io/token/simulation"
-	"irismod.io/token/types"
-	v1 "irismod.io/token/types/v1"
-	"irismod.io/token/types/v1beta1"
 )
 
 // ConsensusVersion defines the current token module consensus version.

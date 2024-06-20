@@ -10,7 +10,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
-	"irismod.io/farm/types"
+	"github.com/irisnet/irismod/farm/types"
 )
 
 type msgServer struct {

@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"irismod.io/oracle/types"
+	"github.com/irisnet/irismod/oracle/types"
 )
 
 // NewDecodeStore unmarshals the KVPair's Value to the corresponding slashing type

@@ -1,4 +1,4 @@
-module irismod.io/simapp
+module github.com/irisnet/irismod/simapp
 
 go 1.19
 

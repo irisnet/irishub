@@ -12,9 +12,9 @@ package testutil_test
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 // 	"github.com/irisnet/irismod/simapp"
-// 	recordcli "irismod.io/record/client/cli"
-// 	recordtestutil "irismod.io/record/client/testutil"
-// 	recordtypes "irismod.io/record/types"
+// 	recordcli "github.com/irisnet/irismod/record/client/cli"
+// 	recordtestutil "github.com/irisnet/irismod/record/client/testutil"
+// 	recordtypes "github.com/irisnet/irismod/record/types"
 // )
 
 // type IntegrationTestSuite struct {

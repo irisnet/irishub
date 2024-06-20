@@ -3,8 +3,8 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"irismod.io/nft/exported"
-	"irismod.io/nft/types"
+	"github.com/irisnet/irismod/nft/exported"
+	"github.com/irisnet/irismod/nft/types"
 )
 
 type LegacyKeeper struct {

@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"irismod.io/token/types"
-	v1 "irismod.io/token/types/v1"
+	"github.com/irisnet/irismod/token/types"
+	v1 "github.com/irisnet/irismod/token/types/v1"
 )
 
 // fee factor formula: (ln(len({name}))/ln{base})^{exp}

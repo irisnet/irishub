@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"irismod.io/mt/types"
+	"github.com/irisnet/irismod/mt/types"
 )
 
 // AddBalance adds amounts to an account

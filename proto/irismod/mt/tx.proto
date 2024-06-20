@@ -3,7 +3,7 @@ package irismod.mt;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "irismod.io/mt/types";
+option go_package = "github.com/irisnet/irismod/mt/types";
 option (gogoproto.goproto_getters_all) = false;
 
 // Msg defines the mt Msg service.

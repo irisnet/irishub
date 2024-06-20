@@ -10,8 +10,8 @@ package testutil
 // 	"github.com/cosmos/cosmos-sdk/client/flags"
 
 // 	"github.com/irisnet/irismod/simapp"
-// 	nftcli "irismod.io/nft/client/cli"
-// 	nfttypes "irismod.io/nft/types"
+// 	nftcli "github.com/irisnet/irismod/nft/client/cli"
+// 	nfttypes "github.com/irisnet/irismod/nft/types"
 // )
 
 // // IssueDenomExec creates a redelegate message.

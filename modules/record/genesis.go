@@ -3,8 +3,8 @@ package record
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"irismod.io/record/keeper"
-	"irismod.io/record/types"
+	"github.com/irisnet/irismod/record/keeper"
+	"github.com/irisnet/irismod/record/types"
 )
 
 // InitGenesis stores the genesis state

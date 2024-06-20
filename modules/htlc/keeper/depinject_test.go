@@ -47,8 +47,8 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	htlcmodule "github.com/irisnet/irismod/api/irismod/htlc/module/v1"
-	_ "irismod.io/htlc"
-	htlctypes "irismod.io/htlc/types"
+	_ "github.com/irisnet/irismod/htlc"
+	htlctypes "github.com/irisnet/irismod/htlc/types"
 )
 
 var (

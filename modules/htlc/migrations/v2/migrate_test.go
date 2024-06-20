@@ -12,8 +12,8 @@ package v2_test
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 // 	"github.com/irisnet/irismod/simapp"
-// 	v2 "irismod.io/htlc/migrations/v2"
-// 	htlctypes "irismod.io/htlc/types"
+// 	v2 "github.com/irisnet/irismod/htlc/migrations/v2"
+// 	htlctypes "github.com/irisnet/irismod/htlc/types"
 // )
 
 // func TestMigrate(t *testing.T) {

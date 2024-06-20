@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"irismod.io/nft/exported"
+	"github.com/irisnet/irismod/nft/exported"
 )
 
 var _ exported.NFT = BaseNFT{}

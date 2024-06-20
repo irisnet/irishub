@@ -10,8 +10,8 @@ package testutil
 // 	"github.com/cosmos/cosmos-sdk/client/flags"
 
 // 	"github.com/irisnet/irismod/simapp"
-// 	farmcli "irismod.io/farm/client/cli"
-// 	farmtypes "irismod.io/farm/types"
+// 	farmcli "github.com/irisnet/irismod/farm/client/cli"
+// 	farmtypes "github.com/irisnet/irismod/farm/types"
 // )
 
 // // CreateFarmPoolExec creates a redelegate message.

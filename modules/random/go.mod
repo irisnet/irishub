@@ -1,4 +1,4 @@
-module irismod.io/random
+module github.com/irisnet/irismod/random
 
 go 1.19
 

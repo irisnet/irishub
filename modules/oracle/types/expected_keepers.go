@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	service "irismod.io/service/exported"
+	service "github.com/irisnet/irismod/service/exported"
 )
 
 // ServiceKeeper defines the expected service keeper (noalias)

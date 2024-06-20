@@ -1,4 +1,4 @@
-module irismod.io/record
+module github.com/irisnet/irismod/record
 
 go 1.19
 

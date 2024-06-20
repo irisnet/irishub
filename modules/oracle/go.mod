@@ -1,4 +1,4 @@
-module irismod.io/oracle
+module github.com/irisnet/irismod/oracle
 
 go 1.19
 

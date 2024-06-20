@@ -15,9 +15,9 @@ package v2_test
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 // 	"github.com/irisnet/irismod/simapp"
-// 	"irismod.io/nft/keeper"
-// 	v2 "irismod.io/nft/migrations/v2"
-// 	"irismod.io/nft/types"
+// 	"github.com/irisnet/irismod/nft/keeper"
+// 	v2 "github.com/irisnet/irismod/nft/migrations/v2"
+// 	"github.com/irisnet/irismod/nft/types"
 // )
 
 // func TestMigrate(t *testing.T) {

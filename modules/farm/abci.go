@@ -3,8 +3,8 @@ package farm
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"irismod.io/farm/keeper"
-	"irismod.io/farm/types"
+	"github.com/irisnet/irismod/farm/keeper"
+	"github.com/irisnet/irismod/farm/types"
 )
 
 // EndBlocker handles block beginning logic for farm

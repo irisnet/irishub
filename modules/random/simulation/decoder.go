@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"irismod.io/random/types"
+	"github.com/irisnet/irismod/random/types"
 )
 
 // DecodeStore unmarshals the KVPair's Value to the corresponding random type

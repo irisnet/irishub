@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"irismod.io/service/types"
+	"github.com/irisnet/irismod/service/types"
 )
 
 // MaxRequestTimeout returns the maximum request timeout

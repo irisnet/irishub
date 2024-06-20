@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"irismod.io/htlc/types"
+	"github.com/irisnet/irismod/htlc/types"
 )
 
 var (

@@ -11,8 +11,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"irismod.io/coinswap/keeper"
-	"irismod.io/coinswap/types"
+	"github.com/irisnet/irismod/coinswap/keeper"
+	"github.com/irisnet/irismod/coinswap/types"
 )
 
 func TestSwapSuite(t *testing.T) {

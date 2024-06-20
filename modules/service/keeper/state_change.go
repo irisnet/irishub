@@ -7,7 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"irismod.io/service/types"
+	"github.com/irisnet/irismod/service/types"
 )
 
 // CompleteBatch completes a running batch

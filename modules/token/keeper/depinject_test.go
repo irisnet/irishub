@@ -58,9 +58,9 @@ import (
 
 	tokenmodule "github.com/irisnet/irismod/api/irismod/token/module/v1"
 	"github.com/irisnet/irismod/contracts"
+	_ "github.com/irisnet/irismod/token"
+	tokentypes "github.com/irisnet/irismod/token/types"
 	"github.com/irisnet/irismod/types"
-	_ "irismod.io/token"
-	tokentypes "irismod.io/token/types"
 )
 
 var (

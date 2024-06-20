@@ -8,8 +8,8 @@ package v2_test
 // 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 // 	"github.com/irisnet/irismod/simapp"
-// 	v2 "irismod.io/service/migrations/v2"
-// 	servicetypes "irismod.io/service/types"
+// 	v2 "github.com/irisnet/irismod/service/migrations/v2"
+// 	servicetypes "github.com/irisnet/irismod/service/types"
 // )
 
 // func TestMigrate(t *testing.T) {

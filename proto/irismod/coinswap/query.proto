@@ -8,7 +8,7 @@ import "cosmos/query/v1/query.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "irismod/coinswap/coinswap.proto";
 
-option go_package = "irismod.io/coinswap/types";
+option go_package = "github.com/irisnet/irismod/coinswap/types";
 
 // Query creates service with coinswap as rpc
 service Query {

@@ -14,9 +14,9 @@ package cli_test
 // 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
 // 	tokentypes "github.com/irisnet/irismod/modules/token/types/v1"
 // 	"github.com/irisnet/irismod/simapp"
-// 	farmcli "irismod.io/farm/client/cli"
-// 	"irismod.io/farm/client/testutil"
-// 	farmtypes "irismod.io/farm/types"
+// 	farmcli "github.com/irisnet/irismod/farm/client/cli"
+// 	"github.com/irisnet/irismod/farm/client/testutil"
+// 	farmtypes "github.com/irisnet/irismod/farm/types"
 // )
 
 // type IntegrationTestSuite struct {

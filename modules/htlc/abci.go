@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"irismod.io/htlc/keeper"
-	"irismod.io/htlc/types"
+	"github.com/irisnet/irismod/htlc/keeper"
+	"github.com/irisnet/irismod/htlc/types"
 )
 
 // BeginBlocker handles block beginning logic for HTLC

@@ -11,8 +11,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"irismod.io/token/types"
-	v1 "irismod.io/token/types/v1"
+	"github.com/irisnet/irismod/token/types"
+	v1 "github.com/irisnet/irismod/token/types/v1"
 )
 
 // GetQueryCmd returns the query commands for the token module.

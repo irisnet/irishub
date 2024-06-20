@@ -11,8 +11,8 @@ package testutil
 // 	"github.com/cosmos/cosmos-sdk/client/flags"
 
 // 	"github.com/irisnet/irismod/simapp"
-// 	mtcli "irismod.io/mt/client/cli"
-// 	mttypes "irismod.io/mt/types"
+// 	mtcli "github.com/irisnet/irismod/mt/client/cli"
+// 	mttypes "github.com/irisnet/irismod/mt/types"
 // )
 
 // // IssueDenomExec creates a redelegate message.

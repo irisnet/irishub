@@ -8,7 +8,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "irismod/service/service.proto";
 
-option go_package = "irismod.io/service/types";
+option go_package = "github.com/irisnet/irismod/service/types";
 
 // Query creates service with iservice as rpc
 service Query {

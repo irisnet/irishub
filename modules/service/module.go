@@ -17,11 +17,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
+	"github.com/irisnet/irismod/service/client/cli"
+	"github.com/irisnet/irismod/service/keeper"
+	"github.com/irisnet/irismod/service/simulation"
+	"github.com/irisnet/irismod/service/types"
 	"github.com/irisnet/irismod/types/exported"
-	"irismod.io/service/client/cli"
-	"irismod.io/service/keeper"
-	"irismod.io/service/simulation"
-	"irismod.io/service/types"
 )
 
 // ConsensusVersion defines the current service module consensus version.

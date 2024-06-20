@@ -11,7 +11,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"irismod.io/htlc/types"
+	"github.com/irisnet/irismod/htlc/types"
 )
 
 // CreateHTLC creates an HTLC

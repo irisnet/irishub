@@ -9,7 +9,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	tokentypes "irismod.io/token/types"
+	tokentypes "github.com/irisnet/irismod/token/types"
 )
 
 var (

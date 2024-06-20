@@ -14,11 +14,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"irismod.io/oracle/keeper"
-	"irismod.io/oracle/types"
-	"irismod.io/service/exported"
-	servicetypes "irismod.io/service/types"
-	"irismod.io/simapp"
+	"github.com/irisnet/irismod/oracle/keeper"
+	"github.com/irisnet/irismod/oracle/types"
+	"github.com/irisnet/irismod/service/exported"
+	servicetypes "github.com/irisnet/irismod/service/types"
+	"github.com/irisnet/irismod/simapp"
 )
 
 var (

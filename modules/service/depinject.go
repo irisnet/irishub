@@ -10,9 +10,9 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	modulev1 "github.com/irisnet/irismod/api/irismod/service/module/v1"
+	"github.com/irisnet/irismod/service/keeper"
+	"github.com/irisnet/irismod/service/types"
 	"github.com/irisnet/irismod/types/exported"
-	"irismod.io/service/keeper"
-	"irismod.io/service/types"
 )
 
 // App Wiring Setup

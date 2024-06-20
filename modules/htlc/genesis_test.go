@@ -12,8 +12,8 @@ package htlc_test
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 // 	"github.com/irisnet/irismod/simapp"
-// 	"irismod.io/htlc/keeper"
-// 	"irismod.io/htlc/types"
+// 	"github.com/irisnet/irismod/htlc/keeper"
+// 	"github.com/irisnet/irismod/htlc/types"
 // )
 
 // type GenesisTestSuite struct {

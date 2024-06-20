@@ -10,9 +10,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"irismod.io/random/types"
-	"irismod.io/service/exported"
-	servicetypes "irismod.io/service/types"
+	"github.com/irisnet/irismod/random/types"
+	"github.com/irisnet/irismod/service/exported"
+	servicetypes "github.com/irisnet/irismod/service/types"
 )
 
 // RequestService requests the service for the oracle seed

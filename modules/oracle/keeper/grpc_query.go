@@ -13,7 +13,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
-	"irismod.io/oracle/types"
+	"github.com/irisnet/irismod/oracle/types"
 )
 
 var _ types.QueryServer = Keeper{}

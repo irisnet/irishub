@@ -4,7 +4,7 @@ package irismod.record;
 import "irismod/record/record.proto";
 import "google/api/annotations.proto";
 
-option go_package = "irismod.io/record/types";
+option go_package = "github.com/irisnet/irismod/record/types";
 
 // Query defines the gRPC querier service for record module
 service Query {

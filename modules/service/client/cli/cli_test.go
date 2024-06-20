@@ -18,10 +18,10 @@ package cli_test
 // 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 // 	"github.com/irisnet/irismod/simapp"
-// 	servicecli "irismod.io/service/client/cli"
-// 	servicetestutil "irismod.io/service/client/testutil"
-// 	"irismod.io/service/types"
-// 	servicetypes "irismod.io/service/types"
+// 	servicecli "github.com/irisnet/irismod/service/client/cli"
+// 	servicetestutil "github.com/irisnet/irismod/service/client/testutil"
+// 	"github.com/irisnet/irismod/service/types"
+// 	servicetypes "github.com/irisnet/irismod/service/types"
 // )
 
 // type IntegrationTestSuite struct {

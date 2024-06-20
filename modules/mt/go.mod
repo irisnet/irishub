@@ -1,4 +1,4 @@
-module irismod.io/mt
+module github.com/irisnet/irismod/mt
 
 go 1.19
 

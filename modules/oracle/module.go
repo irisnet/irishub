@@ -18,10 +18,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"irismod.io/oracle/client/cli"
-	"irismod.io/oracle/keeper"
-	"irismod.io/oracle/simulation"
-	"irismod.io/oracle/types"
+	"github.com/irisnet/irismod/oracle/client/cli"
+	"github.com/irisnet/irismod/oracle/keeper"
+	"github.com/irisnet/irismod/oracle/simulation"
+	"github.com/irisnet/irismod/oracle/types"
 )
 
 var (

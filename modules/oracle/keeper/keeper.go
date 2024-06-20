@@ -15,8 +15,8 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"irismod.io/oracle/types"
-	serviceexported "irismod.io/service/exported"
+	"github.com/irisnet/irismod/oracle/types"
+	serviceexported "github.com/irisnet/irismod/service/exported"
 )
 
 // Keeper defines a struct for the oracle keeper

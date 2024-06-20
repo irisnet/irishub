@@ -48,11 +48,11 @@ import (
 
 	oraclemodule "github.com/irisnet/irismod/api/irismod/oracle/module/v1"
 	servicemodule "github.com/irisnet/irismod/api/irismod/service/module/v1"
-	oracletypes "irismod.io/oracle/types"
-	servicetypes "irismod.io/service/types"
+	oracletypes "github.com/irisnet/irismod/oracle/types"
+	servicetypes "github.com/irisnet/irismod/service/types"
 
-	_ "irismod.io/oracle"
-	_ "irismod.io/service"
+	_ "github.com/irisnet/irismod/oracle"
+	_ "github.com/irisnet/irismod/service"
 )
 
 var (

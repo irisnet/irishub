@@ -8,8 +8,8 @@ import (
 	store "github.com/cosmos/cosmos-sdk/store/types"
 
 	modulev1 "github.com/irisnet/irismod/api/irismod/nft/module/v1"
-	"irismod.io/nft/keeper"
-	"irismod.io/nft/types"
+	"github.com/irisnet/irismod/nft/keeper"
+	"github.com/irisnet/irismod/nft/types"
 )
 
 // App Wiring Setup

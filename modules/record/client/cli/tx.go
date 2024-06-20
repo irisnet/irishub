@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 
-	"irismod.io/record/types"
+	"github.com/irisnet/irismod/record/types"
 )
 
 // NewTxCmd returns the transaction commands for the record module.

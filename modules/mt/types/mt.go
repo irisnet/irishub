@@ -1,7 +1,7 @@
 package types
 
 import (
-	"irismod.io/mt/exported"
+	"github.com/irisnet/irismod/mt/exported"
 )
 
 var _ exported.MT = MT{}

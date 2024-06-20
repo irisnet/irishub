@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"irismod.io/random/types"
+	"github.com/irisnet/irismod/random/types"
 )
 
 // GetQueryCmd returns the cli query commands for the random module.

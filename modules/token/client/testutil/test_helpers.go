@@ -14,8 +14,8 @@ package testutil
 // 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 
 // 	"github.com/irisnet/irismod/simapp"
-// 	tokencli "irismod.io/token/client/cli"
-// 	v1 "irismod.io/token/types/v1"
+// 	tokencli "github.com/irisnet/irismod/token/client/cli"
+// 	v1 "github.com/irisnet/irismod/token/types/v1"
 // )
 
 // func IssueTokenExec(t *testing.T,

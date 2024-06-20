@@ -48,11 +48,11 @@ import (
 
 	coinswapmodule "github.com/irisnet/irismod/api/irismod/coinswap/module/v1"
 	farmmodule "github.com/irisnet/irismod/api/irismod/farm/module/v1"
-	coinswaptypes "irismod.io/coinswap/types"
-	farmtypes "irismod.io/farm/types"
+	coinswaptypes "github.com/irisnet/irismod/coinswap/types"
+	farmtypes "github.com/irisnet/irismod/farm/types"
 
-	_ "irismod.io/coinswap"
-	_ "irismod.io/farm"
+	_ "github.com/irisnet/irismod/coinswap"
+	_ "github.com/irisnet/irismod/farm"
 )
 
 var (

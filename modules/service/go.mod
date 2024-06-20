@@ -1,4 +1,4 @@
-module irismod.io/service
+module github.com/irisnet/irismod/service
 
 go 1.19
 

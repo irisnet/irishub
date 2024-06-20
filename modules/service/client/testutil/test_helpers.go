@@ -10,8 +10,8 @@ package testutil
 // 	"github.com/cosmos/cosmos-sdk/client/flags"
 
 // 	"github.com/irisnet/irismod/simapp"
-// 	servicecli "irismod.io/service/client/cli"
-// 	servicetypes "irismod.io/service/types"
+// 	servicecli "github.com/irisnet/irismod/service/client/cli"
+// 	servicetypes "github.com/irisnet/irismod/service/types"
 // )
 
 // func DefineServiceExec(t *testing.T,

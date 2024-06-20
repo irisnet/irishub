@@ -18,8 +18,8 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"irismod.io/coinswap/keeper"
-	"irismod.io/coinswap/types"
+	"github.com/irisnet/irismod/coinswap/keeper"
+	"github.com/irisnet/irismod/coinswap/types"
 )
 
 // Simulation operation weights constants

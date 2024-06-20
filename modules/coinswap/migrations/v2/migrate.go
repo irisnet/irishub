@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	coinswaptypes "irismod.io/coinswap/types"
+	coinswaptypes "github.com/irisnet/irismod/coinswap/types"
 )
 
 type CoinswapKeeper interface {

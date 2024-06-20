@@ -1,4 +1,4 @@
-module irismod.io/farm
+module github.com/irisnet/irismod/farm
 
 go 1.19
 

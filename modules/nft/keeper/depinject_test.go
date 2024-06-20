@@ -47,8 +47,8 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	nftmodule "github.com/irisnet/irismod/api/irismod/nft/module/v1"
-	_ "irismod.io/nft"
-	nfttypes "irismod.io/nft/types"
+	_ "github.com/irisnet/irismod/nft"
+	nfttypes "github.com/irisnet/irismod/nft/types"
 )
 
 var (
