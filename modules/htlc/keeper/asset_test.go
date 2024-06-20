@@ -12,9 +12,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/simapp"
 	"irismod.io/htlc/keeper"
 	"irismod.io/htlc/types"
+	"irismod.io/simapp"
 )
 
 type AssetTestSuite struct {
@@ -22,13 +22,19 @@ type AssetTestSuite struct {
 
 	cdc    codec.BinaryCodec
 	ctx    sdk.Context
-	keeper *keeper.Keeper
+	keeper keeper.Keeper
 	app    *simapp.SimApp
 }
 
 func (suite *AssetTestSuite) SetupTest() {
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{},
+		Consumers: []interface{}{&suite.keeper},
+	}
 	app := simapp.SetupWithGenesisStateFn(
 		suite.T(),
+		depInjectOptions,
 		func(cdc codec.Codec, state simapp.GenesisState) simapp.GenesisState {
 			state[types.ModuleName] = cdc.MustMarshalJSON(NewHTLTGenesis(TestDeputy))
 			return state
@@ -37,7 +43,6 @@ func (suite *AssetTestSuite) SetupTest() {
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{Height: 1, Time: time.Now()})
 
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
-	suite.keeper = &app.HTLCKeeper
 	suite.app = app
 
 	suite.setTestParams()

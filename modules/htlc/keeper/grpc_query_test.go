@@ -15,9 +15,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/simapp"
 	"irismod.io/htlc/keeper"
 	"irismod.io/htlc/types"
+	"irismod.io/simapp"
 )
 
 type QueryTestSuite struct {
@@ -25,7 +25,7 @@ type QueryTestSuite struct {
 
 	cdc    codec.JSONCodec
 	ctx    sdk.Context
-	keeper *keeper.Keeper
+	keeper keeper.Keeper
 	app    *simapp.SimApp
 
 	queryClient types.QueryClient
@@ -35,8 +35,15 @@ type QueryTestSuite struct {
 }
 
 func (suite *QueryTestSuite) SetupTest() {
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{},
+		Consumers: []interface{}{&suite.keeper},
+	}
+
 	app := simapp.SetupWithGenesisStateFn(
 		suite.T(),
+		depInjectOptions,
 		func(cdc codec.Codec, state simapp.GenesisState) simapp.GenesisState {
 			state[types.ModuleName] = cdc.MustMarshalJSON(NewHTLTGenesis(TestDeputy))
 			return state
@@ -45,7 +52,6 @@ func (suite *QueryTestSuite) SetupTest() {
 
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{Height: 1, Time: time.Now()})
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
-	suite.keeper = &app.HTLCKeeper
 	suite.app = app
 
 	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, app.InterfaceRegistry())
