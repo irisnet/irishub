@@ -1,4 +1,4 @@
-module github.com/irisnet/irismod/coinswap
+module mods.irisnet.org/coinswap
 
 go 1.19
 
@@ -188,10 +188,10 @@ replace (
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.0
-	// Downgraded to avoid bugs in following commits which caused simulations to fail.
-	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
-    // TODO
+	// TODO
 	github.com/irisnet/irismod/api => github.com/dreamer-zq/irismod/api v1.0.0-beta
 	github.com/irisnet/irismod/simapp => github.com/dreamer-zq/irismod/simapp v1.0.0-beta
+	// Downgraded to avoid bugs in following commits which caused simulations to fail.
+	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 )

@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
 
-	"github.com/irisnet/irismod/coinswap/types"
+	"mods.irisnet.org/coinswap/types"
 )
 
 // GetParams sets the coinswap module parameters.

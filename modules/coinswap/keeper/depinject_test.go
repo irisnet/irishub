@@ -47,8 +47,8 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	coinswapmodule "github.com/irisnet/irismod/api/irismod/coinswap/module/v1"
-	_ "github.com/irisnet/irismod/coinswap"
-	coinswaptypes "github.com/irisnet/irismod/coinswap/types"
+	_ "mods.irisnet.org/coinswap"
+	coinswaptypes "mods.irisnet.org/coinswap/types"
 )
 
 var (

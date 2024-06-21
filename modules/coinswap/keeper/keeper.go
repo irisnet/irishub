@@ -14,7 +14,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irismod/coinswap/types"
+	"mods.irisnet.org/coinswap/types"
 )
 
 // Keeper of the coinswap store

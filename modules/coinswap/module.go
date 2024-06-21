@@ -17,9 +17,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irismod/coinswap/keeper"
-	"github.com/irisnet/irismod/coinswap/simulation"
-	"github.com/irisnet/irismod/coinswap/types"
+	"mods.irisnet.org/coinswap/keeper"
+	"mods.irisnet.org/coinswap/simulation"
+	"mods.irisnet.org/coinswap/types"
 )
 
 // ConsensusVersion defines the current coinswap module consensus version.

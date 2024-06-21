@@ -10,8 +10,8 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	modulev1 "github.com/irisnet/irismod/api/irismod/coinswap/module/v1"
-	"github.com/irisnet/irismod/coinswap/keeper"
-	"github.com/irisnet/irismod/coinswap/types"
+	"mods.irisnet.org/coinswap/keeper"
+	"mods.irisnet.org/coinswap/types"
 )
 
 // App Wiring Setup
