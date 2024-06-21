@@ -3,7 +3,7 @@ package contracts_test
 import (
 	"testing"
 
-	"github.com/irisnet/irismod/contracts"
+	"mods.irisnet.org/contracts"
 )
 
 func TestERC20(t *testing.T) {

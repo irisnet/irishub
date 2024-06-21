@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 
-	"github.com/irisnet/irismod/types"
+	"mods.irisnet.org/types"
 )
 
 const (
