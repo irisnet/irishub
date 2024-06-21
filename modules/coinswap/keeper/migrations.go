@@ -7,17 +7,17 @@ import (
 	v3 "github.com/irisnet/irismod/coinswap/migrations/v3"
 	v4 "github.com/irisnet/irismod/coinswap/migrations/v4"
 	v5 "github.com/irisnet/irismod/coinswap/migrations/v5"
-	"github.com/irisnet/irismod/types/exported"
+	"github.com/irisnet/irismod/coinswap/types"
 )
 
 // Migrator is a struct for handling in-place store migrations.
 type Migrator struct {
 	k              Keeper
-	legacySubspace exported.Subspace
+	legacySubspace types.Subspace
 }
 
 // NewMigrator returns a new Migrator.
-func NewMigrator(k Keeper, legacySubspace exported.Subspace) Migrator {
+func NewMigrator(k Keeper, legacySubspace types.Subspace) Migrator {
 	return Migrator{k: k, legacySubspace: legacySubspace}
 }
 

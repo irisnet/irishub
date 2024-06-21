@@ -12,7 +12,6 @@ import (
 	modulev1 "github.com/irisnet/irismod/api/irismod/coinswap/module/v1"
 	"github.com/irisnet/irismod/coinswap/keeper"
 	"github.com/irisnet/irismod/coinswap/types"
-	"github.com/irisnet/irismod/types/exported"
 )
 
 // App Wiring Setup
@@ -23,7 +22,7 @@ func init() {
 	)
 }
 
-func ProvideKeyTable() exported.KeyTable {
+func ProvideKeyTable() types.KeyTable {
 	return types.ParamKeyTable() //nolint:staticcheck
 }
 
@@ -46,7 +45,7 @@ type CoinswapInputs struct {
 	BankKeeper    types.BankKeeper
 
 	// LegacySubspace is used solely for migration of x/params managed parameters
-	LegacySubspace exported.Subspace `optional:"true"`
+	LegacySubspace types.Subspace `optional:"true"`
 }
 
 type CoinswapOutputs struct {

@@ -14,13 +14,13 @@ require (
 	github.com/cosmos/gogoproto v1.4.10
 	github.com/golang/protobuf v1.5.3
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/irisnet/irismod v1.9.0
+	github.com/irisnet/irismod/api v1.0.0-beta
+	github.com/irisnet/irismod/simapp v1.0.0-beta
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/genproto/googleapis/api v0.0.0-20231212172506-995d672761c0
 	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.32.0
-	github.com/irisnet/irismod/simapp v1.9.0
 	sigs.k8s.io/yaml v1.3.0
 )
 
@@ -190,5 +190,8 @@ replace (
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.0
 	// Downgraded to avoid bugs in following commits which caused simulations to fail.
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
-	github.com/irisnet/irismod/simapp => ../../simapp
+
+    // TODO
+	github.com/irisnet/irismod/api => github.com/dreamer-zq/irismod/api v1.0.0-beta
+	github.com/irisnet/irismod/simapp => github.com/dreamer-zq/irismod/simapp v1.0.0-beta
 )

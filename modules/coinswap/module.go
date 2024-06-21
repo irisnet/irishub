@@ -20,7 +20,6 @@ import (
 	"github.com/irisnet/irismod/coinswap/keeper"
 	"github.com/irisnet/irismod/coinswap/simulation"
 	"github.com/irisnet/irismod/coinswap/types"
-	"github.com/irisnet/irismod/types/exported"
 )
 
 // ConsensusVersion defines the current coinswap module consensus version.
@@ -93,7 +92,7 @@ type AppModule struct {
 	keeper         keeper.Keeper
 	accountKeeper  types.AccountKeeper
 	bankKeeper     types.BankKeeper
-	legacySubspace exported.Subspace
+	legacySubspace types.Subspace
 }
 
 // NewAppModule creates a new AppModule object
@@ -102,7 +101,7 @@ func NewAppModule(
 	keeper keeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-	legacySubspace exported.Subspace,
+	legacySubspace types.Subspace,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{cdc: cdc},

@@ -3,6 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 // BankKeeper defines the expected bank keeper
@@ -42,3 +43,22 @@ type AccountKeeper interface {
 	GetModuleAddress(name string) sdk.AccAddress
 	IterateAccounts(ctx sdk.Context, cb func(account authtypes.AccountI) (stop bool))
 }
+
+var (
+	NewParamSetPair = paramtypes.NewParamSetPair
+	NewKeyTable     = paramtypes.NewKeyTable
+)
+
+type (
+	ParamSet      = paramtypes.ParamSet
+	ParamSetPairs = paramtypes.ParamSetPairs
+	KeyTable      = paramtypes.KeyTable
+
+	// Subspace defines an interface that implements the legacy x/params Subspace
+	// type.
+	//
+	// NOTE: This is used solely for migration of x/params managed parameters.
+	Subspace interface {
+		GetParamSet(ctx sdk.Context, ps ParamSet)
+	}
+)
