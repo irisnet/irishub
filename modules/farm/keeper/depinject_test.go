@@ -46,13 +46,13 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	coinswapmodule "github.com/irisnet/irismod/api/irismod/coinswap/module/v1"
-	farmmodule "github.com/irisnet/irismod/api/irismod/farm/module/v1"
-	coinswaptypes "github.com/irisnet/irismod/coinswap/types"
-	farmtypes "github.com/irisnet/irismod/farm/types"
+	coinswapmodule "mods.irisnet.org/api/irismod/coinswap/module/v1"
+	farmmodule "mods.irisnet.org/api/irismod/farm/module/v1"
+	coinswaptypes "mods.irisnet.org/coinswap/types"
+	farmtypes "mods.irisnet.org/farm/types"
 
-	_ "github.com/irisnet/irismod/coinswap"
-	_ "github.com/irisnet/irismod/farm"
+	_ "mods.irisnet.org/coinswap"
+	_ "mods.irisnet.org/farm"
 )
 
 var (

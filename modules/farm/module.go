@@ -18,11 +18,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irismod/farm/client/cli"
-	"github.com/irisnet/irismod/farm/keeper"
-	"github.com/irisnet/irismod/farm/simulation"
-	"github.com/irisnet/irismod/farm/types"
-	"github.com/irisnet/irismod/types/exported"
+	"mods.irisnet.org/farm/client/cli"
+	"mods.irisnet.org/farm/keeper"
+	"mods.irisnet.org/farm/simulation"
+	"mods.irisnet.org/farm/types"
 )
 
 // ConsensusVersion defines the current farm module consensus version.
@@ -101,7 +100,7 @@ type AppModule struct {
 	keeper         keeper.Keeper
 	accountKeeper  types.AccountKeeper
 	bankKeeper     types.BankKeeper
-	legacySubspace exported.Subspace
+	legacySubspace types.Subspace
 }
 
 // NewAppModule creates a new AppModule object
@@ -110,7 +109,7 @@ func NewAppModule(
 	keeper keeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-	legacySubspace exported.Subspace,
+	legacySubspace types.Subspace,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{cdc: cdc},

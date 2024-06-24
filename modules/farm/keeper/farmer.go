@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irismod/farm/types"
+	"mods.irisnet.org/farm/types"
 )
 
 // Stake is responsible for the user to mortgage the lp token to the system and get back the reward accumulated before then

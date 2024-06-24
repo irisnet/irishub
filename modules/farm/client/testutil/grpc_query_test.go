@@ -13,12 +13,12 @@ package testutil_test
 // 	"github.com/cosmos/cosmos-sdk/testutil"
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-// 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
-// 	tokentypes "github.com/irisnet/irismod/modules/token/types/v1"
-// 	"github.com/irisnet/irismod/simapp"
-// 	farmcli "github.com/irisnet/irismod/farm/client/cli"
-// 	farmtestutil "github.com/irisnet/irismod/farm/client/testutil"
-// 	farmtypes "github.com/irisnet/irismod/farm/types"
+// 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
+// 	tokentypes "mods.irisnet.org/modules/token/types/v1"
+// 	"mods.irisnet.org/simapp"
+// 	farmcli "mods.irisnet.org/farm/client/cli"
+// 	farmtestutil "mods.irisnet.org/farm/client/testutil"
+// 	farmtypes "mods.irisnet.org/farm/types"
 // )
 
 // type IntegrationTestSuite struct {

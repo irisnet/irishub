@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"github.com/irisnet/irismod/farm/types"
+	"mods.irisnet.org/farm/types"
 )
 
 // GetQueryCmd returns the cli query commands for the farm module.

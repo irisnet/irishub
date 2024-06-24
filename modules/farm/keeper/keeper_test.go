@@ -10,9 +10,9 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/irisnet/irismod/farm/keeper"
-	"github.com/irisnet/irismod/farm/types"
-	"github.com/irisnet/irismod/simapp"
+	"mods.irisnet.org/farm/keeper"
+	"mods.irisnet.org/farm/types"
+	"mods.irisnet.org/simapp"
 )
 
 var (

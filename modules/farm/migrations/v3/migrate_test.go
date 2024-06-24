@@ -7,9 +7,9 @@ package v3_test
 
 // 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-// 	"github.com/irisnet/irismod/simapp"
-// 	v3 "github.com/irisnet/irismod/farm/migrations/v3"
-// 	farmtypes "github.com/irisnet/irismod/farm/types"
+// 	"mods.irisnet.org/simapp"
+// 	v3 "mods.irisnet.org/farm/migrations/v3"
+// 	farmtypes "mods.irisnet.org/farm/types"
 // )
 
 // func TestMigrate(t *testing.T) {
