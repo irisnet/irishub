@@ -11,8 +11,8 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/token/types"
-	v1 "github.com/irisnet/irismod/token/types/v1"
+	"mods.irisnet.org/token/types"
+	v1 "mods.irisnet.org/token/types/v1"
 )
 
 // Keeper of the token store

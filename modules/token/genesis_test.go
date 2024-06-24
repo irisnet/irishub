@@ -10,9 +10,9 @@ package token_test
 
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-// 	"github.com/irisnet/irismod/modules/token"
-// 	"github.com/irisnet/irismod/simapp"
-// 	v1 "github.com/irisnet/irismod/token/types/v1"
+// 	"mods.irisnet.org/modules/token"
+// 	"mods.irisnet.org/simapp"
+// 	v1 "mods.irisnet.org/token/types/v1"
 // )
 
 // func TestExportGenesis(t *testing.T) {

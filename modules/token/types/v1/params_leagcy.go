@@ -1,10 +1,10 @@
 package v1
 
 import (
-	"github.com/irisnet/irismod/types/exported"
+	"mods.irisnet.org/token/types"
 )
 
-var _ exported.ParamSet = (*Params)(nil)
+var _ types.ParamSet = (*Params)(nil)
 
 // parameter keys
 var (
@@ -13,15 +13,15 @@ var (
 	KeyMintTokenFeeRatio = []byte("MintTokenFeeRatio")
 )
 
-func (p *Params) ParamSetPairs() exported.ParamSetPairs {
-	return exported.ParamSetPairs{
-		exported.NewParamSetPair(KeyTokenTaxRate, &p.TokenTaxRate, validateTaxRate),
-		exported.NewParamSetPair(
+func (p *Params) ParamSetPairs() types.ParamSetPairs {
+	return types.ParamSetPairs{
+		types.NewParamSetPair(KeyTokenTaxRate, &p.TokenTaxRate, validateTaxRate),
+		types.NewParamSetPair(
 			KeyIssueTokenBaseFee,
 			&p.IssueTokenBaseFee,
 			validateIssueTokenBaseFee,
 		),
-		exported.NewParamSetPair(
+		types.NewParamSetPair(
 			KeyMintTokenFeeRatio,
 			&p.MintTokenFeeRatio,
 			validateMintTokenFeeRatio,
@@ -30,6 +30,6 @@ func (p *Params) ParamSetPairs() exported.ParamSetPairs {
 }
 
 // ParamKeyTable returns the TypeTable for the token module
-func ParamKeyTable() exported.KeyTable {
-	return exported.NewKeyTable().RegisterParamSet(&Params{})
+func ParamKeyTable() types.KeyTable {
+	return types.NewKeyTable().RegisterParamSet(&Params{})
 }

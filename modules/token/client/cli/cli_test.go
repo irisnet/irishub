@@ -11,10 +11,10 @@ package cli_test
 // 	"github.com/cosmos/cosmos-sdk/client/flags"
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-// 	"github.com/irisnet/irismod/simapp"
-// 	tokencli "github.com/irisnet/irismod/token/client/cli"
-// 	tokentestutil "github.com/irisnet/irismod/token/client/testutil"
-// 	tokentypes "github.com/irisnet/irismod/token/types"
+// 	"mods.irisnet.org/simapp"
+// 	tokencli "mods.irisnet.org/token/client/cli"
+// 	tokentestutil "mods.irisnet.org/token/client/testutil"
+// 	tokentypes "mods.irisnet.org/token/types"
 // )
 
 // type IntegrationTestSuite struct {

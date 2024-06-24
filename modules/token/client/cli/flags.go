@@ -5,7 +5,7 @@ import (
 
 	flag "github.com/spf13/pflag"
 
-	"github.com/irisnet/irismod/token/types"
+	"mods.irisnet.org/token/types"
 )
 
 const (

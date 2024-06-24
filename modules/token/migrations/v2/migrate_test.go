@@ -7,10 +7,10 @@ package v2_test
 
 // 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-// 	"github.com/irisnet/irismod/simapp"
-// 	v2 "github.com/irisnet/irismod/token/migrations/v2"
-// 	tokentypes "github.com/irisnet/irismod/token/types"
-// 	v1 "github.com/irisnet/irismod/token/types/v1"
+// 	"mods.irisnet.org/simapp"
+// 	v2 "mods.irisnet.org/token/migrations/v2"
+// 	tokentypes "mods.irisnet.org/token/types"
+// 	v1 "mods.irisnet.org/token/types/v1"
 // )
 
 // func TestMigrate(t *testing.T) {

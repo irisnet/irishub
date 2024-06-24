@@ -8,7 +8,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	tokentypes "github.com/irisnet/irismod/token/types"
+	tokentypes "mods.irisnet.org/token/types"
 )
 
 var (

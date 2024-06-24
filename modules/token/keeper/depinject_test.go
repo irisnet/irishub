@@ -56,11 +56,10 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	tokenmodule "github.com/irisnet/irismod/api/irismod/token/module/v1"
-	"github.com/irisnet/irismod/contracts"
-	_ "github.com/irisnet/irismod/token"
-	tokentypes "github.com/irisnet/irismod/token/types"
-	"github.com/irisnet/irismod/types"
+	tokenmodule "mods.irisnet.org/api/irismod/token/module/v1"
+	_ "mods.irisnet.org/token"
+	"mods.irisnet.org/token/contracts"
+	tokentypes "mods.irisnet.org/token/types"
 )
 
 var (
@@ -297,7 +296,7 @@ type evm struct {
 }
 
 // ApplyMessage implements types.EVMKeeper.
-func (e *evm) ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*types.Result, error) {
+func (e *evm) ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*tokentypes.Result, error) {
 	isCreate := msg.To() == nil
 	if isCreate {
 		contractAddr := crypto.CreateAddress(msg.From(), msg.Nonce())
@@ -325,7 +324,7 @@ func (e *evm) ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogge
 			symbol:  symbol,
 			balance: make(map[common.Address]*big.Int),
 		}
-		return &types.Result{
+		return &tokentypes.Result{
 			Hash: contractAddr.Hex(),
 		}, nil
 	}
@@ -343,7 +342,7 @@ func (e *evm) ChainID() *big.Int {
 }
 
 // EstimateGas implements types.EVMKeeper.
-func (e *evm) EstimateGas(ctx context.Context, req *types.EthCallRequest) (uint64, error) {
+func (e *evm) EstimateGas(ctx context.Context, req *tokentypes.EthCallRequest) (uint64, error) {
 	return 3000000, nil
 }
 
@@ -352,7 +351,7 @@ func (e *evm) SupportedKey(pubKey cryptotypes.PubKey) bool {
 	return true
 }
 
-func (e *evm) dispatch(contract *erc20, data []byte) (*types.Result, error) {
+func (e *evm) dispatch(contract *erc20, data []byte) (*tokentypes.Result, error) {
 	method, err := contracts.ERC20TokenContract.ABI.MethodById(data[0:4])
 	if err != nil {
 		return nil, err
@@ -362,7 +361,7 @@ func (e *evm) dispatch(contract *erc20, data []byte) (*types.Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &types.Result{
+	return &tokentypes.Result{
 		Hash: contract.address.Hex(),
 		Ret:  ret,
 	}, nil

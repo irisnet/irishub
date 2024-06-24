@@ -18,13 +18,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irismod/token/client/cli"
-	"github.com/irisnet/irismod/token/keeper"
-	"github.com/irisnet/irismod/token/simulation"
-	"github.com/irisnet/irismod/token/types"
-	v1 "github.com/irisnet/irismod/token/types/v1"
-	"github.com/irisnet/irismod/token/types/v1beta1"
-	"github.com/irisnet/irismod/types/exported"
+	"mods.irisnet.org/token/client/cli"
+	"mods.irisnet.org/token/keeper"
+	"mods.irisnet.org/token/simulation"
+	"mods.irisnet.org/token/types"
+	v1 "mods.irisnet.org/token/types/v1"
+	"mods.irisnet.org/token/types/v1beta1"
 )
 
 // ConsensusVersion defines the current token module consensus version.
@@ -107,7 +106,7 @@ type AppModule struct {
 	keeper         keeper.Keeper
 	accountKeeper  types.AccountKeeper
 	bankKeeper     types.BankKeeper
-	legacySubspace exported.Subspace
+	legacySubspace types.Subspace
 }
 
 // NewAppModule creates a new AppModule object
@@ -116,7 +115,7 @@ func NewAppModule(
 	keeper keeper.Keeper,
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
-	legacySubspace exported.Subspace,
+	legacySubspace types.Subspace,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{cdc: cdc},
