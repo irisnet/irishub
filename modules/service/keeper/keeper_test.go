@@ -18,9 +18,9 @@ import (
 	v1 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v1"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 
-	"github.com/irisnet/irismod/service/keeper"
-	"github.com/irisnet/irismod/service/types"
-	"github.com/irisnet/irismod/simapp"
+	"mods.irisnet.org/service/keeper"
+	"mods.irisnet.org/service/types"
+	"mods.irisnet.org/simapp"
 )
 
 var (

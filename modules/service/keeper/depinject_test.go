@@ -46,9 +46,9 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	servicemodule "github.com/irisnet/irismod/api/irismod/service/module/v1"
-	_ "github.com/irisnet/irismod/service"
-	servicetypes "github.com/irisnet/irismod/service/types"
+	servicemodule "mods.irisnet.org/api/irismod/service/module/v1"
+	_ "mods.irisnet.org/service"
+	servicetypes "mods.irisnet.org/service/types"
 )
 
 var (

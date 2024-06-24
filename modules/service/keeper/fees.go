@@ -8,7 +8,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	v1 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v1"
 
-	"github.com/irisnet/irismod/service/types"
+	"mods.irisnet.org/service/types"
 )
 
 // RefundServiceFee refunds the service fee to the specified consumer

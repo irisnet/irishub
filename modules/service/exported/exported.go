@@ -1,7 +1,7 @@
 package exported
 
 import (
-	"github.com/irisnet/irismod/service/types"
+	"mods.irisnet.org/service/types"
 )
 
 type (

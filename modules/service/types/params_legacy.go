@@ -1,9 +1,5 @@
 package types
 
-import (
-	"github.com/irisnet/irismod/types/exported"
-)
-
 // Keys for parameter access
 // nolint
 var (
@@ -20,39 +16,39 @@ var (
 )
 
 // ParamKeyTable for service module
-func ParamKeyTable() exported.KeyTable {
-	return exported.NewKeyTable().RegisterParamSet(&Params{})
+func ParamKeyTable() KeyTable {
+	return NewKeyTable().RegisterParamSet(&Params{})
 }
 
 // ParamSetPairs implements paramstypes.ParamSet
-func (p *Params) ParamSetPairs() exported.ParamSetPairs {
-	return exported.ParamSetPairs{
-		exported.NewParamSetPair(
+func (p *Params) ParamSetPairs() ParamSetPairs {
+	return ParamSetPairs{
+		NewParamSetPair(
 			KeyMaxRequestTimeout,
 			&p.MaxRequestTimeout,
 			validateMaxRequestTimeout,
 		),
-		exported.NewParamSetPair(
+		NewParamSetPair(
 			KeyMinDepositMultiple,
 			&p.MinDepositMultiple,
 			validateMinDepositMultiple,
 		),
-		exported.NewParamSetPair(KeyMinDeposit, &p.MinDeposit, validateMinDeposit),
-		exported.NewParamSetPair(KeyServiceFeeTax, &p.ServiceFeeTax, validateServiceFeeTax),
-		exported.NewParamSetPair(KeySlashFraction, &p.SlashFraction, validateSlashFraction),
-		exported.NewParamSetPair(
+		NewParamSetPair(KeyMinDeposit, &p.MinDeposit, validateMinDeposit),
+		NewParamSetPair(KeyServiceFeeTax, &p.ServiceFeeTax, validateServiceFeeTax),
+		NewParamSetPair(KeySlashFraction, &p.SlashFraction, validateSlashFraction),
+		NewParamSetPair(
 			KeyComplaintRetrospect,
 			&p.ComplaintRetrospect,
 			validateComplaintRetrospect,
 		),
-		exported.NewParamSetPair(
+		NewParamSetPair(
 			KeyArbitrationTimeLimit,
 			&p.ArbitrationTimeLimit,
 			validateArbitrationTimeLimit,
 		),
-		exported.NewParamSetPair(KeyTxSizeLimit, &p.TxSizeLimit, validateTxSizeLimit),
-		exported.NewParamSetPair(KeyBaseDenom, &p.BaseDenom, validateBaseDenom),
-		exported.NewParamSetPair(
+		NewParamSetPair(KeyTxSizeLimit, &p.TxSizeLimit, validateTxSizeLimit),
+		NewParamSetPair(KeyBaseDenom, &p.BaseDenom, validateBaseDenom),
+		NewParamSetPair(
 			KeyRestrictedServiceFeeDenom,
 			&p.RestrictedServiceFeeDenom,
 			validateRestrictedServiceFeeDenom,

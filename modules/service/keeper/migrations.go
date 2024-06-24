@@ -3,18 +3,18 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	v2 "github.com/irisnet/irismod/service/migrations/v2"
-	"github.com/irisnet/irismod/types/exported"
+	v2 "mods.irisnet.org/service/migrations/v2"
+	"mods.irisnet.org/service/types"
 )
 
 // Migrator is a struct for handling in-place store migrations.
 type Migrator struct {
 	k              Keeper
-	legacySubspace exported.Subspace
+	legacySubspace types.Subspace
 }
 
 // NewMigrator returns a new Migrator.
-func NewMigrator(k Keeper, legacySubspace exported.Subspace) Migrator {
+func NewMigrator(k Keeper, legacySubspace types.Subspace) Migrator {
 	return Migrator{k: k, legacySubspace: legacySubspace}
 }
 

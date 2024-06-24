@@ -4,7 +4,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/service/types"
+	"mods.irisnet.org/service/types"
 )
 
 // AddServiceDefinition creates a new service definition

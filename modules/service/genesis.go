@@ -9,8 +9,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/service/keeper"
-	"github.com/irisnet/irismod/service/types"
+	"mods.irisnet.org/service/keeper"
+	"mods.irisnet.org/service/types"
 )
 
 // InitGenesis stores the genesis state

@@ -17,11 +17,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irismod/service/client/cli"
-	"github.com/irisnet/irismod/service/keeper"
-	"github.com/irisnet/irismod/service/simulation"
-	"github.com/irisnet/irismod/service/types"
-	"github.com/irisnet/irismod/types/exported"
+	"mods.irisnet.org/service/client/cli"
+	"mods.irisnet.org/service/keeper"
+	"mods.irisnet.org/service/simulation"
+	"mods.irisnet.org/service/types"
 )
 
 // ConsensusVersion defines the current service module consensus version.
@@ -95,7 +94,7 @@ type AppModule struct {
 	keeper         keeper.Keeper
 	accountKeeper  types.AccountKeeper
 	bankKeeper     types.BankKeeper
-	legacySubspace exported.Subspace
+	legacySubspace types.Subspace
 }
 
 // NewAppModule creates a new AppModule object
@@ -104,7 +103,7 @@ func NewAppModule(
 	keeper keeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-	legacySubspace exported.Subspace,
+	legacySubspace types.Subspace,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{cdc: cdc},
