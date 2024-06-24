@@ -8,8 +8,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irismod/mt/exported"
-	"github.com/irisnet/irismod/mt/types"
+	"mods.irisnet.org/mt/exported"
+	"mods.irisnet.org/mt/types"
 )
 
 const mtIdPrefix = "mt-%d"

@@ -5,8 +5,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irismod/mt/keeper"
-	"github.com/irisnet/irismod/mt/types"
+	"mods.irisnet.org/mt/keeper"
+	"mods.irisnet.org/mt/types"
 )
 
 // InitGenesis stores the MT genesis.

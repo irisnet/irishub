@@ -9,13 +9,13 @@ package testutil_test
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 // 	"github.com/cosmos/gogoproto/proto"
 
-// 	mtcli "github.com/irisnet/irismod/mt/client/cli"
-// 	mttestutil "github.com/irisnet/irismod/mt/client/testutil"
-// 	mttypes "github.com/irisnet/irismod/mt/types"
+// 	mtcli "mods.irisnet.org/mt/client/cli"
+// 	mttestutil "mods.irisnet.org/mt/client/testutil"
+// 	mttypes "mods.irisnet.org/mt/types"
 
 // 	"github.com/stretchr/testify/suite"
 
-// 	"github.com/irisnet/irismod/simapp"
+// 	"mods.irisnet.org/simapp"
 // )
 
 // type IntegrationTestSuite struct {
