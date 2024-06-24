@@ -1,4 +1,4 @@
-module github.com/irisnet/irismod/api
+module mods.irisnet.org/api
 
 go 1.19
 
