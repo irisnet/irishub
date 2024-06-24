@@ -19,10 +19,10 @@ import (
 	sdknfttypes "github.com/cosmos/cosmos-sdk/x/nft"
 	sdknftsim "github.com/cosmos/cosmos-sdk/x/nft/simulation"
 
-	"mods.irisnet.org/nft/client/cli"
-	"mods.irisnet.org/nft/keeper"
-	"mods.irisnet.org/nft/simulation"
-	"mods.irisnet.org/nft/types"
+	"mods.irisnet.org/modules/nft/client/cli"
+	"mods.irisnet.org/modules/nft/keeper"
+	"mods.irisnet.org/modules/nft/simulation"
+	"mods.irisnet.org/modules/nft/types"
 )
 
 var (

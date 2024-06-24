@@ -5,8 +5,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"mods.irisnet.org/mt/keeper"
-	"mods.irisnet.org/mt/types"
+	"mods.irisnet.org/modules/mt/keeper"
+	"mods.irisnet.org/modules/mt/types"
 )
 
 // NewHandler routes the messages to the handlers

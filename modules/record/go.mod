@@ -1,4 +1,4 @@
-module mods.irisnet.org/record
+module mods.irisnet.org/modules/record
 
 go 1.19
 

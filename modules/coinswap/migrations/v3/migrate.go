@@ -4,7 +4,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"mods.irisnet.org/coinswap/types"
+	"mods.irisnet.org/modules/coinswap/types"
 )
 
 // Parameter store keys

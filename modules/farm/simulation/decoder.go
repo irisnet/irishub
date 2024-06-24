@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"mods.irisnet.org/farm/types"
+	"mods.irisnet.org/modules/farm/types"
 )
 
 // NewDecodeStore unmarshals the KVPair's Value to the corresponding slashing type

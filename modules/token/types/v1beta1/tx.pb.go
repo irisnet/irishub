@@ -15,7 +15,7 @@ import (
 	io "io"
 	math "math"
 	math_bits "math/bits"
-	mods_irisnet_org_token_types "mods.irisnet.org/token/types"
+	mods_irisnet_org_token_types "mods.irisnet.org/modules/token/types"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -194,7 +194,7 @@ type MsgEditToken struct {
 	Symbol    string                            `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`
 	Name      string                            `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	MaxSupply uint64                            `protobuf:"varint,3,opt,name=max_supply,json=maxSupply,proto3" json:"max_supply,omitempty" yaml:"max_supply"`
-	Mintable  mods_irisnet_org_token_types.Bool `protobuf:"bytes,4,opt,name=mintable,proto3,casttype=mods.irisnet.org/token/types.Bool" json:"mintable,omitempty"`
+	Mintable  mods_irisnet_org_token_types.Bool `protobuf:"bytes,4,opt,name=mintable,proto3,casttype=mods.irisnet.org/modules/token/types.Bool" json:"mintable,omitempty"`
 	Owner     string                            `protobuf:"bytes,5,opt,name=owner,proto3" json:"owner,omitempty"`
 }
 

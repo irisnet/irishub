@@ -3,7 +3,7 @@ package types
 import (
 	errorsmod "cosmossdk.io/errors"
 
-	"mods.irisnet.org/mt/exported"
+	"mods.irisnet.org/modules/mt/exported"
 )
 
 // NewGenesisState creates a new genesis state.

@@ -4,7 +4,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"mods.irisnet.org/coinswap/types"
+	"mods.irisnet.org/modules/coinswap/types"
 )
 
 // DeductPoolCreationFee performs fee handling for creating liquidity pool

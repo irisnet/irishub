@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"mods.irisnet.org/farm/types"
+	"mods.irisnet.org/modules/farm/types"
 )
 
 const (

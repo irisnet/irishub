@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"mods.irisnet.org/farm/types"
+	"mods.irisnet.org/modules/farm/types"
 )
 
 // Parameter store keys

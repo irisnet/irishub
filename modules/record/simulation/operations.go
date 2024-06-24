@@ -14,7 +14,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"mods.irisnet.org/record/types"
+	"mods.irisnet.org/modules/record/types"
 	irishelpers "mods.irisnet.org/simapp/helpers"
 )
 

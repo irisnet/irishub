@@ -19,7 +19,7 @@ import (
 	io "io"
 	math "math"
 	math_bits "math/bits"
-	types1 "mods.irisnet.org/service/types"
+	types1 "mods.irisnet.org/modules/service/types"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

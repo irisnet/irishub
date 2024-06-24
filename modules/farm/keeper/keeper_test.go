@@ -10,8 +10,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"mods.irisnet.org/farm/keeper"
-	"mods.irisnet.org/farm/types"
+	"mods.irisnet.org/modules/farm/keeper"
+	"mods.irisnet.org/modules/farm/types"
 	"mods.irisnet.org/simapp"
 )
 

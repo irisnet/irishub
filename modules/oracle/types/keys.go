@@ -3,7 +3,7 @@ package types
 import (
 	"encoding/binary"
 
-	servicetypes "mods.irisnet.org/service/types"
+	servicetypes "mods.irisnet.org/modules/service/types"
 )
 
 // nolint

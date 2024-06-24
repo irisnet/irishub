@@ -12,9 +12,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"mods.irisnet.org/htlc"
-	"mods.irisnet.org/htlc/keeper"
-	"mods.irisnet.org/htlc/types"
+	"mods.irisnet.org/modules/htlc"
+	"mods.irisnet.org/modules/htlc/keeper"
+	"mods.irisnet.org/modules/htlc/types"
 	"mods.irisnet.org/simapp"
 )
 

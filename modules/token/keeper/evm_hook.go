@@ -10,8 +10,8 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 
-	"mods.irisnet.org/token/contracts"
-	"mods.irisnet.org/token/types"
+	"mods.irisnet.org/modules/token/contracts"
+	"mods.irisnet.org/modules/token/types"
 )
 
 type erc20Hook struct {

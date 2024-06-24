@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"mods.irisnet.org/htlc/types"
+	"mods.irisnet.org/modules/htlc/types"
 )
 
 type msgServer struct {

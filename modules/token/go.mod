@@ -1,4 +1,4 @@
-module mods.irisnet.org/token
+module mods.irisnet.org/modules/token
 
 go 1.19
 

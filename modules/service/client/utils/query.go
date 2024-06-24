@@ -14,7 +14,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 
-	"mods.irisnet.org/service/types"
+	"mods.irisnet.org/modules/service/types"
 )
 
 // QueryRequestContext queries a single request context

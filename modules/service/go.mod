@@ -1,4 +1,4 @@
-module mods.irisnet.org/service
+module mods.irisnet.org/modules/service
 
 go 1.19
 

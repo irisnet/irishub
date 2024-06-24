@@ -10,7 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"mods.irisnet.org/service/types"
+	"mods.irisnet.org/modules/service/types"
 )
 
 // Keeper defines the service keeper

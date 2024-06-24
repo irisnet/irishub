@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"mods.irisnet.org/mt/types"
+	"mods.irisnet.org/modules/mt/types"
 )
 
 // DecodeStore unmarshals the KVPair's Value to the corresponding gov type

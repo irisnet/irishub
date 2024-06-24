@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"mods.irisnet.org/coinswap/types"
+	"mods.irisnet.org/modules/coinswap/types"
 )
 
 // InitGenesis initializes the coinswap module's state from a given genesis state.

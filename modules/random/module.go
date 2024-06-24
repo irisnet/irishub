@@ -18,10 +18,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"mods.irisnet.org/random/client/cli"
-	"mods.irisnet.org/random/keeper"
-	"mods.irisnet.org/random/simulation"
-	"mods.irisnet.org/random/types"
+	"mods.irisnet.org/modules/random/client/cli"
+	"mods.irisnet.org/modules/random/keeper"
+	"mods.irisnet.org/modules/random/simulation"
+	"mods.irisnet.org/modules/random/types"
 )
 
 var (

@@ -48,11 +48,11 @@ import (
 
 	randommodule "mods.irisnet.org/api/irismod/random/module/v1"
 	servicemodule "mods.irisnet.org/api/irismod/service/module/v1"
-	randomtypes "mods.irisnet.org/random/types"
-	servicetypes "mods.irisnet.org/service/types"
+	randomtypes "mods.irisnet.org/modules/random/types"
+	servicetypes "mods.irisnet.org/modules/service/types"
 
-	_ "mods.irisnet.org/random"
-	_ "mods.irisnet.org/service"
+	_ "mods.irisnet.org/modules/random"
+	_ "mods.irisnet.org/modules/service"
 )
 
 var (

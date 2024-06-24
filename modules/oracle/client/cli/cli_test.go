@@ -16,8 +16,8 @@ package cli_test
 // 	servicetestutil "mods.irisnet.org/modules/service/client/testutil"
 // 	servicetypes "mods.irisnet.org/modules/service/types"
 // 	"mods.irisnet.org/simapp"
-// 	oraclecli "mods.irisnet.org/oracle/client/cli"
-// 	oracletestutil "mods.irisnet.org/oracle/client/testutil"
+// 	oraclecli "mods.irisnet.org/modules/oracle/client/cli"
+// 	oracletestutil "mods.irisnet.org/modules/oracle/client/testutil"
 // )
 
 // type IntegrationTestSuite struct {

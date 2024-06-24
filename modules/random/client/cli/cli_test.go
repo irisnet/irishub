@@ -18,9 +18,9 @@ package cli_test
 // 	servicetestutil "mods.irisnet.org/modules/service/client/testutil"
 // 	servicetypes "mods.irisnet.org/modules/service/types"
 // 	"mods.irisnet.org/simapp"
-// 	randomcli "mods.irisnet.org/random/client/cli"
-// 	randomtestutil "mods.irisnet.org/random/client/testutil"
-// 	randomtypes "mods.irisnet.org/random/types"
+// 	randomcli "mods.irisnet.org/modules/random/client/cli"
+// 	randomtestutil "mods.irisnet.org/modules/random/client/testutil"
+// 	randomtypes "mods.irisnet.org/modules/random/types"
 // )
 
 // type IntegrationTestSuite struct {

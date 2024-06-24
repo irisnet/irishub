@@ -12,7 +12,7 @@ package token_test
 
 // 	"mods.irisnet.org/modules/token"
 // 	"mods.irisnet.org/simapp"
-// 	v1 "mods.irisnet.org/token/types/v1"
+// 	v1 "mods.irisnet.org/modules/token/types/v1"
 // )
 
 // func TestExportGenesis(t *testing.T) {

@@ -16,9 +16,9 @@ package testutil_test
 // 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
 // 	tokentypes "mods.irisnet.org/modules/token/types/v1"
 // 	"mods.irisnet.org/simapp"
-// 	farmcli "mods.irisnet.org/farm/client/cli"
-// 	farmtestutil "mods.irisnet.org/farm/client/testutil"
-// 	farmtypes "mods.irisnet.org/farm/types"
+// 	farmcli "mods.irisnet.org/modules/farm/client/cli"
+// 	farmtestutil "mods.irisnet.org/modules/farm/client/testutil"
+// 	farmtypes "mods.irisnet.org/modules/farm/types"
 // )
 
 // type IntegrationTestSuite struct {

@@ -14,7 +14,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"mods.irisnet.org/oracle/types"
+	"mods.irisnet.org/modules/oracle/types"
 )
 
 // NewTxCmd returns the transaction commands for the oracle module.

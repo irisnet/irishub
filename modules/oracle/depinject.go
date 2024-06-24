@@ -8,8 +8,8 @@ import (
 	store "github.com/cosmos/cosmos-sdk/store/types"
 
 	modulev1 "mods.irisnet.org/api/irismod/oracle/module/v1"
-	"mods.irisnet.org/oracle/keeper"
-	"mods.irisnet.org/oracle/types"
+	"mods.irisnet.org/modules/oracle/keeper"
+	"mods.irisnet.org/modules/oracle/types"
 )
 
 // App Wiring Setup

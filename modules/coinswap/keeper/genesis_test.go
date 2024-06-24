@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"mods.irisnet.org/coinswap/types"
+	"mods.irisnet.org/modules/coinswap/types"
 )
 
 func TestGenesisSuite(t *testing.T) {

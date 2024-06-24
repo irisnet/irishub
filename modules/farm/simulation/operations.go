@@ -12,8 +12,8 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"mods.irisnet.org/farm/keeper"
-	"mods.irisnet.org/farm/types"
+	"mods.irisnet.org/modules/farm/keeper"
+	"mods.irisnet.org/modules/farm/types"
 )
 
 // Simulation operation weights constants

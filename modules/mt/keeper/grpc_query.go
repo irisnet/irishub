@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"mods.irisnet.org/mt/types"
+	"mods.irisnet.org/modules/mt/types"
 )
 
 var _ types.QueryServer = Keeper{}

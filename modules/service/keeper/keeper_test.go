@@ -18,8 +18,8 @@ import (
 	v1 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v1"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 
-	"mods.irisnet.org/service/keeper"
-	"mods.irisnet.org/service/types"
+	"mods.irisnet.org/modules/service/keeper"
+	"mods.irisnet.org/modules/service/types"
 	"mods.irisnet.org/simapp"
 )
 

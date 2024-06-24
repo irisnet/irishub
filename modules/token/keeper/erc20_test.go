@@ -8,7 +8,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	v1 "mods.irisnet.org/token/types/v1"
+	v1 "mods.irisnet.org/modules/token/types/v1"
 )
 
 func (suite *KeeperTestSuite) TestDeployERC20() {

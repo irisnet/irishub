@@ -18,10 +18,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"mods.irisnet.org/htlc/client/cli"
-	"mods.irisnet.org/htlc/keeper"
-	"mods.irisnet.org/htlc/simulation"
-	"mods.irisnet.org/htlc/types"
+	"mods.irisnet.org/modules/htlc/client/cli"
+	"mods.irisnet.org/modules/htlc/keeper"
+	"mods.irisnet.org/modules/htlc/simulation"
+	"mods.irisnet.org/modules/htlc/types"
 )
 
 // ConsensusVersion defines the current htlc module consensus version.

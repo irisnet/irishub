@@ -10,9 +10,9 @@ package cli_test
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 // 	"mods.irisnet.org/simapp"
-// 	recordcli "mods.irisnet.org/record/client/cli"
-// 	recordtestutil "mods.irisnet.org/record/client/testutil"
-// 	recordtypes "mods.irisnet.org/record/types"
+// 	recordcli "mods.irisnet.org/modules/record/client/cli"
+// 	recordtestutil "mods.irisnet.org/modules/record/client/testutil"
+// 	recordtypes "mods.irisnet.org/modules/record/types"
 // )
 
 // type IntegrationTestSuite struct {

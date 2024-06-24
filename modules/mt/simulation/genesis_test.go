@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"testing"
 
-	mt "mods.irisnet.org/mt/types"
+	mt "mods.irisnet.org/modules/mt/types"
 
 	"github.com/stretchr/testify/require"
 

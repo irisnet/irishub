@@ -11,8 +11,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"mods.irisnet.org/record/keeper"
-	"mods.irisnet.org/record/types"
+	"mods.irisnet.org/modules/record/keeper"
+	"mods.irisnet.org/modules/record/types"
 	"mods.irisnet.org/simapp"
 )
 

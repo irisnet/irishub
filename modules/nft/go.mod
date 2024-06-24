@@ -1,4 +1,4 @@
-module mods.irisnet.org/nft
+module mods.irisnet.org/modules/nft
 
 go 1.19
 

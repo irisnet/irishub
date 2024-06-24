@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"mods.irisnet.org/mt/types"
+	"mods.irisnet.org/modules/mt/types"
 )
 
 const denomIdPrefix = "mt-denom-%d"

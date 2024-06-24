@@ -13,8 +13,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"mods.irisnet.org/nft/keeper"
-	"mods.irisnet.org/nft/types"
+	"mods.irisnet.org/modules/nft/keeper"
+	"mods.irisnet.org/modules/nft/types"
 	"mods.irisnet.org/simapp"
 )
 

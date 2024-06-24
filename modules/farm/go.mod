@@ -1,4 +1,4 @@
-module mods.irisnet.org/farm
+module mods.irisnet.org/modules/farm
 
 go 1.19
 
@@ -22,7 +22,7 @@ require (
 	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.32.0
 	mods.irisnet.org/api v1.0.0-beta
-	mods.irisnet.org/coinswap v1.0.0-beta
+	mods.irisnet.org/modules/coinswap v1.0.0-beta
 	mods.irisnet.org/simapp v1.0.0-beta
 	sigs.k8s.io/yaml v1.3.0
 )
@@ -194,6 +194,6 @@ replace (
 
 	// TODO
 	mods.irisnet.org/api => ../../api
-	mods.irisnet.org/coinswap => ../coinswap
+	mods.irisnet.org/modules/coinswap => ../coinswap
 	mods.irisnet.org/simapp => ../../simapp
 )

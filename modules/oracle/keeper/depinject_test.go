@@ -48,11 +48,11 @@ import (
 
 	oraclemodule "mods.irisnet.org/api/irismod/oracle/module/v1"
 	servicemodule "mods.irisnet.org/api/irismod/service/module/v1"
-	oracletypes "mods.irisnet.org/oracle/types"
-	servicetypes "mods.irisnet.org/service/types"
+	oracletypes "mods.irisnet.org/modules/oracle/types"
+	servicetypes "mods.irisnet.org/modules/service/types"
 
-	_ "mods.irisnet.org/oracle"
-	_ "mods.irisnet.org/service"
+	_ "mods.irisnet.org/modules/oracle"
+	_ "mods.irisnet.org/modules/service"
 )
 
 var (

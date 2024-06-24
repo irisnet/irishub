@@ -6,7 +6,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"mods.irisnet.org/record/types"
+	"mods.irisnet.org/modules/record/types"
 )
 
 // RandomizedGenState generates a random GenesisState for record

@@ -10,7 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	tokentypes "mods.irisnet.org/token/types"
+	tokentypes "mods.irisnet.org/modules/token/types"
 )
 
 var (

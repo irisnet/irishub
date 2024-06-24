@@ -57,9 +57,9 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 
 	tokenmodule "mods.irisnet.org/api/irismod/token/module/v1"
-	_ "mods.irisnet.org/token"
-	"mods.irisnet.org/token/contracts"
-	tokentypes "mods.irisnet.org/token/types"
+	_ "mods.irisnet.org/modules/token"
+	"mods.irisnet.org/modules/token/contracts"
+	tokentypes "mods.irisnet.org/modules/token/types"
 )
 
 var (

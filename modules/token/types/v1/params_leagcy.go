@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"mods.irisnet.org/token/types"
+	"mods.irisnet.org/modules/token/types"
 )
 
 var _ types.ParamSet = (*Params)(nil)

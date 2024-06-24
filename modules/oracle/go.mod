@@ -1,4 +1,4 @@
-module mods.irisnet.org/oracle
+module mods.irisnet.org/modules/oracle
 
 go 1.19
 
@@ -20,7 +20,7 @@ require (
 	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.32.0
 	mods.irisnet.org/api v1.0.0-beta
-	mods.irisnet.org/service v1.0.0-beta
+	mods.irisnet.org/modules/service v1.0.0-beta
 	mods.irisnet.org/simapp v1.0.0-beta
 )
 
@@ -201,6 +201,6 @@ replace (
 
 	// TODO
 	mods.irisnet.org/api => ../../api
-	mods.irisnet.org/service => ../service
+	mods.irisnet.org/modules/service => ../service
 	mods.irisnet.org/simapp => ../../simapp
 )

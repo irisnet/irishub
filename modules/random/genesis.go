@@ -6,8 +6,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"mods.irisnet.org/random/keeper"
-	"mods.irisnet.org/random/types"
+	"mods.irisnet.org/modules/random/keeper"
+	"mods.irisnet.org/modules/random/types"
 )
 
 // InitGenesis stores the genesis state

@@ -47,8 +47,8 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	recordmodule "mods.irisnet.org/api/irismod/record/module/v1"
-	_ "mods.irisnet.org/record"
-	recordtypes "mods.irisnet.org/record/types"
+	_ "mods.irisnet.org/modules/record"
+	recordtypes "mods.irisnet.org/modules/record/types"
 )
 
 var (

@@ -13,8 +13,8 @@ package v2_test
 // 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
 // 	"mods.irisnet.org/simapp"
-// 	v2 "mods.irisnet.org/coinswap/migrations/v2"
-// 	coinswaptypes "mods.irisnet.org/coinswap/types"
+// 	v2 "mods.irisnet.org/modules/coinswap/migrations/v2"
+// 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
 // )
 
 // const (

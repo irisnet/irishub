@@ -1,4 +1,4 @@
-module mods.irisnet.org/coinswap
+module mods.irisnet.org/modules/coinswap
 
 go 1.19
 

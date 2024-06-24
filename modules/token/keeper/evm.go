@@ -12,8 +12,8 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"mods.irisnet.org/token/types"
-	tokentypes "mods.irisnet.org/token/types"
+	"mods.irisnet.org/modules/token/types"
+	tokentypes "mods.irisnet.org/modules/token/types"
 )
 
 // CallEVM calls the EVM with the provided contract ABI, sender and receiver addresses, method, and arguments.

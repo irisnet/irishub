@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"mods.irisnet.org/nft/keeper"
+	"mods.irisnet.org/modules/nft/keeper"
 )
 
 func (suite *KeeperSuite) TestGetNFT() {

@@ -12,9 +12,9 @@ package cli_test
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 // 	"mods.irisnet.org/simapp"
-// 	mtcli "mods.irisnet.org/mt/client/cli"
-// 	mttestutil "mods.irisnet.org/mt/client/testutil"
-// 	mttypes "mods.irisnet.org/mt/types"
+// 	mtcli "mods.irisnet.org/modules/mt/client/cli"
+// 	mttestutil "mods.irisnet.org/modules/mt/client/testutil"
+// 	mttypes "mods.irisnet.org/modules/mt/types"
 // )
 
 // type IntegrationTestSuite struct {

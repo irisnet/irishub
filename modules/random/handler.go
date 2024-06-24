@@ -5,8 +5,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"mods.irisnet.org/random/keeper"
-	"mods.irisnet.org/random/types"
+	"mods.irisnet.org/modules/random/keeper"
+	"mods.irisnet.org/modules/random/types"
 )
 
 // NewHandler returns a handler for all random msgs

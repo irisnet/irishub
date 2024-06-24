@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"mods.irisnet.org/nft/types"
+	"mods.irisnet.org/modules/nft/types"
 )
 
 // SaveCollection saves all NFTs and returns an error if there already exists

@@ -8,8 +8,8 @@ import (
 	store "github.com/cosmos/cosmos-sdk/store/types"
 
 	modulev1 "mods.irisnet.org/api/irismod/record/module/v1"
-	"mods.irisnet.org/record/keeper"
-	"mods.irisnet.org/record/types"
+	"mods.irisnet.org/modules/record/keeper"
+	"mods.irisnet.org/modules/record/types"
 )
 
 // App Wiring Setup

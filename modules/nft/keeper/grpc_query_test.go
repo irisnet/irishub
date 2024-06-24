@@ -3,7 +3,7 @@ package keeper_test
 import (
 	gocontext "context"
 
-	"mods.irisnet.org/nft/types"
+	"mods.irisnet.org/modules/nft/types"
 )
 
 func (suite *KeeperSuite) TestSupply() {

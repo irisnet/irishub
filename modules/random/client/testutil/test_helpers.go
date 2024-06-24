@@ -10,8 +10,8 @@ package testutil
 // 	"github.com/cosmos/cosmos-sdk/client/flags"
 
 // 	"mods.irisnet.org/simapp"
-// 	randomcli "mods.irisnet.org/random/client/cli"
-// 	randomtypes "mods.irisnet.org/random/types"
+// 	randomcli "mods.irisnet.org/modules/random/client/cli"
+// 	randomtypes "mods.irisnet.org/modules/random/types"
 // )
 
 // // MsgRedelegateExec creates a redelegate message.

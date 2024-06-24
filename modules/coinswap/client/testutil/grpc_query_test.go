@@ -14,7 +14,7 @@ package testutil_test
 
 // 	tokentypes "github.com/irisnet/irismod/modules/token/types/v1"
 // 	"mods.irisnet.org/simapp"
-// 	coinswaptypes "mods.irisnet.org/coinswap/types"
+// 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
 // )
 
 // type IntegrationTestSuite struct {

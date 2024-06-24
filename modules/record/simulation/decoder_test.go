@@ -12,8 +12,8 @@ package simulation_test
 // 	"github.com/cosmos/cosmos-sdk/types/kv"
 
 // 	"mods.irisnet.org/simapp"
-// 	"mods.irisnet.org/record/simulation"
-// 	"mods.irisnet.org/record/types"
+// 	"mods.irisnet.org/modules/record/simulation"
+// 	"mods.irisnet.org/modules/record/types"
 // )
 
 // var (

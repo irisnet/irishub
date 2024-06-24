@@ -17,10 +17,10 @@ package testutil_test
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 // 	"mods.irisnet.org/simapp"
-// 	servicecli "mods.irisnet.org/service/client/cli"
-// 	servicetestutil "mods.irisnet.org/service/client/testutil"
-// 	"mods.irisnet.org/service/types"
-// 	servicetypes "mods.irisnet.org/service/types"
+// 	servicecli "mods.irisnet.org/modules/service/client/cli"
+// 	servicetestutil "mods.irisnet.org/modules/service/client/testutil"
+// 	"mods.irisnet.org/modules/service/types"
+// 	servicetypes "mods.irisnet.org/modules/service/types"
 // )
 
 // type IntegrationTestSuite struct {

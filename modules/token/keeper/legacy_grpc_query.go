@@ -9,8 +9,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
-	v1 "mods.irisnet.org/token/types/v1"
-	"mods.irisnet.org/token/types/v1beta1"
+	v1 "mods.irisnet.org/modules/token/types/v1"
+	"mods.irisnet.org/modules/token/types/v1beta1"
 )
 
 var _ v1beta1.QueryServer = legacyQueryServer{}

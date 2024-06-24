@@ -12,8 +12,8 @@ package testutil_test
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 // 	"mods.irisnet.org/simapp"
-// 	htlccli "mods.irisnet.org/htlc/client/cli"
-// 	htlctestutil "mods.irisnet.org/htlc/client/testutil"
+// 	htlccli "mods.irisnet.org/modules/htlc/client/cli"
+// 	htlctestutil "mods.irisnet.org/modules/htlc/client/testutil"
 // )
 
 // type IntegrationTestSuite struct {

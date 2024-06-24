@@ -13,10 +13,10 @@ package testutil_test
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 // 	"mods.irisnet.org/simapp"
-// 	tokencli "mods.irisnet.org/token/client/cli"
-// 	tokentestutil "mods.irisnet.org/token/client/testutil"
-// 	tokentypes "mods.irisnet.org/token/types"
-// 	v1 "mods.irisnet.org/token/types/v1"
+// 	tokencli "mods.irisnet.org/modules/token/client/cli"
+// 	tokentestutil "mods.irisnet.org/modules/token/client/testutil"
+// 	tokentypes "mods.irisnet.org/modules/token/types"
+// 	v1 "mods.irisnet.org/modules/token/types/v1"
 // )
 
 // type IntegrationTestSuite struct {

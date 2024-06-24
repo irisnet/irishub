@@ -11,8 +11,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"mods.irisnet.org/random/simulation"
-	"mods.irisnet.org/random/types"
+	"mods.irisnet.org/modules/random/simulation"
+	"mods.irisnet.org/modules/random/types"
 	"mods.irisnet.org/simapp"
 )
 

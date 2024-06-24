@@ -1,4 +1,4 @@
-module mods.irisnet.org/mt
+module mods.irisnet.org/modules/mt
 
 go 1.19
 

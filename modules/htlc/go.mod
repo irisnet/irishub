@@ -1,4 +1,4 @@
-module mods.irisnet.org/htlc
+module mods.irisnet.org/modules/htlc
 
 go 1.19
 
