@@ -5,7 +5,7 @@ import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/msg/v1/msg.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/irisnet/irismod/coinswap/types";
+option go_package = "mods.irisnet.org/coinswap/types";
 option (gogoproto.goproto_getters_all) = false;
 
 // Input defines the properties of order's input

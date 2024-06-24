@@ -3,7 +3,7 @@ package irismod.record;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/irisnet/irismod/record/types";
+option go_package = "mods.irisnet.org/record/types";
 option (gogoproto.goproto_getters_all) = false;
 
 // Content defines the detailed information for a record

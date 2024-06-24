@@ -4,7 +4,7 @@ package irismod.oracle;
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/irisnet/irismod/oracle/types";
+option go_package = "mods.irisnet.org/oracle/types";
 
 // Msg defines the oracle Msg service
 service Msg {

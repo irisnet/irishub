@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "irismod/token/v1/token.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/irisnet/irismod/token/types/v1";
+option go_package = "mods.irisnet.org/token/types/v1";
 
 // GenesisState defines the token module's genesis state
 message GenesisState {

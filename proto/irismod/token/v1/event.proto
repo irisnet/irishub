@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
 
-option go_package = "github.com/irisnet/irismod/token/types/v1";
+option go_package = "mods.irisnet.org/token/types/v1";
 option (gogoproto.goproto_getters_all) = false;
 
 // EventDeployERC20 is an event emitted when deploying ERC20.

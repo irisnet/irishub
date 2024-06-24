@@ -4,7 +4,7 @@ package irismod.coinswap;
 import "gogoproto/gogo.proto";
 import "irismod/coinswap/coinswap.proto";
 
-option go_package = "github.com/irisnet/irismod/coinswap/types";
+option go_package = "mods.irisnet.org/coinswap/types";
 
 // GenesisState defines the coinswap module's genesis state
 message GenesisState {

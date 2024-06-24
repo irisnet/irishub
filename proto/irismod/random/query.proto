@@ -5,7 +5,7 @@ import "irismod/random/random.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 
-option go_package = "github.com/irisnet/irismod/random/types";
+option go_package = "mods.irisnet.org/random/types";
 
 // Query creates service with guardian as rpc
 service Query {
