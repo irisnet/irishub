@@ -7,9 +7,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 
-	modulev1 "github.com/irisnet/irismod/api/irismod/record/module/v1"
-	"github.com/irisnet/irismod/record/keeper"
-	"github.com/irisnet/irismod/record/types"
+	modulev1 "mods.irisnet.org/api/irismod/record/module/v1"
+	"mods.irisnet.org/record/keeper"
+	"mods.irisnet.org/record/types"
 )
 
 // App Wiring Setup

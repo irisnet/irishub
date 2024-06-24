@@ -46,9 +46,9 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	recordmodule "github.com/irisnet/irismod/api/irismod/record/module/v1"
-	_ "github.com/irisnet/irismod/record"
-	recordtypes "github.com/irisnet/irismod/record/types"
+	recordmodule "mods.irisnet.org/api/irismod/record/module/v1"
+	_ "mods.irisnet.org/record"
+	recordtypes "mods.irisnet.org/record/types"
 )
 
 var (

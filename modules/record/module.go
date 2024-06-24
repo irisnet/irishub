@@ -18,10 +18,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irismod/record/client/cli"
-	"github.com/irisnet/irismod/record/keeper"
-	"github.com/irisnet/irismod/record/simulation"
-	"github.com/irisnet/irismod/record/types"
+	"mods.irisnet.org/record/client/cli"
+	"mods.irisnet.org/record/keeper"
+	"mods.irisnet.org/record/simulation"
+	"mods.irisnet.org/record/types"
 )
 
 var (
