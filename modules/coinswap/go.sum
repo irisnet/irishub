@@ -373,10 +373,6 @@ github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 h1:fAjc9m62+UWV/WA
 github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13/go.mod h1:SqUrOPUnsFjfmXRMNPybcSiG0BgUW2AuFH8PAnS2iTw=
 github.com/docker/go-connections v0.4.0 h1:El9xVISelRB7BuFusrZozjnkIM5YnzCViNKohAFqRJQ=
 github.com/docker/go-units v0.5.0 h1:69rxXcBk27SvSaaxTtLh/8llcHD8vYHT7WSdRZ/jvr4=
-github.com/dreamer-zq/irismod/api v1.0.0-beta h1:XrGMt2ccDqmEuUpwpKJm31inNsHtTI1Voqssh0WNpQE=
-github.com/dreamer-zq/irismod/api v1.0.0-beta/go.mod h1:bNS+IaO49jP1dpQROkHQ4+BwgTbNGPCLIsJnrphqB6E=
-github.com/dreamer-zq/irismod/simapp v1.0.0-beta h1:KpaEmWc/1v6ozSGp0jLMfUhpC9I3SMLHcIWi4urbSmk=
-github.com/dreamer-zq/irismod/simapp v1.0.0-beta/go.mod h1:qxRQfz4bBzfbS17uw3JK1gFvpuU2kQAJPgq2oeKWHzc=
 github.com/dustin/go-humanize v0.0.0-20171111073723-bb3d318650d4/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=

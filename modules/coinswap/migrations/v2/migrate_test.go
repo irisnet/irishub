@@ -12,7 +12,7 @@ package v2_test
 // 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 // 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-// 	"github.com/irisnet/irismod/simapp"
+// 	"mods.irisnet.org/simapp"
 // 	v2 "mods.irisnet.org/coinswap/migrations/v2"
 // 	coinswaptypes "mods.irisnet.org/coinswap/types"
 // )

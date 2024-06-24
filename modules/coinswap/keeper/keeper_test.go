@@ -15,9 +15,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/irisnet/irismod/simapp"
 	"mods.irisnet.org/coinswap/keeper"
 	"mods.irisnet.org/coinswap/types"
+	"mods.irisnet.org/simapp"
 )
 
 const (

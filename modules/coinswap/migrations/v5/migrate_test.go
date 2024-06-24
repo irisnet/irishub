@@ -7,7 +7,7 @@ package v5_test
 
 // 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-// 	"github.com/irisnet/irismod/simapp"
+// 	"mods.irisnet.org/simapp"
 // 	v5 "mods.irisnet.org/coinswap/migrations/v5"
 // 	coinswaptypes "mods.irisnet.org/coinswap/types"
 // )

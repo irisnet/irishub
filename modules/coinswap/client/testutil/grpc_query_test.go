@@ -13,7 +13,7 @@ package testutil_test
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 // 	tokentypes "github.com/irisnet/irismod/modules/token/types/v1"
-// 	"github.com/irisnet/irismod/simapp"
+// 	"mods.irisnet.org/simapp"
 // 	coinswaptypes "mods.irisnet.org/coinswap/types"
 // )
 

@@ -46,7 +46,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	coinswapmodule "github.com/irisnet/irismod/api/irismod/coinswap/module/v1"
+	coinswapmodule "mods.irisnet.org/api/irismod/coinswap/module/v1"
 	_ "mods.irisnet.org/coinswap"
 	coinswaptypes "mods.irisnet.org/coinswap/types"
 )
