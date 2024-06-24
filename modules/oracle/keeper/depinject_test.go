@@ -46,13 +46,13 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	oraclemodule "github.com/irisnet/irismod/api/irismod/oracle/module/v1"
-	servicemodule "github.com/irisnet/irismod/api/irismod/service/module/v1"
-	oracletypes "github.com/irisnet/irismod/oracle/types"
-	servicetypes "github.com/irisnet/irismod/service/types"
+	oraclemodule "mods.irisnet.org/api/irismod/oracle/module/v1"
+	servicemodule "mods.irisnet.org/api/irismod/service/module/v1"
+	oracletypes "mods.irisnet.org/oracle/types"
+	servicetypes "mods.irisnet.org/service/types"
 
-	_ "github.com/irisnet/irismod/oracle"
-	_ "github.com/irisnet/irismod/service"
+	_ "mods.irisnet.org/oracle"
+	_ "mods.irisnet.org/service"
 )
 
 var (

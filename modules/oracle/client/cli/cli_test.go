@@ -12,12 +12,12 @@ package cli_test
 // 	"github.com/cosmos/cosmos-sdk/client/flags"
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-// 	servicecli "github.com/irisnet/irismod/modules/service/client/cli"
-// 	servicetestutil "github.com/irisnet/irismod/modules/service/client/testutil"
-// 	servicetypes "github.com/irisnet/irismod/modules/service/types"
-// 	"github.com/irisnet/irismod/simapp"
-// 	oraclecli "github.com/irisnet/irismod/oracle/client/cli"
-// 	oracletestutil "github.com/irisnet/irismod/oracle/client/testutil"
+// 	servicecli "mods.irisnet.org/modules/service/client/cli"
+// 	servicetestutil "mods.irisnet.org/modules/service/client/testutil"
+// 	servicetypes "mods.irisnet.org/modules/service/types"
+// 	"mods.irisnet.org/simapp"
+// 	oraclecli "mods.irisnet.org/oracle/client/cli"
+// 	oracletestutil "mods.irisnet.org/oracle/client/testutil"
 // )
 
 // type IntegrationTestSuite struct {

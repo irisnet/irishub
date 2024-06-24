@@ -5,8 +5,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irismod/oracle/keeper"
-	"github.com/irisnet/irismod/oracle/types"
+	"mods.irisnet.org/oracle/keeper"
+	"mods.irisnet.org/oracle/types"
 )
 
 // NewHandler returns a handler for all the "oracle" type messages

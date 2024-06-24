@@ -9,9 +9,9 @@ package testutil
 // 	"github.com/cosmos/cosmos-sdk/client"
 // 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-// 	"github.com/irisnet/irismod/simapp"
-// 	oraclecli "github.com/irisnet/irismod/oracle/client/cli"
-// 	oracletypes "github.com/irisnet/irismod/oracle/types"
+// 	"mods.irisnet.org/simapp"
+// 	oraclecli "mods.irisnet.org/oracle/client/cli"
+// 	oracletypes "mods.irisnet.org/oracle/types"
 // )
 
 // // MsgRedelegateExec creates a redelegate message.
