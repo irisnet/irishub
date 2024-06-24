@@ -4,7 +4,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/htlc/types"
+	"mods.irisnet.org/htlc/types"
 )
 
 // GetParams sets the farm module parameters.

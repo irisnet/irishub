@@ -14,10 +14,10 @@ package cli_test
 // 	"github.com/cosmos/cosmos-sdk/client/flags"
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-// 	"github.com/irisnet/irismod/simapp"
-// 	htlccli "github.com/irisnet/irismod/htlc/client/cli"
-// 	htlctestutil "github.com/irisnet/irismod/htlc/client/testutil"
-// 	htlctypes "github.com/irisnet/irismod/htlc/types"
+// 	"mods.irisnet.org/simapp"
+// 	htlccli "mods.irisnet.org/htlc/client/cli"
+// 	htlctestutil "mods.irisnet.org/htlc/client/testutil"
+// 	htlctypes "mods.irisnet.org/htlc/types"
 // )
 
 // const (

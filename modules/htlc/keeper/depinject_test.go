@@ -46,9 +46,9 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	htlcmodule "github.com/irisnet/irismod/api/irismod/htlc/module/v1"
-	_ "github.com/irisnet/irismod/htlc"
-	htlctypes "github.com/irisnet/irismod/htlc/types"
+	htlcmodule "mods.irisnet.org/api/irismod/htlc/module/v1"
+	_ "mods.irisnet.org/htlc"
+	htlctypes "mods.irisnet.org/htlc/types"
 )
 
 var (

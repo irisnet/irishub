@@ -7,8 +7,8 @@ import (
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/htlc/keeper"
-	"github.com/irisnet/irismod/htlc/types"
+	"mods.irisnet.org/htlc/keeper"
+	"mods.irisnet.org/htlc/types"
 )
 
 // InitGenesis stores the genesis state
