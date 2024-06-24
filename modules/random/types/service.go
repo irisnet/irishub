@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/oracle/types"
-	servicetypes "github.com/irisnet/irismod/service/types"
+	"mods.irisnet.org/oracle/types"
+	servicetypes "mods.irisnet.org/service/types"
 )
 
 const (

@@ -15,13 +15,13 @@ package testutil_test
 // 	"github.com/cosmos/cosmos-sdk/testutil"
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-// 	servicecli "github.com/irisnet/irismod/modules/service/client/cli"
-// 	servicetestutil "github.com/irisnet/irismod/modules/service/client/testutil"
-// 	servicetypes "github.com/irisnet/irismod/modules/service/types"
-// 	"github.com/irisnet/irismod/simapp"
-// 	randomcli "github.com/irisnet/irismod/random/client/cli"
-// 	randomtestutil "github.com/irisnet/irismod/random/client/testutil"
-// 	randomtypes "github.com/irisnet/irismod/random/types"
+// 	servicecli "mods.irisnet.org/modules/service/client/cli"
+// 	servicetestutil "mods.irisnet.org/modules/service/client/testutil"
+// 	servicetypes "mods.irisnet.org/modules/service/types"
+// 	"mods.irisnet.org/simapp"
+// 	randomcli "mods.irisnet.org/random/client/cli"
+// 	randomtestutil "mods.irisnet.org/random/client/testutil"
+// 	randomtypes "mods.irisnet.org/random/types"
 // )
 
 // type IntegrationTestSuite struct {

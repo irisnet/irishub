@@ -9,9 +9,9 @@ package testutil
 // 	"github.com/cosmos/cosmos-sdk/client"
 // 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-// 	"github.com/irisnet/irismod/simapp"
-// 	randomcli "github.com/irisnet/irismod/random/client/cli"
-// 	randomtypes "github.com/irisnet/irismod/random/types"
+// 	"mods.irisnet.org/simapp"
+// 	randomcli "mods.irisnet.org/random/client/cli"
+// 	randomtypes "mods.irisnet.org/random/types"
 // )
 
 // // MsgRedelegateExec creates a redelegate message.

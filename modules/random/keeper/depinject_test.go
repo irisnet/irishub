@@ -46,13 +46,13 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	randommodule "github.com/irisnet/irismod/api/irismod/random/module/v1"
-	servicemodule "github.com/irisnet/irismod/api/irismod/service/module/v1"
-	randomtypes "github.com/irisnet/irismod/random/types"
-	servicetypes "github.com/irisnet/irismod/service/types"
+	randommodule "mods.irisnet.org/api/irismod/random/module/v1"
+	servicemodule "mods.irisnet.org/api/irismod/service/module/v1"
+	randomtypes "mods.irisnet.org/random/types"
+	servicetypes "mods.irisnet.org/service/types"
 
-	_ "github.com/irisnet/irismod/random"
-	_ "github.com/irisnet/irismod/service"
+	_ "mods.irisnet.org/random"
+	_ "mods.irisnet.org/service"
 )
 
 var (

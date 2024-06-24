@@ -10,7 +10,7 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/random/types"
+	"mods.irisnet.org/random/types"
 )
 
 // Keeper defines the random module Keeper
