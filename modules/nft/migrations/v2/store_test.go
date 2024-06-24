@@ -14,10 +14,10 @@ package v2_test
 // 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-// 	"github.com/irisnet/irismod/simapp"
-// 	"github.com/irisnet/irismod/nft/keeper"
-// 	v2 "github.com/irisnet/irismod/nft/migrations/v2"
-// 	"github.com/irisnet/irismod/nft/types"
+// 	"mods.irisnet.org/simapp"
+// 	"mods.irisnet.org/nft/keeper"
+// 	v2 "mods.irisnet.org/nft/migrations/v2"
+// 	"mods.irisnet.org/nft/types"
 // )
 
 // func TestMigrate(t *testing.T) {

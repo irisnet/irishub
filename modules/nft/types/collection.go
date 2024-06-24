@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/irisnet/irismod/nft/exported"
+	"mods.irisnet.org/nft/exported"
 )
 
 // NewCollection creates a new NFT Collection

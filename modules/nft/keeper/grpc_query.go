@@ -10,7 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 
-	"github.com/irisnet/irismod/nft/types"
+	"mods.irisnet.org/nft/types"
 )
 
 var _ types.QueryServer = Keeper{}

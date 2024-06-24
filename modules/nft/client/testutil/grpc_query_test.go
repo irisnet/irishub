@@ -11,10 +11,10 @@ package testutil_test
 // 	"github.com/cosmos/cosmos-sdk/testutil"
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-// 	"github.com/irisnet/irismod/simapp"
-// 	nftcli "github.com/irisnet/irismod/nft/client/cli"
-// 	nfttestutil "github.com/irisnet/irismod/nft/client/testutil"
-// 	nfttypes "github.com/irisnet/irismod/nft/types"
+// 	"mods.irisnet.org/simapp"
+// 	nftcli "mods.irisnet.org/nft/client/cli"
+// 	nfttestutil "mods.irisnet.org/nft/client/testutil"
+// 	nfttypes "mods.irisnet.org/nft/types"
 // )
 
 // type IntegrationTestSuite struct {

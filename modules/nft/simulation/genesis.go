@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irismod/nft/types"
+	"mods.irisnet.org/nft/types"
 )
 
 const (

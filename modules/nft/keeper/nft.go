@@ -7,8 +7,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 
-	"github.com/irisnet/irismod/nft/exported"
-	"github.com/irisnet/irismod/nft/types"
+	"mods.irisnet.org/nft/exported"
+	"mods.irisnet.org/nft/types"
 )
 
 // SaveNFT mints an NFT and manages the NFT's existence within Collections and Owners

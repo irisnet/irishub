@@ -13,8 +13,8 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"github.com/irisnet/irismod/nft/keeper"
-	"github.com/irisnet/irismod/nft/types"
+	"mods.irisnet.org/nft/keeper"
+	"mods.irisnet.org/nft/types"
 )
 
 // Simulation operation weights constants

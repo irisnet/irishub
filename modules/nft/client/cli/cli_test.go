@@ -11,9 +11,9 @@ package cli_test
 // 	"github.com/cosmos/cosmos-sdk/client/flags"
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-// 	"github.com/irisnet/irismod/simapp"
-// 	nftcli "github.com/irisnet/irismod/nft/client/cli"
-// 	nfttestutil "github.com/irisnet/irismod/nft/client/testutil"
+// 	"mods.irisnet.org/simapp"
+// 	nftcli "mods.irisnet.org/nft/client/cli"
+// 	nfttestutil "mods.irisnet.org/nft/client/testutil"
 // )
 
 // type IntegrationTestSuite struct {
