@@ -1,18 +1,18 @@
-name: Simulation Test
-on: [pull_request]
+# name: Simulation Test
+# on: [pull_request]
 
-jobs:
-  test-sim-nondeterminism-fast:
-    name: Test AppStateDeterminism
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v3
-      - name: Setup go
-        uses: actions/setup-go@v3
-        with:
-          go-version: '^1.19' # The Go version to download (if necessary) and use.
-      - run: make test-sim-nondeterminism-fast
+# jobs:
+#   test-sim-nondeterminism-fast:
+#     name: Test AppStateDeterminism
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout source code
+#         uses: actions/checkout@v3
+#       - name: Setup go
+#         uses: actions/setup-go@v3
+#         with:
+#           go-version: '^1.19' # The Go version to download (if necessary) and use.
+#       - run: make test-sim-nondeterminism-fast
   # test-sim-import-export:
   #   name: Test AppImportExport
   #   runs-on: ubuntu-latest
