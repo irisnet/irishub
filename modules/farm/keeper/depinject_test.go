@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"fmt"
 	"time"
 
 	runtimev1alpha1 "cosmossdk.io/api/cosmos/app/runtime/v1alpha1"
@@ -27,6 +28,7 @@ import (
 	"cosmossdk.io/core/appconfig"
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
@@ -46,12 +48,9 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	coinswapmodule "mods.irisnet.org/api/irismod/coinswap/module/v1"
 	farmmodule "mods.irisnet.org/api/irismod/farm/module/v1"
-	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
 	farmtypes "mods.irisnet.org/modules/farm/types"
 
-	_ "mods.irisnet.org/modules/coinswap"
 	_ "mods.irisnet.org/modules/farm"
 )
 
@@ -68,7 +67,7 @@ var (
 		distrtypes.ModuleName, stakingtypes.ModuleName, slashingtypes.ModuleName, govtypes.ModuleName,
 		minttypes.ModuleName, crisistypes.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
 		feegrant.ModuleName, group.ModuleName, paramstypes.ModuleName, upgradetypes.ModuleName,
-		vestingtypes.ModuleName, consensustypes.ModuleName, coinswaptypes.ModuleName, farmtypes.ModuleName,
+		vestingtypes.ModuleName, consensustypes.ModuleName, farmtypes.ModuleName,
 	}
 
 	// module account permissions
@@ -79,7 +78,6 @@ var (
 		{Account: stakingtypes.BondedPoolName, Permissions: []string{authtypes.Burner, stakingtypes.ModuleName}},
 		{Account: stakingtypes.NotBondedPoolName, Permissions: []string{authtypes.Burner, stakingtypes.ModuleName}},
 		{Account: govtypes.ModuleName, Permissions: []string{authtypes.Burner}},
-		{Account: coinswaptypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: farmtypes.ModuleName, Permissions: []string{authtypes.Burner}},
 		{Account: farmtypes.RewardCollector},
 		{Account: farmtypes.EscrowCollector},
@@ -126,7 +124,6 @@ var (
 						group.ModuleName,
 						paramstypes.ModuleName,
 						vestingtypes.ModuleName,
-						coinswaptypes.ModuleName,
 						farmtypes.ModuleName,
 						consensustypes.ModuleName,
 					},
@@ -148,7 +145,6 @@ var (
 						paramstypes.ModuleName,
 						consensustypes.ModuleName,
 						upgradetypes.ModuleName,
-						coinswaptypes.ModuleName,
 						farmtypes.ModuleName,
 						vestingtypes.ModuleName,
 					},
@@ -256,12 +252,6 @@ var (
 				Config: appconfig.WrapAny(&consensusmodulev1.Module{}),
 			},
 			{
-				Name: coinswaptypes.ModuleName,
-				Config: appconfig.WrapAny(&coinswapmodule.Module{
-					FeeCollectorName: authtypes.FeeCollectorName,
-				}),
-			},
-			{
 				Name: farmtypes.ModuleName,
 				Config: appconfig.WrapAny(&farmmodule.Module{
 					FeeCollectorName:  authtypes.FeeCollectorName,
@@ -271,3 +261,10 @@ var (
 		},
 	})
 )
+
+type mockCoinswapKeeper struct {}
+
+func (mck *mockCoinswapKeeper) ValidatePool(ctx sdk.Context, lptDenom string) error {
+	fmt.Println("mock coinswap keeper")
+	return nil
+}

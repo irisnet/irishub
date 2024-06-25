@@ -22,7 +22,6 @@ require (
 	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.32.0
 	mods.irisnet.org/api v1.0.0-beta
-	mods.irisnet.org/modules/coinswap v1.0.0-beta
 	mods.irisnet.org/simapp v1.0.0-beta
 	sigs.k8s.io/yaml v1.3.0
 )
