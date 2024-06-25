@@ -11,5 +11,5 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version: '^1.18' # The Go version to download (if necessary) and use.
-      - run: make test-unit
+          go-version: '^1.19' # The Go version to download (if necessary) and use.
+      - run: make test
