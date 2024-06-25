@@ -21,7 +21,6 @@ require (
 	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.32.0
 	mods.irisnet.org/api v1.0.0-beta
-	mods.irisnet.org/modules/oracle v1.0.0-beta
 	mods.irisnet.org/modules/service v1.0.0-beta
 	mods.irisnet.org/simapp v1.0.0-beta
 )
@@ -201,7 +200,6 @@ replace (
 
 	// TODO
 	mods.irisnet.org/api => ../../api
-	mods.irisnet.org/modules/oracle => ../oracle
 	mods.irisnet.org/modules/service => ../service
 	mods.irisnet.org/simapp => ../../simapp
 )

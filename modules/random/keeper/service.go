@@ -132,7 +132,7 @@ func (k Keeper) HandlerResponse(
 	}
 
 	outputBody := gjson.Get(responseOutput[0], servicetypes.PATH_BODY).String()
-	if err := servicetypes.ValidateResponseOutputBody(types.ServiceSchemas, outputBody); err != nil {
+	if err := servicetypes.ValidateResponseOutputBody(servicetypes.RandomServiceSchemas, outputBody); err != nil {
 		ctx.Logger().Error(
 			"invalid output body",
 			"body", outputBody,
@@ -141,7 +141,7 @@ func (k Keeper) HandlerResponse(
 		return
 	}
 
-	seedStr := gjson.Get(outputBody, types.ServiceValueJSONPath).String()
+	seedStr := gjson.Get(outputBody, servicetypes.RandomServiceValueJSONPath).String()
 	seed, err := hex.DecodeString(seedStr)
 	if err != nil || len(seed) != types.SeedBytesLength {
 		ctx.Logger().Error(

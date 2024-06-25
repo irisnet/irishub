@@ -4,17 +4,14 @@ import (
 	"github.com/cometbft/cometbft/crypto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"mods.irisnet.org/modules/oracle/types"
-	servicetypes "mods.irisnet.org/modules/service/types"
 )
 
 const (
-	ServiceName          = "random"
-	ServiceDesc          = "system service definition of random module"
-	ServiceValueJSONPath = "seed"
-	AuthorDescription    = "random module account"
-	ServiceSchemas       = `
+	RandomServiceName          = "random"
+	RandomServiceDesc          = "system service definition of random module"
+	RandomServiceValueJSONPath = "seed"
+	RandomAuthorDescription    = "random module account"
+	RandomServiceSchemas       = `
 	{
 		"input": {
 			"$schema": "http://json-schema.org/draft-04/schema#",
@@ -44,17 +41,17 @@ const (
 )
 
 var (
-	ServiceTags = []string{types.ModuleName}
-	Author      = sdk.AccAddress(crypto.AddressHash([]byte(types.ModuleName)))
+	RandomServiceTags = []string{"oracle"}
+	RandomAuthor      = sdk.AccAddress(crypto.AddressHash([]byte("oracle")))
 )
 
-func GetSvcDefinition() servicetypes.ServiceDefinition {
-	return servicetypes.NewServiceDefinition(
-		ServiceName,
-		ServiceDesc,
-		ServiceTags,
-		Author,
-		AuthorDescription,
-		ServiceSchemas,
+func GetRandomSvcDefinition() ServiceDefinition {
+	return NewServiceDefinition(
+		RandomServiceName,
+		RandomServiceDesc,
+		RandomServiceTags,
+		RandomAuthor,
+		RandomAuthorDescription,
+		RandomServiceSchemas,
 	)
 }
