@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "irismod/nft/nft.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 
-option go_package = "mods.irisnet.org/nft/types";
+option go_package = "mods.irisnet.org/modules/nft/types";
 
 // Query defines the gRPC querier service for NFT module
 service Query {

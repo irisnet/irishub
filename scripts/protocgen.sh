@@ -19,7 +19,7 @@ done
 cd ..
 
 # move proto files to the right places
-cp -r mods.irisnet.org/* ./modules/
+cp -r mods.irisnet.org/* ./
 rm -rf mods.irisnet.org
 
 ./scripts/protocgen-pulsar.sh

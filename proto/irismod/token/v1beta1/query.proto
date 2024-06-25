@@ -9,7 +9,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
 import "irismod/token/v1beta1/token.proto";
 
-option go_package = "mods.irisnet.org/token/types/v1beta1";
+option go_package = "mods.irisnet.org/modules/token/types/v1beta1";
 
 // Query creates service with token as RPC
 service Query {

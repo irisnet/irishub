@@ -3,7 +3,7 @@ package irismod.nft;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "mods.irisnet.org/nft/types";
+option go_package = "mods.irisnet.org/modules/nft/types";
 option (gogoproto.goproto_getters_all) = false;
 
 // BaseNFT defines a non-fungible token

@@ -4,7 +4,7 @@ package irismod.oracle;
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "mods.irisnet.org/oracle/types";
+option go_package = "mods.irisnet.org/modules/oracle/types";
 
 // Feed defines the feed standard
 message Feed {
