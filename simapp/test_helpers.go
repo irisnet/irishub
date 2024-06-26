@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"cosmossdk.io/depinject"
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
@@ -30,6 +31,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	pruningtypes "github.com/cosmos/cosmos-sdk/store/pruning/types"
@@ -165,15 +167,40 @@ func SetupWithGenesisStateFn(
 	return app
 }
 
-func NewConfig(depInjectOptions DepinjectOptions) network.Config {
+func NewConfig(depInjectOptions DepinjectOptions) (network.Config, error) {
+	var (
+		appBuilder        *runtime.AppBuilder
+		txConfig          client.TxConfig
+		legacyAmino       *codec.LegacyAmino
+		cdc               codec.Codec
+		interfaceRegistry codectypes.InterfaceRegistry
+	)
+
+	providers := append(depInjectOptions.Providers[:], log.NewNopLogger())
+	if err := depinject.Inject(
+		depinject.Configs(
+			depInjectOptions.Config,
+			depinject.Supply(
+				providers...,
+			),
+		),
+		&appBuilder,
+		&txConfig,
+		&cdc,
+		&legacyAmino,
+		&interfaceRegistry,
+	); err != nil {
+		return network.Config{}, err
+	}
+
 	cfg := network.DefaultConfig(func() network.TestFixture {
 		return NewTestNetworkFixture(depInjectOptions)
 	})
-	encCfg := MakeTestEncodingConfig() // redundant
-	cfg.Codec = encCfg.Codec
-	cfg.TxConfig = encCfg.TxConfig
-	cfg.LegacyAmino = encCfg.Amino
-	cfg.InterfaceRegistry = encCfg.InterfaceRegistry
+	cfg.Codec = cdc
+	cfg.TxConfig = txConfig
+	cfg.LegacyAmino = legacyAmino
+	cfg.InterfaceRegistry = interfaceRegistry
+	cfg.GenesisState = appBuilder.DefaultGenesis()
 	cfg.AppConstructor = func(val network.ValidatorI) servertypes.Application {
 		return NewSimApp(
 			val.GetCtx().Logger,
@@ -186,8 +213,7 @@ func NewConfig(depInjectOptions DepinjectOptions) network.Config {
 			bam.SetChainID(cfg.ChainID),
 		)
 	}
-	cfg.GenesisState = NewDefaultGenesisState(cfg.Codec)
-	return cfg
+	return cfg, nil
 }
 
 // func SimAppConstructor(val network.ValidatorI) servertypes.Application {

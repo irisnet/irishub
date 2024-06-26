@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/cosmos/gogoproto/proto"
-	"github.com/stretchr/testify/suite"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil"
@@ -13,41 +12,18 @@ import (
 	"mods.irisnet.org/e2e"
 	nftcli "mods.irisnet.org/modules/nft/client/cli"
 	nfttypes "mods.irisnet.org/modules/nft/types"
-	"mods.irisnet.org/simapp"
 )
 
 // QueryTestSuite is a suite of end-to-end tests for the nft module
 type QueryTestSuite struct {
-	suite.Suite
-
-	network simapp.Network
-}
-
-// SetupSuite creates a new network for integration tests
-func (s *QueryTestSuite) SetupSuite() {
-	depInjectOptions := simapp.DepinjectOptions{
-		Config:    e2e.AppConfig,
-		Providers: []interface{}{
-			e2e.ProvideEVMKeeper(),
-			e2e.ProvideICS20Keeper(),
-		},
-	}
-
-	s.T().Log("setting up integration test suite")
-	s.network = simapp.SetupNetwork(s.T(),depInjectOptions)
-}
-
-// TearDownSuite tears down the integration test suite
-func (s *QueryTestSuite) TearDownSuite() {
-	s.T().Log("tearing down integration test suite")
-	s.network.Cleanup()
+	e2e.TestSuite
 }
 
 // TestQueryCmd tests all query command in the nft module
 func (s *QueryTestSuite) TestQueryCmd() {
 	// s.SetupSuite()
 
-	val := s.network.Validators[0]
+	val := s.Network.Validators[0]
 	clientCtx := val.ClientCtx
 	// ---------------------------------------------------------------------------
 
@@ -84,14 +60,14 @@ func (s *QueryTestSuite) TestQueryCmd() {
 		fmt.Sprintf(
 			"--%s=%s",
 			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+			sdk.NewCoins(sdk.NewCoin(s.Network.BondDenom, sdk.NewInt(10))).String(),
 		),
 	}
 
 	expectedCode := uint32(0)
 
 	txResult := IssueDenomExec(s.T(),
-		s.network,
+		s.Network,
 		clientCtx, from.String(), denomID, args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
@@ -135,12 +111,12 @@ func (s *QueryTestSuite) TestQueryCmd() {
 		fmt.Sprintf(
 			"--%s=%s",
 			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+			sdk.NewCoins(sdk.NewCoin(s.Network.BondDenom, sdk.NewInt(10))).String(),
 		),
 	}
 
 	txResult = MintNFTExec(s.T(),
-		s.network,
+		s.Network,
 		clientCtx, from.String(), denomID, tokenID, args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 

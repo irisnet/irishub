@@ -6,45 +6,20 @@ import (
 	"github.com/cometbft/cometbft/crypto"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/suite"
 
 	"mods.irisnet.org/e2e"
 	nftcli "mods.irisnet.org/modules/nft/client/cli"
-	"mods.irisnet.org/simapp"
 )
 
 // TxTestSuite is a suite of end-to-end tests for the nft module
 type TxTestSuite struct {
-	suite.Suite
-
-	network simapp.Network
+	e2e.TestSuite
 }
-
-// SetupSuite creates a new network for integration tests
-func (s *TxTestSuite) SetupSuite() {
-	depInjectOptions := simapp.DepinjectOptions{
-		Config:    e2e.AppConfig,
-		Providers: []interface{}{
-			e2e.ProvideEVMKeeper(),
-			e2e.ProvideICS20Keeper(),
-		},
-	}
-
-	s.T().Log("setting up e2e test suite")
-	s.network = simapp.SetupNetwork(s.T(),depInjectOptions)
-}
-
-// TearDownSuite tears down the integration test suite
-func (s *TxTestSuite) TearDownSuite() {
-	s.T().Log("tearing down e2e nft test suite")
-	s.network.Cleanup()
-}
-
 
 // TestTxCmd tests all tx command in the nft module
 func (s *TxTestSuite) TestTxCmd() {
-	val := s.network.Validators[0]
-	val2 := s.network.Validators[1]
+	val := s.Network.Validators[0]
+	val2 := s.Network.Validators[1]
 	clientCtx := val.ClientCtx
 	expectedCode := uint32(0)
 
@@ -82,17 +57,17 @@ func (s *TxTestSuite) TestTxCmd() {
 		fmt.Sprintf(
 			"--%s=%s",
 			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+			sdk.NewCoins(sdk.NewCoin(s.Network.BondDenom, sdk.NewInt(10))).String(),
 		),
 	}
 
 	txResult := IssueDenomExec(s.T(),
-		s.network,
+		s.Network,
 		clientCtx, from.String(), denomID, args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	//------test GetCmdQueryDenom()-------------
-	queryDenomResponse := QueryDenomExec(s.T(), s.network, clientCtx, denomID)
+	queryDenomResponse := QueryDenomExec(s.T(), s.Network, clientCtx, denomID)
 	s.Require().Equal(denomName, queryDenomResponse.Name)
 	s.Require().Equal(schema, queryDenomResponse.Schema)
 	s.Require().Equal(symbol, queryDenomResponse.Symbol)
@@ -104,7 +79,7 @@ func (s *TxTestSuite) TestTxCmd() {
 	s.Require().Equal(updateRestricted, queryDenomResponse.UpdateRestricted)
 
 	//------test GetCmdQueryDenoms()-------------
-	queryDenomsResponse := QueryDenomsExec(s.T(), s.network, clientCtx)
+	queryDenomsResponse := QueryDenomsExec(s.T(), s.Network, clientCtx)
 	s.Require().Equal(1, len(queryDenomsResponse.Denoms))
 	s.Require().Equal(denomID, queryDenomsResponse.Denoms[0].Id)
 
@@ -121,21 +96,21 @@ func (s *TxTestSuite) TestTxCmd() {
 		fmt.Sprintf(
 			"--%s=%s",
 			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+			sdk.NewCoins(sdk.NewCoin(s.Network.BondDenom, sdk.NewInt(10))).String(),
 		),
 	}
 
 	txResult = MintNFTExec(s.T(),
-		s.network,
+		s.Network,
 		clientCtx, from.String(), denomID, tokenID, args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
 	//------test GetCmdQuerySupply()-------------
-	querySupplyResponse := QuerySupplyExec(s.T(), s.network, clientCtx, denomID)
+	querySupplyResponse := QuerySupplyExec(s.T(), s.Network, clientCtx, denomID)
 	s.Require().Equal(uint64(1), querySupplyResponse.Amount)
 
 	//------test GetCmdQueryNFT()-------------
-	queryNFTResponse := QueryNFTExec(s.T(), s.network, clientCtx, denomID, tokenID)
+	queryNFTResponse := QueryNFTExec(s.T(), s.Network, clientCtx, denomID, tokenID)
 	s.Require().Equal(tokenID, queryNFTResponse.Id)
 	s.Require().Equal(tokenName, queryNFTResponse.Name)
 	s.Require().Equal(uri, queryNFTResponse.URI)
@@ -146,7 +121,7 @@ func (s *TxTestSuite) TestTxCmd() {
 	//------test GetCmdQueryOwner()-------------
 	queryNFTsOfOwnerResponse := QueryOwnerExec(
 		s.T(),
-		s.network,
+		s.Network,
 		clientCtx,
 		from.String(),
 	)
@@ -155,7 +130,7 @@ func (s *TxTestSuite) TestTxCmd() {
 	s.Require().Equal(tokenID, queryNFTsOfOwnerResponse.Owner.IDCollections[0].TokenIds[0])
 
 	//------test GetCmdQueryCollection()-------------
-	queryCollectionResponse := QueryCollectionExec(s.T(), s.network, clientCtx, denomID)
+	queryCollectionResponse := QueryCollectionExec(s.T(), s.Network, clientCtx, denomID)
 	s.Require().Equal(1, len(queryCollectionResponse.Collection.NFTs))
 
 	//------test GetCmdEditNFT()-------------
@@ -174,16 +149,16 @@ func (s *TxTestSuite) TestTxCmd() {
 		fmt.Sprintf(
 			"--%s=%s",
 			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+			sdk.NewCoins(sdk.NewCoin(s.Network.BondDenom, sdk.NewInt(10))).String(),
 		),
 	}
 
 	txResult = EditNFTExec(s.T(),
-		s.network,
+		s.Network,
 		clientCtx, from.String(), denomID, tokenID, args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
-	queryNFTResponse = QueryNFTExec(s.T(), s.network, clientCtx, denomID, tokenID)
+	queryNFTResponse = QueryNFTExec(s.T(), s.Network, clientCtx, denomID, tokenID)
 	s.Require().Equal(newTokenName, queryNFTResponse.Name)
 	s.Require().Equal(newTokenURI, queryNFTResponse.URI)
 	s.Require().Equal(newTokenURIHash, queryNFTResponse.UriHash)
@@ -203,16 +178,16 @@ func (s *TxTestSuite) TestTxCmd() {
 		fmt.Sprintf(
 			"--%s=%s",
 			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+			sdk.NewCoins(sdk.NewCoin(s.Network.BondDenom, sdk.NewInt(10))).String(),
 		),
 	}
 
 	txResult = TransferNFTExec(s.T(),
-		s.network,
+		s.Network,
 		clientCtx, from.String(), recipient.String(), denomID, tokenID, args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
-	queryNFTResponse = QueryNFTExec(s.T(), s.network, clientCtx, denomID, tokenID)
+	queryNFTResponse = QueryNFTExec(s.T(), s.Network, clientCtx, denomID, tokenID)
 	s.Require().Equal(tokenID, queryNFTResponse.Id)
 	s.Require().Equal(tokenName, queryNFTResponse.Name)
 	s.Require().Equal(uri, queryNFTResponse.URI)
@@ -233,16 +208,16 @@ func (s *TxTestSuite) TestTxCmd() {
 		fmt.Sprintf(
 			"--%s=%s",
 			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+			sdk.NewCoins(sdk.NewCoin(s.Network.BondDenom, sdk.NewInt(10))).String(),
 		),
 	}
 
 	txResult = MintNFTExec(s.T(),
-		s.network,
+		s.Network,
 		clientCtx, from.String(), denomID, newTokenID, args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
-	querySupplyResponse = QuerySupplyExec(s.T(), s.network, clientCtx, denomID)
+	querySupplyResponse = QuerySupplyExec(s.T(), s.Network, clientCtx, denomID)
 	s.Require().Equal(uint64(2), querySupplyResponse.Amount)
 
 	args = []string{
@@ -251,15 +226,15 @@ func (s *TxTestSuite) TestTxCmd() {
 		fmt.Sprintf(
 			"--%s=%s",
 			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+			sdk.NewCoins(sdk.NewCoin(s.Network.BondDenom, sdk.NewInt(10))).String(),
 		),
 	}
 	txResult = BurnNFTExec(s.T(),
-		s.network,
+		s.Network,
 		clientCtx, from.String(), denomID, newTokenID, args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
-	querySupplyResponse = QuerySupplyExec(s.T(), s.network, clientCtx, denomID)
+	querySupplyResponse = QuerySupplyExec(s.T(), s.Network, clientCtx, denomID)
 	s.Require().Equal(uint64(1), querySupplyResponse.Amount)
 
 	//------test GetCmdTransferDenom()-------------
@@ -269,16 +244,16 @@ func (s *TxTestSuite) TestTxCmd() {
 		fmt.Sprintf(
 			"--%s=%s",
 			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.network.BondDenom, sdk.NewInt(10))).String(),
+			sdk.NewCoins(sdk.NewCoin(s.Network.BondDenom, sdk.NewInt(10))).String(),
 		),
 	}
 
 	txResult = TransferDenomExec(s.T(),
-		s.network,
+		s.Network,
 		clientCtx, from.String(), val2.Address.String(), denomID, args...)
 	s.Require().Equal(expectedCode, txResult.Code)
 
-	queryDenomResponse = QueryDenomExec(s.T(), s.network, clientCtx, denomID)
+	queryDenomResponse = QueryDenomExec(s.T(), s.Network, clientCtx, denomID)
 	s.Require().Equal(val2.Address.String(), queryDenomResponse.Creator)
 	s.Require().Equal(denomName, queryDenomResponse.Name)
 	s.Require().Equal(schema, queryDenomResponse.Schema)
