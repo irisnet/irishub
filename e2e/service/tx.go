@@ -11,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -28,29 +29,16 @@ type TxTestSuite struct {
 
 // SetupSuite sets up test suite
 func (s *TxTestSuite) SetupSuite() {
-	s.T().Log("setting up integration test suite")
+	s.SetModifyConfigFn(func(cfg *network.Config) {
+		var serviceGenesisState servicetypes.GenesisState
+		cfg.Codec.MustUnmarshalJSON(cfg.GenesisState[servicetypes.ModuleName], &serviceGenesisState)
 
-	depInjectOptions := simapp.DepinjectOptions{
-		Config:    e2e.AppConfig,
-		Providers: []interface{}{
-			e2e.ProvideEVMKeeper(),
-			e2e.ProvideICS20Keeper(),
-		},
-	}
-
-	cfg,err  := simapp.NewConfig(depInjectOptions)
-	s.Require().NoError(err)
-	
-	cfg.NumValidators = 1
-
-	var serviceGenesisState servicetypes.GenesisState
-	cfg.Codec.MustUnmarshalJSON(cfg.GenesisState[servicetypes.ModuleName], &serviceGenesisState)
-
-	serviceGenesisState.Params.ArbitrationTimeLimit = time.Duration(time.Second)
-	serviceGenesisState.Params.ComplaintRetrospect = time.Duration(time.Second)
-	cfg.GenesisState[servicetypes.ModuleName] = cfg.Codec.MustMarshalJSON(&serviceGenesisState)
-
-	s.Network = simapp.SetupNetworkWithConfig(s.T(), cfg)
+		serviceGenesisState.Params.ArbitrationTimeLimit = time.Duration(time.Second)
+		serviceGenesisState.Params.ComplaintRetrospect = time.Duration(time.Second)
+		cfg.GenesisState[servicetypes.ModuleName] = cfg.Codec.MustMarshalJSON(&serviceGenesisState)
+		cfg.NumValidators = 1
+	})
+	s.TestSuite.SetupSuite()
 }
 
 // TestQueryCmd tests all query command in the service module
