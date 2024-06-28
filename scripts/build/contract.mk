@@ -1,4 +1,4 @@
-CONTRACTS_DIR := $(shell pwd)/modules/token/contracts
+CONTRACTS_DIR := $(CURDIR)/modules/token/contracts
 COMPILED_DIR := $(CONTRACTS_DIR)/compiled_contracts
 NODE_MODULES := $(CONTRACTS_DIR)/node_modules
 
