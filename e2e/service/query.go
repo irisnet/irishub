@@ -63,7 +63,7 @@ func (s *QueryTestSuite) TestQueryCmd() {
 	serviceName := "test-service"
 	serviceDesc := "test-description"
 	serviceAuthorDesc := "test-author-description"
-	serviceTags := "tags1,tags2"
+	serviceTags := "tags3,tags4"
 	serviceSchemas := `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
 	serviceDenom := sdk.DefaultBondDenom
 	baseURL := val.APIAddress
