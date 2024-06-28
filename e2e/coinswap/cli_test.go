@@ -1,11 +1,11 @@
 package coinswap
 
-// import (
-// 	"testing"
+import (
+	"testing"
 
-// 	"github.com/stretchr/testify/suite"
-// )
+	"github.com/stretchr/testify/suite"
+)
 
-// func TestQueryTestSuite(t *testing.T) {
-// 	suite.Run(t, new(QueryTestSuite))
-// }
+func TestQueryTestSuite(t *testing.T) {
+	suite.Run(t, new(QueryTestSuite))
+}

@@ -67,7 +67,7 @@ func (s *QueryTestSuite) TestCoinswap() {
 		Owner:         from.String(),
 	}
 	txResult := s.BlockSendMsgs(s.T(), msgIssueToken)
-	s.Require().Equal(0, txResult.Code, "send issue token msg failed")
+	s.Require().Equal(uint32(0), txResult.Code, "send issue token msg failed")
 
 	//_ = tokentestutil.IssueTokenExec(s.T(), s.Network, clientCtx, from.String(), args...)
 
