@@ -18,7 +18,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/genproto/googleapis/api v0.0.0-20231212172506-995d672761c0
 	google.golang.org/grpc v1.60.1
-	mods.irisnet.org/api v1.0.0-beta
+	mods.irisnet.org/api v0.0.0-20240628054110-4cb043e0238a
 )
 
 require (
@@ -141,7 +141,4 @@ replace (
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.0
 	// Downgraded to avoid bugs in following commits which caused simulations to fail.
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
-
-	// TODO
-	mods.irisnet.org/api => ../../api
 )
