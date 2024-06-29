@@ -1,6 +1,9 @@
 name: TestUnit
-on: [pull_request]
-
+on:
+  pull_request:
+    paths:
+      - '**/*.go'
+      - '**/*.mod'
 jobs:
   test-unit:
     name: Test Units
