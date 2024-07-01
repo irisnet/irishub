@@ -22,7 +22,7 @@ func init() {
 }
 
 func ProvideKeyTable() types.KeyTable {
-	return types.ParamKeyTable() 
+	return types.ParamKeyTable()
 }
 
 var _ appmodule.AppModule = AppModule{}

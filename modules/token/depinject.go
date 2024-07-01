@@ -24,7 +24,7 @@ func init() {
 
 // ProvideKeyTable returns the key table for the Token module
 func ProvideKeyTable() types.KeyTable {
-	return v1.ParamKeyTable() 
+	return v1.ParamKeyTable()
 }
 
 var _ appmodule.AppModule = AppModule{}

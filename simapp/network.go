@@ -44,7 +44,7 @@ func SetupNetwork(t *testing.T, depInjectOptions DepinjectOptions) Network {
 		Network: network,
 		Config:  cfg,
 	}
-	n.WaitForNBlock(2)
+	require.NoError(t, n.WaitForNBlock(2), "WaitForNBlock failed")
 	return n
 }
 
@@ -68,7 +68,7 @@ func (n Network) ExecTxCmdWithResult(t *testing.T,
 	buf, err := clitestutil.ExecTestCLICmd(clientCtx, cmd, extraArgs)
 	require.NoError(t, err, "ExecTestCLICmd failed")
 
-	n.WaitForNextBlock()
+	require.NoError(t, n.WaitForNextBlock(), "WaitForNextBlock failed")
 
 	respType := proto.Message(&sdk.TxResponse{})
 	require.NoError(t, clientCtx.Codec.UnmarshalJSON(buf.Bytes(), respType), buf.String())
@@ -119,7 +119,8 @@ func (n Network) QueryTx(t *testing.T,
 reTry:
 	result, err = clientCtx.Client.Tx(context.Background(), txHashBz, false)
 	if err != nil && strings.Contains(err.Error(), "not found") && tryCnt > 0 {
-		n.WaitForNextBlock()
+		require.NoError(t, n.WaitForNextBlock(), "WaitForNextBlock failed")
+
 		tryCnt--
 		goto reTry
 	}
@@ -171,7 +172,7 @@ func (n Network) SendMsgs(
 	res, err := client.BroadcastTx(txBytes)
 	require.NoError(t, err, "BroadcastTx failed")
 	require.Equal(t, uint32(0), res.Code, res.RawLog)
-	n.WaitForNBlock(2)
+	require.NoError(t, n.WaitForNBlock(2), "WaitForNextBlock failed")
 	return res
 }
 

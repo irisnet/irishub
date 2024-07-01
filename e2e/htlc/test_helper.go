@@ -29,6 +29,7 @@ func CreateHTLCExec(t *testing.T,
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
@@ -56,6 +57,7 @@ func ClaimHTLCExec(t *testing.T,
 	secret string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		id,
 		secret,
@@ -81,6 +83,7 @@ func QueryHTLCExec(t *testing.T,
 	id string,
 	extraArgs ...string,
 ) *htlctypes.HTLC {
+	t.Helper()
 	args := []string{
 		id,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),

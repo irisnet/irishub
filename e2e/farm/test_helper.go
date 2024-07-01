@@ -18,6 +18,7 @@ func CreateFarmPoolExec(t *testing.T, network simapp.Network, clientCtx client.C
 	creator string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
@@ -32,6 +33,7 @@ func QueryFarmPoolsExec(
 	clientCtx client.Context,
 	extraArgs ...string,
 ) *farmtypes.QueryFarmPoolsResponse {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
@@ -50,6 +52,7 @@ func QueryFarmPoolExec(
 	poolID string,
 	extraArgs ...string,
 ) *farmtypes.QueryFarmPoolResponse {
+	t.Helper()
 	args := []string{
 		poolID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -66,6 +69,7 @@ func AppendRewardExec(t *testing.T, network simapp.Network, clientCtx client.Con
 	poolID string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		poolID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
@@ -81,6 +85,7 @@ func StakeExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	lpToken string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		poolID,
 		lpToken,
@@ -97,6 +102,7 @@ func UnstakeExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	lpToken string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		poolID,
 		lpToken,
@@ -112,6 +118,7 @@ func HarvestExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	poolID string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		poolID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
@@ -126,6 +133,7 @@ func DestroyExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	poolID string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		poolID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
@@ -139,6 +147,7 @@ func QueryFarmerExec(t *testing.T, network simapp.Network, clientCtx client.Cont
 	creator string,
 	extraArgs ...string,
 ) *farmtypes.QueryFarmerResponse {
+	t.Helper()
 	args := []string{
 		creator,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),

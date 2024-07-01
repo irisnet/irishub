@@ -1,6 +1,5 @@
 package types
 
-
 const (
 	// module name
 	ModuleName = "record"

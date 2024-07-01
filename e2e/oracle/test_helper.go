@@ -28,6 +28,7 @@ func CreateFeedExec(t *testing.T,
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
@@ -55,6 +56,7 @@ func EditFeedExec(t *testing.T,
 	feedName string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		feedName,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
@@ -83,6 +85,7 @@ func StartFeedExec(t *testing.T,
 	feedName string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		feedName,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
@@ -108,6 +111,7 @@ func PauseFeedExec(t *testing.T,
 	feedName string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		feedName,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
@@ -132,6 +136,7 @@ func QueryFeedExec(t *testing.T,
 	feedName string,
 	extraArgs ...string,
 ) *oracletypes.FeedContext {
+	t.Helper()
 	args := []string{
 		feedName,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -158,6 +163,7 @@ func QueryFeedsExec(t *testing.T,
 	clientCtx client.Context,
 	extraArgs ...string,
 ) *oracletypes.QueryFeedsResponse {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
@@ -183,6 +189,7 @@ func QueryFeedValueExec(t *testing.T,
 	feedName string,
 	extraArgs ...string,
 ) *oracletypes.QueryFeedValueResponse {
+	t.Helper()
 	args := []string{
 		feedName,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),

@@ -21,6 +21,7 @@ var (
 	_ tokentypes.EVMKeeper   = (*mockEVM)(nil)
 	_ tokentypes.ICS20Keeper = (*mockICS20)(nil)
 )
+
 // ProvideMockEVM returns an instance of tokentypes.EVMKeeper.
 //
 // No parameters.

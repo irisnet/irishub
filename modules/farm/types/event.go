@@ -1,4 +1,3 @@
-
 package types
 
 // farm module event types

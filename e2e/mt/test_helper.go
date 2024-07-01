@@ -32,6 +32,7 @@ func IssueDenomExec(
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
@@ -39,6 +40,7 @@ func IssueDenomExec(
 
 	return network.ExecTxCmdWithResult(t, clientCtx, mtcli.GetCmdIssueDenom(), args)
 }
+
 // BurnMTExec executes a burn token transaction.
 //
 // Parameters:
@@ -62,6 +64,7 @@ func BurnMTExec(t *testing.T,
 	amount string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		denomID,
 		mtID,
@@ -92,6 +95,7 @@ func MintMTExec(t *testing.T,
 	denomID string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
@@ -122,6 +126,7 @@ func EditMTExec(t *testing.T,
 	mtID string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		denomID,
 		mtID,
@@ -157,6 +162,7 @@ func TransferMTExec(t *testing.T,
 	amount string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		from,
 		recipient,
@@ -186,6 +192,7 @@ func QueryDenomExec(t *testing.T,
 	denomID string,
 	extraArgs ...string,
 ) *mttypes.Denom {
+	t.Helper()
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -212,6 +219,7 @@ func QueryDenomsExec(t *testing.T,
 	clientCtx client.Context,
 	extraArgs ...string,
 ) *mttypes.QueryDenomsResponse {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
@@ -240,6 +248,7 @@ func QueryMTsExec(t *testing.T,
 	resp proto.Message,
 	extraArgs ...string,
 ) {
+	t.Helper()
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -268,6 +277,7 @@ func QueryMTExec(t *testing.T,
 	mtID string,
 	extraArgs ...string,
 ) *mttypes.MT {
+	t.Helper()
 	args := []string{
 		denomID,
 		mtID,
@@ -298,6 +308,7 @@ func QueryBlancesExec(t *testing.T,
 	denomID string,
 	extraArgs ...string,
 ) *mttypes.QueryBalancesResponse {
+	t.Helper()
 	args := []string{
 		from,
 		denomID,
@@ -331,6 +342,7 @@ func TransferDenomExec(t *testing.T,
 	denomID string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		from,
 		recipient,

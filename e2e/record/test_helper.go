@@ -13,7 +13,17 @@ import (
 	"mods.irisnet.org/simapp"
 )
 
-// CreateRecordExec creates a redelegate message.
+// CreateRecordExec creates a record
+//
+// Parameters:
+// - t: *testing.T
+// - network: simapp.Network
+// - clientCtx: client.Context
+// - from: string
+// - digest: string
+// - digestAlgo: string
+// - extraArgs: ...string
+// Returns *simapp.ResponseTx
 func CreateRecordExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
@@ -22,6 +32,7 @@ func CreateRecordExec(t *testing.T,
 	digestAlgo string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		digest,
 		digestAlgo,
@@ -33,6 +44,14 @@ func CreateRecordExec(t *testing.T,
 }
 
 // QueryRecordExec queries a record.
+//
+// Parameters:
+// - t: *testing.T
+// - network: simapp.Network
+// - clientCtx: client.Context
+// - recordID: string
+// - resp: proto.Message
+// - extraArgs: ...string
 func QueryRecordExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
@@ -40,6 +59,7 @@ func QueryRecordExec(t *testing.T,
 	resp proto.Message,
 	extraArgs ...string,
 ) {
+	t.Helper()
 	args := []string{
 		recordID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
