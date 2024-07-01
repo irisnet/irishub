@@ -16,7 +16,6 @@ import (
 	farmcli "mods.irisnet.org/modules/farm/client/cli"
 	farmtypes "mods.irisnet.org/modules/farm/types"
 	tokentypes "mods.irisnet.org/modules/token/types/v1"
-	"mods.irisnet.org/simapp"
 )
 
 // QueryTestSuite is a suite of end-to-end tests for the farm module
@@ -26,21 +25,10 @@ type QueryTestSuite struct {
 
 // SetupSuite creates a new network for integration tests
 func (s *QueryTestSuite) SetupSuite() {
-	s.T().Log("setting up integration test suite")
-
-	depInjectOptions := simapp.DepinjectOptions{
-		Config:    e2e.AppConfig,
-		Providers: []interface{}{
-			e2e.ProvideEVMKeeper(),
-			e2e.ProvideICS20Keeper(),
-		},
-	}
-
-	s.T().Log("setting up integration test suite")
-	s.Network = simapp.SetupNetwork(s.T(),depInjectOptions)
 	sdk.SetCoinDenomRegex(func() string {
 		return `[a-zA-Z][a-zA-Z0-9/\-]{2,127}`
 	})
+	s.TestSuite.SetupSuite()
 }
 
 // TestQueryCmd tests all query command in the farm module
@@ -55,7 +43,7 @@ func (s *QueryTestSuite) TestQueryCmd() {
 
 	creator := val.Address
 	description := "iris-atom farm pool"
-	startHeight := s.latestHeight() + 1
+	startHeight := s.latestHeight() + 2
 	rewardPerBlock := sdk.NewCoins(sdk.NewCoin(s.BondDenom, sdk.NewInt(10)))
 	lpTokenDenom := "lpt-1"
 	totalReward := sdk.NewCoins(sdk.NewCoin(s.BondDenom, sdk.NewInt(1000)))

@@ -23,19 +23,10 @@ type QueryTestSuite struct {
 
 // SetupSuite creates a new network for integration tests
 func (s *QueryTestSuite) SetupSuite() {
-	depInjectOptions := simapp.DepinjectOptions{
-		Config:    e2e.AppConfig,
-		Providers: []interface{}{
-			e2e.ProvideEVMKeeper(),
-			e2e.ProvideICS20Keeper(),
-		},
-	}
-		sdk.SetCoinDenomRegex(func() string {
+	sdk.SetCoinDenomRegex(func() string {
 		return `[a-zA-Z][a-zA-Z0-9/\-]{2,127}`
 	})
-
-	s.T().Log("setting up integration test suite")
-	s.Network = simapp.SetupNetwork(s.T(),depInjectOptions)
+	s.TestSuite.SetupSuite()
 }
 
 // TestCoinswap tests all query command in the nft module

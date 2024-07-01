@@ -4,6 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	"github.com/stretchr/testify/suite"
 
+	"mods.irisnet.org/modules/token/keeper"
 	"mods.irisnet.org/simapp"
 )
 
@@ -24,8 +25,8 @@ func (s *TestSuite) SetupSuite() {
 	depInjectOptions := simapp.DepinjectOptions{
 		Config: AppConfig,
 		Providers: []interface{}{
-			ProvideEVMKeeper(),
-			ProvideICS20Keeper(),
+			keeper.ProvideMockEVM(),
+			keeper.ProvideMockICS20(),
 		},
 	}
 	if s.modifyConfigFn == nil {	

@@ -14,6 +14,7 @@ import (
 	"mods.irisnet.org/e2e"
 	htlccli "mods.irisnet.org/modules/htlc/client/cli"
 	htlctypes "mods.irisnet.org/modules/htlc/types"
+	"mods.irisnet.org/modules/token/keeper"
 	"mods.irisnet.org/simapp"
 )
 
@@ -63,8 +64,8 @@ func (s *TxTestSuite) SetupSuite() {
 	depInjectOptions := simapp.DepinjectOptions{
 		Config:    e2e.AppConfig,
 		Providers: []interface{}{
-			e2e.ProvideEVMKeeper(),
-			e2e.ProvideICS20Keeper(),
+			keeper.ProvideMockEVM(),
+			keeper.ProvideMockICS20(),
 		},
 	}
 
