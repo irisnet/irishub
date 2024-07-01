@@ -24,7 +24,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
-	codectype "github.com/cosmos/cosmos-sdk/codec/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -43,7 +42,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authcli "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 	bankcli "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -780,11 +778,11 @@ func QueryAccountExec(
 	out, err := clitestutil.ExecTestCLICmd(clientCtx, authcli.GetAccountCmd(), args)
 	require.NoError(t, err, "QueryAccountExec  failed")
 
-	respType := proto.Message(&codectype.Any{})
+	respType := proto.Message(&codectypes.Any{})
 	require.NoError(t, clientCtx.Codec.UnmarshalJSON(out.Bytes(), respType))
 
 	var account authtypes.AccountI
-	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*codectype.Any), &account)
+	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*codectypes.Any), &account)
 	require.NoError(t, err, "UnpackAccount failed")
 
 	return account
@@ -801,7 +799,7 @@ func MsgSendExec(
 	args := []string{from.String(), to.String(), amount.String()}
 	args = append(args, extraArgs...)
 
-	return network.ExecTxCmdWithResult(t, clientCtx, cli.NewSendTxCmd(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, bankcli.NewSendTxCmd(), args)
 }
 
 func QueryTx(t *testing.T, clientCtx client.Context, txHash string) abci.ResponseDeliverTx {

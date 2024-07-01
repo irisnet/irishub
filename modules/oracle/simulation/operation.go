@@ -512,7 +512,7 @@ func GenServiceBindingsAndProviders(
 			providers = append(providers, provider.Address.String())
 		}
 	}
-	return
+	return providers
 }
 
 func GenFeed(k keeper.Keeper, r *rand.Rand, ctx sdk.Context) types.Feed {

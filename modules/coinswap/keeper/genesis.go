@@ -19,7 +19,8 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 	k.SetStandardDenom(ctx, genState.StandardDenom)
 	k.setSequence(ctx, genState.Sequence)
 	for _, pool := range genState.Pool {
-		k.setPool(ctx, &pool)
+		poolCopy := pool // Create a copy of the pool variable
+		k.setPool(ctx, &poolCopy)
 	}
 }
 

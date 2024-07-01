@@ -127,13 +127,13 @@ func (s *QueryTestSuite) TestQueryCmd() {
 	s.Require().Len(qrrResp.Requests, 1)
 
 	// ------get service request-------------
-	requestHeight ++
+	requestHeight++
 	_, err = s.Network.WaitForHeightWithTimeout(
 		requestHeight,
 		time.Duration(int64(blockInterval+2)*int64(s.Network.TimeoutCommit)),
 	)
 	if err != nil {
-		s.Network.WaitForNBlock(2)
+		s.Require().NoError(s.Network.WaitForNBlock(2))
 	}
 
 	blockResult, err := val.RPCClient.BlockResults(context.Background(), &requestHeight)

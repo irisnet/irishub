@@ -124,7 +124,7 @@ func (s *TxTestSuite) TestTxCmd() {
 	s.Require().Len(qrrResp.Requests, 1)
 
 	// ------get service request-------------
-	requestHeight ++
+	requestHeight++
 	_, err := s.WaitForHeightWithTimeout(
 		requestHeight,
 		time.Duration(int64(blockInterval+5)*int64(s.TimeoutCommit)),

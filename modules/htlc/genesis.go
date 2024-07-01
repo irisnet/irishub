@@ -18,7 +18,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	}
 
 	k.SetPreviousBlockTime(ctx, data.PreviousBlockTime)
-	k.SetParams(ctx, data.Params)
+	if err := k.SetParams(ctx, data.Params); err != nil {
+		panic(err.Error())
+	}
 	for _, supply := range data.Supplies {
 		k.SetAssetSupply(ctx, supply, supply.CurrentSupply.Denom)
 	}

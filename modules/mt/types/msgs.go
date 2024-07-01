@@ -46,7 +46,7 @@ func (msg MsgIssueDenom) Type() string { return TypeMsgIssueDenom }
 
 // ValidateBasic Implements Msg.
 func (msg MsgIssueDenom) ValidateBasic() error {
-	if len(strings.TrimSpace(msg.Name)) <= 0 {
+	if len(strings.TrimSpace(msg.Name)) == 0 {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "name is required")
 	}
 
@@ -201,7 +201,7 @@ func (msg MsgMintMT) Type() string { return TypeMsgMintMT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgMintMT) ValidateBasic() error {
-	if len(strings.TrimSpace(msg.DenomId)) <= 0 {
+	if len(strings.TrimSpace(msg.DenomId)) == 0 {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
 	}
 

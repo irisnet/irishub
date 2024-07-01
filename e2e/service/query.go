@@ -74,9 +74,9 @@ func (s *QueryTestSuite) TestQueryCmd() {
 	s.Require().NoError(err)
 
 	reqServiceFee := fmt.Sprintf("50%s", serviceDenom)
-	reqInput := `{"header":{},"body":{}}`
-	respResult := `{"code":200,"message":""}`
-	respOutput := `{"header":{},"body":{}}`
+	const reqInput = `{"header":{},"body":{}}`
+	const respResult = `{"code":200,"message":""}`
+	const respOutput = `{"header":{},"body":{}}`
 	timeout := qos
 
 	expectedEarnedFees := fmt.Sprintf("48%s", serviceDenom)
@@ -307,11 +307,11 @@ func (s *QueryTestSuite) TestQueryCmd() {
 			var requests []servicetypes.CompactRequest
 			var requestsBz []byte
 			for _, attribute := range event.Attributes {
-				if string(attribute.Key) == servicetypes.AttributeKeyRequests {
+				if attribute.Key == servicetypes.AttributeKeyRequests {
 					requestsBz = []byte(attribute.Value)
 				}
-				if string(attribute.Key) == servicetypes.AttributeKeyRequestContextID &&
-					string(attribute.GetValue()) == requestContextId {
+				if attribute.Key == servicetypes.AttributeKeyRequestContextID &&
+					attribute.GetValue() == requestContextId {
 					found = true
 				}
 			}

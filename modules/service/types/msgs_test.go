@@ -53,7 +53,7 @@ var (
 
 	// -------------
 
-	invalidName = "invalid/service/name"
+	invalidName             = "invalid/service/name"
 	invalidRequestContextID = "invalid-request-context-id"
 )
 

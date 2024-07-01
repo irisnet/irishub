@@ -14,6 +14,16 @@ import (
 	"mods.irisnet.org/simapp"
 )
 
+const (
+	symbol        = "kitty"
+	name          = "Kitty Token"
+	minUnit       = "kitty"
+	scale         = 0
+	initialSupply = int64(100000000)
+	maxSupply     = int64(200000000)
+	mintable      = true
+)
+
 // TxTestSuite is a suite of end-to-end tests for the nft module
 type TxTestSuite struct {
 	e2e.TestSuite
@@ -23,16 +33,7 @@ type TxTestSuite struct {
 func (s *TxTestSuite) TestTxCmd() {
 	val := s.Network.Validators[0]
 	clientCtx := val.ClientCtx
-	// ---------------------------------------------------------------------------
-
 	from := val.Address
-	symbol := "kitty"
-	name := "Kitty Token"
-	minUnit := "kitty"
-	scale := 0
-	initialSupply := int64(100000000)
-	maxSupply := int64(200000000)
-	mintable := true
 
 	//------test GetCmdIssueToken()-------------
 	args := []string{

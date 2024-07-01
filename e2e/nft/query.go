@@ -13,6 +13,22 @@ import (
 	nfttypes "mods.irisnet.org/modules/nft/types"
 )
 
+const (
+	tokenName   = "Kitty Token"
+	uri         = "uri"
+	uriHash     = "uriHash"
+	description = "description"
+	data        = "{\"key1\":\"value1\",\"key2\":\"value2\"}"
+	tokenID     = "kitty"
+	// owner     := "owner"
+	denomName        = "name"
+	denomID          = "denom"
+	schema           = "schema"
+	symbol           = "symbol"
+	mintRestricted   = true
+	updateRestricted = false
+)
+
 // QueryTestSuite is a suite of end-to-end tests for the nft module
 type QueryTestSuite struct {
 	e2e.TestSuite
@@ -20,26 +36,9 @@ type QueryTestSuite struct {
 
 // TestQueryCmd tests all query command in the nft module
 func (s *QueryTestSuite) TestQueryCmd() {
-	// s.SetupSuite()
-
 	val := s.Network.Validators[0]
 	clientCtx := val.ClientCtx
-	// ---------------------------------------------------------------------------
-
 	from := val.Address
-	tokenName := "Kitty Token"
-	uri := "uri"
-	uriHash := "uriHash"
-	description := "description"
-	data := "{\"key1\":\"value1\",\"key2\":\"value2\"}"
-	tokenID := "kitty"
-	// owner     := "owner"
-	denomName := "name"
-	denomID := "denom"
-	schema := "schema"
-	symbol := "symbol"
-	mintRestricted := true
-	updateRestricted := false
 	baseURL := val.APIAddress
 
 	//------test GetCmdIssueDenom()-------------

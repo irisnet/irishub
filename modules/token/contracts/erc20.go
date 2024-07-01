@@ -1,8 +1,7 @@
 package contracts
 
 import (
-	_ "embed" //embed
-
+	_ "embed" // embed
 	"encoding/json"
 
 	"mods.irisnet.org/modules/token/types"
@@ -12,15 +11,15 @@ const (
 	// EventSwapToNative is the name of the event emitted when swapping to native
 	EventSwapToNative = "SwapToNative"
 	// MethodMint is the name of the method mint of the ERC20 contract
-	MethodMint        = "mint"
+	MethodMint = "mint"
 	// MethodBurn is the name of the method burn of the ERC20 contract
-	MethodBurn        = "burn"
+	MethodBurn = "burn"
 	// MethodBalanceOf is the name of the method balanceOf of the ERC20 contract
-	MethodBalanceOf   = "balanceOf"
+	MethodBalanceOf = "balanceOf"
 	// MethodInitialize is the name of the method initialize of the ERC20 contract
-	MethodInitialize  = "initialize"
+	MethodInitialize = "initialize"
 	// MethodUpgradeTo is the name of the method upgradeTo of the Beacon contract
-	MethodUpgradeTo   = "upgradeTo"
+	MethodUpgradeTo = "upgradeTo"
 )
 
 var (

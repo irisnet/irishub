@@ -686,7 +686,7 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 						MaxBlockLock:  MaxTimeLock,
 					}},
 				}
-				suite.keeper.SetParams(suite.ctx, newParams)
+				suite.Require().NoError(suite.keeper.SetParams(suite.ctx, newParams), "SetParams should not panic")
 				suite.ctx = suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(tc.args.duration))
 				suite.NotPanics(
 					func() {

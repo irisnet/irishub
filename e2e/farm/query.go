@@ -153,13 +153,13 @@ func (s *QueryTestSuite) setup() {
 	clientCtx := val.ClientCtx
 
 	from := val.Address
-	symbol := "kitty"
-	name := "Kitty Token"
-	minUnit := "kitty"
-	scale := uint32(0)
-	initialSupply := uint64(100000000)
-	maxSupply := uint64(200000000)
-	mintable := true
+	const symbol = "kitty"
+	const name = "Kitty Token"
+	const minUnit = "kitty"
+	const scale = uint32(0)
+	const initialSupply = uint64(100000000)
+	const maxSupply = uint64(200000000)
+	const mintable = true
 
 	// issue token
 	msgIssueToken := &tokentypes.MsgIssueToken{

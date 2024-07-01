@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"cosmossdk.io/math"
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -76,7 +75,7 @@ func ParseBool(v string) (Bool, error) {
 // ratio: swap rate
 // inputScale: the decimal scale of input amount
 // outputScale: the decimal scale of output amount
-func LossLessSwap(input math.Int, ratio sdk.Dec, inputScale, outputScale uint32) (math.Int, math.Int) {
+func LossLessSwap(input sdkmath.Int, ratio sdk.Dec, inputScale, outputScale uint32) (sdkmath.Int, sdkmath.Int) {
 	inputDec := sdk.NewDecFromInt(input)
 	scaleFactor := int64(inputScale) - int64(outputScale)
 	var scaleMultipler, scaleReverseMultipler sdk.Dec

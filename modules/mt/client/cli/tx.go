@@ -277,7 +277,7 @@ func GetCmdTransferMT() *cobra.Command {
 			if err := cmd.Flags().Set(flags.FlagFrom, args[0]); err != nil {
 				return err
 			}
-			
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
