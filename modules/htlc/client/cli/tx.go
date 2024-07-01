@@ -14,7 +14,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"github.com/irisnet/irismod/modules/htlc/types"
+	"mods.irisnet.org/modules/htlc/types"
 )
 
 // NewTxCmd returns the transaction commands for this module

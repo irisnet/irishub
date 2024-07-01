@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/token/keeper"
-	v1 "github.com/irisnet/irismod/modules/token/types/v1"
+	"mods.irisnet.org/modules/token/keeper"
+	v1 "mods.irisnet.org/modules/token/types/v1"
 )
 
 // InitGenesis stores the genesis state

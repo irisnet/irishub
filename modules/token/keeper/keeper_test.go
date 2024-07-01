@@ -14,10 +14,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
-	"github.com/irisnet/irismod/modules/token/keeper"
-	"github.com/irisnet/irismod/modules/token/types"
-	v1 "github.com/irisnet/irismod/modules/token/types/v1"
-	"github.com/irisnet/irismod/simapp"
+	"mods.irisnet.org/modules/token/keeper"
+	tokentypes "mods.irisnet.org/modules/token/types"
+	v1 "mods.irisnet.org/modules/token/types/v1"
+	"mods.irisnet.org/simapp"
 )
 
 const (
@@ -44,11 +44,19 @@ type KeeperTestSuite struct {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(suite.T(), isCheckTx)
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{
+			keeper.ProvideMockEVM(),
+			keeper.ProvideMockICS20(),
+		},
+		Consumers: []interface{}{&suite.keeper},
+	}
+
+	app := simapp.Setup(suite.T(), isCheckTx,depInjectOptions)
 
 	suite.legacyAmino = app.LegacyAmino()
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
-	suite.keeper = app.TokenKeeper
 	suite.bk = app.BankKeeper
 	suite.app = app
 
@@ -58,9 +66,9 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.keeper.SetParams(suite.ctx, params)
 
 	// init tokens to addr
-	err := suite.bk.MintCoins(suite.ctx, types.ModuleName, initCoin)
+	err := suite.bk.MintCoins(suite.ctx, tokentypes.ModuleName, initCoin)
 	suite.NoError(err)
-	err = suite.bk.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, owner, initCoin)
+	err = suite.bk.SendCoinsFromModuleToAccount(suite.ctx, tokentypes.ModuleName, owner, initCoin)
 	suite.NoError(err)
 }
 
@@ -83,10 +91,10 @@ func (suite *KeeperTestSuite) issueToken(token v1.Token) {
 		),
 	)
 
-	err := suite.bk.MintCoins(suite.ctx, types.ModuleName, mintCoins)
+	err := suite.bk.MintCoins(suite.ctx, tokentypes.ModuleName, mintCoins)
 	suite.NoError(err)
 
-	err = suite.bk.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, owner, mintCoins)
+	err = suite.bk.SendCoinsFromModuleToAccount(suite.ctx, tokentypes.ModuleName, owner, mintCoins)
 	suite.NoError(err)
 }
 
@@ -117,7 +125,7 @@ func (suite *KeeperTestSuite) TestEditToken() {
 
 	symbol := "btc"
 	name := "Bitcoin Token"
-	mintable := types.True
+	mintable := tokentypes.True
 	maxSupply := uint64(22000000)
 
 	err := suite.keeper.EditToken(suite.ctx, symbol, name, maxSupply, mintable, owner)

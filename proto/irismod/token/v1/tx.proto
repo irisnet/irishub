@@ -7,7 +7,7 @@ import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "irismod/token/v1/token.proto";
 
-option go_package = "github.com/irisnet/irismod/modules/token/types/v1";
+option go_package = "mods.irisnet.org/modules/token/types/v1";
 option (gogoproto.goproto_getters_all) = false;
 
 // Msg defines the oracle Msg service
@@ -94,7 +94,7 @@ message MsgEditToken {
   uint64 max_supply = 3;
   string mintable = 4
       [ (gogoproto.casttype) =
-            "github.com/irisnet/irismod/modules/token/types.Bool" ];
+            "mods.irisnet.org/modules/token/types.Bool" ];
   string owner = 5 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 }
 

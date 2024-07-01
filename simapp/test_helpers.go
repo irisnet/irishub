@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"cosmossdk.io/depinject"
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
@@ -30,6 +31,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	pruningtypes "github.com/cosmos/cosmos-sdk/store/pruning/types"
@@ -57,14 +59,14 @@ type SetupOptions struct {
 	AppOpts servertypes.AppOptions
 }
 
-func setup(withGenesis bool, invCheckPeriod uint) (*SimApp, GenesisState) {
+func setup(withGenesis bool, invCheckPeriod uint, depInjectOptions DepinjectOptions) (*SimApp, GenesisState) {
 	db := dbm.NewMemDB()
 
 	appOptions := make(simtestutil.AppOptionsMap, 0)
 	appOptions[flags.FlagHome] = DefaultNodeHome
 	appOptions[server.FlagInvCheckPeriod] = invCheckPeriod
 
-	app := NewSimApp(log.NewNopLogger(), db, nil, true, appOptions)
+	app := NewSimApp(log.NewNopLogger(), db, nil, true, depInjectOptions, appOptions)
 	if withGenesis {
 		return app, app.DefaultGenesis()
 	}
@@ -72,7 +74,7 @@ func setup(withGenesis bool, invCheckPeriod uint) (*SimApp, GenesisState) {
 }
 
 // Setup initializes a new SimApp. A Nop logger is set in SimApp.
-func Setup(t *testing.T, isCheckTx bool) *SimApp {
+func Setup(t *testing.T, isCheckTx bool, depInjectOptions DepinjectOptions) *SimApp {
 	t.Helper()
 
 	privVal := mock.NewPV()
@@ -96,16 +98,17 @@ func Setup(t *testing.T, isCheckTx bool) *SimApp {
 		Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000000000000))),
 	}
 
-	app := SetupWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{acc}, balance)
+	app := SetupWithGenesisValSet(t, depInjectOptions, valSet, []authtypes.GenesisAccount{acc}, balance)
 
 	return app
 }
 
 func SetupWithGenesisStateFn(
 	t *testing.T,
+	depInjectOptions DepinjectOptions,
 	merge func(cdc codec.Codec, state GenesisState) GenesisState,
 ) *SimApp {
-	app, genesisState := setup(true, 5)
+	app, genesisState := setup(true, 5, depInjectOptions)
 
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
@@ -164,26 +167,53 @@ func SetupWithGenesisStateFn(
 	return app
 }
 
-func NewConfig() network.Config {
-	cfg := network.DefaultConfig(NewTestNetworkFixture)
-	encCfg := MakeTestEncodingConfig() // redundant
-	cfg.Codec = encCfg.Codec
-	cfg.TxConfig = encCfg.TxConfig
-	cfg.LegacyAmino = encCfg.Amino
-	cfg.InterfaceRegistry = encCfg.InterfaceRegistry
+func NewConfig(depInjectOptions DepinjectOptions) (network.Config, error) {
+	var (
+		appBuilder        *runtime.AppBuilder
+		txConfig          client.TxConfig
+		legacyAmino       *codec.LegacyAmino
+		cdc               codec.Codec
+		interfaceRegistry codectypes.InterfaceRegistry
+	)
+
+	providers := append(depInjectOptions.Providers[:], log.NewNopLogger())
+	if err := depinject.Inject(
+		depinject.Configs(
+			depInjectOptions.Config,
+			depinject.Supply(
+				providers...,
+			),
+		),
+		&appBuilder,
+		&txConfig,
+		&cdc,
+		&legacyAmino,
+		&interfaceRegistry,
+	); err != nil {
+		return network.Config{}, err
+	}
+
+	cfg := network.DefaultConfig(func() network.TestFixture {
+		return NewTestNetworkFixture(depInjectOptions)
+	})
+	cfg.Codec = cdc
+	cfg.TxConfig = txConfig
+	cfg.LegacyAmino = legacyAmino
+	cfg.InterfaceRegistry = interfaceRegistry
+	cfg.GenesisState = appBuilder.DefaultGenesis()
 	cfg.AppConstructor = func(val network.ValidatorI) servertypes.Application {
 		return NewSimApp(
 			val.GetCtx().Logger,
 			dbm.NewMemDB(),
 			nil,
 			true,
+			depInjectOptions,
 			EmptyAppOptions{},
 			bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
 			bam.SetChainID(cfg.ChainID),
 		)
 	}
-	cfg.GenesisState = NewDefaultGenesisState(cfg.Codec)
-	return cfg
+	return cfg, nil
 }
 
 // func SimAppConstructor(val network.ValidatorI) servertypes.Application {
@@ -280,13 +310,14 @@ func genesisStateWithValSet(t *testing.T,
 // account. A Nop logger is set in SimApp.
 func SetupWithGenesisValSet(
 	t *testing.T,
+	depInjectOptions DepinjectOptions,
 	valSet *tmtypes.ValidatorSet,
 	genAccs []authtypes.GenesisAccount,
 	balances ...banktypes.Balance,
 ) *SimApp {
 	t.Helper()
 
-	app, genesisState := setup(true, 5)
+	app, genesisState := setup(true, 5, depInjectOptions)
 	genesisState = genesisStateWithValSet(t, app, genesisState, valSet, genAccs, balances...)
 
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
@@ -317,6 +348,7 @@ func SetupWithGenesisValSet(
 // accounts and possible balances.
 func SetupWithGenesisAccounts(
 	t *testing.T,
+	depInjectOptions DepinjectOptions,
 	genAccs []authtypes.GenesisAccount,
 	balances ...banktypes.Balance,
 ) *SimApp {
@@ -330,7 +362,7 @@ func SetupWithGenesisAccounts(
 	validator := tmtypes.NewValidator(pubKey, 1)
 	valSet := tmtypes.NewValidatorSet([]*tmtypes.Validator{validator})
 
-	return SetupWithGenesisValSet(t, valSet, genAccs, balances...)
+	return SetupWithGenesisValSet(t, depInjectOptions, valSet, genAccs, balances...)
 }
 
 type GenerateAccountStrategy func(int) []sdk.AccAddress
@@ -354,9 +386,9 @@ func CreateTestAddrs(numAddrs int) []sdk.AccAddress {
 	// start at 100 so we can make up to 999 test addresses with valid test addresses
 	for i := 100; i < (numAddrs + 100); i++ {
 		numString := strconv.Itoa(i)
-		buffer.WriteString("A58856F0FD53BF058B4909A21AEC019107BA6") //base address string
+		buffer.WriteString("A58856F0FD53BF058B4909A21AEC019107BA6") // base address string
 
-		buffer.WriteString(numString) //adding on final two digits to make addresses unique
+		buffer.WriteString(numString) // adding on final two digits to make addresses unique
 		res, _ := sdk.AccAddressFromHexUnsafe(buffer.String())
 		bech := res.String()
 		addresses = append(addresses, testAddr(buffer.String(), bech))
@@ -524,7 +556,6 @@ func SignCheckDeliver(
 	expSimPass, expPass bool,
 	priv ...cryptotypes.PrivKey,
 ) (sdk.GasInfo, *sdk.Result, error) {
-
 	tx, err := simtestutil.GenSignedMockTx(
 		rand.New(rand.NewSource(time.Now().UnixNano())),
 		txCfg,
@@ -783,7 +814,7 @@ func QueryTxWithHeight(
 }
 
 // NewTestNetworkFixture returns a new simapp AppConstructor for network simulation tests
-func NewTestNetworkFixture() network.TestFixture {
+func NewTestNetworkFixture(depInjectOptions DepinjectOptions) network.TestFixture {
 	dir, err := os.MkdirTemp("", "simapp")
 	if err != nil {
 		panic(fmt.Sprintf("failed creating temporary directory: %v", err))
@@ -795,12 +826,13 @@ func NewTestNetworkFixture() network.TestFixture {
 		dbm.NewMemDB(),
 		nil,
 		true,
+		depInjectOptions,
 		simtestutil.NewAppOptionsWithFlagHome(dir),
 	)
 
 	appCtr := func(val network.ValidatorI) servertypes.Application {
 		return NewSimApp(
-			val.GetCtx().Logger, dbm.NewMemDB(), nil, true,
+			val.GetCtx().Logger, dbm.NewMemDB(), nil, true, depInjectOptions,
 			simtestutil.NewAppOptionsWithFlagHome(val.GetCtx().Config.RootDir),
 			bam.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
 			bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),

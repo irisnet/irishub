@@ -11,9 +11,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/record/keeper"
-	"github.com/irisnet/irismod/modules/record/types"
-	"github.com/irisnet/irismod/simapp"
+	"mods.irisnet.org/modules/record/keeper"
+	"mods.irisnet.org/modules/record/types"
+	"mods.irisnet.org/simapp"
 )
 
 var (
@@ -29,11 +29,16 @@ type KeeperTestSuite struct {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(suite.T(), false)
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{},
+		Consumers: []interface{}{&suite.keeper},
+	}
+
+	app := simapp.Setup(suite.T(), false,depInjectOptions)
 
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
-	suite.keeper = app.RecordKeeper
 	suite.keeper.SetIntraTxCounter(suite.ctx, 0)
 }
 

@@ -13,9 +13,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/nft/keeper"
-	"github.com/irisnet/irismod/modules/nft/types"
-	"github.com/irisnet/irismod/simapp"
+	"mods.irisnet.org/modules/nft/keeper"
+	"mods.irisnet.org/modules/nft/types"
+	"mods.irisnet.org/simapp"
 )
 
 var (
@@ -67,16 +67,20 @@ type KeeperSuite struct {
 }
 
 func (suite *KeeperSuite) SetupTest() {
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{},
+		Consumers: []interface{}{&suite.keeper},
+	}
 
-	app := simapp.Setup(suite.T(), isCheckTx)
+	app := simapp.Setup(suite.T(), isCheckTx, depInjectOptions)
 
 	suite.app = app
 	suite.legacyAmino = app.LegacyAmino()
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
-	suite.keeper = app.NFTKeeper
 
 	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, app.InterfaceRegistry())
-	types.RegisterQueryServer(queryHelper, app.NFTKeeper)
+	types.RegisterQueryServer(queryHelper, suite.keeper)
 	suite.queryClient = types.NewQueryClient(queryHelper)
 
 	err := suite.keeper.SaveDenom(
@@ -165,7 +169,6 @@ func (suite *KeeperSuite) TestMintNFT() {
 		address,
 	)
 	suite.NoError(err)
-
 }
 
 func (suite *KeeperSuite) TestUpdateNFT() {
@@ -279,7 +282,6 @@ func (suite *KeeperSuite) TestUpdateNFT() {
 }
 
 func (suite *KeeperSuite) TestTransferOwnership() {
-
 	// SaveNFT shouldn't fail when collection does not exist
 	err := suite.keeper.SaveNFT(
 		suite.ctx,
@@ -327,7 +329,6 @@ func (suite *KeeperSuite) TestTransferOwnership() {
 }
 
 func (suite *KeeperSuite) TestTransferDenom() {
-
 	// invalid owner
 	err := suite.keeper.TransferDenomOwner(suite.ctx, denomID, address3, address)
 	suite.Error(err)
@@ -376,9 +377,9 @@ func CreateTestAddrs(numAddrs int) []sdk.AccAddress {
 	// start at 100 so we can make up to 999 test addresses with valid test addresses
 	for i := 100; i < (numAddrs + 100); i++ {
 		numString := strconv.Itoa(i)
-		buffer.WriteString("A58856F0FD53BF058B4909A21AEC019107BA6") //base address string
+		buffer.WriteString("A58856F0FD53BF058B4909A21AEC019107BA6") // base address string
 
-		buffer.WriteString(numString) //adding on final two digits to make addresses unique
+		buffer.WriteString(numString) // adding on final two digits to make addresses unique
 		res, _ := sdk.AccAddressFromHexUnsafe(buffer.String())
 		bech := res.String()
 		addresses = append(addresses, testAddr(buffer.String(), bech))

@@ -12,9 +12,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/htlc/keeper"
-	"github.com/irisnet/irismod/modules/htlc/types"
-	"github.com/irisnet/irismod/simapp"
+	"mods.irisnet.org/modules/htlc/keeper"
+	"mods.irisnet.org/modules/htlc/types"
+	"mods.irisnet.org/simapp"
 )
 
 type ParamsTestSuite struct {
@@ -22,13 +22,20 @@ type ParamsTestSuite struct {
 
 	cdc    codec.BinaryCodec
 	ctx    sdk.Context
-	keeper *keeper.Keeper
+	keeper keeper.Keeper
 	app    *simapp.SimApp
 }
 
 func (suite *ParamsTestSuite) SetupTest() {
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{},
+		Consumers: []interface{}{&suite.keeper},
+	}
+
 	app := simapp.SetupWithGenesisStateFn(
 		suite.T(),
+		depInjectOptions,
 		func(cdc codec.Codec, state simapp.GenesisState) simapp.GenesisState {
 			state[types.ModuleName] = cdc.MustMarshalJSON(NewHTLTGenesis(TestDeputy))
 			return state
@@ -37,7 +44,6 @@ func (suite *ParamsTestSuite) SetupTest() {
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{Height: 1, Time: time.Now()})
 
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
-	suite.keeper = &app.HTLCKeeper
 	suite.app = app
 }
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/irisnet/irismod/modules/coinswap/types"
+	"mods.irisnet.org/modules/coinswap/types"
 )
 
 func TestGenesisSuite(t *testing.T) {
@@ -25,7 +25,7 @@ func (suite *TestSuite) TestInitGenesisAndExportGenesis() {
 		}},
 		Sequence: 2,
 	}
-	suite.app.CoinswapKeeper.InitGenesis(suite.ctx, expGenesis)
-	actGenesis := suite.app.CoinswapKeeper.ExportGenesis(suite.ctx)
+	suite.keeper.InitGenesis(suite.ctx, expGenesis)
+	actGenesis := suite.keeper.ExportGenesis(suite.ctx)
 	suite.Require().Equal(expGenesis, actGenesis)
 }

@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"github.com/irisnet/irismod/modules/nft/types"
+	"mods.irisnet.org/modules/nft/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module

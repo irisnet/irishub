@@ -3,8 +3,7 @@ package v4
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/coinswap/types"
-	"github.com/irisnet/irismod/types/exported"
+	"mods.irisnet.org/modules/coinswap/types"
 )
 
 var (
@@ -27,7 +26,7 @@ type (
 	}
 )
 
-func Migrate(ctx sdk.Context, k CoinswapKeeper, paramSpace exported.Subspace) error {
+func Migrate(ctx sdk.Context, k CoinswapKeeper, paramSpace types.Subspace) error {
 	params := GetLegacyParams(ctx, paramSpace)
 	newParams := types.Params{
 		Fee:                    params.Fee,
@@ -39,17 +38,17 @@ func Migrate(ctx sdk.Context, k CoinswapKeeper, paramSpace exported.Subspace) er
 }
 
 // GetLegacyParams gets the parameters for the coinswap module.
-func GetLegacyParams(ctx sdk.Context, paramSpace exported.Subspace) Params {
+func GetLegacyParams(ctx sdk.Context, paramSpace types.Subspace) Params {
 	var swapParams Params
 	paramSpace.GetParamSet(ctx, &swapParams)
 	return swapParams
 }
 
 // ParamSetPairs implements paramtypes.KeyValuePairs
-func (p *Params) ParamSetPairs() exported.ParamSetPairs {
-	return exported.ParamSetPairs{
-		exported.NewParamSetPair(KeyFee, &p.Fee, nil),
-		exported.NewParamSetPair(KeyPoolCreationFee, &p.PoolCreationFee, nil),
-		exported.NewParamSetPair(KeyTaxRate, &p.TaxRate, nil),
+func (p *Params) ParamSetPairs() types.ParamSetPairs {
+	return types.ParamSetPairs{
+		types.NewParamSetPair(KeyFee, &p.Fee, nil),
+		types.NewParamSetPair(KeyPoolCreationFee, &p.PoolCreationFee, nil),
+		types.NewParamSetPair(KeyTaxRate, &p.TaxRate, nil),
 	}
 }

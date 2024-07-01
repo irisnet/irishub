@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	tokentypes "mods.irisnet.org/modules/token/types"
 )
 
 const (

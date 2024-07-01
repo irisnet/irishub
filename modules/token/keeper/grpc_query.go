@@ -17,8 +17,8 @@ import (
 
 	gogotypes "github.com/cosmos/gogoproto/types"
 
-	"github.com/irisnet/irismod/modules/token/types"
-	v1 "github.com/irisnet/irismod/modules/token/types/v1"
+	"mods.irisnet.org/modules/token/types"
+	v1 "mods.irisnet.org/modules/token/types/v1"
 )
 
 var _ v1.QueryServer = Keeper{}

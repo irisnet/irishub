@@ -9,9 +9,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	"github.com/irisnet/irismod/contracts"
-	"github.com/irisnet/irismod/modules/token/types"
-	v1 "github.com/irisnet/irismod/modules/token/types/v1"
+	"mods.irisnet.org/modules/token/contracts"
+	"mods.irisnet.org/modules/token/types"
+	v1 "mods.irisnet.org/modules/token/types/v1"
 )
 
 // DeployERC20 deploys an ERC20 token contract.

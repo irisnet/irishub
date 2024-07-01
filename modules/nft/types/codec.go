@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 	proto "github.com/cosmos/gogoproto/proto"
 
-	"github.com/irisnet/irismod/modules/nft/exported"
+	"mods.irisnet.org/modules/nft/exported"
 )
 
 var (

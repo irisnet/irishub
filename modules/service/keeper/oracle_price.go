@@ -8,7 +8,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/service/types"
+	"mods.irisnet.org/modules/service/types"
 )
 
 // GetExchangedPrice gets the exchanged price for the specified consumer and binding

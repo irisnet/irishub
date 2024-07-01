@@ -9,11 +9,10 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	modulev1 "github.com/irisnet/irismod/api/irismod/token/module/v1"
-	"github.com/irisnet/irismod/modules/token/keeper"
-	"github.com/irisnet/irismod/modules/token/types"
-	v1 "github.com/irisnet/irismod/modules/token/types/v1"
-	"github.com/irisnet/irismod/types/exported"
+	modulev1 "mods.irisnet.org/api/irismod/token/module/v1"
+	"mods.irisnet.org/modules/token/keeper"
+	"mods.irisnet.org/modules/token/types"
+	v1 "mods.irisnet.org/modules/token/types/v1"
 )
 
 // App Wiring Setup
@@ -24,7 +23,8 @@ func init() {
 	)
 }
 
-func ProvideKeyTable() exported.KeyTable {
+// ProvideKeyTable returns the key table for the Token module
+func ProvideKeyTable() types.KeyTable {
 	return v1.ParamKeyTable() //nolint:staticcheck
 }
 
@@ -50,7 +50,7 @@ type TokenInputs struct {
 	ICS20Keeper   types.ICS20Keeper
 
 	// LegacySubspace is used solely for migration of x/params managed parameters
-	LegacySubspace exported.Subspace `optional:"true"`
+	LegacySubspace types.Subspace `optional:"true"`
 }
 
 // TokenOutputs is the output of the Token module

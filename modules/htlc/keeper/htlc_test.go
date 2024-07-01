@@ -12,10 +12,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/htlc"
-	"github.com/irisnet/irismod/modules/htlc/keeper"
-	"github.com/irisnet/irismod/modules/htlc/types"
-	"github.com/irisnet/irismod/simapp"
+	"mods.irisnet.org/modules/htlc"
+	"mods.irisnet.org/modules/htlc/keeper"
+	"mods.irisnet.org/modules/htlc/types"
+	"mods.irisnet.org/simapp"
 )
 
 const (
@@ -30,7 +30,7 @@ type HTLCTestSuite struct {
 
 	cdc    codec.JSONCodec
 	ctx    sdk.Context
-	keeper *keeper.Keeper
+	keeper keeper.Keeper
 	app    *simapp.SimApp
 
 	deputy     sdk.AccAddress
@@ -45,8 +45,15 @@ func TestHTLCTestSuite(t *testing.T) {
 }
 
 func (suite *HTLCTestSuite) SetupTest() {
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{},
+		Consumers: []interface{}{&suite.keeper},
+	}
+
 	app := simapp.SetupWithGenesisStateFn(
 		suite.T(),
+		depInjectOptions,
 		func(cdc codec.Codec, state simapp.GenesisState) simapp.GenesisState {
 			state[types.ModuleName] = cdc.MustMarshalJSON(NewHTLTGenesis(TestDeputy))
 			return state
@@ -55,7 +62,6 @@ func (suite *HTLCTestSuite) SetupTest() {
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{Height: 1, Time: time.Now()})
 
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
-	suite.keeper = &app.HTLCKeeper
 	suite.app = app
 
 	_, addrs := GeneratePrivKeyAddressPairs(20)
@@ -649,7 +655,7 @@ func (suite *HTLCTestSuite) TestClaimHtlc() {
 				}
 
 				// Run the beginblocker before attempting claim
-				htlc.BeginBlocker(tc.claimCtx, *suite.keeper)
+				htlc.BeginBlocker(tc.claimCtx, suite.keeper)
 
 				expectedRecipientBalancePre := suite.app.BankKeeper.GetBalance(
 					suite.ctx,
@@ -856,7 +862,7 @@ func (suite *HTLCTestSuite) TestRefundHTLC() {
 				)
 
 				// Run the beginblocker before attempting refund
-				htlc.BeginBlocker(tc.refundCtx, *suite.keeper)
+				htlc.BeginBlocker(tc.refundCtx, suite.keeper)
 
 				originalSenderBalancePost := suite.app.BankKeeper.GetBalance(
 					tc.refundCtx,

@@ -18,11 +18,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irismod/modules/htlc/client/cli"
-	"github.com/irisnet/irismod/modules/htlc/keeper"
-	"github.com/irisnet/irismod/modules/htlc/simulation"
-	"github.com/irisnet/irismod/modules/htlc/types"
-	"github.com/irisnet/irismod/types/exported"
+	"mods.irisnet.org/modules/htlc/client/cli"
+	"mods.irisnet.org/modules/htlc/keeper"
+	"mods.irisnet.org/modules/htlc/simulation"
+	"mods.irisnet.org/modules/htlc/types"
 )
 
 // ConsensusVersion defines the current htlc module consensus version.
@@ -100,7 +99,7 @@ type AppModule struct {
 	keeper         keeper.Keeper
 	accountKeeper  types.AccountKeeper
 	bankKeeper     types.BankKeeper
-	legacySubspace exported.Subspace
+	legacySubspace types.Subspace
 }
 
 // NewAppModule creates a new AppModule object
@@ -109,7 +108,7 @@ func NewAppModule(
 	keeper keeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-	legacySubspace exported.Subspace,
+	legacySubspace types.Subspace,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{cdc: cdc},

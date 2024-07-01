@@ -11,8 +11,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/coinswap/keeper"
-	"github.com/irisnet/irismod/modules/coinswap/types"
+	"mods.irisnet.org/modules/coinswap/keeper"
+	"mods.irisnet.org/modules/coinswap/types"
 )
 
 func TestSwapSuite(t *testing.T) {
@@ -87,13 +87,13 @@ func (suite *TestSuite) TestSwap() {
 	)
 
 	poolId := types.GetPoolId(denomBTC)
-	pool, has := suite.app.CoinswapKeeper.GetPool(suite.ctx, poolId)
+	pool, has := suite.keeper.GetPool(suite.ctx, poolId)
 	suite.Require().True(has)
 
 	lptDenom := pool.LptDenom
 
 	// first swap buy order
-	err := suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
+	err := suite.keeper.Swap(suite.ctx, msg)
 	suite.NoError(err)
 	reservePoolBalances := suite.app.BankKeeper.GetAllBalances(suite.ctx, reservePoolAddr)
 	senderBalances := suite.app.BankKeeper.GetAllBalances(suite.ctx, sender)
@@ -112,7 +112,7 @@ func (suite *TestSuite) TestSwap() {
 	suite.Equal(expCoins.Sort().String(), senderBalances.Sort().String())
 
 	// second swap buy order
-	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
+	err = suite.keeper.Swap(suite.ctx, msg)
 	suite.NoError(err)
 	reservePoolBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, reservePoolAddr)
 	senderBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, sender)
@@ -139,7 +139,7 @@ func (suite *TestSuite) TestSwap() {
 	)
 
 	// first swap sell order
-	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
+	err = suite.keeper.Swap(suite.ctx, msg)
 	suite.NoError(err)
 	reservePoolBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, reservePoolAddr)
 	senderBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, sender)
@@ -157,7 +157,7 @@ func (suite *TestSuite) TestSwap() {
 	suite.Equal(expCoins.Sort().String(), senderBalances.Sort().String())
 
 	// second swap sell order
-	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
+	err = suite.keeper.Swap(suite.ctx, msg)
 	suite.NoError(err)
 	reservePoolBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, reservePoolAddr)
 	senderBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, sender)
@@ -189,17 +189,17 @@ func (suite *TestSuite) TestDoubleSwap() {
 	)
 
 	poolId := types.GetPoolId(denomBTC)
-	pool, has := suite.app.CoinswapKeeper.GetPool(suite.ctx, poolId)
+	pool, has := suite.keeper.GetPool(suite.ctx, poolId)
 	suite.Require().True(has)
 
 	poolIdETH := types.GetPoolId(denomETH)
-	poolETH, has := suite.app.CoinswapKeeper.GetPool(suite.ctx, poolIdETH)
+	poolETH, has := suite.keeper.GetPool(suite.ctx, poolIdETH)
 	suite.Require().True(has)
 
 	lptDenom := pool.LptDenom
 
 	// first swap buy order
-	err := suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
+	err := suite.keeper.Swap(suite.ctx, msg)
 	suite.NoError(err)
 	reservePoolBTCBalances := suite.app.BankKeeper.GetAllBalances(suite.ctx, reservePoolAddrBTC)
 	reservePoolETHBalances := suite.app.BankKeeper.GetAllBalances(suite.ctx, reservePoolAddrETH)
@@ -225,7 +225,7 @@ func (suite *TestSuite) TestDoubleSwap() {
 	suite.Equal(expCoins.Sort().String(), sender1Balances.Sort().String())
 
 	// second swap buy order
-	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
+	err = suite.keeper.Swap(suite.ctx, msg)
 	suite.NoError(err)
 	reservePoolBTCBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, reservePoolAddrBTC)
 	reservePoolETHBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, reservePoolAddrETH)
@@ -260,7 +260,7 @@ func (suite *TestSuite) TestDoubleSwap() {
 	)
 
 	// first swap sell order
-	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
+	err = suite.keeper.Swap(suite.ctx, msg)
 	suite.NoError(err)
 	reservePoolBTCBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, reservePoolAddrBTC)
 	reservePoolETHBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, reservePoolAddrETH)
@@ -286,7 +286,7 @@ func (suite *TestSuite) TestDoubleSwap() {
 	suite.Equal(expCoins.Sort().String(), sender2Balances.Sort().String())
 
 	// second swap sell order
-	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
+	err = suite.keeper.Swap(suite.ctx, msg)
 	suite.NoError(err)
 	reservePoolBTCBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, reservePoolAddrBTC)
 	reservePoolETHBalances = suite.app.BankKeeper.GetAllBalances(suite.ctx, reservePoolAddrETH)
@@ -334,11 +334,11 @@ func createReservePool(suite *TestSuite, denom string) (sdk.AccAddress, sdk.AccA
 	minReward := sdk.NewInt(1)
 	deadline := time.Now().Add(1 * time.Minute)
 	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender.String())
-	_, err = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
+	_, err = suite.keeper.AddLiquidity(suite.ctx, msg)
 	suite.NoError(err)
 
 	poolId := types.GetPoolId(denom)
-	pool, has := suite.app.CoinswapKeeper.GetPool(suite.ctx, poolId)
+	pool, has := suite.keeper.GetPool(suite.ctx, poolId)
 	suite.Require().True(has)
 	reservePoolAddr := types.GetReservePoolAddr(pool.LptDenom)
 
@@ -352,7 +352,7 @@ func createReservePool(suite *TestSuite, denom string) (sdk.AccAddress, sdk.AccA
 	)
 	suite.Equal(expCoins.Sort().String(), reservePoolBalances.Sort().String())
 
-	params := suite.app.CoinswapKeeper.GetParams(suite.ctx)
+	params := suite.keeper.GetParams(suite.ctx)
 	expCoins = sdk.NewCoins(
 		sdk.NewInt64Coin(denom, 99999000),
 		sdk.NewInt64Coin(denomStandard, 99999000).Sub(params.PoolCreationFee),
@@ -383,7 +383,7 @@ func (suite *TestSuite) TestTradeInputForExactOutput() {
 	maxCnt := int(initSupplyOutput.Quo(outputCoin.Amount).Int64())
 
 	for i := 1; i < 100; i++ {
-		amt, err := suite.app.CoinswapKeeper.TradeInputForExactOutput(suite.ctx, input, output)
+		amt, err := suite.keeper.TradeInputForExactOutput(suite.ctx, input, output)
 		if i == maxCnt {
 			suite.Error(err)
 			break
@@ -421,7 +421,7 @@ func (suite *TestSuite) TestTradeExactInputForOutput() {
 	senderBlances := suite.app.BankKeeper.GetAllBalances(suite.ctx, sender)
 
 	for i := 1; i < 1000; i++ {
-		amt, err := suite.app.CoinswapKeeper.TradeExactInputForOutput(suite.ctx, input, output)
+		amt, err := suite.keeper.TradeExactInputForOutput(suite.ctx, input, output)
 		suite.NoError(err)
 
 		sold := sdk.NewCoins(inputCoin)

@@ -9,7 +9,7 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/farm/types"
+	"mods.irisnet.org/modules/farm/types"
 )
 
 // Keeper of the farm store

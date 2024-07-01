@@ -18,9 +18,9 @@ import (
 	v1 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v1"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 
-	"github.com/irisnet/irismod/modules/service/keeper"
-	"github.com/irisnet/irismod/modules/service/types"
-	"github.com/irisnet/irismod/simapp"
+	"mods.irisnet.org/modules/service/keeper"
+	"mods.irisnet.org/modules/service/types"
+	"mods.irisnet.org/simapp"
 )
 
 var (
@@ -76,7 +76,7 @@ type KeeperTestSuite struct {
 
 	cdc    codec.Codec
 	ctx    sdk.Context
-	keeper *keeper.Keeper
+	keeper keeper.Keeper
 	app    *simapp.SimApp
 }
 
@@ -85,13 +85,18 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{},
+		Consumers: []interface{}{&suite.keeper},
+	}
+
 	isCheckTx := false
-	app := simapp.Setup(suite.T(), isCheckTx)
+	app := simapp.Setup(suite.T(), isCheckTx, depInjectOptions)
 
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
 	suite.app = app
-	suite.keeper = &app.ServiceKeeper
 
 	suite.keeper.SetParams(suite.ctx, types.DefaultParams())
 

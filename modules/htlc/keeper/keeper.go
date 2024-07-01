@@ -10,7 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/irisnet/irismod/modules/htlc/types"
+	"mods.irisnet.org/modules/htlc/types"
 )
 
 // Keeper defines the HTLC keeper

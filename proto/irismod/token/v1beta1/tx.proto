@@ -3,7 +3,7 @@ package irismod.token;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/irisnet/irismod/modules/token/types/v1beta1";
+option go_package = "mods.irisnet.org/modules/token/types/v1beta1";
 option (gogoproto.goproto_getters_all) = false;
 
 // Msg defines the oracle Msg service
@@ -59,7 +59,7 @@ message MsgEditToken {
   uint64 max_supply = 3 [ (gogoproto.moretags) = "yaml:\"max_supply\"" ];
   string mintable = 4
       [ (gogoproto.casttype) =
-            "github.com/irisnet/irismod/modules/token/types.Bool" ];
+            "mods.irisnet.org/modules/token/types.Bool" ];
   string owner = 5;
 }
 

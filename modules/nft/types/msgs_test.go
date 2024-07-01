@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/irisnet/irismod/modules/nft/types"
+	"mods.irisnet.org/modules/nft/types"
 )
 
 // ---------------------------------------- Msgs --------------------------------------------------

@@ -14,11 +14,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/oracle/keeper"
-	"github.com/irisnet/irismod/modules/oracle/types"
-	"github.com/irisnet/irismod/modules/service/exported"
-	servicetypes "github.com/irisnet/irismod/modules/service/types"
-	"github.com/irisnet/irismod/simapp"
+	"mods.irisnet.org/modules/oracle/keeper"
+	"mods.irisnet.org/modules/oracle/types"
+	"mods.irisnet.org/modules/service/exported"
+	servicetypes "mods.irisnet.org/modules/service/types"
+	"mods.irisnet.org/simapp"
 )
 
 var (
@@ -47,7 +47,13 @@ type KeeperTestSuite struct {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(suite.T(), false)
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{},
+		Consumers: []interface{}{&suite.keeper},
+	}
+
+	app := simapp.Setup(suite.T(), false, depInjectOptions)
 
 	suite.cdc = app.LegacyAmino()
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
@@ -149,7 +155,7 @@ func (suite *KeeperTestSuite) TestFeed() {
 	})
 	suite.NoError(err)
 
-	//check feed existed
+	// check feed existed
 	feed, existed = suite.keeper.GetFeed(suite.ctx, msg.FeedName)
 	suite.True(existed)
 	suite.EqualValues(
@@ -336,6 +342,7 @@ func (m MockServiceKeeper) PauseRequestContext(
 	m.cxtMap[strings.ToUpper(hex.EncodeToString(requestContextID))] = reqCtx
 	return nil
 }
+
 func (m MockServiceKeeper) AddServiceBinding(
 	ctx sdk.Context,
 	serviceName string,
@@ -348,6 +355,7 @@ func (m MockServiceKeeper) AddServiceBinding(
 ) error {
 	return nil
 }
+
 func (m MockServiceKeeper) AddServiceDefinition(
 	ctx sdk.Context,
 	name,

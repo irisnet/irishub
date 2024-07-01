@@ -4,7 +4,7 @@ package irismod.random;
 import "irismod/random/random.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/irisnet/irismod/modules/random/types";
+option go_package = "mods.irisnet.org/modules/random/types";
 
 // GenesisState defines the random module's genesis state
 message GenesisState {

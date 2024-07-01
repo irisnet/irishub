@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/nft/types"
+	"mods.irisnet.org/modules/nft/types"
 )
 
 // InitGenesis stores the NFT genesis.

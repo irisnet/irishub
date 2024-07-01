@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/farm/types"
+	"mods.irisnet.org/modules/farm/types"
 )
 
 // CreatePoolFee returns the create pool fee

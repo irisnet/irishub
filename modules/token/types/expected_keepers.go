@@ -12,8 +12,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-
-	"github.com/irisnet/irismod/types"
 )
 
 // BankKeeper defines the expected bank keeper (noalias)
@@ -61,8 +59,8 @@ type AccountKeeper interface {
 type EVMKeeper interface {
 	ChainID() *big.Int
 	SupportedKey(pubKey cryptotypes.PubKey) bool
-	EstimateGas(ctx context.Context, req *types.EthCallRequest) (uint64, error)
-	ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*types.Result, error)
+	EstimateGas(ctx context.Context, req *EthCallRequest) (uint64, error)
+	ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*Result, error)
 }
 
 // ICS20Keeper defines the expected keeper of ICS20

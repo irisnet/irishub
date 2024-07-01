@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/oracle/types"
+	"mods.irisnet.org/modules/oracle/types"
 )
 
 type msgServer struct {

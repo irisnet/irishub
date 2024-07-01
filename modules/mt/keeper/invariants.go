@@ -7,7 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/mt/types"
+	"mods.irisnet.org/modules/mt/types"
 )
 
 // RegisterInvariants registers all supply invariants

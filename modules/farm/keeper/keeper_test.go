@@ -10,9 +10,9 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/irisnet/irismod/modules/farm/keeper"
-	"github.com/irisnet/irismod/modules/farm/types"
-	"github.com/irisnet/irismod/simapp"
+	"mods.irisnet.org/modules/farm/keeper"
+	"mods.irisnet.org/modules/farm/types"
+	"mods.irisnet.org/simapp"
 )
 
 var (
@@ -39,7 +39,7 @@ type KeeperTestSuite struct {
 
 	cdc    codec.BinaryCodec
 	ctx    sdk.Context
-	keeper *keeper.Keeper
+	keeper keeper.Keeper
 	app    *simapp.SimApp
 }
 
@@ -48,11 +48,17 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(suite.T(), isCheckTx)
+	depInjectOptions := simapp.DepinjectOptions{
+		Config:    AppConfig,
+		Providers: []interface{}{
+			&mockCoinswapKeeper{},
+		},
+		Consumers: []interface{}{&suite.keeper},
+	}
+	app := simapp.Setup(suite.T(), isCheckTx,depInjectOptions)
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: 1})
 	suite.app = app
-	suite.keeper = &app.FarmKeeper
 	suite.keeper.SetParams(suite.ctx, types.DefaultParams())
 	suite.setTestAddrs()
 }
@@ -440,7 +446,7 @@ func (suite *KeeperTestSuite) TestHarvest() {
 }
 
 func (suite *KeeperTestSuite) AssertStake(
-	poolId string,
+	poolID string,
 	height int64,
 	stakeCoin sdk.Coin,
 	locked sdk.Int,
@@ -448,18 +454,18 @@ func (suite *KeeperTestSuite) AssertStake(
 	rewardPerShare sdk.Dec,
 ) {
 	ctx := suite.app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: height})
-	reward, err := suite.keeper.Stake(ctx, poolId, stakeCoin, testFarmer1)
+	reward, err := suite.keeper.Stake(ctx, poolID, stakeCoin, testFarmer1)
 
 	suite.Require().NoError(err)
 	suite.Require().Equal(expectReward, reward)
 
-	info, exist := suite.keeper.GetFarmInfo(ctx, poolId, testFarmer1.String())
+	info, exist := suite.keeper.GetFarmInfo(ctx, poolID, testFarmer1.String())
 	suite.Require().True(exist)
 	suite.Require().Equal(debt, info.RewardDebt)
 	suite.Require().Equal(locked, info.Locked)
 
 	//check reward rules again
-	rules := suite.keeper.GetRewardRules(ctx, poolId)
+	rules := suite.keeper.GetRewardRules(ctx, poolID)
 	suite.Require().Len(rules, len(testRewardPerBlock))
 	for _, r := range rules {
 		suite.Require().Equal(rewardPerShare, r.RewardPerShare)
@@ -467,7 +473,7 @@ func (suite *KeeperTestSuite) AssertStake(
 }
 
 func (suite *KeeperTestSuite) AssertUnstake(
-	poolId string,
+	poolID string,
 	height int64,
 	unstakeCoin sdk.Coin,
 	expectReward, expectDebt sdk.Coins,
@@ -477,16 +483,16 @@ func (suite *KeeperTestSuite) AssertUnstake(
 	ctx := suite.app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: height})
 
 	//check farm pool
-	poolSrc, _ := suite.keeper.GetPool(ctx, poolId)
+	poolSrc, _ := suite.keeper.GetPool(ctx, poolID)
 	//check farm information
-	farmInfoSrc, _ := suite.keeper.GetFarmInfo(ctx, poolId, testFarmer1.String())
+	farmInfoSrc, _ := suite.keeper.GetFarmInfo(ctx, poolID, testFarmer1.String())
 
-	reward, err := suite.keeper.Unstake(ctx, poolId, unstakeCoin, testFarmer1)
+	reward, err := suite.keeper.Unstake(ctx, poolID, unstakeCoin, testFarmer1)
 	suite.Require().NoError(err)
 	suite.Require().Equal(expectReward, reward)
 
 	//check farm information
-	farmInfo, exist := suite.keeper.GetFarmInfo(ctx, poolId, testFarmer1.String())
+	farmInfo, exist := suite.keeper.GetFarmInfo(ctx, poolID, testFarmer1.String())
 	if unstakeAll {
 		suite.Require().False(exist)
 	} else {
@@ -496,13 +502,13 @@ func (suite *KeeperTestSuite) AssertUnstake(
 	}
 
 	//check farm pool
-	pool, exist := suite.keeper.GetPool(ctx, poolId)
+	pool, exist := suite.keeper.GetPool(ctx, poolID)
 	suite.Require().True(exist)
 	suite.Require().
 		Equal(pool.TotalLptLocked.String(), poolSrc.TotalLptLocked.Sub(unstakeCoin).String())
 
 	//check reward rules again
-	rules := suite.keeper.GetRewardRules(ctx, poolId)
+	rules := suite.keeper.GetRewardRules(ctx, poolID)
 	suite.Require().Len(rules, len(testRewardPerBlock))
 	for _, r := range rules {
 		suite.Require().Equal(rewardPerShare, r.RewardPerShare)
@@ -510,7 +516,7 @@ func (suite *KeeperTestSuite) AssertUnstake(
 }
 
 func (suite *KeeperTestSuite) AssertHarvest(
-	poolId string,
+	poolID string,
 	index int64,
 	height int64,
 	expectReward sdk.Coins,
@@ -518,17 +524,17 @@ func (suite *KeeperTestSuite) AssertHarvest(
 	rewardPerShare sdk.Dec,
 ) {
 	ctx := suite.app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: height})
-	reward, err := suite.keeper.Harvest(ctx, poolId, testFarmer1)
+	reward, err := suite.keeper.Harvest(ctx, poolID, testFarmer1)
 
 	suite.Require().NoError(err)
 	suite.Require().Equal(expectReward, reward)
 
-	info, exist := suite.keeper.GetFarmInfo(ctx, poolId, testFarmer1.String())
+	info, exist := suite.keeper.GetFarmInfo(ctx, poolID, testFarmer1.String())
 	suite.Require().True(exist)
 	suite.Require().Equal(debt, info.RewardDebt)
 
 	//check reward rules again
-	rules := suite.keeper.GetRewardRules(ctx, poolId)
+	rules := suite.keeper.GetRewardRules(ctx, poolID)
 	suite.Require().Len(rules, len(testRewardPerBlock))
 	for _, r := range rules {
 		suite.Require().Equal(rewardPerShare, r.RewardPerShare)

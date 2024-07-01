@@ -4,7 +4,7 @@ package irismod.mt;
 import "gogoproto/gogo.proto";
 import "irismod/mt/mt.proto";
 
-option go_package = "github.com/irisnet/irismod/modules/mt/types";
+option go_package = "mods.irisnet.org/modules/mt/types";
 
 // GenesisState defines the MT module's genesis state
 message GenesisState {

@@ -11,7 +11,7 @@ import "google/protobuf/any.proto";
 import "amino/amino.proto";
 import "irismod/token/v1/token.proto";
 
-option go_package = "github.com/irisnet/irismod/modules/token/types/v1";
+option go_package = "mods.irisnet.org/modules/token/types/v1";
 
 // Query creates service with token as RPC
 service Query {
@@ -30,7 +30,7 @@ service Query {
   // Fees returns the fees to issue or mint a token
   rpc Fees(QueryFeesRequest) returns (QueryFeesResponse) {
     option (cosmos.query.v1.module_query_safe) = true;
-    option (google.api.http).get = "/irismod/token/v1/tokens/{symbol}/fees";
+    option (google.api.http).get = "/irismod/token/v1/fees/{symbol}";
   }
   // Params queries the token parameters
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {

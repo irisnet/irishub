@@ -602,7 +602,7 @@ var (
 
 	pattern_Query_Token_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 3, 0, 4, 1, 5, 4}, []string{"irismod", "token", "v1", "tokens", "denom"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_Fees_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"irismod", "token", "v1", "tokens", "symbol", "fees"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Fees_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"irismod", "token", "v1", "fees", "symbol"}, "", runtime.AssumeColonVerbOpt(false)))
 
 	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"irismod", "token", "v1", "params"}, "", runtime.AssumeColonVerbOpt(false)))
 

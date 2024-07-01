@@ -2,13 +2,13 @@ version: v1
 managed:
   enabled: true
   go_package_prefix:
-    default: cosmossdk.io/api
+    default: mods.irisnet.org/api
     except:
       - buf.build/googleapis/googleapis
       - buf.build/cosmos/gogo-proto
       - buf.build/cosmos/cosmos-proto
     override:
-      buf.build/irisnet/irismod: github.com/irisnet/irismod/api
+      buf.build/cosmos/cosmos-sdk: cosmossdk.io/api      
 plugins:
   - name: go-pulsar
     out: ../api

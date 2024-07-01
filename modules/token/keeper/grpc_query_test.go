@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	v1 "github.com/irisnet/irismod/modules/token/types/v1"
+	v1 "mods.irisnet.org/modules/token/types/v1"
 )
 
 func (suite *KeeperTestSuite) TestGRPCQueryToken() {
@@ -16,10 +16,10 @@ func (suite *KeeperTestSuite) TestGRPCQueryToken() {
 	token := v1.NewToken("btc", "Bitcoin Token", "satoshi", 18, 21000000, 22000000, true, addr)
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
-	v1.RegisterQueryServer(queryHelper, app.TokenKeeper)
+	v1.RegisterQueryServer(queryHelper, suite.keeper)
 	queryClient := v1.NewQueryClient(queryHelper)
 
-	_ = suite.app.TokenKeeper.AddToken(ctx, token, true)
+	_ = suite.keeper.AddToken(ctx, token, true)
 
 	// Query token
 	tokenResp1, err := queryClient.Token(
@@ -47,7 +47,7 @@ func (suite *KeeperTestSuite) TestGRPCQueryFees() {
 	app, ctx := suite.app, suite.ctx
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
-	v1.RegisterQueryServer(queryHelper, app.TokenKeeper)
+	v1.RegisterQueryServer(queryHelper, suite.keeper)
 	queryClient := v1.NewQueryClient(queryHelper)
 
 	_, err := queryClient.Fees(gocontext.Background(), &v1.QueryFeesRequest{Symbol: "test"})
@@ -58,11 +58,11 @@ func (suite *KeeperTestSuite) TestGRPCQueryParams() {
 	app, ctx := suite.app, suite.ctx
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
-	v1.RegisterQueryServer(queryHelper, app.TokenKeeper)
+	v1.RegisterQueryServer(queryHelper, suite.keeper)
 	queryClient := v1.NewQueryClient(queryHelper)
 
 	paramsResp, err := queryClient.Params(gocontext.Background(), &v1.QueryParamsRequest{})
-	params := app.TokenKeeper.GetParams(ctx)
+	params := suite.keeper.GetParams(ctx)
 	suite.Require().NoError(err)
 	suite.Equal(params, paramsResp.Params)
 }
@@ -71,16 +71,16 @@ func (suite *KeeperTestSuite) TestGRPCQueryTotalBurn() {
 	app, ctx := suite.app, suite.ctx
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
-	v1.RegisterQueryServer(queryHelper, app.TokenKeeper)
+	v1.RegisterQueryServer(queryHelper, suite.keeper)
 	queryClient := v1.NewQueryClient(queryHelper)
 
 	_, _, addr := testdata.KeyTestPubAddr()
 	token := v1.NewToken("btc", "Bitcoin Token", "satoshi", 18, 21000000, 22000000, true, addr)
-	err := suite.app.TokenKeeper.AddToken(ctx, token, true)
+	err := suite.keeper.AddToken(ctx, token, true)
 	suite.Require().NoError(err)
 
 	buinCoin := sdk.NewInt64Coin("satoshi", 1000000000000000000)
-	app.TokenKeeper.AddBurnCoin(ctx, buinCoin)
+	suite.keeper.AddBurnCoin(ctx, buinCoin)
 
 	resp, err := queryClient.TotalBurn(gocontext.Background(), &v1.QueryTotalBurnRequest{})
 	suite.Require().NoError(err)

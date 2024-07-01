@@ -7,9 +7,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 
-	modulev1 "github.com/irisnet/irismod/api/irismod/oracle/module/v1"
-	"github.com/irisnet/irismod/modules/oracle/keeper"
-	"github.com/irisnet/irismod/modules/oracle/types"
+	modulev1 "mods.irisnet.org/api/irismod/oracle/module/v1"
+	"mods.irisnet.org/modules/oracle/keeper"
+	"mods.irisnet.org/modules/oracle/types"
 )
 
 // App Wiring Setup

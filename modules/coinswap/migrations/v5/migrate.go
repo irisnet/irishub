@@ -3,8 +3,7 @@ package v5
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/coinswap/types"
-	"github.com/irisnet/irismod/types/exported"
+	"mods.irisnet.org/modules/coinswap/types"
 )
 
 // CoinswapKeeper defines a interface for SetParams function
@@ -13,7 +12,7 @@ type CoinswapKeeper interface {
 }
 
 // Migrate migrate the coinswap params from legacy x/params module to coinswap module
-func Migrate(ctx sdk.Context, k CoinswapKeeper, legacySubspace exported.Subspace) error {
+func Migrate(ctx sdk.Context, k CoinswapKeeper, legacySubspace types.Subspace) error {
 	var params types.Params
 	legacySubspace.GetParamSet(ctx, &params)
 	return k.SetParams(ctx, params)

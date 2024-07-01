@@ -16,6 +16,9 @@ const (
 
 	// RouterKey is the msg router key for the random module
 	RouterKey = ModuleName
+
+	// ServiceName is the name of the random service
+	ServiceName          = ModuleName
 )
 
 var (

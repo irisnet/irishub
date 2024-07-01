@@ -2,8 +2,6 @@ package types
 
 import (
 	time "time"
-
-	"github.com/irisnet/irismod/types/exported"
 )
 
 // Parameter store keys
@@ -14,12 +12,12 @@ var (
 )
 
 // ParamKeyTable returns the TypeTable for coinswap module
-func ParamKeyTable() exported.KeyTable {
-	return exported.NewKeyTable().RegisterParamSet(&Params{})
+func ParamKeyTable() KeyTable {
+	return NewKeyTable().RegisterParamSet(&Params{})
 }
 
-func (p *Params) ParamSetPairs() exported.ParamSetPairs {
-	return exported.ParamSetPairs{
-		exported.NewParamSetPair(KeyAssetParams, &p.AssetParams, validateAssetParams),
+func (p *Params) ParamSetPairs() ParamSetPairs {
+	return ParamSetPairs{
+		NewParamSetPair(KeyAssetParams, &p.AssetParams, validateAssetParams),
 	}
 }

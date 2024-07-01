@@ -9,7 +9,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/htlc/types"
+	"mods.irisnet.org/modules/htlc/types"
 )
 
 var _ types.QueryServer = Keeper{}

@@ -1,0 +1,30 @@
+{
+  "domain": "mods.irisnet.org",
+  "docsDomain": "pkg.go.dev",
+  "index": true,
+  "repositories": [
+    {
+      "prefix": "",
+      "subs": [
+        "api",
+        "simapp",
+        "modules/coinswap",
+        "modules/farm",
+        "modules/htlc",
+        "modules/mt",
+        "modules/nft",
+        "modules/random",
+        "modules/record",
+        "modules/service",
+        "modules/token"
+      ],
+      "type": "git",
+      "url": "https://github.com/irisnet/irismod",
+      "source": {
+        "home": "https://github.com/irisnet/irismod",
+        "dir": "https://github.com/irisnet/irismod/tree/main{/dir}",
+        "file": "https://github.com/irisnet/irismod/blob/main{/dir}/{file}#L{line}"
+      }
+    }
+  ]
+}

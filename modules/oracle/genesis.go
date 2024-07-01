@@ -6,8 +6,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/oracle/keeper"
-	"github.com/irisnet/irismod/modules/oracle/types"
+	"mods.irisnet.org/modules/oracle/keeper"
+	"mods.irisnet.org/modules/oracle/types"
 )
 
 // InitGenesis - store genesis parameters

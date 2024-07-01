@@ -9,10 +9,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	modulev1 "github.com/irisnet/irismod/api/irismod/service/module/v1"
-	"github.com/irisnet/irismod/modules/service/keeper"
-	"github.com/irisnet/irismod/modules/service/types"
-	"github.com/irisnet/irismod/types/exported"
+	modulev1 "mods.irisnet.org/api/irismod/service/module/v1"
+	"mods.irisnet.org/modules/service/keeper"
+	"mods.irisnet.org/modules/service/types"
 )
 
 // App Wiring Setup
@@ -23,7 +22,7 @@ func init() {
 	)
 }
 
-func ProvideKeyTable() exported.KeyTable {
+func ProvideKeyTable() types.KeyTable {
 	return types.ParamKeyTable() //nolint:staticcheck
 }
 
@@ -46,7 +45,7 @@ type ServiceInputs struct {
 	BankKeeper    types.BankKeeper
 
 	// LegacySubspace is used solely for migration of x/params managed parameters
-	LegacySubspace exported.Subspace `optional:"true"`
+	LegacySubspace types.Subspace `optional:"true"`
 }
 
 type ServiceOutputs struct {
