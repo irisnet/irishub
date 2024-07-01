@@ -9,6 +9,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.47.9
 	github.com/cosmos/gogoproto v1.4.10
 	github.com/stretchr/testify v1.8.4
+	github.com/tidwall/gjson v1.14.4
 	google.golang.org/protobuf v1.32.0
 	mods.irisnet.org/api v1.0.0-beta
 	mods.irisnet.org/modules/coinswap v1.0.0-beta
@@ -171,7 +172,6 @@ require (
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
 	github.com/tidwall/btree v1.6.0 // indirect
-	github.com/tidwall/gjson v1.14.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.5 // indirect

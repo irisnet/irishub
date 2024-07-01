@@ -43,7 +43,7 @@ func (s *TestSuite) SetupSuite() {
 
 // TearDownSuite tears down the integration test suite
 func (s *TestSuite) TearDownSuite() {
-	s.T().Log("tearing down e2e nft test suite")
+	s.T().Log("tearing down e2e test suite")
 	s.Network.Cleanup()
 }
 
