@@ -47,8 +47,8 @@ func (suite *KeeperTestSuite) SetupTest() {
 	depInjectOptions := simapp.DepinjectOptions{
 		Config:    AppConfig,
 		Providers: []interface{}{
-			ProvideEVMKeeper(),
-			ProvideICS20Keeper(),
+			keeper.ProvideMockEVM(),
+			keeper.ProvideMockICS20(),
 		},
 		Consumers: []interface{}{&suite.keeper},
 	}

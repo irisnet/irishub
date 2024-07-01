@@ -23,6 +23,7 @@ func init() {
 	)
 }
 
+// ProvideKeyTable returns the key table for the Token module
 func ProvideKeyTable() types.KeyTable {
 	return v1.ParamKeyTable() //nolint:staticcheck
 }
