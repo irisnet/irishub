@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 
 	"github.com/cometbft/cometbft/crypto/tmhash"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"mods.irisnet.org/modules/record/types"

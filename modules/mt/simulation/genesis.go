@@ -124,5 +124,4 @@ func RandomizedGenState(simState *module.SimulationState) {
 	}
 
 	simState.GenState[mt.ModuleName] = simState.Cdc.MustMarshalJSON(mtGenesis)
-
 }

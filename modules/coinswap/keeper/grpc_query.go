@@ -3,13 +3,12 @@ package keeper
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"mods.irisnet.org/modules/coinswap/types"
 )
@@ -72,7 +71,7 @@ func (k Keeper) LiquidityPools(
 
 	store := ctx.KVStore(k.storeKey)
 	nftStore := prefix.NewStore(store, []byte(types.KeyPool))
-	pageRes, err := query.Paginate(nftStore, req.Pagination, func(_ []byte, value []byte) error {
+	pageRes, err := query.Paginate(nftStore, req.Pagination, func(_, value []byte) error {
 		var pool types.Pool
 		k.cdc.MustUnmarshal(value, &pool)
 

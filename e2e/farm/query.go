@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cosmos/gogoproto/proto"
-
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	"mods.irisnet.org/e2e"
 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
@@ -150,7 +149,6 @@ func (s *QueryTestSuite) latestHeight() int64 {
 }
 
 func (s *QueryTestSuite) setup() {
-
 	val := s.Validators[0]
 	clientCtx := val.ClientCtx
 

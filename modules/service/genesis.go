@@ -6,7 +6,6 @@ import (
 	"sort"
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"mods.irisnet.org/modules/service/keeper"
@@ -68,7 +67,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	k.IterateWithdrawAddresses(
 		ctx,
-		func(ownerAddress sdk.AccAddress, withdrawAddress sdk.AccAddress) bool {
+		func(ownerAddress, withdrawAddress sdk.AccAddress) bool {
 			withdrawAddresses[ownerAddress.String()] = withdrawAddress.String()
 			return false
 		},

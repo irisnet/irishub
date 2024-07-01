@@ -5,13 +5,11 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/spf13/cobra"
-
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
+	"github.com/spf13/cobra"
 
 	"mods.irisnet.org/modules/htlc/types"
 )
@@ -90,7 +88,6 @@ func GetCmdQueryAssetSupply() *cobra.Command {
 			}
 
 			return clientCtx.PrintProto(response.AssetSupply)
-
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

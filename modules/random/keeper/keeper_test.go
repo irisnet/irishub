@@ -6,13 +6,11 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/stretchr/testify/suite"
-
 	"github.com/cometbft/cometbft/crypto"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/suite"
 
 	"mods.irisnet.org/modules/random/keeper"
 	"mods.irisnet.org/modules/random/types"

@@ -18,7 +18,7 @@ const (
 	RouterKey = ModuleName
 
 	// ServiceName is the name of the random service
-	ServiceName          = ModuleName
+	ServiceName = ModuleName
 )
 
 var (

@@ -8,10 +8,9 @@ import (
 	"math/rand"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	tmtypes "github.com/cometbft/cometbft/types"
-
-	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -38,7 +37,6 @@ func AppStateFn(cdc codec.JSONCodec, simManager *module.SimulationManager) simty
 	) (
 		appState json.RawMessage, simAccs []simtypes.Account, chainID string, genesisTimestamp time.Time,
 	) {
-
 		if simcli.FlagGenesisTimeValue == 0 {
 			genesisTimestamp = simtypes.RandTimestamp(r)
 		} else {

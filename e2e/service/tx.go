@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/cometbft/cometbft/crypto"
-
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"

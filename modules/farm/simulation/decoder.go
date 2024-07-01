@@ -47,5 +47,4 @@ func NewDecodeStore(cdc codec.Codec) func(kvA, kvB kv.Pair) string {
 			panic(fmt.Sprintf("invalid farm key prefix %X", kvA.Key[:1]))
 		}
 	}
-
 }

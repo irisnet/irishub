@@ -17,7 +17,6 @@ func NewGenesisState(collections []Collection, owners []Owner) *GenesisState {
 // ValidateGenesis performs basic validation of mts genesis data returning an
 // error for any failed validation criteria.
 func ValidateGenesis(data GenesisState) error {
-
 	var denomMap1 map[string]int
 	denomMap1 = make(map[string]int)
 
@@ -50,7 +49,6 @@ func ValidateGenesis(data GenesisState) error {
 			}
 			for _, b := range d.Balances {
 				mtMap2[d.DenomId+b.MtId] = mtMap2[d.DenomId+b.MtId] + b.Amount
-
 			}
 		}
 	}

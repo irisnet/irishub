@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/cometbft/cometbft/libs/cli"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
@@ -27,7 +26,8 @@ func CreateFeedExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	from string,
-	extraArgs ...string) *simapp.ResponseTx {
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
@@ -53,7 +53,8 @@ func EditFeedExec(t *testing.T,
 	clientCtx client.Context,
 	from string,
 	feedName string,
-	extraArgs ...string) *simapp.ResponseTx {
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		feedName,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
@@ -80,7 +81,8 @@ func StartFeedExec(t *testing.T,
 	clientCtx client.Context,
 	from string,
 	feedName string,
-	extraArgs ...string) *simapp.ResponseTx {
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		feedName,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
@@ -104,7 +106,8 @@ func PauseFeedExec(t *testing.T,
 	clientCtx client.Context,
 	from string,
 	feedName string,
-	extraArgs ...string) *simapp.ResponseTx {
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		feedName,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
@@ -127,7 +130,8 @@ func QueryFeedExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	feedName string,
-	extraArgs ...string) *oracletypes.FeedContext {
+	extraArgs ...string,
+) *oracletypes.FeedContext {
 	args := []string{
 		feedName,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -152,7 +156,8 @@ func QueryFeedExec(t *testing.T,
 func QueryFeedsExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
-	extraArgs ...string) *oracletypes.QueryFeedsResponse {
+	extraArgs ...string,
+) *oracletypes.QueryFeedsResponse {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
@@ -176,7 +181,8 @@ func QueryFeedValueExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	feedName string,
-	extraArgs ...string) *oracletypes.QueryFeedValueResponse {
+	extraArgs ...string,
+) *oracletypes.QueryFeedValueResponse {
 	args := []string{
 		feedName,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),

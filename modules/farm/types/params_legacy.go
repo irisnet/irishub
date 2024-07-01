@@ -1,7 +1,7 @@
 package types
 
 // Keys for parameter access
-// nolint
+
 var (
 	KeyPoolCreationFee     = []byte("CreatePoolFee")
 	KeyTaxRate             = []byte("TaxRate") // fee key
@@ -21,7 +21,7 @@ func (p *Params) ParamSetPairs() ParamSetPairs {
 			&p.MaxRewardCategories,
 			validateMaxRewardCategories,
 		),
-	    NewParamSetPair(KeyTaxRate, &p.TaxRate, validateTaxRate),
+		NewParamSetPair(KeyTaxRate, &p.TaxRate, validateTaxRate),
 	}
 }
 

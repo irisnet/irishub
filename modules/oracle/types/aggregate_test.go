@@ -8,7 +8,7 @@ import (
 )
 
 func TestMax(t *testing.T) {
-	var data = []ArgsType{
+	data := []ArgsType{
 		StringArgsType("1"),
 		StringArgsType("2"),
 		StringArgsType("3"),
@@ -21,7 +21,7 @@ func TestMax(t *testing.T) {
 }
 
 func TestMin(t *testing.T) {
-	var data = []ArgsType{
+	data := []ArgsType{
 		StringArgsType("1"),
 		StringArgsType("2"),
 		StringArgsType("3"),
@@ -35,7 +35,7 @@ func TestMin(t *testing.T) {
 }
 
 func TestAvg(t *testing.T) {
-	var data = []ArgsType{
+	data := []ArgsType{
 		StringArgsType("1"),
 		StringArgsType("2"),
 		StringArgsType("3"),

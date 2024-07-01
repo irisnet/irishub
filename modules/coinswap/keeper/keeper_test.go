@@ -4,16 +4,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/suite"
-
+	sdkmath "cosmossdk.io/math"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
-	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/stretchr/testify/suite"
 
 	"mods.irisnet.org/modules/coinswap/keeper"
 	"mods.irisnet.org/modules/coinswap/types"

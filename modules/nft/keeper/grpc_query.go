@@ -3,12 +3,11 @@ package keeper
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/nft"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"mods.irisnet.org/modules/nft/types"
 )
@@ -46,7 +45,7 @@ func (k Keeper) NFTsOfOwner(c context.Context, request *types.QueryNFTsOfOwnerRe
 		return nil, err
 	}
 
-	var denomMap = make(map[string][]string)
+	denomMap := make(map[string][]string)
 	var denoms []string
 	for _, token := range result.Nfts {
 		if denomMap[token.ClassId] == nil {

@@ -68,7 +68,8 @@ func TestLossLessConvert(t *testing.T) {
 			want:    Int("1000001"),
 			want1:   Int("1000001000000000000"),
 			wantErr: false,
-		}, {
+		},
+		{
 			name: "fully conversion(non-equivalent ratio)",
 			args: args{
 				a:      Int("1000000"),
@@ -100,5 +101,4 @@ func Int(i string) sdk.Int {
 		panic("invalid i: " + i)
 	}
 	return iInt
-
 }

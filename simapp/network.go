@@ -32,9 +32,9 @@ type ResponseTx struct {
 }
 
 func SetupNetwork(t *testing.T, depInjectOptions DepinjectOptions) Network {
-	cfg,err  := NewConfig(depInjectOptions)
+	cfg, err := NewConfig(depInjectOptions)
 	require.NoError(t, err)
-	
+
 	cfg.NumValidators = 4
 
 	network, err := network.New(t, t.TempDir(), cfg)

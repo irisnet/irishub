@@ -3,10 +3,9 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tidwall/gjson"
-
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tidwall/gjson"
 
 	"mods.irisnet.org/modules/service/types"
 )

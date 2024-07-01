@@ -4,9 +4,8 @@ import (
 	"math"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestValidateParams(t *testing.T) {

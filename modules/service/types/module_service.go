@@ -7,5 +7,5 @@ import (
 type ModuleService struct {
 	ServiceName     string
 	Provider        sdk.AccAddress
-	ReuquestService func(ctx sdk.Context, input string) (result string, output string)
+	ReuquestService func(ctx sdk.Context, input string) (result, output string)
 }

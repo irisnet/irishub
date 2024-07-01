@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/cometbft/cometbft/libs/cli"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
@@ -127,7 +126,8 @@ func QueryDenomExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	denomID string,
-	extraArgs ...string) *nfttypes.Denom {
+	extraArgs ...string,
+) *nfttypes.Denom {
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -143,7 +143,8 @@ func QueryCollectionExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	denomID string,
-	extraArgs ...string) *nfttypes.QueryCollectionResponse {
+	extraArgs ...string,
+) *nfttypes.QueryCollectionResponse {
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -158,7 +159,8 @@ func QueryCollectionExec(t *testing.T,
 func QueryDenomsExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
-	extraArgs ...string) *nfttypes.QueryDenomsResponse {
+	extraArgs ...string,
+) *nfttypes.QueryDenomsResponse {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
@@ -173,7 +175,8 @@ func QuerySupplyExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	denom string,
-	extraArgs ...string) *nfttypes.QuerySupplyResponse {
+	extraArgs ...string,
+) *nfttypes.QuerySupplyResponse {
 	args := []string{
 		denom,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -189,7 +192,8 @@ func QueryOwnerExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	address string,
-	extraArgs ...string) *nfttypes.QueryNFTsOfOwnerResponse {
+	extraArgs ...string,
+) *nfttypes.QueryNFTsOfOwnerResponse {
 	args := []string{
 		address,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -206,7 +210,8 @@ func QueryNFTExec(t *testing.T,
 	clientCtx client.Context,
 	denomID string,
 	tokenID string,
-	extraArgs ...string) *nfttypes.BaseNFT {
+	extraArgs ...string,
+) *nfttypes.BaseNFT {
 	args := []string{
 		denomID,
 		tokenID,

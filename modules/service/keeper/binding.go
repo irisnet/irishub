@@ -4,11 +4,10 @@ import (
 	"bytes"
 	"time"
 
-	gogotypes "github.com/cosmos/gogoproto/types"
-
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	v1 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v1"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	"mods.irisnet.org/modules/service/types"
 )
@@ -555,7 +554,7 @@ func (k Keeper) GetWithdrawAddress(ctx sdk.Context, owner sdk.AccAddress) sdk.Ac
 // IterateWithdrawAddresses iterates through all withdrawal addresses
 func (k Keeper) IterateWithdrawAddresses(
 	ctx sdk.Context,
-	op func(owner sdk.AccAddress, withdrawAddress sdk.AccAddress) (stop bool),
+	op func(owner, withdrawAddress sdk.AccAddress) (stop bool),
 ) {
 	store := ctx.KVStore(k.storeKey)
 

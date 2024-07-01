@@ -42,7 +42,7 @@ func Migrate(
 		return err
 	}
 
-	//Grant burner permissions to the farm module account
+	// Grant burner permissions to the farm module account
 	acc := ak.GetModuleAccount(ctx, types.ModuleName)
 	if !acc.HasPermission(authtypes.Burner) {
 		moduleAcc, _ := acc.(*authtypes.ModuleAccount)

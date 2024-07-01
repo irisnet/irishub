@@ -4,11 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/cosmos/gogoproto/proto"
-
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	"mods.irisnet.org/e2e"
 	tokencli "mods.irisnet.org/modules/token/client/cli"

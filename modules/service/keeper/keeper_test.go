@@ -5,18 +5,16 @@ import (
 	"testing"
 	"time"
 
-	gogotypes "github.com/cosmos/gogoproto/types"
-	"github.com/stretchr/testify/suite"
-	"github.com/tidwall/gjson"
-
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	v1 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v1"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
+	"github.com/stretchr/testify/suite"
+	"github.com/tidwall/gjson"
 
 	"mods.irisnet.org/modules/service/keeper"
 	"mods.irisnet.org/modules/service/types"
@@ -881,7 +879,7 @@ type MockOracleService struct {
 func (m MockOracleService) GetExchangeRate(
 	ctx sdk.Context,
 	input string,
-) (result string, output string) {
+) (result, output string) {
 	feedName := gjson.Get(input, "body").Get("pair").String()
 
 	value, ok := m.feeds[feedName]

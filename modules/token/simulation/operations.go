@@ -186,7 +186,6 @@ func SimulateEditToken(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
 		accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		token, _, skip := selectOneToken(ctx, k, ak, bk, false)
 		if skip {
 			return simtypes.NoOpMsg(
@@ -266,7 +265,6 @@ func SimulateMintToken(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
 		accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		token, maxFee, skip := selectOneToken(ctx, k, ak, bk, true)
 		if skip {
 			return simtypes.NoOpMsg(
@@ -346,7 +344,6 @@ func SimulateTransferTokenOwner(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
 		accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		token, _, skip := selectOneToken(ctx, k, ak, bk, false)
 		if skip {
 			return simtypes.NoOpMsg(
@@ -355,7 +352,7 @@ func SimulateTransferTokenOwner(
 				"skip TransferTokenOwner",
 			), nil, nil
 		}
-		var simToAccount, _ = simtypes.RandomAcc(r, accs)
+		simToAccount, _ := simtypes.RandomAcc(r, accs)
 		for simToAccount.Address.Equals(token.GetOwner()) {
 			simToAccount, _ = simtypes.RandomAcc(r, accs)
 		}
@@ -429,7 +426,6 @@ func SimulateBurnToken(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
 		accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		token, _, skip := selectOneToken(ctx, k, ak, bk, false)
 		if skip {
 			return simtypes.NoOpMsg(
@@ -573,7 +569,6 @@ func genToken(ctx sdk.Context,
 	bk types.BankKeeper,
 	accs []simtypes.Account,
 ) (v1.Token, sdk.Coins) {
-
 	var token v1.Token
 	token = randToken(r, accs)
 

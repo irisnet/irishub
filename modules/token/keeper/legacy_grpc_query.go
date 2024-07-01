@@ -3,11 +3,10 @@ package keeper
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	v1 "mods.irisnet.org/modules/token/types/v1"
 	"mods.irisnet.org/modules/token/types/v1beta1"

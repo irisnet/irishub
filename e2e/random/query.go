@@ -6,13 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cosmos/gogoproto/proto"
-	"github.com/tidwall/gjson"
-
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/gogoproto/proto"
+	"github.com/tidwall/gjson"
 
 	"mods.irisnet.org/e2e"
 	"mods.irisnet.org/e2e/service"

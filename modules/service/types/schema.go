@@ -5,9 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/xeipuuv/gojsonschema"
-
 	errorsmod "cosmossdk.io/errors"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 const PATH_BODY = "body"
@@ -61,7 +60,7 @@ func ValidateRequestInput(input string) error {
 	return nil
 }
 
-func ValidateRequestInputBody(schemas string, inputBody string) error {
+func ValidateRequestInputBody(schemas, inputBody string) error {
 	inputSchemaBz, err := parseInputSchema(schemas)
 	if err != nil {
 		return err
@@ -95,7 +94,7 @@ func ValidateResponseOutput(output string) error {
 	return nil
 }
 
-func ValidateResponseOutputBody(schemas string, outputBody string) error {
+func ValidateResponseOutputBody(schemas, outputBody string) error {
 	outputSchemaBz, err := parseOutputSchema(schemas)
 	if err != nil {
 		return err

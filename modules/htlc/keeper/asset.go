@@ -3,10 +3,9 @@ package keeper
 import (
 	"time"
 
-	gogotypes "github.com/cosmos/gogoproto/types"
-
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	"mods.irisnet.org/modules/htlc/types"
 )

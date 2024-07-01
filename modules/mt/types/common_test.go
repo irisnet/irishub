@@ -28,9 +28,9 @@ func CreateTestAddrs(numAddrs int) []sdk.AccAddress {
 	// start at 100 so we can make up to 999 test addresses with valid test addresses
 	for i := 100; i < (numAddrs + 100); i++ {
 		numString := strconv.Itoa(i)
-		buffer.WriteString("A58856F0FD53BF058B4909A21AEC019107BA6") //base address string
+		buffer.WriteString("A58856F0FD53BF058B4909A21AEC019107BA6") // base address string
 
-		buffer.WriteString(numString) //adding on final two digits to make addresses unique
+		buffer.WriteString(numString) // adding on final two digits to make addresses unique
 		res, _ := sdk.AccAddressFromHexUnsafe(buffer.String())
 		bech := res.String()
 		addresses = append(addresses, testAddr(buffer.String(), bech))
@@ -40,7 +40,7 @@ func CreateTestAddrs(numAddrs int) []sdk.AccAddress {
 }
 
 // for incode address generation
-func testAddr(addr string, bech string) sdk.AccAddress {
+func testAddr(addr, bech string) sdk.AccAddress {
 	res, err := sdk.AccAddressFromHexUnsafe(addr)
 	if err != nil {
 		panic(err)

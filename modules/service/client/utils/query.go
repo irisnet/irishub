@@ -9,7 +9,6 @@ import (
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 	rpcclient "github.com/cometbft/cometbft/rpc/client"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
@@ -49,7 +48,8 @@ func QueryRequestContextByTxQuery(
 	queryRoute string,
 	params types.QueryRequestContextRequest,
 ) (
-	requestContext types.RequestContext, err error) {
+	requestContext types.RequestContext, err error,
+) {
 	requestContextId, err := hex.DecodeString(params.RequestContextId)
 	if err != nil {
 		return requestContext, err
@@ -122,7 +122,6 @@ func QueryRequestByTxQuery(
 ) (
 	request types.Request, err error,
 ) {
-
 	contextID, _, requestHeight, batchRequestIndex, err := types.SplitRequestID(requestID)
 	if err != nil {
 		return request, err
@@ -213,7 +212,6 @@ func QueryResponseByTxQuery(
 ) (
 	response types.Response, err error,
 ) {
-
 	events := []string{
 		fmt.Sprintf(
 			"%s.%s='%s'",
@@ -275,7 +273,7 @@ func QueryResponseByTxQuery(
 
 // QueryRequestsByBinding queries active requests by the service binding
 func QueryRequestsByBinding(
-	cliCtx client.Context, queryRoute string, serviceName string, provider sdk.AccAddress,
+	cliCtx client.Context, queryRoute, serviceName string, provider sdk.AccAddress,
 ) (
 	[]types.Request, int64, error,
 ) {

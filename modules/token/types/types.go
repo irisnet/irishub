@@ -36,7 +36,7 @@ func (b Bool) Marshal() ([]byte, error) {
 
 // Unmarshal needed for protobuf compatibility
 func (b *Bool) Unmarshal(data []byte) error {
-	*b = Bool(data[:])
+	*b = Bool(data)
 	return nil
 }
 
@@ -55,6 +55,7 @@ func (b *Bool) UnmarshalJSON(data []byte) error {
 	*b = Bool(s)
 	return nil
 }
+
 func ParseBool(v string) (Bool, error) {
 	if len(v) == 0 {
 		return Nil, nil

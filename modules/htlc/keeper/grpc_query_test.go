@@ -6,14 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/suite"
-
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/suite"
 
 	"mods.irisnet.org/modules/htlc/keeper"
 	"mods.irisnet.org/modules/htlc/types"

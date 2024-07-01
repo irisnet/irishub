@@ -25,8 +25,6 @@ import (
 	upgrademodulev1 "cosmossdk.io/api/cosmos/upgrade/module/v1"
 	vestingmodulev1 "cosmossdk.io/api/cosmos/vesting/module/v1"
 	"cosmossdk.io/core/appconfig"
-	"google.golang.org/protobuf/types/known/durationpb"
-
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
@@ -45,6 +43,7 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	servicemodule "mods.irisnet.org/api/irismod/service/module/v1"
 	_ "mods.irisnet.org/modules/service"
@@ -249,7 +248,7 @@ var (
 				Config: appconfig.WrapAny(&consensusmodulev1.Module{}),
 			},
 			{
-				Name:   servicetypes.ModuleName,
+				Name: servicetypes.ModuleName,
 				Config: appconfig.WrapAny(&servicemodule.Module{
 					FeeCollectorName: servicetypes.FeeCollectorName,
 				}),

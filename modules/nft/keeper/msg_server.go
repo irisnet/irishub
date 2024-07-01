@@ -139,7 +139,8 @@ func (k Keeper) EditNFT(
 }
 
 func (k Keeper) TransferNFT(goCtx context.Context,
-	msg *types.MsgTransferNFT) (*types.MsgTransferNFTResponse, error) {
+	msg *types.MsgTransferNFT,
+) (*types.MsgTransferNFTResponse, error) {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err

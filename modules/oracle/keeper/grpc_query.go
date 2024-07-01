@@ -4,14 +4,12 @@ import (
 	"context"
 	"encoding/hex"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	gogotypes "github.com/cosmos/gogoproto/types"
-
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
+	gogotypes "github.com/cosmos/gogoproto/types"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"mods.irisnet.org/modules/oracle/types"
 )
@@ -54,7 +52,7 @@ func (k Keeper) Feeds(
 		pageRes, err = query.Paginate(
 			feedStore,
 			shapePageRequest(req.Pagination),
-			func(key []byte, value []byte) error {
+			func(key, value []byte) error {
 				var feed types.Feed
 				k.cdc.MustUnmarshal(value, &feed)
 				result = append(result, BuildFeedContext(ctx, k, feed))
@@ -68,10 +66,9 @@ func (k Keeper) Feeds(
 		state, err := types.RequestContextStateFromString(req.State)
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "invalid request state")
-
 		}
 		feedStore := prefix.NewStore(store, types.GetFeedStatePrefixKey(state))
-		pageRes, err = query.Paginate(feedStore, shapePageRequest(req.Pagination), func(key []byte, value []byte) error {
+		pageRes, err = query.Paginate(feedStore, shapePageRequest(req.Pagination), func(key, value []byte) error {
 			var feedName gogotypes.StringValue
 			k.cdc.MustUnmarshal(value, &feedName)
 			if feed, found := k.GetFeed(ctx, feedName.Value); found {

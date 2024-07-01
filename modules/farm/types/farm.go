@@ -13,7 +13,7 @@ func (pool FarmPool) Started(ctx sdk.Context) bool {
 }
 
 func (pool FarmPool) ExpiredHeight() (int64, error) {
-	var targetInteval = int64(math.MaxInt64)
+	targetInteval := int64(math.MaxInt64)
 	for _, r := range pool.Rules {
 		inteval := r.TotalReward.Quo(r.RewardPerBlock).Int64()
 		if targetInteval > inteval {

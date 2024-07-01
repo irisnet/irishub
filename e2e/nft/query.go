@@ -3,11 +3,10 @@ package nft
 import (
 	"fmt"
 
-	"github.com/cosmos/gogoproto/proto"
-
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	"mods.irisnet.org/e2e"
 	nftcli "mods.irisnet.org/modules/nft/client/cli"
@@ -34,7 +33,7 @@ func (s *QueryTestSuite) TestQueryCmd() {
 	description := "description"
 	data := "{\"key1\":\"value1\",\"key2\":\"value2\"}"
 	tokenID := "kitty"
-	//owner     := "owner"
+	// owner     := "owner"
 	denomName := "name"
 	denomID := "denom"
 	schema := "schema"

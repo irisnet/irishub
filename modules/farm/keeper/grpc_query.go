@@ -4,12 +4,11 @@ import (
 	"context"
 
 	errorsmod "cosmossdk.io/errors"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"mods.irisnet.org/modules/farm/types"
 )
@@ -21,7 +20,7 @@ func (k Keeper) FarmPools(goctx context.Context, request *types.QueryFarmPoolsRe
 
 	var list []*types.FarmPoolEntry
 	prefixStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.FarmPoolKey)
-	pageRes, err := query.Paginate(prefixStore, request.Pagination, func(_ []byte, value []byte) error {
+	pageRes, err := query.Paginate(prefixStore, request.Pagination, func(_, value []byte) error {
 		var pool types.FarmPool
 		k.cdc.MustUnmarshal(value, &pool)
 		var totalReward sdk.Coins
@@ -58,7 +57,8 @@ func (k Keeper) FarmPools(goctx context.Context, request *types.QueryFarmPoolsRe
 }
 
 func (k Keeper) FarmPool(goctx context.Context,
-	request *types.QueryFarmPoolRequest) (*types.QueryFarmPoolResponse, error) {
+	request *types.QueryFarmPoolRequest,
+) (*types.QueryFarmPoolResponse, error) {
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -125,7 +125,7 @@ func (k Keeper) Farmer(goctx context.Context, request *types.QueryFarmerRequest)
 			return nil, errorsmod.Wrapf(types.ErrPoolNotFound, farmer.PoolId)
 		}
 
-		//The farm pool has not started, no reward
+		// The farm pool has not started, no reward
 		if pool.StartHeight > ctx.BlockHeight() {
 			list = append(list, &types.LockedInfo{
 				PoolId: farmer.PoolId,

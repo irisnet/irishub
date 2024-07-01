@@ -45,7 +45,7 @@ var (
 
 // NewMsgIssueToken - construct token issue msg.
 func NewMsgIssueToken(
-	symbol string, minUnit string, name string,
+	symbol, minUnit, name string,
 	scale uint32, initialSupply, maxSupply uint64,
 	mintable bool, owner string,
 ) *MsgIssueToken {

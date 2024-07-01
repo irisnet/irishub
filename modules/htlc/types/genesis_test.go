@@ -4,9 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/suite"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/suite"
 
 	"mods.irisnet.org/modules/htlc/types"
 )
@@ -18,7 +17,6 @@ type GenesisTestSuite struct {
 }
 
 func (suite *GenesisTestSuite) SetupTest() {
-
 	coin := sdk.NewCoin("htltbnb", sdk.OneInt())
 	suite.htlcs = htlcs(10)
 

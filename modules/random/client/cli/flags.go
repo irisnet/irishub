@@ -14,9 +14,7 @@ const (
 	FlagQueueHeight   = "queue-height"
 )
 
-var (
-	FsRequestRand = flag.NewFlagSet("", flag.ContinueOnError)
-)
+var FsRequestRand = flag.NewFlagSet("", flag.ContinueOnError)
 
 func init() {
 	FsRequestRand.Uint64(FlagBlockInterval, randomtypes.DefaultBlockInterval, "The block interval")

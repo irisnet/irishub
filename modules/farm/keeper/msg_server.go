@@ -35,7 +35,7 @@ func (m msgServer) CreatePool(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	//check valid begin height
+	// check valid begin height
 	if ctx.BlockHeight() > int64(msg.StartHeight) {
 		return nil, errorsmod.Wrapf(
 			types.ErrExpiredHeight,
@@ -54,7 +54,7 @@ func (m msgServer) CreatePool(
 		)
 	}
 
-	//check valid lp token denom
+	// check valid lp token denom
 	if err := m.k.ck.ValidatePool(ctx, msg.LptDenom); err != nil {
 		return nil, errorsmod.Wrapf(
 			types.ErrInvalidLPToken,
@@ -106,7 +106,7 @@ func (m msgServer) CreatePoolWithCommunityPool(
 		)
 	}
 
-	//check valid lp token denom
+	// check valid lp token denom
 	if err := m.k.ck.ValidatePool(ctx, msg.Content.LptDenom); err != nil {
 		return nil, errorsmod.Wrapf(
 			types.ErrInvalidLPToken,
@@ -115,13 +115,13 @@ func (m msgServer) CreatePoolWithCommunityPool(
 		)
 	}
 
-	//escrow FundSelfBond to EscrowCollector
+	// escrow FundSelfBond to EscrowCollector
 	if err := m.k.bk.SendCoinsFromAccountToModule(ctx,
 		proposer, types.EscrowCollector, msg.Content.FundSelfBond); err != nil {
 		return nil, err
 	}
 
-	//escrow FundApplied to EscrowCollector
+	// escrow FundApplied to EscrowCollector
 	if err := m.k.escrowFromFeePool(ctx, msg.Content.FundApplied); err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (m msgServer) CreatePoolWithCommunityPool(
 		},
 	}
 
-	//create new proposal given a content
+	// create new proposal given a content
 	proposal, err := m.k.gk.SubmitProposal(
 		ctx,
 		msgs,

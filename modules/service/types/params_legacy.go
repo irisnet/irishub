@@ -1,7 +1,7 @@
 package types
 
 // Keys for parameter access
-// nolint
+
 var (
 	KeyMaxRequestTimeout         = []byte("MaxRequestTimeout")
 	KeyMinDepositMultiple        = []byte("MinDepositMultiple")

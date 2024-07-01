@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/cometbft/cometbft/libs/cli"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
@@ -228,7 +227,8 @@ func QueryServiceRequestsExec(t *testing.T,
 	clientCtx client.Context,
 	serviceName,
 	provider string,
-	extraArgs ...string) *servicetypes.QueryRequestsResponse {
+	extraArgs ...string,
+) *servicetypes.QueryRequestsResponse {
 	args := []string{
 		serviceName,
 		provider,
@@ -258,7 +258,6 @@ func QueryServiceRequestsByReqCtx(t *testing.T,
 	response := &servicetypes.QueryRequestsResponse{}
 	network.ExecQueryCmd(t, clientCtx, servicecli.GetCmdQueryServiceRequests(), args, response)
 	return response
-
 }
 
 func QueryEarnedFeesExec(t *testing.T,

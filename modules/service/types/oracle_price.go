@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/cometbft/cometbft/crypto"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

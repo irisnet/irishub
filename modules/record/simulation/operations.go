@@ -5,7 +5,6 @@ import (
 	"math/rand"
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
@@ -53,7 +52,6 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 	) (
 		simtypes.OperationMsg, []simtypes.FutureOperation, error,
 	) {
-
 		record, err := genRecord(r, accs)
 		if err != nil {
 			return simtypes.NoOpMsg(

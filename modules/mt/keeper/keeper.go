@@ -3,9 +3,8 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/cometbft/cometbft/libs/log"
-
 	errorsmod "cosmossdk.io/errors"
+	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -57,7 +56,6 @@ func (k Keeper) IssueMT(ctx sdk.Context,
 	data []byte,
 	recipient sdk.AccAddress,
 ) (types.MT, error) {
-
 	mt := types.NewMT(mtID, amount, data)
 
 	// store MT
@@ -119,7 +117,6 @@ func (k Keeper) TransferOwner(ctx sdk.Context,
 	amount uint64,
 	srcOwner, dstOwner sdk.AccAddress,
 ) error {
-
 	srcOwnerAmount := k.GetBalance(ctx, denomID, mtID, srcOwner)
 	if srcOwnerAmount < amount {
 		return errorsmod.Wrapf(
@@ -136,8 +133,8 @@ func (k Keeper) TransferOwner(ctx sdk.Context,
 func (k Keeper) BurnMT(ctx sdk.Context,
 	denomID, mtID string,
 	amount uint64,
-	owner sdk.AccAddress) error {
-
+	owner sdk.AccAddress,
+) error {
 	srcOwnerAmount := k.GetBalance(ctx, denomID, mtID, owner)
 	if srcOwnerAmount < amount {
 		return errorsmod.Wrapf(
@@ -160,7 +157,6 @@ func (k Keeper) BurnMT(ctx sdk.Context,
 func (k Keeper) TransferDenomOwner(
 	ctx sdk.Context, denomID string, srcOwner, dstOwner sdk.AccAddress,
 ) error {
-
 	// authorize
 	if err := k.Authorize(ctx, denomID, srcOwner); err != nil {
 		return err
@@ -178,7 +174,6 @@ func (k Keeper) TransferDenomOwner(
 }
 
 func (k Keeper) ExportGenesisState(ctx sdk.Context) *types.GenesisState {
-
 	var collections []types.Collection
 	denoms := k.GetDenoms(ctx)
 	for _, d := range denoms {

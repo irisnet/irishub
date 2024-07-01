@@ -21,7 +21,7 @@ func WeightedOperations(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 ) simulation.WeightedOperations {
-	var weightMsgRequestRandom = 100
+	weightMsgRequestRandom := 100
 	return simulation.WeightedOperations{
 		simulation.NewWeightedOperation(
 			weightMsgRequestRandom,

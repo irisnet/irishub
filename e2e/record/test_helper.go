@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/cometbft/cometbft/libs/cli"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/gogoproto/proto"
@@ -21,7 +20,8 @@ func CreateRecordExec(t *testing.T,
 	from string,
 	digest string,
 	digestAlgo string,
-	extraArgs ...string) *simapp.ResponseTx {
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		digest,
 		digestAlgo,
@@ -38,7 +38,8 @@ func QueryRecordExec(t *testing.T,
 	clientCtx client.Context,
 	recordID string,
 	resp proto.Message,
-	extraArgs ...string) {
+	extraArgs ...string,
+) {
 	args := []string{
 		recordID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),

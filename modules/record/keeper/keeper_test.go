@@ -3,22 +3,18 @@ package keeper_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/suite"
-
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/suite"
 
 	"mods.irisnet.org/modules/record/keeper"
 	"mods.irisnet.org/modules/record/types"
 	"mods.irisnet.org/simapp"
 )
 
-var (
-	testCreator = sdk.AccAddress(tmhash.Sum([]byte("test-creator")))
-)
+var testCreator = sdk.AccAddress(tmhash.Sum([]byte("test-creator")))
 
 type KeeperTestSuite struct {
 	suite.Suite
@@ -35,7 +31,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 		Consumers: []interface{}{&suite.keeper},
 	}
 
-	app := simapp.Setup(suite.T(), false,depInjectOptions)
+	app := simapp.Setup(suite.T(), false, depInjectOptions)
 
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})

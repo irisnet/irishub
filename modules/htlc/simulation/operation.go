@@ -6,7 +6,6 @@ import (
 	"time"
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
@@ -64,7 +63,6 @@ func SimulateMsgCreateHtlc(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		sender, _ := simtypes.RandomAcc(r, accs)
 		to, _ := simtypes.RandomAcc(r, accs)
 		recvOnOtherChain, _ := simtypes.RandomAcc(r, accs)
@@ -155,7 +153,6 @@ func SimulateMsgClaimHtlc(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		htlc := GenRandomHtlc(ctx, k, r)
 		if htlc.Size() == 0 {
 			return simtypes.NoOpMsg(

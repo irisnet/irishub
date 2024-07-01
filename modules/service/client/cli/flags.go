@@ -1,4 +1,4 @@
-// nolint
+
 package cli
 
 import (

@@ -12,7 +12,7 @@ const (
 	MethodMint        = "mint"
 	MethodBurn        = "burn"
 	MethodBalanceOf   = "balanceOf"
-	MethodInitialize   = "initialize"
+	MethodInitialize  = "initialize"
 	MethodUpgradeTo   = "upgradeTo"
 )
 

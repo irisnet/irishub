@@ -3,7 +3,6 @@ package oracle
 import (
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/depinject"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 

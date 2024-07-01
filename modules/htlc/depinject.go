@@ -3,7 +3,6 @@ package htlc
 import (
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/depinject"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -22,7 +21,7 @@ func init() {
 }
 
 func ProvideKeyTable() types.KeyTable {
-	return types.ParamKeyTable() //nolint:staticcheck
+	return types.ParamKeyTable() 
 }
 
 var _ appmodule.AppModule = AppModule{}

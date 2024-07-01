@@ -59,7 +59,7 @@ func (k Keeper) escrowFromFeePool(ctx sdk.Context, amount sdk.Coins) error {
 
 // refundToFeePool return the remaining funds of the farm pool to CommunityPool
 func (k Keeper) refundToFeePool(ctx sdk.Context, fromModule string, refundTotal sdk.Coins) error {
-	//refund the total remaining reward to creator
+	// refund the total remaining reward to creator
 	if err := k.bk.SendCoinsFromModuleToModule(ctx, fromModule, k.communityPoolName, refundTotal); err != nil {
 		return err
 	}
@@ -74,13 +74,13 @@ func (k Keeper) refundEscrow(ctx sdk.Context, info types.EscrowInfo) {
 	if err != nil {
 		return
 	}
-	//refund the amount locked by the user
+	// refund the amount locked by the user
 	if err := k.bk.SendCoinsFromModuleToAccount(ctx,
 		types.EscrowCollector, proposer, info.FundSelfBond); err != nil {
 		return
 	}
 
-	//refund the amount locked by the CommunityPool
+	// refund the amount locked by the CommunityPool
 	if err := k.refundToFeePool(ctx, types.EscrowCollector, sdk.NewCoins(info.FundApplied...)); err != nil {
 		return
 	}

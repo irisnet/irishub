@@ -6,14 +6,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cosmos/gogoproto/proto"
-
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	"mods.irisnet.org/e2e"
 	servicecli "mods.irisnet.org/modules/service/client/cli"

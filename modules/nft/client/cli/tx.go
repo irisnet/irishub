@@ -5,13 +5,12 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/spf13/cobra"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
+	"github.com/spf13/cobra"
 
 	"mods.irisnet.org/modules/nft/types"
 )
@@ -156,7 +155,7 @@ func GetCmdMintNFT() *cobra.Command {
 				return err
 			}
 
-			var sender = clientCtx.GetFromAddress().String()
+			sender := clientCtx.GetFromAddress().String()
 
 			recipient, err := cmd.Flags().GetString(FlagRecipient)
 			if err != nil {

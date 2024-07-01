@@ -3,7 +3,6 @@ package token
 import (
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/depinject"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -25,7 +24,7 @@ func init() {
 
 // ProvideKeyTable returns the key table for the Token module
 func ProvideKeyTable() types.KeyTable {
-	return v1.ParamKeyTable() //nolint:staticcheck
+	return v1.ParamKeyTable() 
 }
 
 var _ appmodule.AppModule = AppModule{}

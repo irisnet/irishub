@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cosmos/gogoproto/proto"
-
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	"mods.irisnet.org/e2e"
 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
@@ -60,7 +59,7 @@ func (s *QueryTestSuite) TestCoinswap() {
 	txResult := s.BlockSendMsgs(s.T(), msgIssueToken)
 	s.Require().Equal(uint32(0), txResult.Code, "send issue token msg failed")
 
-	//_ = tokentestutil.IssueTokenExec(s.T(), s.Network, clientCtx, from.String(), args...)
+	// _ = tokentestutil.IssueTokenExec(s.T(), s.Network, clientCtx, from.String(), args...)
 
 	balances := simapp.QueryBalancesExec(s.T(), s.Network, clientCtx, from.String())
 	s.Require().Equal("100000000", balances.AmountOf(symbol).String())

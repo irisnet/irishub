@@ -234,7 +234,6 @@ func SimulateMsgCreatePool(
 		}
 		keeper.RewardInvariant(k)
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
-
 	}
 }
 

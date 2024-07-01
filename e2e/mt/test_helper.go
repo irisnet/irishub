@@ -5,10 +5,9 @@ import (
 	"testing"
 
 	"github.com/cometbft/cometbft/libs/cli"
-	"github.com/cosmos/gogoproto/proto"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/gogoproto/proto"
 
 	mtcli "mods.irisnet.org/modules/mt/client/cli"
 	mttypes "mods.irisnet.org/modules/mt/types"
@@ -40,8 +39,6 @@ func IssueDenomExec(
 
 	return network.ExecTxCmdWithResult(t, clientCtx, mtcli.GetCmdIssueDenom(), args)
 }
-
-
 // BurnMTExec executes a burn token transaction.
 //
 // Parameters:
@@ -187,7 +184,8 @@ func QueryDenomExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	denomID string,
-	extraArgs ...string) *mttypes.Denom {
+	extraArgs ...string,
+) *mttypes.Denom {
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -212,7 +210,8 @@ func QueryDenomExec(t *testing.T,
 func QueryDenomsExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
-	extraArgs ...string) *mttypes.QueryDenomsResponse {
+	extraArgs ...string,
+) *mttypes.QueryDenomsResponse {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
@@ -267,7 +266,8 @@ func QueryMTExec(t *testing.T,
 	clientCtx client.Context,
 	denomID string,
 	mtID string,
-	extraArgs ...string) *mttypes.MT {
+	extraArgs ...string,
+) *mttypes.MT {
 	args := []string{
 		denomID,
 		mtID,
@@ -296,7 +296,8 @@ func QueryBlancesExec(t *testing.T,
 	clientCtx client.Context,
 	from string,
 	denomID string,
-	extraArgs ...string) *mttypes.QueryBalancesResponse {
+	extraArgs ...string,
+) *mttypes.QueryBalancesResponse {
 	args := []string{
 		from,
 		denomID,

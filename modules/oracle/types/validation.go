@@ -11,18 +11,16 @@ import (
 )
 
 const (
-	//MaxLatestHistory defines the the maximum number of feed values saved
+	// MaxLatestHistory defines the the maximum number of feed values saved
 	MaxLatestHistory = 100
-	//MaxAggregateFuncNameLen defines the the maximum length of the aggregation function name
+	// MaxAggregateFuncNameLen defines the the maximum length of the aggregation function name
 	MaxAggregateFuncNameLen = 10
-	//MaxDescriptionLen defines the the maximum length of the description
+	// MaxDescriptionLen defines the the maximum length of the description
 	MaxDescriptionLen = 280
 )
 
-var (
-	// the feed name only accepts alphanumeric characters, _ and - /
-	regexpFeedName = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9/_-]*$`)
-)
+// the feed name only accepts alphanumeric characters, _ and - /
+var regexpFeedName = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9/_-]*$`)
 
 // ValidateFeedName verifies if the feed name is legal
 func ValidateFeedName(feedName string) error {

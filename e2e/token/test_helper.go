@@ -5,13 +5,12 @@ import (
 	"testing"
 
 	"github.com/cometbft/cometbft/libs/cli"
-	"github.com/cosmos/gogoproto/proto"
-	"github.com/stretchr/testify/require"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
+	"github.com/cosmos/gogoproto/proto"
+	"github.com/stretchr/testify/require"
 
 	tokencli "mods.irisnet.org/modules/token/client/cli"
 	v1 "mods.irisnet.org/modules/token/types/v1"

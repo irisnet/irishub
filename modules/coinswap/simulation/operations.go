@@ -236,7 +236,6 @@ func SimulateMsgAddLiquidity(
 			[]uint64{account.GetSequence()},
 			simAccount.PrivKey,
 		)
-
 		if err != nil {
 			return simtypes.NoOpMsg(
 				types.ModuleName,
@@ -251,7 +250,6 @@ func SimulateMsgAddLiquidity(
 
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
 	}
-
 }
 
 // SimulateMsgSwapOrder  simulates  the swap of order
@@ -450,7 +448,6 @@ func SimulateMsgSwapOrder(
 			[]uint64{account.GetSequence()},
 			simAccount.PrivKey,
 		)
-
 		if err != nil {
 			return simtypes.NoOpMsg(
 				types.ModuleName,
@@ -609,7 +606,6 @@ func SimulateMsgRemoveLiquidity(
 			[]uint64{account.GetSequence()},
 			simAccount.PrivKey,
 		)
-
 		if err != nil {
 			return simtypes.NoOpMsg(
 				types.ModuleName,
@@ -623,7 +619,6 @@ func SimulateMsgRemoveLiquidity(
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
-
 	}
 }
 
@@ -719,7 +714,7 @@ func SimulateMsgAddUnilateralLiquidity(
 			), nil, err
 		}
 		// lpt = square^0.5 - lpt_balance
-		var squareBigInt = &big.Int{}
+		squareBigInt := &big.Int{}
 		squareBigInt.Sqrt(square.BigInt())
 		mintLptAmt := sdkmath.NewIntFromBigInt(squareBigInt).Sub(lptBalanceAmt)
 
@@ -759,7 +754,6 @@ func SimulateMsgAddUnilateralLiquidity(
 			[]uint64{account.GetSequence()},
 			simAccount.PrivKey,
 		)
-
 		if err != nil {
 			return simtypes.NoOpMsg(
 				types.ModuleName,
@@ -919,7 +913,6 @@ func SimulateMsgRemoveUnilateralLiquidity(
 			[]uint64{account.GetSequence()},
 			simAccount.PrivKey,
 		)
-
 		if err != nil {
 			return simtypes.NoOpMsg(
 				types.ModuleName,
@@ -949,7 +942,7 @@ func randToken(r *rand.Rand, spendableCoin sdk.Coins) (sdk.Coin, error) {
 }
 
 func randDeadline(r *rand.Rand) int64 {
-	var delta = time.Duration(simtypes.RandIntBetween(r, 10, 100)) * time.Second
+	delta := time.Duration(simtypes.RandIntBetween(r, 10, 100)) * time.Second
 	return time.Now().Add(delta).UnixNano()
 }
 

@@ -4,13 +4,12 @@ import (
 	"encoding/json"
 	"math/big"
 
+	errorsmod "cosmossdk.io/errors"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
-
-	errorsmod "cosmossdk.io/errors"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"mods.irisnet.org/modules/token/types"
 	tokentypes "mods.irisnet.org/modules/token/types"

@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/cometbft/cometbft/libs/cli"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
@@ -33,7 +32,8 @@ func QueryRandomExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	requestID string,
-	extraArgs ...string) *randomtypes.Random {
+	extraArgs ...string,
+) *randomtypes.Random {
 	args := []string{
 		requestID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -49,7 +49,8 @@ func QueryRandomRequestQueueExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	genHeight string,
-	extraArgs ...string) *randomtypes.QueryRandomRequestQueueResponse {
+	extraArgs ...string,
+) *randomtypes.QueryRandomRequestQueueResponse {
 	args := []string{
 		genHeight,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),

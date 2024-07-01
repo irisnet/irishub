@@ -2,7 +2,6 @@ package types
 
 import (
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -92,9 +91,7 @@ type AuthKeeper interface {
 	Authorized(ctx sdk.Context, addr sdk.AccAddress) bool
 }
 
-var (
-	RequestContextStateFromString = service.RequestContextStateFromString
-)
+var RequestContextStateFromString = service.RequestContextStateFromString
 
 type BankKeeper interface {
 	SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins

@@ -3,12 +3,11 @@ package keeper
 import (
 	"fmt"
 
-	gogotypes "github.com/cosmos/gogoproto/types"
-	"github.com/ethereum/go-ethereum/common"
-
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
+	"github.com/ethereum/go-ethereum/common"
 
 	"mods.irisnet.org/modules/token/types"
 	v1 "mods.irisnet.org/modules/token/types/v1"

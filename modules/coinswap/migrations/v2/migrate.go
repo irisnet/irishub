@@ -30,11 +30,11 @@ func Migrate(ctx sdk.Context,
 
 	// 2. Create a new liquidity pool based on the results of the first step
 	standardDenom := k.GetStandardDenom(ctx)
-	var pools = make(map[string]coinswaptypes.Pool, len(lptDenoms))
+	pools := make(map[string]coinswaptypes.Pool, len(lptDenoms))
 	for _, ltpDenom := range lptDenoms {
 		counterpartyDenom := strings.TrimPrefix(ltpDenom, FormatUniABSPrefix)
 		pools[ltpDenom] = k.CreatePool(ctx, counterpartyDenom)
-		//3. Transfer tokens from the old liquidity to the newly created liquidity pool
+		// 3. Transfer tokens from the old liquidity to the newly created liquidity pool
 		if err := migratePool(ctx, bk, pools[ltpDenom], ltpDenom, standardDenom); err != nil {
 			return err
 		}
@@ -65,7 +65,7 @@ func migrateProvider(ctx sdk.Context,
 	pool coinswaptypes.Pool,
 	provider sdk.AccAddress,
 ) error {
-	//1. Burn the old liquidity tokens
+	// 1. Burn the old liquidity tokens
 	burnCoins := sdk.NewCoins(originLptCoin)
 	// send liquidity vouchers to be burned from sender account to module account
 	if err := bk.SendCoinsFromAccountToModule(ctx, provider, coinswaptypes.ModuleName, burnCoins); err != nil {
@@ -76,7 +76,7 @@ func migrateProvider(ctx sdk.Context,
 		return err
 	}
 
-	//2. Issue new liquidity tokens
+	// 2. Issue new liquidity tokens
 	mintToken := sdk.NewCoin(pool.LptDenom, originLptCoin.Amount)
 	mintTokens := sdk.NewCoins(mintToken)
 	if err := bk.MintCoins(ctx, coinswaptypes.ModuleName, mintTokens); err != nil {
@@ -94,7 +94,7 @@ func migratePool(ctx sdk.Context,
 	counterpartyDenom := strings.TrimPrefix(ltpDenom, FormatUniABSPrefix)
 	originPoolAddress := GetReservePoolAddr(ltpDenom)
 
-	//Query the amount of the original liquidity pool account
+	// Query the amount of the original liquidity pool account
 	originPoolBalances := bk.GetAllBalances(ctx, originPoolAddress)
 	transferCoins := sdk.NewCoins(
 		sdk.NewCoin(standardDenom, originPoolBalances.AmountOf(standardDenom)),

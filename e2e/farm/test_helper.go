@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/cometbft/cometbft/libs/cli"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
@@ -17,7 +16,8 @@ import (
 // CreateFarmPoolExec creates a redelegate message.
 func CreateFarmPoolExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator string,
-	extraArgs ...string) *simapp.ResponseTx {
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
 	}
@@ -64,7 +64,8 @@ func QueryFarmPoolExec(
 func AppendRewardExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator,
 	poolID string,
-	extraArgs ...string) *simapp.ResponseTx {
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		poolID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
@@ -78,7 +79,8 @@ func StakeExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator,
 	poolID,
 	lpToken string,
-	extraArgs ...string) *simapp.ResponseTx {
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		poolID,
 		lpToken,
@@ -93,7 +95,8 @@ func UnstakeExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator,
 	poolID,
 	lpToken string,
-	extraArgs ...string) *simapp.ResponseTx {
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		poolID,
 		lpToken,
@@ -107,7 +110,8 @@ func UnstakeExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 func HarvestExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator,
 	poolID string,
-	extraArgs ...string) *simapp.ResponseTx {
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		poolID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
@@ -120,7 +124,8 @@ func HarvestExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 func DestroyExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator,
 	poolID string,
-	extraArgs ...string) *simapp.ResponseTx {
+	extraArgs ...string,
+) *simapp.ResponseTx {
 	args := []string{
 		poolID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, creator),
@@ -132,7 +137,8 @@ func DestroyExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 // QueryFarmerExec creates a redelegate message.
 func QueryFarmerExec(t *testing.T, network simapp.Network, clientCtx client.Context,
 	creator string,
-	extraArgs ...string) *farmtypes.QueryFarmerResponse {
+	extraArgs ...string,
+) *farmtypes.QueryFarmerResponse {
 	args := []string{
 		creator,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),

@@ -8,8 +8,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const RandPrec = 20        // the precision for generated random numbers
-const SeedBytesLength = 32 //
+const (
+	RandPrec        = 20 // the precision for generated random numbers
+	SeedBytesLength = 32 //
+)
 
 // RNG is a random number generator
 type RNG interface {

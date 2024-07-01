@@ -5,9 +5,7 @@ import (
 	"regexp"
 )
 
-var (
-	reSchemaReplace = regexp.MustCompile(`[\n\t]`)
-)
+var reSchemaReplace = regexp.MustCompile(`[\n\t]`)
 
 // SchemaType defines the schema type
 type SchemaType string

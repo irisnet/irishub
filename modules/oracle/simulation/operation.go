@@ -29,8 +29,8 @@ func WeightedOperations(
 	cdc codec.JSONCodec,
 	k keeper.Keeper,
 	ak types.AccountKeeper,
-	bk types.BankKeeper) simulation.WeightedOperations {
-
+	bk types.BankKeeper,
+) simulation.WeightedOperations {
 	var weightCreate, weightPause, weightStart, WeightEdit int
 
 	appParams.GetOrGenerate(
@@ -274,7 +274,6 @@ func SimulatePauseFeed(
 	) (
 		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
 	) {
-
 		feed := GenFeed(k, r, ctx)
 		if feed.Size() == 0 {
 			return simtypes.NoOpMsg(
@@ -443,7 +442,6 @@ func SimulateEditFeed(
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
-
 	}
 }
 

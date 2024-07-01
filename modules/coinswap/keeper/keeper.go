@@ -5,10 +5,9 @@ import (
 	"math/big"
 	"strconv"
 
+	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/cometbft/cometbft/libs/log"
-
-	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -157,7 +156,7 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.C
 		return sdk.Coin{}, err
 	}
 
-	//pool exist but has no balances,so do same operations as firist addLiquidity(but without creating pool)
+	// pool exist but has no balances,so do same operations as firist addLiquidity(but without creating pool)
 	if balances == nil || balances.IsZero() {
 		mintLiquidityAmt = msg.ExactStandardAmt
 		if mintLiquidityAmt.LT(msg.MinLiquidity) {
@@ -324,8 +323,8 @@ func (k Keeper) AddUnilateralLiquidity(
 		Mul(lptBalanceAmt).
 		Quo(denominator.Mul(tokenBalanceAmt))
 
-	// lpt = square^0.5 - lpt_balance
-	var squareBigInt = &big.Int{}
+		// lpt = square^0.5 - lpt_balance
+	squareBigInt := &big.Int{}
 	squareBigInt.Sqrt(square.BigInt())
 	mintLptAmt := sdkmath.NewIntFromBigInt(squareBigInt).Sub(lptBalanceAmt)
 

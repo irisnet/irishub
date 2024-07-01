@@ -4,9 +4,8 @@ import (
 	fmt "fmt"
 	"strings"
 
-	"gopkg.in/yaml.v2"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -33,8 +32,8 @@ func (p Params) String() string {
 
 func NewAssetParam(
 	denom string, coinID int, limit SupplyLimit, active bool,
-	deputyAddr string, fixedFee sdk.Int, minSwapAmount sdk.Int,
-	maxSwapAmount sdk.Int, minBlockLock uint64, maxBlockLock uint64,
+	deputyAddr string, fixedFee, minSwapAmount sdk.Int,
+	maxSwapAmount sdk.Int, minBlockLock, maxBlockLock uint64,
 ) AssetParam {
 	return AssetParam{
 		Denom:         denom,

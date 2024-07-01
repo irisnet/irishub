@@ -4,18 +4,16 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cosmos/gogoproto/proto"
-	"github.com/ethereum/go-ethereum/common"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	sdkmath "cosmossdk.io/math"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
-
+	"github.com/cosmos/gogoproto/proto"
 	gogotypes "github.com/cosmos/gogoproto/types"
+	"github.com/ethereum/go-ethereum/common"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"mods.irisnet.org/modules/token/types"
 	v1 "mods.irisnet.org/modules/token/types/v1"
@@ -90,7 +88,7 @@ func (k Keeper) Tokens(c context.Context, req *v1.QueryTokensRequest) (*v1.Query
 		pageRes, err = query.Paginate(
 			tokenStore,
 			shapePageRequest(req.Pagination),
-			func(_ []byte, value []byte) error {
+			func(_, value []byte) error {
 				var token v1.Token
 				k.cdc.MustUnmarshal(value, &token)
 				tokens = append(tokens, &token)
@@ -102,7 +100,7 @@ func (k Keeper) Tokens(c context.Context, req *v1.QueryTokensRequest) (*v1.Query
 		}
 	} else {
 		tokenStore := prefix.NewStore(store, types.KeyTokens(owner, ""))
-		pageRes, err = query.Paginate(tokenStore, shapePageRequest(req.Pagination), func(_ []byte, value []byte) error {
+		pageRes, err = query.Paginate(tokenStore, shapePageRequest(req.Pagination), func(_, value []byte) error {
 			var symbol gogotypes.StringValue
 			k.cdc.MustUnmarshal(value, &symbol)
 			token, err := k.GetToken(ctx, symbol.Value)

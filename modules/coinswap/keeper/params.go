@@ -48,7 +48,7 @@ func (k Keeper) GetStandardDenom(ctx sdk.Context) string {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.KeyStandardDenom)
 
-	var denomWrap = gogotypes.StringValue{}
+	denomWrap := gogotypes.StringValue{}
 	k.cdc.MustUnmarshal(bz, &denomWrap)
 	return denomWrap.Value
 }

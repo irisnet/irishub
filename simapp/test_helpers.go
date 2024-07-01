@@ -18,9 +18,6 @@ import (
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
-	"github.com/cosmos/gogoproto/proto"
-	"github.com/stretchr/testify/require"
-
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -50,6 +47,8 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/cosmos/gogoproto/proto"
+	"github.com/stretchr/testify/require"
 )
 
 // SetupOptions defines arguments that are passed into `Simapp` constructor.
@@ -176,7 +175,7 @@ func NewConfig(depInjectOptions DepinjectOptions) (network.Config, error) {
 		interfaceRegistry codectypes.InterfaceRegistry
 	)
 
-	providers := append(depInjectOptions.Providers[:], log.NewNopLogger())
+	providers := append(depInjectOptions.Providers, log.NewNopLogger())
 	if err := depinject.Inject(
 		depinject.Configs(
 			depInjectOptions.Config,
@@ -399,7 +398,7 @@ func CreateTestAddrs(numAddrs int) []sdk.AccAddress {
 }
 
 // for incode address generation
-func testAddr(addr string, bech string) sdk.AccAddress {
+func testAddr(addr, bech string) sdk.AccAddress {
 	res, err := sdk.AccAddressFromHexUnsafe(addr)
 	if err != nil {
 		panic(err)
@@ -514,7 +513,7 @@ func ConvertAddrsToValAddrs(addrs []sdk.AccAddress) []sdk.ValAddress {
 	return valAddrs
 }
 
-func TestAddr(addr string, bech string) (sdk.AccAddress, error) {
+func TestAddr(addr, bech string) (sdk.AccAddress, error) {
 	res, err := sdk.AccAddressFromHexUnsafe(addr)
 	if err != nil {
 		return nil, err

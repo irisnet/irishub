@@ -5,13 +5,12 @@ import (
 	"encoding/hex"
 
 	"cosmossdk.io/api/tendermint/abci"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"mods.irisnet.org/modules/random/types"
 )
@@ -92,7 +91,7 @@ func queryRandomRequestQueue(ctx sdk.Context, req abci.RequestQuery, k Keeper, l
 }
 
 func queryRandomRequestQueueByHeight(ctx sdk.Context, height int64, k Keeper) []types.Request {
-	var requests = make([]types.Request, 0)
+	requests := make([]types.Request, 0)
 
 	iterator := k.IterateRandomRequestQueueByHeight(ctx, height)
 	defer iterator.Close()
@@ -108,7 +107,7 @@ func queryRandomRequestQueueByHeight(ctx sdk.Context, height int64, k Keeper) []
 }
 
 func queryAllRandomRequestsInQueue(ctx sdk.Context, k Keeper) []types.Request {
-	var requests = make([]types.Request, 0)
+	requests := make([]types.Request, 0)
 
 	k.IterateRandomRequestQueue(ctx, func(h int64, reqID []byte, r types.Request) (stop bool) {
 		requests = append(requests, r)

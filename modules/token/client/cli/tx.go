@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/spf13/cobra"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/spf13/cobra"
 
 	"mods.irisnet.org/modules/token/types"
 	v1 "mods.irisnet.org/modules/token/types/v1"
@@ -444,7 +443,7 @@ func GetCmdSwapToErc20() *cobra.Command {
 			if err != nil {
 				return err
 			}
-	
+
 			paidAmount, token, err := parseMainCoin(clientCtx, args[0])
 			if err != nil {
 				return err

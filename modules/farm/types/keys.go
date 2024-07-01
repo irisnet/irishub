@@ -2,7 +2,7 @@ package types
 
 import sdk "github.com/cosmos/cosmos-sdk/types"
 
-// nolint
+
 const (
 	// module name
 	ModuleName = "farm"

@@ -26,8 +26,6 @@ import (
 	upgrademodulev1 "cosmossdk.io/api/cosmos/upgrade/module/v1"
 	vestingmodulev1 "cosmossdk.io/api/cosmos/vesting/module/v1"
 	"cosmossdk.io/core/appconfig"
-	"google.golang.org/protobuf/types/known/durationpb"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
@@ -47,11 +45,11 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	farmmodule "mods.irisnet.org/api/irismod/farm/module/v1"
-	farmtypes "mods.irisnet.org/modules/farm/types"
-
 	_ "mods.irisnet.org/modules/farm"
+	farmtypes "mods.irisnet.org/modules/farm/types"
 )
 
 var (
@@ -262,7 +260,7 @@ var (
 	})
 )
 
-type mockCoinswapKeeper struct {}
+type mockCoinswapKeeper struct{}
 
 func (mck *mockCoinswapKeeper) ValidatePool(ctx sdk.Context, lptDenom string) error {
 	fmt.Println("mock coinswap keeper")

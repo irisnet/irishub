@@ -7,7 +7,6 @@ import (
 	"time"
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -62,16 +61,16 @@ func (s *TxTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
 	depInjectOptions := simapp.DepinjectOptions{
-		Config:    e2e.AppConfig,
+		Config: e2e.AppConfig,
 		Providers: []interface{}{
 			keeper.ProvideMockEVM(),
 			keeper.ProvideMockICS20(),
 		},
 	}
 
-	cfg,err  := simapp.NewConfig(depInjectOptions)
+	cfg, err := simapp.NewConfig(depInjectOptions)
 	s.Require().NoError(err)
-	
+
 	cfg.NumValidators = 4
 
 	Deputy, _ = sdk.AccAddressFromBech32(DEPUTY_ADDR)

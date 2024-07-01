@@ -4,14 +4,12 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	gogotypes "github.com/cosmos/gogoproto/types"
-
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	"github.com/cometbft/cometbft/libs/log"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	"mods.irisnet.org/modules/record/types"
 )
@@ -43,7 +41,7 @@ func (k Keeper) AddRecord(ctx sdk.Context, record types.Record) []byte {
 	intraTxCounter := k.GetIntraTxCounter(ctx)
 
 	bz := make([]byte, 4+len(recordBz))
-	copy(bz[:len(recordBz)], recordBz[:])
+	copy(bz[:len(recordBz)], recordBz)
 	binary.BigEndian.PutUint32(bz[len(recordBz):], intraTxCounter)
 
 	recordID := getRecordID(bz)
