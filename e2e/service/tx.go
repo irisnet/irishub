@@ -16,7 +16,6 @@ import (
 
 	"mods.irisnet.org/e2e"
 	servicecli "mods.irisnet.org/modules/service/client/cli"
-	"mods.irisnet.org/modules/service/types"
 	servicetypes "mods.irisnet.org/modules/service/types"
 	"mods.irisnet.org/simapp"
 )
@@ -32,8 +31,8 @@ func (s *TxTestSuite) SetupSuite() {
 		var serviceGenesisState servicetypes.GenesisState
 		cfg.Codec.MustUnmarshalJSON(cfg.GenesisState[servicetypes.ModuleName], &serviceGenesisState)
 
-		serviceGenesisState.Params.ArbitrationTimeLimit = time.Duration(time.Second)
-		serviceGenesisState.Params.ComplaintRetrospect = time.Duration(time.Second)
+		serviceGenesisState.Params.ArbitrationTimeLimit = time.Second
+		serviceGenesisState.Params.ComplaintRetrospect = time.Second
 		cfg.GenesisState[servicetypes.ModuleName] = cfg.Codec.MustMarshalJSON(&serviceGenesisState)
 		cfg.NumValidators = 1
 	})
@@ -314,11 +313,11 @@ func (s *TxTestSuite) TestQueryCmd() {
 			var requests []servicetypes.CompactRequest
 			var requestsBz []byte
 			for _, attribute := range event.Attributes {
-				if string(attribute.Key) == types.AttributeKeyRequests {
+				if attribute.Key == servicetypes.AttributeKeyRequests {
 					requestsBz = []byte(attribute.GetValue())
 				}
-				if string(attribute.Key) == types.AttributeKeyRequestContextID &&
-					string(attribute.GetValue()) == requestContextId {
+				if attribute.Key == servicetypes.AttributeKeyRequestContextID &&
+					attribute.GetValue() == requestContextId {
 					found = true
 				}
 			}

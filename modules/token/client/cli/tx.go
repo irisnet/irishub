@@ -448,7 +448,7 @@ func GetCmdSwapToErc20() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if len(token.GetContract()) <= 0 {
+			if len(token.GetContract()) == 0 {
 				return fmt.Errorf("corresponding erc20 contract of %s does not exist", paidAmount.Denom)
 			}
 
@@ -458,7 +458,7 @@ func GetCmdSwapToErc20() *cobra.Command {
 			}
 
 			from := clientCtx.GetFromAddress()
-			if len(receiver) <= 0 {
+			if len(receiver) == 0 {
 				// set default receiver
 				receiver = common.BytesToAddress(from.Bytes()).Hex()
 			}
@@ -512,7 +512,7 @@ func GetCmdSwapFromErc20() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if len(token.GetContract()) <= 0 {
+			if len(token.GetContract()) == 0 {
 				return fmt.Errorf("corresponding erc20 contract of %s does not exist", wantedAmount.Denom)
 			}
 
@@ -520,7 +520,7 @@ func GetCmdSwapFromErc20() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if len(receiver) <= 0 {
+			if len(receiver) == 0 {
 				// set default receiver
 				receiver = from
 			}

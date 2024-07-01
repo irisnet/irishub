@@ -5,6 +5,7 @@ import (
 
 	servicetypes "mods.irisnet.org/modules/service/types"
 )
+
 const (
 	// module name
 	ModuleName = "oracle"

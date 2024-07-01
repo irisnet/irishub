@@ -100,7 +100,10 @@ func GetCmdTransferDenom() *cobra.Command {
 		),
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cmd.Flags().Set(flags.FlagFrom, args[0])
+			if err := cmd.Flags().Set(flags.FlagFrom, args[0]); err != nil {
+				return err
+			}
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -271,7 +274,10 @@ func GetCmdTransferMT() *cobra.Command {
 		),
 		Args: cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cmd.Flags().Set(flags.FlagFrom, args[0])
+			if err := cmd.Flags().Set(flags.FlagFrom, args[0]); err != nil {
+				return err
+			}
+			
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err

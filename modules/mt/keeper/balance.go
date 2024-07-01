@@ -65,8 +65,7 @@ func (k Keeper) getBalances(ctx sdk.Context) []types.Owner {
 	it := sdk.KVStorePrefixIterator(store, types.PrefixBalance)
 	defer it.Close()
 
-	var ownerMap map[string]map[string]map[string]uint64
-	ownerMap = make(map[string]map[string]map[string]uint64)
+	ownerMap := make(map[string]map[string]map[string]uint64)
 
 	for ; it.Valid(); it.Next() {
 		keys := bytes.Split(it.Key(), types.Delimiter)

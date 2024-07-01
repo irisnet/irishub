@@ -107,7 +107,7 @@ func (s *QueryTestSuite) TestQueryCmd() {
 
 	_, err = s.WaitForHeight(startHeight)
 	s.Require().NoError(err)
-	s.WaitForNextBlock()
+	s.Require().NoError(s.WaitForNextBlock())
 
 	lpToken := sdk.NewCoin(lpTokenDenom, sdk.NewInt(100))
 	txResult = StakeExec(

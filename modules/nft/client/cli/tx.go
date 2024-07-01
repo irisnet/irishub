@@ -2,7 +2,7 @@ package cli
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -101,7 +101,7 @@ func GetCmdIssueDenom() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			optionsContent, err := ioutil.ReadFile(schema)
+			optionsContent, err := os.ReadFile(schema)
 			if err == nil {
 				schema = string(optionsContent)
 			}

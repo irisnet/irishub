@@ -32,6 +32,7 @@ type ResponseTx struct {
 }
 
 func SetupNetwork(t *testing.T, depInjectOptions DepinjectOptions) Network {
+	t.Helper()
 	cfg, err := NewConfig(depInjectOptions)
 	require.NoError(t, err)
 
@@ -49,6 +50,7 @@ func SetupNetwork(t *testing.T, depInjectOptions DepinjectOptions) Network {
 }
 
 func SetupNetworkWithConfig(t *testing.T, cfg network.Config) Network {
+	t.Helper() 
 	network, err := network.New(t, t.TempDir(), cfg)
 	require.NoError(t, err, "SetupNetwork failed")
 
@@ -65,6 +67,7 @@ func (n Network) ExecTxCmdWithResult(t *testing.T,
 	cmd *cobra.Command,
 	extraArgs []string,
 ) *ResponseTx {
+	t.Helper() 
 	buf, err := clitestutil.ExecTestCLICmd(clientCtx, cmd, extraArgs)
 	require.NoError(t, err, "ExecTestCLICmd failed")
 
@@ -84,6 +87,7 @@ func (n Network) ExecQueryCmd(t *testing.T,
 	extraArgs []string,
 	resp proto.Message,
 ) {
+	t.Helper() 
 	buf, err := clitestutil.ExecTestCLICmd(clientCtx, cmd, extraArgs)
 	require.NoError(t, err, "ExecTestCLICmd failed")
 	require.NoError(t, clientCtx.Codec.UnmarshalJSON(buf.Bytes(), resp), buf.String())
@@ -107,6 +111,7 @@ func (n Network) QueryTx(t *testing.T,
 	clientCtx client.Context,
 	txHash string,
 ) *ResponseTx {
+	t.Helper() 
 	var (
 		result *coretypes.ResultTx
 		err    error
@@ -146,6 +151,7 @@ func (n Network) SendMsgs(
 	t *testing.T,
 	msgs ...sdk.Msg,
 ) *sdk.TxResponse {
+	t.Helper() 
 	val := n.Validators[0]
 	client := val.ClientCtx.WithBroadcastMode(flags.BroadcastSync)
 
@@ -179,6 +185,7 @@ func (n Network) SendMsgs(
 func (n Network) BlockSendMsgs(t *testing.T,
 	msgs ...sdk.Msg,
 ) *ResponseTx {
+	t.Helper() 
 	response := n.SendMsgs(t, msgs...)
 	return n.QueryTx(t, n.Validators[0].ClientCtx, response.TxHash)
 }

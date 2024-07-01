@@ -84,7 +84,7 @@ func (suite *HTLCTestSuite) SetupTest() {
 func (suite *HTLCTestSuite) setTestParams() {
 	params := suite.keeper.GetParams(suite.ctx)
 	params.AssetParams[1].Active = true
-	suite.keeper.SetParams(suite.ctx, params)
+	suite.NoError(suite.keeper.SetParams(suite.ctx, params), "set params failed")
 }
 
 func (suite *HTLCTestSuite) GenerateHTLCDetails() {

@@ -7,19 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// nolint: deadcode unused
-var (
-	denomID   = "denom"
-	denom     = "denom"
-	id        = "id1"
-	mtName    = "report"
-	address   = CreateTestAddrs(1)[0]
-	address2  = CreateTestAddrs(2)[1]
-	tokenURI  = "https://google.com/token-1.json"
-	uriHash   = "uriHash"
-	tokenData = "https://google.com/token-1.json"
-)
-
 // CreateTestAddrs creates test addresses
 func CreateTestAddrs(numAddrs int) []sdk.AccAddress {
 	var addresses []sdk.AccAddress

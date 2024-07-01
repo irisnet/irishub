@@ -29,7 +29,7 @@ func ValidateGenesis(data GenesisState) error {
 
 		_, err := sdk.AccAddressFromBech32(record.Creator)
 		if err != nil {
-			return fmt.Errorf("invalid record creator address (%s)", err)
+			return fmt.Errorf("invalid record creator address (%w)", err)
 		}
 
 		if err := ValidateContents(record.Contents...); err != nil {

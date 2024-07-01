@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -86,7 +86,7 @@ func GetCmdCreateFeed() *cobra.Command {
 				return err
 			}
 			if !json.Valid([]byte(input)) {
-				inputContent, err := ioutil.ReadFile(input)
+				inputContent, err := os.ReadFile(input)
 				if err != nil {
 					return fmt.Errorf("invalid input data: neither JSON input nor path to .json file were provided")
 				}

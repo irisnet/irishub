@@ -341,7 +341,7 @@ func (k Keeper) ModuleServiceRequest(ctx sdk.Context, input string) (result, out
 	valueData := value.Data
 	valueTime := value.Timestamp
 
-	if time.Since(valueTime) > time.Duration(time.Minute*5) {
+	if time.Since(valueTime) > time.Minute*5 {
 		result = `{"code":"402","message":"all values expired"}`
 		return
 	}

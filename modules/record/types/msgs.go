@@ -13,10 +13,10 @@ const (
 var _ sdk.Msg = &MsgCreateRecord{}
 
 // NewMsgCreateRecord constructs a new MsgCreateRecord instance
-func NewMsgCreateRecord(contents []Content, Creator string) *MsgCreateRecord {
+func NewMsgCreateRecord(contents []Content, creator string) *MsgCreateRecord {
 	return &MsgCreateRecord{
 		Contents: contents,
-		Creator:  Creator,
+		Creator:  creator,
 	}
 }
 

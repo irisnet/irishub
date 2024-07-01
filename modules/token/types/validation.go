@@ -50,9 +50,6 @@ var (
 
 	regexpMinUintFmt = fmt.Sprintf("^[a-z][a-z0-9]{%d,%d}$", MinimumMinUnitLen-1, MaximumMinUnitLen-1)
 	regexpMinUint    = regexp.MustCompile(regexpMinUintFmt).MatchString
-
-	regexpEthAddressStr = "^0x[0-9a-f]{40}$"
-	regexpEthAddress    = regexp.MustCompile(regexpEthAddressStr).MatchString
 )
 
 // ValidateInitialSupply verifies whether the initial supply is legal

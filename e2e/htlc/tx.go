@@ -263,6 +263,7 @@ func (s *TxTestSuite) TestTxCmd() {
 		testCases[0].args.secret.String(),
 		args...,
 	)
+	s.Require().EqualValues(0, txResult.Code)
 
 	respType = QueryHTLCExec(
 		s.T(),
@@ -373,6 +374,7 @@ func (s *TxTestSuite) TestTxCmd() {
 		testCases[1].args.secret.String(),
 		args...,
 	)
+	s.Require().EqualValues(0, txResult.Code)
 
 	respType = QueryHTLCExec(
 		s.T(),
@@ -476,6 +478,7 @@ func (s *TxTestSuite) TestTxCmd() {
 		testCases[2].args.secret.String(),
 		args...,
 	)
+	s.Require().EqualValues(0, txResult.Code)
 
 	respType = QueryHTLCExec(
 		s.T(),

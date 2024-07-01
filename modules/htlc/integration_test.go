@@ -20,22 +20,6 @@ var (
 	SenderOnOtherChain          = "SenderOnOtherChain"
 )
 
-func i(in int64) sdk.Int {
-	return sdk.NewInt(in)
-}
-
-func c(denom string, amount int64) sdk.Coin {
-	return sdk.NewInt64Coin(denom, amount)
-}
-
-func cs(coins ...sdk.Coin) sdk.Coins {
-	return sdk.NewCoins(coins...)
-}
-
-func ts(minOffset int) uint64 {
-	return uint64(time.Now().Add(time.Duration(minOffset) * time.Minute).Unix())
-}
-
 func NewHTLTGenesis(deputyAddress sdk.AccAddress) *types.GenesisState {
 	return &types.GenesisState{
 		Params: types.Params{
@@ -116,40 +100,4 @@ func GenerateRandomSecret() ([]byte, error) {
 		return []byte{}, err
 	}
 	return bytes, nil
-}
-
-func loadSwapAndSupply(addr sdk.AccAddress, index int) (types.HTLC, types.AssetSupply) {
-	coin := c(DenomMap[index], 50000)
-	expireOffset := MinTimeLock
-	timestamp := ts(index)
-	amount := cs(coin)
-	randomSecret, _ := GenerateRandomSecret()
-	randomHashLock := types.GetHashLock(randomSecret, timestamp)
-	id := types.GetID(addr, addr, amount, randomHashLock)
-	htlc := types.NewHTLC(
-		id,
-		addr,
-		addr,
-		ReceiverOnOtherChain,
-		SenderOnOtherChain,
-		amount,
-		randomHashLock,
-		[]byte{},
-		timestamp,
-		expireOffset,
-		types.Open,
-		1,
-		true,
-		types.Incoming,
-	)
-
-	supply := types.NewAssetSupply(
-		coin,
-		c(coin.Denom, 0),
-		c(coin.Denom, 0),
-		c(coin.Denom, 0),
-		time.Duration(0),
-	)
-
-	return htlc, supply
 }

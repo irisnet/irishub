@@ -17,11 +17,8 @@ func NewGenesisState(collections []Collection, owners []Owner) *GenesisState {
 // ValidateGenesis performs basic validation of mts genesis data returning an
 // error for any failed validation criteria.
 func ValidateGenesis(data GenesisState) error {
-	var denomMap1 map[string]int
-	denomMap1 = make(map[string]int)
-
-	var mtMap1 map[string]uint64
-	mtMap1 = make(map[string]uint64)
+	denomMap1 := make(map[string]int)
+	mtMap1 := make(map[string]uint64)
 
 	for _, c := range data.Collections {
 		denomMap1[c.Denom.Id] = len(c.Mts)
@@ -34,11 +31,8 @@ func ValidateGenesis(data GenesisState) error {
 	mtCount1 := len(mtMap1)
 
 	// --------------------------
-	var denomMap2 map[string]bool
-	denomMap2 = make(map[string]bool)
-
-	var mtMap2 map[string]uint64
-	mtMap2 = make(map[string]uint64)
+	denomMap2 := make(map[string]bool)
+	mtMap2 := make(map[string]uint64)
 
 	for _, o := range data.Owners {
 		for _, d := range o.Denoms {
@@ -48,7 +42,7 @@ func ValidateGenesis(data GenesisState) error {
 				return errorsmod.Wrapf(errorsmod.ErrPanic, "unknown mt denom, (%s)", d.DenomId)
 			}
 			for _, b := range d.Balances {
-				mtMap2[d.DenomId+b.MtId] = mtMap2[d.DenomId+b.MtId] + b.Amount
+				mtMap2[d.DenomId+b.MtId] += b.Amount
 			}
 		}
 	}

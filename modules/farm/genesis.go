@@ -34,7 +34,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		k.SetEscrowInfo(ctx, info)
 	}
 	k.SetSequence(ctx, data.Sequence)
-	k.SetParams(ctx, data.Params)
+	if err := k.SetParams(ctx, data.Params); err != nil {
+		panic(err)
+	}
 }
 
 // ExportGenesis outputs the genesis state

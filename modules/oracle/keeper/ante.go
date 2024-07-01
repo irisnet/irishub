@@ -23,8 +23,7 @@ func NewValidateOracleAuthDecorator(k Keeper, ak types.AuthKeeper) ValidateOracl
 // AnteHandle returns an AnteHandler that checks if the creator is authorized
 func (dtf ValidateOracleAuthDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	for _, msg := range tx.GetMsgs() {
-		switch msg := msg.(type) {
-		case *types.MsgCreateFeed:
+		if msg, ok := msg.(*types.MsgCreateFeed); ok {
 			creator, err := sdk.AccAddressFromBech32(msg.Creator)
 			if err != nil {
 				return ctx, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "invalid creator")

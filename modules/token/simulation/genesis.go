@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math/rand"
 
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
@@ -27,15 +28,15 @@ func RandomDec(r *rand.Rand) sdk.Dec {
 	return sdk.NewDecWithPrec(r.Int63n(9)+1, 1)
 }
 
-// RandomInt randomized sdk.Int
-func RandomInt(r *rand.Rand) sdk.Int {
+// RandomInt randomized math.Int
+func RandomInt(r *rand.Rand) math.Int {
 	return sdk.NewInt(r.Int63())
 }
 
 // RandomizedGenState generates a random GenesisState for bank
 func RandomizedGenState(simState *module.SimulationState) {
 	var tokenTaxRate sdk.Dec
-	var issueTokenBaseFee sdk.Int
+	var issueTokenBaseFee math.Int
 	var mintTokenFeeRatio sdk.Dec
 	var enableErc20 bool
 	var tokens []v1.Token

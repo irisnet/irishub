@@ -1,10 +1,10 @@
-// nolint
 package keeper
 
 import (
 	"math"
 	"strconv"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"mods.irisnet.org/modules/token/types"
@@ -101,7 +101,7 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 }
 
 // calcFeeByBase computes the actual fee according to the given base fee
-func calcFeeByBase(name string, baseFee sdk.Int) sdk.Dec {
+func calcFeeByBase(name string, baseFee sdkmath.Int) sdk.Dec {
 	feeFactor := calcFeeFactor(name)
 	actualFee := sdk.NewDecFromInt(baseFee).Quo(feeFactor)
 

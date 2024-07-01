@@ -36,7 +36,7 @@ func (m msgServer) CreatePool(
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check valid begin height
-	if ctx.BlockHeight() > int64(msg.StartHeight) {
+	if ctx.BlockHeight() > msg.StartHeight {
 		return nil, errorsmod.Wrapf(
 			types.ErrExpiredHeight,
 			"The current block height[%d] is greater than StartHeight[%d]",

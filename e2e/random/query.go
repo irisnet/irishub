@@ -127,7 +127,7 @@ func (s *QueryTestSuite) TestQueryCmd() {
 	s.Require().Len(qrrResp.Requests, 1)
 
 	// ------get service request-------------
-	requestHeight = requestHeight + 1
+	requestHeight ++
 	_, err = s.Network.WaitForHeightWithTimeout(
 		requestHeight,
 		time.Duration(int64(blockInterval+2)*int64(s.Network.TimeoutCommit)),
@@ -145,7 +145,7 @@ func (s *QueryTestSuite) TestQueryCmd() {
 			var requestIds []string
 			var requestsBz []byte
 			for _, attribute := range event.Attributes {
-				if string(attribute.Key) == servicetypes.AttributeKeyRequests {
+				if attribute.Key == servicetypes.AttributeKeyRequests {
 					requestsBz = []byte(attribute.Value)
 					found = true
 				}

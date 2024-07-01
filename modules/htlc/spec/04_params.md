@@ -20,17 +20,17 @@ type AssetParam struct {
     SupplyLimit   SupplyLimit
     Active        bool
     DeputyAddress string
-    FixedFee      sdk.Int
-    MinSwapAmount sdk.Int
-    MaxSwapAmount sdk.Int
+    FixedFee      math.Int
+    MinSwapAmount math.Int
+    MaxSwapAmount math.Int
     MinBlockLock  uint64
     MaxBlockLock  uint64
 }
 
 type SupplyLimit struct {
-    Limit          sdk.Int
+    Limit          math.Int
     TimeLimited    bool
     TimePeriod     time.Duration
-    TimeBasedLimit sdk.Int
+    TimeBasedLimit math.Int
 }
 ```

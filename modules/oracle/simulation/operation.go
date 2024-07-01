@@ -478,15 +478,15 @@ func GenServiceBindingsAndProviders(
 ) (providers []string) {
 	ownerAddr, err := sdk.AccAddressFromBech32(owner)
 	if err != nil {
-		return
+		return providers
 	}
 	spendable := bk.SpendableCoins(ctx, ownerAddr)
 	if spendable.IsZero() {
-		return
+		return providers
 	}
 	token := spendable[r.Intn(len(spendable))]
 	if token.IsZero() {
-		return
+		return providers
 	}
 	for i := 0; i < 10; i++ {
 		provider, _ := simtypes.RandomAcc(r, accs)

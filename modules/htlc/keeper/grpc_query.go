@@ -34,7 +34,7 @@ func (k Keeper) AssetSupply(c context.Context, request *types.QueryAssetSupplyRe
 
 	assetSupply, found := k.GetAssetSupply(ctx, request.Denom)
 	if !found {
-		return nil, status.Errorf(codes.NotFound, string(request.Denom))
+		return nil, status.Errorf(codes.NotFound, request.Denom)
 	}
 
 	return &types.QueryAssetSupplyResponse{AssetSupply: &assetSupply}, nil

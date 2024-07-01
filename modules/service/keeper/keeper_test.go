@@ -96,8 +96,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
 	suite.app = app
 
-	suite.keeper.SetParams(suite.ctx, types.DefaultParams())
-
+	suite.NoError(suite.keeper.SetParams(suite.ctx, types.DefaultParams()),"set params failed")
 	suite.setTestAddrs()
 }
 

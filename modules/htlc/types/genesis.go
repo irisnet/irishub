@@ -8,11 +8,11 @@ import (
 )
 
 // NewGenesisState constructs a new GenesisState instance
-func NewGenesisState(params Params, htlcs []HTLC, Supplies []AssetSupply, previousBlockTime time.Time) *GenesisState {
+func NewGenesisState(params Params, htlcs []HTLC, supplies []AssetSupply, previousBlockTime time.Time) *GenesisState {
 	return &GenesisState{
 		Params:            params,
 		Htlcs:             htlcs,
-		Supplies:          Supplies,
+		Supplies:          supplies,
 		PreviousBlockTime: previousBlockTime,
 	}
 }

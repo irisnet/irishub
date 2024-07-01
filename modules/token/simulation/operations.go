@@ -551,7 +551,7 @@ func selectOneToken(
 			sdk.NewCoin(v1.GetNativeToken().MinUnit, spendableStake).Sub(mintFee),
 		)
 		token = t
-		return
+		break
 	}
 	return token, maxFees, true
 }

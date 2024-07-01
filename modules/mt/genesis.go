@@ -48,9 +48,13 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		for _, d := range o.Denoms {
 			for _, b := range d.Balances {
 				// increase supply
-				k.IncreaseMTSupply(ctx, d.DenomId, b.MtId, b.Amount)
+				if err := k.IncreaseMTSupply(ctx, d.DenomId, b.MtId, b.Amount); err != nil {
+					panic(err)
+				}
 				// add balance to account
-				k.AddBalance(ctx, d.DenomId, b.MtId, b.Amount, addr)
+				if err := k.AddBalance(ctx, d.DenomId, b.MtId, b.Amount, addr); err != nil {
+					panic(err)
+				}
 			}
 		}
 	}

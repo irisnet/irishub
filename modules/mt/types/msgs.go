@@ -92,11 +92,11 @@ func (msg MsgTransferMT) Type() string { return TypeMsgTransferMT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgTransferMT) ValidateBasic() error {
-	if len(strings.TrimSpace(msg.Id)) <= 0 {
+	if len(strings.TrimSpace(msg.Id)) == 0 {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "mt id is required")
 	}
 
-	if len(strings.TrimSpace(msg.DenomId)) <= 0 {
+	if len(strings.TrimSpace(msg.DenomId)) == 0 {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
 	}
 
@@ -149,11 +149,11 @@ func (msg MsgEditMT) Type() string { return TypeMsgEditMT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgEditMT) ValidateBasic() error {
-	if len(strings.TrimSpace(msg.Id)) <= 0 {
+	if len(strings.TrimSpace(msg.Id)) == 0 {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "mt id is required")
 	}
 
-	if len(strings.TrimSpace(msg.DenomId)) <= 0 {
+	if len(strings.TrimSpace(msg.DenomId)) == 0 {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
 	}
 
@@ -259,11 +259,11 @@ func (msg MsgBurnMT) Type() string { return TypeMsgBurnMT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgBurnMT) ValidateBasic() error {
-	if len(strings.TrimSpace(msg.Id)) <= 0 {
+	if len(strings.TrimSpace(msg.Id)) == 0 {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "mt id is required")
 	}
 
-	if len(strings.TrimSpace(msg.DenomId)) <= 0 {
+	if len(strings.TrimSpace(msg.DenomId)) == 0 {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
 	}
 
@@ -310,7 +310,7 @@ func (msg MsgTransferDenom) Type() string { return TypeMsgTransferDenom }
 
 // ValidateBasic Implements Msg.
 func (msg MsgTransferDenom) ValidateBasic() error {
-	if len(strings.TrimSpace(msg.Id)) <= 0 {
+	if len(strings.TrimSpace(msg.Id)) == 0 {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "denom id is required")
 	}
 

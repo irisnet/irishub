@@ -45,7 +45,7 @@ func (k Keeper) Denom(c context.Context, request *types.QueryDenomRequest) (*typ
 	ctx := sdk.UnwrapSDKContext(c)
 
 	denomID := strings.TrimSpace(request.DenomId)
-	if len(denomID) <= 0 {
+	if len(denomID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "denom id is required")
 	}
 
@@ -63,11 +63,11 @@ func (k Keeper) MTSupply(c context.Context, request *types.QueryMTSupplyRequest)
 	denomID := strings.TrimSpace(request.DenomId)
 	mtID := strings.TrimSpace(request.MtId)
 
-	if len(denomID) <= 0 {
+	if len(denomID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "denom id is required")
 	}
 
-	if len(mtID) <= 0 {
+	if len(mtID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "mt id is required")
 	}
 
@@ -78,7 +78,7 @@ func (k Keeper) MTs(c context.Context, request *types.QueryMTsRequest) (*types.Q
 	ctx := sdk.UnwrapSDKContext(c)
 
 	denomID := strings.TrimSpace(request.DenomId)
-	if len(denomID) <= 0 {
+	if len(denomID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "denom id is required")
 	}
 
@@ -109,11 +109,11 @@ func (k Keeper) MT(c context.Context, request *types.QueryMTRequest) (*types.Que
 	denomID := strings.TrimSpace(request.DenomId)
 	mtID := strings.TrimSpace(request.MtId)
 
-	if len(denomID) <= 0 {
+	if len(denomID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "denom id is required")
 	}
 
-	if len(mtID) <= 0 {
+	if len(mtID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "mt id is required")
 	}
 
@@ -132,7 +132,7 @@ func (k Keeper) Balances(c context.Context, request *types.QueryBalancesRequest)
 	denomID := strings.TrimSpace(request.DenomId)
 	owner := strings.TrimSpace(request.Owner)
 
-	if len(denomID) <= 0 {
+	if len(denomID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "denom id is required")
 	}
 

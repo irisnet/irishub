@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"cosmossdk.io/depinject"
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
@@ -107,6 +109,7 @@ func SetupWithGenesisStateFn(
 	depInjectOptions DepinjectOptions,
 	merge func(cdc codec.Codec, state GenesisState) GenesisState,
 ) *SimApp {
+	t.Helper()
 	app, genesisState := setup(true, 5, depInjectOptions)
 
 	privVal := mock.NewPV()
@@ -227,6 +230,7 @@ func genesisStateWithValSet(t *testing.T,
 	valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount,
 	balances ...banktypes.Balance,
 ) GenesisState {
+	t.Helper()
 	// set genesis accounts
 	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
 	genesisState[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(authGenesis)
@@ -446,7 +450,7 @@ func AddTestAddrsFromPubKeys(
 	app *SimApp,
 	ctx sdk.Context,
 	pubKeys []cryptotypes.PubKey,
-	accAmt sdk.Int,
+	accAmt math.Int,
 ) {
 	initCoins := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), accAmt))
 
@@ -457,7 +461,7 @@ func AddTestAddrsFromPubKeys(
 
 // AddTestAddrs constructs and returns accNum amount of accounts with an
 // initial balance of accAmt in random order
-func AddTestAddrs(app *SimApp, ctx sdk.Context, accNum int, accAmt sdk.Int) []sdk.AccAddress {
+func AddTestAddrs(app *SimApp, ctx sdk.Context, accNum int, accAmt math.Int) []sdk.AccAddress {
 	return addTestAddrs(app, ctx, accNum, accAmt, createRandomAccounts)
 }
 
@@ -467,7 +471,7 @@ func AddTestAddrsIncremental(
 	app *SimApp,
 	ctx sdk.Context,
 	accNum int,
-	accAmt sdk.Int,
+	accAmt math.Int,
 ) []sdk.AccAddress {
 	return addTestAddrs(app, ctx, accNum, accAmt, createIncrementalAccounts)
 }
@@ -476,7 +480,7 @@ func addTestAddrs(
 	app *SimApp,
 	ctx sdk.Context,
 	accNum int,
-	accAmt sdk.Int,
+	accAmt math.Int,
 	strategy GenerateAccountStrategy,
 ) []sdk.AccAddress {
 	testAddrs := strategy(accNum)
@@ -536,6 +540,7 @@ func TestAddr(addr, bech string) (sdk.AccAddress, error) {
 
 // CheckBalance checks the balance of an account.
 func CheckBalance(t *testing.T, app *SimApp, addr sdk.AccAddress, balances sdk.Coins) {
+	t.Helper()
 	ctxCheck := app.BaseApp.NewContext(true, tmproto.Header{})
 	require.True(t, balances.IsEqual(app.BankKeeper.GetAllBalances(ctxCheck, addr)))
 }
@@ -555,6 +560,7 @@ func SignCheckDeliver(
 	expSimPass, expPass bool,
 	priv ...cryptotypes.PrivKey,
 ) (sdk.GasInfo, *sdk.Result, error) {
+	t.Helper()
 	tx, err := simtestutil.GenSignedMockTx(
 		rand.New(rand.NewSource(time.Now().UnixNano())),
 		txCfg,
@@ -667,7 +673,7 @@ func NewPubKeyFromHex(pk string) (res cryptotypes.PubKey) {
 		panic(err)
 	}
 	if len(pkBytes) != ed25519.PubKeySize {
-		panic(errors.Wrap(errors.ErrInvalidPubKey, "invalid pubkey size"))
+		panic(errorsmod.Wrap(errors.ErrInvalidPubKey, "invalid pubkey size"))
 	}
 	return &ed25519.PubKey{Key: pkBytes}
 }
@@ -725,6 +731,7 @@ func QueryBalancesExec(
 	address string,
 	extraArgs ...string,
 ) sdk.Coins {
+	t.Helper()
 	args := []string{
 		address,
 		fmt.Sprintf("--%s=json", "output"),
@@ -744,6 +751,7 @@ func QueryBalanceExec(
 	denom string,
 	extraArgs ...string,
 ) *sdk.Coin {
+	t.Helper()
 	args := []string{
 		address,
 		fmt.Sprintf("--%s=%s", bankcli.FlagDenom, denom),
@@ -763,6 +771,7 @@ func QueryAccountExec(
 	address string,
 	extraArgs ...string,
 ) authtypes.AccountI {
+	t.Helper()
 	args := []string{
 		address,
 		fmt.Sprintf("--%s=json", "output"),
@@ -788,6 +797,7 @@ func MsgSendExec(
 	from, to, amount fmt.Stringer,
 	extraArgs ...string,
 ) *ResponseTx {
+	t.Helper()
 	args := []string{from.String(), to.String(), amount.String()}
 	args = append(args, extraArgs...)
 
@@ -795,6 +805,7 @@ func MsgSendExec(
 }
 
 func QueryTx(t *testing.T, clientCtx client.Context, txHash string) abci.ResponseDeliverTx {
+	t.Helper()
 	txResult, _ := QueryTxWithHeight(t, clientCtx, txHash)
 	return txResult
 }
@@ -804,6 +815,7 @@ func QueryTxWithHeight(
 	clientCtx client.Context,
 	txHash string,
 ) (abci.ResponseDeliverTx, int64) {
+	t.Helper()
 	txHashBz, err := hex.DecodeString(txHash)
 	require.NoError(t, err, "query tx failed")
 

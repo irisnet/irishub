@@ -124,7 +124,7 @@ func (s *TxTestSuite) TestTxCmd() {
 	s.Require().Len(qrrResp.Requests, 1)
 
 	// ------get service request-------------
-	requestHeight = requestHeight + 1
+	requestHeight ++
 	_, err := s.WaitForHeightWithTimeout(
 		requestHeight,
 		time.Duration(int64(blockInterval+5)*int64(s.TimeoutCommit)),
@@ -140,7 +140,7 @@ func (s *TxTestSuite) TestTxCmd() {
 			var requestIds []string
 			var requestsBz []byte
 			for _, attribute := range event.Attributes {
-				if string(attribute.Key) == servicetypes.AttributeKeyRequests {
+				if attribute.Key == servicetypes.AttributeKeyRequests {
 					requestsBz = []byte(attribute.GetValue())
 					found = true
 				}

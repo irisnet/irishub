@@ -4,11 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 
-	"cosmossdk.io/api/tendermint/abci"
-	errorsmod "cosmossdk.io/errors"
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -60,34 +56,6 @@ func (k Keeper) RandomRequestQueue(c context.Context, req *types.QueryRandomRequ
 	}
 
 	return &types.QueryRandomRequestQueueResponse{Requests: requests}, nil
-}
-
-func queryRandomRequestQueue(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
-	var params types.QueryRandomRequestQueueParams
-	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, errorsmod.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
-	}
-
-	if params.Height < 0 {
-		return nil, errorsmod.Wrap(types.ErrInvalidHeight, string(rune(params.Height)))
-	}
-
-	var requests []types.Request
-
-	if params.Height == 0 {
-		// query all pending requests
-		requests = queryAllRandomRequestsInQueue(ctx, k)
-	} else {
-		// query the pending requests by the specified height
-		requests = queryRandomRequestQueueByHeight(ctx, params.Height, k)
-	}
-
-	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, requests)
-	if err != nil {
-		return nil, errorsmod.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
-	}
-
-	return bz, nil
 }
 
 func queryRandomRequestQueueByHeight(ctx sdk.Context, height int64, k Keeper) []types.Request {

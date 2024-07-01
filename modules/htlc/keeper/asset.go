@@ -57,7 +57,7 @@ func (k Keeper) DecrementCurrentAssetSupply(ctx sdk.Context, coin sdk.Coin) erro
 	}
 
 	// Resulting current supply must be greater than or equal to 0
-	// Use sdk.Int instead of sdk.Coin to prevent panic if true
+	// Use math.Int instead of sdk.Coin to prevent panic if true
 	if supply.CurrentSupply.Amount.Sub(coin.Amount).IsNegative() {
 		return errorsmod.Wrapf(
 			types.ErrInvalidCurrentSupply,
@@ -122,7 +122,7 @@ func (k Keeper) DecrementIncomingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 	}
 
 	// Resulting incoming supply must be greater than or equal to 0
-	// Use sdk.Int instead of sdk.Coin to prevent panic if true
+	// Use math.Int instead of sdk.Coin to prevent panic if true
 	if supply.IncomingSupply.Amount.Sub(coin.Amount).IsNegative() {
 		return errorsmod.Wrapf(
 			types.ErrInvalidIncomingSupply,
@@ -166,7 +166,7 @@ func (k Keeper) DecrementOutgoingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 	}
 
 	// Resulting outgoing supply must be greater than or equal to 0
-	// Use sdk.Int instead of sdk.Coin to prevent panic if true
+	// Use math.Int instead of sdk.Coin to prevent panic if true
 	if supply.OutgoingSupply.Amount.Sub(coin.Amount).IsNegative() {
 		return errorsmod.Wrapf(
 			types.ErrInvalidOutgoingSupply,

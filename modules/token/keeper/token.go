@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
@@ -18,33 +19,32 @@ func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress) (tokens []v1.To
 	store := ctx.KVStore(k.storeKey)
 
 	var it sdk.Iterator
+
+	// 获取迭代器
 	if owner == nil {
 		it = sdk.KVStorePrefixIterator(store, types.PrefixTokenForSymbol)
-		defer it.Close()
-
-		for ; it.Valid(); it.Next() {
-			var token v1.Token
-			k.cdc.MustUnmarshal(it.Value(), &token)
-
-			tokens = append(tokens, &token)
-		}
-		return
+	} else {
+		it = sdk.KVStorePrefixIterator(store, types.KeyTokens(owner, ""))
 	}
-
-	it = sdk.KVStorePrefixIterator(store, types.KeyTokens(owner, ""))
 	defer it.Close()
 
 	for ; it.Valid(); it.Next() {
-		var symbol gogotypes.StringValue
-		k.cdc.MustUnmarshal(it.Value(), &symbol)
+		if owner == nil {
+			var token v1.Token
+			k.cdc.MustUnmarshal(it.Value(), &token)
+			tokens = append(tokens, &token)
+		} else {
+			var symbol gogotypes.StringValue
+			k.cdc.MustUnmarshal(it.Value(), &symbol)
 
-		token, err := k.getTokenBySymbol(ctx, symbol.Value)
-		if err != nil {
-			continue
+			token, err := k.getTokenBySymbol(ctx, symbol.Value)
+			if err != nil {
+				continue
+			}
+			tokens = append(tokens, token)
 		}
-		tokens = append(tokens, token)
 	}
-	return
+	return tokens
 }
 
 // GetToken returns the token of the specified symbol or min uint
@@ -282,7 +282,7 @@ func (k Keeper) resetStoreKeyForQueryToken(
 }
 
 // getTokenSupply queries the token supply from the total supply
-func (k Keeper) getTokenSupply(ctx sdk.Context, denom string) sdk.Int {
+func (k Keeper) getTokenSupply(ctx sdk.Context, denom string) math.Int {
 	return k.bankKeeper.GetSupply(ctx, denom).Amount
 }
 

@@ -18,7 +18,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		panic(err.Error())
 	}
 
-	k.SetParams(ctx, data.Params)
+	if err := k.SetParams(ctx, data.Params); err != nil {
+		panic(err.Error())
+	}
 
 	for _, definition := range data.Definitions {
 		k.SetServiceDefinition(ctx, definition)

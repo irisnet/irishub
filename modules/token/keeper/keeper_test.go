@@ -61,7 +61,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	// set params
 	params := v1.DefaultParams()
 	params.Beacon = beacon.String()
-	suite.keeper.SetParams(suite.ctx, params)
+	suite.NoError(suite.keeper.SetParams(suite.ctx, params), "SetParams failed")
 
 	// init tokens to addr
 	err := suite.bk.MintCoins(suite.ctx, tokentypes.ModuleName, initCoin)

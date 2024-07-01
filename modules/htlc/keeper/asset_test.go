@@ -51,7 +51,7 @@ func (suite *AssetTestSuite) setTestParams() {
 	params.AssetParams[0].SupplyLimit.Limit = sdk.NewInt(50)
 	params.AssetParams[1].SupplyLimit.Limit = sdk.NewInt(100)
 	params.AssetParams[1].SupplyLimit.TimeBasedLimit = sdk.NewInt(15)
-	suite.keeper.SetParams(suite.ctx, params)
+	suite.NoError(suite.keeper.SetParams(suite.ctx, params), "set params failed")
 
 	bnbSupply := types.NewAssetSupply(
 		c("htltbnb", 5),

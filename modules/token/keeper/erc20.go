@@ -93,13 +93,15 @@ func (k Keeper) DeployERC20(
 	token.Contract = contractAddr.String()
 	k.upsertToken(ctx, *token)
 
-	ctx.EventManager().EmitTypedEvent(&v1.EventDeployERC20{
+	if err := ctx.EventManager().EmitTypedEvent(&v1.EventDeployERC20{
 		Symbol:   symbol,
 		Name:     name,
 		Scale:    uint32(scale),
 		MinUnit:  minUnit,
 		Contract: contractAddr.String(),
-	})
+	}); err != nil {
+		return common.Address{}, err
+	}
 	return contractAddr, nil
 }
 
@@ -144,14 +146,12 @@ func (k Keeper) SwapFromERC20(
 	if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiver, mintedCoins); err != nil {
 		return err
 	}
-
-	ctx.EventManager().EmitTypedEvent(&v1.EventSwapFromERC20{
+	return ctx.EventManager().EmitTypedEvent(&v1.EventSwapFromERC20{
 		FromContract: contract.String(),
 		WantedAmount: &wantedAmount,
 		Sender:       sender.String(),
 		Receiver:     receiver.String(),
 	})
-	return nil
 }
 
 // SwapToERC20 executes a swap from a native token to its ERC20 token counterpart
@@ -202,14 +202,12 @@ func (k Keeper) SwapToERC20(
 	if err := k.MintERC20(ctx, contract, receiver, amount.Amount.BigInt()); err != nil {
 		return err
 	}
-
-	ctx.EventManager().EmitTypedEvent(&v1.EventSwapToERC20{
+	return ctx.EventManager().EmitTypedEvent(&v1.EventSwapToERC20{
 		Amount:     amount,
 		Sender:     sender.String(),
 		Receiver:   receiver.String(),
 		ToContract: token.Contract,
 	})
-	return nil
 }
 
 // MintERC20 mints ERC20 tokens to an account.

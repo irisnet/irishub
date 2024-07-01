@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"testing"
 
+	"cosmossdk.io/math"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -57,7 +58,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: 1})
 	suite.app = app
-	suite.keeper.SetParams(suite.ctx, types.DefaultParams())
+	suite.Require().NoError(suite.keeper.SetParams(suite.ctx, types.DefaultParams()), "set params failed")
 	suite.setTestAddrs()
 }
 
@@ -247,7 +248,7 @@ func (suite *KeeperTestSuite) TestStake() {
 	type args struct {
 		height         int64
 		stakeCoin      sdk.Coin
-		locked         sdk.Int
+		locked         math.Int
 		expectReward   sdk.Coins
 		debt           sdk.Coins
 		rewardPerShare sdk.Dec
@@ -447,7 +448,7 @@ func (suite *KeeperTestSuite) AssertStake(
 	poolID string,
 	height int64,
 	stakeCoin sdk.Coin,
-	locked sdk.Int,
+	locked math.Int,
 	expectReward, debt sdk.Coins,
 	rewardPerShare sdk.Dec,
 ) {

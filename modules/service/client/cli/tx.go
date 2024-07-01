@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -92,7 +92,7 @@ func GetCmdDefineService() *cobra.Command {
 			}
 
 			if !json.Valid([]byte(schemas)) {
-				schemasContent, err := ioutil.ReadFile(schemas)
+				schemasContent, err := os.ReadFile(schemas)
 				if err != nil {
 					return fmt.Errorf("invalid schemas: neither JSON input nor path to .json file were provided")
 				}
@@ -179,7 +179,7 @@ func GetCmdBindService() *cobra.Command {
 				return err
 			}
 			if !json.Valid([]byte(options)) {
-				optionsContent, err := ioutil.ReadFile(options)
+				optionsContent, err := os.ReadFile(options)
 				if err != nil {
 					return fmt.Errorf("invalid options: neither JSON input nor path to .json file were provided")
 				}
@@ -205,7 +205,7 @@ func GetCmdBindService() *cobra.Command {
 				return err
 			}
 			if !json.Valid([]byte(pricing)) {
-				pricingContent, err := ioutil.ReadFile(pricing)
+				pricingContent, err := os.ReadFile(pricing)
 				if err != nil {
 					return fmt.Errorf("invalid pricing: neither JSON input nor path to .json file were provided")
 				}
@@ -293,7 +293,7 @@ func GetCmdUpdateServiceBinding() *cobra.Command {
 			}
 			if len(pricing) != 0 {
 				if !json.Valid([]byte(pricing)) {
-					pricingContent, err := ioutil.ReadFile(pricing)
+					pricingContent, err := os.ReadFile(pricing)
 					if err != nil {
 						return fmt.Errorf("invalid pricing: neither JSON input nor path to .json file were provided")
 					}
@@ -323,7 +323,7 @@ func GetCmdUpdateServiceBinding() *cobra.Command {
 			}
 			if len(options) != 0 {
 				if !json.Valid([]byte(options)) {
-					optionsContent, err := ioutil.ReadFile(options)
+					optionsContent, err := os.ReadFile(options)
 					if err != nil {
 						return fmt.Errorf("invalid options: neither JSON input nor path to .json file were provided")
 					}
@@ -567,7 +567,7 @@ func GetCmdCallService() *cobra.Command {
 			input, _ := cmd.Flags().GetString(FlagData)
 
 			if !json.Valid([]byte(input)) {
-				inputContent, err := ioutil.ReadFile(input)
+				inputContent, err := os.ReadFile(input)
 				if err != nil {
 					return fmt.Errorf("invalid input data: neither JSON input nor path to .json file were provided")
 				}
@@ -673,7 +673,7 @@ func GetCmdRespondService() *cobra.Command {
 
 			if len(result) > 0 {
 				if !json.Valid([]byte(result)) {
-					resultContent, err := ioutil.ReadFile(result)
+					resultContent, err := os.ReadFile(result)
 					if err != nil {
 						return fmt.Errorf("invalid result: neither JSON input nor path to .json file were provided")
 					}
@@ -695,7 +695,7 @@ func GetCmdRespondService() *cobra.Command {
 
 			if len(output) > 0 {
 				if !json.Valid([]byte(output)) {
-					outputContent, err := ioutil.ReadFile(output)
+					outputContent, err := os.ReadFile(output)
 					if err != nil {
 						return fmt.Errorf("invalid output data: neither JSON input nor path to .json file were provided")
 					}

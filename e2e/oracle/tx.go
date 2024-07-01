@@ -192,7 +192,7 @@ func (s *TxTestSuite) TestTxCmd() {
 			var requestIds []string
 			var requestsBz []byte
 			for _, attribute := range event.Attributes {
-				if string(attribute.Key) == servicetypes.AttributeKeyRequests {
+				if attribute.Key == servicetypes.AttributeKeyRequests {
 					requestsBz = []byte(attribute.GetValue())
 					found = true
 				}

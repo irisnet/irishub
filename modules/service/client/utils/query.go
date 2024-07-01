@@ -159,11 +159,11 @@ func QueryRequestByTxQuery(
 			var requests []types.CompactRequest
 			var requestsBz []byte
 			for _, attribute := range event.Attributes {
-				if string(attribute.Key) == types.AttributeKeyRequests {
+				if attribute.Key == types.AttributeKeyRequests {
 					requestsBz = []byte(attribute.GetValue())
 				}
-				if string(attribute.Key) == types.AttributeKeyRequestContextID &&
-					string(attribute.GetValue()) == contextID.String() {
+				if attribute.Key == types.AttributeKeyRequestContextID &&
+					attribute.GetValue() == contextID.String() {
 					found = true
 				}
 			}

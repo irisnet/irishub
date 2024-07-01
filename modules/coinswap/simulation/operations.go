@@ -827,6 +827,13 @@ func SimulateMsgRemoveUnilateralLiquidity(
 		}
 
 		balances, err := k.GetPoolBalances(ctx, pool.EscrowAddress)
+		if err != nil {
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				types.TypeMsgRemoveUnilateralLiquidity,
+				"pool balances not found",
+			), nil, err
+		}
 
 		lptDenom := pool.LptDenom
 		targetTokenDenom := targetToken.Denom

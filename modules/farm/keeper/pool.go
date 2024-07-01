@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -63,20 +64,20 @@ func (k Keeper) DestroyPool(ctx sdk.Context, poolId string, creator sdk.AccAddre
 // AdjustPool adjusts farm pool parameters
 func (k Keeper) AdjustPool(
 	ctx sdk.Context,
-	poolId string,
+	poolID string,
 	reward sdk.Coins,
 	rewardPerBlock sdk.Coins,
 	creator sdk.AccAddress,
 ) (err error) {
-	pool, exist := k.GetPool(ctx, poolId)
+	pool, exist := k.GetPool(ctx, poolID)
 	// check if the liquidity pool exists
 	if !exist {
-		return errorsmod.Wrapf(types.ErrPoolNotFound, poolId)
+		return errorsmod.Wrapf(types.ErrPoolNotFound, poolID)
 	}
 
 	if !pool.Editable {
 		return errorsmod.Wrapf(
-			types.ErrInvalidOperate, "pool [%s] is not editable", poolId)
+			types.ErrInvalidOperate, "pool [%s] is not editable", poolID)
 	}
 
 	// check permissions
@@ -88,7 +89,7 @@ func (k Keeper) AdjustPool(
 	if k.Expired(ctx, pool) {
 		return errorsmod.Wrapf(types.ErrPoolExpired,
 			"pool [%s] has expired at height[%d], current [%d]",
-			poolId,
+			poolID,
 			pool.EndHeight,
 			ctx.BlockHeight(),
 		)
@@ -144,7 +145,7 @@ func (k Keeper) AdjustPool(
 		availableReward = remainingReward.Add(reward...)
 	}
 
-	pool.Rules = types.RewardRules(rules).UpdateWith(rewardPerBlock)
+	pool.Rules = rules.UpdateWith(rewardPerBlock)
 	k.SetRewardRules(ctx, pool.Id, pool.Rules)
 
 	// expiredHeight = [(srcEndHeight-beginPoint)*srcRewardPerBlock +appendReward]/RewardPerBlock + beginPoint
@@ -224,7 +225,7 @@ func (k Keeper) createPool(
 func (k Keeper) updatePool(
 	ctx sdk.Context,
 	pool types.FarmPool,
-	amount sdk.Int,
+	amount math.Int,
 	isDestroy bool,
 ) (types.FarmPool, sdk.Coins, error) {
 	height := ctx.BlockHeight()
@@ -246,7 +247,7 @@ func (k Keeper) updatePool(
 		pool.TotalLptLocked.Amount.GT(sdk.ZeroInt()) {
 		blockInterval := height - pool.LastHeightDistrRewards
 		for i := range rules {
-			rewardCollected := rules[i].RewardPerBlock.MulRaw(int64(blockInterval))
+			rewardCollected := rules[i].RewardPerBlock.MulRaw(blockInterval)
 			coinCollected := sdk.NewCoin(rules[i].Reward, rewardCollected)
 			if rules[i].RemainingReward.LT(rewardCollected) {
 				k.Logger(ctx).Error(

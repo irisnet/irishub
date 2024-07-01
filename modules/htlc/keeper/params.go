@@ -2,6 +2,7 @@ package keeper
 
 import (
 	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"mods.irisnet.org/modules/htlc/types"
@@ -10,7 +11,7 @@ import (
 // GetParams sets the farm module parameters.
 func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get([]byte(types.ParamsKey))
+	bz := store.Get(types.ParamsKey)
 	if bz == nil {
 		return params
 	}
@@ -63,7 +64,7 @@ func (k Keeper) SetAsset(ctx sdk.Context, asset types.AssetParam) {
 			params.AssetParams[i] = asset
 		}
 	}
-	k.SetParams(ctx, params)
+	_ = k.SetParams(ctx, params)
 }
 
 // GetAssets returns a list containing all supported assets
@@ -87,28 +88,28 @@ func (k Keeper) GetDeputyAddress(ctx sdk.Context, denom string) (sdk.AccAddress,
 }
 
 // GetFixedFee returns the fixed fee for incoming swaps
-func (k Keeper) GetFixedFee(ctx sdk.Context, denom string) (sdk.Int, error) {
+func (k Keeper) GetFixedFee(ctx sdk.Context, denom string) (math.Int, error) {
 	asset, err := k.GetAsset(ctx, denom)
 	if err != nil {
-		return sdk.Int{}, err
+		return math.Int{}, err
 	}
 	return asset.FixedFee, nil
 }
 
 // GetMinSwapAmount returns the minimum swap amount
-func (k Keeper) GetMinSwapAmount(ctx sdk.Context, denom string) (sdk.Int, error) {
+func (k Keeper) GetMinSwapAmount(ctx sdk.Context, denom string) (math.Int, error) {
 	asset, err := k.GetAsset(ctx, denom)
 	if err != nil {
-		return sdk.Int{}, err
+		return math.Int{}, err
 	}
 	return asset.MinSwapAmount, nil
 }
 
 // GetMaxSwapAmount returns the maximum swap amount
-func (k Keeper) GetMaxSwapAmount(ctx sdk.Context, denom string) (sdk.Int, error) {
+func (k Keeper) GetMaxSwapAmount(ctx sdk.Context, denom string) (math.Int, error) {
 	asset, err := k.GetAsset(ctx, denom)
 	if err != nil {
-		return sdk.Int{}, err
+		return math.Int{}, err
 	}
 	return asset.MaxSwapAmount, nil
 }

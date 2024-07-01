@@ -67,7 +67,7 @@ func (suite *TestSuite) TestParams() {
 		{types.DefaultParams()},
 	}
 	for _, tc := range cases {
-		suite.keeper.SetParams(suite.ctx, tc.params)
+		suite.NoError(suite.keeper.SetParams(suite.ctx, tc.params), "set params failed")
 
 		feeParam := suite.keeper.GetParams(suite.ctx)
 		suite.Equal(tc.params.Fee, feeParam.Fee)
@@ -75,6 +75,7 @@ func (suite *TestSuite) TestParams() {
 }
 
 func setupWithGenesisAccounts(t *testing.T, keeper *keeper.Keeper) *simapp.SimApp {
+	t.Helper()
 	amountInitStandard, _ := sdkmath.NewIntFromString("30000000000000000000")
 	amountInitBTC, _ := sdkmath.NewIntFromString("3000000000")
 

@@ -159,7 +159,7 @@ func (s *TxTestSuite) TestTxCmd() {
 		from.String(),
 		symbol,
 	)
-	exceptedAmount = exceptedAmount - burnAmount
+	exceptedAmount -= burnAmount
 	s.Require().Equal(exceptedAmount, balance.Amount.Int64())
 
 	//------test GetCmdEditToken()-------------
