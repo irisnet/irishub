@@ -30,7 +30,7 @@ service Query {
   // Fees returns the fees to issue or mint a token
   rpc Fees(QueryFeesRequest) returns (QueryFeesResponse) {
     option (cosmos.query.v1.module_query_safe) = true;
-    option (google.api.http).get = "/irismod/token/v1/tokens/{symbol}/fees";
+    option (google.api.http).get = "/irismod/token/v1/fees/{symbol}";
   }
   // Params queries the token parameters
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {

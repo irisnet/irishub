@@ -87,7 +87,7 @@ func (s *QueryTestSuite) TestQueryCmd() {
 	s.Require().Equal(uint64(initialSupply), token.GetInitialSupply())
 
 	//------test GetCmdQueryFee()-------------
-	url = fmt.Sprintf("%s/irismod/token/v1/tokens/%s/fees", baseURL, tokenSymbol)
+	url = fmt.Sprintf("%s/irismod/token/v1/fees/%s", baseURL, tokenSymbol)
 	resp, err = testutil.GetRequest(url)
 	respType = proto.Message(&v1.QueryFeesResponse{})
 	s.Require().NoError(err)
