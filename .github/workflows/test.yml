@@ -4,8 +4,6 @@ on:
     paths:
       - '**/*.go'
       - '**/*.mod'
-    paths-ignore:
-      - '**/*' # 忽略其他所有文件
 jobs:
   test-unit:
     name: Test Units
