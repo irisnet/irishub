@@ -4,9 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/suite"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/suite"
 
 	"mods.irisnet.org/modules/htlc/types"
 )
@@ -36,7 +35,6 @@ func (suite *ParamsTestSuite) SetupTest() {
 }
 
 func (suite *ParamsTestSuite) TestParamValidation() {
-
 	type args struct {
 		assetParams []types.AssetParam
 	}

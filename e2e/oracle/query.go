@@ -3,19 +3,17 @@ package oracle
 import (
 	"fmt"
 
-	"github.com/cosmos/gogoproto/proto"
-
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	"mods.irisnet.org/e2e"
+	"mods.irisnet.org/e2e/service"
 	oraclecli "mods.irisnet.org/modules/oracle/client/cli"
 	oracletypes "mods.irisnet.org/modules/oracle/types"
 	servicecli "mods.irisnet.org/modules/service/client/cli"
 	servicetypes "mods.irisnet.org/modules/service/types"
-
-	"mods.irisnet.org/e2e/service"
 )
 
 // QueryTestSuite is a suite of end-to-end tests for the nft module

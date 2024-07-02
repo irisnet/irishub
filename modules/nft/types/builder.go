@@ -71,10 +71,10 @@ func (cb ClassBuilder) BuildMetadata(class nft.Class) (string, error) {
 	if len(metadata.Data) > 0 {
 		err := json.Unmarshal([]byte(metadata.Data), &kvals)
 		if err != nil && IsIBCDenom(class.Id) {
-			//when classData is not a legal json, there is no need to parse the data
+			// when classData is not a legal json, there is no need to parse the data
 			return Base64.EncodeToString([]byte(metadata.Data)), nil
 		}
-		//note: if metadata.Data is null, it may cause map to be redefined as nil
+		// note: if metadata.Data is null, it may cause map to be redefined as nil
 		if kvals == nil {
 			kvals = make(map[string]interface{})
 		}
@@ -216,7 +216,7 @@ func (cb ClassBuilder) Build(classID, classURI, classData string) (nft.Class, er
 		}
 	}
 
-	var data = ""
+	data := ""
 	if len(dataMap) > 0 {
 		dataBz, err := json.Marshal(dataMap)
 		if err != nil {
@@ -268,10 +268,10 @@ func (tb TokenBuilder) BuildMetadata(token nft.NFT) (string, error) {
 	if len(nftMetadata.Data) > 0 {
 		err := json.Unmarshal([]byte(nftMetadata.Data), &kvals)
 		if err != nil && IsIBCDenom(token.ClassId) {
-			//when nftMetadata is not a legal json, there is no need to parse the data
+			// when nftMetadata is not a legal json, there is no need to parse the data
 			return Base64.EncodeToString([]byte(nftMetadata.Data)), nil
 		}
-		//note: if nftMetadata.Data is null, it may cause map to be redefined as nil
+		// note: if nftMetadata.Data is null, it may cause map to be redefined as nil
 		if kvals == nil {
 			kvals = make(map[string]interface{})
 		}
@@ -331,7 +331,7 @@ func (tb TokenBuilder) Build(classId, tokenId, tokenURI, tokenData string) (nft.
 		}
 	}
 
-	var data = ""
+	data := ""
 	if len(dataMap) > 0 {
 		dataBz, err := json.Marshal(dataMap)
 		if err != nil {

@@ -48,7 +48,7 @@ func (k Keeper) Stake(
 		return reward, err
 	}
 
-	//update pool reward shards
+	// update pool reward shards
 	pool, _, err = k.updatePool(ctx, pool, lpToken.Amount, false)
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (k Keeper) Stake(
 	}
 
 	rewards, rewardDebt := pool.CaclRewards(farmInfo, lpToken.Amount)
-	//reward users
+	// reward users
 	if rewards.IsAllPositive() {
 		if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.RewardCollector, sender, rewards); err != nil {
 			return reward, err
@@ -85,7 +85,7 @@ func (k Keeper) Unstake(ctx sdk.Context, poolId string, lpToken sdk.Coin, sender
 		return nil, errorsmod.Wrapf(types.ErrPoolNotFound, poolId)
 	}
 
-	//lpToken demon must be same as pool.TotalLptLocked.Denom
+	// lpToken demon must be same as pool.TotalLptLocked.Denom
 	if lpToken.Denom != pool.TotalLptLocked.Denom {
 		return nil, errorsmod.Wrapf(
 			types.ErrNotMatch,
@@ -94,7 +94,7 @@ func (k Keeper) Unstake(ctx sdk.Context, poolId string, lpToken sdk.Coin, sender
 		)
 	}
 
-	//farmInfo must be exist
+	// farmInfo must be exist
 	farmInfo, exist := k.GetFarmInfo(ctx, poolId, sender.String())
 	if !exist {
 		return nil, errorsmod.Wrapf(
@@ -104,7 +104,7 @@ func (k Keeper) Unstake(ctx sdk.Context, poolId string, lpToken sdk.Coin, sender
 		)
 	}
 
-	//the lp token unstaked must be less than staked
+	// the lp token unstaked must be less than staked
 	if farmInfo.Locked.LT(lpToken.Amount) {
 		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrInsufficientFunds,
@@ -113,7 +113,7 @@ func (k Keeper) Unstake(ctx sdk.Context, poolId string, lpToken sdk.Coin, sender
 		)
 	}
 
-	//the lp token unstaked must be less than pool
+	// the lp token unstaked must be less than pool
 	if pool.TotalLptLocked.Amount.LT(lpToken.Amount) {
 		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrInsufficientFunds,
@@ -123,27 +123,27 @@ func (k Keeper) Unstake(ctx sdk.Context, poolId string, lpToken sdk.Coin, sender
 	}
 
 	if k.Expired(ctx, pool) {
-		//If the farm has ended, the reward rules cannot be updated
+		// If the farm has ended, the reward rules cannot be updated
 		pool.Rules = k.GetRewardRules(ctx, pool.Id)
 		pool.TotalLptLocked = pool.TotalLptLocked.Sub(lpToken)
 		k.SetPool(ctx, pool)
 	} else {
-		//update pool reward shards
+		// update pool reward shards
 		pool, _, err = k.updatePool(ctx, pool, lpToken.Amount.Neg(), false)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	//unstake lpToken to sender account
+	// unstake lpToken to sender account
 	if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sender, sdk.NewCoins(lpToken)); err != nil {
 		return nil, err
 	}
 
-	//compute farmer rewards
+	// compute farmer rewards
 	rewards, rewardDebt := pool.CaclRewards(farmInfo, lpToken.Amount.Neg())
 	if rewards.IsAllPositive() {
-		//distribute reward
+		// distribute reward
 		if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.RewardCollector, sender, rewards); err != nil {
 			return nil, err
 		}
@@ -184,14 +184,14 @@ func (k Keeper) Harvest(ctx sdk.Context, poolId string, sender sdk.AccAddress) (
 	}
 
 	amtAdded := sdk.ZeroInt()
-	//update pool reward shards
+	// update pool reward shards
 	pool, _, err := k.updatePool(ctx, pool, amtAdded, false)
 	if err != nil {
 		return nil, err
 	}
 
 	rewards, rewardDebt := pool.CaclRewards(farmInfo, amtAdded)
-	//reward users
+	// reward users
 	if rewards.IsAllPositive() {
 		if err = k.bk.SendCoinsFromModuleToAccount(ctx, types.RewardCollector, sender, rewards); err != nil {
 			return nil, err
@@ -205,7 +205,7 @@ func (k Keeper) Harvest(ctx sdk.Context, poolId string, sender sdk.AccAddress) (
 
 // Refund refund the remaining reward to pool creator
 func (k Keeper) Refund(ctx sdk.Context, pool types.FarmPool) (sdk.Coins, error) {
-	//remove from active Pool
+	// remove from active Pool
 	k.DequeueActivePool(ctx, pool.Id, pool.EndHeight)
 	pool, _, err := k.updatePool(ctx, pool, sdk.ZeroInt(), true)
 	if err != nil {
@@ -238,7 +238,7 @@ func (k Keeper) Refund(ctx sdk.Context, pool types.FarmPool) (sdk.Coins, error) 
 		return refundTotal, k.refundToFeePool(ctx, types.ModuleName, refundTotal)
 	}
 
-	//refund the total remaining reward to creator
+	// refund the total remaining reward to creator
 	if err := k.bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, refundTotal); err != nil {
 		return nil, err
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
@@ -19,7 +20,7 @@ const (
 // RandomizedGenState generates a random GenesisState for farm
 func RandomizedGenState(simState *module.SimulationState) {
 	var (
-		createPoolFee      sdk.Int
+		createPoolFee      math.Int
 		taxRate            sdk.Dec
 		maxRewardCategoryN uint32
 	)

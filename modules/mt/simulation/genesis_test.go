@@ -5,15 +5,14 @@ import (
 	"math/rand"
 	"testing"
 
-	mt "mods.irisnet.org/modules/mt/types"
-
-	"github.com/stretchr/testify/require"
-
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	"github.com/stretchr/testify/require"
+
+	mt "mods.irisnet.org/modules/mt/types"
 )
 
 func TestRandomizedGenState(t *testing.T) {

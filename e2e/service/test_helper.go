@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/cometbft/cometbft/libs/cli"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
@@ -14,12 +13,22 @@ import (
 	"mods.irisnet.org/simapp"
 )
 
+// DefineServiceExec defines a service execution.
+//
+// Parameters:
+// - t: *testing.T
+// - network: simapp.Network
+// - clientCtx: client.Context
+// - from: string
+// - extraArgs: ...string
+// Returns *simapp.ResponseTx
 func DefineServiceExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
@@ -28,12 +37,24 @@ func DefineServiceExec(t *testing.T,
 	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdDefineService(), args)
 }
 
+// BindServiceExec executes the command to bind a service.
+//
+// Parameters:
+// - t: *testing.T - the testing object
+// - network: simapp.Network - the network object
+// - clientCtx: client.Context - the client context object
+// - from: string - the address of the user binding the service
+// - extraArgs: ...string - additional arguments for the command
+//
+// Returns:
+// - *simapp.ResponseTx - the response transaction object
 func BindServiceExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
@@ -42,12 +63,24 @@ func BindServiceExec(t *testing.T,
 	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdBindService(), args)
 }
 
+// UpdateBindingExec executes the command to update a service binding.
+//
+// Parameters:
+// - t: *testing.T - the testing object
+// - network: simapp.Network - the network object
+// - clientCtx: client.Context - the client context object
+// - from: string - the address of the user updating the service binding
+// - extraArgs: ...string - additional arguments for the command
+//
+// Returns:
+// - *simapp.ResponseTx - the response transaction object
 func UpdateBindingExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
@@ -56,6 +89,19 @@ func UpdateBindingExec(t *testing.T,
 	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdUpdateServiceBinding(), args)
 }
 
+// RefundDepositExec executes the command to refund the deposit for a service.
+//
+// Parameters:
+// - t: *testing.T - the testing object
+// - network: simapp.Network - the network object
+// - clientCtx: client.Context - the client context object
+// - serviceName: string - the name of the service
+// - provider: string - the provider of the service
+// - from: string - the address of the user refunding the deposit
+// - extraArgs: ...string - additional arguments for the command
+//
+// Returns:
+// - *simapp.ResponseTx - the response transaction object
 func RefundDepositExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
@@ -64,6 +110,7 @@ func RefundDepositExec(t *testing.T,
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		serviceName,
 		provider,
@@ -74,6 +121,19 @@ func RefundDepositExec(t *testing.T,
 	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdRefundServiceDeposit(), args)
 }
 
+// DisableServiceExec executes the command to disable a service binding.
+//
+// Parameters:
+// - t: *testing.T - the testing object
+// - network: simapp.Network - the network object
+// - clientCtx: client.Context - the client context object
+// - serviceName: string - the name of the service
+// - provider: string - the provider of the service
+// - from: string - the address of the user disabling the service
+// - extraArgs: ...string - additional arguments for the command
+//
+// Returns:
+// - *simapp.ResponseTx - the response transaction object
 func DisableServiceExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
@@ -82,6 +142,7 @@ func DisableServiceExec(t *testing.T,
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		serviceName,
 		provider,
@@ -92,6 +153,19 @@ func DisableServiceExec(t *testing.T,
 	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdDisableServiceBinding(), args)
 }
 
+// EnableServiceExec executes the command to enable a service binding.
+//
+// Parameters:
+// - t: *testing.T - the testing object
+// - network: simapp.Network - the network object
+// - clientCtx: client.Context - the client context object
+// - serviceName: string - the name of the service
+// - provider: string - the provider of the service
+// - from: string - the address of the user enabling the service
+// - extraArgs: ...string - additional arguments for the command
+//
+// Returns:
+// - *simapp.ResponseTx - the response transaction object
 func EnableServiceExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
@@ -100,6 +174,7 @@ func EnableServiceExec(t *testing.T,
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		serviceName,
 		provider,
@@ -110,12 +185,24 @@ func EnableServiceExec(t *testing.T,
 	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdEnableServiceBinding(), args)
 }
 
+// CallServiceExec executes the command to call a service.
+//
+// Parameters:
+// - t: *testing.T - the testing object
+// - network: simapp.Network - the network object
+// - clientCtx: client.Context - the client context object
+// - from: string - the address of the user calling the service
+// - extraArgs: ...string - additional arguments for the command
+//
+// Returns:
+// - *simapp.ResponseTx - the response transaction object
 func CallServiceExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
@@ -124,12 +211,24 @@ func CallServiceExec(t *testing.T,
 	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdCallService(), args)
 }
 
+// RespondServiceExec executes the command to respond to a service request.
+//
+// Parameters:
+// - t: *testing.T - the testing object
+// - network: simapp.Network - the network object
+// - clientCtx: client.Context - the client context object
+// - from: string - the address of the user responding to the service request
+// - extraArgs: ...string - additional arguments for the command
+//
+// Returns:
+// - *simapp.ResponseTx - the response transaction object
 func RespondServiceExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
@@ -138,6 +237,18 @@ func RespondServiceExec(t *testing.T,
 	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdRespondService(), args)
 }
 
+// SetWithdrawAddrExec executes the command to set a withdrawal address.
+//
+// Parameters:
+// - t: *testing.T - the testing object
+// - network: simapp.Network - the network object
+// - clientCtx: client.Context - the client context object
+// - withdrawalAddress: string - the address to set for withdrawal
+// - from: string - the address of the user setting the withdrawal address
+// - extraArgs: ...string - additional arguments for the command
+//
+// Returns:
+// - *simapp.ResponseTx - the response transaction object
 func SetWithdrawAddrExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
@@ -145,6 +256,7 @@ func SetWithdrawAddrExec(t *testing.T,
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		withdrawalAddress,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
@@ -154,6 +266,18 @@ func SetWithdrawAddrExec(t *testing.T,
 	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdSetWithdrawAddr(), args)
 }
 
+// WithdrawEarnedFeesExec executes the command to withdraw earned fees.
+//
+// Parameters:
+// - t: *testing.T - the testing object
+// - network: simapp.Network - the network object
+// - clientCtx: client.Context - the client context object
+// - provider: string - the provider of the service
+// - from: string - the address of the user withdrawing the fees
+// - extraArgs: ...string - additional arguments for the command
+//
+// Returns:
+// - *simapp.ResponseTx - the response transaction object
 func WithdrawEarnedFeesExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
@@ -161,6 +285,7 @@ func WithdrawEarnedFeesExec(t *testing.T,
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		provider,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
@@ -170,12 +295,24 @@ func WithdrawEarnedFeesExec(t *testing.T,
 	return network.ExecTxCmdWithResult(t, clientCtx, servicecli.GetCmdWithdrawEarnedFees(), args)
 }
 
+// QueryServiceDefinitionExec executes a query to retrieve a service definition from the network.
+//
+// Parameters:
+// - t: *testing.T - the testing object
+// - network: simapp.Network - the network object
+// - clientCtx: client.Context - the client context object
+// - serviceName: string - the name of the service
+// - extraArgs: ...string - additional arguments for the command
+//
+// Returns:
+// - *servicetypes.ServiceDefinition - the response object containing the service definition
 func QueryServiceDefinitionExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	serviceName string,
 	extraArgs ...string,
 ) *servicetypes.ServiceDefinition {
+	t.Helper()
 	args := []string{
 		serviceName,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -187,6 +324,18 @@ func QueryServiceDefinitionExec(t *testing.T,
 	return response
 }
 
+// QueryServiceBindingExec executes a query to retrieve a service binding from the network.
+//
+// Parameters:
+// - t: *testing.T - the testing object.
+// - network: simapp.Network - the network object.
+// - clientCtx: client.Context - the client context object.
+// - serviceName: string - the name of the service.
+// - provider: string - the provider of the service.
+// - extraArgs: ...string - additional arguments for the command.
+//
+// Returns:
+// - *servicetypes.ServiceBinding - the response object containing the service binding.
 func QueryServiceBindingExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
@@ -194,6 +343,7 @@ func QueryServiceBindingExec(t *testing.T,
 	provider string,
 	extraArgs ...string,
 ) *servicetypes.ServiceBinding {
+	t.Helper()
 	args := []string{
 		serviceName,
 		provider,
@@ -206,12 +356,24 @@ func QueryServiceBindingExec(t *testing.T,
 	return response
 }
 
+// QueryServiceBindingsExec executes a query to retrieve service bindings from the network.
+//
+// Parameters:
+// - t: *testing.T - the testing object
+// - network: simapp.Network - the network object
+// - clientCtx: client.Context - the client context object
+// - serviceName: string - the name of the service
+// - extraArgs: ...string - additional arguments for the command
+//
+// Returns:
+// - *servicetypes.QueryBindingsResponse - the response object containing the service bindings
 func QueryServiceBindingsExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	serviceName string,
 	extraArgs ...string,
 ) *servicetypes.QueryBindingsResponse {
+	t.Helper()
 	args := []string{
 		serviceName,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -223,12 +385,26 @@ func QueryServiceBindingsExec(t *testing.T,
 	return response
 }
 
+// QueryServiceRequestsExec queries the service requests by service name and provider.
+//
+// Parameters:
+// - t: *testing.T - the testing object
+// - network: simapp.Network - the network object
+// - clientCtx: client.Context - the client context object
+// - serviceName: string - the name of the service
+// - provider: string - the provider of the service
+// - extraArgs: ...string - additional arguments for the command
+//
+// Returns:
+// - *servicetypes.QueryRequestsResponse - the response object containing the service requests
 func QueryServiceRequestsExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	serviceName,
 	provider string,
-	extraArgs ...string) *servicetypes.QueryRequestsResponse {
+	extraArgs ...string,
+) *servicetypes.QueryRequestsResponse {
+	t.Helper()
 	args := []string{
 		serviceName,
 		provider,
@@ -241,6 +417,18 @@ func QueryServiceRequestsExec(t *testing.T,
 	return response
 }
 
+// QueryServiceRequestsByReqCtx queries the service requests by request context ID.
+//
+// Parameters:
+// - t: *testing.T
+// - network: simapp.Network
+// - clientCtx: client.Context
+// - requestContextID: string
+// - batchCounter: string
+// - extraArgs: ...string
+//
+// Returns:
+// - *servicetypes.QueryRequestsResponse
 func QueryServiceRequestsByReqCtx(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
@@ -248,6 +436,7 @@ func QueryServiceRequestsByReqCtx(t *testing.T,
 	batchCounter string,
 	extraArgs ...string,
 ) *servicetypes.QueryRequestsResponse {
+	t.Helper()
 	args := []string{
 		requestContextID,
 		batchCounter,
@@ -258,14 +447,24 @@ func QueryServiceRequestsByReqCtx(t *testing.T,
 	response := &servicetypes.QueryRequestsResponse{}
 	network.ExecQueryCmd(t, clientCtx, servicecli.GetCmdQueryServiceRequests(), args, response)
 	return response
-
 }
 
+// QueryEarnedFeesExec executes the command to query the earned fees.
+//
+// Parameters:
+// - t: *testing.T - the testing object
+// - network: simapp.Network - the network object
+// - clientCtx: client.Context - the client context object
+// - extraArgs: ...string - additional arguments for the command
+//
+// Returns:
+// - *servicetypes.QueryEarnedFeesResponse - the response object containing the earned fees
 func QueryEarnedFeesExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	extraArgs ...string,
 ) *servicetypes.QueryEarnedFeesResponse {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
@@ -276,14 +475,24 @@ func QueryEarnedFeesExec(t *testing.T,
 	return response
 }
 
+// QueryRequestContextExec executes a query to retrieve a request context from the network.
+//
+// Parameters:
+// - t: *testing.T
+// - network: simapp.Network
+// - clientCtx: client.Context
+// - contextId: string
+// - extraArgs: ...string
+// Returns *servicetypes.RequestContext
 func QueryRequestContextExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
-	contextId string,
+	contextID string,
 	extraArgs ...string,
 ) *servicetypes.RequestContext {
+	t.Helper()
 	args := []string{
-		contextId,
+		contextID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
@@ -293,14 +502,24 @@ func QueryRequestContextExec(t *testing.T,
 	return response
 }
 
+// QueryServiceRequestExec executes a query to retrieve a service request from the network.
+//
+// Parameters:
+// - t: *testing.T
+// - network: simapp.Network
+// - clientCtx: client.Context
+// - requestID: string
+// - extraArgs: ...string
+// Returns *servicetypes.Request
 func QueryServiceRequestExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
-	requestId string,
+	requestID string,
 	extraArgs ...string,
 ) *servicetypes.Request {
+	t.Helper()
 	args := []string{
-		requestId,
+		requestID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
@@ -310,14 +529,24 @@ func QueryServiceRequestExec(t *testing.T,
 	return response
 }
 
+// QueryServiceResponseExec executes a query to retrieve a service response from the network.
+//
+// Parameters:
+// - t: *testing.T
+// - network: simapp.Network
+// - clientCtx: client.Context
+// - requestID: string
+// - extraArgs: ...string
+// Returns *servicetypes.Response
 func QueryServiceResponseExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
-	requestId string,
+	requestID string,
 	extraArgs ...string,
 ) *servicetypes.Response {
+	t.Helper()
 	args := []string{
-		requestId,
+		requestID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)

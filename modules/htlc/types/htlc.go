@@ -4,10 +4,9 @@ import (
 	fmt "fmt"
 	time "time"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
-	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )

@@ -5,12 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
 
 	"mods.irisnet.org/modules/htlc/types"
 )

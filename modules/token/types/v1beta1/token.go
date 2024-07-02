@@ -3,12 +3,11 @@ package v1beta1
 import (
 	"math/big"
 
-	"github.com/cosmos/gogoproto/proto"
-	"gopkg.in/yaml.v2"
-
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/gogoproto/proto"
+	"gopkg.in/yaml.v2"
 
 	tokentypes "mods.irisnet.org/modules/token/types"
 )

@@ -3,12 +3,10 @@ package keeper
 import (
 	"encoding/hex"
 
-	"github.com/tidwall/gjson"
-
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/tidwall/gjson"
 
 	"mods.irisnet.org/modules/random/types"
 	"mods.irisnet.org/modules/service/exported"

@@ -2,7 +2,6 @@ package types
 
 import (
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

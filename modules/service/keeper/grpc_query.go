@@ -4,16 +4,14 @@ import (
 	"context"
 	"encoding/hex"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
-
 	gogotypes "github.com/cosmos/gogoproto/types"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"mods.irisnet.org/modules/service/types"
 )
@@ -87,7 +85,7 @@ func (k Keeper) Bindings(
 		pageRes, err = query.Paginate(
 			bindingStore,
 			shapePageRequest(req.Pagination),
-			func(key []byte, value []byte) error {
+			func(key, value []byte) error {
 				var binding types.ServiceBinding
 				k.cdc.MustUnmarshal(value, &binding)
 				bindings = append(bindings, &binding)
@@ -103,7 +101,7 @@ func (k Keeper) Bindings(
 			return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 		}
 		bindingStore := prefix.NewStore(store, types.GetOwnerBindingsSubspace(owner, req.ServiceName))
-		pageRes, err = query.Paginate(bindingStore, shapePageRequest(req.Pagination), func(key []byte, value []byte) error {
+		pageRes, err = query.Paginate(bindingStore, shapePageRequest(req.Pagination), func(key, value []byte) error {
 			provider := sdk.AccAddress(key)
 
 			if binding, found := k.GetServiceBinding(ctx, req.ServiceName, provider); found {
@@ -226,7 +224,7 @@ func (k Keeper) Requests(
 	pageRes, err := query.Paginate(
 		requestStore,
 		shapePageRequest(req.Pagination),
-		func(key []byte, value []byte) error {
+		func(key, value []byte) error {
 			var requestID gogotypes.BytesValue
 			k.cdc.MustUnmarshal(value, &requestID)
 			request, _ := k.GetRequest(ctx, requestID.Value)
@@ -274,7 +272,7 @@ func (k Keeper) RequestsByReqCtx(
 	pageRes, err := query.Paginate(
 		requestStore,
 		shapePageRequest(req.Pagination),
-		func(key []byte, value []byte) error {
+		func(key, value []byte) error {
 			requestID := append(
 				append(requestContextId, sdk.Uint64ToBigEndian(req.BatchCounter)...),
 				key...)
@@ -353,7 +351,7 @@ func (k Keeper) Responses(
 	pageRes, err := query.Paginate(
 		responseStore,
 		shapePageRequest(req.Pagination),
-		func(key []byte, value []byte) error {
+		func(key, value []byte) error {
 			var response types.Response
 			k.cdc.MustUnmarshal(value, &response)
 			responses = append(responses, &response)

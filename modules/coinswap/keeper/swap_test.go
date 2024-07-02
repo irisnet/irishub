@@ -7,9 +7,8 @@ import (
 	"time"
 
 	sdkmath "cosmossdk.io/math"
-	"github.com/stretchr/testify/suite"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/suite"
 
 	"mods.irisnet.org/modules/coinswap/keeper"
 	"mods.irisnet.org/modules/coinswap/types"
@@ -31,7 +30,7 @@ type SwapCase struct {
 }
 
 func (suite *TestSuite) TestGetInputPrice() {
-	var datas = []SwapCase{{
+	datas := []SwapCase{{
 		data:   Data{delta: sdk.NewInt(100), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewDecWithPrec(3, 3)},
 		expect: sdk.NewInt(90),
 	}, {
@@ -55,7 +54,7 @@ func (suite *TestSuite) TestGetInputPrice() {
 }
 
 func (suite *TestSuite) TestGetOutputPrice() {
-	var datas = []SwapCase{{
+	datas := []SwapCase{{
 		data:   Data{delta: sdk.NewInt(100), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewDecWithPrec(3, 3)},
 		expect: sdk.NewInt(112),
 	}, {

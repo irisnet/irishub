@@ -5,13 +5,11 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/stretchr/testify/suite"
-
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/suite"
 
 	"mods.irisnet.org/modules/nft/keeper"
 	"mods.irisnet.org/modules/nft/types"
@@ -390,7 +388,7 @@ func CreateTestAddrs(numAddrs int) []sdk.AccAddress {
 }
 
 // for incode address generation
-func testAddr(addr string, bech string) sdk.AccAddress {
+func testAddr(addr, bech string) sdk.AccAddress {
 	res, err := sdk.AccAddressFromHexUnsafe(addr)
 	if err != nil {
 		panic(err)

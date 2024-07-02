@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/cometbft/cometbft/libs/cli"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
@@ -28,7 +27,9 @@ func CreateHTLCExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	from string,
-	extraArgs ...string) *simapp.ResponseTx {
+	extraArgs ...string,
+) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
@@ -54,7 +55,9 @@ func ClaimHTLCExec(t *testing.T,
 	from string,
 	id string,
 	secret string,
-	extraArgs ...string) *simapp.ResponseTx {
+	extraArgs ...string,
+) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		id,
 		secret,
@@ -78,7 +81,9 @@ func QueryHTLCExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	id string,
-	extraArgs ...string) *htlctypes.HTLC {
+	extraArgs ...string,
+) *htlctypes.HTLC {
+	t.Helper()
 	args := []string{
 		id,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),

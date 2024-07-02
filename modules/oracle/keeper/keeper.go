@@ -6,14 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/tidwall/gjson"
-
-	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	errorsmod "cosmossdk.io/errors"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tidwall/gjson"
 
 	"mods.irisnet.org/modules/oracle/types"
 	serviceexported "mods.irisnet.org/modules/service/exported"
@@ -326,7 +324,7 @@ func (k Keeper) GetRequestContext(
 	return k.sk.GetRequestContext(ctx, requestContextID)
 }
 
-func (k Keeper) ModuleServiceRequest(ctx sdk.Context, input string) (result string, output string) {
+func (k Keeper) ModuleServiceRequest(ctx sdk.Context, input string) (result, output string) {
 	feedName := gjson.Get(input, serviceexported.PATH_BODY).Get("pair").String()
 	if _, found := k.GetFeed(ctx, feedName); !found {
 		result = `{"code":"400","message":"feed not found"}`
@@ -343,7 +341,7 @@ func (k Keeper) ModuleServiceRequest(ctx sdk.Context, input string) (result stri
 	valueData := value.Data
 	valueTime := value.Timestamp
 
-	if time.Since(valueTime) > time.Duration(time.Minute*5) {
+	if time.Since(valueTime) > time.Minute*5 {
 		result = `{"code":"402","message":"all values expired"}`
 		return
 	}
@@ -353,6 +351,7 @@ func (k Keeper) ModuleServiceRequest(ctx sdk.Context, input string) (result stri
 
 	return
 }
+
 func (k Keeper) GetServiceKeeper() types.ServiceKeeper {
 	return k.sk
 }

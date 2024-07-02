@@ -36,7 +36,7 @@ func (b Bool) Marshal() ([]byte, error) {
 
 // Unmarshal needed for protobuf compatibility
 func (b *Bool) Unmarshal(data []byte) error {
-	*b = Bool(data[:])
+	*b = Bool(data)
 	return nil
 }
 
@@ -55,6 +55,7 @@ func (b *Bool) UnmarshalJSON(data []byte) error {
 	*b = Bool(s)
 	return nil
 }
+
 func ParseBool(v string) (Bool, error) {
 	if len(v) == 0 {
 		return Nil, nil
@@ -74,7 +75,7 @@ func ParseBool(v string) (Bool, error) {
 // ratio: swap rate
 // inputScale: the decimal scale of input amount
 // outputScale: the decimal scale of output amount
-func LossLessSwap(input sdk.Int, ratio sdk.Dec, inputScale, outputScale uint32) (sdk.Int, sdk.Int) {
+func LossLessSwap(input sdkmath.Int, ratio sdk.Dec, inputScale, outputScale uint32) (sdkmath.Int, sdkmath.Int) {
 	inputDec := sdk.NewDecFromInt(input)
 	scaleFactor := int64(inputScale) - int64(outputScale)
 	var scaleMultipler, scaleReverseMultipler sdk.Dec

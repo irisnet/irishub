@@ -3,11 +3,9 @@ package v1beta1
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/cometbft/cometbft/crypto/tmhash"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
 
 	tokentypes "mods.irisnet.org/modules/token/types"
 )
@@ -154,7 +152,7 @@ func TestMsgEditTokenRoute(t *testing.T) {
 func TestMsgEditTokenGetSignBytes(t *testing.T) {
 	mintable := tokentypes.False
 
-	var msg = MsgEditToken{
+	msg := MsgEditToken{
 		Name:      "BTC TOKEN",
 		Owner:     sdk.AccAddress(tmhash.SumTruncated([]byte("owner"))).String(),
 		Symbol:    "btc",

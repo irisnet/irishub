@@ -335,7 +335,7 @@ func (m msgServer) UpgradeERC20(goCtx context.Context, msg *v1.MsgUpgradeERC20) 
 			msg.Authority,
 		)
 	}
-	
+
 	implementation := common.HexToAddress(msg.Implementation)
 	if err := m.k.UpgradeERC20(ctx, implementation); err != nil {
 		return nil, err

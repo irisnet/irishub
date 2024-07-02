@@ -15,8 +15,8 @@ import (
 func (k Keeper) AddBalance(ctx sdk.Context,
 	denomID, mtID string,
 	amount uint64,
-	addr sdk.AccAddress) error {
-
+	addr sdk.AccAddress,
+) error {
 	balance := k.GetBalance(ctx, denomID, mtID, addr)
 	if math.MaxUint64-balance < amount {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "overflow: max %d, got %d", math.MaxUint64-balance, amount)
@@ -33,8 +33,8 @@ func (k Keeper) AddBalance(ctx sdk.Context,
 func (k Keeper) SubBalance(ctx sdk.Context,
 	denomID, mtID string,
 	amount uint64,
-	addr sdk.AccAddress) {
-
+	addr sdk.AccAddress,
+) {
 	store := ctx.KVStore(k.storeKey)
 	balance := k.GetBalance(ctx, denomID, mtID, addr)
 	balance -= amount
@@ -46,8 +46,8 @@ func (k Keeper) SubBalance(ctx sdk.Context,
 // GetBalance gets balance of an MT
 func (k Keeper) GetBalance(ctx sdk.Context,
 	denomID, mtID string,
-	addr sdk.AccAddress) uint64 {
-
+	addr sdk.AccAddress,
+) uint64 {
 	store := ctx.KVStore(k.storeKey)
 
 	amount := store.Get(types.KeyBalance(addr, denomID, mtID))
@@ -60,14 +60,12 @@ func (k Keeper) GetBalance(ctx sdk.Context,
 
 // getBalances gets balances of all accounts, should only be used in exporting genesis states
 func (k Keeper) getBalances(ctx sdk.Context) []types.Owner {
-
 	store := ctx.KVStore(k.storeKey)
 
 	it := sdk.KVStorePrefixIterator(store, types.PrefixBalance)
 	defer it.Close()
 
-	var ownerMap map[string]map[string]map[string]uint64
-	ownerMap = make(map[string]map[string]map[string]uint64)
+	ownerMap := make(map[string]map[string]map[string]uint64)
 
 	for ; it.Valid(); it.Next() {
 		keys := bytes.Split(it.Key(), types.Delimiter)
@@ -112,8 +110,8 @@ func (k Keeper) getBalances(ctx sdk.Context) []types.Owner {
 func (k Keeper) Transfer(ctx sdk.Context,
 	denomID, mtID string,
 	amount uint64,
-	from, to sdk.AccAddress) error {
-
+	from, to sdk.AccAddress,
+) error {
 	k.SubBalance(ctx, denomID, mtID, amount, from)
 
 	return k.AddBalance(ctx, denomID, mtID, amount, to)

@@ -25,7 +25,7 @@ func (k Keeper) Denoms(c context.Context, request *types.QueryDenomsRequest) (*t
 	var denoms []types.Denom
 	store := ctx.KVStore(k.storeKey)
 	denomStore := prefix.NewStore(store, types.KeyDenom(""))
-	pageRes, err := query.Paginate(denomStore, request.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.Paginate(denomStore, request.Pagination, func(key, value []byte) error {
 		var denom types.Denom
 		k.cdc.MustUnmarshal(value, &denom)
 		denoms = append(denoms, denom)
@@ -45,7 +45,7 @@ func (k Keeper) Denom(c context.Context, request *types.QueryDenomRequest) (*typ
 	ctx := sdk.UnwrapSDKContext(c)
 
 	denomID := strings.TrimSpace(request.DenomId)
-	if len(denomID) <= 0 {
+	if len(denomID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "denom id is required")
 	}
 
@@ -63,11 +63,11 @@ func (k Keeper) MTSupply(c context.Context, request *types.QueryMTSupplyRequest)
 	denomID := strings.TrimSpace(request.DenomId)
 	mtID := strings.TrimSpace(request.MtId)
 
-	if len(denomID) <= 0 {
+	if len(denomID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "denom id is required")
 	}
 
-	if len(mtID) <= 0 {
+	if len(mtID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "mt id is required")
 	}
 
@@ -78,14 +78,14 @@ func (k Keeper) MTs(c context.Context, request *types.QueryMTsRequest) (*types.Q
 	ctx := sdk.UnwrapSDKContext(c)
 
 	denomID := strings.TrimSpace(request.DenomId)
-	if len(denomID) <= 0 {
+	if len(denomID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "denom id is required")
 	}
 
 	var mts []types.MT
 	store := ctx.KVStore(k.storeKey)
 	mtStore := prefix.NewStore(store, types.KeyMT(denomID, ""))
-	pageRes, err := query.Paginate(mtStore, request.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.Paginate(mtStore, request.Pagination, func(key, value []byte) error {
 		var mt types.MT
 		k.cdc.MustUnmarshal(value, &mt)
 
@@ -101,7 +101,6 @@ func (k Keeper) MTs(c context.Context, request *types.QueryMTsRequest) (*types.Q
 		Mts:        mts,
 		Pagination: pageRes,
 	}, nil
-
 }
 
 func (k Keeper) MT(c context.Context, request *types.QueryMTRequest) (*types.QueryMTResponse, error) {
@@ -110,11 +109,11 @@ func (k Keeper) MT(c context.Context, request *types.QueryMTRequest) (*types.Que
 	denomID := strings.TrimSpace(request.DenomId)
 	mtID := strings.TrimSpace(request.MtId)
 
-	if len(denomID) <= 0 {
+	if len(denomID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "denom id is required")
 	}
 
-	if len(mtID) <= 0 {
+	if len(mtID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "mt id is required")
 	}
 
@@ -133,7 +132,7 @@ func (k Keeper) Balances(c context.Context, request *types.QueryBalancesRequest)
 	denomID := strings.TrimSpace(request.DenomId)
 	owner := strings.TrimSpace(request.Owner)
 
-	if len(denomID) <= 0 {
+	if len(denomID) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "denom id is required")
 	}
 
@@ -145,7 +144,7 @@ func (k Keeper) Balances(c context.Context, request *types.QueryBalancesRequest)
 	var bals []types.Balance
 	store := ctx.KVStore(k.storeKey)
 	mtStore := prefix.NewStore(store, types.KeyBalance(addr, denomID, ""))
-	pageRes, err := query.Paginate(mtStore, request.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.Paginate(mtStore, request.Pagination, func(key, value []byte) error {
 		bal := types.Balance{
 			MtId:   string(key),
 			Amount: types.MustUnMarshalAmount(k.cdc, value),

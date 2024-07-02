@@ -6,7 +6,6 @@ import (
 	servicetypes "mods.irisnet.org/modules/service/types"
 )
 
-// nolint
 const (
 	// module name
 	ModuleName = "oracle"
@@ -45,7 +44,7 @@ func GetReqCtxIDKey(requestContextID []byte) []byte {
 
 func GetFeedValueKey(feedName string, batchCounter uint64) []byte {
 	key := make([]byte, 8)
-	binary.BigEndian.PutUint64(key[:], batchCounter)
+	binary.BigEndian.PutUint64(key, batchCounter)
 	return append(GetFeedValuePrefixKey(feedName), key...)
 }
 

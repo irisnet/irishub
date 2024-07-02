@@ -65,7 +65,7 @@ func ValidateReward(rewardPerBlock, totalReward sdk.Coins) error {
 		if !totalReward[i].IsGTE(rewardPerBlock[i]) {
 			return errorsmod.Wrapf(ErrNotMatch, "The totalReward should be greater than or equal to rewardPerBlock")
 		}
-		//uint64 overflow check
+		// uint64 overflow check
 		h := totalReward[i].Amount.Quo(rewardPerBlock[i].Amount)
 		if !h.IsInt64() {
 			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "Can not convert to int64, overflow")

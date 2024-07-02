@@ -29,8 +29,8 @@ func WeightedOperations(
 	cdc codec.JSONCodec,
 	k keeper.Keeper,
 	ak types.AccountKeeper,
-	bk types.BankKeeper) simulation.WeightedOperations {
-
+	bk types.BankKeeper,
+) simulation.WeightedOperations {
 	var weightCreate, weightPause, weightStart, WeightEdit int
 
 	appParams.GetOrGenerate(
@@ -274,7 +274,6 @@ func SimulatePauseFeed(
 	) (
 		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
 	) {
-
 		feed := GenFeed(k, r, ctx)
 		if feed.Size() == 0 {
 			return simtypes.NoOpMsg(
@@ -443,7 +442,6 @@ func SimulateEditFeed(
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
-
 	}
 }
 
@@ -480,15 +478,15 @@ func GenServiceBindingsAndProviders(
 ) (providers []string) {
 	ownerAddr, err := sdk.AccAddressFromBech32(owner)
 	if err != nil {
-		return
+		return providers
 	}
 	spendable := bk.SpendableCoins(ctx, ownerAddr)
 	if spendable.IsZero() {
-		return
+		return providers
 	}
 	token := spendable[r.Intn(len(spendable))]
 	if token.IsZero() {
-		return
+		return providers
 	}
 	for i := 0; i < 10; i++ {
 		provider, _ := simtypes.RandomAcc(r, accs)
@@ -514,7 +512,7 @@ func GenServiceBindingsAndProviders(
 			providers = append(providers, provider.Address.String())
 		}
 	}
-	return
+	return providers
 }
 
 func GenFeed(k keeper.Keeper, r *rand.Rand, ctx sdk.Context) types.Feed {

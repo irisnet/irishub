@@ -8,5 +8,3 @@ type DepinjectOptions struct {
 	Providers []interface{}
 	Consumers []interface{}
 }
-
-

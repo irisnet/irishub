@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/spf13/cobra"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/spf13/cobra"
 
 	"mods.irisnet.org/modules/token/types"
 	v1 "mods.irisnet.org/modules/token/types/v1"
@@ -444,12 +443,12 @@ func GetCmdSwapToErc20() *cobra.Command {
 			if err != nil {
 				return err
 			}
-	
+
 			paidAmount, token, err := parseMainCoin(clientCtx, args[0])
 			if err != nil {
 				return err
 			}
-			if len(token.GetContract()) <= 0 {
+			if len(token.GetContract()) == 0 {
 				return fmt.Errorf("corresponding erc20 contract of %s does not exist", paidAmount.Denom)
 			}
 
@@ -459,7 +458,7 @@ func GetCmdSwapToErc20() *cobra.Command {
 			}
 
 			from := clientCtx.GetFromAddress()
-			if len(receiver) <= 0 {
+			if len(receiver) == 0 {
 				// set default receiver
 				receiver = common.BytesToAddress(from.Bytes()).Hex()
 			}
@@ -513,7 +512,7 @@ func GetCmdSwapFromErc20() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if len(token.GetContract()) <= 0 {
+			if len(token.GetContract()) == 0 {
 				return fmt.Errorf("corresponding erc20 contract of %s does not exist", wantedAmount.Denom)
 			}
 
@@ -521,7 +520,7 @@ func GetCmdSwapFromErc20() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if len(receiver) <= 0 {
+			if len(receiver) == 0 {
 				// set default receiver
 				receiver = from
 			}

@@ -49,7 +49,7 @@ func (suite *KeeperTestSuite) TestGRPCRandomRequestQueue() {
 
 	randomResp, err := queryClient.RandomRequestQueue(gocontext.Background(), &types.QueryRandomRequestQueueRequest{Height: 1})
 	suite.Require().NoError(err)
-	var requests = make([]types.Request, 0)
+	requests := make([]types.Request, 0)
 
 	suite.keeper.IterateRandomRequestQueue(ctx, func(h int64, reqID []byte, r types.Request) (stop bool) {
 		requests = append(requests, r)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -25,7 +26,7 @@ func (k Keeper) CreatePool(
 	if err := k.DeductPoolCreationFee(ctx, creator); err != nil {
 		return nil, err
 	}
-	//Escrow total reward
+	// Escrow total reward
 	if err := k.bk.SendCoinsFromAccountToModule(ctx,
 		creator, types.ModuleName, totalReward); err != nil {
 		return nil, err
@@ -63,32 +64,32 @@ func (k Keeper) DestroyPool(ctx sdk.Context, poolId string, creator sdk.AccAddre
 // AdjustPool adjusts farm pool parameters
 func (k Keeper) AdjustPool(
 	ctx sdk.Context,
-	poolId string,
+	poolID string,
 	reward sdk.Coins,
 	rewardPerBlock sdk.Coins,
 	creator sdk.AccAddress,
 ) (err error) {
-	pool, exist := k.GetPool(ctx, poolId)
-	//check if the liquidity pool exists
+	pool, exist := k.GetPool(ctx, poolID)
+	// check if the liquidity pool exists
 	if !exist {
-		return errorsmod.Wrapf(types.ErrPoolNotFound, poolId)
+		return errorsmod.Wrapf(types.ErrPoolNotFound, poolID)
 	}
 
 	if !pool.Editable {
 		return errorsmod.Wrapf(
-			types.ErrInvalidOperate, "pool [%s] is not editable", poolId)
+			types.ErrInvalidOperate, "pool [%s] is not editable", poolID)
 	}
 
-	//check permissions
+	// check permissions
 	if creator.String() != pool.Creator {
 		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "creator [%s] is not the creator of the pool", creator.String())
 	}
 
-	//check for expiration
+	// check for expiration
 	if k.Expired(ctx, pool) {
 		return errorsmod.Wrapf(types.ErrPoolExpired,
 			"pool [%s] has expired at height[%d], current [%d]",
-			poolId,
+			poolID,
 			pool.EndHeight,
 			ctx.BlockHeight(),
 		)
@@ -109,13 +110,13 @@ func (k Keeper) AdjustPool(
 		startHeight = ctx.BlockHeight()
 	}
 
-	//update pool reward shards
+	// update pool reward shards
 	pool, _, err = k.updatePool(ctx, pool, sdk.ZeroInt(), false)
 	if err != nil {
 		return err
 	}
 
-	//update pool TotalReward、RemainingReward
+	// update pool TotalReward、RemainingReward
 	rules = types.RewardRules(pool.Rules)
 	if reward != nil {
 		if err := k.bk.SendCoinsFromAccountToModule(ctx,
@@ -144,10 +145,10 @@ func (k Keeper) AdjustPool(
 		availableReward = remainingReward.Add(reward...)
 	}
 
-	pool.Rules = types.RewardRules(rules).UpdateWith(rewardPerBlock)
+	pool.Rules = rules.UpdateWith(rewardPerBlock)
 	k.SetRewardRules(ctx, pool.Id, pool.Rules)
 
-	//expiredHeight = [(srcEndHeight-beginPoint)*srcRewardPerBlock +appendReward]/RewardPerBlock + beginPoint
+	// expiredHeight = [(srcEndHeight-beginPoint)*srcRewardPerBlock +appendReward]/RewardPerBlock + beginPoint
 	rewardsPerBlock := types.RewardRules(pool.Rules).RewardsPerBlock()
 	availableHeight := availableReward[0].Amount.Quo(rewardsPerBlock.AmountOf(availableReward[0].Denom)).Int64()
 	for _, c := range availableReward[1:] {
@@ -158,7 +159,7 @@ func (k Keeper) AdjustPool(
 		}
 	}
 	expiredHeight := startHeight + availableHeight
-	//if the expiration height does not change,
+	// if the expiration height does not change,
 	// there is no need to update the pool and the expired queue
 	if expiredHeight == pool.EndHeight {
 		return nil
@@ -224,7 +225,7 @@ func (k Keeper) createPool(
 func (k Keeper) updatePool(
 	ctx sdk.Context,
 	pool types.FarmPool,
-	amount sdk.Int,
+	amount math.Int,
 	isDestroy bool,
 ) (types.FarmPool, sdk.Coins, error) {
 	height := ctx.BlockHeight()
@@ -241,12 +242,12 @@ func (k Keeper) updatePool(
 		return pool, nil, errorsmod.Wrapf(types.ErrPoolNotFound, pool.Id)
 	}
 	var rewardTotal sdk.Coins
-	//when there are multiple farm operations in the same block, the value needs to be updated once
+	// when there are multiple farm operations in the same block, the value needs to be updated once
 	if height > pool.LastHeightDistrRewards &&
 		pool.TotalLptLocked.Amount.GT(sdk.ZeroInt()) {
 		blockInterval := height - pool.LastHeightDistrRewards
 		for i := range rules {
-			rewardCollected := rules[i].RewardPerBlock.MulRaw(int64(blockInterval))
+			rewardCollected := rules[i].RewardPerBlock.MulRaw(blockInterval)
 			coinCollected := sdk.NewCoin(rules[i].Reward, rewardCollected)
 			if rules[i].RemainingReward.LT(rewardCollected) {
 				k.Logger(ctx).Error(
@@ -270,7 +271,7 @@ func (k Keeper) updatePool(
 		}
 	}
 
-	//escrow the collected rewards to the `RewardCollector` account
+	// escrow the collected rewards to the `RewardCollector` account
 	if rewardTotal.IsAllPositive() {
 		if err := k.bk.SendCoinsFromModuleToModule(ctx, types.ModuleName, types.RewardCollector, rewardTotal); err != nil {
 			return pool, rewardTotal, err

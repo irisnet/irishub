@@ -6,11 +6,10 @@ import (
 	"bytes"
 	"fmt"
 
-	gogotypes "github.com/cosmos/gogoproto/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	"mods.irisnet.org/modules/token/types"
 	v1 "mods.irisnet.org/modules/token/types/v1"

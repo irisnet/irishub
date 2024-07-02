@@ -3,12 +3,10 @@ package v1
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
-	"github.com/cometbft/cometbft/crypto/tmhash"
-
 	sdkmath "cosmossdk.io/math"
+	"github.com/cometbft/cometbft/crypto/tmhash"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
 
 	tokentypes "mods.irisnet.org/modules/token/types"
 )
@@ -269,9 +267,9 @@ func TestMsgDeployERC20(t *testing.T) {
 		authority  string
 		expectPass bool
 	}{
-		{symbol: "btc", name: "BTC TOKEN", scale: 18, minUnit: "staoshi", authority: addr1, expectPass: true},
-		{symbol: "BTC", name: "BTC TOKEN", scale: 18, minUnit: "staoshi", authority: addr1, expectPass: false},
-		{symbol: "bTC", name: "BTC TOKEN", scale: 18, minUnit: "staoshi", authority: addr1, expectPass: true},
+		{symbol: "btc", name: "BTC TOKEN", scale: 18, minUnit: "satoshi", authority: addr1, expectPass: true},
+		{symbol: "BTC", name: "BTC TOKEN", scale: 18, minUnit: "satoshi", authority: addr1, expectPass: false},
+		{symbol: "bTC", name: "BTC TOKEN", scale: 18, minUnit: "satoshi", authority: addr1, expectPass: true},
 		{symbol: "stake", name: "Stake Token", scale: 18, minUnit: "ibc/3C3D7B3BE4ECC85A0E5B52A3AEC3B7DFC2AA9CA47C37821E57020D6807043BE9", authority: addr1, expectPass: true},
 		{symbol: "ibc/3C3D7B3BE4ECC85A0E5B52A3AEC3B7DFC2AA9CA47C37821E57020D6807043BE9", name: "Stake Token", scale: 18, minUnit: "ibc/3C3D7B3BE4ECC85A0E5B52A3AEC3B7DFC2AA9CA47C37821E57020D6807043BE9", authority: addr1, expectPass: true},
 	}

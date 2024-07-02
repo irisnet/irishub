@@ -22,7 +22,7 @@ type TxTestSuite struct {
 
 // TestTxCmd tests all tx command in the nft module
 func (s *TxTestSuite) TestTxCmd() {
-    val := s.Network.Validators[0]
+	val := s.Network.Validators[0]
 	clientCtx := val.ClientCtx
 
 	s.setup()
@@ -185,7 +185,6 @@ func (s *TxTestSuite) latestHeight() int64 {
 }
 
 func (s *TxTestSuite) setup() {
-
 	val := s.Network.Validators[0]
 	clientCtx := val.ClientCtx
 

@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -71,7 +72,7 @@ func TestFarmPool_CaclRewards(t *testing.T) {
 	}
 	type args struct {
 		farmInfo FarmInfo
-		deltaAmt sdk.Int
+		deltaAmt math.Int
 	}
 	tests := []struct {
 		name           string

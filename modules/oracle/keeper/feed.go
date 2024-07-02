@@ -3,11 +3,9 @@ package keeper
 import (
 	"encoding/hex"
 
-	gogotypes "github.com/cosmos/gogoproto/types"
-
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	"mods.irisnet.org/modules/oracle/types"
 	"mods.irisnet.org/modules/service/exported"

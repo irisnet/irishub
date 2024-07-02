@@ -10,11 +10,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"mods.irisnet.org/e2e"
+	"mods.irisnet.org/e2e/service"
 	oraclecli "mods.irisnet.org/modules/oracle/client/cli"
 	servicecli "mods.irisnet.org/modules/service/client/cli"
 	servicetypes "mods.irisnet.org/modules/service/types"
-
-	"mods.irisnet.org/e2e/service"
 )
 
 // TxTestSuite is a suite of end-to-end tests for the nft module
@@ -193,7 +192,7 @@ func (s *TxTestSuite) TestTxCmd() {
 			var requestIds []string
 			var requestsBz []byte
 			for _, attribute := range event.Attributes {
-				if string(attribute.Key) == servicetypes.AttributeKeyRequests {
+				if attribute.Key == servicetypes.AttributeKeyRequests {
 					requestsBz = []byte(attribute.GetValue())
 					found = true
 				}

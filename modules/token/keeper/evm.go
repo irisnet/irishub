@@ -4,15 +4,13 @@ import (
 	"encoding/json"
 	"math/big"
 
+	errorsmod "cosmossdk.io/errors"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 
-	errorsmod "cosmossdk.io/errors"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"mods.irisnet.org/modules/token/types"
 	tokentypes "mods.irisnet.org/modules/token/types"
 )
 
@@ -37,7 +35,7 @@ func (k Keeper) CallEVM(
 	commit bool,
 	method string,
 	args ...interface{},
-) (*types.Result, error) {
+) (*tokentypes.Result, error) {
 	data, err := contractABI.Pack(method, args...)
 	if err != nil {
 		return nil, errorsmod.Wrap(
@@ -71,15 +69,15 @@ func (k Keeper) CallEVMWithData(
 	contract *common.Address,
 	data []byte,
 	commit bool,
-) (*types.Result, error) {
+) (*tokentypes.Result, error) {
 	nonce, err := k.accountKeeper.GetSequence(ctx, from.Bytes())
 	if err != nil {
 		return nil, err
 	}
 
-	gasCap := types.DefaultGasCap
+	gasCap := tokentypes.DefaultGasCap
 	if commit {
-		args, err := json.Marshal(types.TransactionArgs{
+		args, err := json.Marshal(tokentypes.TransactionArgs{
 			From: &from,
 			To:   contract,
 			Data: (*hexutil.Bytes)(&data),
@@ -88,9 +86,9 @@ func (k Keeper) CallEVMWithData(
 			return nil, errorsmod.Wrapf(tokentypes.ErrJSONMarshal, "failed to marshal tx args: %s", err.Error())
 		}
 
-		gas, err := k.evmKeeper.EstimateGas(sdk.WrapSDKContext(ctx), &types.EthCallRequest{
+		gas, err := k.evmKeeper.EstimateGas(sdk.WrapSDKContext(ctx), &tokentypes.EthCallRequest{
 			Args:    args,
-			GasCap:  types.DefaultGasCap,
+			GasCap:  tokentypes.DefaultGasCap,
 			ChainID: k.evmKeeper.ChainID().Int64(),
 		})
 		if err != nil {
@@ -113,7 +111,7 @@ func (k Keeper) CallEVMWithData(
 		!commit,               // isFake
 	)
 
-	res, err := k.evmKeeper.ApplyMessage(ctx, msg, types.NewNoOpTracer(), commit)
+	res, err := k.evmKeeper.ApplyMessage(ctx, msg, tokentypes.NewNoOpTracer(), commit)
 	if err != nil {
 		return nil, err
 	}

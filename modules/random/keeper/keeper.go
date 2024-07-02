@@ -3,9 +3,8 @@ package keeper
 import (
 	"encoding/hex"
 
-	"github.com/cometbft/cometbft/libs/log"
-
 	errorsmod "cosmossdk.io/errors"
+	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"

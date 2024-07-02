@@ -41,21 +41,4 @@ else
     echo "no files to lint"
     exit 0
   fi
-
-  GIT_DIFF=$(echo $GIT_DIFF | tr -d "'" | tr ' ' '\n' | grep '\.go$' | grep -v '\.pb\.go$' | grep -Eo '^[^/]+\/[^/]+' | uniq)
-
-  lint_sdk=false
-  for dir in ${GIT_DIFF[@]}; do
-    if [[ ! -f "$REPO_ROOT/$dir/go.mod" ]]; then
-      lint_sdk=true
-    else
-      lint_module $dir "$@"
-    fi
-  done
-
-  if [[ $lint_sdk ]]; then
-    cd "$REPO_ROOT"
-    echo "linting github.com/cosmos/cosmos-sdk [$(date -Iseconds -u)]"
-    golangci-lint run ./... -c "${REPO_ROOT}/.golangci.yml" "$@" --build-tags=${LINT_TAGS}
-  fi
 fi

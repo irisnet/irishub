@@ -6,7 +6,6 @@ import (
 	"math/rand"
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
@@ -246,7 +245,6 @@ func SimulateMsgDefineService(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 
 		serviceName := simtypes.RandStringOfLength(r, 70)
@@ -313,7 +311,6 @@ func SimulateMsgBindService(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		def, err := GenServiceDefinition(r, k, ctx)
 		if err != nil {
 			return simtypes.NoOpMsg(
@@ -462,7 +459,6 @@ func SimulateMsgUpdateServiceBinding(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		binding, err := GenServiceBinding(r, k, ctx)
 		if err != nil {
 			return simtypes.NoOpMsg(
@@ -582,7 +578,6 @@ func SimulateMsgSetWithdrawAddress(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		withdrawalAccount, _ := simtypes.RandomAcc(r, accs)
 
 		binding, err := GenServiceBinding(r, k, ctx)
@@ -661,7 +656,6 @@ func SimulateMsgDisableServiceBinding(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		binding, err := GenServiceBinding(r, k, ctx)
 		if err != nil {
 			return simtypes.NoOpMsg(
@@ -749,7 +743,6 @@ func SimulateMsgEnableServiceBinding(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		binding, err := GenServiceBinding(r, k, ctx)
 		if err != nil {
 			return simtypes.NoOpMsg(
@@ -865,7 +858,6 @@ func SimulateMsgRefundServiceDeposit(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		binding, err := GenServiceBindingDisabled(r, k, ctx)
 		if err != nil {
 			return simtypes.NoOpMsg(
@@ -1066,7 +1058,6 @@ func SimulateMsgRespondService(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		request := GenRequest(r, k, ctx)
 		if request.Size() == 0 {
 			return simtypes.NoOpMsg(
@@ -1135,7 +1126,6 @@ func SimulateMsgRespondService(
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
-
 	}
 }
 
@@ -1241,7 +1231,6 @@ func SimulateMsgStartRequestContext(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		requestContextId := GenPausedRequestContextId(r, k, ctx)
 		if len(requestContextId) == 0 {
 			return simtypes.NoOpMsg(
@@ -1343,7 +1332,6 @@ func SimulateMsgKillRequestContext(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		requestContextId := GenRequestContextId(r, k, ctx)
 		if len(requestContextId) == 0 {
 			return simtypes.NoOpMsg(
@@ -1444,7 +1432,6 @@ func SimulateMsgUpdateRequestContext(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		requestContextId := GenRequestContextId(r, k, ctx)
 		if len(requestContextId) == 0 {
 			return simtypes.NoOpMsg(
@@ -1580,7 +1567,6 @@ func SimulateMsgWithdrawEarnedFees(
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		binding, err := GenServiceBinding(r, k, ctx)
 		if err != nil {
 			return simtypes.NoOpMsg(
@@ -1646,7 +1632,6 @@ func SimulateMsgWithdrawEarnedFees(
 		}
 
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
-
 	}
 }
 

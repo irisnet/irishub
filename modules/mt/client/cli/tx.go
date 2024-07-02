@@ -5,13 +5,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/spf13/cobra"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
+	"github.com/spf13/cobra"
 
 	"mods.irisnet.org/modules/mt/types"
 )
@@ -59,7 +58,7 @@ func GetCmdIssueDenom() *cobra.Command {
 				return err
 			}
 
-			var sender = clientCtx.GetFromAddress().String()
+			sender := clientCtx.GetFromAddress().String()
 
 			name, err := cmd.Flags().GetString(FlagName)
 			if err != nil {
@@ -101,7 +100,10 @@ func GetCmdTransferDenom() *cobra.Command {
 		),
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cmd.Flags().Set(flags.FlagFrom, args[0])
+			if err := cmd.Flags().Set(flags.FlagFrom, args[0]); err != nil {
+				return err
+			}
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -176,7 +178,7 @@ func GetCmdMintMT() *cobra.Command {
 				return err
 			}
 
-			var sender = clientCtx.GetFromAddress().String()
+			sender := clientCtx.GetFromAddress().String()
 
 			recipient, err := cmd.Flags().GetString(FlagRecipient)
 			if err != nil {
@@ -272,7 +274,10 @@ func GetCmdTransferMT() *cobra.Command {
 		),
 		Args: cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cmd.Flags().Set(flags.FlagFrom, args[0])
+			if err := cmd.Flags().Set(flags.FlagFrom, args[0]); err != nil {
+				return err
+			}
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err

@@ -93,7 +93,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 	var (
 		collections []mt.Collection
 		owners      []mt.Owner
-		accLen      int = 10
+		accLen      = 10
 	)
 
 	if len(simState.Accounts) < accLen {
@@ -124,5 +124,4 @@ func RandomizedGenState(simState *module.SimulationState) {
 	}
 
 	simState.GenState[mt.ModuleName] = simState.Cdc.MustMarshalJSON(mtGenesis)
-
 }

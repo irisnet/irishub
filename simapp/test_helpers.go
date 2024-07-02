@@ -13,19 +13,17 @@ import (
 	"time"
 
 	"cosmossdk.io/depinject"
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
-	"github.com/cosmos/gogoproto/proto"
-	"github.com/stretchr/testify/require"
-
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
-	codectype "github.com/cosmos/cosmos-sdk/codec/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -44,12 +42,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authcli "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 	bankcli "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/cosmos/gogoproto/proto"
+	"github.com/stretchr/testify/require"
 )
 
 // SetupOptions defines arguments that are passed into `Simapp` constructor.
@@ -108,6 +107,7 @@ func SetupWithGenesisStateFn(
 	depInjectOptions DepinjectOptions,
 	merge func(cdc codec.Codec, state GenesisState) GenesisState,
 ) *SimApp {
+	t.Helper()
 	app, genesisState := setup(true, 5, depInjectOptions)
 
 	privVal := mock.NewPV()
@@ -176,7 +176,7 @@ func NewConfig(depInjectOptions DepinjectOptions) (network.Config, error) {
 		interfaceRegistry codectypes.InterfaceRegistry
 	)
 
-	providers := append(depInjectOptions.Providers[:], log.NewNopLogger())
+	providers := append(depInjectOptions.Providers, log.NewNopLogger())
 	if err := depinject.Inject(
 		depinject.Configs(
 			depInjectOptions.Config,
@@ -228,6 +228,7 @@ func genesisStateWithValSet(t *testing.T,
 	valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount,
 	balances ...banktypes.Balance,
 ) GenesisState {
+	t.Helper()
 	// set genesis accounts
 	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
 	genesisState[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(authGenesis)
@@ -399,7 +400,7 @@ func CreateTestAddrs(numAddrs int) []sdk.AccAddress {
 }
 
 // for incode address generation
-func testAddr(addr string, bech string) sdk.AccAddress {
+func testAddr(addr, bech string) sdk.AccAddress {
 	res, err := sdk.AccAddressFromHexUnsafe(addr)
 	if err != nil {
 		panic(err)
@@ -447,7 +448,7 @@ func AddTestAddrsFromPubKeys(
 	app *SimApp,
 	ctx sdk.Context,
 	pubKeys []cryptotypes.PubKey,
-	accAmt sdk.Int,
+	accAmt math.Int,
 ) {
 	initCoins := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), accAmt))
 
@@ -458,7 +459,7 @@ func AddTestAddrsFromPubKeys(
 
 // AddTestAddrs constructs and returns accNum amount of accounts with an
 // initial balance of accAmt in random order
-func AddTestAddrs(app *SimApp, ctx sdk.Context, accNum int, accAmt sdk.Int) []sdk.AccAddress {
+func AddTestAddrs(app *SimApp, ctx sdk.Context, accNum int, accAmt math.Int) []sdk.AccAddress {
 	return addTestAddrs(app, ctx, accNum, accAmt, createRandomAccounts)
 }
 
@@ -468,7 +469,7 @@ func AddTestAddrsIncremental(
 	app *SimApp,
 	ctx sdk.Context,
 	accNum int,
-	accAmt sdk.Int,
+	accAmt math.Int,
 ) []sdk.AccAddress {
 	return addTestAddrs(app, ctx, accNum, accAmt, createIncrementalAccounts)
 }
@@ -477,7 +478,7 @@ func addTestAddrs(
 	app *SimApp,
 	ctx sdk.Context,
 	accNum int,
-	accAmt sdk.Int,
+	accAmt math.Int,
 	strategy GenerateAccountStrategy,
 ) []sdk.AccAddress {
 	testAddrs := strategy(accNum)
@@ -514,7 +515,7 @@ func ConvertAddrsToValAddrs(addrs []sdk.AccAddress) []sdk.ValAddress {
 	return valAddrs
 }
 
-func TestAddr(addr string, bech string) (sdk.AccAddress, error) {
+func TestAddr(addr, bech string) (sdk.AccAddress, error) {
 	res, err := sdk.AccAddressFromHexUnsafe(addr)
 	if err != nil {
 		return nil, err
@@ -537,6 +538,7 @@ func TestAddr(addr string, bech string) (sdk.AccAddress, error) {
 
 // CheckBalance checks the balance of an account.
 func CheckBalance(t *testing.T, app *SimApp, addr sdk.AccAddress, balances sdk.Coins) {
+	t.Helper()
 	ctxCheck := app.BaseApp.NewContext(true, tmproto.Header{})
 	require.True(t, balances.IsEqual(app.BankKeeper.GetAllBalances(ctxCheck, addr)))
 }
@@ -556,6 +558,7 @@ func SignCheckDeliver(
 	expSimPass, expPass bool,
 	priv ...cryptotypes.PrivKey,
 ) (sdk.GasInfo, *sdk.Result, error) {
+	t.Helper()
 	tx, err := simtestutil.GenSignedMockTx(
 		rand.New(rand.NewSource(time.Now().UnixNano())),
 		txCfg,
@@ -668,7 +671,7 @@ func NewPubKeyFromHex(pk string) (res cryptotypes.PubKey) {
 		panic(err)
 	}
 	if len(pkBytes) != ed25519.PubKeySize {
-		panic(errors.Wrap(errors.ErrInvalidPubKey, "invalid pubkey size"))
+		panic(errorsmod.Wrap(errors.ErrInvalidPubKey, "invalid pubkey size"))
 	}
 	return &ed25519.PubKey{Key: pkBytes}
 }
@@ -726,6 +729,7 @@ func QueryBalancesExec(
 	address string,
 	extraArgs ...string,
 ) sdk.Coins {
+	t.Helper()
 	args := []string{
 		address,
 		fmt.Sprintf("--%s=json", "output"),
@@ -745,6 +749,7 @@ func QueryBalanceExec(
 	denom string,
 	extraArgs ...string,
 ) *sdk.Coin {
+	t.Helper()
 	args := []string{
 		address,
 		fmt.Sprintf("--%s=%s", bankcli.FlagDenom, denom),
@@ -764,6 +769,7 @@ func QueryAccountExec(
 	address string,
 	extraArgs ...string,
 ) authtypes.AccountI {
+	t.Helper()
 	args := []string{
 		address,
 		fmt.Sprintf("--%s=json", "output"),
@@ -772,11 +778,11 @@ func QueryAccountExec(
 	out, err := clitestutil.ExecTestCLICmd(clientCtx, authcli.GetAccountCmd(), args)
 	require.NoError(t, err, "QueryAccountExec  failed")
 
-	respType := proto.Message(&codectype.Any{})
+	respType := proto.Message(&codectypes.Any{})
 	require.NoError(t, clientCtx.Codec.UnmarshalJSON(out.Bytes(), respType))
 
 	var account authtypes.AccountI
-	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*codectype.Any), &account)
+	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*codectypes.Any), &account)
 	require.NoError(t, err, "UnpackAccount failed")
 
 	return account
@@ -789,13 +795,15 @@ func MsgSendExec(
 	from, to, amount fmt.Stringer,
 	extraArgs ...string,
 ) *ResponseTx {
+	t.Helper()
 	args := []string{from.String(), to.String(), amount.String()}
 	args = append(args, extraArgs...)
 
-	return network.ExecTxCmdWithResult(t, clientCtx, cli.NewSendTxCmd(), args)
+	return network.ExecTxCmdWithResult(t, clientCtx, bankcli.NewSendTxCmd(), args)
 }
 
 func QueryTx(t *testing.T, clientCtx client.Context, txHash string) abci.ResponseDeliverTx {
+	t.Helper()
 	txResult, _ := QueryTxWithHeight(t, clientCtx, txHash)
 	return txResult
 }
@@ -805,6 +813,7 @@ func QueryTxWithHeight(
 	clientCtx client.Context,
 	txHash string,
 ) (abci.ResponseDeliverTx, int64) {
+	t.Helper()
 	txHashBz, err := hex.DecodeString(txHash)
 	require.NoError(t, err, "query tx failed")
 

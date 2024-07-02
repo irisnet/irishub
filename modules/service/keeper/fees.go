@@ -1,12 +1,11 @@
 package keeper
 
 import (
-	gogotypes "github.com/cosmos/gogoproto/types"
-
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	v1 "github.com/cosmos/cosmos-sdk/x/auth/migrations/v1"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
 	"mods.irisnet.org/modules/service/types"
 )

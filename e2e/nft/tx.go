@@ -32,7 +32,7 @@ func (s *TxTestSuite) TestTxCmd() {
 	description := "description"
 	data := "{\"key1\":\"value1\",\"key2\":\"value2\"}"
 	tokenID := "kitty"
-	//owner     := "owner"
+	// owner     := "owner"
 	denomName := "name"
 	denomID := "denom"
 	schema := "schema"

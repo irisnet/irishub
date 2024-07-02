@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cosmos/gogoproto/proto"
-
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	"mods.irisnet.org/e2e"
 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
@@ -108,7 +107,7 @@ func (s *QueryTestSuite) TestQueryCmd() {
 
 	_, err = s.WaitForHeight(startHeight)
 	s.Require().NoError(err)
-	s.WaitForNextBlock()
+	s.Require().NoError(s.WaitForNextBlock())
 
 	lpToken := sdk.NewCoin(lpTokenDenom, sdk.NewInt(100))
 	txResult = StakeExec(
@@ -150,18 +149,17 @@ func (s *QueryTestSuite) latestHeight() int64 {
 }
 
 func (s *QueryTestSuite) setup() {
-
 	val := s.Validators[0]
 	clientCtx := val.ClientCtx
 
 	from := val.Address
-	symbol := "kitty"
-	name := "Kitty Token"
-	minUnit := "kitty"
-	scale := uint32(0)
-	initialSupply := uint64(100000000)
-	maxSupply := uint64(200000000)
-	mintable := true
+	const symbol = "kitty"
+	const name = "Kitty Token"
+	const minUnit = "kitty"
+	const scale = uint32(0)
+	const initialSupply = uint64(100000000)
+	const maxSupply = uint64(200000000)
+	const mintable = true
 
 	// issue token
 	msgIssueToken := &tokentypes.MsgIssueToken{

@@ -1,11 +1,10 @@
 package cli
 
 import (
-	"github.com/spf13/cobra"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/spf13/cobra"
 
 	"mods.irisnet.org/modules/record/types"
 )

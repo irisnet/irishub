@@ -62,7 +62,7 @@ func (k Keeper) RestrictedServiceFeeDenom(ctx sdk.Context) bool {
 // GetParams sets the farm module parameters.
 func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get([]byte(types.ParamsKey))
+	bz := store.Get(types.ParamsKey)
 	if bz == nil {
 		return params
 	}

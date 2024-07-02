@@ -5,11 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/cometbft/cometbft/crypto/tmhash"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -55,7 +53,8 @@ var (
 
 	// -------------
 
-	invalidName = "invalid/service/name"
+	invalidName             = "invalid/service/name"
+	invalidRequestContextID = "invalid-request-context-id"
 )
 
 // TestMsgDefineServiceRoute tests Route for MsgDefineService
@@ -1366,8 +1365,6 @@ func TestMsgPauseRequestContextType(t *testing.T) {
 
 // TestMsgPauseRequestContextValidation tests ValidateBasic for MsgPauseRequestContext
 func TestMsgPauseRequestContextValidation(t *testing.T) {
-	invalidRequestContextID := "invalid-request-context-id"
-
 	testMsgs := []*MsgPauseRequestContext{
 		NewMsgPauseRequestContext(testRequestContextID, testConsumer), // valid msg
 		NewMsgPauseRequestContext(
@@ -1432,8 +1429,6 @@ func TestMsgStartRequestContextType(t *testing.T) {
 
 // TestMsgStartRequestContextValidation tests ValidateBasic for MsgStartRequestContext
 func TestMsgStartRequestContextValidation(t *testing.T) {
-	invalidRequestContextID := "invalid-request-context-id"
-
 	testMsgs := []*MsgStartRequestContext{
 		NewMsgStartRequestContext(testRequestContextID, testConsumer), // valid msg
 		NewMsgStartRequestContext(
@@ -1498,8 +1493,6 @@ func TestMsgKillRequestContextType(t *testing.T) {
 
 // TestMsgKillRequestContextValidation tests ValidateBasic for MsgKillRequestContext
 func TestMsgKillRequestContextValidation(t *testing.T) {
-	invalidRequestContextID := "invalid-request-context-id"
-
 	testMsgs := []*MsgKillRequestContext{
 		NewMsgKillRequestContext(testRequestContextID, testConsumer), // valid msg
 		NewMsgKillRequestContext(testRequestContextID, emptyAddress), // missing consumer address
@@ -1561,7 +1554,6 @@ func TestMsgUpdateRequestContextType(t *testing.T) {
 
 // TestMsgUpdateRequestContextValidation tests ValidateBasic for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextValidation(t *testing.T) {
-	invalidRequestContextID := "invalid-request-context-id"
 	invalidDuplicateProviders := []string{testProvider, testProvider}
 	invalidTimeout := int64(-1)
 	invalidLessRepeatedFreq := uint64(testTimeout) - 10

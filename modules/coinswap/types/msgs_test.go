@@ -8,9 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var (
-	sender = sdk.AccAddress(tmhash.SumTruncated([]byte("sender"))).String()
-)
+var sender = sdk.AccAddress(tmhash.SumTruncated([]byte("sender"))).String()
 
 func TestMsgSwapOrder_ValidateBasic(t *testing.T) {
 	type fields struct {

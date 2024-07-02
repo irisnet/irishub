@@ -127,7 +127,7 @@ func (dt NoOpTracer) CaptureFault(pc uint64, op vm.OpCode, gas, cost uint64, sco
 func (dt NoOpTracer) CaptureEnd(output []byte, gasUsed uint64, tm time.Duration, err error) {}
 
 // CaptureEnter implements vm.Tracer interface
-func (dt NoOpTracer) CaptureEnter(typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
+func (dt NoOpTracer) CaptureEnter(typ vm.OpCode, from, to common.Address, input []byte, gas uint64, value *big.Int) {
 }
 
 // CaptureExit implements vm.Tracer interface

@@ -32,7 +32,7 @@ var (
 
 // NewMsgIssueToken - construct token issue msg.
 func NewMsgIssueToken(
-	symbol string, minUnit string, name string,
+	symbol, minUnit, name string,
 	scale uint32, initialSupply, maxSupply uint64,
 	mintable bool, owner string,
 ) *MsgIssueToken {
@@ -256,7 +256,7 @@ func (msg MsgMintToken) ValidateBasic() error {
 }
 
 // NewMsgBurnToken creates a MsgMintToken
-func NewMsgBurnToken(symbol string, owner string, amount uint64) *MsgBurnToken {
+func NewMsgBurnToken(symbol, owner string, amount uint64) *MsgBurnToken {
 	return &MsgBurnToken{
 		Symbol: symbol,
 		Amount: amount,

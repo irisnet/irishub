@@ -29,7 +29,7 @@ const (
 	// FeeCollectorName is the root string for the service fee collector address used for testing
 	FeeCollectorName = "service_fee_collector"
 
-	//Address length (binary)
+	// Address length (binary)
 	AddrLen = 20
 )
 

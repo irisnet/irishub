@@ -11,18 +11,16 @@ import (
 	tokentypes "mods.irisnet.org/modules/token/types"
 )
 
-var (
-	token = Token{
-		Symbol:        "iris",
-		Name:          "irisnet",
-		Scale:         18,
-		MinUnit:       "atto",
-		InitialSupply: 1000000,
-		MaxSupply:     10000000,
-		Mintable:      true,
-		Owner:         "",
-	}
-)
+var token = Token{
+	Symbol:        "iris",
+	Name:          "irisnet",
+	Scale:         18,
+	MinUnit:       "atto",
+	InitialSupply: 1000000,
+	MaxSupply:     10000000,
+	Mintable:      true,
+	Owner:         "",
+}
 
 func TestToken_ToMinCoin(t *testing.T) {
 	type args struct {

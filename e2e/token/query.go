@@ -4,11 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/cosmos/gogoproto/proto"
-
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	"mods.irisnet.org/e2e"
 	tokencli "mods.irisnet.org/modules/token/client/cli"
@@ -25,16 +24,7 @@ type QueryTestSuite struct {
 func (s *QueryTestSuite) TestQueryCmd() {
 	val := s.Network.Validators[0]
 	clientCtx := val.ClientCtx
-	// ---------------------------------------------------------------------------
-
 	from := val.Address
-	symbol := "kitty"
-	name := "Kitty Token"
-	minUnit := "kitty"
-	scale := 0
-	initialSupply := int64(100000000)
-	maxSupply := int64(200000000)
-	mintable := true
 	baseURL := val.APIAddress
 
 	//------test GetCmdIssueToken()-------------

@@ -7,19 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// nolint: deadcode unused
-var (
-	denomID   = "denom"
-	denom     = "denom"
-	id        = "id1"
-	mtName    = "report"
-	address   = CreateTestAddrs(1)[0]
-	address2  = CreateTestAddrs(2)[1]
-	tokenURI  = "https://google.com/token-1.json"
-	uriHash   = "uriHash"
-	tokenData = "https://google.com/token-1.json"
-)
-
 // CreateTestAddrs creates test addresses
 func CreateTestAddrs(numAddrs int) []sdk.AccAddress {
 	var addresses []sdk.AccAddress
@@ -28,9 +15,9 @@ func CreateTestAddrs(numAddrs int) []sdk.AccAddress {
 	// start at 100 so we can make up to 999 test addresses with valid test addresses
 	for i := 100; i < (numAddrs + 100); i++ {
 		numString := strconv.Itoa(i)
-		buffer.WriteString("A58856F0FD53BF058B4909A21AEC019107BA6") //base address string
+		buffer.WriteString("A58856F0FD53BF058B4909A21AEC019107BA6") // base address string
 
-		buffer.WriteString(numString) //adding on final two digits to make addresses unique
+		buffer.WriteString(numString) // adding on final two digits to make addresses unique
 		res, _ := sdk.AccAddressFromHexUnsafe(buffer.String())
 		bech := res.String()
 		addresses = append(addresses, testAddr(buffer.String(), bech))
@@ -40,7 +27,7 @@ func CreateTestAddrs(numAddrs int) []sdk.AccAddress {
 }
 
 // for incode address generation
-func testAddr(addr string, bech string) sdk.AccAddress {
+func testAddr(addr, bech string) sdk.AccAddress {
 	res, err := sdk.AccAddressFromHexUnsafe(addr)
 	if err != nil {
 		panic(err)

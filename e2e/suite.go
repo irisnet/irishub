@@ -21,7 +21,7 @@ type TestSuite struct {
 // SetupSuite creates a new network for integration tests
 func (s *TestSuite) SetupSuite() {
 	s.T().Log("setting up e2e test suite")
-	
+
 	depInjectOptions := simapp.DepinjectOptions{
 		Config: AppConfig,
 		Providers: []interface{}{
@@ -29,7 +29,7 @@ func (s *TestSuite) SetupSuite() {
 			keeper.ProvideMockICS20(),
 		},
 	}
-	if s.modifyConfigFn == nil {	
+	if s.modifyConfigFn == nil {
 		s.Network = simapp.SetupNetwork(s.T(), depInjectOptions)
 		return
 	}

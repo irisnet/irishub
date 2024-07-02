@@ -4,16 +4,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/suite"
-
+	sdkmath "cosmossdk.io/math"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
-	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/stretchr/testify/suite"
 
 	"mods.irisnet.org/modules/coinswap/keeper"
 	"mods.irisnet.org/modules/coinswap/types"
@@ -69,7 +67,7 @@ func (suite *TestSuite) TestParams() {
 		{types.DefaultParams()},
 	}
 	for _, tc := range cases {
-		suite.keeper.SetParams(suite.ctx, tc.params)
+		suite.NoError(suite.keeper.SetParams(suite.ctx, tc.params), "set params failed")
 
 		feeParam := suite.keeper.GetParams(suite.ctx)
 		suite.Equal(tc.params.Fee, feeParam.Fee)
@@ -77,6 +75,7 @@ func (suite *TestSuite) TestParams() {
 }
 
 func setupWithGenesisAccounts(t *testing.T, keeper *keeper.Keeper) *simapp.SimApp {
+	t.Helper()
 	amountInitStandard, _ := sdkmath.NewIntFromString("30000000000000000000")
 	amountInitBTC, _ := sdkmath.NewIntFromString("3000000000")
 

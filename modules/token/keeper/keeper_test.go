@@ -3,16 +3,14 @@ package keeper_test
 import (
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/stretchr/testify/suite"
-
+	sdkmath "cosmossdk.io/math"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
-	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/stretchr/testify/suite"
 
 	"mods.irisnet.org/modules/token/keeper"
 	tokentypes "mods.irisnet.org/modules/token/types"
@@ -30,7 +28,7 @@ var (
 	add2     = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest1")))
 	initAmt  = sdkmath.NewIntWithDecimal(100000000, int(6))
 	initCoin = sdk.Coins{sdk.NewCoin(denom, initAmt)}
-	beacon  = common.BytesToAddress(owner.Bytes())
+	beacon   = common.BytesToAddress(owner.Bytes())
 )
 
 type KeeperTestSuite struct {
@@ -45,7 +43,7 @@ type KeeperTestSuite struct {
 
 func (suite *KeeperTestSuite) SetupTest() {
 	depInjectOptions := simapp.DepinjectOptions{
-		Config:    AppConfig,
+		Config: AppConfig,
 		Providers: []interface{}{
 			keeper.ProvideMockEVM(),
 			keeper.ProvideMockICS20(),
@@ -53,7 +51,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 		Consumers: []interface{}{&suite.keeper},
 	}
 
-	app := simapp.Setup(suite.T(), isCheckTx,depInjectOptions)
+	app := simapp.Setup(suite.T(), isCheckTx, depInjectOptions)
 
 	suite.legacyAmino = app.LegacyAmino()
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
@@ -63,7 +61,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	// set params
 	params := v1.DefaultParams()
 	params.Beacon = beacon.String()
-	suite.keeper.SetParams(suite.ctx, params)
+	suite.NoError(suite.keeper.SetParams(suite.ctx, params), "SetParams failed")
 
 	// init tokens to addr
 	err := suite.bk.MintCoins(suite.ctx, tokentypes.ModuleName, initCoin)

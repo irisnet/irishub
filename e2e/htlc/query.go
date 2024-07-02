@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/cometbft/cometbft/crypto"
-
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -22,7 +21,7 @@ func (s *QueryTestSuite) TestQueryCmd() {
 	val := s.Network.Validators[0]
 
 	//------test GetCmdCreateHTLC()-------------
-	//baseURL := val.APIAddress
+	// baseURL := val.APIAddress
 	from := val.Address
 	to := sdk.AccAddress(crypto.AddressHash([]byte("dgsbl")))
 	amount := "1000" + sdk.DefaultBondDenom
@@ -30,7 +29,7 @@ func (s *QueryTestSuite) TestQueryCmd() {
 	hashLock := "e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561"
 	timeLock := uint64(50)
 	timestamp := uint64(1580000000)
-	//stateOpen := "HTLC_STATE_OPEN"
+	// stateOpen := "HTLC_STATE_OPEN"
 
 	args := []string{
 		fmt.Sprintf("--%s=%s", htlccli.FlagTo, to),

@@ -6,12 +6,10 @@ import (
 	"os"
 	"path/filepath"
 
+	"cosmossdk.io/depinject"
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
-
-	"cosmossdk.io/depinject"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -163,7 +161,7 @@ func NewSimApp(
 		app        = &SimApp{}
 		appBuilder *runtime.AppBuilder
 
-		providers = append(depInjectOptions.Providers[:], appOpts)
+		providers = append(depInjectOptions.Providers, appOpts)
 		// merge the AppConfig and other configuration in one config
 		appConfig = depinject.Configs(
 			depInjectOptions.Config,
@@ -200,7 +198,7 @@ func NewSimApp(
 		)
 	)
 
-	consumer := append(depInjectOptions.Consumers[:],
+	consumer := append(depInjectOptions.Consumers,
 		&appBuilder,
 		&app.appCodec,
 		&app.legacyAmino,

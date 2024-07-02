@@ -4,10 +4,9 @@ import (
 	"context"
 	"encoding/hex"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"mods.irisnet.org/modules/htlc/types"
 )
@@ -35,7 +34,7 @@ func (k Keeper) AssetSupply(c context.Context, request *types.QueryAssetSupplyRe
 
 	assetSupply, found := k.GetAssetSupply(ctx, request.Denom)
 	if !found {
-		return nil, status.Errorf(codes.NotFound, string(request.Denom))
+		return nil, status.Errorf(codes.NotFound, request.Denom)
 	}
 
 	return &types.QueryAssetSupplyResponse{AssetSupply: &assetSupply}, nil

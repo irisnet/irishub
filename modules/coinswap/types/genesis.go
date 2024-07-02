@@ -29,9 +29,9 @@ func ValidateGenesis(data GenesisState) error {
 		return err
 	}
 
-	var poolIds = make(map[string]bool, len(data.Pool))
-	var lptDenoms = make(map[string]bool, len(data.Pool))
-	var maxSequence = uint64(0)
+	poolIds := make(map[string]bool, len(data.Pool))
+	lptDenoms := make(map[string]bool, len(data.Pool))
+	maxSequence := uint64(0)
 	for _, pool := range data.Pool {
 		if poolIds[pool.Id] {
 			return fmt.Errorf("duplicate pool: %s", pool.Id)
@@ -42,7 +42,7 @@ func ValidateGenesis(data GenesisState) error {
 		poolIds[pool.Id] = true
 		lptDenoms[pool.LptDenom] = true
 
-		//validate the liquidity pool token denom
+		// validate the liquidity pool token denom
 		seq, err := ParseLptDenom(pool.LptDenom)
 		if err != nil {
 			return err
@@ -52,17 +52,17 @@ func ValidateGenesis(data GenesisState) error {
 			maxSequence = seq
 		}
 
-		//validate the token denom
+		// validate the token denom
 		if err := sdk.ValidateDenom(pool.CounterpartyDenom); err != nil {
 			return err
 		}
 
-		//validate the token denom
+		// validate the token denom
 		if err := sdk.ValidateDenom(pool.StandardDenom); err != nil {
 			return err
 		}
 
-		//validate the address
+		// validate the address
 		if _, err := sdk.AccAddressFromBech32(pool.EscrowAddress); err != nil {
 			return err
 		}

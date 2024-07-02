@@ -5,10 +5,9 @@ import (
 	"testing"
 
 	"github.com/cometbft/cometbft/libs/cli"
-	"github.com/cosmos/gogoproto/proto"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/gogoproto/proto"
 
 	mtcli "mods.irisnet.org/modules/mt/client/cli"
 	mttypes "mods.irisnet.org/modules/mt/types"
@@ -33,6 +32,7 @@ func IssueDenomExec(
 	from string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 	}
@@ -40,7 +40,6 @@ func IssueDenomExec(
 
 	return network.ExecTxCmdWithResult(t, clientCtx, mtcli.GetCmdIssueDenom(), args)
 }
-
 
 // BurnMTExec executes a burn token transaction.
 //
@@ -65,6 +64,7 @@ func BurnMTExec(t *testing.T,
 	amount string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		denomID,
 		mtID,
@@ -95,6 +95,7 @@ func MintMTExec(t *testing.T,
 	denomID string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
@@ -125,6 +126,7 @@ func EditMTExec(t *testing.T,
 	mtID string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		denomID,
 		mtID,
@@ -160,6 +162,7 @@ func TransferMTExec(t *testing.T,
 	amount string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		from,
 		recipient,
@@ -187,7 +190,9 @@ func QueryDenomExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
 	denomID string,
-	extraArgs ...string) *mttypes.Denom {
+	extraArgs ...string,
+) *mttypes.Denom {
+	t.Helper()
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -212,7 +217,9 @@ func QueryDenomExec(t *testing.T,
 func QueryDenomsExec(t *testing.T,
 	network simapp.Network,
 	clientCtx client.Context,
-	extraArgs ...string) *mttypes.QueryDenomsResponse {
+	extraArgs ...string,
+) *mttypes.QueryDenomsResponse {
+	t.Helper()
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
@@ -241,6 +248,7 @@ func QueryMTsExec(t *testing.T,
 	resp proto.Message,
 	extraArgs ...string,
 ) {
+	t.Helper()
 	args := []string{
 		denomID,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -267,7 +275,9 @@ func QueryMTExec(t *testing.T,
 	clientCtx client.Context,
 	denomID string,
 	mtID string,
-	extraArgs ...string) *mttypes.MT {
+	extraArgs ...string,
+) *mttypes.MT {
+	t.Helper()
 	args := []string{
 		denomID,
 		mtID,
@@ -296,7 +306,9 @@ func QueryBlancesExec(t *testing.T,
 	clientCtx client.Context,
 	from string,
 	denomID string,
-	extraArgs ...string) *mttypes.QueryBalancesResponse {
+	extraArgs ...string,
+) *mttypes.QueryBalancesResponse {
+	t.Helper()
 	args := []string{
 		from,
 		denomID,
@@ -330,6 +342,7 @@ func TransferDenomExec(t *testing.T,
 	denomID string,
 	extraArgs ...string,
 ) *simapp.ResponseTx {
+	t.Helper()
 	args := []string{
 		from,
 		recipient,

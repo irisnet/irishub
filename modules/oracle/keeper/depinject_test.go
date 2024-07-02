@@ -25,8 +25,6 @@ import (
 	upgrademodulev1 "cosmossdk.io/api/cosmos/upgrade/module/v1"
 	vestingmodulev1 "cosmossdk.io/api/cosmos/vesting/module/v1"
 	"cosmossdk.io/core/appconfig"
-	"google.golang.org/protobuf/types/known/durationpb"
-
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
@@ -45,14 +43,14 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	oraclemodule "mods.irisnet.org/api/irismod/oracle/module/v1"
 	servicemodule "mods.irisnet.org/api/irismod/service/module/v1"
-	oracletypes "mods.irisnet.org/modules/oracle/types"
-	servicetypes "mods.irisnet.org/modules/service/types"
-
 	_ "mods.irisnet.org/modules/oracle"
+	oracletypes "mods.irisnet.org/modules/oracle/types"
 	_ "mods.irisnet.org/modules/service"
+	servicetypes "mods.irisnet.org/modules/service/types"
 )
 
 var (

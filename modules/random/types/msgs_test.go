@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/cometbft/cometbft/crypto/tmhash"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -56,7 +54,7 @@ func TestMsgRequestRandomValidation(t *testing.T) {
 }
 
 func TestMsgRequestRandomGetSignBytes(t *testing.T) {
-	var msg = NewMsgRequestRandom(testAddr, blockInterval, true, serviceFeeCap)
+	msg := NewMsgRequestRandom(testAddr, blockInterval, true, serviceFeeCap)
 	res := msg.GetSignBytes()
 
 	expected := fmt.Sprintf(
@@ -67,7 +65,7 @@ func TestMsgRequestRandomGetSignBytes(t *testing.T) {
 }
 
 func TestMsgRequestRandomGetSigners(t *testing.T) {
-	var msg = NewMsgRequestRandom(testAddr, blockInterval, false, serviceFeeCap)
+	msg := NewMsgRequestRandom(testAddr, blockInterval, false, serviceFeeCap)
 	res := msg.GetSigners()
 
 	expected := "[8C739F254AB0A7EB5D6D71DBE535041E5EB36682]"

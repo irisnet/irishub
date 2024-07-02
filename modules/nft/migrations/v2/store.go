@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/cometbft/cometbft/libs/log"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -39,7 +38,7 @@ func Migrate(ctx sdk.Context,
 		var denom types.Denom
 		cdc.MustUnmarshal(iterator.Value(), &denom)
 
-		//delete unused key
+		// delete unused key
 		store.Delete(KeyDenom(denom.Id))
 		store.Delete(KeyDenomName(denom.Name))
 		store.Delete(KeyCollection(denom.Id))
@@ -79,6 +78,7 @@ func Migrate(ctx sdk.Context,
 	)
 	return nil
 }
+
 func migrateToken(
 	ctx sdk.Context,
 	k keeper,
@@ -105,7 +105,7 @@ func migrateToken(
 			return 0, err
 		}
 
-		//delete unused key
+		// delete unused key
 		store.Delete(KeyNFT(denomID, baseNFT.Id))
 		store.Delete(KeyOwner(owner, denomID, baseNFT.Id))
 

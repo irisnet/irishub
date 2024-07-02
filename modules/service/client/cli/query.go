@@ -6,14 +6,12 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/spf13/cobra"
-
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
+	"github.com/spf13/cobra"
 
 	"mods.irisnet.org/modules/service/client/utils"
 	"mods.irisnet.org/modules/service/types"
@@ -422,7 +420,6 @@ func GetCmdQueryServiceResponses() *cobra.Command {
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
-
 			if err != nil {
 				return err
 			}

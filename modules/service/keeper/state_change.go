@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"mods.irisnet.org/modules/service/types"

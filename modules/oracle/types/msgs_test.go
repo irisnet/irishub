@@ -3,11 +3,9 @@ package types
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/cometbft/cometbft/crypto/tmhash"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -163,7 +161,8 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false,
+		},
+		false,
 	}, {
 		"empty Providers",
 		MsgCreateFeed{
@@ -216,7 +215,8 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           emptyAddr,
-		}, false,
+		},
+		false,
 	}}
 
 	for _, tc := range tests {
@@ -307,67 +307,68 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 		testCase string
 		MsgEditFeed
 		expectPass bool
-	}{{
-		"basic good",
-		MsgEditFeed{
-			FeedName:          "feedEthPrice",
-			LatestHistory:     10,
-			Providers:         []string{addr1, addr2},
-			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
-			RepeatedFrequency: 5,
-			ResponseThreshold: 1,
-			Creator:           addr1,
+	}{
+		{
+			"basic good",
+			MsgEditFeed{
+				FeedName:          "feedEthPrice",
+				LatestHistory:     10,
+				Providers:         []string{addr1, addr2},
+				ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
+				RepeatedFrequency: 5,
+				ResponseThreshold: 1,
+				Creator:           addr1,
+			},
+			true,
+		}, {
+			"wrong FeedName, invalid char",
+			MsgEditFeed{
+				FeedName:          "$feedEthPrice",
+				LatestHistory:     10,
+				Providers:         []string{addr1, addr2},
+				ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
+				RepeatedFrequency: 5,
+				ResponseThreshold: 1,
+				Creator:           addr1,
+			},
+			false,
+		}, {
+			"wrong MaxLatestHistory(>100)",
+			MsgEditFeed{
+				FeedName:          "feedEthPrice",
+				LatestHistory:     101,
+				Providers:         []string{addr1, addr2},
+				ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
+				RepeatedFrequency: 5,
+				ResponseThreshold: 1,
+				Creator:           addr1,
+			},
+			false,
+		}, {
+			"invalid ResponseThreshold",
+			MsgEditFeed{
+				FeedName:          "feedEthPrice",
+				LatestHistory:     10,
+				Providers:         []string{addr1, addr2},
+				ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
+				RepeatedFrequency: 5,
+				ResponseThreshold: 3,
+				Creator:           addr1,
+			},
+			false,
+		}, {
+			"empty Creator",
+			MsgEditFeed{
+				FeedName:          "feedEthPrice",
+				LatestHistory:     10,
+				Providers:         []string{addr1, addr2},
+				ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
+				RepeatedFrequency: 5,
+				ResponseThreshold: 1,
+				Creator:           emptyAddr,
+			},
+			false,
 		},
-		true,
-	}, {
-		"wrong FeedName, invalid char",
-		MsgEditFeed{
-			FeedName:          "$feedEthPrice",
-			LatestHistory:     10,
-			Providers:         []string{addr1, addr2},
-			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
-			RepeatedFrequency: 5,
-			ResponseThreshold: 1,
-			Creator:           addr1,
-		},
-		false,
-	}, {
-		"wrong MaxLatestHistory(>100)",
-		MsgEditFeed{
-			FeedName:          "feedEthPrice",
-			LatestHistory:     101,
-			Providers:         []string{addr1, addr2},
-			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
-			RepeatedFrequency: 5,
-			ResponseThreshold: 1,
-			Creator:           addr1,
-		},
-		false,
-	}, {
-		"invalid ResponseThreshold",
-		MsgEditFeed{
-			FeedName:          "feedEthPrice",
-			LatestHistory:     10,
-			Providers:         []string{addr1, addr2},
-			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
-			RepeatedFrequency: 5,
-			ResponseThreshold: 3,
-			Creator:           addr1,
-		},
-		false,
-	}, {
-		"empty Creator",
-		MsgEditFeed{
-			FeedName:          "feedEthPrice",
-			LatestHistory:     10,
-			Providers:         []string{addr1, addr2},
-			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
-			RepeatedFrequency: 5,
-			ResponseThreshold: 1,
-			Creator:           emptyAddr,
-		},
-		false,
-	},
 	}
 
 	for _, tc := range tests {

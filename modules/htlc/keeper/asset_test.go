@@ -5,12 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/suite"
-
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/suite"
 
 	"mods.irisnet.org/modules/htlc/keeper"
 	"mods.irisnet.org/modules/htlc/types"
@@ -53,7 +51,7 @@ func (suite *AssetTestSuite) setTestParams() {
 	params.AssetParams[0].SupplyLimit.Limit = sdk.NewInt(50)
 	params.AssetParams[1].SupplyLimit.Limit = sdk.NewInt(100)
 	params.AssetParams[1].SupplyLimit.TimeBasedLimit = sdk.NewInt(15)
-	suite.keeper.SetParams(suite.ctx, params)
+	suite.NoError(suite.keeper.SetParams(suite.ctx, params), "set params failed")
 
 	bnbSupply := types.NewAssetSupply(
 		c("htltbnb", 5),
@@ -149,7 +147,8 @@ func (suite *AssetTestSuite) TestIncrementTimeLimitedCurrentAssetSupply() {
 				OutgoingSupply:           c("htltinc", 5),
 				CurrentSupply:            c("htltinc", 10),
 				TimeLimitedCurrentSupply: c("htltinc", 5),
-				TimeElapsed:              time.Duration(0)},
+				TimeElapsed:              time.Duration(0),
+			},
 		},
 		errArgs{
 			expectPass: true,
@@ -308,7 +307,8 @@ func (suite *AssetTestSuite) TestIncrementTimeLimitedIncomingAssetSupply() {
 				OutgoingSupply:           c("htltinc", 5),
 				CurrentSupply:            c("htltinc", 5),
 				TimeLimitedCurrentSupply: c("htltinc", 0),
-				TimeElapsed:              time.Duration(0)},
+				TimeElapsed:              time.Duration(0),
+			},
 		},
 		errArgs{
 			expectPass: true,
@@ -686,7 +686,7 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 						MaxBlockLock:  MaxTimeLock,
 					}},
 				}
-				suite.keeper.SetParams(suite.ctx, newParams)
+				suite.Require().NoError(suite.keeper.SetParams(suite.ctx, newParams), "SetParams should not panic")
 				suite.ctx = suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(tc.args.duration))
 				suite.NotPanics(
 					func() {

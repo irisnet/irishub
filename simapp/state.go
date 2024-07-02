@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
+	"os"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	tmtypes "github.com/cometbft/cometbft/types"
-
-	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -38,7 +37,6 @@ func AppStateFn(cdc codec.JSONCodec, simManager *module.SimulationManager) simty
 	) (
 		appState json.RawMessage, simAccs []simtypes.Account, chainID string, genesisTimestamp time.Time,
 	) {
-
 		if simcli.FlagGenesisTimeValue == 0 {
 			genesisTimestamp = simtypes.RandTimestamp(r)
 		} else {
@@ -65,7 +63,7 @@ func AppStateFn(cdc codec.JSONCodec, simManager *module.SimulationManager) simty
 
 		case config.ParamsFile != "":
 			appParams := make(simtypes.AppParams)
-			bz, err := ioutil.ReadFile(config.ParamsFile)
+			bz, err := os.ReadFile(config.ParamsFile)
 			if err != nil {
 				panic(err)
 			}
@@ -225,7 +223,7 @@ func AppStateFromGenesisFileFn(
 	cdc codec.JSONCodec,
 	genesisFile string,
 ) (tmtypes.GenesisDoc, []simtypes.Account) {
-	bytes, err := ioutil.ReadFile(genesisFile)
+	bytes, err := os.ReadFile(genesisFile)
 	if err != nil {
 		panic(err)
 	}

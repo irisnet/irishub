@@ -5,18 +5,17 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/tidwall/gjson"
-
 	errorsmod "cosmossdk.io/errors"
+	"github.com/tidwall/gjson"
 )
 
-var (
-	router funcRouter
-)
+var router funcRouter
 
-type ArgsType = gjson.Result
-type funcRouter map[string]Aggregate
-type Aggregate func(args []ArgsType) string
+type (
+	ArgsType   = gjson.Result
+	funcRouter map[string]Aggregate
+	Aggregate  func(args []ArgsType) string
+)
 
 func init() {
 	router = make(funcRouter)
@@ -43,7 +42,7 @@ func RegisterAggregateFunc(methodNm string, fun Aggregate) error {
 }
 
 func Max(data []ArgsType) string {
-	var maxNumber = math.SmallestNonzeroFloat64
+	maxNumber := math.SmallestNonzeroFloat64
 	for _, d := range data {
 		f := d.Float()
 		if maxNumber < f {
@@ -54,7 +53,7 @@ func Max(data []ArgsType) string {
 }
 
 func Min(data []ArgsType) string {
-	var minNum = math.MaxFloat64
+	minNum := math.MaxFloat64
 	for _, d := range data {
 		f := d.Float()
 		if minNum > d.Float() {
@@ -65,7 +64,7 @@ func Min(data []ArgsType) string {
 }
 
 func Avg(data []ArgsType) string {
-	var total = 0.0
+	total := 0.0
 	for _, d := range data {
 		f := d.Float()
 		total += f

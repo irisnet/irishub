@@ -125,7 +125,6 @@ func (msg MsgAddLiquidity) Type() string { return TypeMsgAddLiquidity }
 
 // ValidateBasic implements Msg.
 func (msg MsgAddLiquidity) ValidateBasic() error {
-
 	if err := ValidateToken(msg.MaxToken); err != nil {
 		return err
 	}

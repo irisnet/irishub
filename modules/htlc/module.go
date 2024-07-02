@@ -5,18 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gorilla/mux"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/spf13/cobra"
-
 	abci "github.com/cometbft/cometbft/abci/types"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	"github.com/gorilla/mux"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/spf13/cobra"
 
 	"mods.irisnet.org/modules/htlc/client/cli"
 	"mods.irisnet.org/modules/htlc/keeper"
@@ -67,7 +65,7 @@ func (AppModuleBasic) ValidateGenesis(
 
 // RegisterRESTRoutes registers the REST routes for the HTLC module.
 func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	//rest.RegisterHandlers(clientCtx, rtr)
+	// rest.RegisterHandlers(clientCtx, rtr)
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the HTLC module.
@@ -131,7 +129,6 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	if err := cfg.RegisterMigration(types.ModuleName, 1, m.Migrate1to2); err != nil {
 		panic(err)
 	}
-
 }
 
 // RegisterInvariants registers the HTLC module invariants.

@@ -3,11 +3,10 @@ package v1
 import (
 	"math/big"
 
-	"github.com/cosmos/gogoproto/proto"
-
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/gogoproto/proto"
 
 	tokentypes "mods.irisnet.org/modules/token/types"
 )
@@ -17,11 +16,13 @@ var (
 	tenInt               = big.NewInt(10)
 )
 
-type SwapRegistry map[string]SwapParams
-type SwapParams struct {
-	MinUnit string
-	Ratio   sdk.Dec
-}
+type (
+	SwapRegistry map[string]SwapParams
+	SwapParams   struct {
+		MinUnit string
+		Ratio   sdk.Dec
+	}
+)
 
 // TokenI defines an interface for Token
 type TokenI interface {

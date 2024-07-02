@@ -4,12 +4,13 @@ import (
 	"reflect"
 	"testing"
 
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func TestLossLessConvert(t *testing.T) {
 	type args struct {
-		a      sdk.Int
+		a      math.Int
 		ratio  sdk.Dec
 		aScale uint32
 		bScale uint32
@@ -17,8 +18,8 @@ func TestLossLessConvert(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    sdk.Int
-		want1   sdk.Int
+		want    math.Int
+		want1   math.Int
 		wantErr bool
 	}{
 		{
@@ -68,7 +69,8 @@ func TestLossLessConvert(t *testing.T) {
 			want:    Int("1000001"),
 			want1:   Int("1000001000000000000"),
 			wantErr: false,
-		}, {
+		},
+		{
 			name: "fully conversion(non-equivalent ratio)",
 			args: args{
 				a:      Int("1000000"),
@@ -94,11 +96,10 @@ func TestLossLessConvert(t *testing.T) {
 	}
 }
 
-func Int(i string) sdk.Int {
+func Int(i string) math.Int {
 	iInt, ok := sdk.NewIntFromString(i)
 	if !ok {
 		panic("invalid i: " + i)
 	}
 	return iInt
-
 }

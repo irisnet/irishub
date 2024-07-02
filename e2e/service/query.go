@@ -6,18 +6,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cosmos/gogoproto/proto"
-
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	"mods.irisnet.org/e2e"
 	servicecli "mods.irisnet.org/modules/service/client/cli"
-	"mods.irisnet.org/modules/service/types"
 	servicetypes "mods.irisnet.org/modules/service/types"
 	"mods.irisnet.org/simapp"
 )
@@ -33,8 +31,8 @@ func (s *QueryTestSuite) SetupSuite() {
 		var serviceGenesisState servicetypes.GenesisState
 		cfg.Codec.MustUnmarshalJSON(cfg.GenesisState[servicetypes.ModuleName], &serviceGenesisState)
 
-		serviceGenesisState.Params.ArbitrationTimeLimit = time.Duration(time.Second)
-		serviceGenesisState.Params.ComplaintRetrospect = time.Duration(time.Second)
+		serviceGenesisState.Params.ArbitrationTimeLimit = time.Second
+		serviceGenesisState.Params.ComplaintRetrospect = time.Second
 		cfg.GenesisState[servicetypes.ModuleName] = cfg.Codec.MustMarshalJSON(&serviceGenesisState)
 		cfg.NumValidators = 1
 	})
@@ -76,9 +74,9 @@ func (s *QueryTestSuite) TestQueryCmd() {
 	s.Require().NoError(err)
 
 	reqServiceFee := fmt.Sprintf("50%s", serviceDenom)
-	reqInput := `{"header":{},"body":{}}`
-	respResult := `{"code":200,"message":""}`
-	respOutput := `{"header":{},"body":{}}`
+	const reqInput = `{"header":{},"body":{}}`
+	const respResult = `{"code":200,"message":""}`
+	const respOutput = `{"header":{},"body":{}}`
 	timeout := qos
 
 	expectedEarnedFees := fmt.Sprintf("48%s", serviceDenom)
@@ -309,11 +307,11 @@ func (s *QueryTestSuite) TestQueryCmd() {
 			var requests []servicetypes.CompactRequest
 			var requestsBz []byte
 			for _, attribute := range event.Attributes {
-				if string(attribute.Key) == types.AttributeKeyRequests {
+				if attribute.Key == servicetypes.AttributeKeyRequests {
 					requestsBz = []byte(attribute.Value)
 				}
-				if string(attribute.Key) == types.AttributeKeyRequestContextID &&
-					string(attribute.GetValue()) == requestContextId {
+				if attribute.Key == servicetypes.AttributeKeyRequestContextID &&
+					attribute.GetValue() == requestContextId {
 					found = true
 				}
 			}

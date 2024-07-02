@@ -27,12 +27,10 @@ const (
 	OpWeightMsgTransferDenom = "op_weight_msg_transfer_denom"
 )
 
-var (
-	data = []string{
-		"{\"key1\":\"value1\",\"key2\":\"value2\"}",
-		"{\"irismod:key1\":\"value1\",\"irismod:key2\":\"value2\"}",
-	}
-)
+var data = []string{
+	"{\"key1\":\"value1\",\"key2\":\"value2\"}",
+	"{\"irismod:key1\":\"value1\",\"irismod:key2\":\"value2\"}",
+}
 
 // WeightedOperations returns all the operations from the module with their respective weights
 func WeightedOperations(
@@ -409,7 +407,6 @@ func SimulateMsgTransferDenom(
 	) (
 		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
 	) {
-
 		denomID := randDenom(ctx, k, r, false, false)
 		denom, err := k.GetDenomInfo(ctx, denomID)
 		if err != nil {
@@ -498,7 +495,6 @@ func SimulateMsgIssueDenom(
 	) (
 		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
 	) {
-
 		denomID := genDenomID(r)
 		if k.HasDenom(ctx, denomID) {
 			return simtypes.NoOpMsg(
@@ -571,7 +567,7 @@ func randNFT(
 	r *rand.Rand,
 	mintable, editable bool,
 ) (sdk.AccAddress, string, string) {
-	var denoms = []string{kitties, doggos}
+	denoms := []string{kitties, doggos}
 	res, err := k.Denoms(sdk.UnwrapSDKContext(ctx), &types.QueryDenomsRequest{})
 
 	if err == nil {
@@ -624,7 +620,7 @@ func genNFTID(r *rand.Rand, min, max int) string {
 
 func randDenom(ctx sdk.Context, k keeper.Keeper, r *rand.Rand, mintable, editable bool) string {
 	res, err := k.Denoms(sdk.UnwrapSDKContext(ctx), &types.QueryDenomsRequest{})
-	var denoms = []string{kitties, doggos}
+	denoms := []string{kitties, doggos}
 	if err != nil {
 		i := r.Intn(len(denoms))
 		return denoms[i]

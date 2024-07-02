@@ -23,7 +23,7 @@ func (h GovHook) AfterProposalFailedMinDeposit(ctx sdk.Context, proposalID uint6
 	if !has {
 		return
 	}
-	//execute refund logic
+	// execute refund logic
 	h.k.refundEscrow(ctx, info)
 }
 
@@ -39,13 +39,13 @@ func (h GovHook) AfterProposalVotingPeriodEnded(ctx sdk.Context, proposalID uint
 		return
 	}
 
-	//when the proposal is passed, the content of the proposal is executed by the gov module, which is not directly processed here
+	// when the proposal is passed, the content of the proposal is executed by the gov module, which is not directly processed here
 	if proposal.Status == v1.StatusPassed {
 		h.k.deleteEscrowInfo(ctx, proposalID)
 		return
 	}
 
-	//when the proposal is not passed,execute refund logic
+	// when the proposal is not passed,execute refund logic
 	h.k.refundEscrow(ctx, info)
 }
 

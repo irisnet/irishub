@@ -1,4 +1,3 @@
-// nolint
 package cli
 
 import (
@@ -17,9 +16,7 @@ const (
 	FlagTransfer             = "transfer"
 )
 
-var (
-	FsCreateHTLC = flag.NewFlagSet("", flag.ContinueOnError)
-)
+var FsCreateHTLC = flag.NewFlagSet("", flag.ContinueOnError)
 
 func init() {
 	FsCreateHTLC.String(FlagTo, "", "Bech32 encoding address to receive tokens")

@@ -25,9 +25,6 @@ import (
 	upgrademodulev1 "cosmossdk.io/api/cosmos/upgrade/module/v1"
 	vestingmodulev1 "cosmossdk.io/api/cosmos/vesting/module/v1"
 	"cosmossdk.io/core/appconfig"
-	_ "github.com/cosmos/cosmos-sdk/x/upgrade" // import for side-effects
-	"google.golang.org/protobuf/types/known/durationpb"
-
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
@@ -45,7 +42,9 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	_ "github.com/cosmos/cosmos-sdk/x/upgrade" // import for side-effects
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	coinswapmodule "mods.irisnet.org/api/irismod/coinswap/module/v1"
 	farmmodule "mods.irisnet.org/api/irismod/farm/module/v1"
@@ -92,7 +91,7 @@ var (
 		distrtypes.ModuleName, stakingtypes.ModuleName, slashingtypes.ModuleName, govtypes.ModuleName,
 		minttypes.ModuleName, crisistypes.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
 		feegrant.ModuleName, group.ModuleName, paramstypes.ModuleName, upgradetypes.ModuleName,
-		vestingtypes.ModuleName, consensustypes.ModuleName, 
+		vestingtypes.ModuleName, consensustypes.ModuleName,
 		coinswaptypes.ModuleName,
 		farmtypes.ModuleName,
 		htlctypes.ModuleName,
@@ -311,7 +310,7 @@ var (
 				Config: appconfig.WrapAny(&consensusmodulev1.Module{}),
 			},
 			{
-				Name:   coinswaptypes.ModuleName,
+				Name: coinswaptypes.ModuleName,
 				Config: appconfig.WrapAny(&coinswapmodule.Module{
 					FeeCollectorName: authtypes.FeeCollectorName,
 				}),
@@ -354,7 +353,7 @@ var (
 				Config: appconfig.WrapAny(&recordmodule.Module{}),
 			},
 			{
-				Name:   tokentypes.ModuleName,
+				Name: tokentypes.ModuleName,
 				Config: appconfig.WrapAny(&tokenmodule.Module{
 					FeeCollectorName: authtypes.FeeCollectorName,
 				}),

@@ -4,6 +4,7 @@ import (
 	math "math"
 
 	errorsmod "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -13,7 +14,7 @@ func (pool FarmPool) Started(ctx sdk.Context) bool {
 }
 
 func (pool FarmPool) ExpiredHeight() (int64, error) {
-	var targetInteval = int64(math.MaxInt64)
+	targetInteval := int64(math.MaxInt64)
 	for _, r := range pool.Rules {
 		inteval := r.TotalReward.Quo(r.RewardPerBlock).Int64()
 		if targetInteval > inteval {
@@ -26,7 +27,7 @@ func (pool FarmPool) ExpiredHeight() (int64, error) {
 	return pool.StartHeight + targetInteval, nil
 }
 
-func (pool FarmPool) CaclRewards(farmInfo FarmInfo, deltaAmt sdk.Int) (rewards, rewardDebt sdk.Coins) {
+func (pool FarmPool) CaclRewards(farmInfo FarmInfo, deltaAmt sdkmath.Int) (rewards, rewardDebt sdk.Coins) {
 	for _, r := range pool.Rules {
 		if farmInfo.Locked.GT(sdk.ZeroInt()) {
 			pendingRewardTotal := r.RewardPerShare.MulInt(farmInfo.Locked).TruncateInt()

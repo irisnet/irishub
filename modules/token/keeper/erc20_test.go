@@ -4,9 +4,8 @@ import (
 	"math/big"
 
 	"github.com/cometbft/cometbft/crypto/tmhash"
-	"github.com/ethereum/go-ethereum/common"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ethereum/go-ethereum/common"
 
 	v1 "mods.irisnet.org/modules/token/types/v1"
 )

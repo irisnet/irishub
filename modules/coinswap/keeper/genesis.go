@@ -11,13 +11,16 @@ import (
 // InitGenesis initializes the coinswap module's state from a given genesis state.
 func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 	if err := types.ValidateGenesis(genState); err != nil {
-		panic(fmt.Errorf("panic for ValidateGenesis,%v", err))
+		panic(fmt.Errorf("panic for ValidateGenesis,%w", err))
 	}
-	k.SetParams(ctx, genState.Params)
+	if err := k.SetParams(ctx, genState.Params); err != nil {
+		panic(fmt.Errorf("panic for SetParams,%w", err))
+	}
 	k.SetStandardDenom(ctx, genState.StandardDenom)
 	k.setSequence(ctx, genState.Sequence)
 	for _, pool := range genState.Pool {
-		k.setPool(ctx, &pool)
+		poolCopy := pool // Create a copy of the pool variable
+		k.setPool(ctx, &poolCopy)
 	}
 }
 

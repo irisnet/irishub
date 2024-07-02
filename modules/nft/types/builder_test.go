@@ -6,7 +6,6 @@ import (
 
 	"github.com/cometbft/cometbft/crypto"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/codec/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/nft"
@@ -60,7 +59,7 @@ func TestTokenBuilder_Build(t *testing.T) {
 }
 
 func GetEncoding() codec.Codec {
-	interfaceRegistry := types.NewInterfaceRegistry()
+	interfaceRegistry := codectypes.NewInterfaceRegistry()
 	interfaceRegistry.RegisterImplementations(
 		(*proto.Message)(nil),
 		&nft.Class{},

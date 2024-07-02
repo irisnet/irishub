@@ -6,10 +6,9 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"
+	"github.com/stretchr/testify/require"
 
 	"mods.irisnet.org/modules/random/simulation"
 	"mods.irisnet.org/modules/random/types"

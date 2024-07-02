@@ -5,12 +5,10 @@ import (
 	"encoding/hex"
 	"errors"
 
-	"github.com/spf13/cobra"
-
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/spf13/cobra"
 
 	"mods.irisnet.org/modules/record/types"
 )

@@ -39,9 +39,9 @@ type FarmPool struct {
 
 type RewardRule struct {
     Reward          string
-    TotalReward     sdk.Int
-    RemainingReward sdk.Int
-    RewardPerBlock  sdk.Int
+    TotalReward     math.Int
+    RemainingReward math.Int
+    RewardPerBlock  math.Int
     RewardPerShare  sdk.Dec
 }
 ```
@@ -62,9 +62,9 @@ type RewardRule struct {
 ```go
 type RewardRule struct {
     Reward          string
-    TotalReward     sdk.Int
-    RemainingReward sdk.Int
-    RewardPerBlock  sdk.Int
+    TotalReward     math.Int
+    RemainingReward math.Int
+    RewardPerBlock  math.Int
     RewardPerShare  sdk.Dec
 }
 ```
@@ -83,7 +83,7 @@ type RewardRule struct {
 type FarmInfo struct {
     PoolId   string
     Address    string
-    Locked     sdk.Int
+    Locked     math.Int
     RewardDebt sdks.Coins
 }
 ```
