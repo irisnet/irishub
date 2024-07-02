@@ -1,4 +1,4 @@
-package module
+package nft
 
 import (
 	"context"

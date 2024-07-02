@@ -1,4 +1,4 @@
-package module
+package nft
 
 import (
 	"cosmossdk.io/core/appmodule"
@@ -26,7 +26,8 @@ func (am AppModule) IsOnePerModuleType() {}
 // IsAppModule implements the appmodule.AppModule interface.
 func (am AppModule) IsAppModule() {}
 
-type NFTInputs struct {
+// Inputs define the arguments used to instantiate an app module.
+type Inputs struct {
 	depinject.In
 
 	Config *modulev1.Module
@@ -37,14 +38,18 @@ type NFTInputs struct {
 	BankKeeper    types.BankKeeper
 }
 
-type NFTOutputs struct {
+// Outputs define the read-only arguments return by depinject.
+type Outputs struct {
 	depinject.Out
 
 	NFTKeeper keeper.Keeper
 	Module    appmodule.AppModule
 }
 
-func ProvideModule(in NFTInputs) NFTOutputs {
+// ProvideModule provides a module for the NFT with the given inputs and returns the NFT keeper and module.
+//
+// Takes Inputs as input parameters and returns Outputs.
+func ProvideModule(in Inputs) Outputs {
 	keeper := keeper.NewKeeper(
 		in.Cdc,
 		in.Key,
@@ -53,5 +58,5 @@ func ProvideModule(in NFTInputs) NFTOutputs {
 	)
 	m := NewAppModule(in.Cdc, keeper, in.AccountKeeper, in.BankKeeper)
 
-	return NFTOutputs{NFTKeeper: keeper, Module: m}
+	return Outputs{NFTKeeper: keeper, Module: m}
 }

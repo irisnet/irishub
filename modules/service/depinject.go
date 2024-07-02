@@ -21,6 +21,13 @@ func init() {
 	)
 }
 
+// ProvideKeyTable returns the KeyTable for the service module.
+//
+// It calls the ParamKeyTable function from the types package to retrieve the KeyTable.
+// The KeyTable is used to register parameter sets for the service module.
+//
+// Returns:
+// - types.KeyTable: The KeyTable for the service module.
 func ProvideKeyTable() types.KeyTable {
 	return types.ParamKeyTable()
 }
@@ -33,7 +40,8 @@ func (am AppModule) IsOnePerModuleType() {}
 // IsAppModule implements the appmodule.AppModule interface.
 func (am AppModule) IsAppModule() {}
 
-type ServiceInputs struct {
+// Inputs define the module inputs for the depinject.
+type Inputs struct {
 	depinject.In
 
 	Config *modulev1.Module
@@ -47,14 +55,19 @@ type ServiceInputs struct {
 	LegacySubspace types.Subspace `optional:"true"`
 }
 
-type ServiceOutputs struct {
+// Outputs define the module outputs for the depinject.
+type Outputs struct {
 	depinject.Out
 
 	ServiceKeeper keeper.Keeper
 	Module        appmodule.AppModule
 }
 
-func ProvideModule(in ServiceInputs) ServiceOutputs {
+// ProvideModule creates and returns the HTLC module with the specified inputs.
+//
+// It takes Inputs as the parameter, which includes the configuration, codec, key, account keeper, and bank keeper.
+// It returns Outputs containing the HTLC keeper and the app module.
+func ProvideModule(in Inputs) Outputs {
 	// default to governance authority if not provided
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 	if in.Config.Authority != "" {
@@ -71,5 +84,5 @@ func ProvideModule(in ServiceInputs) ServiceOutputs {
 	)
 	m := NewAppModule(in.Cdc, keeper, in.AccountKeeper, in.BankKeeper, in.LegacySubspace)
 
-	return ServiceOutputs{ServiceKeeper: keeper, Module: m}
+	return Outputs{ServiceKeeper: keeper, Module: m}
 }

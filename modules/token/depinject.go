@@ -35,8 +35,8 @@ func (am AppModule) IsOnePerModuleType() {}
 // IsAppModule implements the appmodule.AppModule interface.
 func (am AppModule) IsAppModule() {}
 
-// TokenInputs is the input of the Token module
-type TokenInputs struct {
+// Inputs is the input of the Token module
+type Inputs struct {
 	depinject.In
 
 	Config *modulev1.Module
@@ -52,8 +52,8 @@ type TokenInputs struct {
 	LegacySubspace types.Subspace `optional:"true"`
 }
 
-// TokenOutputs is the output of the Token module
-type TokenOutputs struct {
+// Outputs is the output of the Token module
+type Outputs struct {
 	depinject.Out
 
 	TokenKeeper keeper.Keeper
@@ -63,7 +63,7 @@ type TokenOutputs struct {
 // ProvideModule provides a module for the token with the given inputs and returns the token keeper and module.
 //
 // Takes TokenInputs as input parameters and returns TokenOutputs.
-func ProvideModule(in TokenInputs) TokenOutputs {
+func ProvideModule(in Inputs) Outputs {
 	// default to governance authority if not provided
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 	if in.Config.Authority != "" {
@@ -82,5 +82,5 @@ func ProvideModule(in TokenInputs) TokenOutputs {
 	)
 	m := NewAppModule(in.Cdc, keeper, in.AccountKeeper, in.BankKeeper, in.LegacySubspace)
 
-	return TokenOutputs{TokenKeeper: keeper, Module: m}
+	return Outputs{TokenKeeper: keeper, Module: m}
 }

@@ -26,7 +26,8 @@ func (am AppModule) IsOnePerModuleType() {}
 // IsAppModule implements the appmodule.AppModule interface.
 func (am AppModule) IsAppModule() {}
 
-type RecordInputs struct {
+// Inputs define the module inputs for the depinject.
+type Inputs struct {
 	depinject.In
 
 	Config *modulev1.Module
@@ -37,19 +38,24 @@ type RecordInputs struct {
 	BankKeeper    types.BankKeeper
 }
 
-type RecordOutputs struct {
+// Outputs define the module outputs for the depinject.
+type Outputs struct {
 	depinject.Out
 
 	RecordKeeper keeper.Keeper
 	Module       appmodule.AppModule
 }
 
-func ProvideModule(in RecordInputs) RecordOutputs {
+// ProvideModule creates and returns the record module with the specified inputs.
+//
+// Takes Inputs as the parameter, which includes the codec, key, account keeper, and bank keeper.
+// Returns Outputs containing the record keeper and the app module.
+func ProvideModule(in Inputs) Outputs {
 	keeper := keeper.NewKeeper(
 		in.Cdc,
 		in.Key,
 	)
 	m := NewAppModule(in.Cdc, keeper, in.AccountKeeper, in.BankKeeper)
 
-	return RecordOutputs{RecordKeeper: keeper, Module: m}
+	return Outputs{RecordKeeper: keeper, Module: m}
 }

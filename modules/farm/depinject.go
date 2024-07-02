@@ -21,6 +21,10 @@ func init() {
 	)
 }
 
+// ProvideKeyTable returns the KeyTable for the farm module's parameters.
+//
+// No parameters.
+// Returns a types.KeyTable.
 func ProvideKeyTable() types.KeyTable {
 	return types.ParamKeyTable()
 }
@@ -33,7 +37,8 @@ func (am AppModule) IsOnePerModuleType() {}
 // IsAppModule implements the appmodule.AppModule interface.
 func (am AppModule) IsAppModule() {}
 
-type FarmInputs struct {
+// Inputs define the module inputs for the depinject.
+type Inputs struct {
 	depinject.In
 
 	Config *modulev1.Module
@@ -50,14 +55,19 @@ type FarmInputs struct {
 	LegacySubspace types.Subspace `optional:"true"`
 }
 
-type FarmOutputs struct {
+// Outputs define the module outputs for the depinject.
+type Outputs struct {
 	depinject.Out
 
 	FarmKeeper keeper.Keeper
 	Module     appmodule.AppModule
 }
 
-func ProvideModule(in FarmInputs) FarmOutputs {
+// ProvideModule creates and returns the farm module with the specified inputs.
+//
+// It takes Inputs as the parameter, which includes the configuration, codec, key, account keeper, bank keeper, governance keeper, coinswap keeper, and legacy subspace.
+// It returns Outputs containing the farm keeper and the app module.
+func ProvideModule(in Inputs) Outputs {
 	// default to governance authority if not provided
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 	if in.Config.Authority != "" {
@@ -78,5 +88,5 @@ func ProvideModule(in FarmInputs) FarmOutputs {
 	)
 	m := NewAppModule(in.Cdc, keeper, in.AccountKeeper, in.BankKeeper, in.LegacySubspace)
 
-	return FarmOutputs{FarmKeeper: keeper, Module: m}
+	return Outputs{FarmKeeper: keeper, Module: m}
 }
