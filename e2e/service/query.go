@@ -27,7 +27,7 @@ type QueryTestSuite struct {
 
 // SetupSuite sets up test suite
 func (s *QueryTestSuite) SetupSuite() {
-	s.SetModifyConfigFn(func(cfg *network.Config) {
+	s.SetupSuiteWithModifyConfigFn(func(cfg *network.Config) {
 		var serviceGenesisState servicetypes.GenesisState
 		cfg.Codec.MustUnmarshalJSON(cfg.GenesisState[servicetypes.ModuleName], &serviceGenesisState)
 
@@ -36,7 +36,6 @@ func (s *QueryTestSuite) SetupSuite() {
 		cfg.GenesisState[servicetypes.ModuleName] = cfg.Codec.MustMarshalJSON(&serviceGenesisState)
 		cfg.NumValidators = 1
 	})
-	s.TestSuite.SetupSuite()
 }
 
 // TestQueryCmd tests all query command in the service module

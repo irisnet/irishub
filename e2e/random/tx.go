@@ -27,7 +27,7 @@ type TxTestSuite struct {
 
 // SetupSuite sets up test suite
 func (s *TxTestSuite) SetupSuite() {
-	s.SetModifyConfigFn(func(cfg *network.Config) {
+	s.SetupSuiteWithModifyConfigFn(func(cfg *network.Config) {
 		var serviceGenState servicetypes.GenesisState
 		cfg.Codec.MustUnmarshalJSON(cfg.GenesisState[servicetypes.ModuleName], &serviceGenState)
 
@@ -42,7 +42,6 @@ func (s *TxTestSuite) SetupSuite() {
 		)
 		cfg.GenesisState[servicetypes.ModuleName] = cfg.Codec.MustMarshalJSON(&serviceGenState)
 	})
-	s.TestSuite.SetupSuite()
 }
 
 // TestTxCmd tests all tx command in the nft module

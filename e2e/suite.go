@@ -15,30 +15,29 @@ type ModifyConfigFn = func(cfg *network.Config)
 type TestSuite struct {
 	suite.Suite
 	simapp.Network
-	modifyConfigFn ModifyConfigFn
+	
+}
+
+// SetupSuiteWithModifyConfigFn sets up the end-to-end test suite with the given modifyConfigFn.
+//
+// Parameters:
+// - modifyConfigFn: A function that modifies the config for the test suite.
+//
+// Return type: None.
+func (s *TestSuite) SetupSuiteWithModifyConfigFn(modifyConfigFn ModifyConfigFn) {
+	s.T().Log("setting up e2e test suite")
+
+	cfg, err := simapp.NewConfig(s.DepinjectOptions())
+	s.Require().NoError(err)
+
+	modifyConfigFn(&cfg)
+	s.Network = simapp.SetupNetworkWithConfig(s.T(), cfg)
 }
 
 // SetupSuite creates a new network for integration tests
 func (s *TestSuite) SetupSuite() {
 	s.T().Log("setting up e2e test suite")
-
-	depInjectOptions := simapp.DepinjectOptions{
-		Config: AppConfig,
-		Providers: []interface{}{
-			keeper.ProvideMockEVM(),
-			keeper.ProvideMockICS20(),
-		},
-	}
-	if s.modifyConfigFn == nil {
-		s.Network = simapp.SetupNetwork(s.T(), depInjectOptions)
-		return
-	}
-
-	cfg, err := simapp.NewConfig(depInjectOptions)
-	s.Require().NoError(err)
-
-	s.modifyConfigFn(&cfg)
-	s.Network = simapp.SetupNetworkWithConfig(s.T(), cfg)
+	s.Network = simapp.SetupNetwork(s.T(), s.DepinjectOptions())
 }
 
 // TearDownSuite tears down the integration test suite
@@ -47,7 +46,13 @@ func (s *TestSuite) TearDownSuite() {
 	s.Network.Cleanup()
 }
 
-// SetModifyConfigFn sets the modify config function
-func (s *TestSuite) SetModifyConfigFn(fn ModifyConfigFn) {
-	s.modifyConfigFn = fn
+// DepinjectOptions returns the depinject options for the test suite
+func (s *TestSuite) DepinjectOptions() simapp.DepinjectOptions {
+	return simapp.DepinjectOptions{
+		Config: AppConfig,
+		Providers: []interface{}{
+			keeper.ProvideMockEVM(),
+			keeper.ProvideMockICS20(),
+		},
+	}
 }
