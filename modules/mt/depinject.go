@@ -26,7 +26,8 @@ func (am AppModule) IsOnePerModuleType() {}
 // IsAppModule implements the appmodule.AppModule interface.
 func (am AppModule) IsAppModule() {}
 
-type MTInputs struct {
+// Inputs define the module inputs for the depinject.
+type Inputs struct {
 	depinject.In
 
 	Config *modulev1.Module
@@ -37,19 +38,27 @@ type MTInputs struct {
 	BankKeeper    types.BankKeeper
 }
 
-type MTOutputs struct {
+// Outputs define the module outputs for the depinject.
+type Outputs struct {
 	depinject.Out
 
 	MTKeeper keeper.Keeper
 	Module   appmodule.AppModule
 }
 
-func ProvideModule(in MTInputs) MTOutputs {
+// ProvideModule creates a new MTKeeper and AppModule using the provided inputs and returns the Outputs.
+//
+// Parameters:
+// - in: the Inputs struct containing the necessary dependencies for creating the MTKeeper and AppModule.
+//
+// Returns:
+// - Outputs: the struct containing the MTKeeper and AppModule.
+func ProvideModule(in Inputs) Outputs {
 	keeper := keeper.NewKeeper(
 		in.Cdc,
 		in.Key,
 	)
 	m := NewAppModule(in.Cdc, keeper, in.AccountKeeper, in.BankKeeper)
 
-	return MTOutputs{MTKeeper: keeper, Module: m}
+	return Outputs{MTKeeper: keeper, Module: m}
 }

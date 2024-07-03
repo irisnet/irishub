@@ -26,7 +26,8 @@ func (am AppModule) IsOnePerModuleType() {}
 // IsAppModule implements the appmodule.AppModule interface.
 func (am AppModule) IsAppModule() {}
 
-type RandomInputs struct {
+// Inputs define the module inputs for the depinject.
+type Inputs struct {
 	depinject.In
 
 	Config *modulev1.Module
@@ -38,14 +39,20 @@ type RandomInputs struct {
 	ServiceKeeper types.ServiceKeeper
 }
 
-type RandomOutputs struct {
+// Outputs define the module outputs for the depinject.
+type Outputs struct {
 	depinject.Out
 
 	RandomKeeper keeper.Keeper
 	Module       appmodule.AppModule
 }
 
-func ProvideModule(in RandomInputs) RandomOutputs {
+// ProvideModule creates a new AppModule and returns the Outputs.
+//
+// - in: the Inputs struct containing the necessary dependencies for creating the AppModule.
+// Returns:
+// - Outputs: the struct containing the RandomKeeper and AppModule.
+func ProvideModule(in Inputs) Outputs {
 	keeper := keeper.NewKeeper(
 		in.Cdc,
 		in.Key,
@@ -54,5 +61,5 @@ func ProvideModule(in RandomInputs) RandomOutputs {
 	)
 	m := NewAppModule(in.Cdc, keeper, in.AccountKeeper, in.BankKeeper)
 
-	return RandomOutputs{RandomKeeper: keeper, Module: m}
+	return Outputs{RandomKeeper: keeper, Module: m}
 }

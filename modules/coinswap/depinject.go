@@ -21,6 +21,7 @@ func init() {
 	)
 }
 
+// ProvideKeyTable provides module's KVStore keys
 func ProvideKeyTable() types.KeyTable {
 	return types.ParamKeyTable()
 }
@@ -33,7 +34,8 @@ func (am AppModule) IsOnePerModuleType() {}
 // IsAppModule implements the appmodule.AppModule interface.
 func (am AppModule) IsAppModule() {}
 
-type CoinswapInputs struct {
+// Inputs define the module inputs for the depinject.
+type Inputs struct {
 	depinject.In
 
 	Config *modulev1.Module
@@ -47,14 +49,19 @@ type CoinswapInputs struct {
 	LegacySubspace types.Subspace `optional:"true"`
 }
 
-type CoinswapOutputs struct {
+// Outputs define the module outputs for the depinject.
+type Outputs struct {
 	depinject.Out
 
 	CoinswapKeeper keeper.Keeper
 	Module         appmodule.AppModule
 }
 
-func ProvideModule(in CoinswapInputs) CoinswapOutputs {
+// ProvideModule creates and returns the coinswap module with the specified inputs.
+//
+// It takes Inputs as the parameter, which includes the configuration, codec, key, account keeper, bank keeper, and legacy subspace.
+// It returns Outputs containing the coinswap keeper and the app module.
+func ProvideModule(in Inputs) Outputs {
 	// default to governance authority if not provided
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 	if in.Config.Authority != "" {
@@ -71,5 +78,5 @@ func ProvideModule(in CoinswapInputs) CoinswapOutputs {
 	)
 	m := NewAppModule(in.Cdc, keeper, in.AccountKeeper, in.BankKeeper, in.LegacySubspace)
 
-	return CoinswapOutputs{CoinswapKeeper: keeper, Module: m}
+	return Outputs{CoinswapKeeper: keeper, Module: m}
 }
