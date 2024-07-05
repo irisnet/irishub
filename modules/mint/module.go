@@ -17,8 +17,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irismod/types/exported"
-
 	"github.com/irisnet/irishub/v3/modules/mint/client/cli"
 	"github.com/irisnet/irishub/v3/modules/mint/keeper"
 	"github.com/irisnet/irishub/v3/modules/mint/simulation"
@@ -93,14 +91,14 @@ type AppModule struct {
 	AppModuleBasic
 
 	keeper         keeper.Keeper
-	legacySubspace exported.Subspace
+	legacySubspace types.Subspace
 }
 
 // NewAppModule creates a new AppModule object
 func NewAppModule(
 	cdc codec.Codec,
 	keeper keeper.Keeper,
-	legacySubspace exported.Subspace,
+	legacySubspace types.Subspace,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{cdc: cdc},

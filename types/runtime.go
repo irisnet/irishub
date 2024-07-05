@@ -14,8 +14,8 @@ import (
 	"github.com/evmos/ethermint/ethereum/eip712"
 	etherminttypes "github.com/evmos/ethermint/types"
 
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
-	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
+	tokentypes "mods.irisnet.org/modules/token/types"
+	tokenv1 "mods.irisnet.org/modules/token/types/v1"
 )
 
 const (

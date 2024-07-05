@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
+	farmkeeper "mods.irisnet.org/modules/farm/keeper"
 )
 
 var _ govtypes.GovHooks = farmGovHook{}
