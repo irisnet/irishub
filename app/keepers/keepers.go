@@ -82,28 +82,28 @@ import (
 	tibccli "github.com/bianjieai/tibc-go/modules/tibc/core/client/cli"
 	tibckeeper "github.com/bianjieai/tibc-go/modules/tibc/core/keeper"
 
-	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
-	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
-	"github.com/irisnet/irismod/modules/farm"
-	farmkeeper "github.com/irisnet/irismod/modules/farm/keeper"
-	farmtypes "github.com/irisnet/irismod/modules/farm/types"
-	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
-	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
-	mtkeeper "github.com/irisnet/irismod/modules/mt/keeper"
-	mttypes "github.com/irisnet/irismod/modules/mt/types"
-	nftkeeper "github.com/irisnet/irismod/modules/nft/keeper"
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
-	oraclekeeper "github.com/irisnet/irismod/modules/oracle/keeper"
-	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
-	randomkeeper "github.com/irisnet/irismod/modules/random/keeper"
-	randomtypes "github.com/irisnet/irismod/modules/random/types"
-	recordkeeper "github.com/irisnet/irismod/modules/record/keeper"
-	recordtypes "github.com/irisnet/irismod/modules/record/types"
-	servicekeeper "github.com/irisnet/irismod/modules/service/keeper"
-	servicetypes "github.com/irisnet/irismod/modules/service/types"
-	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
-	tokenv1 "github.com/irisnet/irismod/modules/token/types/v1"
+	coinswapkeeper "mods.irisnet.org/modules/coinswap/keeper"
+	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
+	"mods.irisnet.org/modules/farm"
+	farmkeeper "mods.irisnet.org/modules/farm/keeper"
+	farmtypes "mods.irisnet.org/modules/farm/types"
+	htlckeeper "mods.irisnet.org/modules/htlc/keeper"
+	htlctypes "mods.irisnet.org/modules/htlc/types"
+	mtkeeper "mods.irisnet.org/modules/mt/keeper"
+	mttypes "mods.irisnet.org/modules/mt/types"
+	nftkeeper "mods.irisnet.org/modules/nft/keeper"
+	nfttypes "mods.irisnet.org/modules/nft/types"
+	oraclekeeper "mods.irisnet.org/modules/oracle/keeper"
+	oracletypes "mods.irisnet.org/modules/oracle/types"
+	randomkeeper "mods.irisnet.org/modules/random/keeper"
+	randomtypes "mods.irisnet.org/modules/random/types"
+	recordkeeper "mods.irisnet.org/modules/record/keeper"
+	recordtypes "mods.irisnet.org/modules/record/types"
+	servicekeeper "mods.irisnet.org/modules/service/keeper"
+	servicetypes "mods.irisnet.org/modules/service/types"
+	tokenkeeper "mods.irisnet.org/modules/token/keeper"
+	tokentypes "mods.irisnet.org/modules/token/types"
+	tokenv1 "mods.irisnet.org/modules/token/types/v1"
 
 	guardiankeeper "github.com/irisnet/irishub/v3/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/v3/modules/guardian/types"
@@ -515,7 +515,7 @@ func New(
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(appKeepers.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper)).
 		AddRoute(tibchost.RouterKey, tibccli.NewProposalHandler(appKeepers.TIBCKeeper)).
-		AddRoute(farmtypes.RouterKey, farm.NewCommunityPoolCreateFarmProposalHandler(appKeepers.FarmKeeper))
+		AddRoute(farmtypes.RouterKey, farm.NewProposalHandler(appKeepers.FarmKeeper))
 
 	appKeepers.GovKeeper.SetHooks(govtypes.NewMultiGovHooks(
 		wrapper.NewFarmGovHook(farmkeeper.NewGovHook(appKeepers.FarmKeeper)),

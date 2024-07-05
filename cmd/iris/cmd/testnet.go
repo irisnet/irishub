@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	tokentypes "mods.irisnet.org/modules/token/types"
 
 	"github.com/spf13/cobra"
 
@@ -41,9 +41,8 @@ import (
 
 	servercfg "github.com/evmos/ethermint/server/config"
 
-	randomtypes "github.com/irisnet/irismod/modules/random/types"
-	servicetypes "github.com/irisnet/irismod/modules/service/types"
-	tokentypesv1 "github.com/irisnet/irismod/modules/token/types/v1"
+	servicetypes "mods.irisnet.org/modules/service/types"
+	tokentypesv1 "mods.irisnet.org/modules/token/types/v1"
 
 	guardiantypes "github.com/irisnet/irishub/v3/modules/guardian/types"
 	iristypes "github.com/irisnet/irishub/v3/types"
@@ -381,7 +380,7 @@ func initGenFiles(
 	)
 	serviceGenState.Definitions = append(
 		serviceGenState.Definitions,
-		randomtypes.GetSvcDefinition(),
+		servicetypes.GetRandomSvcDefinition(),
 	)
 	appGenState[servicetypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&serviceGenState)
 

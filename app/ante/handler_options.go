@@ -11,8 +11,8 @@ import (
 
 	ethante "github.com/evmos/ethermint/app/ante"
 
-	oraclekeeper "github.com/irisnet/irismod/modules/oracle/keeper"
-	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
+	oraclekeeper "mods.irisnet.org/modules/oracle/keeper"
+	tokenkeeper "mods.irisnet.org/modules/token/keeper"
 
 	guardiankeeper "github.com/irisnet/irishub/v3/modules/guardian/keeper"
 )

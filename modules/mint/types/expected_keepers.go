@@ -3,9 +3,10 @@ package types // noalias
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
-// accountKeeper defines the contract required for account APIs.
+// AccountKeeper defines the contract required for account APIs.
 type AccountKeeper interface {
 	GetModuleAddress(name string) sdk.AccAddress
 
@@ -14,7 +15,7 @@ type AccountKeeper interface {
 	GetModuleAccount(ctx sdk.Context, moduleName string) types.ModuleAccountI
 }
 
-// bankKeeper defines the contract needed to be fulfilled for banking and supply
+// BankKeeper defines the contract needed to be fulfilled for banking and supply
 // dependencies.
 type BankKeeper interface {
 	SendCoinsFromModuleToAccount(
@@ -29,4 +30,9 @@ type BankKeeper interface {
 		amt sdk.Coins,
 	) error
 	MintCoins(ctx sdk.Context, name string, amt sdk.Coins) error
+}
+
+// Subspace defines an interface that implements a param subspace.
+type Subspace interface {
+	GetParamSet(ctx sdk.Context, ps paramtypes.ParamSet)
 }
