@@ -941,7 +941,7 @@ func randToken(r *rand.Rand, spendableCoin sdk.Coins) (sdk.Coin, error) {
 		return sdk.Coin{}, errors.New("insufficient funds")
 	}
 	token := spendableCoin[r.Intn(len(spendableCoin))]
-	randAmt, err := simtypes.RandPositiveInt(r, token.Amount.QuoRaw(2))
+	randAmt, err := simtypes.RandPositiveInt(r, token.Amount.QuoRaw(4))
 	if err != nil {
 		return sdk.Coin{}, errors.New("insufficient funds")
 	}
@@ -1001,6 +1001,18 @@ func doubleSwapBill(
 		outputReserve2,
 		param.Fee,
 	)
+	
+	if soldTokenAmt.IsNegative() {
+		return sdk.Coin{}, sdk.Coin{}, errorsmod.Wrap(
+			types.ErrConstraintNotMet,
+			fmt.Sprintf(
+				"insufficient amount of %s, user expected: %s, actual: %s",
+				outputCoin.Denom,
+				outputCoin.Amount,
+				outputReserve,
+			),
+		)
+	}
 	inputCoin = sdk.NewCoin(inputCoin.Denom, soldTokenAmt)
 
 	return inputCoin, outputCoin, nil

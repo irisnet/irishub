@@ -441,7 +441,10 @@ func (suite *KeeperTestSuite) TestHarvest() {
 			tc.expectReward,
 			tc.debt,
 			tc.rewardPerShare)
+		err,broken := keeper.RewardInvariant(suite.keeper)(ctx)
+		suite.Require().False(broken, err)
 	}
+	
 }
 
 func (suite *KeeperTestSuite) AssertStake(

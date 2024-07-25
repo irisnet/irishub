@@ -48,6 +48,10 @@ func (s *TestSuite) TearDownSuite() {
 
 // DepinjectOptions returns the depinject options for the test suite
 func (s *TestSuite) DepinjectOptions() simapp.DepinjectOptions {
+	return defaultDepinjectOptions()
+}
+
+func defaultDepinjectOptions() simapp.DepinjectOptions {
 	return simapp.DepinjectOptions{
 		Config: AppConfig,
 		Providers: []interface{}{

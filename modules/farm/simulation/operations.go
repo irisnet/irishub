@@ -104,6 +104,7 @@ func WeightedOperations(
 	}
 }
 
+// SimulateMsgCreatePool randomized CreatePool
 func SimulateMsgCreatePool(
 	k keeper.Keeper,
 	ak types.AccountKeeper,
@@ -232,11 +233,11 @@ func SimulateMsgCreatePool(
 		if _, _, err = app.SimDeliver(txGen.TxEncoder(), tx); err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to deliver tx"), nil, nil
 		}
-		keeper.RewardInvariant(k)
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
 	}
 }
 
+// SimulateMsgAdjustPool simulates MsgAdjustPool
 func SimulateMsgAdjustPool(
 	k keeper.Keeper,
 	ak types.AccountKeeper,
@@ -384,11 +385,11 @@ func SimulateMsgAdjustPool(
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to deliver tx"), nil, err
 		}
-		keeper.RewardInvariant(k)
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
 	}
 }
 
+// SimulateMsgStake simulates MsgStake
 func SimulateMsgStake(
 	k keeper.Keeper,
 	ak types.AccountKeeper,
@@ -491,11 +492,11 @@ func SimulateMsgStake(
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to deliver tx"), nil, err
 		}
 
-		keeper.RewardInvariant(k)
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
 	}
 }
 
+// SimulateMsgUnStake simulates MsgUnStake
 func SimulateMsgUnStake(
 	k keeper.Keeper,
 	ak types.AccountKeeper,
@@ -596,11 +597,11 @@ func SimulateMsgUnStake(
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to deliver tx"), nil, err
 		}
-		keeper.RewardInvariant(k)
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
 	}
 }
 
+// SimulateMsgHarvest simulates MsgHarvest
 func SimulateMsgHarvest(
 	k keeper.Keeper,
 	ak types.AccountKeeper,
@@ -675,11 +676,11 @@ func SimulateMsgHarvest(
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to deliver tx"), nil, err
 		}
-		keeper.RewardInvariant(k)
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
 	}
 }
 
+// SimulateMsgDestroyPool simulates MsgDestroyPool
 func SimulateMsgDestroyPool(
 	k keeper.Keeper,
 	ak types.AccountKeeper,
@@ -782,7 +783,6 @@ func SimulateMsgDestroyPool(
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to deliver tx"), nil, err
 		}
-		keeper.RewardInvariant(k)
 		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
 	}
 }
