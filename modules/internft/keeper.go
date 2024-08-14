@@ -10,8 +10,8 @@ import (
 
 	nfttransfer "github.com/bianjieai/nft-transfer/types"
 
-	irismodnftkeeper "github.com/irisnet/irismod/modules/nft/keeper"
-	"github.com/irisnet/irismod/modules/nft/types"
+	irismodnftkeeper "mods.irisnet.org/modules/nft/keeper"
+	"mods.irisnet.org/modules/nft/types"
 )
 
 // NewInterNftKeeper creates a new ics721 Keeper instance

@@ -48,26 +48,26 @@ import (
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 
-	"github.com/irisnet/irismod/modules/coinswap"
-	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
-	"github.com/irisnet/irismod/modules/farm"
-	farmtypes "github.com/irisnet/irismod/modules/farm/types"
-	"github.com/irisnet/irismod/modules/htlc"
-	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
-	"github.com/irisnet/irismod/modules/mt"
-	mttypes "github.com/irisnet/irismod/modules/mt/types"
-	nftmodule "github.com/irisnet/irismod/modules/nft/module"
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
-	"github.com/irisnet/irismod/modules/oracle"
-	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
-	"github.com/irisnet/irismod/modules/random"
-	randomtypes "github.com/irisnet/irismod/modules/random/types"
-	"github.com/irisnet/irismod/modules/record"
-	recordtypes "github.com/irisnet/irismod/modules/record/types"
-	"github.com/irisnet/irismod/modules/service"
-	servicetypes "github.com/irisnet/irismod/modules/service/types"
-	"github.com/irisnet/irismod/modules/token"
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
+	"mods.irisnet.org/modules/coinswap"
+	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
+	"mods.irisnet.org/modules/farm"
+	farmtypes "mods.irisnet.org/modules/farm/types"
+	"mods.irisnet.org/modules/htlc"
+	htlctypes "mods.irisnet.org/modules/htlc/types"
+	"mods.irisnet.org/modules/mt"
+	mttypes "mods.irisnet.org/modules/mt/types"
+	"mods.irisnet.org/modules/nft"
+	nfttypes "mods.irisnet.org/modules/nft/types"
+	"mods.irisnet.org/modules/oracle"
+	oracletypes "mods.irisnet.org/modules/oracle/types"
+	"mods.irisnet.org/modules/random"
+	randomtypes "mods.irisnet.org/modules/random/types"
+	"mods.irisnet.org/modules/record"
+	recordtypes "mods.irisnet.org/modules/record/types"
+	"mods.irisnet.org/modules/service"
+	servicetypes "mods.irisnet.org/modules/service/types"
+	"mods.irisnet.org/modules/token"
+	tokentypes "mods.irisnet.org/modules/token/types"
 
 	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
 	tibcmttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/types"
@@ -137,7 +137,7 @@ var (
 		guardian.AppModuleBasic{},
 		token.AppModuleBasic{},
 		record.AppModuleBasic{},
-		nftmodule.AppModuleBasic{},
+		nft.AppModuleBasic{},
 		htlc.AppModuleBasic{},
 		coinswap.AppModuleBasic{},
 		service.AppModuleBasic{},
@@ -282,7 +282,7 @@ func appModules(
 			app.GetSubspace(tokentypes.ModuleName),
 		),
 		record.NewAppModule(appCodec, app.RecordKeeper, app.AccountKeeper, app.BankKeeper),
-		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
+		nft.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
 		mt.NewAppModule(appCodec, app.MTKeeper, app.AccountKeeper, app.BankKeeper),
 		htlc.NewAppModule(
 			appCodec,
@@ -408,7 +408,7 @@ func simulationModules(
 			app.GetSubspace(tokentypes.ModuleName),
 		),
 		record.NewAppModule(appCodec, app.RecordKeeper, app.AccountKeeper, app.BankKeeper),
-		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
+		nft.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
 		htlc.NewAppModule(
 			appCodec,
 			app.HTLCKeeper,
