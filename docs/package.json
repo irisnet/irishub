@@ -12,7 +12,7 @@
   "devDependencies": {
     "@vuepress/client": "2.0.0-rc.0",
     "@vuepress/plugin-search": "2.0.0-rc.0",
-    "axios": "^1.6.2",
+    "axios": "^1.7.4",
     "lodash": "^4.17.21",
     "markdown-it": "^12.3.2",
     "markdown-it-meta": "^0.0.1",
