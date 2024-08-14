@@ -237,9 +237,8 @@ require (
 )
 
 replace (
-
 	// use bianjieai fork of ethermint
-	github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.22.0-irishub-20240512
+	github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.22.1-irishub
 
 	// following versions might cause unexpected behavior
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
