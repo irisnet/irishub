@@ -1,0 +1,31 @@
+name: Release
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+    
+jobs:
+  setup-build-publish:
+    name: Setup, Build and Publish
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Codes
+        uses: actions/checkout@v4
+        
+      - name: Setup Golang
+        uses: actions/setup-go@v5
+        with:
+          go-version: '^1.21.0' # The Go version to download (if necessary) and use.
+          
+      - name: Build Binaries
+        run: |
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+          make build-all-binaries
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: RELEASE.md
+          files: |
+            build/iris-linux-amd64
+            build/iris-linux-arm64
