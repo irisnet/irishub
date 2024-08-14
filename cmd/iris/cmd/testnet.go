@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
+	iristypes "github.com/irisnet/irishub/v3/app/params"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
 	"github.com/spf13/cobra"
@@ -46,7 +47,6 @@ import (
 	tokentypesv1 "github.com/irisnet/irismod/modules/token/types/v1"
 
 	guardiantypes "github.com/irisnet/irishub/v3/modules/guardian/types"
-	iristypes "github.com/irisnet/irishub/v3/types"
 )
 
 var (
@@ -302,7 +302,7 @@ func InitTestnet(
 			return err
 		}
 
-		customAppTemplate, _ := servercfg.AppConfig(iristypes.NativeToken.MinUnit)
+		customAppTemplate, _ := servercfg.AppConfig(iristypes.BaseToken.MinUnit)
 		srvconfig.SetConfigTemplate(customAppTemplate)
 
 		srvconfig.WriteConfigFile(filepath.Join(nodeDir, "config/app.toml"), simappConfig)
@@ -368,7 +368,7 @@ func initGenFiles(
 	tokenGenState.Tokens = append(tokenGenState.Tokens, iristypes.EvmToken)
 	appGenState[tokentypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&tokenGenState)
 
-	//set system service in the genesis state
+	// set system service in the genesis state
 	var serviceGenState servicetypes.GenesisState
 	clientCtx.Codec.MustUnmarshalJSON(appGenState[servicetypes.ModuleName], &serviceGenState)
 	serviceGenState.Definitions = append(
@@ -377,7 +377,7 @@ func initGenFiles(
 	)
 	serviceGenState.Bindings = append(
 		serviceGenState.Bindings,
-		servicetypes.GenOraclePriceSvcBinding(iristypes.NativeToken.MinUnit),
+		servicetypes.GenOraclePriceSvcBinding(iristypes.BaseToken.MinUnit),
 	)
 	serviceGenState.Definitions = append(
 		serviceGenState.Definitions,

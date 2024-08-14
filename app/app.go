@@ -40,7 +40,6 @@ import (
 	"github.com/irisnet/irishub/v3/app/params"
 	"github.com/irisnet/irishub/v3/app/rpc"
 	"github.com/irisnet/irishub/v3/client/lite"
-	iristypes "github.com/irisnet/irishub/v3/types"
 )
 
 var (
@@ -85,7 +84,7 @@ func NewIrisApp(
 	baseAppOptions = append(baseAppOptions, NoOpMempoolOption())
 
 	bApp := baseapp.NewBaseApp(
-		iristypes.AppName,
+		params.AppName,
 		logger,
 		db,
 		encodingConfig.TxConfig.TxDecoder(),
@@ -237,7 +236,7 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 
 // InitChainer application update at chain initialization
 func (app *IrisApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-	var genesisState iristypes.GenesisState
+	var genesisState GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
@@ -360,7 +359,7 @@ func (app *IrisApp) DefaultGenesis() map[string]json.RawMessage {
 
 // Init initializes the IrisApp.
 func (app *IrisApp) Init() {
-	iristypes.InjectCodec(app.legacyAmino, app.interfaceRegistry)
+	params.InjectCodec(app.legacyAmino, app.interfaceRegistry)
 }
 
 // NoOpMempoolOption returns a function that sets up a no-op mempool for the given BaseApp.

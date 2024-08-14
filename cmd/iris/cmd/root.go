@@ -33,7 +33,6 @@ import (
 
 	"github.com/irisnet/irishub/v3/app"
 	"github.com/irisnet/irishub/v3/app/params"
-	iristypes "github.com/irisnet/irishub/v3/types"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
@@ -48,7 +47,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastSync).
-		WithHomeDir(iristypes.DefaultNodeHome).
+		WithHomeDir(params.DefaultNodeHome).
 		WithKeyringOptions(etherminthd.EthSecp256k1Option()).
 		WithViper("")
 
@@ -69,8 +68,6 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 			if err = client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
-
-			converter.handlePreRun(cmd, args)
 
 			customTemplate, customIRISHubConfig := initAppConfig()
 			customTMConfig := initTendermintConfig()
@@ -106,7 +103,7 @@ func initTendermintConfig() *tmcfg.Config {
 // initAppConfig helps to override default appConfig template and configs.
 // return "", nil if no custom configuration is required for the application.
 func initAppConfig() (string, interface{}) {
-	customAppTemplate, customAppConfig := servercfg.AppConfig(iristypes.NativeToken.MinUnit)
+	customAppTemplate, customAppConfig := servercfg.AppConfig(params.BaseToken.MinUnit)
 	srvCfg, ok := customAppConfig.(servercfg.Config)
 	if !ok {
 		panic(fmt.Errorf("unknown app config type %T", customAppConfig))
@@ -124,20 +121,20 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	}
 
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(app.ModuleBasics, iristypes.DefaultNodeHome),
+		genutilcli.InitCmd(app.ModuleBasics, params.DefaultNodeHome),
 		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
-		AddGenesisAccountCmd(iristypes.DefaultNodeHome),
+		AddGenesisAccountCmd(params.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		testnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		ethermintdebug.Cmd(),
 		config.Cmd(),
 		mergeGenesisCmd(encodingConfig),
-		pruning.Cmd(ac.newApp, iristypes.DefaultNodeHome),
+		pruning.Cmd(ac.newApp, params.DefaultNodeHome),
 	)
 
 	ethermintserver.AddCommands(
 		rootCmd,
-		ethermintserver.NewDefaultStartOptions(ac.newApp, iristypes.DefaultNodeHome),
+		ethermintserver.NewDefaultStartOptions(ac.newApp, params.DefaultNodeHome),
 		ac.appExport,
 		addModuleInitFlags,
 	)
@@ -155,7 +152,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		genesisCommand(encodingConfig),
 		queryCommand(),
 		txCommand(),
-		Commands(iristypes.DefaultNodeHome),
+		Commands(params.DefaultNodeHome),
 	)
 }
 
@@ -164,7 +161,7 @@ func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command
 	cmd := genutilcli.GenesisCoreCommand(
 		encodingConfig.TxConfig,
 		app.ModuleBasics,
-		iristypes.DefaultNodeHome,
+		params.DefaultNodeHome,
 	)
 
 	for _, subCmd := range cmds {
