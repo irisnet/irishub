@@ -33,7 +33,7 @@ jobs:
         
   deploy:
     name: Deploy
-    runs-on: iris-runner-set
+    runs-on: default-runner-set
     environment: production
 
     permissions:
