@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/bianjieai/nft-transfer v1.1.3-ibc-v7.3.0
-	github.com/bianjieai/tibc-go v0.5.0
+	github.com/bianjieai/tibc-go v0.5.1-0.20240703054905-6368161b801f
 	github.com/cometbft/cometbft v0.37.5
 	github.com/cometbft/cometbft-db v0.8.0
 	github.com/cosmos/cosmos-sdk v0.47.15-ics-lsm
@@ -12,7 +12,16 @@ require (
 	github.com/cosmos/iavl v0.20.1 // indirect
 	github.com/cosmos/ibc-go/v7 v7.3.0
 	github.com/evmos/ethermint v0.22.0
-	github.com/irisnet/irismod v1.9.0
+	mods.irisnet.org/modules/coinswap v0.0.0-20240705013837-55f906fb239e
+	mods.irisnet.org/modules/farm v0.0.0-20240705013837-55f906fb239e
+	mods.irisnet.org/modules/htlc v0.0.0-20240705013837-55f906fb239e
+	mods.irisnet.org/modules/mt v0.0.0-20240705013837-55f906fb239e
+	mods.irisnet.org/modules/nft v0.0.0-20240705013837-55f906fb239e
+	mods.irisnet.org/modules/oracle v0.0.0-20240705013837-55f906fb239e
+	mods.irisnet.org/modules/random v0.0.0-20240705013837-55f906fb239e
+	mods.irisnet.org/modules/record v0.0.0-20240705013837-55f906fb239e
+	mods.irisnet.org/modules/service v0.0.0-20240705013837-55f906fb239e
+	mods.irisnet.org/modules/token v0.0.0-20240705013837-55f906fb239e
 )
 
 require (
@@ -90,6 +99,8 @@ require (
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240123012728-ef4313101c80 // indirect
+	mods.irisnet.org/api v0.0.0-20240628054110-4cb043e0238a // indirect
+	mods.irisnet.org/simapp v0.0.0-20240628054110-4cb043e0238a // indirect
 	pgregory.net/rapid v1.1.0 // indirect
 )
 

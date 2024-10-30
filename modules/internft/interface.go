@@ -6,7 +6,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
+	nfttypes "mods.irisnet.org/modules/nft/types"
 )
 
 type (
