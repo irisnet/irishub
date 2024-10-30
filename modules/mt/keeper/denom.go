@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
+	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -51,7 +52,7 @@ func (k Keeper) GetDenom(ctx sdk.Context, id string) (denom types.Denom, found b
 // GetDenoms returns all the denoms
 func (k Keeper) GetDenoms(ctx sdk.Context) (denoms []types.Denom) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.KeyDenom(""))
+	iterator := storetypes.KVStorePrefixIterator(store, types.KeyDenom(""))
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {

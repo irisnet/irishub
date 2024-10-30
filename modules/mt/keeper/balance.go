@@ -5,6 +5,7 @@ import (
 	"math"
 
 	errorsmod "cosmossdk.io/errors"
+	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -62,7 +63,7 @@ func (k Keeper) GetBalance(ctx sdk.Context,
 func (k Keeper) getBalances(ctx sdk.Context) []types.Owner {
 	store := ctx.KVStore(k.storeKey)
 
-	it := sdk.KVStorePrefixIterator(store, types.PrefixBalance)
+	it := storetypes.KVStorePrefixIterator(store, types.PrefixBalance)
 	defer it.Close()
 
 	ownerMap := make(map[string]map[string]map[string]uint64)
