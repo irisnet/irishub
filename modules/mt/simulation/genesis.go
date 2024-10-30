@@ -101,13 +101,13 @@ func RandomizedGenState(simState *module.SimulationState) {
 	}
 
 	accs := simState.Accounts[:accLen]
-	simState.AppParams.GetOrGenerate(simState.Cdc, "mt", &collections, simState.Rand,
+	simState.AppParams.GetOrGenerate("mt", &collections, simState.Rand,
 		func(r *rand.Rand) {
 			collections = genCollections(r, accs)
 		},
 	)
 
-	simState.AppParams.GetOrGenerate(simState.Cdc, "mt", &owners, simState.Rand,
+	simState.AppParams.GetOrGenerate("mt", &owners, simState.Rand,
 		func(r *rand.Rand) {
 			owners = genOwners(r, collections, accs)
 		},

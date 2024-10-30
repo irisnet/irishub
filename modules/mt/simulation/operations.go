@@ -36,41 +36,41 @@ func WeightedOperations(
 	var weightIssueDenom, weightMint, weightEdit, weightBurn, weightTransfer, weightTransferDenom int
 
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgIssueDenom, &weightIssueDenom, nil,
+		OpWeightMsgIssueDenom, &weightIssueDenom, nil,
 		func(_ *rand.Rand) {
 			weightIssueDenom = 50
 		},
 	)
 
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgMintMT, &weightMint, nil,
+		OpWeightMsgMintMT, &weightMint, nil,
 		func(_ *rand.Rand) {
 			weightMint = 100
 		},
 	)
 
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgEditMT, &weightEdit, nil,
+		OpWeightMsgEditMT, &weightEdit, nil,
 		func(_ *rand.Rand) {
 			weightEdit = 50
 		},
 	)
 
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgTransferMT, &weightTransfer, nil,
+		OpWeightMsgTransferMT, &weightTransfer, nil,
 		func(_ *rand.Rand) {
 			weightTransfer = 50
 		},
 	)
 
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgBurnMT, &weightBurn, nil,
+		OpWeightMsgBurnMT, &weightBurn, nil,
 		func(_ *rand.Rand) {
 			weightBurn = 10
 		},
 	)
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgTransferDenom, &weightTransferDenom, nil,
+		OpWeightMsgTransferDenom, &weightTransferDenom, nil,
 		func(_ *rand.Rand) {
 			weightTransferDenom = 10
 		},
@@ -170,7 +170,7 @@ func SimulateMsgIssueDenom(
 			), nil, err
 		}
 
-		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
+		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }
 
@@ -265,7 +265,7 @@ func SimulateMsgMintMT(k keeper.Keeper, ak mt.AccountKeeper, bk mt.BankKeeper) s
 			), nil, err
 		}
 
-		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
+		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }
 
@@ -353,7 +353,7 @@ func SimulateMsgEditMT(k keeper.Keeper, ak mt.AccountKeeper, bk mt.BankKeeper) s
 			), nil, err
 		}
 
-		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
+		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }
 
@@ -458,7 +458,7 @@ func SimulateMsgTransferMT(
 			), nil, err
 		}
 
-		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
+		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }
 
@@ -542,7 +542,7 @@ func SimulateMsgBurnMT(k keeper.Keeper, ak mt.AccountKeeper, bk mt.BankKeeper) s
 			), nil, err
 		}
 
-		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
+		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }
 
@@ -632,7 +632,7 @@ func SimulateMsgTransferDenom(
 			), nil, err
 		}
 
-		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
+		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }
 

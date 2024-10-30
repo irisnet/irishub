@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
+	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -45,7 +46,7 @@ func (k Keeper) GetMT(ctx sdk.Context, denomID, mtID string) (mt exported.MT, er
 func (k Keeper) GetMTs(ctx sdk.Context, denomID string) (mts []exported.MT) {
 	store := ctx.KVStore(k.storeKey)
 
-	iterator := sdk.KVStorePrefixIterator(store, types.KeyMT(denomID, ""))
+	iterator := storetypes.KVStorePrefixIterator(store, types.KeyMT(denomID, ""))
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var baseMT types.MT
