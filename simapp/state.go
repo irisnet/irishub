@@ -110,7 +110,7 @@ func AppStateFn(cdc codec.JSONCodec, simManager *module.SimulationManager) simty
 			panic(err)
 		}
 		// compute not bonded balance
-		notBondedTokens := sdk.ZeroInt()
+		notBondedTokens := sdkmath.ZeroInt()
 		for _, val := range stakingState.Validators {
 			if val.Status != stakingtypes.Unbonded {
 				continue
@@ -174,11 +174,11 @@ func AppStateRandomizedFn(
 		initialStake       sdkmath.Int
 	)
 	appParams.GetOrGenerate(
-		cdc, StakePerAccount, &initialStake, r,
+		StakePerAccount, &initialStake, r,
 		func(r *rand.Rand) { initialStake = sdkmath.NewInt(r.Int63n(1e12)) },
 	)
 	appParams.GetOrGenerate(
-		cdc, InitiallyBondedValidators, &numInitiallyBonded, r,
+		InitiallyBondedValidators, &numInitiallyBonded, r,
 		func(r *rand.Rand) { numInitiallyBonded = int64(r.Intn(300)) },
 	)
 

@@ -27,7 +27,7 @@ type Network struct {
 }
 
 type ResponseTx struct {
-	abci.ResponseDeliverTx
+	abci.ExecTxResult
 	Height int64
 }
 
