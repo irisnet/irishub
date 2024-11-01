@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"testing"
 
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -75,7 +74,7 @@ func (suite *KeeperSuite) SetupTest() {
 
 	suite.app = app
 	suite.legacyAmino = app.LegacyAmino()
-	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
+	suite.ctx = app.BaseApp.NewContext(isCheckTx)
 
 	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, app.InterfaceRegistry())
 	types.RegisterQueryServer(queryHelper, suite.keeper)
