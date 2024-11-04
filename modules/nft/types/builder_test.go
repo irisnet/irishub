@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"testing"
 
+	"cosmossdk.io/x/nft"
 	"github.com/cometbft/cometbft/crypto"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/require"
 )

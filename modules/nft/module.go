@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	sdknfttypes "cosmossdk.io/x/nft"
+	sdknftsim "cosmossdk.io/x/nft/simulation"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -12,8 +14,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	sdknfttypes "github.com/cosmos/cosmos-sdk/x/nft"
-	sdknftsim "github.com/cosmos/cosmos-sdk/x/nft/simulation"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 

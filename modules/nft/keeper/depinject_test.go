@@ -8,7 +8,8 @@ import (
 	authmodulev1 "cosmossdk.io/api/cosmos/auth/module/v1"
 	authzmodulev1 "cosmossdk.io/api/cosmos/authz/module/v1"
 	bankmodulev1 "cosmossdk.io/api/cosmos/bank/module/v1"
-	capabilitymodulev1 "cosmossdk.io/api/cosmos/capability/module/v1"
+	// todo remove?
+	//capabilitymodulev1 "cosmossdk.io/api/cosmos/capability/module/v1"
 	consensusmodulev1 "cosmossdk.io/api/cosmos/consensus/module/v1"
 	crisismodulev1 "cosmossdk.io/api/cosmos/crisis/module/v1"
 	distrmodulev1 "cosmossdk.io/api/cosmos/distribution/module/v1"
@@ -25,16 +26,18 @@ import (
 	upgrademodulev1 "cosmossdk.io/api/cosmos/upgrade/module/v1"
 	vestingmodulev1 "cosmossdk.io/api/cosmos/vesting/module/v1"
 	"cosmossdk.io/core/appconfig"
+	// todo remove?
+	//capabilitytypes "cosmossdk.io/x/capability/types"
+	evidencetypes "cosmossdk.io/x/evidence/types"
+	"cosmossdk.io/x/feegrant"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	consensustypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
-	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/group"
@@ -42,7 +45,6 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	nftmodule "mods.irisnet.org/api/irismod/nft/module/v1"
@@ -59,7 +61,9 @@ var (
 	// so that other modules that want to create or claim capabilities afterwards in InitChain
 	// can do so safely.
 	genesisModuleOrder = []string{
-		capabilitytypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName,
+		// todo remove?
+		//capabilitytypes.ModuleName,
+		authtypes.ModuleName, banktypes.ModuleName,
 		distrtypes.ModuleName, stakingtypes.ModuleName, slashingtypes.ModuleName, govtypes.ModuleName,
 		minttypes.ModuleName, crisistypes.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
 		feegrant.ModuleName, group.ModuleName, paramstypes.ModuleName, upgradetypes.ModuleName,
@@ -102,7 +106,8 @@ var (
 					// NOTE: capability module's beginblocker must come before any modules using capabilities (e.g. IBC)
 					BeginBlockers: []string{
 						upgradetypes.ModuleName,
-						capabilitytypes.ModuleName,
+						// todo remove?
+						//capabilitytypes.ModuleName,
 						minttypes.ModuleName,
 						distrtypes.ModuleName,
 						slashingtypes.ModuleName,
@@ -125,7 +130,8 @@ var (
 						crisistypes.ModuleName,
 						govtypes.ModuleName,
 						stakingtypes.ModuleName,
-						capabilitytypes.ModuleName,
+						// todo remove?
+						//capabilitytypes.ModuleName,
 						authtypes.ModuleName,
 						banktypes.ModuleName,
 						distrtypes.ModuleName,
@@ -208,12 +214,13 @@ var (
 				Name:   distrtypes.ModuleName,
 				Config: appconfig.WrapAny(&distrmodulev1.Module{}),
 			},
-			{
-				Name: capabilitytypes.ModuleName,
-				Config: appconfig.WrapAny(&capabilitymodulev1.Module{
-					SealKeeper: true,
-				}),
-			},
+			// todo remove?
+			//{
+			//	Name: capabilitytypes.ModuleName,
+			//	Config: appconfig.WrapAny(&capabilitymodulev1.Module{
+			//		SealKeeper: true,
+			//	}),
+			//},
 			{
 				Name:   evidencetypes.ModuleName,
 				Config: appconfig.WrapAny(&evidencemodulev1.Module{}),

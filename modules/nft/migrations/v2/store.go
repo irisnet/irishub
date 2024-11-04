@@ -22,7 +22,7 @@ func Migrate(ctx sdk.Context,
 	startTime := time.Now()
 
 	store := ctx.KVStore(storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, KeyDenom(""))
+	iterator := storetypes.KVStorePrefixIterator(store, KeyDenom(""))
 	defer iterator.Close()
 
 	k := keeper{
@@ -85,7 +85,7 @@ func migrateToken(
 	logger log.Logger,
 	denomID string,
 ) (int64, error) {
-	var iterator sdk.Iterator
+	var iterator storetypes.Iterator
 	defer func() {
 		if iterator != nil {
 			_ = iterator.Close()
@@ -95,7 +95,7 @@ func migrateToken(
 	store := ctx.KVStore(k.storeKey)
 
 	total := int64(0)
-	iterator = sdk.KVStorePrefixIterator(store, KeyNFT(denomID, ""))
+	iterator = storetypes.KVStorePrefixIterator(store, KeyNFT(denomID, ""))
 	for ; iterator.Valid(); iterator.Next() {
 		var baseNFT types.BaseNFT
 		k.cdc.MustUnmarshal(iterator.Value(), &baseNFT)

@@ -4,8 +4,8 @@ import (
 	"context"
 
 	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/x/nft"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 

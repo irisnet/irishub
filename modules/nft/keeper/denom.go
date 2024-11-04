@@ -2,10 +2,10 @@ package keeper
 
 import (
 	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/x/nft"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 
 	"mods.irisnet.org/modules/nft/types"
 )
