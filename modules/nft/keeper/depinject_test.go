@@ -8,8 +8,8 @@ import (
 	authmodulev1 "cosmossdk.io/api/cosmos/auth/module/v1"
 	authzmodulev1 "cosmossdk.io/api/cosmos/authz/module/v1"
 	bankmodulev1 "cosmossdk.io/api/cosmos/bank/module/v1"
-	// todo remove?
-	//capabilitymodulev1 "cosmossdk.io/api/cosmos/capability/module/v1"
+
+	capabilitymodulev1 "cosmossdk.io/api/cosmos/capability/module/v1"
 	consensusmodulev1 "cosmossdk.io/api/cosmos/consensus/module/v1"
 	crisismodulev1 "cosmossdk.io/api/cosmos/crisis/module/v1"
 	distrmodulev1 "cosmossdk.io/api/cosmos/distribution/module/v1"
@@ -26,8 +26,7 @@ import (
 	upgrademodulev1 "cosmossdk.io/api/cosmos/upgrade/module/v1"
 	vestingmodulev1 "cosmossdk.io/api/cosmos/vesting/module/v1"
 	"cosmossdk.io/core/appconfig"
-	// todo remove?
-	//capabilitytypes "cosmossdk.io/x/capability/types"
+
 	evidencetypes "cosmossdk.io/x/evidence/types"
 	"cosmossdk.io/x/feegrant"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
@@ -45,6 +44,7 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	nftmodule "mods.irisnet.org/api/irismod/nft/module/v1"
@@ -62,7 +62,7 @@ var (
 	// can do so safely.
 	genesisModuleOrder = []string{
 		// todo remove?
-		//capabilitytypes.ModuleName,
+		capabilitytypes.ModuleName,
 		authtypes.ModuleName, banktypes.ModuleName,
 		distrtypes.ModuleName, stakingtypes.ModuleName, slashingtypes.ModuleName, govtypes.ModuleName,
 		minttypes.ModuleName, crisistypes.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
@@ -215,12 +215,12 @@ var (
 				Config: appconfig.WrapAny(&distrmodulev1.Module{}),
 			},
 			// todo remove?
-			//{
-			//	Name: capabilitytypes.ModuleName,
-			//	Config: appconfig.WrapAny(&capabilitymodulev1.Module{
-			//		SealKeeper: true,
-			//	}),
-			//},
+			{
+				Name: capabilitytypes.ModuleName,
+				Config: appconfig.WrapAny(&capabilitymodulev1.Module{
+					SealKeeper: true,
+				}),
+			},
 			{
 				Name:   evidencetypes.ModuleName,
 				Config: appconfig.WrapAny(&evidencemodulev1.Module{}),
