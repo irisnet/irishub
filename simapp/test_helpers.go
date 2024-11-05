@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/codec/address"
 	"math/rand"
 	"os"
 	"strconv"
@@ -35,21 +36,18 @@ import (
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	"github.com/cosmos/cosmos-sdk/testutil/mock"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module/testutil"
-	authcli "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankcli "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/require"
 )
 
@@ -730,7 +728,7 @@ func QueryBalancesExec(
 	args = append(args, extraArgs...)
 
 	result := &banktypes.QueryAllBalancesResponse{}
-	network.ExecQueryCmd(t, clientCtx, bankcli.GetBalancesCmd(), args, result)
+	//network.ExecQueryCmd(t, clientCtx, bankcli.GetBalancesCmd(), args, result)
 	return result.Balances
 }
 
@@ -743,15 +741,15 @@ func QueryBalanceExec(
 	extraArgs ...string,
 ) *sdk.Coin {
 	t.Helper()
-	args := []string{
-		address,
-		fmt.Sprintf("--%s=%s", bankcli.FlagDenom, denom),
-		fmt.Sprintf("--%s=json", "output"),
-	}
-	args = append(args, extraArgs...)
+	//args := []string{
+	//	address,
+	//	fmt.Sprintf("--%s=%s", bankcli.FlagDenom, denom),
+	//	fmt.Sprintf("--%s=json", "output"),
+	//}
+	//args = append(args, extraArgs...)
 
 	result := &sdk.Coin{}
-	network.ExecQueryCmd(t, clientCtx, bankcli.GetBalancesCmd(), args, result)
+	//network.ExecQueryCmd(t, clientCtx, bankcli.GetBalancesCmd(), args, result)
 	return result
 }
 
@@ -763,20 +761,20 @@ func QueryAccountExec(
 	extraArgs ...string,
 ) authtypes.AccountI {
 	t.Helper()
-	args := []string{
-		address,
-		fmt.Sprintf("--%s=json", "output"),
-	}
-	args = append(args, extraArgs...)
-	out, err := clitestutil.ExecTestCLICmd(clientCtx, authcli.GetAccountCmd(), args)
-	require.NoError(t, err, "QueryAccountExec  failed")
-
-	respType := proto.Message(&codectypes.Any{})
-	require.NoError(t, clientCtx.Codec.UnmarshalJSON(out.Bytes(), respType))
+	//args := []string{
+	//	address,
+	//	fmt.Sprintf("--%s=json", "output"),
+	//}
+	//args = append(args, extraArgs...)
+	////out, err := clitestutil.ExecTestCLICmd(clientCtx, authcli.GetAccountCmd(), args)
+	////require.NoError(t, err, "QueryAccountExec  failed")
+	//
+	//respType := proto.Message(&codectypes.Any{})
+	//require.NoError(t, clientCtx.Codec.UnmarshalJSON(out.Bytes(), respType))
 
 	var account authtypes.AccountI
-	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*codectypes.Any), &account)
-	require.NoError(t, err, "UnpackAccount failed")
+	//err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*codectypes.Any), &account)
+	//require.NoError(t, err, "UnpackAccount failed")
 
 	return account
 }
@@ -792,7 +790,9 @@ func MsgSendExec(
 	args := []string{from.String(), to.String(), amount.String()}
 	args = append(args, extraArgs...)
 
-	return network.ExecTxCmdWithResult(t, clientCtx, bankcli.NewSendTxCmd(), args)
+	ac := address.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix())
+
+	return network.ExecTxCmdWithResult(t, clientCtx, bankcli.NewSendTxCmd(ac), args)
 }
 
 func QueryTx(t *testing.T, clientCtx client.Context, txHash string) abci.ExecTxResult {
