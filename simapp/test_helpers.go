@@ -151,25 +151,13 @@ func SetupWithGenesisStateFn(
 	}
 
 	// Initialize the chain
-	app.InitChain(&abci.RequestInitChain{
+	_, err = app.InitChain(&abci.RequestInitChain{
 		Validators:      []abci.ValidatorUpdate{},
 		ConsensusParams: simtestutil.DefaultConsensusParams,
 		AppStateBytes:   stateBytes,
 	},
 	)
-	// commit genesis changes
-	app.Commit()
-	app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height:             app.LastBlockHeight() + 1,
-		Hash:               app.LastCommitID().Hash,
-		NextValidatorsHash: valSet.Hash(),
-	})
-	//app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
-	//	Height:             app.LastBlockHeight() + 1,
-	//	AppHash:            app.LastCommitID().Hash,
-	//	ValidatorsHash:     valSet.Hash(),
-	//	NextValidatorsHash: valSet.Hash(),
-	//}})
+	require.NoError(t, err)
 	return app
 }
 
@@ -332,27 +320,14 @@ func SetupWithGenesisValSet(
 	require.NoError(t, err)
 
 	// init chain will set the validator set and initialize the genesis accounts
-	app.InitChain(
+	_, err = app.InitChain(
 		&abci.RequestInitChain{
 			Validators:      []abci.ValidatorUpdate{},
 			ConsensusParams: simtestutil.DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
 		},
 	)
-
-	// commit genesis changes
-	app.Commit()
-	app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height:             app.LastBlockHeight() + 1,
-		Hash:               app.LastCommitID().Hash,
-		NextValidatorsHash: valSet.Hash(),
-	})
-	//app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
-	//	Height:             app.LastBlockHeight() + 1,
-	//	AppHash:            app.LastCommitID().Hash,
-	//	ValidatorsHash:     valSet.Hash(),
-	//	NextValidatorsHash: valSet.Hash(),
-	//}})
+	require.NoError(t, err)
 
 	return app
 }
