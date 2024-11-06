@@ -1,11 +1,12 @@
 package v2
 
 import (
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"reflect"
 	"unsafe"
 
+	"cosmossdk.io/core/store"
 	"cosmossdk.io/store/prefix"
-	storetypes "cosmossdk.io/store/types"
 	"cosmossdk.io/x/nft"
 	nftkeeper "cosmossdk.io/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -17,8 +18,8 @@ import (
 )
 
 type keeper struct {
-	storeKey storetypes.StoreKey // Unexposed key to access store from sdk.Context
-	cdc      codec.Codec
+	storeService store.KVStoreService
+	cdc          codec.BinaryCodec
 }
 
 func (k keeper) saveNFT(ctx sdk.Context, denomID,
@@ -58,7 +59,7 @@ func (k keeper) setNFT(ctx sdk.Context, token nft.NFT) {
 }
 
 func (k keeper) setOwner(ctx sdk.Context, classID, nftID string, owner sdk.AccAddress) {
-	store := ctx.KVStore(k.storeKey)
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store.Set(ownerStoreKey(classID, nftID), owner.Bytes())
 
 	ownerStore := k.getClassStoreByOwner(ctx, owner, classID)
@@ -72,25 +73,25 @@ func (k keeper) incrTotalSupply(ctx sdk.Context, classID string) {
 
 // GetTotalSupply returns the number of all nfts under the specified classID
 func (k keeper) GetTotalSupply(ctx sdk.Context, classID string) uint64 {
-	store := ctx.KVStore(k.storeKey)
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	bz := store.Get(classTotalSupply(classID))
 	return sdk.BigEndianToUint64(bz)
 }
 
 func (k keeper) updateTotalSupply(ctx sdk.Context, classID string, supply uint64) {
-	store := ctx.KVStore(k.storeKey)
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	supplyKey := classTotalSupply(classID)
 	store.Set(supplyKey, sdk.Uint64ToBigEndian(supply))
 }
 
 func (k keeper) getClassStoreByOwner(ctx sdk.Context, owner sdk.AccAddress, classID string) prefix.Store {
-	store := ctx.KVStore(k.storeKey)
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	key := nftOfClassByOwnerStoreKey(owner, classID)
 	return prefix.NewStore(store, key)
 }
 
 func (k keeper) getNFTStore(ctx sdk.Context, classID string) prefix.Store {
-	store := ctx.KVStore(k.storeKey)
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	return prefix.NewStore(store, nftStoreKey(classID))
 }
 

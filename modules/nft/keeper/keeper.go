@@ -3,10 +3,10 @@ package keeper
 import (
 	"fmt"
 
-	storetypes "cosmossdk.io/store/types"
+	"cosmossdk.io/core/store"
+	"cosmossdk.io/log"
 	"cosmossdk.io/x/nft"
 	nftkeeper "cosmossdk.io/x/nft/keeper"
-	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -15,21 +15,21 @@ import (
 
 // Keeper maintains the link to data storage and exposes getter/setter methods for the various parts of the state machine
 type Keeper struct {
-	storeKey storetypes.StoreKey // Unexposed key to access store from sdk.Context
-	cdc      codec.Codec
-	nk       nftkeeper.Keeper
+	storeService store.KVStoreService
+	cdc          codec.Codec
+	nk           nftkeeper.Keeper
 }
 
 // NewKeeper creates a new instance of the NFT Keeper
 func NewKeeper(cdc codec.Codec,
-	storeKey storetypes.StoreKey,
+	storeService store.KVStoreService,
 	ak nft.AccountKeeper,
 	bk nft.BankKeeper,
 ) Keeper {
 	return Keeper{
-		storeKey: storeKey,
-		cdc:      cdc,
-		nk:       nftkeeper.NewKeeper(storeKey, cdc, ak, bk),
+		storeService: storeService,
+		cdc:          cdc,
+		nk:           nftkeeper.NewKeeper(storeService, cdc, ak, bk),
 	}
 }
 

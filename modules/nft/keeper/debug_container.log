@@ -1,0 +1,247 @@
+Initializing logger
+Registering providers
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84)
+  Registering resolver for simple type codec.Codec
+  Registering resolver for simple type *codec.LegacyAmino
+  Registering resolver for simple type *runtime.AppBuilder
+  Registering resolver for simple type *baseapp.MsgServiceRouter
+  Registering resolver for simple type *baseapp.GRPCQueryRouter
+  Registering resolver for one-per-module type appmodule.AppModule
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Registering resolver for simple type protodesc.Resolver
+  Registering resolver for simple type protoregistry.MessageTypeResolver
+ Registering resolver for many-per-container type signing.CustomGetSigner
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:164)
+  Registering resolver for simple type types.InterfaceRegistry
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreKey (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:201)
+  Registering resolver for module-scoped type *types.KVStoreKey
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/runtime.ProvideTransientStoreKey (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:216)
+  Registering resolver for module-scoped type *types.TransientStoreKey
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/runtime.ProvideMemoryStoreKey (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:222)
+  Registering resolver for module-scoped type *types.MemoryStoreKey
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideGenesisTxHandler (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:229)
+  Registering resolver for simple type genesis.TxHandler
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:232)
+  Registering resolver for module-scoped type store.KVStoreService
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/runtime.ProvideMemoryStoreService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:237)
+  Registering resolver for module-scoped type store.MemoryStoreService
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/runtime.ProvideTransientStoreService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:242)
+  Registering resolver for module-scoped type store.TransientStoreService
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideEventService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:247)
+  Registering resolver for simple type event.Service
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideHeaderInfoService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:256)
+  Registering resolver for simple type header.Service
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideCometInfoService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:252)
+  Registering resolver for simple type comet.BlockInfoService
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideBasicManager (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:260)
+  Registering resolver for simple type module.BasicManager
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:284)
+  Registering resolver for simple type address.Codec
+  Registering resolver for simple type runtime.ValidatorAddressCodec
+  Registering resolver for simple type runtime.ConsensusAddressCodec
+ Registering github.com/cosmos/cosmos-sdk/x/auth.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/auth/module.go:209)
+  Registering resolver for simple type keeper.AccountKeeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Registering github.com/cosmos/cosmos-sdk/x/auth/vesting.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/auth/vesting/module.go:140)
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/bank.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/bank/module.go:227)
+  Registering resolver for simple type keeper.BaseKeeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.BankKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/staking.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/staking/module.go:221)
+  Registering resolver for simple type *keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.BankKeeper
+ Implicitly registering resolver *keeper.Keeper for interface type types.StakingKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/slashing.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/slashing/module.go:230)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Registering resolver for one-per-module type types.StakingHooksWrapper
+  Found resolver for types.StakingHooksWrapper: *depinject.onePerModuleResolver
+ Registering github.com/cosmos/cosmos-sdk/x/params.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/params/module.go:129)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Registering resolver for many-per-container type v1beta1.HandlerRoute
+  Found resolver for v1beta1.HandlerRoute: *depinject.groupResolver
+ Registering resolver for one-per-module type types.KeyTable
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/x/params.ProvideSubspace (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/params/module.go:146)
+  Registering resolver for module-scoped type types.Subspace
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.BankKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type tx.BankKeeper
+ Implicitly registering resolver keeper.AccountKeeper for interface type ante.AccountKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/auth/tx/config.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/auth/tx/config/config.go:70)
+  Registering resolver for simple type client.TxConfig
+  Registering resolver for simple type tx.ConfigOptions
+  Registering resolver for many-per-container type runtime.BaseAppOption
+  Found resolver for runtime.BaseAppOption: *depinject.groupResolver
+ Registering github.com/cosmos/cosmos-sdk/x/auth/tx/config.ProvideProtoRegistry (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/auth/tx/config/config.go:67)
+  Registering resolver for simple type signing.ProtoFileResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Implicitly registering resolver *keeper.Keeper for interface type types.StakingKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/genutil.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/genutil/module.go:138)
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type authz.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type authz.BankKeeper
+ Implicitly registering resolver *baseapp.MsgServiceRouter for interface type baseapp.MessageRouter
+ Registering github.com/cosmos/cosmos-sdk/x/authz/module.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/authz/module/module.go:178)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Registering cosmossdk.io/x/upgrade.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/cosmossdk.io/x/upgrade@v0.1.4/module.go:196)
+  Registering resolver for simple type *keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Found resolver for runtime.BaseAppOption: *depinject.groupResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.BankKeeper
+ Implicitly registering resolver *keeper.Keeper for interface type types.StakingKeeper
+ Implicitly registering resolver types.Subspace for interface type exported.Subspace
+ Registering github.com/cosmos/cosmos-sdk/x/distribution.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/distribution/module.go:232)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Found resolver for types.StakingHooksWrapper: *depinject.onePerModuleResolver
+ Implicitly registering resolver *keeper.Keeper for interface type types.StakingKeeper
+ Implicitly registering resolver keeper.Keeper for interface type types.SlashingKeeper
+ Registering cosmossdk.io/x/evidence.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/cosmossdk.io/x/evidence@v0.1.1/module.go:210)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver types.Subspace for interface type exported.Subspace
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.BankKeeper
+ Implicitly registering resolver *keeper.Keeper for interface type types.StakingKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/mint.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/mint/module.go:221)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type group.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type group.BankKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/group/module.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/group/module/module.go:208)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type feegrant.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type feegrant.BankKeeper
+ Registering cosmossdk.io/x/feegrant/module.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/cosmossdk.io/x/feegrant@v0.1.1/module/module.go:184)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.BankKeeper
+ Implicitly registering resolver *keeper.Keeper for interface type types.StakingKeeper
+ Implicitly registering resolver keeper.Keeper for interface type types.DistributionKeeper
+ Implicitly registering resolver types.Subspace for interface type types.ParamSubspace
+ Registering github.com/cosmos/cosmos-sdk/x/gov.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/gov/module.go:189)
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Registering resolver for simple type *keeper.Keeper
+  Found resolver for v1beta1.HandlerRoute: *depinject.groupResolver
+ Registering github.com/cosmos/cosmos-sdk/x/gov.ProvideKeyTable (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/gov/module.go:218)
+  Found resolver for types.KeyTable: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.SupplyKeeper
+ Implicitly registering resolver types.Subspace for interface type exported.Subspace
+ Registering github.com/cosmos/cosmos-sdk/x/crisis.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/crisis/module.go:197)
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Registering resolver for simple type *keeper.Keeper
+ Registering github.com/cosmos/cosmos-sdk/x/consensus.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/consensus/module.go:117)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Found resolver for runtime.BaseAppOption: *depinject.groupResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.BankKeeper
+ Registering mods.irisnet.org/modules/nft.ProvideModule (/Users/avery/irismod/modules/nft/depinject.go:52)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+Registering outputs
+ Implicitly registering resolver keeper.BaseKeeper for interface type keeper.Keeper
+ Registering mods.irisnet.org/simapp.NewSimApp (/Users/avery/irismod/simapp/app_v2.go:219)
+Building container
+Resolving dependencies for mods.irisnet.org/simapp.NewSimApp (/Users/avery/irismod/simapp/app_v2.go:219)
+ Providing keeper.Keeper from mods.irisnet.org/modules/nft.ProvideModule (/Users/avery/irismod/modules/nft/depinject.go:52) to mods.irisnet.org/simapp.NewSimApp
+ Resolving dependencies for mods.irisnet.org/modules/nft.ProvideModule (/Users/avery/irismod/modules/nft/depinject.go:52)
+  Supplying *modulev1.Module from cosmossdk.io/depinject/appconfig.Compose (/Users/avery/go/1.20.0/pkg/mod/cosmossdk.io/depinject@v1.0.0/appconfig/config.go:144) to mods.irisnet.org/modules/nft.ProvideModule
+  Providing codec.Codec from github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84) to mods.irisnet.org/modules/nft.ProvideModule
+  Resolving dependencies for github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84)
+   Providing types.InterfaceRegistry from github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:164) to github.com/cosmos/cosmos-sdk/runtime.ProvideApp
+   Resolving dependencies for github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:164)
+    Providing address.Codec from github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:284) to github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry
+    Resolving dependencies for github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:284)
+     Supplying *modulev1.Module from cosmossdk.io/depinject/appconfig.Compose (/Users/avery/go/1.20.0/pkg/mod/cosmossdk.io/depinject@v1.0.0/appconfig/config.go:144) to github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec
+     Supplying *modulev1.Module from cosmossdk.io/depinject/appconfig.Compose (/Users/avery/go/1.20.0/pkg/mod/cosmossdk.io/depinject@v1.0.0/appconfig/config.go:144) to github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec
+     Providing zero value for optional dependency func() address.Codec
+     Providing zero value for optional dependency func() runtime.ValidatorAddressCodec
+     Providing zero value for optional dependency func() runtime.ConsensusAddressCodec
+    Calling github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:284)
+    Providing runtime.ValidatorAddressCodec from github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:284) to github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry
+    Providing many-per-container type slice []signing.CustomGetSigner to github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry from:
+   Calling github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:164)
+  Calling github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84)
+  Providing store.KVStoreService from github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:232) to mods.irisnet.org/modules/nft.ProvideModule
+  Resolving dependencies for github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:232)
+   Supplying *runtimev1alpha1.Module from cosmossdk.io/depinject/appconfig.Compose (/Users/avery/go/1.20.0/pkg/mod/cosmossdk.io/depinject@v1.0.0/appconfig/config.go:144) to github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService
+   Providing ModuleKey nft
+   Providing *runtime.AppBuilder from github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84) to github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService
+  Calling github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:232)
+  Providing keeper.AccountKeeper from github.com/cosmos/cosmos-sdk/x/auth.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/auth/module.go:209) to mods.irisnet.org/modules/nft.ProvideModule
+  Resolving dependencies for github.com/cosmos/cosmos-sdk/x/auth.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/auth/module.go:209)
+   Supplying *modulev1.Module from cosmossdk.io/depinject/appconfig.Compose (/Users/avery/go/1.20.0/pkg/mod/cosmossdk.io/depinject@v1.0.0/appconfig/config.go:144) to github.com/cosmos/cosmos-sdk/x/auth.ProvideModule
+   Providing store.KVStoreService from github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:232) to github.com/cosmos/cosmos-sdk/x/auth.ProvideModule
+   Resolving dependencies for github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:232)
+    Supplying *runtimev1alpha1.Module from cosmossdk.io/depinject/appconfig.Compose (/Users/avery/go/1.20.0/pkg/mod/cosmossdk.io/depinject@v1.0.0/appconfig/config.go:144) to github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService
+    Providing ModuleKey auth
+    Providing *runtime.AppBuilder from github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84) to github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService
+   Calling github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:232)
+   Providing codec.Codec from github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84) to github.com/cosmos/cosmos-sdk/x/auth.ProvideModule
+   Providing address.Codec from github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:284) to github.com/cosmos/cosmos-sdk/x/auth.ProvideModule
+   Providing zero value for optional dependency types.RandomGenesisAccountsFn
+   Providing zero value for optional dependency func() types.AccountI
+   Implicitly registering resolver types.Subspace for interface type exported.Subspace
+   Providing types.Subspace from github.com/cosmos/cosmos-sdk/x/params.ProvideSubspace (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/params/module.go:146) to github.com/cosmos/cosmos-sdk/x/auth.ProvideModule
+   Resolving dependencies for github.com/cosmos/cosmos-sdk/x/params.ProvideSubspace (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/params/module.go:146)
+    Providing ModuleKey auth
+    Providing keeper.Keeper from github.com/cosmos/cosmos-sdk/x/params.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/params/module.go:129) to github.com/cosmos/cosmos-sdk/x/params.ProvideSubspace
+    Resolving dependencies for github.com/cosmos/cosmos-sdk/x/params.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/params/module.go:129)
+     Providing *types.KVStoreKey from github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreKey (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:201) to github.com/cosmos/cosmos-sdk/x/params.ProvideModule
+     Resolving dependencies for github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreKey (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:201)
+      Supplying *runtimev1alpha1.Module from cosmossdk.io/depinject/appconfig.Compose (/Users/avery/go/1.20.0/pkg/mod/cosmossdk.io/depinject@v1.0.0/appconfig/config.go:144) to github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreKey
+      Providing ModuleKey params
+      Providing *runtime.AppBuilder from github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84) to github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreKey
+     Calling github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreKey (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:201)
+     Providing *types.TransientStoreKey from github.com/cosmos/cosmos-sdk/runtime.ProvideTransientStoreKey (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:216) to github.com/cosmos/cosmos-sdk/x/params.ProvideModule
+     Resolving dependencies for github.com/cosmos/cosmos-sdk/runtime.ProvideTransientStoreKey (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:216)
+      Providing ModuleKey params
+      Providing *runtime.AppBuilder from github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84) to github.com/cosmos/cosmos-sdk/runtime.ProvideTransientStoreKey
+     Calling github.com/cosmos/cosmos-sdk/runtime.ProvideTransientStoreKey (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:216)
+     Providing codec.Codec from github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84) to github.com/cosmos/cosmos-sdk/x/params.ProvideModule
+     Providing *codec.LegacyAmino from github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84) to github.com/cosmos/cosmos-sdk/x/params.ProvideModule
+    Calling github.com/cosmos/cosmos-sdk/x/params.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/params/module.go:129)
+    Providing one-per-module type map map[string]types.KeyTable to github.com/cosmos/cosmos-sdk/x/params.ProvideSubspace from:
+     gov: github.com/cosmos/cosmos-sdk/x/gov.ProvideKeyTable (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/gov/module.go:218)
+    Resolving dependencies for github.com/cosmos/cosmos-sdk/x/gov.ProvideKeyTable (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/gov/module.go:218)
+    Calling github.com/cosmos/cosmos-sdk/x/gov.ProvideKeyTable (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/gov/module.go:218)
+   Calling github.com/cosmos/cosmos-sdk/x/params.ProvideSubspace (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/params/module.go:146)
+  Calling github.com/cosmos/cosmos-sdk/x/auth.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/auth/module.go:209)
+  Providing keeper.BaseKeeper from github.com/cosmos/cosmos-sdk/x/bank.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/bank/module.go:227) to mods.irisnet.org/modules/nft.ProvideModule
+  Resolving dependencies for github.com/cosmos/cosmos-sdk/x/bank.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/bank/module.go:227)
+   Supplying *modulev1.Module from cosmossdk.io/depinject/appconfig.Compose (/Users/avery/go/1.20.0/pkg/mod/cosmossdk.io/depinject@v1.0.0/appconfig/config.go:144) to github.com/cosmos/cosmos-sdk/x/bank.ProvideModule
+   Providing codec.Codec from github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84) to github.com/cosmos/cosmos-sdk/x/bank.ProvideModule
+   Providing store.KVStoreService from github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:232) to github.com/cosmos/cosmos-sdk/x/bank.ProvideModule
+   Resolving dependencies for github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:232)
+    Supplying *runtimev1alpha1.Module from cosmossdk.io/depinject/appconfig.Compose (/Users/avery/go/1.20.0/pkg/mod/cosmossdk.io/depinject@v1.0.0/appconfig/config.go:144) to github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService
+    Providing ModuleKey bank
+    Providing *runtime.AppBuilder from github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84) to github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService
+   Calling github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:232)
+   Error: can't resolve type cosmossdk.io/log/log.Logger for github.com/cosmos/cosmos-sdk/x/bank.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/bank/module.go:227):
+	while resolving:
+		log.Logger for github.com/cosmos/cosmos-sdk/x/bank.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/bank/module.go:227)
+		store.KVStoreService for github.com/cosmos/cosmos-sdk/x/bank.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/bank/module.go:227)
+		types.BankKeeper for mods.irisnet.org/modules/nft.ProvideModule (/Users/avery/irismod/modules/nft/depinject.go:52)
+		depinject.ModuleKey for github.com/cosmos/cosmos-sdk/x/params.ProvideSubspace (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/params/module.go:146)
+		exported.Subspace for github.com/cosmos/cosmos-sdk/x/auth.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/auth/module.go:209)
+		func() types.AccountI for github.com/cosmos/cosmos-sdk/x/auth.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/auth/module.go:209)
+		types.RandomGenesisAccountsFn for github.com/cosmos/cosmos-sdk/x/auth.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/auth/module.go:209)
+		store.KVStoreService for github.com/cosmos/cosmos-sdk/x/auth.ProvideModule (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/x/auth/module.go:209)
+		types.AccountKeeper for mods.irisnet.org/modules/nft.ProvideModule (/Users/avery/irismod/modules/nft/depinject.go:52)
+		store.KVStoreService for mods.irisnet.org/modules/nft.ProvideModule (/Users/avery/irismod/modules/nft/depinject.go:52)
+		address.Codec for github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:164)
+		types.InterfaceRegistry for github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/avery/go/1.20.0/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.10/runtime/module.go:84)
+		codec.Codec for mods.irisnet.org/modules/nft.ProvideModule (/Users/avery/irismod/modules/nft/depinject.go:52)
+		keeper.Keeper for mods.irisnet.org/simapp.NewSimApp (/Users/avery/irismod/simapp/app_v2.go:219)
+
+   Saved graph of container to /Users/avery/irismod/modules/nft/keeper/debug_container.dot

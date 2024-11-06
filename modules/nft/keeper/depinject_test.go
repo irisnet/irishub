@@ -8,8 +8,6 @@ import (
 	authmodulev1 "cosmossdk.io/api/cosmos/auth/module/v1"
 	authzmodulev1 "cosmossdk.io/api/cosmos/authz/module/v1"
 	bankmodulev1 "cosmossdk.io/api/cosmos/bank/module/v1"
-
-	capabilitymodulev1 "cosmossdk.io/api/cosmos/capability/module/v1"
 	consensusmodulev1 "cosmossdk.io/api/cosmos/consensus/module/v1"
 	crisismodulev1 "cosmossdk.io/api/cosmos/crisis/module/v1"
 	distrmodulev1 "cosmossdk.io/api/cosmos/distribution/module/v1"
@@ -44,7 +42,6 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	nftmodule "mods.irisnet.org/api/irismod/nft/module/v1"
@@ -61,8 +58,6 @@ var (
 	// so that other modules that want to create or claim capabilities afterwards in InitChain
 	// can do so safely.
 	genesisModuleOrder = []string{
-		// todo remove?
-		capabilitytypes.ModuleName,
 		authtypes.ModuleName, banktypes.ModuleName,
 		distrtypes.ModuleName, stakingtypes.ModuleName, slashingtypes.ModuleName, govtypes.ModuleName,
 		minttypes.ModuleName, crisistypes.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
@@ -106,8 +101,6 @@ var (
 					// NOTE: capability module's beginblocker must come before any modules using capabilities (e.g. IBC)
 					BeginBlockers: []string{
 						upgradetypes.ModuleName,
-						// todo remove?
-						//capabilitytypes.ModuleName,
 						minttypes.ModuleName,
 						distrtypes.ModuleName,
 						slashingtypes.ModuleName,
@@ -130,8 +123,6 @@ var (
 						crisistypes.ModuleName,
 						govtypes.ModuleName,
 						stakingtypes.ModuleName,
-						// todo remove?
-						//capabilitytypes.ModuleName,
 						authtypes.ModuleName,
 						banktypes.ModuleName,
 						distrtypes.ModuleName,
@@ -213,13 +204,6 @@ var (
 			{
 				Name:   distrtypes.ModuleName,
 				Config: appconfig.WrapAny(&distrmodulev1.Module{}),
-			},
-			// todo remove?
-			{
-				Name: capabilitytypes.ModuleName,
-				Config: appconfig.WrapAny(&capabilitymodulev1.Module{
-					SealKeeper: true,
-				}),
 			},
 			{
 				Name:   evidencetypes.ModuleName,
