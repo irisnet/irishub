@@ -256,7 +256,7 @@ func genesisStateWithValSet(t *testing.T,
 		valAddr := sdk.ValAddress(val.Address.Bytes())
 		delegations = append(
 			delegations,
-			stakingtypes.NewDelegation(genAccs[0].GetAddress().String(), valAddr.String(), sdkmath.LegacyZeroDec()),
+			stakingtypes.NewDelegation(genAccs[0].GetAddress().String(), valAddr.String(), sdkmath.LegacyOneDec()),
 		)
 
 	}
