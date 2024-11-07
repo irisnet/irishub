@@ -215,6 +215,7 @@ replace (
 	// Downgraded to avoid bugs in following commits which caused simulations to fail.
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
+	// todo replace version
 	mods.irisnet.org/simapp v0.0.0-20240628054110-4cb043e0238a => /Users/avery/irismod/simapp
 
 )
