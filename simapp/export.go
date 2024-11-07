@@ -1,11 +1,11 @@
 package simapp
 
 import (
-	storetypes "cosmossdk.io/store/types"
 	"encoding/json"
 	"fmt"
 	"log"
 
+	storetypes "cosmossdk.io/store/types"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"

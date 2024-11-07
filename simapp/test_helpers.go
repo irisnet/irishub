@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/codec/address"
 	"math/rand"
 	"os"
 	"strconv"
@@ -28,6 +27,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/address"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -435,7 +435,10 @@ func AddTestAddrsFromPubKeys(
 	pubKeys []cryptotypes.PubKey,
 	accAmt math.Int,
 ) {
-	bondDemo, _ := app.StakingKeeper.BondDenom(ctx)
+	bondDemo, err := app.StakingKeeper.BondDenom(ctx)
+	if err != nil {
+		panic(err)
+	}
 	initCoins := sdk.NewCoins(sdk.NewCoin(bondDemo, accAmt))
 
 	for _, pk := range pubKeys {
@@ -468,7 +471,10 @@ func addTestAddrs(
 	strategy GenerateAccountStrategy,
 ) []sdk.AccAddress {
 	testAddrs := strategy(accNum)
-	bondDemon, _ := app.StakingKeeper.BondDenom(ctx)
+	bondDemon, err := app.StakingKeeper.BondDenom(ctx)
+	if err != nil {
+		panic(err)
+	}
 	initCoins := sdk.NewCoins(sdk.NewCoin(bondDemon, accAmt))
 
 	for _, addr := range testAddrs {
