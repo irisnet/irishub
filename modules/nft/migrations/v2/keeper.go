@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"github.com/cosmos/cosmos-sdk/runtime"
 	"reflect"
 	"unsafe"
 
@@ -11,6 +10,7 @@ import (
 	nftkeeper "cosmossdk.io/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
 
