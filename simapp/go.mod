@@ -17,7 +17,6 @@ require (
 	github.com/cosmos/cosmos-db v1.0.2
 	github.com/cosmos/cosmos-sdk v0.50.10
 	github.com/cosmos/gogoproto v1.7.0
-
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
 )
