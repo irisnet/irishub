@@ -6,7 +6,7 @@ import "irishub/mint/mint.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 
-option go_package = "github.com/irisnet/irishub/v3/modules/mint/types";
+option go_package = "github.com/irisnet/irishub/v4/modules/mint/types";
 
 // Query creates service with guardian as rpc
 service Query {

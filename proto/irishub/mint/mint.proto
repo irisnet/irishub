@@ -4,7 +4,7 @@ package irishub.mint;
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/irisnet/irishub/v3/modules/mint/types";
+option go_package = "github.com/irisnet/irishub/v4/modules/mint/types";
 
 // Minter represents the minting state
 message Minter {

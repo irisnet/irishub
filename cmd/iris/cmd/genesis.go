@@ -16,7 +16,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
-	"github.com/irisnet/irishub/v3/app/params"
+	"github.com/irisnet/irishub/v4/app/params"
 )
 
 const (

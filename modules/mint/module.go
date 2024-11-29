@@ -17,10 +17,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irishub/v3/modules/mint/client/cli"
-	"github.com/irisnet/irishub/v3/modules/mint/keeper"
-	"github.com/irisnet/irishub/v3/modules/mint/simulation"
-	"github.com/irisnet/irishub/v3/modules/mint/types"
+	"github.com/irisnet/irishub/v4/modules/mint/client/cli"
+	"github.com/irisnet/irishub/v4/modules/mint/keeper"
+	"github.com/irisnet/irishub/v4/modules/mint/simulation"
+	"github.com/irisnet/irishub/v4/modules/mint/types"
 )
 
 // ConsensusVersion defines the current mint module consensus version.

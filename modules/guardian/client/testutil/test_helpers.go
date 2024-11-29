@@ -13,8 +13,8 @@ import (
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 
-	guardiancli "github.com/irisnet/irishub/v3/modules/guardian/client/cli"
-	apptestutil "github.com/irisnet/irishub/v3/testutil"
+	guardiancli "github.com/irisnet/irishub/v4/modules/guardian/client/cli"
+	apptestutil "github.com/irisnet/irishub/v4/testutil"
 )
 
 // CreateSuperExec creates a new super

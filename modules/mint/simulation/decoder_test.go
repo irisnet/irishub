@@ -11,9 +11,9 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"github.com/irisnet/irishub/v3/modules/mint/simulation"
-	"github.com/irisnet/irishub/v3/modules/mint/types"
-	"github.com/irisnet/irishub/v3/testutil"
+	"github.com/irisnet/irishub/v4/modules/mint/simulation"
+	"github.com/irisnet/irishub/v4/modules/mint/types"
+	"github.com/irisnet/irishub/v4/testutil"
 )
 
 func TestDecodeStore(t *testing.T) {

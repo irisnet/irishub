@@ -105,13 +105,13 @@ import (
 	tokentypes "mods.irisnet.org/modules/token/types"
 	tokenv1 "mods.irisnet.org/modules/token/types/v1"
 
-	guardiankeeper "github.com/irisnet/irishub/v3/modules/guardian/keeper"
-	guardiantypes "github.com/irisnet/irishub/v3/modules/guardian/types"
-	"github.com/irisnet/irishub/v3/modules/internft"
-	mintkeeper "github.com/irisnet/irishub/v3/modules/mint/keeper"
-	minttypes "github.com/irisnet/irishub/v3/modules/mint/types"
-	iristypes "github.com/irisnet/irishub/v3/types"
-	"github.com/irisnet/irishub/v3/wrapper"
+	guardiankeeper "github.com/irisnet/irishub/v4/modules/guardian/keeper"
+	guardiantypes "github.com/irisnet/irishub/v4/modules/guardian/types"
+	"github.com/irisnet/irishub/v4/modules/internft"
+	mintkeeper "github.com/irisnet/irishub/v4/modules/mint/keeper"
+	minttypes "github.com/irisnet/irishub/v4/modules/mint/types"
+	iristypes "github.com/irisnet/irishub/v4/types"
+	"github.com/irisnet/irishub/v4/wrapper"
 )
 
 // AppKeepers defines a structure used to consolidate all

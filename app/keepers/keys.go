@@ -41,8 +41,8 @@ import (
 	tibcnfttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/types"
 	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
 
-	guardiantypes "github.com/irisnet/irishub/v3/modules/guardian/types"
-	minttypes "github.com/irisnet/irishub/v3/modules/mint/types"
+	guardiantypes "github.com/irisnet/irishub/v4/modules/guardian/types"
+	minttypes "github.com/irisnet/irishub/v4/modules/mint/types"
 )
 
 func (appKeepers *AppKeepers) genStoreKeys() {

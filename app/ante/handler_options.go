@@ -14,7 +14,7 @@ import (
 	oraclekeeper "mods.irisnet.org/modules/oracle/keeper"
 	tokenkeeper "mods.irisnet.org/modules/token/keeper"
 
-	guardiankeeper "github.com/irisnet/irishub/v3/modules/guardian/keeper"
+	guardiankeeper "github.com/irisnet/irishub/v4/modules/guardian/keeper"
 )
 
 // HandlerOptions extend the SDK's AnteHandler options by requiring the IBC

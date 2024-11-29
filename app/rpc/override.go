@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/irisnet/irishub/v3/app/keepers"
+	"github.com/irisnet/irishub/v4/app/keepers"
 )
 
 var overrideModules = map[string]overrideHandler{

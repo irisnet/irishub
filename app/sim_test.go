@@ -19,8 +19,8 @@ import (
 	tokentypes "mods.irisnet.org/modules/token/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/irisnet/irishub/v3/app/params"
-	iristypes "github.com/irisnet/irishub/v3/types"
+	"github.com/irisnet/irishub/v4/app/params"
+	iristypes "github.com/irisnet/irishub/v4/types"
 
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
