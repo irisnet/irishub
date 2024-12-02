@@ -6,9 +6,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 
-	_ "github.com/irisnet/irishub/v3/client/lite/statik"
-	"github.com/irisnet/irishub/v3/cmd/iris/cmd"
-	"github.com/irisnet/irishub/v3/types"
+	_ "github.com/irisnet/irishub/v4/client/lite/statik"
+	"github.com/irisnet/irishub/v4/cmd/iris/cmd"
+	"github.com/irisnet/irishub/v4/types"
 )
 
 func main() {

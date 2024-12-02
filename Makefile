@@ -60,7 +60,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=iris \
 		  -X github.com/cosmos/cosmos-sdk/version.AppName=iris \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-		  -X github.com/irisnet/irishub/v3/types.EIP155ChainID=$(EVM_CHAIN_ID) \
+		  -X github.com/irisnet/irishub/v4/types.EIP155ChainID=$(EVM_CHAIN_ID) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
 
 ifeq ($(WITH_CLEVELDB),yes)
@@ -198,7 +198,7 @@ lint: golangci-lint
 format:
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lite/statik/statik.go" -not -path "*.pb.go" | xargs gofmt -w -s
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lite/statik/statik.go" -not -path "*.pb.go" | xargs misspell -w
-	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lite/statik/statik.go" -not -path "*.pb.go" | xargs goimports -w -local github.com/irisnet/irishub/v3
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lite/statik/statik.go" -not -path "*.pb.go" | xargs goimports -w -local github.com/irisnet/irishub/v4
 
 benchmark:
 	@go test -mod=readonly -bench=. ./...

@@ -8,7 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 
-	_ "github.com/irisnet/irishub/v3/client/lite/statik"
+	_ "github.com/irisnet/irishub/v4/client/lite/statik"
 )
 
 // RegisterSwaggerAPI registers swagger route with API Server

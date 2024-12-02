@@ -35,12 +35,12 @@ import (
 
 	srvflags "github.com/evmos/ethermint/server/flags"
 
-	irishubante "github.com/irisnet/irishub/v3/app/ante"
-	"github.com/irisnet/irishub/v3/app/keepers"
-	"github.com/irisnet/irishub/v3/app/params"
-	"github.com/irisnet/irishub/v3/app/rpc"
-	"github.com/irisnet/irishub/v3/client/lite"
-	iristypes "github.com/irisnet/irishub/v3/types"
+	irishubante "github.com/irisnet/irishub/v4/app/ante"
+	"github.com/irisnet/irishub/v4/app/keepers"
+	"github.com/irisnet/irishub/v4/app/params"
+	"github.com/irisnet/irishub/v4/app/rpc"
+	"github.com/irisnet/irishub/v4/client/lite"
+	iristypes "github.com/irisnet/irishub/v4/types"
 )
 
 var (

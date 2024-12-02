@@ -11,8 +11,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/v3/modules/mint/types"
-	apptestutil "github.com/irisnet/irishub/v3/testutil"
+	"github.com/irisnet/irishub/v4/modules/mint/types"
+	apptestutil "github.com/irisnet/irishub/v4/testutil"
 )
 
 type KeeperTestSuite struct {

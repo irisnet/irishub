@@ -11,8 +11,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/runtime"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 
-	"github.com/irisnet/irishub/v3/app"
-	"github.com/irisnet/irishub/v3/app/params"
+	"github.com/irisnet/irishub/v4/app"
+	"github.com/irisnet/irishub/v4/app/params"
 )
 
 var (
