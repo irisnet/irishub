@@ -1,12 +1,11 @@
 package internft
 
 import (
-	"github.com/cometbft/cometbft/libs/log"
-
+	"cosmossdk.io/log"
+	"cosmossdk.io/x/nft"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 
 	nfttransfer "github.com/bianjieai/nft-transfer/types"
 

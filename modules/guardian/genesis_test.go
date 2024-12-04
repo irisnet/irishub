@@ -10,10 +10,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/v3/modules/guardian"
-	"github.com/irisnet/irishub/v3/modules/guardian/keeper"
-	"github.com/irisnet/irishub/v3/modules/guardian/types"
-	"github.com/irisnet/irishub/v3/testutil"
+	"github.com/irisnet/irishub/v4/modules/guardian"
+	"github.com/irisnet/irishub/v4/modules/guardian/keeper"
+	"github.com/irisnet/irishub/v4/modules/guardian/types"
+	"github.com/irisnet/irishub/v4/testutil"
 )
 
 type TestSuite struct {
@@ -27,8 +27,8 @@ type TestSuite struct {
 func (suite *TestSuite) SetupTest() {
 	app := testutil.CreateApp(suite.T())
 
-	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
-	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
+	suite.cdc = app.AppCodec()
+	suite.ctx = app.BaseApp.NewContextLegacy(false, tmproto.Header{})
 	suite.keeper = app.GuardianKeeper
 }
 

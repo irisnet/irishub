@@ -15,10 +15,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	abci "github.com/cometbft/cometbft/abci/types"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	coretypes "github.com/cometbft/cometbft/rpc/core/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 
+	"cosmossdk.io/math"
+	pruningtypes "cosmossdk.io/store/pruning/types"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -27,7 +28,6 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	pruningtypes "github.com/cosmos/cosmos-sdk/store/pruning/types"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	"github.com/cosmos/cosmos-sdk/testutil/mock"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
@@ -38,7 +38,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/irisnet/irishub/v3/app"
+	"github.com/irisnet/irishub/v4/app"
 )
 
 // CreateApp initializes a new SimApp. A Nop logger is set in SimApp.
@@ -63,7 +63,7 @@ func CreateApp(t *testing.T) *AppWrapper {
 	)
 	balance := banktypes.Balance{
 		Address: acc.GetAddress().String(),
-		Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000000000000))),
+		Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, math.NewInt(100000000000000))),
 	}
 	return CreateAppWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{acc}, balance)
 }
@@ -115,7 +115,7 @@ func CreateAppWithGenesisValSet(
 
 	// init chain will set the validator set and initialize the genesis accounts
 	app.InitChain(
-		abci.RequestInitChain{
+		&abci.RequestInitChain{
 			Validators:      []abci.ValidatorUpdate{},
 			ConsensusParams: simtestutil.DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
@@ -124,12 +124,11 @@ func CreateAppWithGenesisValSet(
 
 	// commit genesis changes
 	app.Commit()
-	app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
+	app.FinalizeBlock(&abci.RequestFinalizeBlock{
 		Height:             app.LastBlockHeight() + 1,
-		AppHash:            app.LastCommitID().Hash,
-		ValidatorsHash:     valSet.Hash(),
+		Hash:               app.LastCommitID().Hash,
 		NextValidatorsHash: valSet.Hash(),
-	}})
+	})
 
 	return app
 }
@@ -165,21 +164,21 @@ func genesisStateWithValSet(codec codec.Codec, genesisState map[string]json.RawM
 			Jailed:          false,
 			Status:          stakingtypes.Bonded,
 			Tokens:          bondAmt,
-			DelegatorShares: sdk.OneDec(),
+			DelegatorShares: math.LegacyOneDec(),
 			Description:     stakingtypes.Description{},
 			UnbondingHeight: int64(0),
 			UnbondingTime:   time.Unix(0, 0).UTC(),
 			Commission: stakingtypes.NewCommission(
-				sdk.ZeroDec(),
-				sdk.ZeroDec(),
-				sdk.ZeroDec(),
+				math.LegacyZeroDec(),
+				math.LegacyZeroDec(),
+				math.LegacyZeroDec(),
 			),
-			MinSelfDelegation: sdk.ZeroInt(),
+			MinSelfDelegation: math.ZeroInt(),
 		}
 		validators = append(validators, validator)
 		delegations = append(
 			delegations,
-			stakingtypes.NewDelegation(genAccs[0].GetAddress(), val.Address.Bytes(), sdk.OneDec()),
+			stakingtypes.NewDelegation(string(genAccs[0].GetAddress()), string(val.Address.Bytes()), math.LegacyOneDec()),
 		)
 
 	}

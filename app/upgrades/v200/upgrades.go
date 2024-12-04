@@ -1,25 +1,26 @@
 package v200
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/store/prefix"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	"cosmossdk.io/store/prefix"
+	storetypes "cosmossdk.io/store/types"
+	"cosmossdk.io/x/upgrade/types"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/types"
+	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
 
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	"github.com/evmos/ethermint/x/feemarket"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	"github.com/irisnet/irishub/v3/app/upgrades"
-	irisevm "github.com/irisnet/irishub/v3/modules/evm"
+	"github.com/irisnet/irishub/v4/app/upgrades"
+	irisevm "github.com/irisnet/irishub/v4/modules/evm"
 )
 
 // Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal
@@ -37,7 +38,8 @@ func upgradeHandlerConstructor(
 	c module.Configurator,
 	box upgrades.Toolbox,
 ) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+	return func(context context.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx := sdk.UnwrapSDKContext(context)
 		fromVM[evmtypes.ModuleName] = irisevm.AppModule{}.ConsensusVersion()
 		fromVM[feemarkettypes.ModuleName] = feemarket.AppModule{}.ConsensusVersion()
 

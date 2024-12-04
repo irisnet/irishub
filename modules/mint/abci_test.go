@@ -1,6 +1,8 @@
 package mint_test
 
 import (
+	"cosmossdk.io/math"
+	"github.com/irisnet/irishub/v4/app/keepers"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -10,9 +12,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 
-	"github.com/irisnet/irishub/v3/modules/mint"
-	"github.com/irisnet/irishub/v3/modules/mint/types"
-	apptestutil "github.com/irisnet/irishub/v3/testutil"
+	"github.com/irisnet/irishub/v4/modules/mint"
+	"github.com/irisnet/irishub/v4/modules/mint/types"
+	apptestutil "github.com/irisnet/irishub/v4/testutil"
 )
 
 func TestBeginBlocker(t *testing.T) {
@@ -32,12 +34,14 @@ func TestBeginBlocker(t *testing.T) {
 func createTestApp(t *testing.T, isCheckTx bool) (*apptestutil.AppWrapper, sdk.Context) {
 	app := apptestutil.CreateApp(t)
 
-	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: 2})
+	ctx := app.BaseApp.NewContextLegacy(isCheckTx, tmproto.Header{Height: 2})
 	app.MintKeeper.SetParams(ctx, types.NewParams(
 		sdk.DefaultBondDenom,
-		sdk.NewDecWithPrec(4, 2),
+		math.LegacyNewDecWithPrec(4, 2),
 	))
 	app.MintKeeper.SetMinter(ctx, types.DefaultMinter())
-	app.DistrKeeper.SetFeePool(ctx, distributiontypes.InitialFeePool())
+	err := keepers.NewDistrKeeperAdapter(app.DistrKeeper).SetFeePool(ctx, distributiontypes.InitialFeePool())
+	require.NoError(t, err)
+
 	return app, ctx
 }

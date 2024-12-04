@@ -6,7 +6,7 @@ import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/irisnet/irishub/v3/modules/mint/types";
+option go_package = "github.com/irisnet/irishub/v4/modules/mint/types";
 option (gogoproto.goproto_getters_all) = false;
 
 // Msg defines the coinswap Msg service

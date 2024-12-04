@@ -1,10 +1,12 @@
 package v300
 
 import (
+	"context"
 	"sort"
 
+	"cosmossdk.io/math"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
 )
@@ -12,13 +14,13 @@ import (
 // keeper contains the staking keeper functions required
 // for the migration
 type keeper interface {
-	GetAllDelegations(ctx sdk.Context) []types.Delegation
-	GetAllValidators(ctx sdk.Context) []types.Validator
-	SetDelegation(ctx sdk.Context, delegation types.Delegation)
-	SetValidator(ctx sdk.Context, validator types.Validator)
-	RefreshTotalLiquidStaked(ctx sdk.Context) error
-	GetParams(ctx sdk.Context) (params types.Params)
-	SetParams(ctx sdk.Context, params types.Params) error
+	GetAllDelegations(ctx context.Context) ([]types.Delegation, error)
+	GetAllValidators(ctx context.Context) ([]types.Validator, error)
+	SetDelegation(ctx context.Context, delegation types.Delegation) error
+	SetValidator(ctx context.Context, validator types.Validator) error
+	RefreshTotalLiquidStaked(ctx context.Context) error
+	GetParams(ctx context.Context) (params types.Params, err error)
+	SetParams(ctx context.Context, params types.Params) error
 }
 
 // migrateParamsStore migrates the params store to the latest version.
@@ -26,7 +28,10 @@ type keeper interface {
 // ctx - sdk context
 // k - keeper
 func migrateParamsStore(ctx sdk.Context, k keeper) error {
-	params := k.GetParams(ctx)
+	params, err := k.GetParams(ctx)
+	if err != nil {
+		return err
+	}
 	params.ValidatorBondFactor = ValidatorBondFactor
 	params.ValidatorLiquidStakingCap = ValidatorLiquidStakingCap
 	params.GlobalLiquidStakingCap = GlobalLiquidStakingCap
@@ -34,26 +39,40 @@ func migrateParamsStore(ctx sdk.Context, k keeper) error {
 }
 
 // migrateValidators Set each validator's ValidatorBondShares and LiquidShares to 0
-func migrateValidators(ctx sdk.Context, k keeper) {
-	for _, validator := range k.GetAllValidators(ctx) {
-		validator.ValidatorBondShares = sdk.ZeroDec()
-		validator.LiquidShares = sdk.ZeroDec()
-		k.SetValidator(ctx, validator)
+func migrateValidators(ctx sdk.Context, k keeper) error {
+	validators, err := k.GetAllValidators(ctx)
+	if err != nil {
+		return err
 	}
+	for _, validator := range validators {
+		validator.ValidatorBondShares = math.LegacyZeroDec()
+		validator.LiquidShares = math.LegacyZeroDec()
+		if err := k.SetValidator(ctx, validator); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // migrateDelegations Set each delegation's ValidatorBond field to false
-func migrateDelegations(ctx sdk.Context, k keeper) {
-	for _, delegation := range k.GetAllDelegations(ctx) {
-		delegation.ValidatorBond = false
-		k.SetDelegation(ctx, delegation)
+func migrateDelegations(ctx sdk.Context, k keeper) error {
+	delegations, err := k.GetAllDelegations(ctx)
+	if err != nil {
+		return err
 	}
+	for _, delegation := range delegations {
+		delegation.ValidatorBond = false
+		if err := k.SetDelegation(ctx, delegation); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // MigrateUBDEntries will remove the ubdEntries with same creation_height
 // and create a new ubdEntry with updated balance and initial_balance
 func migrateUBDEntries(ctx sdk.Context, store storetypes.KVStore, cdc codec.BinaryCodec) error {
-	iterator := sdk.KVStorePrefixIterator(store, types.UnbondingDelegationKey)
+	iterator := storetypes.KVStorePrefixIterator(store, types.UnbondingDelegationKey)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
@@ -75,8 +94,8 @@ func migrateUBDEntries(ctx sdk.Context, store storetypes.KVStore, cdc codec.Bina
 
 		for _, h := range creationHeights {
 			ubdEntry := types.UnbondingDelegationEntry{
-				Balance:        sdk.ZeroInt(),
-				InitialBalance: sdk.ZeroInt(),
+				Balance:        math.ZeroInt(),
+				InitialBalance: math.ZeroInt(),
 			}
 			for _, entry := range entriesAtSameCreationHeight[h] {
 				ubdEntry.Balance = ubdEntry.Balance.Add(entry.Balance)
@@ -122,7 +141,9 @@ func migrateStore(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Binar
 	}
 
 	ctx.Logger().Info("Staking LSM Migration: Migrating validators")
-	migrateValidators(ctx, k)
+	if err := migrateValidators(ctx, k); err != nil {
+		return err
+	}
 
 	ctx.Logger().Info("Staking LSM Migration: Migrating delegations")
 	migrateDelegations(ctx, k)

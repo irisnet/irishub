@@ -1,19 +1,20 @@
 package v210
 
 import (
+	"context"
+	storetypes "cosmossdk.io/store/types"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	consensustypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	"github.com/cosmos/ibc-go/v7/modules/core/exported"
+	"github.com/cosmos/ibc-go/v8/modules/core/exported"
 
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
-	"github.com/irisnet/irishub/v3/app/upgrades"
+	"github.com/irisnet/irishub/v4/app/upgrades"
 )
 
 // Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal
@@ -30,7 +31,8 @@ func upgradeHandlerConstructor(
 	c module.Configurator,
 	box upgrades.Toolbox,
 ) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+	return func(context context.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx := sdk.UnwrapSDKContext(context)
 		// Enable 09-localhost type in allowed clients according to
 		// https://github.com/cosmos/ibc-go/blob/v7.3.0/docs/migrations/v7-to-v7_1.md
 		params := box.IBCKeeper.ClientKeeper.GetParams(ctx)
@@ -41,7 +43,7 @@ func upgradeHandlerConstructor(
 		// dedicated x/consensus module.
 		baseAppLegacySS := box.ParamsKeeper.Subspace(baseapp.Paramspace).
 			WithKeyTable(paramstypes.ConsensusParamsKeyTable())
-		baseapp.MigrateParams(ctx, baseAppLegacySS, &box.ConsensusParamsKeeper)
+		baseapp.MigrateParams(ctx, baseAppLegacySS, &box.ConsensusParamsKeeper.ParamsStore)
 		return box.ModuleManager.RunMigrations(ctx, c, fromVM)
 	}
 }

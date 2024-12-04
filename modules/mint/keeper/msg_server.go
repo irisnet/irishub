@@ -3,10 +3,11 @@ package keeper
 import (
 	"context"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errorstypes "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irishub/v3/modules/mint/types"
+	"github.com/irisnet/irishub/v4/modules/mint/types"
 )
 
 type msgServer struct {
@@ -28,7 +29,7 @@ func (m msgServer) UpdateParams(
 ) (*types.MsgUpdateParamsResponse, error) {
 	if m.k.authority != msg.Authority {
 		return nil, sdkerrors.Wrapf(
-			sdkerrors.ErrUnauthorized,
+			errorstypes.ErrUnauthorized,
 			"invalid authority; expected %s, got %s",
 			m.k.authority,
 			msg.Authority,

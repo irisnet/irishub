@@ -18,9 +18,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irishub/v3/modules/guardian/client/cli"
-	"github.com/irisnet/irishub/v3/modules/guardian/keeper"
-	"github.com/irisnet/irishub/v3/modules/guardian/types"
+	"github.com/irisnet/irishub/v4/modules/guardian/client/cli"
+	"github.com/irisnet/irishub/v4/modules/guardian/keeper"
+	"github.com/irisnet/irishub/v4/modules/guardian/types"
 )
 
 var (
@@ -95,6 +95,10 @@ type AppModule struct {
 	keeper keeper.Keeper
 }
 
+func (am AppModule) IsOnePerModuleType() {}
+
+func (am AppModule) IsAppModule() {}
+
 // NewAppModule creates a new AppModule object
 func NewAppModule(cdc codec.Codec, keeper keeper.Keeper) AppModule {
 	return AppModule{
@@ -150,12 +154,12 @@ func (am AppModule) ConsensusVersion() uint64 {
 }
 
 // BeginBlock performs a no-op.
-func (AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
+func (AppModule) BeginBlock(_ context.Context) error { return nil }
 
 // EndBlock returns the end blocker for the guardian module. It returns no validator
 // updates.
-func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return []abci.ValidatorUpdate{}
+func (AppModule) EndBlock(_ context.Context) error {
+	return nil
 }
 
 // ____________________________________________________________________________
@@ -167,7 +171,7 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 }
 
 // RegisterStoreDecoder registers a decoder for guardian module's types
-func (am AppModule) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
+func (am AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
 }
 
 // WeightedOperations returns the all the guardian module operations with their respective weights.

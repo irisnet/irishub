@@ -1,15 +1,16 @@
 package guardian
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errorstypes "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irishub/v3/modules/guardian/keeper"
-	"github.com/irisnet/irishub/v3/modules/guardian/types"
+	"github.com/irisnet/irishub/v4/modules/guardian/keeper"
+	"github.com/irisnet/irishub/v4/modules/guardian/types"
 )
 
 // NewHandler returns a handler for all "guardian" type messages.
-func NewHandler(k keeper.Keeper) sdk.Handler {
+func NewHandler(k keeper.Keeper) func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 	msgServer := keeper.NewMsgServerImpl(k)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
@@ -25,7 +26,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized bank message type: %T", msg)
+			return nil, sdkerrors.Wrapf(errorstypes.ErrUnknownRequest, "unrecognized bank message type: %T", msg)
 		}
 	}
 }

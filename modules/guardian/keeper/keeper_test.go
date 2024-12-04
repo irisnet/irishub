@@ -14,9 +14,9 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/v3/modules/guardian/keeper"
-	"github.com/irisnet/irishub/v3/modules/guardian/types"
-	"github.com/irisnet/irishub/v3/testutil"
+	"github.com/irisnet/irishub/v4/modules/guardian/keeper"
+	"github.com/irisnet/irishub/v4/modules/guardian/types"
+	"github.com/irisnet/irishub/v4/testutil"
 )
 
 var (
@@ -46,7 +46,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 
 	suite.cdc = app.LegacyAmino()
 	suite.ifr = app.InterfaceRegistry()
-	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
+	suite.ctx = app.BaseApp.NewContextLegacy(false, tmproto.Header{})
 	suite.keeper = app.GuardianKeeper
 }
 

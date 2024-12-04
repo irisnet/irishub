@@ -3,16 +3,15 @@ package testutil
 import (
 	"encoding/json"
 
-	dbm "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
-
+	"cosmossdk.io/log"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 
-	"github.com/irisnet/irishub/v3/app"
-	"github.com/irisnet/irishub/v3/app/params"
+	"github.com/irisnet/irishub/v4/app"
+	"github.com/irisnet/irishub/v4/app/params"
 )
 
 var (

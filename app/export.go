@@ -7,6 +7,7 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
+	storetypes "cosmossdk.io/store/types"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
@@ -25,7 +26,7 @@ func (app *IrisApp) ExportAppStateAndValidators(
 	modulesToExport []string,
 ) (servertypes.ExportedApp, error) {
 	// as if they could withdraw from the start of the next block
-	ctx := app.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
+	ctx := app.NewContextLegacy(true, tmproto.Header{Height: app.LastBlockHeight()})
 
 	// We export at last height + 1, because that's the height at which
 	// Tendermint will start InitChain.
@@ -38,7 +39,10 @@ func (app *IrisApp) ExportAppStateAndValidators(
 		service.PrepForZeroHeightGenesis(ctx, app.ServiceKeeper)
 	}
 
-	genState := app.mm.ExportGenesisForModules(ctx, app.appCodec, modulesToExport)
+	genState, err := app.mm.ExportGenesisForModules(ctx, app.appCodec, modulesToExport)
+	if err != nil {
+		return servertypes.ExportedApp{}, err
+	}
 	appState, err := json.MarshalIndent(genState, "", "  ")
 	if err != nil {
 		return servertypes.ExportedApp{}, err
@@ -84,13 +88,16 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 	app.StakingKeeper.IterateValidators(
 		ctx,
 		func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
-			_, _ = app.DistrKeeper.WithdrawValidatorCommission(ctx, val.GetOperator())
+			_, _ = app.DistrKeeper.WithdrawValidatorCommission(ctx, sdk.ValAddress(val.GetOperator()))
 			return false
 		},
 	)
 
 	// withdraw all delegator rewards
-	dels := app.StakingKeeper.GetAllDelegations(ctx)
+	dels, err := app.StakingKeeper.GetAllDelegations(ctx)
+	if err != nil {
+		panic(err)
+	}
 	for _, delegation := range dels {
 		valAddr, err := sdk.ValAddressFromBech32(delegation.ValidatorAddress)
 		if err != nil {
@@ -119,12 +126,21 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 		ctx,
 		func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
 			// donate any unwithdrawn outstanding reward fraction tokens to the community pool
-			scraps := app.DistrKeeper.GetValidatorOutstandingRewardsCoins(ctx, val.GetOperator())
-			feePool := app.DistrKeeper.GetFeePool(ctx)
-			feePool.CommunityPool = feePool.CommunityPool.Add(scraps...)
-			app.DistrKeeper.SetFeePool(ctx, feePool)
+			scraps, err := app.DistrKeeper.GetValidatorOutstandingRewardsCoins(ctx, sdk.ValAddress(val.GetOperator()))
+			if err != nil {
+				panic(err)
+			}
+			feePool, err := app.DistrKeeper.FeePool.Get(ctx)
+			if err != nil {
+				panic(nil)
+			}
 
-			if err := app.DistrKeeper.Hooks().AfterValidatorCreated(ctx, val.GetOperator()); err != nil {
+			feePool.CommunityPool = feePool.CommunityPool.Add(scraps...)
+			if err := app.DistrKeeper.FeePool.Set(ctx, feePool); err != nil {
+				panic(err)
+			}
+
+			if err := app.DistrKeeper.Hooks().AfterValidatorCreated(ctx, sdk.ValAddress(val.GetOperator())); err != nil {
 				panic(err)
 			}
 			return false
@@ -182,14 +198,14 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 	// Iterate through validators by power descending, reset bond heights, and
 	// update bond intra-tx counters.
 	store := ctx.KVStore(app.GetKey(stakingtypes.StoreKey))
-	iter := sdk.KVStoreReversePrefixIterator(store, stakingtypes.ValidatorsKey)
+	iter := storetypes.KVStoreReversePrefixIterator(store, stakingtypes.ValidatorsKey)
 	counter := int16(0)
 
 	for ; iter.Valid(); iter.Next() {
 		addr := sdk.ValAddress(stakingtypes.AddressFromValidatorsKey(iter.Key()))
-		validator, found := app.StakingKeeper.GetValidator(ctx, addr)
-		if !found {
-			panic("expected validator, not found")
+		validator, err := app.StakingKeeper.GetValidator(ctx, addr)
+		if err != nil {
+			panic(err)
 		}
 
 		validator.UnbondingHeight = 0
@@ -197,7 +213,9 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 			validator.Jailed = true
 		}
 
-		app.StakingKeeper.SetValidator(ctx, validator)
+		if err := app.StakingKeeper.SetValidator(ctx, validator); err != nil {
+			panic(err)
+		}
 		counter++
 	}
 
@@ -206,7 +224,7 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 		return
 	}
 
-	_, err := app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(ctx)
+	_, err = app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -232,6 +250,6 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 // ExportGenesis returns the KVStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *IrisApp) ExportGenesis(ctx sdk.Context) map[string]json.RawMessage {
+func (app *IrisApp) ExportGenesis(ctx sdk.Context) (map[string]json.RawMessage, error) {
 	return app.mm.ExportGenesis(ctx, app.AppCodec())
 }

@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"io/ioutil"
 	"net"
 	"os"
@@ -22,6 +23,7 @@ import (
 	"github.com/cometbft/cometbft/types"
 	tmtime "github.com/cometbft/cometbft/types/time"
 
+	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -44,8 +46,8 @@ import (
 	servicetypes "mods.irisnet.org/modules/service/types"
 	tokentypesv1 "mods.irisnet.org/modules/token/types/v1"
 
-	guardiantypes "github.com/irisnet/irishub/v3/modules/guardian/types"
-	iristypes "github.com/irisnet/irishub/v3/types"
+	guardiantypes "github.com/irisnet/irishub/v4/modules/guardian/types"
+	iristypes "github.com/irisnet/irishub/v4/types"
 )
 
 var (
@@ -59,7 +61,7 @@ var (
 
 const nativeIrisMinUnit = "uiris"
 
-var PowerReduction = sdk.NewIntFromUint64(1000000000000000000)
+var PowerReduction = math.NewIntFromUint64(1000000000000000000)
 
 // get cmd to initialize all files for tendermint testnet and application
 func testnetCmd(
@@ -264,11 +266,11 @@ func InitTestnet(
 
 		valTokens := sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction)
 		createValMsg, err := stakingtypes.NewMsgCreateValidator(
-			sdk.ValAddress(addr),
+			sdk.ValAddress(addr).String(),
 			valPubKeys[i],
 			sdk.NewCoin(sdk.DefaultBondDenom, valTokens),
 			stakingtypes.NewDescription(nodeDirName, "", "", "", ""),
-			stakingtypes.NewCommissionRates(sdk.OneDec(), sdk.OneDec(), sdk.OneDec()),
+			stakingtypes.NewCommissionRates(math.LegacyOneDec(), math.LegacyOneDec(), math.LegacyOneDec()),
 		)
 		if err != nil {
 			return err
@@ -288,7 +290,7 @@ func InitTestnet(
 			WithKeybase(kb).
 			WithTxConfig(clientCtx.TxConfig)
 
-		if err := tx.Sign(txFactory, nodeDirName, txBuilder, true); err != nil {
+		if err := tx.Sign(clientCtx.CmdContext, txFactory, nodeDirName, txBuilder, true); err != nil {
 			return err
 		}
 
@@ -313,7 +315,7 @@ func InitTestnet(
 
 	err := collectGenFiles(
 		clientCtx, nodeConfig, chainID, nodeIDs, valPubKeys, numValidators,
-		outputDir, nodeDirPrefix, nodeDaemonHome, genBalIterator,
+		outputDir, nodeDirPrefix, nodeDaemonHome, genBalIterator, clientCtx.TxConfig.SigningContext().ValidatorAddressCodec(),
 	)
 	if err != nil {
 		return err
@@ -419,6 +421,7 @@ func collectGenFiles(
 	numValidators int,
 	outputDir, nodeDirPrefix, nodeDaemonHome string,
 	genBalIterator banktypes.GenesisBalancesIterator,
+	valAddrCodec runtime.ValidatorAddressCodec,
 ) error {
 
 	var appState json.RawMessage
@@ -435,19 +438,19 @@ func collectGenFiles(
 		nodeID, valPubKey := nodeIDs[i], valPubKeys[i]
 		initCfg := genutiltypes.NewInitConfig(chainID, gentxsDir, nodeID, valPubKey)
 
-		genDoc, err := types.GenesisDocFromFile(nodeConfig.GenesisFile())
+		appGenesis, err := genutiltypes.AppGenesisFromFile(nodeConfig.GenesisFile())
 		if err != nil {
 			return err
 		}
-
 		nodeAppState, err := genutil.GenAppStateFromConfig(
 			clientCtx.Codec,
 			clientCtx.TxConfig,
 			nodeConfig,
 			initCfg,
-			*genDoc,
+			appGenesis,
 			genBalIterator,
 			genutiltypes.DefaultMessageValidator,
+			valAddrCodec,
 		)
 		if err != nil {
 			return err
@@ -457,14 +460,14 @@ func collectGenFiles(
 			// set the canonical application state (they should not differ)
 			appState = nodeAppState
 		}
-		genDoc.ConsensusParams.Block.MaxGas = 20000000
-		genDoc.ChainID = chainID
-		genDoc.GenesisTime = genTime
-		genDoc.AppState = appState
+		appGenesis.Consensus.Params.Block.MaxBytes = 20000000
+		appGenesis.ChainID = chainID
+		appGenesis.GenesisTime = genTime
+		appGenesis.AppState = appState
 
 		genFile := nodeConfig.GenesisFile()
 		// overwrite each validator's genesis file to have a canonical genesis time
-		if err := genutil.ExportGenesisFile(genDoc, genFile); err != nil {
+		if err := genutil.ExportGenesisFile(appGenesis, genFile); err != nil {
 			return err
 		}
 	}

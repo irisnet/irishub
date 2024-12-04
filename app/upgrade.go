@@ -3,12 +3,12 @@ package app
 import (
 	"fmt"
 
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 
-	"github.com/irisnet/irishub/v3/app/upgrades"
-	v200 "github.com/irisnet/irishub/v3/app/upgrades/v200"
-	v210 "github.com/irisnet/irishub/v3/app/upgrades/v210"
-	v300 "github.com/irisnet/irishub/v3/app/upgrades/v300"
+	"github.com/irisnet/irishub/v4/app/upgrades"
+	v200 "github.com/irisnet/irishub/v4/app/upgrades/v200"
+	v210 "github.com/irisnet/irishub/v4/app/upgrades/v210"
+	v300 "github.com/irisnet/irishub/v4/app/upgrades/v300"
 )
 
 var (

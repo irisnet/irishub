@@ -9,10 +9,11 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/v3/modules/mint/types"
-	apptestutil "github.com/irisnet/irishub/v3/testutil"
+	"github.com/irisnet/irishub/v4/modules/mint/types"
+	apptestutil "github.com/irisnet/irishub/v4/testutil"
 )
 
 type KeeperTestSuite struct {
@@ -25,7 +26,7 @@ type KeeperTestSuite struct {
 func (suite *KeeperTestSuite) SetupTest() {
 	app := apptestutil.CreateApp(suite.T())
 
-	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
+	suite.ctx = app.BaseApp.NewContextLegacy(false, tmproto.Header{})
 	suite.app = app
 
 	err := app.MintKeeper.SetParams(suite.ctx, types.DefaultParams())
@@ -38,7 +39,7 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestSetGetMinter() {
-	minter := types.NewMinter(time.Now().UTC(), sdk.NewInt(100000))
+	minter := types.NewMinter(time.Now().UTC(), math.NewInt(100000))
 	suite.app.MintKeeper.SetMinter(suite.ctx, minter)
 	expMinter := suite.app.MintKeeper.GetMinter(suite.ctx)
 
@@ -55,7 +56,7 @@ func (suite *KeeperTestSuite) TestSetGetParamSet() {
 
 func (suite *KeeperTestSuite) TestMintCoins() {
 
-	mintCoins := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(1000)))
+	mintCoins := sdk.NewCoins(sdk.NewCoin("iris", math.NewInt(1000)))
 	err := suite.app.MintKeeper.MintCoins(suite.ctx, mintCoins)
 	require.NoError(suite.T(), err)
 
@@ -65,7 +66,7 @@ func (suite *KeeperTestSuite) TestMintCoins() {
 }
 
 func (suite *KeeperTestSuite) TestAddCollectedFees() {
-	mintCoins := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(1000)))
+	mintCoins := sdk.NewCoins(sdk.NewCoin("iris", math.NewInt(1000)))
 
 	feeCollector := suite.app.AccountKeeper.GetModuleAccount(suite.ctx, "fee_collector")
 	feeCollectorBalance := suite.app.BankKeeper.GetAllBalances(suite.ctx, feeCollector.GetAddress())

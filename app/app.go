@@ -4,18 +4,18 @@ import (
 	"encoding/json"
 	"io"
 
-	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmjson "github.com/cometbft/cometbft/libs/json"
-	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
 	"github.com/spf13/cast"
 
+	"cosmossdk.io/log"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/grpc/cmtservice"
 	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
-	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -35,12 +35,12 @@ import (
 
 	srvflags "github.com/evmos/ethermint/server/flags"
 
-	irishubante "github.com/irisnet/irishub/v3/app/ante"
-	"github.com/irisnet/irishub/v3/app/keepers"
-	"github.com/irisnet/irishub/v3/app/params"
-	"github.com/irisnet/irishub/v3/app/rpc"
-	"github.com/irisnet/irishub/v3/client/lite"
-	iristypes "github.com/irisnet/irishub/v3/types"
+	irishubante "github.com/irisnet/irishub/v4/app/ante"
+	"github.com/irisnet/irishub/v4/app/keepers"
+	"github.com/irisnet/irishub/v4/app/params"
+	"github.com/irisnet/irishub/v4/app/rpc"
+	"github.com/irisnet/irishub/v4/client/lite"
+	iristypes "github.com/irisnet/irishub/v4/types"
 )
 
 var (
@@ -214,7 +214,7 @@ func NewIrisApp(
 		// that in-memory capabilities get regenerated on app restart.
 		// Note that since this reads from the store, we can only perform it when
 		// `loadLatest` is set to true.
-		app.CapabilityKeeper.Seal()
+		//app.CapabilityKeeper.Seal()
 	}
 	return app
 }
@@ -223,20 +223,17 @@ func NewIrisApp(
 func (app *IrisApp) Name() string { return app.BaseApp.Name() }
 
 // BeginBlocker application updates every begin block
-func (app *IrisApp) BeginBlocker(
-	ctx sdk.Context,
-	req abci.RequestBeginBlock,
-) abci.ResponseBeginBlock {
-	return app.mm.BeginBlock(ctx, req)
+func (app *IrisApp) BeginBlocker(ctx sdk.Context) (sdk.BeginBlock, error) {
+	return app.mm.BeginBlock(ctx)
 }
 
 // EndBlocker application updates every end block
-func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
-	return app.mm.EndBlock(ctx, req)
+func (app *IrisApp) EndBlocker(ctx sdk.Context) (sdk.EndBlock, error) {
+	return app.mm.EndBlock(ctx)
 }
 
 // InitChainer application update at chain initialization
-func (app *IrisApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *IrisApp) InitChainer(ctx sdk.Context, req *abci.RequestInitChain) (*abci.ResponseInitChain, error) {
 	var genesisState iristypes.GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
@@ -303,7 +300,7 @@ func (app *IrisApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APICo
 	// Register new tx routes from grpc-gateway.
 	authtx.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// Register new tendermint queries routes from grpc-gateway.
-	tmservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+	cmtservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// Register node gRPC service for grpc-gateway.
 	nodeservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// Register grpc-gateway routes for all modules.
@@ -322,7 +319,7 @@ func (app *IrisApp) RegisterServices() {
 		if !ok {
 			panic("unable to cast mod into AppModule")
 		}
-		rpc.RegisterService(m, app.configurator, app.AppKeepers)
+		rpc.RegisterService(app.appCodec, m, app.configurator, app.AppKeepers)
 	}
 }
 
@@ -338,7 +335,7 @@ func (app *IrisApp) RegisterTxService(clientCtx client.Context) {
 
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *IrisApp) RegisterTendermintService(clientCtx client.Context) {
-	tmservice.RegisterTendermintService(
+	cmtservice.RegisterTendermintService(
 		clientCtx,
 		app.BaseApp.GRPCQueryRouter(),
 		app.interfaceRegistry,
@@ -349,8 +346,8 @@ func (app *IrisApp) RegisterTendermintService(clientCtx client.Context) {
 // RegisterNodeService registers the node service.
 //
 // It takes a client context as a parameter and does not return anything.
-func (app *IrisApp) RegisterNodeService(clientCtx client.Context) {
-	nodeservice.RegisterNodeService(clientCtx, app.GRPCQueryRouter())
+func (app *IrisApp) RegisterNodeService(clientCtx client.Context, c config.Config) {
+	nodeservice.RegisterNodeService(clientCtx, app.GRPCQueryRouter(), c)
 }
 
 // DefaultGenesis returns a default genesis from the registered AppModuleBasic's.

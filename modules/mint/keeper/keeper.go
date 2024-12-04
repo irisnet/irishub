@@ -3,18 +3,18 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/cometbft/cometbft/libs/log"
+	"cosmossdk.io/log"
 
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/v3/modules/mint/types"
+	"github.com/irisnet/irishub/v4/modules/mint/types"
 )
 
 // keeper of the mint store
 type Keeper struct {
-	cdc              codec.Codec
+	cdc              codec.BinaryCodec
 	storeKey         storetypes.StoreKey
 	bankKeeper       types.BankKeeper
 	feeCollectorName string
@@ -23,7 +23,7 @@ type Keeper struct {
 
 // NewKeeper returns a mint keeper
 func NewKeeper(
-	cdc codec.Codec,
+	cdc codec.BinaryCodec,
 	key storetypes.StoreKey,
 	ak types.AccountKeeper,
 	bk types.BankKeeper,

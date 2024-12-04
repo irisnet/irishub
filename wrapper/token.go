@@ -15,8 +15,8 @@ import (
 	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
-	ibctransferkeeper "github.com/cosmos/ibc-go/v7/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 
 	tokentypes "mods.irisnet.org/modules/token/types"
 )

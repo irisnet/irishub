@@ -17,10 +17,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irishub/v3/modules/mint/client/cli"
-	"github.com/irisnet/irishub/v3/modules/mint/keeper"
-	"github.com/irisnet/irishub/v3/modules/mint/simulation"
-	"github.com/irisnet/irishub/v3/modules/mint/types"
+	"github.com/irisnet/irishub/v4/modules/mint/client/cli"
+	"github.com/irisnet/irishub/v4/modules/mint/keeper"
+	"github.com/irisnet/irishub/v4/modules/mint/simulation"
+	"github.com/irisnet/irishub/v4/modules/mint/types"
 )
 
 // ConsensusVersion defines the current mint module consensus version.
@@ -159,14 +159,15 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 // BeginBlock performs a no-op.
-func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
+func (am AppModule) BeginBlock(ctx context.Context) error {
 	BeginBlocker(ctx, am.keeper)
+	return nil
 }
 
 // EndBlock returns the end blocker for the mint module. It returns no validator
 // updates.
-func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return []abci.ValidatorUpdate{}
+func (AppModule) EndBlock(_ context.Context) error {
+	return nil
 }
 
 // ____________________________________________________________________________
@@ -178,7 +179,7 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 }
 
 // RegisterStoreDecoder registers a decoder for mint module's types
-func (am AppModule) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
+func (am AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
 	sdr[types.StoreKey] = simulation.NewDecodeStore(am.cdc)
 }
 
@@ -188,3 +189,9 @@ func (am AppModule) WeightedOperations(
 ) []simtypes.WeightedOperation {
 	return []simtypes.WeightedOperation{}
 }
+
+// IsOnePerModuleType implements the depinject.OnePerModuleType interface.
+func (am AppModule) IsOnePerModuleType() {}
+
+// IsAppModule implements the appmodule.AppModule interface.
+func (am AppModule) IsAppModule() {}

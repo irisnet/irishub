@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/irisnet/irishub/v3/types"
+	"github.com/irisnet/irishub/v4/types"
 )
 
 // NewDefaultGenesisState generates the default state for the application.

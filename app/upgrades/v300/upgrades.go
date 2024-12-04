@@ -1,18 +1,19 @@
 package v300
 
 import (
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	"context"
+	storetypes "cosmossdk.io/store/types"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
-	icacontrollertypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/types"
-	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/types"
+	ica "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts"
+	icacontrollertypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/types"
+	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
 
-	"github.com/irisnet/irishub/v3/app/upgrades"
+	"github.com/irisnet/irishub/v4/app/upgrades"
 )
 
 // Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal
@@ -29,19 +30,20 @@ func upgradeHandlerConstructor(
 	c module.Configurator,
 	box upgrades.Toolbox,
 ) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+	return func(context context.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx := sdk.UnwrapSDKContext(context)
 		if err := mergeEVM(ctx, box); err != nil {
 			return nil, err
 		}
-		
+
 		if err := mergeFeeMarket(ctx, box); err != nil {
 			return nil, err
 		}
-		
+
 		if err := mergeToken(ctx, box); err != nil {
 			return nil, err
 		}
-		
+
 		if err := mergeGov(ctx, box); err != nil {
 			return nil, err
 		}
@@ -104,7 +106,10 @@ func mergeToken(ctx sdk.Context, box upgrades.Toolbox) error {
 func mergeGov(ctx sdk.Context, box upgrades.Toolbox) error {
 	ctx.Logger().Info("start to run gov module migrations...")
 
-	params := box.GovKeeper.GetParams(ctx)
+	params, err := box.GovKeeper.Params.Get(ctx)
+	if err != nil {
+		return err
+	}
 	params.MinDepositRatio = MinDepositRatio.String()
-	return box.GovKeeper.SetParams(ctx, params)
+	return box.GovKeeper.Params.Set(ctx, params)
 }

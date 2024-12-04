@@ -8,11 +8,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	dbm "github.com/cometbft/cometbft-db"
 	tmcfg "github.com/cometbft/cometbft/config"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
-	"github.com/cometbft/cometbft/libs/log"
 
+	"cosmossdk.io/log"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -31,9 +31,9 @@ import (
 	ethermintserver "github.com/evmos/ethermint/server"
 	servercfg "github.com/evmos/ethermint/server/config"
 
-	"github.com/irisnet/irishub/v3/app"
-	"github.com/irisnet/irishub/v3/app/params"
-	iristypes "github.com/irisnet/irishub/v3/types"
+	"github.com/irisnet/irishub/v4/app"
+	"github.com/irisnet/irishub/v4/app/params"
+	iristypes "github.com/irisnet/irishub/v4/types"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
@@ -130,7 +130,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		tmcli.NewCompletionCmd(rootCmd, true),
 		testnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		ethermintdebug.Cmd(),
-		config.Cmd(),
 		mergeGenesisCmd(encodingConfig),
 		pruning.Cmd(ac.newApp, iristypes.DefaultNodeHome),
 	)
@@ -151,7 +150,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
-		rpc.StatusCommand(),
+		server.StatusCommand(),
 		genesisCommand(encodingConfig),
 		queryCommand(),
 		txCommand(),
@@ -189,7 +188,6 @@ func queryCommand() *cobra.Command {
 
 	cmd.AddCommand(
 		rpc.ValidatorCommand(),
-		rpc.BlockCommand(),
 		authcmd.QueryTxsByEventsCmd(),
 		authcmd.QueryTxCmd(),
 	)
