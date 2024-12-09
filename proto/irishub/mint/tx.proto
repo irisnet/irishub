@@ -11,6 +11,8 @@ option (gogoproto.goproto_getters_all) = false;
 
 // Msg defines the coinswap Msg service
 service Msg {
+  option (cosmos.msg.v1.service) = true;
+
   // UpdateParams defines a governance operation for updating the x/coinswap
   // module parameters. The authority is defined in the keeper.
   //

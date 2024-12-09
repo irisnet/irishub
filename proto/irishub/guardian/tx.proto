@@ -6,6 +6,8 @@ option go_package = "github.com/irisnet/irishub/v4/modules/guardian/types";
 
 // Msg defines the guardian Msg service
 service Msg {
+  option (cosmos.msg.v1.service) = true;
+
   // AddSuper defines a method for adding a super account
   rpc AddSuper(MsgAddSuper) returns (MsgAddSuperResponse);
 

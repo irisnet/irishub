@@ -68,7 +68,6 @@ func (k Keeper) SetMinter(ctx sdk.Context, minter types.Minter) {
 	store := ctx.KVStore(k.storeKey)
 	b := k.cdc.MustMarshal(&minter)
 	store.Set(types.MinterKey, b)
-	k.GetMinter(ctx)
 }
 
 // MintCoins implements an alias call to the underlying supply keeper's
