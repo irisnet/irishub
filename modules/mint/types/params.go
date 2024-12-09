@@ -7,8 +7,9 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	sdkerrors "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
@@ -29,7 +30,7 @@ func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-func NewParams(mintDenom string, inflation sdk.Dec) Params {
+func NewParams(mintDenom string, inflation math.LegacyDec) Params {
 	return Params{
 		MintDenom: mintDenom,
 		Inflation: inflation,
@@ -39,7 +40,7 @@ func NewParams(mintDenom string, inflation sdk.Dec) Params {
 // DefaultParams returns default minting module parameters
 func DefaultParams() Params {
 	return Params{
-		Inflation: sdk.NewDecWithPrec(4, 2),
+		Inflation: math.LegacyNewDecWithPrec(4, 2),
 		MintDenom: sdk.DefaultBondDenom,
 	}
 }
@@ -65,7 +66,7 @@ func (p *Params) GetParamSpace() string {
 
 // Validate returns err if the Params is invalid
 func (p Params) Validate() error {
-	if p.Inflation.GT(sdk.NewDecWithPrec(2, 1)) || p.Inflation.LT(sdk.ZeroDec()) {
+	if p.Inflation.GT(math.LegacyNewDecWithPrec(2, 1)) || p.Inflation.LT(math.LegacyZeroDec()) {
 		return sdkerrors.Wrapf(
 			ErrInvalidMintInflation,
 			"Mint inflation [%s] should be between [0, 0.2] ",
@@ -83,12 +84,12 @@ func (p Params) Validate() error {
 }
 
 func validateInflation(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(math.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if v.GT(sdk.NewDecWithPrec(2, 1)) || v.LT(sdk.ZeroDec()) {
+	if v.GT(math.LegacyNewDecWithPrec(2, 1)) || v.LT(math.LegacyZeroDec()) {
 		return fmt.Errorf("Mint inflation [%s] should be between [0, 0.2] ", v.String())
 	}
 

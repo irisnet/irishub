@@ -1,8 +1,9 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errortypes "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
@@ -42,13 +43,13 @@ func (msg MsgAddSuper) GetSignBytes() []byte {
 // ValidateBasic implements Msg.
 func (msg MsgAddSuper) ValidateBasic() error {
 	if len(msg.Description) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "description missing")
+		return sdkerrors.Wrap(errortypes.ErrInvalidRequest, "description missing")
 	}
 	if _, err := sdk.AccAddressFromBech32(msg.Address); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s)", err)
+		return sdkerrors.Wrapf(errortypes.ErrInvalidAddress, "invalid address (%s)", err)
 	}
 	if _, err := sdk.AccAddressFromBech32(msg.AddedBy); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid operator address (%s)", err)
+		return sdkerrors.Wrapf(errortypes.ErrInvalidAddress, "invalid operator address (%s)", err)
 	}
 	if err := msg.EnsureLength(); err != nil {
 		return err
@@ -93,10 +94,10 @@ func (msg MsgDeleteSuper) GetSignBytes() []byte {
 // RoValidateBasicute implements Msg.
 func (msg MsgDeleteSuper) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Address); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s)", err)
+		return sdkerrors.Wrapf(errortypes.ErrInvalidAddress, "invalid address (%s)", err)
 	}
 	if _, err := sdk.AccAddressFromBech32(msg.DeletedBy); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid operator address (%s)", err)
+		return sdkerrors.Wrapf(errortypes.ErrInvalidAddress, "invalid operator address (%s)", err)
 	}
 	return nil
 }
@@ -113,7 +114,7 @@ func (msg MsgDeleteSuper) GetSigners() []sdk.AccAddress {
 // EnsureLength validate the length of AddGuardian
 func (msg MsgAddSuper) EnsureLength() error {
 	if len(msg.Description) > 70 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid website length; got: %d, max: %d", len(msg.Description), 70)
+		return sdkerrors.Wrapf(errortypes.ErrInvalidRequest, "invalid website length; got: %d, max: %d", len(msg.Description), 70)
 	}
 	return nil
 }
