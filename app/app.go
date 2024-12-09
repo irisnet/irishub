@@ -214,7 +214,7 @@ func NewIrisApp(
 		// that in-memory capabilities get regenerated on app restart.
 		// Note that since this reads from the store, we can only perform it when
 		// `loadLatest` is set to true.
-		//app.CapabilityKeeper.Seal()
+		app.CapabilityKeeper.Seal()
 	}
 	return app
 }

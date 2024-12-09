@@ -3,13 +3,13 @@ package rpc
 import (
 	"context"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/codec"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
+	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -59,7 +59,10 @@ func (a authQueryServer) Accounts(c context.Context, req *types.QueryAccountsReq
 
 	var accounts []*codectypes.Any
 	pageRes, err := query.Paginate(accountsStore, req.Pagination, func(key, value []byte) error {
-		account := a.decodeAccount(value)
+		account, err := a.decodeAccount(value)
+		if err != nil {
+			return err
+		}
 		any, err := codectypes.NewAnyWithValue(account)
 		if err != nil {
 			return err
@@ -91,14 +94,14 @@ func (a authQueryServer) Account(c context.Context, req *types.QueryAccountReque
 	return &types.QueryAccountResponse{Account: any}, nil
 }
 
-func (a authQueryServer) decodeAccount(bz []byte) sdk.AccountI {
+func (a authQueryServer) decodeAccount(bz []byte) (sdk.AccountI, error) {
 	var acc sdk.AccountI
 	if err := a.cdc.UnmarshalInterface(bz, &acc); err != nil {
-		panic(err)
+		return nil, err
 	}
 	ethAcc, ok := acc.(*ethermint.EthAccount)
 	if ok {
-		return ethAcc.BaseAccount
+		return ethAcc.BaseAccount, nil
 	}
-	return acc
+	return acc, nil
 }

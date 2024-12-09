@@ -132,7 +132,7 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 			}
 			feePool, err := app.DistrKeeper.FeePool.Get(ctx)
 			if err != nil {
-				panic(nil)
+				panic(err)
 			}
 
 			feePool.CommunityPool = feePool.CommunityPool.Add(scraps...)

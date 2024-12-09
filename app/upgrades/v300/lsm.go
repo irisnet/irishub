@@ -146,7 +146,9 @@ func migrateStore(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Binar
 	}
 
 	ctx.Logger().Info("Staking LSM Migration: Migrating delegations")
-	migrateDelegations(ctx, k)
+	if err := migrateDelegations(ctx, k); err != nil {
+		return err
+	}
 
 	ctx.Logger().Info("Staking LSM Migration: Migrating UBD entries")
 	if err := migrateUBDEntries(ctx, store, cdc); err != nil {

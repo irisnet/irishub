@@ -266,7 +266,6 @@ require (
 )
 
 replace (
-
 	github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.50.10-lsm
 	// use bianjieai fork of ethermint
 	github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.22.0-irishub-20240512.0.20241209074239-dfcd609c9182

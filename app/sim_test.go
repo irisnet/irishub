@@ -3,13 +3,13 @@ package app
 import (
 	"encoding/json"
 	"fmt"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	"math/rand"
 	"os"
 	"runtime/debug"
 	"strings"
 	"testing"
 
+	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	"github.com/stretchr/testify/require"
 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
 	htlctypes "mods.irisnet.org/modules/htlc/types"
