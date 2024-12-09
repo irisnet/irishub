@@ -26,41 +26,9 @@ import (
 var _ authtypes.QueryServer = authQueryServer{}
 
 type authQueryServer struct {
-	cdc codec.Codec
 	key storetypes.StoreKey
-	authkeeper.AccountKeeper
-}
-
-func (a authQueryServer) AccountAddressByID(ctx context.Context, request *authtypes.QueryAccountAddressByIDRequest) (*authtypes.QueryAccountAddressByIDResponse, error) {
-	return &authtypes.QueryAccountAddressByIDResponse{}, status.Error(codes.Unimplemented, "not implemented")
-}
-
-func (a authQueryServer) Params(ctx context.Context, request *authtypes.QueryParamsRequest) (*authtypes.QueryParamsResponse, error) {
-	return &authtypes.QueryParamsResponse{}, status.Error(codes.Unimplemented, "not implemented")
-}
-
-func (a authQueryServer) ModuleAccounts(ctx context.Context, request *authtypes.QueryModuleAccountsRequest) (*authtypes.QueryModuleAccountsResponse, error) {
-	return &authtypes.QueryModuleAccountsResponse{}, status.Error(codes.Unimplemented, "not implemented")
-}
-
-func (a authQueryServer) ModuleAccountByName(ctx context.Context, request *authtypes.QueryModuleAccountByNameRequest) (*authtypes.QueryModuleAccountByNameResponse, error) {
-	return &authtypes.QueryModuleAccountByNameResponse{}, status.Error(codes.Unimplemented, "not implemented")
-}
-
-func (a authQueryServer) Bech32Prefix(ctx context.Context, request *authtypes.Bech32PrefixRequest) (*authtypes.Bech32PrefixResponse, error) {
-	return &authtypes.Bech32PrefixResponse{}, status.Error(codes.Unimplemented, "not implemented")
-}
-
-func (a authQueryServer) AddressBytesToString(ctx context.Context, request *authtypes.AddressBytesToStringRequest) (*authtypes.AddressBytesToStringResponse, error) {
-	return &authtypes.AddressBytesToStringResponse{}, status.Error(codes.Unimplemented, "not implemented")
-}
-
-func (a authQueryServer) AddressStringToBytes(ctx context.Context, request *authtypes.AddressStringToBytesRequest) (*authtypes.AddressStringToBytesResponse, error) {
-	return &authtypes.AddressStringToBytesResponse{}, status.Error(codes.Unimplemented, "not implemented")
-}
-
-func (a authQueryServer) AccountInfo(ctx context.Context, request *authtypes.QueryAccountInfoRequest) (*authtypes.QueryAccountInfoResponse, error) {
-	return &authtypes.QueryAccountInfoResponse{}, status.Error(codes.Unimplemented, "not implemented")
+	cdc codec.Codec
+	authtypes.QueryServer
 }
 
 // overrideAuthServices overrides auth query service
@@ -70,7 +38,7 @@ func overrideAuthServices(cdc codec.Codec, cfg module.Configurator, appKeepers k
 	ss := appKeepers.GetSubspace(authtypes.ModuleName)
 
 	types.RegisterMsgServer(cfg.MsgServer(), authkeeper.NewMsgServerImpl(k))
-	types.RegisterQueryServer(cfg.QueryServer(), authQueryServer{cdc, key, k})
+	types.RegisterQueryServer(cfg.QueryServer(), authQueryServer{key: key, cdc: cdc, QueryServer: authkeeper.NewQueryServer(k)})
 
 	m := authkeeper.NewMigrator(k, cfg.QueryServer(), ss)
 	if err := cfg.RegisterMigration(types.ModuleName, 3, m.Migrate3to4); err != nil {
@@ -124,11 +92,10 @@ func (a authQueryServer) Account(c context.Context, req *types.QueryAccountReque
 }
 
 func (a authQueryServer) decodeAccount(bz []byte) sdk.AccountI {
-	var acc types.AccountI
+	var acc sdk.AccountI
 	if err := a.cdc.UnmarshalInterface(bz, &acc); err != nil {
 		panic(err)
 	}
-
 	ethAcc, ok := acc.(*ethermint.EthAccount)
 	if ok {
 		return ethAcc.BaseAccount

@@ -11,16 +11,16 @@ require (
 	github.com/cosmos/gogoproto v1.7.0
 	github.com/cosmos/iavl v1.2.0 // indirect
 	github.com/evmos/ethermint v0.22.0
-	mods.irisnet.org/modules/coinswap v0.0.0-20241202072418-ae2ffd0c842e
-	mods.irisnet.org/modules/farm v0.0.0-20241202072418-ae2ffd0c842e
-	mods.irisnet.org/modules/htlc v0.0.0-20241202072418-ae2ffd0c842e
-	mods.irisnet.org/modules/mt v0.0.0-20241202072418-ae2ffd0c842e
-	mods.irisnet.org/modules/nft v0.0.0-20241202072418-ae2ffd0c842e
-	mods.irisnet.org/modules/oracle v0.0.0-20241202072418-ae2ffd0c842e
-	mods.irisnet.org/modules/random v0.0.0-20241202072418-ae2ffd0c842e
-	mods.irisnet.org/modules/record v0.0.0-20241202072418-ae2ffd0c842e
-	mods.irisnet.org/modules/service v0.0.0-20241202072418-ae2ffd0c842e
-	mods.irisnet.org/modules/token v0.0.0-20241202072418-ae2ffd0c842e
+	mods.irisnet.org/modules/coinswap v0.0.0-20241209074433-1380d52b7709
+	mods.irisnet.org/modules/farm v0.0.0-20241209074433-1380d52b7709
+	mods.irisnet.org/modules/htlc v0.0.0-20241209074433-1380d52b7709
+	mods.irisnet.org/modules/mt v0.0.0-20241209074433-1380d52b7709
+	mods.irisnet.org/modules/nft v0.0.0-20241209074433-1380d52b7709
+	mods.irisnet.org/modules/oracle v0.0.0-20241209074433-1380d52b7709
+	mods.irisnet.org/modules/random v0.0.0-20241209074433-1380d52b7709
+	mods.irisnet.org/modules/record v0.0.0-20241209074433-1380d52b7709
+	mods.irisnet.org/modules/service v0.0.0-20241209074433-1380d52b7709
+	mods.irisnet.org/modules/token v0.0.0-20241209074433-1380d52b7709
 )
 
 require (
@@ -266,14 +266,10 @@ require (
 )
 
 replace (
-	github.com/bianjieai/nft-transfer => ../nft-transfer
 
-	//github.com/cosmos/gogoproto => github.com/cosmos/gogoproto v1.4.10
-	//github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.50.10-lsm
+	github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.50.10-lsm
 	// use bianjieai fork of ethermint
-	//github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.22.0-irishub-20240512.0.20241118070831-53fd9361fc0d
-	// todo change real version
-	github.com/evmos/ethermint => ../ethermint
+	github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.22.0-irishub-20240512.0.20241209074239-dfcd609c9182
 
 	// following versions might cause unexpected behavior
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
@@ -282,6 +278,5 @@ replace (
 	// stick with compatible version or x/exp in v0.47.x line
 	// x/exp had a breaking change in further commits
 	golang.org/x/exp => golang.org/x/exp v0.0.0-20240404231335-c0f41cb1a7a0
-	mods.irisnet.org/modules/coinswap => ../irismod/modules/coinswap
 
 )

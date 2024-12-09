@@ -370,6 +370,8 @@ func New(
 		bApp.MsgServiceRouter(),
 		authtypes.NewModuleAddress(icahosttypes.SubModuleName).String(),
 	)
+	appKeepers.ICAHostKeeper.WithQueryRouter(bApp.GRPCQueryRouter())
+
 	appKeepers.ICAModule = ica.NewAppModule(nil, &appKeepers.ICAHostKeeper)
 	icaHostIBCModule := icahost.NewIBCModule(appKeepers.ICAHostKeeper)
 

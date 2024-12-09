@@ -14,7 +14,7 @@ import (
 
 // keeper of the mint store
 type Keeper struct {
-	cdc              codec.BinaryCodec
+	cdc              codec.Codec
 	storeKey         storetypes.StoreKey
 	bankKeeper       types.BankKeeper
 	feeCollectorName string
@@ -23,7 +23,7 @@ type Keeper struct {
 
 // NewKeeper returns a mint keeper
 func NewKeeper(
-	cdc codec.BinaryCodec,
+	cdc codec.Codec,
 	key storetypes.StoreKey,
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
@@ -68,6 +68,7 @@ func (k Keeper) SetMinter(ctx sdk.Context, minter types.Minter) {
 	store := ctx.KVStore(k.storeKey)
 	b := k.cdc.MustMarshal(&minter)
 	store.Set(types.MinterKey, b)
+	k.GetMinter(ctx)
 }
 
 // MintCoins implements an alias call to the underlying supply keeper's

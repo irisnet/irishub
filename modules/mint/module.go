@@ -160,7 +160,8 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 
 // BeginBlock performs a no-op.
 func (am AppModule) BeginBlock(ctx context.Context) error {
-	BeginBlocker(ctx, am.keeper)
+	c := sdk.UnwrapSDKContext(ctx)
+	BeginBlocker(c, am.keeper)
 	return nil
 }
 

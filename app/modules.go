@@ -40,15 +40,17 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/cosmos/ibc-go/modules/capability"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
+	iristypes "github.com/irisnet/irishub/v4/types"
+	"github.com/spf13/cobra"
+
 	ica "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts"
 	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
 	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v8/modules/core"
+	//ibcclientclient "github.com/cosmos/ibc-go/v8/modules/core/02-client/client"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
-	iristypes "github.com/irisnet/irishub/v4/types"
-	"github.com/spf13/cobra"
 
 	"mods.irisnet.org/modules/coinswap"
 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
@@ -105,7 +107,9 @@ var (
 		govclient.NewProposalHandler(func() *cobra.Command {
 			return upgradeclient.NewCmdSubmitCancelUpgradeProposal(addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()))
 		}),
-		// todo add proposal handler
+		// todo
+		//upgradeclient.LegacyProposalHandler,
+		//upgradeclient.LegacyCancelProposalHandler,
 		//ibcclientclient.UpdateClientProposalHandler,
 		//ibcclientclient.UpgradeProposalHandler,
 	}
@@ -215,7 +219,7 @@ func appModules(
 			app.AccountKeeper,
 			app.GetSubspace(banktypes.ModuleName),
 		),
-		//capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
+		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
 		crisis.NewAppModule(
 			app.CrisisKeeper,
 			skipGenesisInvariants,
@@ -535,7 +539,7 @@ func orderEndBlockers() []string {
 		feemarkettypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibcexported.ModuleName,
-		//capabilitytypes.ModuleName,
+		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		distrtypes.ModuleName,
@@ -581,7 +585,7 @@ can do so safely.
 */
 func orderInitBlockers() []string {
 	return []string{
-		//capabilitytypes.ModuleName,
+		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		distrtypes.ModuleName,

@@ -114,21 +114,24 @@ func CreateAppWithGenesisValSet(
 	require.NoError(t, err)
 
 	// init chain will set the validator set and initialize the genesis accounts
-	app.InitChain(
+	_, err = app.InitChain(
 		&abci.RequestInitChain{
 			Validators:      []abci.ValidatorUpdate{},
 			ConsensusParams: simtestutil.DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
 		},
 	)
+	require.NoError(t, err)
 
-	// commit genesis changes
-	app.Commit()
-	app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height:             app.LastBlockHeight() + 1,
-		Hash:               app.LastCommitID().Hash,
-		NextValidatorsHash: valSet.Hash(),
-	})
+	//// commit genesis changes
+	//_, err = app.Commit()
+	//require.NoError(t, err)
+	//r, err := app.FinalizeBlock(&abci.RequestFinalizeBlock{
+	//	Height:             app.LastBlockHeight() + 1,
+	//	Hash:               app.LastCommitID().Hash,
+	//	NextValidatorsHash: valSet.Hash(),
+	//})
+	//require.NoError(t, err)
 
 	return app
 }
@@ -178,7 +181,7 @@ func genesisStateWithValSet(codec codec.Codec, genesisState map[string]json.RawM
 		validators = append(validators, validator)
 		delegations = append(
 			delegations,
-			stakingtypes.NewDelegation(string(genAccs[0].GetAddress()), string(val.Address.Bytes()), math.LegacyOneDec()),
+			stakingtypes.NewDelegation(genAccs[0].GetAddress().String(), sdk.ValAddress(val.Address.Bytes()).String(), math.LegacyOneDec()),
 		)
 
 	}

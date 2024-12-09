@@ -1,8 +1,6 @@
 package mint
 
 import (
-	"context"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/v4/modules/mint/keeper"
@@ -10,8 +8,7 @@ import (
 )
 
 // BeginBlocker handles block beginning logic for mint
-func BeginBlocker(c context.Context, k keeper.Keeper) {
-	ctx := sdk.UnwrapSDKContext(c)
+func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 	logger := k.Logger(ctx)
 	// Get block BFT time and block height
 	blockTime := ctx.BlockHeader().Time
