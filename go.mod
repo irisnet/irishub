@@ -46,6 +46,8 @@ require (
 )
 
 require (
+	cosmossdk.io/client/v2 v2.0.0-beta.6
+	cosmossdk.io/core v0.11.1
 	cosmossdk.io/log v1.4.1
 	cosmossdk.io/store v1.1.1
 	cosmossdk.io/x/evidence v0.1.1
@@ -70,9 +72,7 @@ require (
 	cloud.google.com/go/auth v0.6.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
-	cosmossdk.io/client/v2 v2.0.0-beta.3 // indirect
 	cosmossdk.io/collections v0.4.0 // indirect
-	cosmossdk.io/core v0.11.1 // indirect
 	cosmossdk.io/simapp v0.0.0-20240118210941-3897926e722e // indirect
 	cosmossdk.io/tools/rosetta v0.2.1-0.20230613133644-0a778132a60f // indirect
 	cosmossdk.io/x/circuit v0.1.1 // indirect
@@ -266,6 +266,7 @@ require (
 )
 
 replace (
+	cosmossdk.io/api => github.com/informalsystems/cosmos-sdk/api v0.7.5-lsm
 	github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.50.10-lsm
 	// use bianjieai fork of ethermint
 	github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.22.0-irishub-20240512.0.20241209074239-dfcd609c9182

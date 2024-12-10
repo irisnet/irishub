@@ -1,7 +1,10 @@
 package app
 
 import (
+	"cosmossdk.io/client/v2/autocli"
+	"cosmossdk.io/core/appmodule"
 	"encoding/json"
+	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	"io"
 
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -360,6 +363,26 @@ func (app *IrisApp) DefaultGenesis() map[string]json.RawMessage {
 // Init initializes the IrisApp.
 func (app *IrisApp) Init() {
 	iristypes.InjectCodec(app.legacyAmino, app.interfaceRegistry)
+}
+
+// AutoCliOpts returns the autocli options for the app.
+func (app *IrisApp) AutoCliOpts() autocli.AppOptions {
+	modules := make(map[string]appmodule.AppModule, 0)
+	for _, m := range app.mm.Modules {
+		if moduleWithName, ok := m.(module.HasName); ok {
+			moduleName := moduleWithName.Name()
+			if appModule, ok := moduleWithName.(appmodule.AppModule); ok {
+				modules[moduleName] = appModule
+			}
+		}
+	}
+
+	return autocli.AppOptions{
+		Modules:               modules,
+		AddressCodec:          authcodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
+		ValidatorAddressCodec: authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix()),
+		ConsensusAddressCodec: authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
+	}
 }
 
 // NoOpMempoolOption returns a function that sets up a no-op mempool for the given BaseApp.
