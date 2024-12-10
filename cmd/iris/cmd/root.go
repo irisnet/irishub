@@ -28,7 +28,6 @@ import (
 
 	ethermintdebug "github.com/evmos/ethermint/client/debug"
 	etherminthd "github.com/evmos/ethermint/crypto/hd"
-	ethermintserver "github.com/evmos/ethermint/server"
 	servercfg "github.com/evmos/ethermint/server/config"
 
 	"github.com/irisnet/irishub/v4/app"
@@ -134,19 +133,19 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		pruning.Cmd(ac.newApp, iristypes.DefaultNodeHome),
 	)
 
-	ethermintserver.AddCommands(
+	//ethermintserver.AddCommands(
+	//	rootCmd,
+	//	ethermintserver.NewDefaultStartOptions(ac.newApp, iristypes.DefaultNodeHome),
+	//	ac.appExport,
+	//	addModuleInitFlags,
+	//)
+	server.AddCommands(
 		rootCmd,
-		ethermintserver.NewDefaultStartOptions(ac.newApp, iristypes.DefaultNodeHome),
+		iristypes.DefaultNodeHome,
+		ac.newApp,
 		ac.appExport,
 		addModuleInitFlags,
 	)
-	// server.AddCommands(
-	// 	rootCmd,
-	// 	iristypes.DefaultNodeHome,
-	// 	ac.newApp,
-	// 	ac.appExport,
-	// 	addModuleInitFlags,
-	// )
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
@@ -218,7 +217,7 @@ func txCommand() *cobra.Command {
 		authcmd.GetDecodeCommand(),
 	)
 
-	app.ModuleBasics.AddTxCommands(cmd)
+	//app.ModuleBasics.AddTxCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd

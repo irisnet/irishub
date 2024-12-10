@@ -2,11 +2,11 @@ package cli_test
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/codec/address"
 	"testing"
 
 	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/codec/address"
 	cosmoscrypto "github.com/cosmos/cosmos-sdk/crypto"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/testutil/network"

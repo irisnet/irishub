@@ -1,0 +1,74 @@
+global:
+    api-listen-addr: :5183
+    timeout: 10s
+    memo: ""
+    light-cache-size: 20
+    log-level: info
+    ics20-memo-limit: 0
+    max-receiver-size: 150
+chains:
+    test-1:
+        type: cosmos
+        value:
+            key-directory: data/relayer/keys/test-1
+            key: test-1
+            chain-id: test-1
+            rpc-addr: http://127.0.0.1:16657
+            backup-rpc-addrs: []
+            account-prefix: iaa
+            keyring-backend: test
+            dynamic-gas-price: false
+            gas-adjustment: 1.5
+            gas-prices: 0.025uiris
+            min-gas-amount: 0
+            max-gas-amount: 0
+            debug: true
+            timeout: 10s
+            block-timeout: ""
+            output-format: json
+            sign-mode: direct
+            extra-codecs:
+                - ethermint
+            coin-type: null
+            signing-algorithm: ""
+            broadcast-mode: batch
+            min-loop-duration: 0s
+            extension-options: []
+            feegrants: null
+    test-2:
+        type: cosmos
+        value:
+            key-directory: data/relayer/keys/test-2
+            key: test-2
+            chain-id: test-2
+            rpc-addr: http://127.0.0.1:26657
+            backup-rpc-addrs: []
+            account-prefix: iaa
+            keyring-backend: test
+            dynamic-gas-price: false
+            gas-adjustment: 1.5
+            gas-prices: 0.025uiris
+            min-gas-amount: 0
+            max-gas-amount: 0
+            debug: true
+            timeout: 10s
+            block-timeout: ""
+            output-format: json
+            sign-mode: direct
+            extra-codecs:
+                - ethermint
+            coin-type: null
+            signing-algorithm: ""
+            broadcast-mode: batch
+            min-loop-duration: 0s
+            extension-options: []
+            feegrants: null
+paths:
+    test1-nft-test2:
+        src:
+            chain-id: test-1
+        dst:
+            chain-id: test-2
+        src-channel-filter:
+            rule: ""
+            channel-list: []
