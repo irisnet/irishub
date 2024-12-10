@@ -12,4 +12,3 @@ sleep 5s
 
 $HERMES_BINARY -c ./network/hermes/config.toml keys restore test-2 -m "record gift you once hip style during joke field prize dust unique length more pencil transfer quit train device arrive energy sort steak upset"
 sleep 5s
-
