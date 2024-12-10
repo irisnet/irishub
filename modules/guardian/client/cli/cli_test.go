@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"testing"
 
+	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/codec/address"
 	cosmoscrypto "github.com/cosmos/cosmos-sdk/crypto"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
@@ -76,7 +78,7 @@ func (s *IntegrationTestSuite) TestGuardian() {
 	clientCtx.Keyring.ImportPubKey(addr.String(), pubKeyStr)
 	expectedCode := uint32(0)
 
-	amount := sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(100000000))
+	amount := sdk.NewCoin(s.cfg.BondDenom, math.NewInt(100000000))
 	args := []string{
 		from.String(),
 		addr.String(),
@@ -86,11 +88,12 @@ func (s *IntegrationTestSuite) TestGuardian() {
 		fmt.Sprintf(
 			"--%s=%s",
 			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String(),
+			sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, math.NewInt(10))).String(),
 		),
 	}
+	ac := address.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix())
 
-	result := apptestutil.ExecCommand(s.T(), s.network, clientCtx, bankcli.NewSendTxCmd(), args)
+	result := apptestutil.ExecCommand(s.T(), s.network, clientCtx, bankcli.NewSendTxCmd(ac), args)
 	s.Require().Equal(uint32(0), result.TxResult.Code, result.TxResult.Log)
 
 	//------test GetCmdQuerySupers()-------------
@@ -111,7 +114,7 @@ func (s *IntegrationTestSuite) TestGuardian() {
 		fmt.Sprintf(
 			"--%s=%s",
 			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String(),
+			sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, math.NewInt(10))).String(),
 		),
 	}
 
@@ -138,7 +141,7 @@ func (s *IntegrationTestSuite) TestGuardian() {
 		fmt.Sprintf(
 			"--%s=%s",
 			flags.FlagFees,
-			sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String(),
+			sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, math.NewInt(10))).String(),
 		),
 	}
 

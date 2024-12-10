@@ -28,7 +28,7 @@ func (rmd RejectMessagesDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 		case *vestingtypes.MsgCreateVestingAccount,
 			*vestingtypes.MsgCreatePermanentLockedAccount,
 			*vestingtypes.MsgCreatePeriodicVestingAccount:
-			return ctx, errortypes.Wrap(
+			return ctx, errorsmod.Wrap(
 				errortypes.ErrInvalidType,
 				"currently doesn't support creating vesting account")
 		}
