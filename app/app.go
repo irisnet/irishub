@@ -1,10 +1,7 @@
 package app
 
 import (
-	"cosmossdk.io/client/v2/autocli"
-	"cosmossdk.io/core/appmodule"
 	"encoding/json"
-	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	"io"
 
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -12,6 +9,8 @@ import (
 	tmos "github.com/cometbft/cometbft/libs/os"
 	"github.com/spf13/cast"
 
+	"cosmossdk.io/client/v2/autocli"
+	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/log"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -31,6 +30,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"

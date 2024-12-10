@@ -3,9 +3,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/v4/testutil"
 	"io"
 	"os"
 
@@ -22,8 +19,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/pruning"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
+	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -36,6 +35,7 @@ import (
 
 	"github.com/irisnet/irishub/v4/app"
 	"github.com/irisnet/irishub/v4/app/params"
+	"github.com/irisnet/irishub/v4/testutil"
 	iristypes "github.com/irisnet/irishub/v4/types"
 )
 
