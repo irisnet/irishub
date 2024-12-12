@@ -3,11 +3,11 @@ package upgrades
 import (
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
+	store "cosmossdk.io/store/types"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/cosmos/cosmos-sdk/codec"
-	store "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/irisnet/irishub/v4/app/keepers"
 )
@@ -29,8 +29,8 @@ type Upgrade struct {
 
 // ConsensusParamsReaderWriter defines the interface for reading and writing consensus params
 type ConsensusParamsReaderWriter interface {
-	StoreConsensusParams(ctx sdk.Context, cp *tmproto.ConsensusParams)
-	GetConsensusParams(ctx sdk.Context) *tmproto.ConsensusParams
+	StoreConsensusParams(ctx sdk.Context, cp tmproto.ConsensusParams) error
+	GetConsensusParams(ctx sdk.Context) tmproto.ConsensusParams
 }
 
 // Toolbox contains all the modules necessary for an upgrade

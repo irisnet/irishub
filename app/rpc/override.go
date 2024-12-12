@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -11,13 +12,13 @@ var overrideModules = map[string]overrideHandler{
 	authtypes.ModuleName: overrideAuthServices,
 }
 
-type overrideHandler func(configurator module.Configurator, appKeepers keepers.AppKeepers)
+type overrideHandler func(cdc codec.Codec, configurator module.Configurator, appKeepers keepers.AppKeepers)
 
 // RegisterService allows a module to register services.
-func RegisterService(mod module.AppModule, configurator module.Configurator, appKeepers keepers.AppKeepers) {
+func RegisterService(cdc codec.Codec, mod module.AppModule, configurator module.Configurator, appKeepers keepers.AppKeepers) {
 	handler, has := overrideModules[mod.Name()]
 	if has {
-		handler(configurator, appKeepers)
+		handler(cdc, configurator, appKeepers)
 		return
 	}
 

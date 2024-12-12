@@ -46,7 +46,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 
 	suite.cdc = app.LegacyAmino()
 	suite.ifr = app.InterfaceRegistry()
-	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
+	suite.ctx = app.BaseApp.NewContextLegacy(false, tmproto.Header{})
 	suite.keeper = app.GuardianKeeper
 }
 

@@ -8,6 +8,6 @@ option go_package = "github.com/irisnet/irishub/v4/modules/mint/types";
 
 // GenesisState defines the mint module's genesis state
 message GenesisState {
-    Minter minter = 1 [ (gogoproto.nullable) = false ];
-    Params params = 2 [ (gogoproto.nullable) = false ];
+  Minter minter = 1 [ (gogoproto.nullable) = false ];
+  Params params = 2 [ (gogoproto.nullable) = false ];
 }

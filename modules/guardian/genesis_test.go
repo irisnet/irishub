@@ -27,8 +27,8 @@ type TestSuite struct {
 func (suite *TestSuite) SetupTest() {
 	app := testutil.CreateApp(suite.T())
 
-	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
-	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
+	suite.cdc = app.AppCodec()
+	suite.ctx = app.BaseApp.NewContextLegacy(false, tmproto.Header{})
 	suite.keeper = app.GuardianKeeper
 }
 

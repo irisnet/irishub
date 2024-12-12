@@ -1,6 +1,8 @@
 package wrapper
 
 import (
+	"context"
+
 	"github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
@@ -23,31 +25,36 @@ func NewFarmGovHook(gh farmkeeper.GovHook) govtypes.GovHooks {
 }
 
 // AfterProposalDeposit implements types.GovHooks.
-func (f farmGovHook) AfterProposalDeposit(ctx types.Context, proposalID uint64, depositorAddr types.AccAddress) error {
+func (f farmGovHook) AfterProposalDeposit(c context.Context, proposalID uint64, depositorAddr types.AccAddress) error {
+	ctx := types.UnwrapSDKContext(c)
 	f.gh.AfterProposalDeposit(ctx, proposalID, depositorAddr)
 	return nil
 }
 
 // AfterProposalFailedMinDeposit implements types.GovHooks.
-func (f farmGovHook) AfterProposalFailedMinDeposit(ctx types.Context, proposalID uint64) error {
+func (f farmGovHook) AfterProposalFailedMinDeposit(c context.Context, proposalID uint64) error {
+	ctx := types.UnwrapSDKContext(c)
 	f.gh.AfterProposalFailedMinDeposit(ctx, proposalID)
 	return nil
 }
 
 // AfterProposalSubmission implements types.GovHooks.
-func (f farmGovHook) AfterProposalSubmission(ctx types.Context, proposalID uint64) error {
+func (f farmGovHook) AfterProposalSubmission(c context.Context, proposalID uint64) error {
+	ctx := types.UnwrapSDKContext(c)
 	f.gh.AfterProposalSubmission(ctx, proposalID)
 	return nil
 }
 
 // AfterProposalVote implements types.GovHooks.
-func (f farmGovHook) AfterProposalVote(ctx types.Context, proposalID uint64, voterAddr types.AccAddress) error {
-	f.gh.AfterProposalVote(ctx, proposalID,voterAddr)
+func (f farmGovHook) AfterProposalVote(c context.Context, proposalID uint64, voterAddr types.AccAddress) error {
+	ctx := types.UnwrapSDKContext(c)
+	f.gh.AfterProposalVote(ctx, proposalID, voterAddr)
 	return nil
 }
 
 // AfterProposalVotingPeriodEnded implements types.GovHooks.
-func (f farmGovHook) AfterProposalVotingPeriodEnded(ctx types.Context, proposalID uint64) error {
+func (f farmGovHook) AfterProposalVotingPeriodEnded(c context.Context, proposalID uint64) error {
+	ctx := types.UnwrapSDKContext(c)
 	f.gh.AfterProposalVotingPeriodEnded(ctx, proposalID)
 	return nil
 }

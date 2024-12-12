@@ -1,12 +1,12 @@
 package keeper
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/cometbft/cometbft/libs/log"
-
+	"cosmossdk.io/log"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/v4/modules/guardian/types"
@@ -63,7 +63,7 @@ func (k Keeper) IterateSupers(
 ) {
 	store := ctx.KVStore(k.storeKey)
 
-	iterator := sdk.KVStorePrefixIterator(store, types.GetSupersSubspaceKey())
+	iterator := storetypes.KVStorePrefixIterator(store, types.GetSupersSubspaceKey())
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
@@ -76,7 +76,8 @@ func (k Keeper) IterateSupers(
 	}
 }
 
-func (k Keeper) Authorized(ctx sdk.Context, addr sdk.AccAddress) bool {
+func (k Keeper) Authorized(c context.Context, addr sdk.AccAddress) bool {
+	ctx := sdk.UnwrapSDKContext(c)
 	_, found := k.GetSuper(ctx, addr)
 	return found
 }

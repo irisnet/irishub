@@ -2,7 +2,6 @@ package v200
 
 import (
 	"cosmossdk.io/math"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	etherminttypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
@@ -31,8 +30,8 @@ var (
 		BaseFeeChangeDenominator: 8,
 		ElasticityMultiplier:     4,
 		BaseFee:                  math.NewInt(500000000000),
-		MinGasPrice:              sdk.NewDecFromInt(math.NewInt(500000000000)),
-		MinGasMultiplier:         sdk.NewDecWithPrec(5, 1),
+		MinGasPrice:              math.LegacyNewDecFromInt(math.NewInt(500000000000)),
+		MinGasMultiplier:         math.LegacyNewDecWithPrec(5, 1),
 	}
 )
 

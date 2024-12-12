@@ -3,10 +3,11 @@ package ante
 import (
 	"strings"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errortypes "github.com/cosmos/cosmos-sdk/types/errors"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 
 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
 	servicetypes "mods.irisnet.org/modules/service/types"
@@ -38,23 +39,23 @@ func (vtd ValidateTokenDecorator) AnteHandle(
 		switch msg := msg.(type) {
 		case *ibctransfertypes.MsgTransfer:
 			if containSwapCoin(msg.Token) {
-				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "can't transfer coinswap liquidity tokens through the IBC module")
+				return ctx, sdkerrors.Wrap(errortypes.ErrInvalidRequest, "can't transfer coinswap liquidity tokens through the IBC module")
 			}
 		case *tokentypesv1.MsgBurnToken:
 			if _, err := vtd.tk.GetToken(ctx, msg.Coin.Denom); err != nil {
-				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "burnt failed, only native tokens can be burnt")
+				return ctx, sdkerrors.Wrap(errortypes.ErrInvalidRequest, "burnt failed, only native tokens can be burnt")
 			}
 		case *tokentypesv1beta1.MsgBurnToken:
 			if _, err := vtd.tk.GetToken(ctx, msg.Symbol); err != nil {
-				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "burnt failed, only native tokens can be burnt")
+				return ctx, sdkerrors.Wrap(errortypes.ErrInvalidRequest, "burnt failed, only native tokens can be burnt")
 			}
 		case *govv1.MsgSubmitProposal:
 			if containSwapCoin(msg.InitialDeposit...) {
-				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
+				return ctx, sdkerrors.Wrap(errortypes.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
 			}
 		case *govv1.MsgDeposit:
 			if containSwapCoin(msg.Amount...) {
-				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
+				return ctx, sdkerrors.Wrap(errortypes.ErrInvalidRequest, "can't deposit coinswap liquidity token for proposal")
 			}
 		}
 	}
@@ -80,7 +81,7 @@ func (vsd ValidateServiceDecorator) AnteHandle(
 		switch msg := msg.(type) {
 		case *servicetypes.MsgCallService:
 			if msg.Repeated {
-				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "currently does not support to create repeatable service invocation")
+				return ctx, sdkerrors.Wrap(errortypes.ErrInvalidRequest, "currently does not support to create repeatable service invocation")
 			}
 		}
 	}
