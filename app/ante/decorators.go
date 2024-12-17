@@ -10,7 +10,6 @@ import (
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 
 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
-	servicetypes "mods.irisnet.org/modules/service/types"
 	tokenkeeper "mods.irisnet.org/modules/token/keeper"
 	tokentypesv1 "mods.irisnet.org/modules/token/types/v1"
 	tokentypesv1beta1 "mods.irisnet.org/modules/token/types/v1beta1"
@@ -77,14 +76,7 @@ func (vsd ValidateServiceDecorator) AnteHandle(
 	simulate bool,
 	next sdk.AnteHandler,
 ) (sdk.Context, error) {
-	for _, msg := range tx.GetMsgs() {
-		switch msg := msg.(type) {
-		case *servicetypes.MsgCallService:
-			if msg.Repeated {
-				return ctx, sdkerrors.Wrap(errortypes.ErrInvalidRequest, "currently does not support to create repeatable service invocation")
-			}
-		}
-	}
+
 	return next(ctx, tx, simulate)
 }
 

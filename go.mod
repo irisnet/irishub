@@ -11,16 +11,16 @@ require (
 	github.com/cosmos/gogoproto v1.7.0
 	github.com/cosmos/iavl v1.2.0 // indirect
 	github.com/evmos/ethermint v0.22.0
-	mods.irisnet.org/modules/coinswap v0.0.0-20241209074433-1380d52b7709
-	mods.irisnet.org/modules/farm v0.0.0-20241209074433-1380d52b7709
-	mods.irisnet.org/modules/htlc v0.0.0-20241209074433-1380d52b7709
-	mods.irisnet.org/modules/mt v0.0.0-20241209074433-1380d52b7709
-	mods.irisnet.org/modules/nft v0.0.0-20241209074433-1380d52b7709
-	mods.irisnet.org/modules/oracle v0.0.0-20241209074433-1380d52b7709
-	mods.irisnet.org/modules/random v0.0.0-20241209074433-1380d52b7709
-	mods.irisnet.org/modules/record v0.0.0-20241209074433-1380d52b7709
-	mods.irisnet.org/modules/service v0.0.0-20241209074433-1380d52b7709
-	mods.irisnet.org/modules/token v0.0.0-20241209074433-1380d52b7709
+	mods.irisnet.org/modules/coinswap v0.0.0-20241217080151-0ad41be03ac6
+	mods.irisnet.org/modules/farm v0.0.0-20241217080151-0ad41be03ac6
+	mods.irisnet.org/modules/htlc v0.0.0-20241217080151-0ad41be03ac6
+	mods.irisnet.org/modules/mt v0.0.0-20241217080151-0ad41be03ac6
+	mods.irisnet.org/modules/nft v0.0.0-20241217080151-0ad41be03ac6
+	mods.irisnet.org/modules/oracle v0.0.0-20241217080151-0ad41be03ac6
+	mods.irisnet.org/modules/random v0.0.0-20241217080151-0ad41be03ac6
+	mods.irisnet.org/modules/record v0.0.0-20241217080151-0ad41be03ac6
+	mods.irisnet.org/modules/service v0.0.0-20241217080151-0ad41be03ac6
+	mods.irisnet.org/modules/token v0.0.0-20241217080151-0ad41be03ac6
 )
 
 require (
@@ -278,5 +278,10 @@ replace (
 	// stick with compatible version or x/exp in v0.47.x line
 	// x/exp had a breaking change in further commits
 	golang.org/x/exp => golang.org/x/exp v0.0.0-20240404231335-c0f41cb1a7a0
+//mods.irisnet.org/modules/coinswap => ../irismod/modules/coinswap
+//
+//// todo test
+//mods.irisnet.org/modules/service => ../irismod/modules/service
+//mods.irisnet.org/modules/token => ../irismod/modules/token
 
 )
