@@ -129,7 +129,15 @@ func TestAppImportExport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
 	config.ChainID = AppChainID
 
-	sdk.DefaultBondDenom = iristypes.NativeToken.Symbol
+	simcli.FlagEnabledValue = true
+	simcli.FlagVerboseValue = true
+	config.NumBlocks = 50
+	//config.Seed = 89182391
+	config.Seed = 4
+	config.Commit = true
+	simcli.FlagPeriodValue = 5
+
+	//sdk.DefaultBondDenom = iristypes.NativeToken.Symbol
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(
 		config,
