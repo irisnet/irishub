@@ -278,10 +278,5 @@ replace (
 	// stick with compatible version or x/exp in v0.47.x line
 	// x/exp had a breaking change in further commits
 	golang.org/x/exp => golang.org/x/exp v0.0.0-20240404231335-c0f41cb1a7a0
-//mods.irisnet.org/modules/coinswap => ../irismod/modules/coinswap
-//
-//// todo test
-//mods.irisnet.org/modules/service => ../irismod/modules/service
-//mods.irisnet.org/modules/token => ../irismod/modules/token
 
 )
