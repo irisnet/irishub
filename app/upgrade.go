@@ -9,13 +9,15 @@ import (
 	v200 "github.com/irisnet/irishub/v4/app/upgrades/v200"
 	v210 "github.com/irisnet/irishub/v4/app/upgrades/v210"
 	v300 "github.com/irisnet/irishub/v4/app/upgrades/v300"
+	v400 "github.com/irisnet/irishub/v4/app/upgrades/v400"
 )
 
 var (
 	router = upgrades.NewUpgradeRouter().
 		Register(v200.Upgrade).
 		Register(v210.Upgrade).
-		Register(v300.Upgrade)
+		Register(v300.Upgrade).
+		Register(v400.Upgrade)
 )
 
 // RegisterUpgradePlans register a handler of upgrade plan
