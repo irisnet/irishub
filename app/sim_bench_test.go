@@ -52,6 +52,7 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 		true,
 		encfg,
 		EmptyAppOptions{},
+		true,
 		interBlockCacheOpt(),
 	)
 
@@ -119,6 +120,7 @@ func BenchmarkInvariants(b *testing.B) {
 		true,
 		encfg,
 		EmptyAppOptions{},
+		true,
 		interBlockCacheOpt(),
 	)
 
