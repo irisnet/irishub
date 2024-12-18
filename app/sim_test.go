@@ -296,15 +296,6 @@ func TestAppSimulationAfterImport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
 	config.ChainID = AppChainID
 	encfg := RegisterEncodingConfig()
-
-	simcli.FlagEnabledValue = true
-	simcli.FlagVerboseValue = true
-	config.NumBlocks = 50
-	//config.Seed = 89182391
-	config.Seed = 4
-	config.Commit = true
-	simcli.FlagPeriodValue = 5
-
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(
 		config,
 		"goleveldb-app-sim",
