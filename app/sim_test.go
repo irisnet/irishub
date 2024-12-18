@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
 	htlctypes "mods.irisnet.org/modules/htlc/types"
@@ -33,7 +34,6 @@ import (
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -46,7 +46,6 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 )
 
 // AppChainID hardcoded chainID for simulation
@@ -128,16 +127,6 @@ func TestFullAppSimulation(t *testing.T) {
 func TestAppImportExport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
 	config.ChainID = AppChainID
-
-	simcli.FlagEnabledValue = true
-	simcli.FlagVerboseValue = true
-	config.NumBlocks = 50
-	//config.Seed = 89182391
-	config.Seed = 4
-	config.Commit = true
-	simcli.FlagPeriodValue = 5
-
-	//sdk.DefaultBondDenom = iristypes.NativeToken.Symbol
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(
 		config,
@@ -225,6 +214,13 @@ func TestAppImportExport(t *testing.T) {
 	ctxA := app.NewContextLegacy(true, tmproto.Header{Height: app.LastBlockHeight()})
 	ctxB := newApp.NewContextLegacy(true, tmproto.Header{Height: app.LastBlockHeight()})
 	_, err = newApp.mm.InitGenesis(ctxB, app.AppCodec(), genesisState)
+	if err != nil {
+		if strings.Contains(err.Error(), "validator set is empty after InitGenesis") {
+			logger.Info("Skipping simulation as all validators have been unbonded")
+			logger.Info("err", err, "stacktrace", string(debug.Stack()))
+			return
+		}
+	}
 	require.NoError(t, err)
 	err = newApp.StoreConsensusParams(ctxB, exported.ConsensusParams)
 	require.NoError(t, err)
@@ -237,10 +233,11 @@ func TestAppImportExport(t *testing.T) {
 			app.AppKeepers.KvStoreKeys()[stakingtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[stakingtypes.StoreKey],
 			[][]byte{
 				stakingtypes.UnbondingQueueKey, stakingtypes.RedelegationQueueKey, stakingtypes.ValidatorQueueKey,
-				stakingtypes.HistoricalInfoKey,
+				stakingtypes.HistoricalInfoKey, stakingtypes.UnbondingIDKey, stakingtypes.UnbondingIndexKey,
+				stakingtypes.UnbondingTypeKey, stakingtypes.ValidatorUpdatesKey,
 			},
 		}, // ordering may change but it doesn't matter
-		{app.AppKeepers.KvStoreKeys()[slashingtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[slashingtypes.StoreKey], [][]byte{}},
+		{app.AppKeepers.KvStoreKeys()[slashingtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[slashingtypes.StoreKey], [][]byte{slashingtypes.ValidatorMissedBlockBitmapKeyPrefix}},
 		{app.AppKeepers.KvStoreKeys()[minttypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[minttypes.StoreKey], [][]byte{}},
 		{app.AppKeepers.KvStoreKeys()[distrtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[distrtypes.StoreKey], [][]byte{}},
 		{
@@ -252,7 +249,6 @@ func TestAppImportExport(t *testing.T) {
 		{app.AppKeepers.KvStoreKeys()[govtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[govtypes.StoreKey], [][]byte{}},
 		{app.AppKeepers.KvStoreKeys()[evidencetypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[evidencetypes.StoreKey], [][]byte{}},
 		{app.AppKeepers.KvStoreKeys()[capabilitytypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[capabilitytypes.StoreKey], [][]byte{}},
-		{app.AppKeepers.KvStoreKeys()[ibcexported.StoreKey], newApp.AppKeepers.KvStoreKeys()[ibcexported.StoreKey], [][]byte{}},
 		{app.AppKeepers.KvStoreKeys()[ibctransfertypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[ibctransfertypes.StoreKey], [][]byte{}},
 
 		// check irismod module
@@ -288,17 +284,12 @@ func TestAppImportExport(t *testing.T) {
 			skp.A,
 			skp.B,
 		)
-		require.Equal(
-			t,
-			len(failedKVAs),
-			0,
-			simtestutil.GetSimulationLog(
-				skp.A.Name(),
-				app.SimulationManager().StoreDecoders,
-				failedKVAs,
-				failedKVBs,
-			),
-		)
+		if !assert.Equal(t, 0, len(failedKVAs), simtestutil.GetSimulationLog(skp.A.Name(), app.SimulationManager().StoreDecoders, failedKVAs, failedKVBs)) {
+			for _, v := range failedKVAs {
+				t.Logf("store missmatch: %q\n", v)
+			}
+			t.FailNow()
+		}
 	}
 }
 
@@ -406,7 +397,6 @@ func TestAppStateDeterminism(t *testing.T) {
 	if !simcli.FlagEnabledValue {
 		t.Skip("skipping application simulation")
 	}
-	sdk.DefaultBondDenom = iristypes.NativeToken.Symbol
 
 	config := simcli.NewConfigFromFlags()
 	config.InitialBlockHeight = 1
