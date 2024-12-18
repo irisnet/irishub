@@ -43,7 +43,7 @@ import (
 // main function.
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 
-	tempApplication := app.NewIrisApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true, app.RegisterEncodingConfig(), testutil.EmptyAppOptions{})
+	tempApplication := app.NewIrisApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true, app.RegisterEncodingConfig(), testutil.EmptyAppOptions{}, false)
 
 	encodingConfig := app.RegisterEncodingConfig()
 	initClientCtx := client.Context{}.
@@ -263,6 +263,7 @@ func (ac appCreator) newApp(
 		true,
 		ac.encCfg,
 		appOpts,
+		false,
 		baseappOptions...,
 	)
 }
@@ -295,6 +296,7 @@ func (ac appCreator) appExport(
 		loadLatest,
 		ac.encCfg,
 		appOpts,
+		false,
 	)
 
 	if height != -1 {

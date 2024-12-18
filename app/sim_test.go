@@ -297,7 +297,6 @@ func TestAppSimulationAfterImport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
 	config.ChainID = AppChainID
 	encfg := RegisterEncodingConfig()
-
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(
 		config,
 		"goleveldb-app-sim",
@@ -495,6 +494,7 @@ func createApp(
 		true,
 		encodingConfig,
 		EmptyAppOptions{},
+		true,
 		baseAppOptions...,
 	)
 }
