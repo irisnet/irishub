@@ -11,6 +11,8 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 	simcli "github.com/cosmos/cosmos-sdk/x/simulation/client/cli"
+
+	"github.com/irisnet/irishub/v4/app/params"
 )
 
 // Profile with:
@@ -51,7 +53,9 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 		nil,
 		true,
 		encfg,
-		EmptyAppOptions{},
+		SimTestAppOptions{
+			options: map[string]interface{}{params.SimulationTest: true},
+		},
 		interBlockCacheOpt(),
 	)
 
@@ -118,7 +122,9 @@ func BenchmarkInvariants(b *testing.B) {
 		nil,
 		true,
 		encfg,
-		EmptyAppOptions{},
+		SimTestAppOptions{
+			options: map[string]interface{}{params.SimulationTest: true},
+		},
 		interBlockCacheOpt(),
 	)
 

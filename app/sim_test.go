@@ -196,7 +196,7 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := createApp(logger, db, encfg, fauxMerkleModeOpt)
+	newApp := createApp(logger, newDB, encfg, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", newApp.Name())
 
 	var genesisState iristypes.GenesisState
@@ -366,12 +366,15 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := createApp(logger, db, encfg, fauxMerkleModeOpt)
+	newApp := createApp(logger, newDB, encfg, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", newApp.Name())
 
-	newApp.InitChain(&abci.RequestInitChain{
+	_, err = newApp.InitChain(&abci.RequestInitChain{
 		AppStateBytes: exported.AppState,
+		ChainId:       AppChainID,
 	})
+
+	require.NoError(t, err)
 
 	_, _, err = simulation.SimulateFromSeed(
 		t,
@@ -475,6 +478,16 @@ func (ao EmptyAppOptions) Get(o string) interface{} {
 	return nil
 }
 
+// SimTestAppOptions is a stub implementing AppOptions
+type SimTestAppOptions struct {
+	options map[string]interface{}
+}
+
+// Get implements AppOptions
+func (o SimTestAppOptions) Get(key string) interface{} {
+	return o.options[key]
+}
+
 func createApp(
 	logger log.Logger,
 	db dbm.DB,
@@ -491,7 +504,9 @@ func createApp(
 		nil,
 		true,
 		encodingConfig,
-		EmptyAppOptions{},
+		SimTestAppOptions{
+			options: map[string]interface{}{params.SimulationTest: true},
+		},
 		baseAppOptions...,
 	)
 }

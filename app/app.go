@@ -177,6 +177,13 @@ func NewIrisApp(
 	app.MountMemoryStores(app.MemoryStoreKeys())
 
 	maxGasWanted := cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted))
+
+	simulationTest := false
+	opt = appOpts.Get(params.SimulationTest)
+	if opt, ok := opt.(bool); ok {
+		simulationTest = opt
+	}
+
 	anteHandler := irishubante.NewAnteHandler(
 		irishubante.HandlerOptions{
 			HandlerOptions: ante.HandlerOptions{
@@ -195,6 +202,7 @@ func NewIrisApp(
 			FeeMarketKeeper:      app.FeeMarketKeeper,
 			BypassMinFeeMsgTypes: []string{},
 			MaxTxGasWanted:       maxGasWanted,
+			SimulationTest:       simulationTest,
 		},
 	)
 
