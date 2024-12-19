@@ -178,10 +178,10 @@ func NewIrisApp(
 
 	maxGasWanted := cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted))
 
-	simulation := false
-	opt = appOpts.Get(params.Simulation)
+	simulationTest := false
+	opt = appOpts.Get(params.SimulationTest)
 	if opt, ok := opt.(bool); ok {
-		simulation = opt
+		simulationTest = opt
 	}
 
 	anteHandler := irishubante.NewAnteHandler(
@@ -202,7 +202,7 @@ func NewIrisApp(
 			FeeMarketKeeper:      app.FeeMarketKeeper,
 			BypassMinFeeMsgTypes: []string{},
 			MaxTxGasWanted:       maxGasWanted,
-			Simulation:           simulation,
+			SimulationTest:       simulationTest,
 		},
 	)
 

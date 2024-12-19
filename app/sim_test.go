@@ -505,7 +505,7 @@ func createApp(
 		true,
 		encodingConfig,
 		SimTestAppOptions{
-			options: map[string]interface{}{params.Simulation: true},
+			options: map[string]interface{}{params.SimulationTest: true},
 		},
 		baseAppOptions...,
 	)

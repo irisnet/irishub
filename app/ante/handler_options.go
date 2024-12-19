@@ -31,7 +31,7 @@ type HandlerOptions struct {
 	FeeMarketKeeper      ethante.FeeMarketKeeper
 	BypassMinFeeMsgTypes []string
 	MaxTxGasWanted       uint64
-	Simulation           bool
+	SimulationTest       bool
 }
 
 // newCosmosAnteHandler creates the default ante handler for Ethereum transactions
@@ -86,7 +86,7 @@ func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
 		NewValidateTokenDecorator(options.TokenKeeper),
 		tokenkeeper.NewValidateTokenFeeDecorator(options.TokenKeeper, options.BankKeeper),
 		oraclekeeper.NewValidateOracleAuthDecorator(options.OracleKeeper, options.GuardianKeeper),
-		NewValidateServiceDecorator(),
+		NewValidateServiceDecorator(options.SimulationTest),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
 	)

@@ -63,11 +63,15 @@ func (vtd ValidateTokenDecorator) AnteHandle(
 }
 
 // ValidateServiceDecorator is responsible for checking the permission to execute MsgCallService
-type ValidateServiceDecorator struct{}
+type ValidateServiceDecorator struct {
+	SimulateTest bool
+}
 
 // NewValidateServiceDecorator returns an instance of ServiceAuthDecorator
-func NewValidateServiceDecorator() ValidateServiceDecorator {
-	return ValidateServiceDecorator{}
+func NewValidateServiceDecorator(simulateTest bool) ValidateServiceDecorator {
+	return ValidateServiceDecorator{
+		SimulateTest: simulateTest,
+	}
 }
 
 // AnteHandle checks the transaction
@@ -77,7 +81,7 @@ func (vsd ValidateServiceDecorator) AnteHandle(
 	simulate bool,
 	next sdk.AnteHandler,
 ) (sdk.Context, error) {
-	if simulate {
+	if vsd.SimulateTest {
 		return next(ctx, tx, simulate)
 	}
 
