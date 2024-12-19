@@ -477,6 +477,16 @@ func (ao EmptyAppOptions) Get(o string) interface{} {
 	return nil
 }
 
+// SimTestAppOptions is a stub implementing AppOptions
+type SimTestAppOptions struct {
+	options map[string]interface{}
+}
+
+// Get implements AppOptions
+func (o SimTestAppOptions) Get(key string) interface{} {
+	return o.options[key]
+}
+
 func createApp(
 	logger log.Logger,
 	db dbm.DB,
@@ -493,8 +503,9 @@ func createApp(
 		nil,
 		true,
 		encodingConfig,
-		EmptyAppOptions{},
-		true,
+		SimTestAppOptions{
+			options: map[string]interface{}{params.SimulationTest: true},
+		},
 		baseAppOptions...,
 	)
 }
