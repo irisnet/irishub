@@ -78,7 +78,6 @@ func NewIrisApp(
 	loadLatest bool,
 	encodingConfig params.EncodingConfig,
 	appOpts servertypes.AppOptions,
-	simulate bool,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *IrisApp {
 	appCodec := encodingConfig.Marshaler
@@ -203,11 +202,7 @@ func NewIrisApp(
 			FeeMarketKeeper:      app.FeeMarketKeeper,
 			BypassMinFeeMsgTypes: []string{},
 			MaxTxGasWanted:       maxGasWanted,
-<<<<<<< HEAD
-			Simulate:             simulate,
-=======
 			SimulationTest:       simulationTest,
->>>>>>> 684f3471c7649a941b8984dde1bebe293375e67a
 		},
 	)
 

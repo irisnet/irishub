@@ -42,7 +42,6 @@ func setup(
 		true,
 		encCdc,
 		appOpts,
-		true,
 		baseAppOptions...,
 	)
 	return &AppWrapper{app}

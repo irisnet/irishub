@@ -81,16 +81,10 @@ func (vsd ValidateServiceDecorator) AnteHandle(
 	simulate bool,
 	next sdk.AnteHandler,
 ) (sdk.Context, error) {
-<<<<<<< HEAD
-	if simulate {
-		return next(ctx, tx, simulate)
-	}
-=======
 	if vsd.SimulateTest {
 		return next(ctx, tx, simulate)
 	}
 
->>>>>>> 684f3471c7649a941b8984dde1bebe293375e67a
 	for _, msg := range tx.GetMsgs() {
 		switch msg := msg.(type) {
 		case *servicetypes.MsgCallService:

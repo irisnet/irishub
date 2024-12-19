@@ -53,14 +53,9 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 		nil,
 		true,
 		encfg,
-<<<<<<< HEAD
-		EmptyAppOptions{},
-		true,
-=======
 		SimTestAppOptions{
 			options: map[string]interface{}{params.SimulationTest: true},
 		},
->>>>>>> 684f3471c7649a941b8984dde1bebe293375e67a
 		interBlockCacheOpt(),
 	)
 
@@ -127,14 +122,9 @@ func BenchmarkInvariants(b *testing.B) {
 		nil,
 		true,
 		encfg,
-<<<<<<< HEAD
-		EmptyAppOptions{},
-		true,
-=======
 		SimTestAppOptions{
 			options: map[string]interface{}{params.SimulationTest: true},
 		},
->>>>>>> 684f3471c7649a941b8984dde1bebe293375e67a
 		interBlockCacheOpt(),
 	)
 
