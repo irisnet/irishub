@@ -21,6 +21,8 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 
 		defer ethante.Recover(ctx.Logger(), &err)
 
+		sim = options.Simulation
+
 		txWithExtensions, ok := tx.(authante.HasExtensionOptionsTx)
 		if ok {
 			opts := txWithExtensions.GetExtensionOptions()

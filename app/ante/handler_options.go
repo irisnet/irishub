@@ -31,6 +31,7 @@ type HandlerOptions struct {
 	FeeMarketKeeper      ethante.FeeMarketKeeper
 	BypassMinFeeMsgTypes []string
 	MaxTxGasWanted       uint64
+	Simulation           bool
 }
 
 // newCosmosAnteHandler creates the default ante handler for Ethereum transactions
