@@ -215,6 +215,7 @@ func NewIrisApp(
 	app.Init()
 	app.SetAnteHandler(anteHandler)
 	app.SetInitChainer(app.InitChainer)
+	app.SetPreBlocker(app.PreBlocker)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.RegisterUpgradePlans()
@@ -238,6 +239,11 @@ func NewIrisApp(
 
 // Name returns the name of the App
 func (app *IrisApp) Name() string { return app.BaseApp.Name() }
+
+// PreBlocker application updates every pre block
+func (app *IrisApp) PreBlocker(ctx sdk.Context, _ *abci.RequestFinalizeBlock) (*sdk.ResponsePreBlock, error) {
+	return app.mm.PreBlock(ctx)
+}
 
 // BeginBlocker application updates every begin block
 func (app *IrisApp) BeginBlocker(ctx sdk.Context) (sdk.BeginBlock, error) {
