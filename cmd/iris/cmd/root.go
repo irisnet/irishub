@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	tmcfg "github.com/cometbft/cometbft/config"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
@@ -23,6 +24,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/module"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -31,26 +33,38 @@ import (
 
 	ethermintdebug "github.com/evmos/ethermint/client/debug"
 	etherminthd "github.com/evmos/ethermint/crypto/hd"
+	ethermintserver "github.com/evmos/ethermint/server"
 	servercfg "github.com/evmos/ethermint/server/config"
 
 	"github.com/irisnet/irishub/v4/app"
 	"github.com/irisnet/irishub/v4/app/params"
-	"github.com/irisnet/irishub/v4/testutil"
 	iristypes "github.com/irisnet/irishub/v4/types"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
-func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
+func NewRootCmd() *cobra.Command {
+	// we "pre"-instantiate the application for getting the injected/configured encoding configuration
+	initAppOptions := viper.New()
+	tempDir := tempDir()
+	initAppOptions.Set(flags.FlagHome, tempDir)
+	tempApplication := app.NewIrisApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true,  initAppOptions)
+	encodingConfig := tempApplication.EncodingConfig()
 
-	tempApplication := app.NewIrisApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true, app.RegisterEncodingConfig(), testutil.EmptyAppOptions{})
+	defer func() {
+		if err := tempApplication.Close(); err != nil {
+			panic(err)
+		}
+		if tempDir != iristypes.DefaultNodeHome {
+			os.RemoveAll(tempDir)
+		}
+	}()
 
-	encodingConfig := app.RegisterEncodingConfig()
 	initClientCtx := client.Context{}.
-		WithCodec(encodingConfig.Marshaler).
+		WithCodec(encodingConfig.Codec).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
 		WithTxConfig(encodingConfig.TxConfig).
-		WithLegacyAmino(encodingConfig.Amino).
+		WithLegacyAmino(encodingConfig.LegacyAmino).
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastSync).
@@ -92,14 +106,14 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		},
 	}
 
-	initRootCmd(rootCmd, encodingConfig)
+	initRootCmd(rootCmd, encodingConfig, tempApplication.BasicManager())
 
 	autoCliOpts := enrichAutoCliOpts(tempApplication.AutoCliOpts(), initClientCtx)
 	if err := autoCliOpts.EnhanceRootCommand(rootCmd); err != nil {
 		panic(err)
 	}
 
-	return rootCmd, encodingConfig
+	return rootCmd
 }
 
 func enrichAutoCliOpts(autoCliOpts autocli.AppOptions, clientCtx client.Context) autocli.AppOptions {
@@ -139,32 +153,27 @@ func initAppConfig() (string, interface{}) {
 	return customAppTemplate, srvCfg
 }
 
-func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
-	ac := appCreator{
-		encCfg: encodingConfig,
-	}
+func initRootCmd(
+	rootCmd *cobra.Command,
+	encodingConfig params.EncodingConfig,
+	basicManager module.BasicManager,
+) {
+	ac := appCreator{}
 
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(app.ModuleBasics, iristypes.DefaultNodeHome),
-		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
+		genutilcli.InitCmd(basicManager, iristypes.DefaultNodeHome),
+		genutilcli.ValidateGenesisCmd(basicManager),
 		AddGenesisAccountCmd(iristypes.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
-		testnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
+		testnetCmd(basicManager, banktypes.GenesisBalancesIterator{}),
 		ethermintdebug.Cmd(),
 		mergeGenesisCmd(encodingConfig),
 		pruning.Cmd(ac.newApp, iristypes.DefaultNodeHome),
 	)
 
-	//ethermintserver.AddCommands(
-	//	rootCmd,
-	//	ethermintserver.NewDefaultStartOptions(ac.newApp, iristypes.DefaultNodeHome),
-	//	ac.appExport,
-	//	addModuleInitFlags,
-	//)
-	server.AddCommands(
+	ethermintserver.AddCommands(
 		rootCmd,
-		iristypes.DefaultNodeHome,
-		ac.newApp,
+		ethermintserver.NewDefaultStartOptions(ac.newApp, iristypes.DefaultNodeHome),
 		ac.appExport,
 		addModuleInitFlags,
 	)
@@ -172,18 +181,18 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		server.StatusCommand(),
-		genesisCommand(encodingConfig),
+		genesisCommand(basicManager, encodingConfig),
 		queryCommand(),
-		txCommand(),
+		txCommand(basicManager),
 		Commands(iristypes.DefaultNodeHome),
 	)
 }
 
 // genesisCommand builds genesis-related `simd genesis` command. Users may provide application specific commands as a parameter
-func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
+func genesisCommand(basicManager module.BasicManager, encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
 	cmd := genutilcli.GenesisCoreCommand(
 		encodingConfig.TxConfig,
-		app.ModuleBasics,
+		basicManager,
 		iristypes.DefaultNodeHome,
 	)
 
@@ -209,17 +218,19 @@ func queryCommand() *cobra.Command {
 
 	cmd.AddCommand(
 		rpc.ValidatorCommand(),
+		server.QueryBlocksCmd(),
+		server.QueryBlockCmd(),
+		server.QueryBlockResultsCmd(),
 		authcmd.QueryTxsByEventsCmd(),
 		authcmd.QueryTxCmd(),
 	)
 
-	app.ModuleBasics.AddQueryCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
 }
 
-func txCommand() *cobra.Command {
+func txCommand(basicManager module.BasicManager) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "tx",
 		Short:                      "Transactions subcommands",
@@ -239,15 +250,16 @@ func txCommand() *cobra.Command {
 		authcmd.GetDecodeCommand(),
 	)
 
-	//app.ModuleBasics.AddTxCommands(cmd)
+    // NOTE: this must be registered for now so that submit-legacy-proposal
+	// message (e.g. consumer-addition proposal) can be routed to the its handler and processed correctly.
+	basicManager.AddTxCommands(cmd)
+	// app.ModuleBasics.AddTxCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
 }
 
-type appCreator struct {
-	encCfg params.EncodingConfig
-}
+type appCreator struct {}
 
 func (ac appCreator) newApp(
 	logger log.Logger,
@@ -261,7 +273,6 @@ func (ac appCreator) newApp(
 		db,
 		traceStore,
 		true,
-		ac.encCfg,
 		appOpts,
 		baseappOptions...,
 	)
@@ -293,7 +304,6 @@ func (ac appCreator) appExport(
 		db,
 		traceStore,
 		loadLatest,
-		ac.encCfg,
 		appOpts,
 	)
 
@@ -304,4 +314,14 @@ func (ac appCreator) appExport(
 	}
 
 	return irisApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
+}
+
+var tempDir = func() string {
+	dir, err := os.MkdirTemp("", ".iris")
+	if err != nil {
+		panic(fmt.Sprintf("failed creating temp directory: %s", err.Error()))
+	}
+	defer os.RemoveAll(dir)
+
+	return dir
 }

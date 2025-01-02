@@ -8,8 +8,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	"github.com/cosmos/gogoproto/proto"
-	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	"google.golang.org/protobuf/reflect/protoreflect"
+
+	enccodec "github.com/evmos/ethermint/encoding/codec"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
 // MakeEncodingConfig creates an EncodingConfig for an amino based test configuration.
@@ -33,10 +35,14 @@ func MakeEncodingConfig() EncodingConfig {
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
 	txCfg := tx.NewTxConfig(marshaler, tx.DefaultSignModes)
 
+	// Register the evm types
+	enccodec.RegisterLegacyAminoCodec(amino)
+	enccodec.RegisterInterfaces(interfaceRegistry)
+
 	return EncodingConfig{
 		InterfaceRegistry: interfaceRegistry,
-		Marshaler:         marshaler,
+		Codec:         marshaler,
 		TxConfig:          txCfg,
-		Amino:             amino,
+		LegacyAmino:             amino,
 	}
 }

@@ -2,7 +2,6 @@ package keepers
 
 import (
 	"github.com/spf13/cast"
-	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/math"
@@ -11,16 +10,11 @@ import (
 	evidencetypes "cosmossdk.io/x/evidence/types"
 	"cosmossdk.io/x/feegrant"
 	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
-	"cosmossdk.io/x/tx/signing"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/codec/address"
-	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
-	"github.com/cosmos/gogoproto/proto"
 
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
@@ -128,8 +122,6 @@ type AppKeepers struct {
 	tkeys   map[string]*storetypes.TransientStoreKey
 	memKeys map[string]*storetypes.MemoryStoreKey
 
-	interfaceRegistry types.InterfaceRegistry
-
 	scopedIBCKeeper         capabilitykeeper.ScopedKeeper
 	scopedTransferKeeper    capabilitykeeper.ScopedKeeper
 	scopedIBCMockKeeper     capabilitykeeper.ScopedKeeper
@@ -198,26 +190,7 @@ func New(
 	logger log.Logger,
 	appOpts servertypes.AppOptions,
 ) AppKeepers {
-	signingOptions := signing.Options{
-		AddressCodec: address.Bech32Codec{
-			Bech32Prefix: sdk.GetConfig().GetBech32AccountAddrPrefix(),
-		},
-		ValidatorAddressCodec: address.Bech32Codec{
-			Bech32Prefix: sdk.GetConfig().GetBech32ValidatorAddrPrefix(),
-		},
-		CustomGetSigners: map[protoreflect.FullName]signing.GetSignersFunc{
-			evmtypes.MsgEthereumTxCustomGetSigner.MsgType: evmtypes.MsgEthereumTxCustomGetSigner.Fn,
-		},
-	}
-	interfaceRegistry, _ := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
-		ProtoFiles:     proto.HybridResolver,
-		SigningOptions: signingOptions,
-	})
-
 	appKeepers := AppKeepers{}
-
-	appKeepers.interfaceRegistry = interfaceRegistry
-
 	// Set keys KVStoreKey, TransientStoreKey, MemoryStoreKey
 	appKeepers.genStoreKeys()
 

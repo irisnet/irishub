@@ -6,10 +6,8 @@ import (
 	"cosmossdk.io/x/feegrant"
 	feegrantmodule "cosmossdk.io/x/feegrant/module"
 	"cosmossdk.io/x/upgrade"
-	upgradeclient "cosmossdk.io/x/upgrade/client/cli"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -41,15 +39,11 @@ import (
 	"github.com/cosmos/ibc-go/modules/capability"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	iristypes "github.com/irisnet/irishub/v4/types"
-	"github.com/spf13/cobra"
 
-	ica "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts"
 	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
-	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v8/modules/core"
 
-	//ibcclientclient "github.com/cosmos/ibc-go/v8/modules/core/02-client/client"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 
@@ -74,20 +68,16 @@ import (
 	"mods.irisnet.org/modules/token"
 	tokentypes "mods.irisnet.org/modules/token/types"
 
-	tibcmttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer"
 	tibcmttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/mt_transfer/types"
-	tibcnfttransfer "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer"
 	tibcnfttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/types"
 	tibc "github.com/bianjieai/tibc-go/modules/tibc/core"
 	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
 	tibccli "github.com/bianjieai/tibc-go/modules/tibc/core/client/cli"
 
-	"github.com/evmos/ethermint/x/evm"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	"github.com/evmos/ethermint/x/feemarket"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	nfttransfer "github.com/bianjieai/nft-transfer"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
 	irisappparams "github.com/irisnet/irishub/v4/app/params"
@@ -101,70 +91,7 @@ import (
 var (
 	legacyProposalHandlers = []govclient.ProposalHandler{
 		paramsclient.ProposalHandler,
-		//distrclient.ProposalHandler,
-		govclient.NewProposalHandler(func() *cobra.Command {
-			return upgradeclient.NewCmdSubmitUpgradeProposal(addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()))
-		}),
-		govclient.NewProposalHandler(func() *cobra.Command {
-			return upgradeclient.NewCmdSubmitCancelUpgradeProposal(addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()))
-		}),
-		// todo
-		//upgradeclient.LegacyProposalHandler,
-		//upgradeclient.LegacyCancelProposalHandler,
-		//ibcclientclient.UpdateClientProposalHandler,
-		//ibcclientclient.UpgradeProposalHandler,
 	}
-
-	// ModuleBasics defines the module BasicManager is in charge of setting up basic,
-	// non-dependant module elements, such as codec registration
-	// and genesis verification.
-	ModuleBasics = module.NewBasicManager(
-		auth.AppModuleBasic{},
-		authzmodule.AppModuleBasic{},
-		genutil.AppModuleBasic{
-			GenTxValidator: genutiltypes.DefaultMessageValidator,
-		},
-		bank.AppModuleBasic{},
-		capability.AppModuleBasic{},
-		staking.AppModuleBasic{},
-		mint.AppModuleBasic{},
-		distr.AppModuleBasic{},
-		gov.NewAppModuleBasic(
-			append(legacyProposalHandlers, tibccli.GovHandlers...),
-		),
-		params.AppModuleBasic{},
-		crisis.AppModuleBasic{},
-		slashing.AppModuleBasic{},
-		ibc.AppModuleBasic{},
-		ibctm.AppModuleBasic{},
-		upgrade.AppModuleBasic{},
-		evidence.AppModuleBasic{},
-		transfer.AppModuleBasic{},
-		vesting.AppModuleBasic{},
-		feegrantmodule.AppModuleBasic{},
-		authzmodule.AppModuleBasic{},
-		consensus.AppModuleBasic{},
-		ica.AppModuleBasic{},
-
-		guardian.AppModuleBasic{},
-		token.AppModuleBasic{},
-		record.AppModuleBasic{},
-		nft.AppModuleBasic{},
-		htlc.AppModuleBasic{},
-		coinswap.AppModuleBasic{},
-		service.AppModuleBasic{},
-		oracle.AppModuleBasic{},
-		random.AppModuleBasic{},
-		farm.AppModuleBasic{},
-		tibc.AppModuleBasic{},
-		tibcnfttransfer.AppModuleBasic{},
-		tibcmttransfer.AppModuleBasic{},
-		mt.AppModuleBasic{},
-		nfttransfer.AppModuleBasic{},
-
-		evm.AppModuleBasic{},
-		feemarket.AppModuleBasic{},
-	)
 
 	// module account permissions
 	maccPerms = map[string][]string{
@@ -195,12 +122,27 @@ var (
 	}
 )
 
+// ModuleBasics defines the module BasicManager that is in charge of setting up basic,
+// non-dependant module elements, such as codec registration
+// and genesis verification.
+func newBasicManagerFromManager(app *IrisApp) module.BasicManager {
+	basicManager := module.NewBasicManagerFromManager(
+		app.mm,
+		map[string]module.AppModuleBasic{
+			genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
+			govtypes.ModuleName:     gov.NewAppModuleBasic(append(legacyProposalHandlers, tibccli.GovHandlers...)),
+		})
+	basicManager.RegisterLegacyAminoCodec(app.legacyAmino)
+	basicManager.RegisterInterfaces(app.interfaceRegistry)
+	return basicManager
+}
+
 func appModules(
 	app *IrisApp,
 	encodingConfig irisappparams.EncodingConfig,
 	skipGenesisInvariants bool,
 ) []module.AppModule {
-	appCodec := encodingConfig.Marshaler
+	appCodec := encodingConfig.Codec
 
 	return []module.AppModule{
 		genutil.NewAppModule(
@@ -279,7 +221,9 @@ func appModules(
 			app.interfaceRegistry,
 		),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
-		ibc.NewAppModule(app.IBCKeeper), tibc.NewAppModule(app.TIBCKeeper),
+		ibc.NewAppModule(app.IBCKeeper), 
+		ibctm.NewAppModule(),
+		tibc.NewAppModule(app.TIBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		app.TransferModule,
 		app.IBCNftTransferModule,
@@ -346,7 +290,7 @@ func simulationModules(
 	encodingConfig irisappparams.EncodingConfig,
 	_ bool,
 ) []module.AppModuleSimulation {
-	appCodec := encodingConfig.Marshaler
+	appCodec := encodingConfig.Codec
 
 	return []module.AppModuleSimulation{
 		auth.NewAppModule(
@@ -501,7 +445,7 @@ func orderBeginBlockers() []string {
 		icatypes.ModuleName,
 		consensustypes.ModuleName,
 
-		//self module
+		// self module
 		tokentypes.ModuleName,
 		tibchost.ModuleName,
 		nfttypes.ModuleName,
@@ -554,7 +498,7 @@ func orderEndBlockers() []string {
 		icatypes.ModuleName,
 		consensustypes.ModuleName,
 
-		//self module
+		// self module
 		tokentypes.ModuleName,
 		tibchost.ModuleName,
 		nfttypes.ModuleName,
@@ -608,7 +552,7 @@ func orderInitBlockers() []string {
 		icatypes.ModuleName,
 		consensustypes.ModuleName,
 
-		//self module
+		// self module
 		tokentypes.ModuleName,
 		tibchost.ModuleName,
 		nfttypes.ModuleName,

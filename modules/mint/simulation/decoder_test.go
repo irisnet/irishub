@@ -18,12 +18,12 @@ import (
 
 func TestDecodeStore(t *testing.T) {
 	minter := types.NewMinter(time.Now().UTC(), sdkmath.NewIntWithDecimal(2, 9))
-	ec := testutil.MakeCodecs()
-	dec := simulation.NewDecodeStore(ec.Marshaler)
+	app := testutil.CreateApp(t)
+	dec := simulation.NewDecodeStore(app.AppCodec())
 
 	kvPairs := kv.Pairs{
 		Pairs: []kv.Pair{
-			{Key: types.MinterKey, Value: ec.Marshaler.MustMarshal(&minter)},
+			{Key: types.MinterKey, Value: app.AppCodec().MustMarshal(&minter)},
 			{Key: []byte{0x99}, Value: []byte{0x99}},
 		},
 	}

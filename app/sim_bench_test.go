@@ -45,14 +45,12 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 		}
 	}()
 
-	encfg := RegisterEncodingConfig()
 
 	app := NewIrisApp(
 		logger,
 		db,
 		nil,
 		true,
-		encfg,
 		SimTestAppOptions{
 			options: map[string]interface{}{params.SimulationTest: true},
 		},
@@ -114,14 +112,11 @@ func BenchmarkInvariants(b *testing.B) {
 		}
 	}()
 
-	encfg := RegisterEncodingConfig()
-
 	app := NewIrisApp(
 		logger,
 		db,
 		nil,
 		true,
-		encfg,
 		SimTestAppOptions{
 			options: map[string]interface{}{params.SimulationTest: true},
 		},

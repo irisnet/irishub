@@ -2,13 +2,12 @@ package cmd
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 
 	"github.com/spf13/cobra"
 
-	tmjson "github.com/cometbft/cometbft/libs/json"
+	cometjson "github.com/cometbft/cometbft/libs/json"
 	"github.com/cometbft/cometbft/types"
+	comettypes "github.com/cometbft/cometbft/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -47,17 +46,17 @@ func mergeGenesisCmd(encodingConfig params.EncodingConfig) *cobra.Command {
 				return err
 			}
 
-			testnetGenesis, err := genesisDocFromFile(testnetGenesisPath)
+			testnetGenesis, err := comettypes.GenesisDocFromFile(testnetGenesisPath)
 			if err != nil {
 				return err
 			}
 
-			mainnetGenesis, err := genesisDocFromFile(mainnetGenesisPath)
+			mainnetGenesis, err := comettypes.GenesisDocFromFile(mainnetGenesisPath)
 			if err != nil {
 				return err
 			}
 
-			return merge(encodingConfig.Marshaler, testnetGenesis, mainnetGenesis, outputFile)
+			return merge(encodingConfig.Codec, testnetGenesis, mainnetGenesis, outputFile)
 		},
 	}
 	cmd.Flags().String(testnetFile, "", "irishub testnet genesis")
@@ -68,11 +67,11 @@ func mergeGenesisCmd(encodingConfig params.EncodingConfig) *cobra.Command {
 
 func merge(cdc codec.Codec, testnet, mainnet *types.GenesisDoc, output string) (err error) {
 	var mainnetAppState, testnetAppState map[string]json.RawMessage
-	if err = tmjson.Unmarshal(mainnet.AppState, &mainnetAppState); err != nil {
+	if err = cometjson.Unmarshal(mainnet.AppState, &mainnetAppState); err != nil {
 		return err
 	}
 
-	if err = tmjson.Unmarshal(testnet.AppState, &testnetAppState); err != nil {
+	if err = cometjson.Unmarshal(testnet.AppState, &testnetAppState); err != nil {
 		panic(err)
 	}
 	mainnet.Validators = nil
@@ -89,7 +88,7 @@ func merge(cdc codec.Codec, testnet, mainnet *types.GenesisDoc, output string) (
 
 	mainnet.InitialHeight = 0
 	mainnet.ChainID = testnet.ChainID
-	mainnet.AppState, err = tmjson.Marshal(mainnetAppState)
+	mainnet.AppState, err = cometjson.Marshal(mainnetAppState)
 	if err != nil {
 		return err
 	}
@@ -147,16 +146,4 @@ func mergeGov(cdc codec.Codec, testnet, mainnet map[string]json.RawMessage) {
 	govState.VotingParams = testnetgovState.VotingParams
 	govState.TallyParams = testnetgovState.TallyParams
 	mainnet["gov"] = cdc.MustMarshalJSON(&govState)
-}
-
-func genesisDocFromFile(genDocFile string) (*types.GenesisDoc, error) {
-	jsonBlob, err := ioutil.ReadFile(genDocFile)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't read GenesisDoc file: %w", err)
-	}
-	genDoc, err := types.GenesisDocFromJSON(jsonBlob)
-	if err != nil {
-		return nil, fmt.Errorf("error reading GenesisDoc at %s: %w", genDocFile, err)
-	}
-	return genDoc, nil
 }

@@ -96,9 +96,8 @@ func TestFullAppSimulation(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	encfg := RegisterEncodingConfig()
 
-	app := createApp(logger, db, encfg, fauxMerkleModeOpt)
+	app := createApp(logger, db, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", app.Name())
 
 	// run randomized simulation
@@ -146,8 +145,7 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	encfg := RegisterEncodingConfig()
-	app := createApp(logger, db, encfg, fauxMerkleModeOpt)
+	app := createApp(logger, db, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
@@ -193,7 +191,7 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := createApp(logger, newDB, encfg, fauxMerkleModeOpt)
+	newApp := createApp(logger, newDB, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", newApp.Name())
 
 	var genesisState iristypes.GenesisState
@@ -296,7 +294,6 @@ func TestAppImportExport(t *testing.T) {
 func TestAppSimulationAfterImport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
 	config.ChainID = AppChainID
-	encfg := RegisterEncodingConfig()
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(
 		config,
@@ -316,7 +313,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	app := createApp(logger, db, encfg, fauxMerkleModeOpt)
+	app := createApp(logger, db, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
@@ -367,7 +364,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := createApp(logger, newDB, encfg, fauxMerkleModeOpt)
+	newApp := createApp(logger, newDB, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", newApp.Name())
 
 	_, err = newApp.InitChain(&abci.RequestInitChain{
@@ -408,7 +405,6 @@ func TestAppStateDeterminism(t *testing.T) {
 	numSeeds := 3
 	numTimesToRunPerSeed := 5
 	appHashList := make([]json.RawMessage, numTimesToRunPerSeed)
-	encfg := RegisterEncodingConfig()
 
 	for i := 0; i < numSeeds; i++ {
 		config.Seed = rand.Int63()
@@ -422,7 +418,7 @@ func TestAppStateDeterminism(t *testing.T) {
 			}
 
 			db := dbm.NewMemDB()
-			app := createApp(logger, db, encfg, interBlockCacheOpt())
+			app := createApp(logger, db, interBlockCacheOpt())
 
 			fmt.Printf(
 				"running non-determinism simulation; seed %d: %d/%d, attempt: %d/%d\n",
@@ -491,7 +487,6 @@ func (o SimTestAppOptions) Get(key string) interface{} {
 func createApp(
 	logger log.Logger,
 	db dbm.DB,
-	encodingConfig params.EncodingConfig,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *IrisApp {
 	if baseAppOptions == nil {
@@ -503,7 +498,6 @@ func createApp(
 		db,
 		nil,
 		true,
-		encodingConfig,
 		SimTestAppOptions{
 			options: map[string]interface{}{params.SimulationTest: true},
 		},
