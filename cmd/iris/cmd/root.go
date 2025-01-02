@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	tmcfg "github.com/cometbft/cometbft/config"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
@@ -37,15 +38,27 @@ import (
 
 	"github.com/irisnet/irishub/v4/app"
 	"github.com/irisnet/irishub/v4/app/params"
-	"github.com/irisnet/irishub/v4/testutil"
 	iristypes "github.com/irisnet/irishub/v4/types"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
-func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
-	tempApplication := app.NewIrisApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true,  testutil.EmptyAppOptions{})
+func NewRootCmd() *cobra.Command {
+	// we "pre"-instantiate the application for getting the injected/configured encoding configuration
+	initAppOptions := viper.New()
+	tempDir := tempDir()
+	initAppOptions.Set(flags.FlagHome, tempDir)
+	tempApplication := app.NewIrisApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true,  initAppOptions)
 	encodingConfig := tempApplication.EncodingConfig()
+
+	defer func() {
+		if err := tempApplication.Close(); err != nil {
+			panic(err)
+		}
+		if tempDir != iristypes.DefaultNodeHome {
+			os.RemoveAll(tempDir)
+		}
+	}()
 
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Codec).
@@ -100,7 +113,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		panic(err)
 	}
 
-	return rootCmd, encodingConfig
+	return rootCmd
 }
 
 func enrichAutoCliOpts(autoCliOpts autocli.AppOptions, clientCtx client.Context) autocli.AppOptions {
@@ -164,13 +177,6 @@ func initRootCmd(
 		ac.appExport,
 		addModuleInitFlags,
 	)
-	// server.AddCommands(
-	// 	rootCmd,
-	// 	iristypes.DefaultNodeHome,
-	// 	ac.newApp,
-	// 	ac.appExport,
-	// 	addModuleInitFlags,
-	// )
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
@@ -308,4 +314,14 @@ func (ac appCreator) appExport(
 	}
 
 	return irisApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
+}
+
+var tempDir = func() string {
+	dir, err := os.MkdirTemp("", ".iris")
+	if err != nil {
+		panic(fmt.Sprintf("failed creating temp directory: %s", err.Error()))
+	}
+	defer os.RemoveAll(dir)
+
+	return dir
 }

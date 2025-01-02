@@ -6,10 +6,8 @@ import (
 	"cosmossdk.io/x/feegrant"
 	feegrantmodule "cosmossdk.io/x/feegrant/module"
 	"cosmossdk.io/x/upgrade"
-	upgradeclient "cosmossdk.io/x/upgrade/client/cli"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -41,14 +39,13 @@ import (
 	"github.com/cosmos/ibc-go/modules/capability"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	iristypes "github.com/irisnet/irishub/v4/types"
-	"github.com/spf13/cobra"
 
 	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v8/modules/core"
 
-	// ibcclientclient "github.com/cosmos/ibc-go/v8/modules/core/02-client/client"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 
 	"mods.irisnet.org/modules/coinswap"
 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
@@ -94,12 +91,6 @@ import (
 var (
 	legacyProposalHandlers = []govclient.ProposalHandler{
 		paramsclient.ProposalHandler,
-		govclient.NewProposalHandler(func() *cobra.Command {
-			return upgradeclient.NewCmdSubmitUpgradeProposal(addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()))
-		}),
-		govclient.NewProposalHandler(func() *cobra.Command {
-			return upgradeclient.NewCmdSubmitCancelUpgradeProposal(addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()))
-		}),
 	}
 
 	// module account permissions
@@ -230,7 +221,9 @@ func appModules(
 			app.interfaceRegistry,
 		),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
-		ibc.NewAppModule(app.IBCKeeper), tibc.NewAppModule(app.TIBCKeeper),
+		ibc.NewAppModule(app.IBCKeeper), 
+		ibctm.NewAppModule(),
+		tibc.NewAppModule(app.TIBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		app.TransferModule,
 		app.IBCNftTransferModule,

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 
@@ -233,7 +233,7 @@ func (it *coinConverter) handlePostRun(cmd *cobra.Command) {
 	if it.w != nil {
 		_ = it.w.Close()
 	}
-	out, _ := ioutil.ReadAll(it.r)
+	out, _ := io.ReadAll(it.r)
 	os.Stdout = rescueStdout
 	fmt.Println(it.parseYAML(cmd, out))
 }
