@@ -3,6 +3,7 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	storetypes "cosmossdk.io/store/types"
@@ -37,7 +38,7 @@ func (app *IrisApp) ExportAppStateAndValidators(
 		service.PrepForZeroHeightGenesis(ctx, app.ServiceKeeper)
 	}
 
-	genState, err := app.mm.ExportGenesisForModules(ctx, app.appCodec, modulesToExport)
+	genState, err := app.mm.ExportGenesisForModules(ctx, app.codec, modulesToExport)
 	if err != nil {
 		return servertypes.ExportedApp{}, err
 	}

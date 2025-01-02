@@ -57,7 +57,7 @@ func mergeGenesisCmd(encodingConfig params.EncodingConfig) *cobra.Command {
 				return err
 			}
 
-			return merge(encodingConfig.Marshaler, testnetGenesis, mainnetGenesis, outputFile)
+			return merge(encodingConfig.Codec, testnetGenesis, mainnetGenesis, outputFile)
 		},
 	}
 	cmd.Flags().String(testnetFile, "", "irishub testnet genesis")

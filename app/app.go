@@ -2,7 +2,9 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
+	"os"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmjson "github.com/cometbft/cometbft/libs/json"
@@ -29,13 +31,17 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/mempool"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/cosmos/cosmos-sdk/types/msgservice"
+	sigtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
+	txmodule "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	srvflags "github.com/evmos/ethermint/server/flags"
 
@@ -57,15 +63,17 @@ var (
 // capabilities aren't needed for testing.
 type IrisApp struct {
 	*baseapp.BaseApp
-	legacyAmino       *codec.LegacyAmino
-	appCodec          codec.Codec
-	interfaceRegistry types.InterfaceRegistry
-	configurator      module.Configurator
-
 	keepers.AppKeepers
+
+	configurator      module.Configurator
+	interfaceRegistry types.InterfaceRegistry
+	codec             codec.Codec
+	txConfig          client.TxConfig
+	legacyAmino       *codec.LegacyAmino
 
 	// the module manager
 	mm *module.Manager
+	bm module.BasicManager
 
 	// simulation manager
 	sm *module.SimulationManager
@@ -77,13 +85,15 @@ func NewIrisApp(
 	db dbm.DB,
 	traceStore io.Writer,
 	loadLatest bool,
-	encodingConfig params.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *IrisApp {
-	appCodec := encodingConfig.Marshaler
-	legacyAmino := encodingConfig.Amino
+	encodingConfig := params.MakeEncodingConfig()
+
+	appCodec := encodingConfig.Codec
+	legacyAmino := encodingConfig.LegacyAmino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
+	txConfig := encodingConfig.TxConfig
 
 	// Setup Mempool
 	baseAppOptions = append(baseAppOptions, NoOpMempoolOption())
@@ -92,7 +102,7 @@ func NewIrisApp(
 		iristypes.AppName,
 		logger,
 		db,
-		encodingConfig.TxConfig.TxDecoder(),
+		txConfig.TxDecoder(),
 		baseAppOptions...,
 	)
 	bApp.SetCommitMultiStoreTracer(traceStore)
@@ -101,9 +111,10 @@ func NewIrisApp(
 
 	app := &IrisApp{
 		BaseApp:           bApp,
-		legacyAmino:       legacyAmino,
-		appCodec:          appCodec,
+		codec:             appCodec,
 		interfaceRegistry: interfaceRegistry,
+		txConfig:          txConfig,
+		legacyAmino:       legacyAmino,
 	}
 
 	// get skipUpgradeHeights from the app options
@@ -137,6 +148,24 @@ func NewIrisApp(
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(appModules(app, encodingConfig, skipGenesisInvariants)...)
+	app.bm = newBasicManagerFromManager(app)
+
+	enabledSignModes := append([]sigtypes.SignMode(nil), authtx.DefaultSignModes...)
+	enabledSignModes = append(enabledSignModes, sigtypes.SignMode_SIGN_MODE_TEXTUAL)
+
+	txConfigOpts := authtx.ConfigOptions{
+		EnabledSignModes:           enabledSignModes,
+		TextualCoinMetadataQueryFn: txmodule.NewBankKeeperCoinMetadataQueryFn(app.BankKeeper),
+	}
+
+	txConfig, err := authtx.NewTxConfigWithOptions(
+		appCodec,
+		txConfigOpts,
+	)
+	if err != nil {
+		panic(err)
+	}
+	app.txConfig = txConfig
 
 	// NOTE: upgrade module is required to be prioritized
 	app.mm.SetOrderPreBlockers(
@@ -196,7 +225,7 @@ func NewIrisApp(
 				AccountKeeper:   app.AccountKeeper,
 				BankKeeper:      app.BankKeeper,
 				FeegrantKeeper:  app.FeeGrantKeeper,
-				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+				SignModeHandler: txConfig.SignModeHandler(),
 			},
 			AccountKeeper:        app.AccountKeeper,
 			BankKeeper:           app.BankKeeper,
@@ -220,6 +249,19 @@ func NewIrisApp(
 	app.SetEndBlocker(app.EndBlocker)
 	app.RegisterUpgradePlans()
 
+	// At startup, after all modules have been registered, check that all prot
+	// annotations are correct.
+	protoFiles, err := proto.MergedRegistry()
+	if err != nil {
+		panic(err)
+	}
+	err = msgservice.ValidateProtoAnnotations(protoFiles)
+	if err != nil {
+		// Once we switch to using protoreflect-based antehandlers, we might
+		// want to panic here instead of logging a warning.
+		fmt.Fprintln(os.Stderr, err.Error())
+	}
+	
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
@@ -264,7 +306,7 @@ func (app *IrisApp) InitChainer(ctx sdk.Context, req *abci.RequestInitChain) (*a
 	if err := app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap()); err != nil {
 		return nil, err
 	}
-	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
+	return app.mm.InitGenesis(ctx, app.codec, genesisState)
 }
 
 // LoadHeight loads a particular height
@@ -306,7 +348,7 @@ func (app *IrisApp) LegacyAmino() *codec.LegacyAmino {
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
 func (app *IrisApp) AppCodec() codec.Codec {
-	return app.appCodec
+	return app.codec
 }
 
 // InterfaceRegistry returns IrisApp's InterfaceRegistry
@@ -314,9 +356,24 @@ func (app *IrisApp) InterfaceRegistry() types.InterfaceRegistry {
 	return app.interfaceRegistry
 }
 
+// EncodingConfig returns IrisApp's EncodingConfig
+func (app *IrisApp) EncodingConfig() params.EncodingConfig {
+	return params.EncodingConfig{
+		InterfaceRegistry: app.interfaceRegistry,
+		LegacyAmino:       app.legacyAmino,
+		Codec:             app.codec,
+		TxConfig:          app.txConfig,
+	}
+}
+
 // SimulationManager implements the SimulationApp interface
 func (app *IrisApp) SimulationManager() *module.SimulationManager {
 	return app.sm
+}
+
+// BasicManager return the basic manager
+func (app *IrisApp) BasicManager() module.BasicManager {
+	return app.bm
 }
 
 // RegisterAPIRoutes registers all application module routes with the provided API server.
@@ -329,7 +386,7 @@ func (app *IrisApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APICo
 	// Register node gRPC service for grpc-gateway.
 	nodeservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// Register grpc-gateway routes for all modules.
-	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+	app.bm.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// register swagger API from root so that other applications can override easily
 	if apiConfig.Swagger {
@@ -344,7 +401,7 @@ func (app *IrisApp) RegisterServices() {
 		if !ok {
 			panic("unable to cast mod into AppModule")
 		}
-		rpc.RegisterService(app.appCodec, m, app.configurator, app.AppKeepers)
+		rpc.RegisterService(app.codec, m, app.configurator, app.AppKeepers)
 	}
 }
 
@@ -377,7 +434,7 @@ func (app *IrisApp) RegisterNodeService(clientCtx client.Context, c config.Confi
 
 // DefaultGenesis returns a default genesis from the registered AppModuleBasic's.
 func (app *IrisApp) DefaultGenesis() map[string]json.RawMessage {
-	return ModuleBasics.DefaultGenesis(app.AppCodec())
+	return app.bm.DefaultGenesis(app.AppCodec())
 }
 
 // Init initializes the IrisApp.

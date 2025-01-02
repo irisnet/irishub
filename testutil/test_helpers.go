@@ -37,8 +37,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-
-	"github.com/irisnet/irishub/v4/app"
 )
 
 // CreateApp initializes a new SimApp. A Nop logger is set in SimApp.
@@ -71,10 +69,13 @@ func CreateApp(t *testing.T) *AppWrapper {
 // NewConfig returns a new app config
 func NewConfig() network.Config {
 	cfg := network.DefaultConfig(NewTestNetworkFixture)
-	encCfg := app.RegisterEncodingConfig()
-	cfg.Codec = encCfg.Marshaler
+
+
+	tempApp := setup(nil)
+	encCfg := tempApp.EncodingConfig()
+	cfg.Codec = encCfg.Codec
 	cfg.TxConfig = encCfg.TxConfig
-	cfg.LegacyAmino = encCfg.Amino
+	cfg.LegacyAmino = encCfg.LegacyAmino
 	cfg.InterfaceRegistry = encCfg.InterfaceRegistry
 	cfg.AppConstructor = func(val network.ValidatorI) servertypes.Application {
 		return setup(
@@ -83,7 +84,7 @@ func NewConfig() network.Config {
 			bam.SetChainID(cfg.ChainID),
 		)
 	}
-	cfg.GenesisState = app.ModuleBasics.DefaultGenesis(cfg.Codec)
+	cfg.GenesisState = tempApp.DefaultGenesis()
 	return cfg
 }
 
@@ -247,16 +248,18 @@ func NewTestNetworkFixture() network.TestFixture {
 			bam.SetChainID(val.GetCtx().Viper.GetString(flags.FlagChainID)),
 		)
 	}
-	ec := MakeCodecs()
+
+	tempApp := setup(nil)
+	ec := tempApp.EncodingConfig()
 
 	return network.TestFixture{
 		AppConstructor: appCtr,
-		GenesisState:   DefaultGenesis(ec.Marshaler),
+		GenesisState:   tempApp.DefaultGenesis(),
 		EncodingConfig: testutil.TestEncodingConfig{
 			InterfaceRegistry: ec.InterfaceRegistry,
-			Codec:             ec.Marshaler,
+			Codec:             ec.Codec,
 			TxConfig:          ec.TxConfig,
-			Amino:             ec.Amino,
+			Amino:             ec.LegacyAmino,
 		},
 	}
 }
