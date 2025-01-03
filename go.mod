@@ -268,7 +268,7 @@ require (
 replace (
 	cosmossdk.io/api => github.com/informalsystems/cosmos-sdk/api v0.7.5-lsm
 	// use bianjieai fork of ethermint
-	github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.22.0-irishub-20240512.0.20250102063401-4dfa00763ed4
+	github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.22.0-irishub-20240512.0.20250103062036-dc2ecd5cc643
 
 	// following versions might cause unexpected behavior
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
