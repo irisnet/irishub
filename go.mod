@@ -11,16 +11,16 @@ require (
 	github.com/cosmos/gogoproto v1.7.0
 	github.com/cosmos/iavl v1.2.2 // indirect
 	github.com/evmos/ethermint v0.22.0
-	mods.irisnet.org/modules/coinswap v0.0.0-20241219091434-96f998e7149d
-	mods.irisnet.org/modules/farm v0.0.0-20241219091434-96f998e7149d
-	mods.irisnet.org/modules/htlc v0.0.0-20241219091434-96f998e7149d
-	mods.irisnet.org/modules/mt v0.0.0-20241219091434-96f998e7149d
-	mods.irisnet.org/modules/nft v0.0.0-20241219091434-96f998e7149d
-	mods.irisnet.org/modules/oracle v0.0.0-20241219091434-96f998e7149d
-	mods.irisnet.org/modules/random v0.0.0-20241219091434-96f998e7149d
-	mods.irisnet.org/modules/record v0.0.0-20241219091434-96f998e7149d
-	mods.irisnet.org/modules/service v0.0.0-20241219091434-96f998e7149d
-	mods.irisnet.org/modules/token v0.0.0-20241219091434-96f998e7149d
+	mods.irisnet.org/modules/coinswap v0.0.0-20250113074037-04cdd04d8afb
+	mods.irisnet.org/modules/farm v0.0.0-20250113074037-04cdd04d8afb
+	mods.irisnet.org/modules/htlc v0.0.0-20250113074037-04cdd04d8afb
+	mods.irisnet.org/modules/mt v0.0.0-20250113074037-04cdd04d8afb
+	mods.irisnet.org/modules/nft v0.0.0-20250113074037-04cdd04d8afb
+	mods.irisnet.org/modules/oracle v0.0.0-20250113074037-04cdd04d8afb
+	mods.irisnet.org/modules/random v0.0.0-20250113074037-04cdd04d8afb
+	mods.irisnet.org/modules/record v0.0.0-20250113074037-04cdd04d8afb
+	mods.irisnet.org/modules/service v0.0.0-20250113074037-04cdd04d8afb
+	mods.irisnet.org/modules/token v0.0.0-20250113074037-04cdd04d8afb
 )
 
 require (
