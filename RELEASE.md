@@ -1,3 +1,14 @@
+# v4.0.0
+
+## Release Notes
+
+This release focuses on upgrading Cosmos-SDK to v0.50.11-lsm and adjusting related dependencies.
+
+## ChangeLog
+
+Full Changelog: [v3.1.1...v4.0.0](https://github.com/irisnet/irishub/compare/v3.1.1...v4.0.0-rc0).
+
+
 # v3.1.1
 
 ## Release Notes
