@@ -3,7 +3,7 @@ module github.com/irisnet/irishub/v4
 go 1.22.7
 
 require (
-	github.com/bianjieai/nft-transfer v1.1.3-ibc-v7.3.0.0.20241107152113-c88a3ab19870
+	github.com/bianjieai/nft-transfer v1.1.3-ibc-v8.6.1
 	github.com/bianjieai/tibc-go v0.5.1-0.20241202081401-7f861f1a49ef
 	github.com/cometbft/cometbft v0.38.15
 	github.com/cometbft/cometbft-db v0.14.1 // indirect
@@ -57,7 +57,7 @@ require (
 	cosmossdk.io/x/upgrade v0.1.4
 	github.com/cosmos/cosmos-db v1.1.0
 	github.com/cosmos/ibc-go/modules/capability v1.0.1
-	github.com/cosmos/ibc-go/v8 v8.5.0
+	github.com/cosmos/ibc-go/v8 v8.6.1
 	github.com/gogo/protobuf v1.3.2
 	github.com/hashicorp/go-metrics v0.5.3
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
