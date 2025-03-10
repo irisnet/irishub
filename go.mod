@@ -3,24 +3,24 @@ module github.com/irisnet/irishub/v4
 go 1.22.7
 
 require (
-	github.com/bianjieai/nft-transfer v1.1.3-ibc-v7.3.0.0.20241107152113-c88a3ab19870
-	github.com/bianjieai/tibc-go v0.5.1-0.20241202081401-7f861f1a49ef
+	github.com/bianjieai/nft-transfer v1.1.3-ibc-v8.6.1
+	github.com/bianjieai/tibc-go v0.6.0
 	github.com/cometbft/cometbft v0.38.15
 	github.com/cometbft/cometbft-db v0.14.1 // indirect
 	github.com/cosmos/cosmos-sdk v0.50.11-lsm
 	github.com/cosmos/gogoproto v1.7.0
 	github.com/cosmos/iavl v1.2.2 // indirect
 	github.com/evmos/ethermint v0.22.0
-	mods.irisnet.org/modules/coinswap v0.0.0-20250113074037-04cdd04d8afb
-	mods.irisnet.org/modules/farm v0.0.0-20250113074037-04cdd04d8afb
-	mods.irisnet.org/modules/htlc v0.0.0-20250113074037-04cdd04d8afb
-	mods.irisnet.org/modules/mt v0.0.0-20250113074037-04cdd04d8afb
-	mods.irisnet.org/modules/nft v0.0.0-20250113074037-04cdd04d8afb
-	mods.irisnet.org/modules/oracle v0.0.0-20250113074037-04cdd04d8afb
-	mods.irisnet.org/modules/random v0.0.0-20250113074037-04cdd04d8afb
-	mods.irisnet.org/modules/record v0.0.0-20250113074037-04cdd04d8afb
-	mods.irisnet.org/modules/service v0.0.0-20250113074037-04cdd04d8afb
-	mods.irisnet.org/modules/token v0.0.0-20250113074037-04cdd04d8afb
+	mods.irisnet.org/modules/coinswap v1.0.0
+	mods.irisnet.org/modules/farm v1.0.0
+	mods.irisnet.org/modules/htlc v1.0.0
+	mods.irisnet.org/modules/mt v1.0.0
+	mods.irisnet.org/modules/nft v1.0.0
+	mods.irisnet.org/modules/oracle v1.0.0
+	mods.irisnet.org/modules/random v1.0.0
+	mods.irisnet.org/modules/record v1.0.0
+	mods.irisnet.org/modules/service v1.0.0
+	mods.irisnet.org/modules/token v1.0.0
 )
 
 require (
@@ -57,7 +57,7 @@ require (
 	cosmossdk.io/x/upgrade v0.1.4
 	github.com/cosmos/cosmos-db v1.1.0
 	github.com/cosmos/ibc-go/modules/capability v1.0.1
-	github.com/cosmos/ibc-go/v8 v8.5.0
+	github.com/cosmos/ibc-go/v8 v8.6.1
 	github.com/gogo/protobuf v1.3.2
 	github.com/hashicorp/go-metrics v0.5.3
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
@@ -268,7 +268,7 @@ require (
 replace (
 	cosmossdk.io/api => github.com/informalsystems/cosmos-sdk/api v0.7.5-lsm
 	// use bianjieai fork of ethermint
-	github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.22.0-irishub-20240512.0.20250103062036-dc2ecd5cc643
+	github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.23.0-irishub
 
 	// following versions might cause unexpected behavior
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
