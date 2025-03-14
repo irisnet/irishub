@@ -57,7 +57,7 @@ require (
 	cosmossdk.io/x/upgrade v0.1.4
 	github.com/cosmos/cosmos-db v1.1.0
 	github.com/cosmos/ibc-go/modules/capability v1.0.1
-	github.com/cosmos/ibc-go/v8 v8.6.1
+	github.com/cosmos/ibc-go/v8 v8.7.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/hashicorp/go-metrics v0.5.3
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
