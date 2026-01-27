@@ -169,7 +169,7 @@ require (
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/dvsekhvalnov/jose2go v1.6.0 // indirect
+	github.com/dvsekhvalnov/jose2go v1.7.0 // indirect
 	github.com/edsrzf/mmap-go v1.0.0 // indirect
 	github.com/ethereum/go-ethereum v1.10.26
 	github.com/felixge/httpsnoop v1.0.4 // indirect
@@ -279,5 +279,4 @@ replace (
 	// stick with compatible version or x/exp in v0.47.x line
 	// x/exp had a breaking change in further commits
 	golang.org/x/exp => golang.org/x/exp v0.0.0-20240404231335-c0f41cb1a7a0
-
 )
