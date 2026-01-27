@@ -7,7 +7,7 @@ toolchain go1.24.9
 require (
 	github.com/bianjieai/nft-transfer v1.1.3-ibc-v8.6.1
 	github.com/bianjieai/tibc-go v0.6.0
-	github.com/cometbft/cometbft v0.38.19
+	github.com/cometbft/cometbft v0.38.21
 	github.com/cometbft/cometbft-db v0.14.1 // indirect
 	github.com/cosmos/cosmos-sdk v0.50.11-lsm
 	github.com/cosmos/gogoproto v1.7.0
