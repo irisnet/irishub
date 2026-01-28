@@ -29,4 +29,4 @@ jobs:
         build-args: |
           EVM_CHAIN_ID=6688
         push: true
-        tags: irisnet/irishub:${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
+        tags: irisnet/irishub:${{ github.ref_type == 'tag' && github.ref_name || github.sha }}-6688
