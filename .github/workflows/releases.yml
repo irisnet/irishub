@@ -7,7 +7,7 @@ on:
 jobs:
   setup-build-publish:
     name: Setup, Build and Publish
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Codes
         uses: actions/checkout@v4
