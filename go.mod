@@ -268,6 +268,9 @@ require (
 )
 
 replace (
+	// Use the paired local token module with issuance disabled.
+	mods.irisnet.org/modules/token => ../irismod/modules/token
+
 	cosmossdk.io/api => github.com/informalsystems/cosmos-sdk/api v0.7.5-lsm
 	// use bianjieai fork of ethermint
 	github.com/evmos/ethermint => github.com/bianjieai/ethermint v0.23.0-irishub

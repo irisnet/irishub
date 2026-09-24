@@ -177,6 +177,11 @@ func initRootCmd(
 		ac.appExport,
 		addModuleInitFlags,
 	)
+	for _, command := range rootCmd.Commands() {
+		if command.Name() == "rollback" {
+			addRollbackHeightFlag(command)
+		}
+	}
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
