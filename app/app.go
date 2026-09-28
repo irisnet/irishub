@@ -45,12 +45,12 @@ import (
 
 	srvflags "github.com/evmos/ethermint/server/flags"
 
-	irishubante "github.com/irisnet/irishub/v4/app/ante"
-	"github.com/irisnet/irishub/v4/app/keepers"
-	"github.com/irisnet/irishub/v4/app/params"
-	"github.com/irisnet/irishub/v4/app/rpc"
-	"github.com/irisnet/irishub/v4/client/lite"
-	iristypes "github.com/irisnet/irishub/v4/types"
+	irishubante "github.com/irisnet/irishub/v5/app/ante"
+	"github.com/irisnet/irishub/v5/app/keepers"
+	"github.com/irisnet/irishub/v5/app/params"
+	"github.com/irisnet/irishub/v5/app/rpc"
+	"github.com/irisnet/irishub/v5/client/lite"
+	iristypes "github.com/irisnet/irishub/v5/types"
 )
 
 var (
@@ -170,6 +170,7 @@ func NewIrisApp(
 	// NOTE: upgrade module is required to be prioritized
 	app.mm.SetOrderPreBlockers(
 		upgradetypes.ModuleName,
+		authtypes.ModuleName,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -181,9 +182,6 @@ func NewIrisApp(
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
 	// NOTE: The genutils module must also occur after auth so that it can access the params from auth.
-	// NOTE: Capability module must occur first so that it can initialize any capabilities
-	// so that other modules that want to create or claim capabilities afterwards in InitChain
-	// can do so safely.
 	app.mm.SetOrderInitGenesis(orderInitBlockers()...)
 	app.mm.SetOrderExportGenesis(orderInitBlockers()...)
 
@@ -261,20 +259,12 @@ func NewIrisApp(
 		// want to panic here instead of logging a warning.
 		fmt.Fprintln(os.Stderr, err.Error())
 	}
-	
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
 		}
 
-		// Initialize and seal the capability keeper so all persistent capabilities
-		// are loaded in-memory and prevent any further modules from creating scoped
-		// sub-keepers.
-		// This must be done during creation of baseapp rather than in InitChain so
-		// that in-memory capabilities get regenerated on app restart.
-		// Note that since this reads from the store, we can only perform it when
-		// `loadLatest` is set to true.
-		app.CapabilityKeeper.Seal()
 	}
 	return app
 }

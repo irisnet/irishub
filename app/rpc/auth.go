@@ -20,7 +20,7 @@ import (
 
 	ethermint "github.com/evmos/ethermint/types"
 
-	"github.com/irisnet/irishub/v4/app/keepers"
+	"github.com/irisnet/irishub/v5/app/keepers"
 )
 
 var _ authtypes.QueryServer = authQueryServer{}

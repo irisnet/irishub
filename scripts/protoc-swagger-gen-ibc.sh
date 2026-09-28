@@ -1,9 +1,8 @@
 
-IBC_GO=v8.0.0
+# Resolve the implementation selected by the root module, including replace.
+go mod download github.com/cosmos/ibc-go/v10
 
-go mod download github.com/cosmos/ibc-go/v8@${IBC_GO}
-
-IBC_PATH=${GOPATH}/pkg/mod/github.com/cosmos/ibc-go/v8@${IBC_GO}
+IBC_PATH=$(go list -m -f '{{.Dir}}' github.com/cosmos/ibc-go/v10)
 
 proto_dirs=$(find ${IBC_PATH}/proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do

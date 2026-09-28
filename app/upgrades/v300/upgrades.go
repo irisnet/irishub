@@ -4,16 +4,16 @@ import (
 	"context"
 	storetypes "cosmossdk.io/store/types"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	ica "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts"
-	icacontrollertypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/types"
-	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
+	ica "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts"
+	icagenesistypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/genesis/types"
+	icahosttypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
 
-	"github.com/irisnet/irishub/v4/app/upgrades"
+	"github.com/irisnet/irishub/v5/app/upgrades"
 )
 
 // Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal
@@ -48,34 +48,25 @@ func upgradeHandlerConstructor(
 			return nil, err
 		}
 		// initialize ICS27 module
-		initICAModule(ctx, m, fromVM)
+		initICAModule(ctx, m, box.AppCodec, fromVM)
 
-		// merge liquid staking module
-		if err := mergeLSModule(ctx, box); err != nil {
-			return nil, err
-		}
 		return box.ModuleManager.RunMigrations(ctx, c, fromVM)
 	}
 }
 
-func initICAModule(ctx sdk.Context, m *module.Manager, fromVM module.VersionMap) {
+func initICAModule(ctx sdk.Context, m *module.Manager, cdc codec.Codec, fromVM module.VersionMap) {
 	icaModule := m.Modules[icatypes.ModuleName].(ica.AppModule)
 	fromVM[icatypes.ModuleName] = icaModule.ConsensusVersion()
-	controllerParams := icacontrollertypes.Params{}
 	hostParams := icahosttypes.Params{
 		HostEnabled:   true,
 		AllowMessages: allowMessages,
 	}
 
 	ctx.Logger().Info("start to run ica migrations...")
-	icaModule.InitModule(ctx, controllerParams, hostParams)
-}
-
-func mergeLSModule(ctx sdk.Context, box upgrades.Toolbox) error {
-	ctx.Logger().Info("start to run lsm module migrations...")
-
-	storeKey := box.GetKey(stakingtypes.StoreKey)
-	return migrateStore(ctx, storeKey, box.AppCodec, box.StakingKeeper)
+	genesis := icagenesistypes.DefaultGenesis()
+	genesis.ControllerGenesisState.Params.ControllerEnabled = false
+	genesis.HostGenesisState.Params = hostParams
+	icaModule.InitGenesis(ctx, cdc, cdc.MustMarshalJSON(genesis))
 }
 
 func mergeEVM(ctx sdk.Context, box upgrades.Toolbox) error {

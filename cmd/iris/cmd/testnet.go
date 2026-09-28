@@ -46,8 +46,8 @@ import (
 	servicetypes "mods.irisnet.org/modules/service/types"
 	tokentypesv1 "mods.irisnet.org/modules/token/types/v1"
 
-	guardiantypes "github.com/irisnet/irishub/v4/modules/guardian/types"
-	iristypes "github.com/irisnet/irishub/v4/types"
+	guardiantypes "github.com/irisnet/irishub/v5/modules/guardian/types"
+	iristypes "github.com/irisnet/irishub/v5/types"
 )
 
 var (
@@ -271,6 +271,7 @@ func InitTestnet(
 			sdk.NewCoin(sdk.DefaultBondDenom, valTokens),
 			stakingtypes.NewDescription(nodeDirName, "", "", "", ""),
 			stakingtypes.NewCommissionRates(math.LegacyOneDec(), math.LegacyOneDec(), math.LegacyOneDec()),
+			math.OneInt(),
 		)
 		if err != nil {
 			return err

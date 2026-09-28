@@ -9,7 +9,6 @@ import (
 	"strings"
 	"testing"
 
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
@@ -21,8 +20,8 @@ import (
 	servicetypes "mods.irisnet.org/modules/service/types"
 	tokentypes "mods.irisnet.org/modules/token/types"
 
-	"github.com/irisnet/irishub/v4/app/params"
-	iristypes "github.com/irisnet/irishub/v4/types"
+	"github.com/irisnet/irishub/v5/app/params"
+	iristypes "github.com/irisnet/irishub/v5/types"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
@@ -45,7 +44,7 @@ import (
 	simcli "github.com/cosmos/cosmos-sdk/x/simulation/client/cli"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
 )
 
 // AppChainID hardcoded chainID for simulation
@@ -95,7 +94,6 @@ func TestFullAppSimulation(t *testing.T) {
 		db.Close()
 		require.NoError(t, os.RemoveAll(dir))
 	}()
-
 
 	app := createApp(logger, db, fauxMerkleModeOpt)
 	require.Equal(t, "IrisApp", app.Name())
@@ -246,7 +244,6 @@ func TestAppImportExport(t *testing.T) {
 		{app.AppKeepers.KvStoreKeys()[paramtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[paramtypes.StoreKey], [][]byte{}},
 		{app.AppKeepers.KvStoreKeys()[govtypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[govtypes.StoreKey], [][]byte{}},
 		{app.AppKeepers.KvStoreKeys()[evidencetypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[evidencetypes.StoreKey], [][]byte{}},
-		{app.AppKeepers.KvStoreKeys()[capabilitytypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[capabilitytypes.StoreKey], [][]byte{}},
 		{app.AppKeepers.KvStoreKeys()[ibctransfertypes.StoreKey], newApp.AppKeepers.KvStoreKeys()[ibctransfertypes.StoreKey], [][]byte{}},
 
 		// check irismod module
