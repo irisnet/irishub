@@ -182,7 +182,9 @@ func buildExportedSource(t *testing.T, cdc codec.Codec, defaults map[string]json
 		ValidatorHistoricalRewards: []distrtypes.ValidatorHistoricalRewardsRecord{{
 			ValidatorAddress: valAddr.String(),
 			Period:           0,
-			Rewards:          distrtypes.ValidatorHistoricalRewards{ReferenceCount: 1},
+			// reference count 2, like a real export: one from validator
+			// creation and one from the delegation's starting period
+			Rewards: distrtypes.ValidatorHistoricalRewards{ReferenceCount: 2},
 		}},
 		ValidatorCurrentRewards: []distrtypes.ValidatorCurrentRewardsRecord{{
 			ValidatorAddress: valAddr.String(),
