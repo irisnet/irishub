@@ -195,6 +195,12 @@ func genesisCommand(basicManager module.BasicManager, encodingConfig params.Enco
 		basicManager,
 		iristypes.DefaultNodeHome,
 	)
+	for _, subCmd := range cmd.Commands() {
+		if subCmd.Name() == "validate" {
+			cmd.RemoveCommand(subCmd)
+		}
+	}
+	cmd.AddCommand(validateGenesisCmd(basicManager))
 
 	for _, subCmd := range cmds {
 		cmd.AddCommand(subCmd)
