@@ -45,12 +45,13 @@ import (
 
 	srvflags "github.com/evmos/ethermint/server/flags"
 
-	irishubante "github.com/irisnet/irishub/v4/app/ante"
-	"github.com/irisnet/irishub/v4/app/keepers"
-	"github.com/irisnet/irishub/v4/app/params"
-	"github.com/irisnet/irishub/v4/app/rpc"
-	"github.com/irisnet/irishub/v4/client/lite"
-	iristypes "github.com/irisnet/irishub/v4/types"
+	irishubante "github.com/irisnet/irishub/v5/app/ante"
+	lsmgenesis "github.com/irisnet/irishub/v5/app/genesis/lsm"
+	"github.com/irisnet/irishub/v5/app/keepers"
+	"github.com/irisnet/irishub/v5/app/params"
+	"github.com/irisnet/irishub/v5/app/rpc"
+	"github.com/irisnet/irishub/v5/client/lite"
+	iristypes "github.com/irisnet/irishub/v5/types"
 )
 
 var (
@@ -170,6 +171,7 @@ func NewIrisApp(
 	// NOTE: upgrade module is required to be prioritized
 	app.mm.SetOrderPreBlockers(
 		upgradetypes.ModuleName,
+		authtypes.ModuleName,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -181,9 +183,6 @@ func NewIrisApp(
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
 	// NOTE: The genutils module must also occur after auth so that it can access the params from auth.
-	// NOTE: Capability module must occur first so that it can initialize any capabilities
-	// so that other modules that want to create or claim capabilities afterwards in InitChain
-	// can do so safely.
 	app.mm.SetOrderInitGenesis(orderInitBlockers()...)
 	app.mm.SetOrderExportGenesis(orderInitBlockers()...)
 
@@ -261,20 +260,12 @@ func NewIrisApp(
 		// want to panic here instead of logging a warning.
 		fmt.Fprintln(os.Stderr, err.Error())
 	}
-	
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
 		}
 
-		// Initialize and seal the capability keeper so all persistent capabilities
-		// are loaded in-memory and prevent any further modules from creating scoped
-		// sub-keepers.
-		// This must be done during creation of baseapp rather than in InitChain so
-		// that in-memory capabilities get regenerated on app restart.
-		// Note that since this reads from the store, we can only perform it when
-		// `loadLatest` is set to true.
-		app.CapabilityKeeper.Seal()
 	}
 	return app
 }
@@ -297,16 +288,45 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context) (sdk.EndBlock, error) {
 	return app.mm.EndBlock(ctx)
 }
 
+// ValidateGenesis runs application-wide checks required by legacy genesis patches.
+func ValidateGenesis(cdc codec.Codec, config client.TxEncodingConfig, basics module.BasicManager, state map[string]json.RawMessage) error {
+	return lsmgenesis.ValidateGenesis(cdc, config, basics, state)
+}
+
 // InitChainer application update at chain initialization
 func (app *IrisApp) InitChainer(ctx sdk.Context, req *abci.RequestInitChain) (*abci.ResponseInitChain, error) {
 	var genesisState iristypes.GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		return nil, err
 	}
+	prepared, plan, err := lsmgenesis.Prepare(app.codec, genesisState)
+	if err != nil {
+		return nil, err
+	}
+	write := func() {}
+	if len(plan) > 0 {
+		// Keep live LSM conversion atomic with module initialization. Prepare
+		// rejects gentxs for this path; ordinary gentxs need BaseApp's context
+		// to see the module state initialized before genutil executes them.
+		ctx, write = ctx.CacheContext()
+	}
 	if err := app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap()); err != nil {
 		return nil, err
 	}
-	return app.mm.InitGenesis(ctx, app.codec, genesisState)
+	response, err := app.mm.InitGenesis(ctx, app.codec, prepared)
+	if err != nil {
+		return nil, err
+	}
+	if err := lsmgenesis.Migrate(ctx, lsmgenesis.Keepers{
+		Bank:         app.BankKeeper,
+		Staking:      app.StakingKeeper,
+		Distribution: app.DistrKeeper,
+		Crisis:       app.CrisisKeeper,
+	}, plan); err != nil {
+		return nil, err
+	}
+	write()
+	return response, nil
 }
 
 // LoadHeight loads a particular height

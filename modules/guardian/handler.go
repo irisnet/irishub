@@ -5,8 +5,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	errorstypes "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irishub/v4/modules/guardian/keeper"
-	"github.com/irisnet/irishub/v4/modules/guardian/types"
+	"github.com/irisnet/irishub/v5/modules/guardian/keeper"
+	"github.com/irisnet/irishub/v5/modules/guardian/types"
 )
 
 // NewHandler returns a handler for all "guardian" type messages.

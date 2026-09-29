@@ -2,7 +2,7 @@ package mint_test
 
 import (
 	"cosmossdk.io/math"
-	"github.com/irisnet/irishub/v4/app/keepers"
+	"github.com/irisnet/irishub/v5/app/keepers"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -12,9 +12,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 
-	"github.com/irisnet/irishub/v4/modules/mint"
-	"github.com/irisnet/irishub/v4/modules/mint/types"
-	apptestutil "github.com/irisnet/irishub/v4/testutil"
+	"github.com/irisnet/irishub/v5/modules/mint"
+	"github.com/irisnet/irishub/v5/modules/mint/types"
+	apptestutil "github.com/irisnet/irishub/v5/testutil"
 )
 
 func TestBeginBlocker(t *testing.T) {

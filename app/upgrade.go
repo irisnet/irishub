@@ -5,11 +5,12 @@ import (
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 
-	"github.com/irisnet/irishub/v4/app/upgrades"
-	v200 "github.com/irisnet/irishub/v4/app/upgrades/v200"
-	v210 "github.com/irisnet/irishub/v4/app/upgrades/v210"
-	v300 "github.com/irisnet/irishub/v4/app/upgrades/v300"
-	v400 "github.com/irisnet/irishub/v4/app/upgrades/v400"
+	"github.com/irisnet/irishub/v5/app/upgrades"
+	"github.com/irisnet/irishub/v5/app/upgrades/sdk0538"
+	v200 "github.com/irisnet/irishub/v5/app/upgrades/v200"
+	v210 "github.com/irisnet/irishub/v5/app/upgrades/v210"
+	v300 "github.com/irisnet/irishub/v5/app/upgrades/v300"
+	v400 "github.com/irisnet/irishub/v5/app/upgrades/v400"
 )
 
 var (
@@ -17,7 +18,8 @@ var (
 		Register(v200.Upgrade).
 		Register(v210.Upgrade).
 		Register(v300.Upgrade).
-		Register(v400.Upgrade)
+		Register(v400.Upgrade).
+		Register(sdk0538.Upgrade)
 )
 
 // RegisterUpgradePlans register a handler of upgrade plan

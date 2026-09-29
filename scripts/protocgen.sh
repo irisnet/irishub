@@ -19,5 +19,5 @@ done
 cd ..
 
 # move proto files to the right places
-cp -r github.com/irisnet/irishub/v4/* ./
+cp -r github.com/irisnet/irishub/v5/* ./
 rm -rf github.com

@@ -15,8 +15,8 @@ import (
 	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
-	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
 
 	tokentypes "mods.irisnet.org/modules/token/types"
 )
@@ -104,6 +104,6 @@ func (i *ics20Keeper) HasTrace(ctx sdk.Context, denom string) bool {
 	if err != nil {
 		return false
 	}
-	_, has := i.ik.GetDenomTrace(ctx, hash)
+	_, has := i.ik.GetDenom(ctx, hash)
 	return has
 }
