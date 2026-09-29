@@ -15,6 +15,7 @@ import (
 	"cosmossdk.io/client/v2/autocli"
 	"cosmossdk.io/log"
 	dbm "github.com/cosmos/cosmos-db"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -299,12 +300,16 @@ func (ac appCreator) appExport(
 		loadLatest = true
 	}
 
+	// Export is a read-only dump: never trigger IAVL's automatic fastnode
+	// storage migration (skipFastStorageUpgrade), which would rewrite a
+	// fast index for the entire live state (infeasible on very large data).
 	irisApp := app.NewIrisApp(
 		logger,
 		db,
 		traceStore,
 		loadLatest,
 		appOpts,
+		baseapp.SetIAVLDisableFastNode(true),
 	)
 
 	if height != -1 {
