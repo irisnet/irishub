@@ -181,7 +181,7 @@ func initRootCmd(
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		server.StatusCommand(),
-		genesisCommand(basicManager, encodingConfig),
+		genesisCommand(basicManager, encodingConfig, replaceValidatorsCmd(basicManager, encodingConfig)),
 		queryCommand(),
 		txCommand(basicManager),
 		Commands(iristypes.DefaultNodeHome),
