@@ -303,8 +303,13 @@ func (app *IrisApp) InitChainer(ctx sdk.Context, req *abci.RequestInitChain) (*a
 	if err != nil {
 		return nil, err
 	}
-	// Keep module initialization and any LSM conversion atomic on failure.
-	ctx, write := ctx.CacheContext()
+	write := func() {}
+	if len(plan) > 0 {
+		// Keep live LSM conversion atomic with module initialization. Prepare
+		// rejects gentxs for this path; ordinary gentxs need BaseApp's context
+		// to see the module state initialized before genutil executes them.
+		ctx, write = ctx.CacheContext()
+	}
 	if err := app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap()); err != nil {
 		return nil, err
 	}

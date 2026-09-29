@@ -22,6 +22,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
@@ -245,7 +246,7 @@ func TestLSMGenesisConvertsPrincipalAndRewards(t *testing.T) {
 
 func TestLSMGenesisRejectsUnsupportedHoldings(t *testing.T) {
 	fixture := newLSMFixture(t)
-	for _, name := range []string{"split", "different owner", "missing records", "bad shares", "withdraw address", "unsigned holder"} {
+	for _, name := range []string{"split", "different owner", "missing records", "bad shares", "withdraw address", "unsigned holder", "genesis transactions"} {
 		t.Run(name, func(t *testing.T) {
 			state := make(map[string]json.RawMessage, len(fixture.state))
 			for key, data := range fixture.state {
@@ -256,6 +257,10 @@ func TestLSMGenesisRejectsUnsupportedHoldings(t *testing.T) {
 			var stakingJSON map[string]json.RawMessage
 			require.NoError(t, json.Unmarshal(state[stakingtypes.ModuleName], &stakingJSON))
 			switch name {
+			case "genesis transactions":
+				state[genutiltypes.ModuleName] = fixture.app.AppCodec().MustMarshalJSON(&genutiltypes.GenesisState{GenTxs: []json.RawMessage{json.RawMessage(`{}`)}})
+				_, _, err := lsmgenesis.Prepare(fixture.app.AppCodec(), state)
+				require.ErrorContains(t, err, "live LSM conversion does not support genesis transactions")
 			case "split", "different owner":
 				coin := sdk.NewInt64Coin(fixture.val.String()+"/1", 1)
 				for i := range bank.Balances {
