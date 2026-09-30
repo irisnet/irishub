@@ -13,10 +13,22 @@
 # Env:
 #   IRIS_BIN        iris binary (default: iris)
 #   EXPORT_GENESIS  the recovered genesis to simulate (required)
-#   SIM_DIR         working directory (default: /tmp/irishub-sim)
+#   SIM_DIR         working directory (default: /tmp/irishub-sim). Needs
+#                   roughly 3x the genesis size of free disk for the converted
+#                   intermediates; do NOT point it at a tmpfs when the
+#                   genesis is ~2GB
 #   SIM_CHAIN_ID    simulation chain-id (default: irishub-sim-1); the final
 #                   genesis carries this id because gentx signatures bind to it
 #   KEEP_RUNNING=1  leave the node running when done (default: stop it)
+#
+# All large-file JSON conversions are streamed (O(1) memory, python3): the
+# recovered genesis is ~2GB and jq would load 3-5x that into RAM. The node
+# start itself is still memory-heavy for a 2GB genesis — on a 16GB machine run
+# the script as:
+#   GOMEMLIMIT=12GiB GOGC=30 bash scripts/chain-recovery/simulate-launch.sh ...
+# (env vars are passed through to iris).
+#
+# Requires: bash, jq, python3, curl.
 
 set -euo pipefail
 
@@ -29,6 +41,300 @@ RPC=tcp://127.0.0.1:26657
 RPC_HTTP=http://127.0.0.1:26657
 
 die() { printf '%s\n' "$*" >&2; exit 1; }
+
+# Streaming JSON member tool — trimmed copy of the one embedded in
+# export-genesis.sh (same scanner core, verbatim), with one mode:
+#   top <file> <key>                     print raw value of a top-level member
+#   set-members <src> <dst> <member>=<value_file> ...
+#                                       stream-copy src to dst, replacing the
+#                                       listed members' values with the given
+#                                       files' contents (complete JSON values)
+#                                       and appending members missing from src
+json_tool() {
+  python3 - "$@" <<'PY'
+import io, json, re, sys
+
+CHUNK = 1 << 20
+PAT = re.compile(rb'["\\\{\}\[\]]')
+SCALAR_END = re.compile(rb'[,\}\] \t\n\r]')
+
+
+class Stream:
+    def __init__(self, path):
+        self.f = open(path, 'rb')
+        self.buf = b''
+        self.pos = 0
+
+    def fill(self):
+        self.buf = self.f.read(CHUNK)
+        self.pos = 0
+        return len(self.buf)
+
+    def peek(self):
+        if self.pos >= len(self.buf) and self.fill() == 0:
+            return b''
+        return self.buf[self.pos:self.pos + 1]
+
+    def adv(self):
+        c = self.peek()
+        if c:
+            self.pos += 1
+        return c
+
+    def skipws(self):
+        while self.peek() in (b' ', b'\t', b'\n', b'\r'):
+            self.pos += 1
+
+
+def scan_string(s, out):
+    in_str = False
+    # index (in the current chunk) of a byte consumed by a string escape, or -1
+    esc_pos = -1
+    rec = s.pos
+    while True:
+        buf = s.buf
+        for m in PAT.finditer(buf, s.pos):
+            if esc_pos >= 0 and m.start() == esc_pos:
+                esc_pos = -1
+                continue
+            esc_pos = -1
+            ch = m.group()
+            if not in_str:
+                if ch != b'"':
+                    raise ValueError('bad string start %r' % ch)
+                in_str = True
+            elif ch == b'"':
+                s.pos = m.end()
+                if out is not None:
+                    out.write(buf[rec:m.end()])
+                return
+            elif ch == b'\\':
+                esc_pos = m.end()
+        if out is not None:
+            out.write(buf[rec:])
+        if s.fill() == 0:
+            raise ValueError('EOF inside string')
+        # a backslash as the last byte of a chunk escapes the first byte of
+        # the next chunk; otherwise the escaped byte (if any) is behind us
+        esc_pos = 0 if esc_pos == len(buf) else -1
+        rec = 0
+
+
+def scan_container(s, out):
+    depth = 0
+    in_str = False
+    # index (in the current chunk) of a byte consumed by a string escape, or -1
+    esc_pos = -1
+    rec = s.pos
+    while True:
+        buf = s.buf
+        for m in PAT.finditer(buf, s.pos):
+            if esc_pos >= 0 and m.start() == esc_pos:
+                esc_pos = -1
+                continue
+            esc_pos = -1
+            ch = m.group()
+            if in_str:
+                if ch == b'"':
+                    in_str = False
+                elif ch == b'\\':
+                    esc_pos = m.end()
+                continue
+            if ch == b'"':
+                in_str = True
+            elif ch in (b'{', b'['):
+                depth += 1
+            else:
+                depth -= 1
+                if depth == 0:
+                    s.pos = m.end()
+                    if out is not None:
+                        out.write(buf[rec:m.end()])
+                    return
+        if out is not None:
+            out.write(buf[rec:])
+        if s.fill() == 0:
+            raise ValueError('EOF inside container')
+        esc_pos = 0 if esc_pos == len(buf) else -1
+        rec = 0
+
+
+def scan_scalar(s, out):
+    rec = s.pos
+    any_char = False
+    while True:
+        buf = s.buf
+        m = SCALAR_END.search(buf, s.pos)
+        if m is not None:
+            if not any_char and m.start() == s.pos:
+                raise ValueError('empty scalar value')
+            if out is not None:
+                out.write(buf[rec:m.start()])
+            s.pos = m.start()
+            return
+        if s.pos < len(buf):
+            any_char = True
+        if out is not None:
+            out.write(buf[rec:])
+        if s.fill() == 0:
+            raise ValueError('EOF inside scalar')
+        rec = 0
+
+
+def scan_value(s, out=None):
+    s.skipws()
+    c = s.peek()
+    if c == b'"':
+        scan_string(s, out)
+    elif c in (b'{', b'['):
+        scan_container(s, out)
+    elif c == b'':
+        raise ValueError('EOF while expecting value')
+    else:
+        scan_scalar(s, out)
+
+
+def read_key(s):
+    s.skipws()
+    if s.peek() != b'"':
+        raise ValueError('expected object key')
+    bio = io.BytesIO()
+    scan_string(s, bio)
+    return json.loads(bio.getvalue().decode('utf-8', 'surrogateescape'))
+
+
+def iter_members(s):
+    # yields keys; when a key is yielded, s is positioned at the start of its
+    # value — the caller MUST consume the value with scan_value(s, ...)
+    s.skipws()
+    if s.adv() != b'{':
+        raise ValueError('expected object')
+    s.skipws()
+    if s.peek() == b'}':
+        s.adv()
+        return
+    while True:
+        key = read_key(s)
+        s.skipws()
+        if s.adv() != b':':
+            raise ValueError('expected colon')
+        s.skipws()
+        yield key
+        s.skipws()
+        c = s.adv()
+        if c == b',':
+            continue
+        if c == b'}':
+            return
+        raise ValueError('bad object structure')
+
+
+def cmd_top(path, key):
+    s = Stream(path)
+    for k in iter_members(s):
+        if k == key:
+            scan_value(s, sys.stdout.buffer)
+            sys.stdout.buffer.write(b'\n')
+            return 0
+        scan_value(s)
+    sys.stderr.write('member not found: %s\n' % key)
+    return 3
+
+
+def cmd_set_members(src, dst, pairs):
+    # stream-copy src to dst, replacing the listed top-level members' values
+    # with the contents of the given files (complete JSON values); members
+    # not present in src are appended at the end of the object
+    repl = {}
+    for p in pairs:
+        member, sep, path = p.partition('=')
+        if not member or not sep or not path:
+            raise ValueError('expected member=value_file, got %r' % p)
+        repl[member] = path
+    afs = {m: open(f, 'rb') for m, f in repl.items()}
+    s = Stream(src)
+    out = open(dst, 'wb')
+    try:
+        out.write(b'{')
+        wrote = False
+        for k in iter_members(s):
+            if wrote:
+                out.write(b',\n')
+            wrote = True
+            out.write(json.dumps(k).encode('utf-8'))
+            out.write(b':')
+            if k in repl:
+                af = afs.pop(k)
+                try:
+                    while True:
+                        b = af.read(CHUNK)
+                        if not b:
+                            break
+                        out.write(b)
+                finally:
+                    af.close()
+                scan_value(s, None)
+            else:
+                scan_value(s, out)
+        for m, af in afs.items():
+            if wrote:
+                out.write(b',\n')
+            wrote = True
+            out.write(json.dumps(m).encode('utf-8'))
+            out.write(b':')
+            try:
+                while True:
+                    b = af.read(CHUNK)
+                    if not b:
+                        break
+                    out.write(b)
+            finally:
+                af.close()
+        out.write(b'}\n')
+    finally:
+        out.close()
+        for af in afs.values():
+            af.close()
+    return 0
+
+
+def main():
+    if len(sys.argv) < 4:
+        sys.stderr.write('usage: json_tool MODE ARGS...\n')
+        return 2
+    mode = sys.argv[1]
+    try:
+        if mode == 'top' and len(sys.argv) == 4:
+            return cmd_top(sys.argv[2], sys.argv[3])
+        if mode == 'set-members' and len(sys.argv) >= 5:
+            return cmd_set_members(sys.argv[2], sys.argv[3], sys.argv[4:])
+    except (ValueError, KeyError) as e:
+        sys.stderr.write('json_tool %s: %s\n' % (mode, e))
+        return 1
+    sys.stderr.write('bad arguments for mode %s\n' % mode)
+    return 2
+
+
+sys.exit(main())
+PY
+}
+
+# to_comet <src> <dst>: rewrite an SDK genesis in cometbft's strict JSON
+# spelling — `replace-validators` reads genesis files with cometbft's decoder,
+# which rejects the SDK's numeric initial_height and null app_hash. Single
+# streaming pass, O(1) memory.
+to_comet() {
+  local src=$1 dst=$2 ih ah
+  ih=$(json_tool top "$src" initial_height) || return 1
+  ih=${ih#\"}; ih=${ih%\"}
+  ah=$(json_tool top "$src" app_hash) || return 1
+  if [[ $ah == null ]]; then ah='""'; fi
+  printf '"%s"' "$ih" > "$dst.ih.tmp"
+  printf '%s' "$ah" > "$dst.ah.tmp"
+  json_tool set-members "$src" "$dst" \
+    initial_height="$dst.ih.tmp" app_hash="$dst.ah.tmp" || return 1
+  rm -f "$dst.ih.tmp" "$dst.ah.tmp"
+}
 
 [[ -f $EXPORT_GENESIS ]] || die "genesis not found: $EXPORT_GENESIS"
 if [[ -e $SIM_DIR ]]; then
@@ -46,14 +352,13 @@ printf '==> generating a local testnet with our own validator\n'
   --keyring-backend test \
   >/dev/null
 
+printf '==> converting the genesis files to cometbft spelling\n'
+to_comet "$NODE_HOME/config/genesis.json" "$SIM_DIR/source.comet.json" \
+  || die "failed to convert the testnet genesis"
+to_comet "$EXPORT_GENESIS" "$SIM_DIR/target.comet.json" \
+  || die "failed to convert the recovered genesis"
+
 printf '==> replacing the exported validator set with ours\n'
-# `replace-validators` reads genesis files with cometbft's strict decoder, which
-# requires int64 fields (initial_height, app_hash) in cometbft spelling while
-# the SDK writes plain numbers; convert both files first
-jq '.initial_height |= tostring | .app_hash = (.app_hash // "")' \
-  "$NODE_HOME/config/genesis.json" > "$SIM_DIR/source.comet.json"
-jq '.initial_height |= tostring | .app_hash = (.app_hash // "")' \
-  "$EXPORT_GENESIS" > "$SIM_DIR/target.comet.json"
 "$IRIS_BIN" genesis replace-validators \
   --source-genesis-file "$SIM_DIR/source.comet.json" \
   --target-genesis-file "$SIM_DIR/target.comet.json" \
@@ -64,14 +369,31 @@ printf '==> converting the merged genesis back to SDK format\n'
 # decoder dropped; consensus.validators MUST stay empty: the doc validator set
 # would otherwise mix the old (uncontrolled) validators with ours and block
 # consensus, the set comes from the imported gentxs via InitChain instead
-jq -c '{app_name, app_version, params: .consensus.params}' \
-  "$EXPORT_GENESIS" > "$SIM_DIR/meta.json"
-jq --slurpfile m "$SIM_DIR/meta.json" \
-  '.initial_height |= tonumber
-   | .app_name = $m[0].app_name
-   | .app_version = $m[0].app_version
-   | .consensus = {params: $m[0].params, validators: []}' \
-  "$SIM_DIR/simulation.comet.json" > "$SIM_DIR/simulation-genesis.json"
+an=$(json_tool top "$EXPORT_GENESIS" app_name) \
+  || die "no app_name in $EXPORT_GENESIS"
+av=$(json_tool top "$EXPORT_GENESIS" app_version) \
+  || die "no app_version in $EXPORT_GENESIS"
+printf '%s' "$an" > "$SIM_DIR/app-name.json"
+printf '%s' "$av" > "$SIM_DIR/app-version.json"
+json_tool top "$EXPORT_GENESIS" consensus > "$SIM_DIR/consensus.json" \
+  || die "no consensus in $EXPORT_GENESIS"
+python3 - "$SIM_DIR/consensus.json" "$SIM_DIR/consensus-final.json" <<'PY2'
+import json, sys
+cons = json.load(open(sys.argv[1]))
+json.dump({'params': cons.get('params'), 'validators': []},
+          open(sys.argv[2], 'w'))
+PY2
+ih=$(json_tool top "$SIM_DIR/simulation.comet.json" initial_height) \
+  || die "no initial_height in the merged genesis"
+ih=${ih#\"}; ih=${ih%\"}   # cometbft writes int64s quoted
+printf '%s' "$ih" > "$SIM_DIR/initial-height.json"
+json_tool set-members "$SIM_DIR/simulation.comet.json" \
+  "$SIM_DIR/simulation-genesis.json" \
+  initial_height="$SIM_DIR/initial-height.json" \
+  app_name="$SIM_DIR/app-name.json" \
+  app_version="$SIM_DIR/app-version.json" \
+  consensus="$SIM_DIR/consensus-final.json" \
+  || die "failed to convert the merged genesis back to SDK format"
 "$IRIS_BIN" genesis validate "$SIM_DIR/simulation-genesis.json" >/dev/null
 
 printf '==> starting the simulation node\n'
