@@ -699,6 +699,113 @@ PY3
   fi
 fi
 
+### tibc client state sanitize ###############################################
+
+# tibc-go v0.6.0 rejects legacy tibc genesis data on three counts: client
+# states with trusting_period >= unbonding_period (both were created equal,
+# e.g. 2400h), consensus states whose light client type differs from the
+# client state type (relics from before a client type change), and consensus
+# states / metadata belonging to clients no longer in the genesis. Fix the
+# trusting periods to 2/3 of the unbonding period (the comet convention) and
+# drop the invalid consensus states / metadata.
+if [[ -n ${FRAG_FILE[tibc]:-} ]]; then
+  TIBC_FRAG=${FRAG_FILE[tibc]}
+  json_tool top "$TIBC_FRAG" client_genesis > "$WORK/tibc-clients.json" \
+    || die "failed to extract client_genesis from the tibc fragment"
+  python3 - "$WORK/tibc-clients.json" "$WORK/tibc-clients-fixed.json" \
+    > "$WORK/tibc-count.txt" <<'PY4'
+import json, re, sys
+
+
+def parse_dur(s):
+    m = re.fullmatch(r'(?:(\d+)h)?(?:(\d+)m)?(?:(\d+(?:\.\d+)?)s)?', s or '')
+    if not m:
+        return None
+    return (int(m.group(1) or 0) * 3600 + int(m.group(2) or 0) * 60
+            + float(m.group(3) or 0))
+
+
+def fmt_dur(sec):
+    sec = int(sec)
+    return '%dh%dm%ds' % (sec // 3600, (sec % 3600) // 60, sec % 60)
+
+
+g = json.load(open(sys.argv[1]))
+fixed = 0
+for c in g.get('clients') or []:
+    cs = c.get('client_state') or {}
+    tp = parse_dur(cs.get('trusting_period', ''))
+    up = parse_dur(cs.get('unbonding_period', ''))
+    if tp is not None and up is not None and tp >= up:
+        new = fmt_dur(up * 2 // 3)
+        print('tibc client %s: trusting_period %s -> %s (must be < unbonding_period %s)'
+              % (c.get('chain_name'), cs['trusting_period'], new,
+                 cs['unbonding_period']), file=sys.stderr)
+        cs['trusting_period'] = new
+        fixed += 1
+
+# consensus states must be of the same light client type as the client state
+# (legacy clients can carry states from before a client type change) and must
+# belong to a client in the genesis; drop the invalid ones
+def lc_package(type_url):
+    m = re.search(r'lightclients\.([a-z0-9-]+)\.', type_url or '')
+    return m.group(1) if m else None
+
+client_pkg = {}
+for c in g.get('clients') or []:
+    client_pkg[c.get('chain_name')] = lc_package(
+        (c.get('client_state') or {}).get('@type', ''))
+
+kept_cc = []
+for cc in g.get('clients_consensus') or []:
+    name = cc.get('chain_name')
+    if name not in client_pkg:
+        print('tibc: dropped consensus states of orphan client %s' % name, file=sys.stderr)
+        fixed += 1
+        continue
+    cpkg = client_pkg[name]
+    kept_states = []
+    for s in cc.get('consensus_states') or []:
+        spkg = lc_package((s.get('consensus_state') or {}).get('@type', ''))
+        if spkg and cpkg and spkg != cpkg:
+            h = (s.get('height') or {}).get('revision_height')
+            print('tibc client %s: dropped consensus state at height %s (type %s does not match client state type %s)'
+                  % (name, h, spkg, cpkg), file=sys.stderr)
+            fixed += 1
+            continue
+        kept_states.append(s)
+    cc['consensus_states'] = kept_states
+    kept_cc.append(cc)
+g['clients_consensus'] = kept_cc
+
+kept_md = []
+for md in g.get('clients_metadata') or []:
+    if md.get('chain_name') not in client_pkg:
+        print('tibc: dropped metadata of orphan client %s' % md.get('chain_name'), file=sys.stderr)
+        fixed += 1
+        continue
+    kept_md.append(md)
+g['clients_metadata'] = kept_md
+
+print('tibc sanitize: %d client(s), %d consensus entr(y/ies), %d consensus state(s) checked, %d fix(es)'
+      % (len(g.get('clients') or []),
+         len(g.get('clients_consensus') or []),
+         sum(len(cc.get('consensus_states') or [])
+             for cc in g.get('clients_consensus') or []),
+         fixed), file=sys.stderr)
+
+json.dump(g, open(sys.argv[2], 'w'))
+print(fixed)
+PY4
+  TIBC_FIXED=$(cat "$WORK/tibc-count.txt")
+  if [[ $TIBC_FIXED != 0 ]]; then
+    json_tool patch "$TIBC_FRAG" "$TIBC_FRAG.new" client_genesis \
+      "$WORK/tibc-clients-fixed.json" || die "failed to patch tibc fragment"
+    mv "$TIBC_FRAG.new" "$TIBC_FRAG"
+    printf 'tibc client states sanitized: %s client(s) fixed\n' "$TIBC_FIXED"
+  fi
+fi
+
 ### padded validation #######################################################
 
 # validate every module and report ALL failures at once (a per-module die
