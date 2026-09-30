@@ -9,13 +9,16 @@
 #
 # This script instead:
 #   1. runs `iris export` once per module (default) with --modules-to-export,
-#      so peak RSS is bounded by the largest single module;
+#      so peak RSS is bounded by the largest single module; resumes are
+#      content-addressed (partials are matched to groups by their module set,
+#      so the module list may change between runs without invalidating them);
 #   2. assembles the final genesis with a streaming JSON member scanner
 #      (python, O(1) memory), producing the same result as the old jq merge:
-#      chain_id replaced, IBC modules reset to fresh-init defaults, everything
-#      else taken from the export at EXPORT_HEIGHT; modules that export no
-#      genesis (skipped by the module manager because they implement no
-#      genesis interfaces) fall back to their fresh default;
+#      chain_id replaced, cross-chain modules (IBC + TIBC) reset to
+#      fresh-init defaults, everything else taken from the export at
+#      EXPORT_HEIGHT; modules that export no genesis (skipped by the module
+#      manager because they implement no genesis interfaces) fall back to
+#      their fresh default;
 #   3. sanitizes legacy chain data that the v0.50 genesis validation rejects
 #      (blank bank denom_metadata name/symbol, unusable denom units, gov
 #      expedited_min_deposit <= min_deposit), logging every change;
@@ -46,16 +49,19 @@
 
 set -euo pipefail
 
-IRIS_BIN=${IRIS_BIN:-/path/to/verified/iris}
-OLD_HOME=${OLD_HOME:-/path/to/stopped-node-copy}
-OUT_DIR=${OUT_DIR:-/path/to/export-output}
+IRIS_BIN=${IRIS_BIN:-/root/iris}
+OLD_HOME=${OLD_HOME:-/data/iris}
+OUT_DIR=${OUT_DIR:-/data/export-output}
 
 NEW_CHAIN_ID=${NEW_CHAIN_ID:-irishub-2}
 EXPORT_HEIGHT=${EXPORT_HEIGHT:-37242247}
 EXPECTED_INITIAL_HEIGHT=${EXPECTED_INITIAL_HEIGHT:-37242248}
 EXPECTED_SUPPLY=${EXPECTED_SUPPLY:-2156713998266827}
 
-IBC_MODULES=(07-tendermint ibc transfer interchainaccounts nonfungibletokentransfer)
+# cross-chain modules whose state is reset to fresh-init defaults instead of
+# being exported: the IBC/TIBC client & connection state of the legacy chain
+# is not carried over to the recovered chain
+RESET_MODULES=(07-tendermint ibc transfer interchainaccounts nonfungibletokentransfer tibc)
 RESUME=${RESUME:-0}
 SKIP_VALIDATE=${SKIP_VALIDATE:-0}
 MODULE_GROUPS=${MODULE_GROUPS:-}
@@ -331,6 +337,19 @@ def cmd_split(path, container, outdir):
     return 3
 
 
+def cmd_subkeys(path, container):
+    s = Stream(path)
+    for k in iter_members(s):
+        if k == container:
+            for k2 in iter_members(s):
+                sys.stdout.write(k2 + '\n')
+                scan_value(s)
+            return 0
+        scan_value(s)
+    sys.stderr.write('container not found: %s\n' % container)
+    return 3
+
+
 def cmd_patch(src, dst, member, value_file):
     # stream-copy src to dst, replacing the top-level member's value with the
     # contents of value_file (a complete JSON value)
@@ -418,6 +437,8 @@ def main():
             return cmd_top(sys.argv[2], sys.argv[3])
         if mode == 'split' and len(sys.argv) == 5:
             return cmd_split(sys.argv[2], sys.argv[3], sys.argv[4])
+        if mode == 'subkeys' and len(sys.argv) == 4:
+            return cmd_subkeys(sys.argv[2], sys.argv[3])
         if mode == 'skeleton' and len(sys.argv) == 6:
             return cmd_skeleton(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         if mode == 'patch' and len(sys.argv) == 6:
@@ -461,12 +482,12 @@ else
 fi
 mkdir -p "$WORK" "$FRAG"
 
-### module list (export everything except the IBC modules, which are reset
-### to fresh-init defaults in the final genesis) ##############################
+### module list (export everything except the cross-chain modules, which are
+### reset to fresh-init defaults in the final genesis) ########################
 
 mapfile -t ALL_KEYS < <(jq -r '.app_state | keys[]' "$FRESH" | sort)
 declare -A IBC_SET=()
-for m in "${IBC_MODULES[@]}"; do IBC_SET[$m]=1; done
+for m in "${RESET_MODULES[@]}"; do IBC_SET[$m]=1; done
 
 MODULES=()
 for m in "${ALL_KEYS[@]}"; do
@@ -476,7 +497,7 @@ for m in "${ALL_KEYS[@]}"; do
 done
 ((${#MODULES[@]} > 0)) || die "no modules to export"
 
-for m in "${MODULES[@]}" "${IBC_MODULES[@]}"; do
+for m in "${MODULES[@]}" "${RESET_MODULES[@]}"; do
   [[ $m =~ ^[A-Za-z0-9._-]+$ ]] || die "unexpected module name: $m"
 done
 
@@ -490,13 +511,35 @@ mapfile -t EXPORT_GROUPS < <(
   fi
 )
 
+# content-addressed resume: match existing partials to groups by their
+# app_state module set instead of by index — the module list can change
+# between runs (e.g. a module moved to the reset list), which would shift
+# positional numbering and silently reuse the wrong partial. Partials that
+# belong to no group (e.g. a dropped module from an earlier run) are pruned.
+declare -A PARTIAL_BY_KEY=()
+if [[ $RESUME == 1 ]]; then
+  for p in "$WORK"/partial-*.json "$WORK"/stage*/partial-*.json; do
+    [[ -e $p ]] || continue
+    key=$(json_tool subkeys "$p" app_state | sort | tr '\n' ',')
+    # empty key = a module that exports no genesis; it cannot be matched by
+    # content and is re-exported (cheap)
+    [[ -n $key ]] || continue
+    PARTIAL_BY_KEY[$key]=$p
+  done
+fi
+
+STAGE="$WORK/stage.$$"
+mkdir -p "$STAGE"
+
 i=0
 for g in "${EXPORT_GROUPS[@]}"; do
   [[ -n $g ]] || continue
   i=$((i+1))
-  partial="$WORK/partial-$i.json"
-  if [[ $RESUME == 1 && -s $partial ]]; then
-    printf 'resume: reusing %s\n' "$partial"
+  key=$(printf '%s\n' ${g//,/ } | sort | tr '\n' ',')
+  if [[ -n ${PARTIAL_BY_KEY[$key]:-} ]]; then
+    printf 'resume: reusing %s for group %d (%s)\n' \
+      "${PARTIAL_BY_KEY[$key]}" "$i" "$g"
+    mv "${PARTIAL_BY_KEY[$key]}" "$STAGE/partial-$i.json"
   else
     printf 'export group %d: %s\n' "$i" "$g"
     "$IRIS_BIN" export \
@@ -504,14 +547,21 @@ for g in "${EXPORT_GROUPS[@]}"; do
       --height "$EXPORT_HEIGHT" \
       --for-zero-height=false \
       --modules-to-export "$g" \
-      --output-document "$partial"
+      --output-document "$STAGE/partial-$i.json"
   fi
 
-  ih=$(json_tool top "$partial" initial_height) \
-    || die "failed to read initial_height from $partial"
+  ih=$(json_tool top "$STAGE/partial-$i.json" initial_height) \
+    || die "failed to read initial_height from partial-$i.json"
   [[ $ih == "$EXPECTED_INITIAL_HEIGHT" ]] \
-    || die "$partial: initial_height=$ih, want $EXPECTED_INITIAL_HEIGHT"
+    || die "partial-$i.json: initial_height=$ih, want $EXPECTED_INITIAL_HEIGHT"
 done
+
+# swap in this run's partials; whatever was left in the pool or in old
+# interrupted staging dirs belongs to no group (e.g. a module dropped from
+# the module list since an earlier run) and is pruned
+rm -f "$WORK"/partial-*.json
+mv "$STAGE"/partial-*.json "$WORK/" || die "failed to move partials back"
+rm -rf "$WORK"/stage*
 
 ### streaming assembly #######################################################
 
@@ -568,7 +618,7 @@ for m in "${MODULES[@]}"; do
   fi
 done
 
-ALL_MERGED=$(printf '%s\n' "${MODULES[@]}" "${IBC_MODULES[@]}" | sort -u)
+ALL_MERGED=$(printf '%s\n' "${MODULES[@]}" "${RESET_MODULES[@]}" | sort -u)
 
 ### bank denom_metadata sanitize ############################################
 
