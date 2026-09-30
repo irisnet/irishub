@@ -14,12 +14,14 @@
 #   IRIS_BIN        iris binary (default: iris)
 #   EXPORT_GENESIS  the recovered genesis to simulate (required)
 #   SIM_DIR         working directory (default: /tmp/irishub-sim). Needs
-#                   roughly 3x the genesis size of free disk for the converted
+#                   roughly 4x the genesis size of free disk for the converted
 #                   intermediates; do NOT point it at a tmpfs when the
 #                   genesis is ~2GB
 #   SIM_CHAIN_ID    simulation chain-id (default: irishub-sim-1); the final
 #                   genesis carries this id because gentx signatures bind to it
 #   KEEP_RUNNING=1  leave the node running when done (default: stop it)
+#   WAIT_SECS      how long to wait for the first blocks (default: 7200; the
+#                  InitChain import of a ~2GB genesis takes an hour or more)
 #
 # All large-file JSON conversions are streamed (O(1) memory, python3): the
 # recovered genesis is ~2GB and jq would load 3-5x that into RAM. The node
@@ -50,6 +52,11 @@ die() { printf '%s\n' "$*" >&2; exit 1; }
 #                                       listed members' values with the given
 #                                       files' contents (complete JSON values)
 #                                       and appending members missing from src
+#   set-nested <src> <dst> <a.b.c> <value_file>
+#                                       stream-copy src to dst, replacing the
+#                                       member at a dotted path with the file's
+#                                       contents; when the path is absent the
+#                                       file passes through unchanged (exit 0)
 json_tool() {
   python3 - "$@" <<'PY'
 import io, json, re, sys
@@ -298,6 +305,69 @@ def cmd_set_members(src, dst, pairs):
     return 0
 
 
+def cmd_set_nested(src, dst, path, value_file):
+    # stream-copy src to dst, replacing the member at a dotted path
+    # (e.g. app_state.staking.tokenize_share_records) with the contents of
+    # value_file; path components match their camelCase/snake_case spelling
+    # when the exact name is absent, and a missing path leaves the file
+    # unchanged (exit 0) so optional members can be cleared unconditionally
+    parts = [p for p in path.split('.') if p]
+    if not parts:
+        raise ValueError('empty path')
+
+    def variants(name):
+        v = [name]
+        seg = name.split('_')
+        if len(seg) > 1:
+            v.append(seg[0] + ''.join(p[:1].upper() + p[1:] for p in seg[1:]))
+        else:
+            v.append(re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower())
+        return v
+
+    def copy_object(s, out, depth):
+        found = False
+        wrote = False
+        for k in iter_members(s):
+            if wrote:
+                out.write(b',\n')
+            wrote = True
+            out.write(json.dumps(k).encode('utf-8'))
+            out.write(b':')
+            if k not in variants(parts[depth]):
+                scan_value(s, out)
+                continue
+            if depth == len(parts) - 1:
+                with open(value_file, 'rb') as af:
+                    while True:
+                        b = af.read(CHUNK)
+                        if not b:
+                            break
+                        out.write(b)
+                scan_value(s, None)
+                found = True
+            else:
+                s.skipws()
+                if s.peek() != b'{':
+                    scan_value(s, out)
+                    continue
+                out.write(b'{')
+                found = copy_object(s, out, depth + 1) or found
+                out.write(b'}')
+        return found
+
+    s = Stream(src)
+    out = open(dst, 'wb')
+    try:
+        out.write(b'{')
+        found = copy_object(s, out, 0)
+        out.write(b'}\n')
+        if not found:
+            sys.stderr.write('set-nested: path not found, file unchanged: %s\n' % path)
+    finally:
+        out.close()
+    return 0
+
+
 def main():
     if len(sys.argv) < 4:
         sys.stderr.write('usage: json_tool MODE ARGS...\n')
@@ -308,6 +378,8 @@ def main():
             return cmd_top(sys.argv[2], sys.argv[3])
         if mode == 'set-members' and len(sys.argv) >= 5:
             return cmd_set_members(sys.argv[2], sys.argv[3], sys.argv[4:])
+        if mode == 'set-nested' and len(sys.argv) == 6:
+            return cmd_set_nested(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
     except (ValueError, KeyError) as e:
         sys.stderr.write('json_tool %s: %s\n' % (mode, e))
         return 1
@@ -357,6 +429,21 @@ to_comet "$NODE_HOME/config/genesis.json" "$SIM_DIR/source.comet.json" \
   || die "failed to convert the testnet genesis"
 to_comet "$EXPORT_GENESIS" "$SIM_DIR/target.comet.json" \
   || die "failed to convert the recovered genesis"
+
+printf '==> clearing tokenize-share records on the simulation copy\n'
+# replace-validators refuses targets with live tokenize-share records: the
+# merge removes their validators, which would strand the derivative coins.
+# For the simulation this is fine — the whole staking state is replaced by
+# the source's anyway, so the records cannot survive regardless; clear them
+# on our SIM_DIR copy to let the merge proceed. The real launch keeps the
+# original validators and needs no such strip. (When the target has no
+# tokenize-share records the call passes the file through unchanged.)
+printf '[]' > "$SIM_DIR/empty-records.json"
+json_tool set-nested "$SIM_DIR/target.comet.json" "$SIM_DIR/target.clean.json" \
+  app_state.staking.tokenize_share_records "$SIM_DIR/empty-records.json" \
+  || die "failed to clear tokenize-share records"
+mv "$SIM_DIR/target.clean.json" "$SIM_DIR/target.comet.json"
+rm -f "$SIM_DIR/empty-records.json"
 
 printf '==> replacing the exported validator set with ours\n'
 "$IRIS_BIN" genesis replace-validators \
@@ -409,15 +496,24 @@ stop_node() {
 trap stop_node EXIT
 
 printf '==> waiting for the node to produce blocks\n'
+# InitChain imports the whole genesis state before the first block — for a
+# ~2GB genesis this can take an hour or more, so the wait must be generous;
+# a dead node process fails fast instead of waiting out the timeout
 HEIGHT=0
-for _ in $(seq 1 60); do
+WAIT_SECS=${WAIT_SECS:-7200}
+DEADLINE=$((SECONDS + WAIT_SECS))
+while (( SECONDS < DEADLINE )); do
+  if ! kill -0 "$NODE_PID" 2>/dev/null; then
+    tail -30 "$SIM_DIR/node.log"
+    die "node exited before producing blocks"
+  fi
   H=$( { curl -s "$RPC_HTTP/status" 2>/dev/null | jq -r '.result.sync_info.latest_block_height // 0'; } 2>/dev/null || echo 0)
   if [[ "$H" -gt 2 ]]; then HEIGHT=$H; break; fi
-  sleep 2
+  sleep 5
 done
 if [[ "$HEIGHT" == 0 ]]; then
   tail -30 "$SIM_DIR/node.log"
-  die "node did not produce blocks"
+  die "node did not produce blocks within ${WAIT_SECS}s"
 fi
 printf '    block height: %s\n' "$HEIGHT"
 
