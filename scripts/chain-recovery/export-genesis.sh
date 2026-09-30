@@ -350,6 +350,244 @@ def cmd_subkeys(path, container):
     return 3
 
 
+CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l'
+
+
+def bech32_to_bytes(addr):
+    # decode the 20-byte payload of an iaa1... address (checksum not verified)
+    try:
+        pos = addr.index('1')
+        acc = 0
+        bits = 0
+        out = bytearray()
+        for c in addr[pos + 1:]:
+            v = CHARSET.find(c)
+            if v < 0:
+                return None
+            acc = (acc << 5) | v
+            bits += 5
+            while bits >= 8:
+                bits -= 8
+                out.append((acc >> bits) & 0xff)
+        return bytes(out[:20]) if len(out) >= 20 else None
+    except ValueError:
+        return None
+
+
+def collect_auth_addrs(s, keep):
+    # collect the hex form of every "address" inside an auth genesis value
+    for m in iter_members(s):
+        if m == 'accounts':
+            for _ in iter_array(s):
+                bio = io.BytesIO()
+                scan_value(s, bio)
+                am = re.search(rb'"address":\s*"([^"]+)"', bio.getvalue())
+                if am:
+                    raw = bech32_to_bytes(am.group(1).decode())
+                    if raw:
+                        keep.add(raw.hex())
+        else:
+            scan_value(s)
+
+
+def cmd_filter_evm(src, dst):
+    # drop evm genesis accounts whose address has no matching auth account:
+    # such entries carry unreachable code/storage and evm InitGenesis panics
+    # on the missing account
+    keep = set()
+    s = Stream(src)
+    for k in iter_members(s):
+        if k == 'app_state':
+            for m in iter_members(s):
+                if m == 'auth':
+                    collect_auth_addrs(s, keep)
+                else:
+                    scan_value(s)
+            break
+        scan_value(s)
+
+    dropped = 0
+    total = 0
+
+    def rewrite_evm(s, out):
+        nonlocal dropped, total
+        out.write(b'{')
+        wrote = False
+        for m in iter_members(s):
+            if wrote:
+                out.write(b',')
+            wrote = True
+            out.write(json.dumps(m).encode('utf-8'))
+            out.write(b':')
+            if m == 'accounts':
+                out.write(b'[')
+                first = True
+                for _ in iter_array(s):
+                    bio = io.BytesIO()
+                    scan_value(s, bio)
+                    el = bio.getvalue()
+                    total += 1
+                    am = re.search(rb'"address":\s*"0x([0-9a-fA-F]{40})"', el)
+                    key = am.group(1).decode().lower() if am else None
+                    if key is None or key not in keep:
+                        dropped += 1
+                        print('evm: dropped account %s (no matching auth account)'
+                              % (key or '<no address>'), file=sys.stderr)
+                        continue
+                    if not first:
+                        out.write(b',')
+                    first = False
+                    out.write(el)
+                out.write(b']')
+            else:
+                scan_value(s, out)
+        out.write(b'}')
+
+    s = Stream(src)
+    out = open(dst, 'wb')
+    out.write(b'{')
+    wrote = False
+    with out:
+        for k in iter_members(s):
+            if wrote:
+                out.write(b',\n')
+            wrote = True
+            out.write(json.dumps(k).encode('utf-8'))
+            out.write(b':')
+            if k == 'app_state':
+                out.write(b'{')
+                wrote2 = False
+                for m in iter_members(s):
+                    if wrote2:
+                        out.write(b',')
+                    wrote2 = True
+                    out.write(json.dumps(m).encode('utf-8'))
+                    out.write(b':')
+                    if m == 'evm':
+                        rewrite_evm(s, out)
+                    else:
+                        scan_value(s, out)
+                out.write(b'}')
+            else:
+                scan_value(s, out)
+        out.write(b'}\n')
+
+    print('evm sanitize: %d auth account(s), %d evm account(s), %d dropped'
+          % (len(keep), total, dropped), file=sys.stderr)
+    return 0
+
+
+def cmd_fix_liquid_stake(src, dst):
+    # normalize the staking genesis' total_liquid_staked_tokens counter to the
+    # sum of the validators' liquid_shares: legacy chains can carry a 1-unit
+    # drift between the cached counter and the per-validator state, which the
+    # crisis module's liquid stake invariant panics on at genesis import
+    s = Stream(src)
+    for k in iter_members(s):
+        if k == 'app_state':
+            for m in iter_members(s):
+                if m == 'staking':
+                    return fix_staking_member(s, dst)
+                scan_value(s)
+            break
+        scan_value(s)
+    sys.stderr.write('staking member not found\n')
+    return 3
+
+
+def fix_staking_member(s, dst):
+    # single pass: sum liquid_shares while streaming the validators array,
+    # rewrite total_liquid_staked_tokens when reached
+    total = [None]  # mutable box for the nested writer below
+
+    def rewrite_staking(s, out):
+        out.write(b'{')
+        wrote = False
+        for m in iter_members(s):
+            if wrote:
+                out.write(b',')
+            wrote = True
+            out.write(json.dumps(m).encode('utf-8'))
+            out.write(b':')
+            if m == 'validators':
+                out.write(b'[')
+                first = True
+                for _ in iter_array(s):
+                    bio = io.BytesIO()
+                    scan_value(s, bio)
+                    el = bio.getvalue()
+                    # replicate the invariant: sum over all validators of
+                    # int(liquid_shares * tokens / delegator_shares) with
+                    # sdk.Dec semantics (18-decimal truncating arithmetic)
+                    ls = re.search(rb'"liquid_shares":\s*"([0-9.]+)"', el)
+                    if ls:
+                        from decimal import Decimal, ROUND_DOWN
+                        if total[0] is None:
+                            total[0] = 0
+                        tk = re.search(rb'"tokens":\s*"([0-9.]+)"', el)
+                        dsh = re.search(rb'"delegator_shares":\s*"([0-9.]+)"', el)
+                        ls_d = Decimal(ls.group(1).decode())
+                        dsh_d = Decimal(dsh.group(1).decode()) if dsh else Decimal(0)
+                        tk_d = Decimal(tk.group(1).decode()) if tk else Decimal(0)
+                        if dsh_d != 0:
+                            q = (ls_d / dsh_d).quantize(Decimal('1e-18'), rounding=ROUND_DOWN)
+                            contrib = int((q * tk_d).quantize(Decimal('1e-18'), rounding=ROUND_DOWN))
+                            total[0] += contrib
+                    if not first:
+                        out.write(b',')
+                    first = False
+                    out.write(el)
+                out.write(b']')
+            elif m == 'total_liquid_staked_tokens':
+                bio = io.BytesIO()
+                scan_value(s, bio)
+                old = bio.getvalue()
+                if total[0] is None:
+                    out.write(old)
+                else:
+                    new = ('"%d"' % int(total[0])).encode()
+                    if old != new:
+                        print('staking: total_liquid_staked_tokens %s -> %s '
+                              '(sum of validators\' liquid_shares)'
+                              % (old.decode(), new.decode().strip('"')), file=sys.stderr)
+                    out.write(new)
+            else:
+                scan_value(s, out)
+        out.write(b'}')
+
+    s2 = Stream(s.f.name)
+    out = open(dst, 'wb')
+    out.write(b'{')
+    wrote = False
+    with out:
+        for k in iter_members(s2):
+            if wrote:
+                out.write(b',\n')
+            wrote = True
+            out.write(json.dumps(k).encode('utf-8'))
+            out.write(b':')
+            if k == 'app_state':
+                out.write(b'{')
+                wrote2 = False
+                for m in iter_members(s2):
+                    if wrote2:
+                        out.write(b',')
+                    wrote2 = True
+                    out.write(json.dumps(m).encode('utf-8'))
+                    out.write(b':')
+                    if m == 'staking':
+                        rewrite_staking(s2, out)
+                    else:
+                        scan_value(s2, out)
+                out.write(b'}')
+            else:
+                scan_value(s2, out)
+        out.write(b'}\n')
+    if total[0] is None:
+        sys.stderr.write('staking: no validators seen, nothing to normalize\n')
+    return 0
+
+
 def cmd_patch(src, dst, member, value_file):
     # stream-copy src to dst, replacing the top-level member's value with the
     # contents of value_file (a complete JSON value)
@@ -439,6 +677,10 @@ def main():
             return cmd_split(sys.argv[2], sys.argv[3], sys.argv[4])
         if mode == 'subkeys' and len(sys.argv) == 4:
             return cmd_subkeys(sys.argv[2], sys.argv[3])
+        if mode == 'filter-evm' and len(sys.argv) == 4:
+            return cmd_filter_evm(sys.argv[2], sys.argv[3])
+        if mode == 'fix-liquid-stake' and len(sys.argv) == 4:
+            return cmd_fix_liquid_stake(sys.argv[2], sys.argv[3])
         if mode == 'skeleton' and len(sys.argv) == 6:
             return cmd_skeleton(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         if mode == 'patch' and len(sys.argv) == 6:
@@ -915,6 +1157,21 @@ fi
 first_partial=$(ls "$WORK"/partial-*.json | head -n 1)
 json_tool skeleton "$first_partial" "$OUT_DIR/genesis.json" \
   "$NEW_CHAIN_ID" "$WORK/app_state.json" || die "genesis assembly failed"
+
+# the legacy chain carries evm code/storage entries for addresses that have
+# no auth account (unreachable orphan state); evm InitGenesis panics on the
+# missing account — drop them from the assembled genesis
+json_tool filter-evm "$OUT_DIR/genesis.json" "$OUT_DIR/genesis.json.tmp" \
+  || die "evm accounts sanitize failed"
+mv "$OUT_DIR/genesis.json.tmp" "$OUT_DIR/genesis.json"
+
+# legacy chains can carry a drift between the staking module's cached
+# total_liquid_staked_tokens counter and the sum of the validators'
+# liquid_shares; the crisis module's liquid stake invariant panics on it at
+# genesis import — normalize the counter to the sum
+json_tool fix-liquid-stake "$OUT_DIR/genesis.json" "$OUT_DIR/genesis.json.tmp" \
+  || die "liquid staking counter sanitize failed"
+mv "$OUT_DIR/genesis.json.tmp" "$OUT_DIR/genesis.json"
 
 ### assertions ###############################################################
 
