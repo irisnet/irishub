@@ -13,12 +13,18 @@
 #   2. assembles the final genesis with a streaming JSON member scanner
 #      (python, O(1) memory), producing the same result as the old jq merge:
 #      chain_id replaced, IBC modules reset to fresh-init defaults, everything
-#      else taken from the export at EXPORT_HEIGHT;
-#   3. validates each exported module by building a "padded" genesis — the
+#      else taken from the export at EXPORT_HEIGHT; modules that export no
+#      genesis (skipped by the module manager because they implement no
+#      genesis interfaces) fall back to their fresh default;
+#   3. sanitizes legacy chain data that the v0.50 genesis validation rejects
+#      (blank bank denom_metadata name/symbol, unusable denom units, gov
+#      expedited_min_deposit <= min_deposit), logging every change;
+#   4. validates each exported module by building a "padded" genesis — the
 #      fresh defaults with that one module replaced by the exported fragment
 #      (`iris genesis validate` requires every module section to be present,
-#      so a bare partial cannot be validated directly);
-#   4. asserts chain_id / initial_height / uiris supply with streaming tools
+#      so a bare partial cannot be validated directly) — and reports ALL
+#      module failures at once;
+#   5. asserts chain_id / initial_height / uiris supply with streaming tools
 #      (no jq slurpfile on the huge final file).
 #
 # Note: `iris export` runs service.PrepForZeroHeightGenesis on every run
@@ -65,6 +71,10 @@ die() { printf '%s\n' "$*" >&2; exit 1; }
 #   split <file> <container> <outdir>    write each member of <container>'s
 #                                        value to <outdir>/<member>.json and
 #                                        print the member names
+#   patch <src> <dst> <member> <value_file>
+#                                       stream-copy <src> to <dst>, replacing
+#                                       the top-level member's value with the
+#                                       contents of <value_file>
 #   skeleton <src> <dst> <chain_id> <app_state_file>
 #                                       copy <src> verbatim to <dst> but with
 #                                       chain_id replaced and app_state value
@@ -321,6 +331,33 @@ def cmd_split(path, container, outdir):
     return 3
 
 
+def cmd_patch(src, dst, member, value_file):
+    # stream-copy src to dst, replacing the top-level member's value with the
+    # contents of value_file (a complete JSON value)
+    s = Stream(src)
+    out = open(dst, 'wb')
+    out.write(b'{')
+    wrote = False
+    with open(value_file, 'rb') as af, out:
+        for k in iter_members(s):
+            if wrote:
+                out.write(b',\n')
+            out.write(json.dumps(k).encode('utf-8'))
+            out.write(b':')
+            if k == member:
+                while True:
+                    b = af.read(CHUNK)
+                    if not b:
+                        break
+                    out.write(b)
+                scan_value(s, None)
+            else:
+                scan_value(s, out)
+            wrote = True
+        out.write(b'}\n')
+    return 0
+
+
 def cmd_skeleton(src, dst, chain_id, app_state_file):
     s = Stream(src)
     out = open(dst, 'wb')
@@ -383,6 +420,8 @@ def main():
             return cmd_split(sys.argv[2], sys.argv[3], sys.argv[4])
         if mode == 'skeleton' and len(sys.argv) == 6:
             return cmd_skeleton(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+        if mode == 'patch' and len(sys.argv) == 6:
+            return cmd_patch(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         if mode == 'supply' and len(sys.argv) == 4:
             return cmd_supply(sys.argv[2], sys.argv[3])
     except (ValueError, KeyError) as e:
@@ -490,12 +529,9 @@ while IFS=$'\t' read -r mod fn; do
 done < "$WORK/exported.txt"
 mapfile -t EXPORTED < <(cut -f1 "$WORK/exported.txt" | sort -u)
 
-if ! diff <(printf '%s\n' "${MODULES[@]}") <(printf '%s\n' "${EXPORTED[@]}"); then
-  die "exported module set does not match the expected module list"
-fi
-
 # fresh defaults for every module: used to reset the IBC modules in the final
-# genesis and to pad partials for `iris genesis validate`
+# genesis, to pad partials for `iris genesis validate`, and as a fallback for
+# modules that export no genesis
 DEF="$WORK/defaults"
 rm -rf "$DEF"
 mkdir -p "$DEF"
@@ -509,12 +545,167 @@ for m in "${ALL_KEYS[@]}"; do
   [[ -n ${DEF_FILE[$m]:-} ]] || die "fresh defaults do not cover module $m"
 done
 
+# nothing unexpected may appear in the export output
+declare -A MOD_SET=()
+for m in "${MODULES[@]}"; do MOD_SET[$m]=1; done
+for m in "${EXPORTED[@]}"; do
+  [[ -n ${MOD_SET[$m]:-} ]] || die "unexpected exported module: $m"
+done
+
+# Modules that implement no genesis interfaces are silently skipped by the
+# module manager's export (on this chain: consensus, MT, NFT, params — all
+# with a null default). They fall back to their fresh default, but only when
+# that default is an empty genesis (null / {}); a module with real expected
+# data producing no export output still fails loudly.
+for m in "${MODULES[@]}"; do
+  if [[ -z ${FRAG_FILE[$m]:-} ]]; then
+    d=$(tr -d ' \t\n\r' < "${DEF_FILE[$m]}")
+    if [[ $d == 'null' || $d == '{}' ]]; then
+      printf 'notice: module %s exports no genesis; using fresh default\n' "$m"
+    else
+      die "module $m produced no export output but has a non-empty default genesis"
+    fi
+  fi
+done
+
 ALL_MERGED=$(printf '%s\n' "${MODULES[@]}" "${IBC_MODULES[@]}" | sort -u)
+
+### bank denom_metadata sanitize ############################################
+
+# The legacy chain's bank denom_metadata violates several v0.50 validation
+# rules: blank name/symbol (the token module never fills them), duplicate
+# denom units, and IBC entries whose first denom unit is the source denom
+# instead of the ibc/... base. name/symbol/display are display-only fields,
+# so fill blanks from the token module's exported genesis (matched by
+# min_unit == base), falling back to description/display; drop duplicate
+# units; rebuild unusable unit lists as [base:0] and fall back display to
+# base when the display cannot be expressed as a denom unit. Every change is
+# logged.
+if [[ -n ${FRAG_FILE[bank]:-} ]]; then
+  BANK_FRAG=${FRAG_FILE[bank]}
+  TOKEN_FRAG=${FRAG_FILE[token]:-}
+  json_tool top "$BANK_FRAG" denom_metadata > "$WORK/denom-metadata.json" \
+    || die "failed to extract denom_metadata from the bank fragment"
+  python3 - "$WORK/denom-metadata.json" "$TOKEN_FRAG" \
+    "$WORK/denom-metadata-fixed.json" > "$WORK/sanitize-count.txt" <<'PY2'
+import json, sys
+
+arr = json.load(open(sys.argv[1]))
+tokens = {}
+if len(sys.argv) > 2 and sys.argv[2]:
+    tg = json.load(open(sys.argv[2]))
+    for t in tg.get('tokens', []):
+        tokens[t.get('min_unit')] = t
+
+changes = 0
+for m in arr:
+    t = tokens.get(m.get('base')) or {}
+    if not str(m.get('name', '')).strip():
+        m['name'] = (str(t.get('name', '')).strip()
+                     or str(m.get('description', '')).strip()
+                     or m.get('base'))
+        changes += 1
+        print('denom_metadata: %s: name <- %r' % (m['base'], m['name']), file=sys.stderr)
+    if not str(m.get('symbol', '')).strip():
+        m['symbol'] = (str(t.get('symbol', '')).strip()
+                       or m.get('display')
+                       or m.get('base'))
+        changes += 1
+        print('denom_metadata: %s: symbol <- %r' % (m['base'], m['symbol']), file=sys.stderr)
+    # v0.50 requires the first denom unit to be the base denom (exponent 0);
+    # legacy IBC entries only carry a single exponent-0 unit named after the
+    # source denom, which cannot be expressed under the new rules — rebuild
+    if not m.get('denom_units') or m['denom_units'][0].get('denom') != m.get('base'):
+        old = [(u.get('denom'), u.get('exponent')) for u in m.get('denom_units', [])]
+        m['denom_units'] = [{'denom': m['base'], 'exponent': 0, 'aliases': []}]
+        changes += 1
+        print('denom_metadata: %s: rebuilt denom_units to [base:0] (legacy units: %s)'
+              % (m['base'], old), file=sys.stderr)
+    seen = set()
+    units = []
+    for u in m.get('denom_units', []):
+        if u.get('denom') in seen:
+            changes += 1
+            print('denom_metadata: %s: dropped duplicate denom unit %r (exponent %s)'
+                  % (m['base'], u.get('denom'), u.get('exponent')), file=sys.stderr)
+            continue
+        seen.add(u.get('denom'))
+        units.append(u)
+    m['denom_units'] = units
+    # display must be one of the denom units; trace-path displays cannot be
+    # units (they would need a fabricated exponent), so fall back to base
+    if not any(u.get('denom') == m.get('display') for u in m.get('denom_units', [])):
+        changes += 1
+        print('denom_metadata: %s: display %r -> base %r (not expressible as a denom unit)'
+              % (m['base'], m.get('display'), m['base']), file=sys.stderr)
+        m['display'] = m['base']
+
+json.dump(arr, open(sys.argv[3], 'w'))
+print(changes)
+PY2
+  SANITIZED=$(cat "$WORK/sanitize-count.txt")
+  if [[ $SANITIZED != 0 ]]; then
+    json_tool patch "$BANK_FRAG" "$BANK_FRAG.new" denom_metadata \
+      "$WORK/denom-metadata-fixed.json" || die "failed to patch bank fragment"
+    mv "$BANK_FRAG.new" "$BANK_FRAG"
+    printf 'bank denom_metadata sanitized: %s change(s)\n' "$SANITIZED"
+  fi
+fi
+
+### gov params sanitize ######################################################
+
+# Legacy gov params can carry expedited_min_deposit <= min_deposit, which
+# the v0.50 genesis validation rejects (it must be strictly greater). Reset
+# it to 5x min_deposit — the SDK's own default ratio (fresh init uses
+# 10000000/50000000 uiris) — so expedited proposals cost 5x a regular
+# deposit until governance changes the param.
+if [[ -n ${FRAG_FILE[gov]:-} ]]; then
+  GOV_FRAG=${FRAG_FILE[gov]}
+  json_tool top "$GOV_FRAG" params > "$WORK/gov-params.json" \
+    || die "failed to extract params from the gov fragment"
+  python3 - "$WORK/gov-params.json" "$WORK/gov-params-fixed.json" \
+    > "$WORK/gov-count.txt" <<'PY3'
+import json, sys
+
+p = json.load(open(sys.argv[1]))
+fixed = 0
+min_list = p.get('min_deposit') or []
+if min_list:
+    min_d = min_list[0]
+    old = p.get('expedited_min_deposit') or []
+    exp_d = old[0] if old else {}
+    try:
+        violates = (exp_d.get('denom') != min_d.get('denom')
+                    or int(exp_d.get('amount', 0)) <= int(min_d.get('amount', 0)))
+    except (TypeError, ValueError):
+        violates = True
+    if violates:
+        new = {'denom': min_d['denom'], 'amount': str(int(min_d['amount']) * 5)}
+        p['expedited_min_deposit'] = [new]
+        fixed = 1
+        print('gov params: expedited_min_deposit %s -> %s (must be strictly '
+              'greater than min_deposit %s; using 5x like the SDK default)'
+              % (json.dumps(old), json.dumps(new),
+                 min_d['amount'] + min_d['denom']), file=sys.stderr)
+json.dump(p, open(sys.argv[2], 'w'))
+print(fixed)
+PY3
+  GOV_FIXED=$(cat "$WORK/gov-count.txt")
+  if [[ $GOV_FIXED != 0 ]]; then
+    json_tool patch "$GOV_FRAG" "$GOV_FRAG.new" params "$WORK/gov-params-fixed.json" \
+      || die "failed to patch gov fragment"
+    mv "$GOV_FRAG.new" "$GOV_FRAG"
+    printf 'gov params sanitized: expedited_min_deposit reset to 5x min_deposit\n'
+  fi
+fi
 
 ### padded validation #######################################################
 
+# validate every module and report ALL failures at once (a per-module die
+# would hide failures behind the first one)
 if [[ $SKIP_VALIDATE != 1 ]]; then
-  for m in "${MODULES[@]}"; do
+  FAILED_MODULES=()
+  for m in "${EXPORTED[@]}"; do
     {
       printf '{'
       first=1
@@ -532,11 +723,19 @@ if [[ $SKIP_VALIDATE != 1 ]]; then
     json_tool skeleton "$FRESH" "$WORK/padded-genesis.json" \
       "$NEW_CHAIN_ID" "$WORK/padded-app-state.json" \
       || die "padded genesis assembly failed for module $m"
-    "$IRIS_BIN" genesis validate "$WORK/padded-genesis.json" \
-      || die "genesis validate failed for module $m"
+    if "$IRIS_BIN" genesis validate "$WORK/padded-genesis.json" \
+      > "$WORK/validate-$m.log" 2>&1; then
+      printf 'validated module: %s\n' "$m"
+    else
+      printf 'validation FAILED: module %s\n' "$m"
+      grep -m1 '^Error:' "$WORK/validate-$m.log" | sed 's/^/  /'
+      FAILED_MODULES+=("$m")
+    fi
     rm -f "$WORK/padded-genesis.json" "$WORK/padded-app-state.json"
-    printf 'validated module: %s\n' "$m"
   done
+  if ((${#FAILED_MODULES[@]} > 0)); then
+    die "padded validation failed for module(s): ${FAILED_MODULES[*]} (fix the data and re-run with RESUME=1)"
+  fi
 fi
 
 ### final assembly ##########################################################
