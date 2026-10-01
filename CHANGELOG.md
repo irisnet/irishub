@@ -1,5 +1,38 @@
 # Changelog
 
+## v4.1.0 — Chain relaunch: irishub-2
+
+This release relaunches the network as **irishub-2** from a verified state export of irishub-1 at height **37242247** (first new-chain block: **37242248**). It is **not** an in-place upgrade: all nodes must start from the published genesis with the v4.1.0 binary. Full validator instructions: `scripts/chain-recovery/VALIDATOR-MIGRATION.md`.
+
+### Security
+
+* (IRISMod) Bump `mods.irisnet.org/modules/token` to v2.0.0: `MsgIssueToken` is now rejected with `ErrIssueTokenDisabled` (new token issuance is closed pending governance decision); hardened symbol/min-unit uniqueness checks across namespaces; fixed `SwapFeeToken` to resolve by min-unit; fixed ERC20 auto-deploy validation path.
+* (IRISHub) Corrected IBC/ICA/transfer keeper authorities to the gov module address (previously unsettable module-self authorities blocked governance-gated `MsgUpdateParams`); fixed TIBC MT transfer keeper to use its own store key instead of sharing the NFT store.
+
+### State Machine Breaking
+
+* New chain `irishub-2`; `irishub-1` state after height 37242247 is **not** carried over.
+* IBC/TIBC state (`07-tendermint`, `ibc`, `transfer`, `interchainaccounts`, `nonfungibletokentransfer`, `tibc`) reset to fresh defaults — all cross-chain connections must be re-established; `ibc/*` voucher balances persist as bank balances but are untransferable until channels exist.
+* Minimal genesis sanitizations (all logged by the export script): bank `denom_metadata` display fields normalized (153 places, balances untouched); gov `expedited_min_deposit` raised to 25000 iris (5× min_deposit, required by v0.50 validation); unreachable EVM accounts pruned; `total_liquid_staked_tokens` realigned (1-unit drift).
+* Preserved as-is: EVM contracts/storage, NFTs, MTs, all accounts/balances (`uiris` supply `2156713998266827`), staking set (38 bonded validators, keys unchanged), distribution rewards, 3 tokenize-share records.
+
+### Features
+
+* New `iris genesis replace-validators` helper for local simulation launches from exported genesis.
+* Memory-bounded export flow (`scripts/chain-recovery/export-genesis.sh`, O(1)-memory assembly) and `export` now skips the IAVL fastnode rewrite (`SetIAVLDisableFastNode`), so multi-TB data dirs no longer OOM.
+
+### Genesis
+
+```
+https://irishub-snapshot.oss-ap-southeast-1.aliyuncs.com/genesis.json
+MD5:    199c0f48900cc00a71c68e7c44a80c5d
+SHA256: 6540bd7c1d11d5475e7eaabe8d16278c76dc319636cb1679a1f1351646822ef2
+```
+
+### Action required
+
+All validators: use binary `v4.1.0`, reuse your irishub-1 `priv_validator_key.json`, follow the migration guide. 16GB machines must apply the documented memory tuning for the first Commit (~15–18GB peak, one-time).
+
 ## 3.1.0
 
 ### State Machine Breaking
