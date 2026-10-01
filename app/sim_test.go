@@ -74,6 +74,18 @@ func interBlockCacheOpt() func(*baseapp.BaseApp) {
 	return baseapp.SetInterBlockCache(store.NewCommitKVStoreCacheManager())
 }
 
+func TestIBCKeeperAuthorities(t *testing.T) {
+	db := dbm.NewMemDB()
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	app := createApp(log.NewNopLogger(), db)
+	expected := authtypes.NewModuleAddress(govtypes.ModuleName).String()
+
+	require.Equal(t, expected, app.IBCKeeper.GetAuthority())
+	require.Equal(t, expected, app.ICAHostKeeper.GetAuthority())
+	require.Equal(t, expected, app.IBCTransferKeeper.GetAuthority())
+}
+
 func TestFullAppSimulation(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
 	config.ChainID = AppChainID

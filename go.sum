@@ -2087,8 +2087,8 @@ mods.irisnet.org/modules/record v1.0.0 h1:cISmtC1L8/ohMpKDacMCZG49/pTt155+TnvdaG
 mods.irisnet.org/modules/record v1.0.0/go.mod h1:n8gRooDvJ5B44EJRZ+UlDz0GcXQeNwjH2tjpnVx7nd8=
 mods.irisnet.org/modules/service v1.0.0 h1:hwa5xXWpAhpv18a28T/RjISgwljOLu5UyTN4xDfeWFg=
 mods.irisnet.org/modules/service v1.0.0/go.mod h1:B1nKRNYn1VLqpvNbmbDSYagqL56sj0MIceXJi/DKg6s=
-mods.irisnet.org/modules/token v1.0.0 h1:PhI5pC2ipMkG1eyH/Ll+9ZFhXsKS9yt2cAXgwy5BDmE=
-mods.irisnet.org/modules/token v1.0.0/go.mod h1:fHJzeEBPhE9vaa4aye90+WFtHjZyGRvkWRpJeBSc9/k=
+mods.irisnet.org/modules/token v2.0.0+incompatible h1:AWBvllKkVpCcbkEy1A/4xyrxM2teRo7mcRRvgcSLbfw=
+mods.irisnet.org/modules/token v2.0.0+incompatible/go.mod h1:fHJzeEBPhE9vaa4aye90+WFtHjZyGRvkWRpJeBSc9/k=
 mods.irisnet.org/simapp v0.0.0-20241125071105-d76ae25d05d2 h1:9AGZYpMjpk1gItviL31vsehmen119HtcuOKwv8WWpZo=
 mods.irisnet.org/simapp v0.0.0-20241125071105-d76ae25d05d2/go.mod h1:t7FSQJkJOgXq1/LdhpBeOu7TS8hLQkAMMx9fL5w53PY=
 nhooyr.io/websocket v1.8.6 h1:s+C3xAMLwGmlI31Nyn/eAehUlZPwfYZu2JXM621Q5/k=

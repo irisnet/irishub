@@ -335,7 +335,7 @@ func New(
 		appKeepers.StakingKeeper,
 		appKeepers.UpgradeKeeper,
 		appKeepers.scopedIBCKeeper,
-		authtypes.NewModuleAddress(ibcexported.ModuleName).String(),
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	appKeepers.ICAHostKeeper = icahostkeeper.NewKeeper(
@@ -348,7 +348,7 @@ func New(
 		appKeepers.AccountKeeper,
 		appKeepers.scopedICAHostKeeper,
 		bApp.MsgServiceRouter(),
-		authtypes.NewModuleAddress(icahosttypes.SubModuleName).String(),
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	appKeepers.ICAHostKeeper.WithQueryRouter(bApp.GRPCQueryRouter())
 
@@ -385,7 +385,7 @@ func New(
 
 	appKeepers.TIBCMTTransferKeeper = tibcmttransferkeeper.NewKeeper(
 		appCodec,
-		appKeepers.keys[tibcnfttypes.StoreKey],
+		appKeepers.keys[tibcmttypes.StoreKey],
 		appKeepers.AccountKeeper, appKeepers.MTKeeper,
 		appKeepers.TIBCKeeper.PacketKeeper,
 		appKeepers.TIBCKeeper.ClientKeeper,
@@ -401,7 +401,7 @@ func New(
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		appKeepers.scopedTransferKeeper,
-		authtypes.NewModuleAddress(ibctransfertypes.ModuleName).String(),
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	appKeepers.TransferModule = transfer.NewAppModule(appKeepers.IBCTransferKeeper)
 	transferIBCModule := transfer.NewIBCModule(appKeepers.IBCTransferKeeper)

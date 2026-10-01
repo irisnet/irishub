@@ -15,6 +15,7 @@ import (
 	"cosmossdk.io/client/v2/autocli"
 	"cosmossdk.io/log"
 	dbm "github.com/cosmos/cosmos-db"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -48,7 +49,7 @@ func NewRootCmd() *cobra.Command {
 	initAppOptions := viper.New()
 	tempDir := tempDir()
 	initAppOptions.Set(flags.FlagHome, tempDir)
-	tempApplication := app.NewIrisApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true,  initAppOptions)
+	tempApplication := app.NewIrisApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true, initAppOptions)
 	encodingConfig := tempApplication.EncodingConfig()
 
 	defer func() {
@@ -181,7 +182,7 @@ func initRootCmd(
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		server.StatusCommand(),
-		genesisCommand(basicManager, encodingConfig),
+		genesisCommand(basicManager, encodingConfig, replaceValidatorsCmd(basicManager, encodingConfig)),
 		queryCommand(),
 		txCommand(basicManager),
 		Commands(iristypes.DefaultNodeHome),
@@ -250,7 +251,7 @@ func txCommand(basicManager module.BasicManager) *cobra.Command {
 		authcmd.GetDecodeCommand(),
 	)
 
-    // NOTE: this must be registered for now so that submit-legacy-proposal
+	// NOTE: this must be registered for now so that submit-legacy-proposal
 	// message (e.g. consumer-addition proposal) can be routed to the its handler and processed correctly.
 	basicManager.AddTxCommands(cmd)
 	// app.ModuleBasics.AddTxCommands(cmd)
@@ -259,7 +260,7 @@ func txCommand(basicManager module.BasicManager) *cobra.Command {
 	return cmd
 }
 
-type appCreator struct {}
+type appCreator struct{}
 
 func (ac appCreator) newApp(
 	logger log.Logger,
@@ -299,12 +300,16 @@ func (ac appCreator) appExport(
 		loadLatest = true
 	}
 
+	// Export is a read-only dump: never trigger IAVL's automatic fastnode
+	// storage migration (skipFastStorageUpgrade), which would rewrite a
+	// fast index for the entire live state (infeasible on very large data).
 	irisApp := app.NewIrisApp(
 		logger,
 		db,
 		traceStore,
 		loadLatest,
 		appOpts,
+		baseapp.SetIAVLDisableFastNode(true),
 	)
 
 	if height != -1 {

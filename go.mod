@@ -22,7 +22,7 @@ require (
 	mods.irisnet.org/modules/random v1.0.0
 	mods.irisnet.org/modules/record v1.0.0
 	mods.irisnet.org/modules/service v1.0.0
-	mods.irisnet.org/modules/token v1.0.0
+	mods.irisnet.org/modules/token v2.0.0+incompatible
 )
 
 require (
@@ -279,5 +279,4 @@ replace (
 	// stick with compatible version or x/exp in v0.47.x line
 	// x/exp had a breaking change in further commits
 	golang.org/x/exp => golang.org/x/exp v0.0.0-20240404231335-c0f41cb1a7a0
-
 )
