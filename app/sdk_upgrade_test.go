@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protowire"
 
-	"github.com/irisnet/irishub/v5/app/upgrades/sdk0538"
+	v500 "github.com/irisnet/irishub/v5/app/upgrades/v500"
 	minttypes "github.com/irisnet/irishub/v5/modules/mint/types"
 	apptestutil "github.com/irisnet/irishub/v5/testutil"
 	"github.com/irisnet/irishub/v5/wrapper"
@@ -72,7 +72,7 @@ func TestSDK053UpgradeMigratesIBCDenom(t *testing.T) {
 	versions[transfertypes.ModuleName] = 5
 	versions["capability"] = 1
 	require.NoError(t, app.UpgradeKeeper.SetModuleVersionMap(ctx, versions))
-	require.NoError(t, app.UpgradeKeeper.ApplyUpgrade(ctx, upgradetypes.Plan{Name: sdk0538.Upgrade.UpgradeName, Height: 1}))
+	require.NoError(t, app.UpgradeKeeper.ApplyUpgrade(ctx, upgradetypes.Plan{Name: v500.Upgrade.UpgradeName, Height: 1}))
 	denom, found := app.IBCTransferKeeper.GetDenom(ctx, hash[:])
 	require.True(t, found)
 	require.Equal(t, path+"/"+baseDenom, denom.Path())
@@ -157,7 +157,7 @@ func TestSDK053UpgradeClearsLSMAndKeepsClaims(t *testing.T) {
 	require.True(t, hasProtoField(store.Get(valKey), 15))
 	require.True(t, hasProtoField(store.Get(delKey), 4))
 
-	plan := upgradetypes.Plan{Name: sdk0538.Upgrade.UpgradeName, Height: 1}
+	plan := upgradetypes.Plan{Name: v500.Upgrade.UpgradeName, Height: 1}
 	require.NoError(t, app.UpgradeKeeper.ApplyUpgrade(ctx, plan))
 	for _, field := range []protowire.Number{7, 8, 9} {
 		require.False(t, hasProtoField(store.Get(stakingtypes.ParamsKey), field))

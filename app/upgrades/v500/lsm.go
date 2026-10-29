@@ -1,4 +1,4 @@
-package sdk0538
+package v500
 
 import (
 	"encoding/binary"

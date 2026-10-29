@@ -1,4 +1,4 @@
-package sdk0538
+package v500
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 // Upgrade removes the obsolete IBC capability store before running the SDK and
 // IBC module migrations at the coordinated upgrade height.
 var Upgrade = upgrades.Upgrade{
-	UpgradeName:   "cosmos-sdk-v0.53.8",
+	UpgradeName:   "v5.0.0",
 	StoreUpgrades: &storetypes.StoreUpgrades{Deleted: []string{"capability"}},
 	UpgradeHandlerConstructor: func(m *module.Manager, c module.Configurator, box upgrades.Toolbox) upgradetypes.UpgradeHandler {
 		return func(ctx context.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
