@@ -359,7 +359,7 @@ func New(
 
 	appKeepers.TIBCMTTransferKeeper = tibcmttransferkeeper.NewKeeper(
 		appCodec,
-		appKeepers.keys[tibcnfttypes.StoreKey],
+		appKeepers.keys[tibcmttypes.StoreKey],
 		appKeepers.AccountKeeper, appKeepers.MTKeeper,
 		appKeepers.TIBCKeeper.PacketKeeper,
 		appKeepers.TIBCKeeper.ClientKeeper,

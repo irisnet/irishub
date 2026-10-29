@@ -1,5 +1,38 @@
 # Changelog
 
+## 4.1.0
+
+Chain relaunch: irishub-2, built from a verified irishub-1 state export at height 37242247 (first new-chain block: 37242248). This is **not** an in-place upgrade: all nodes must start from the published genesis with the v4.1.0 binary. Validator guide: `scripts/chain-recovery/VALIDATOR-MIGRATION.md`.
+
+### State Machine Breaking
+
+* (IRISHub) New chain `irishub-2`; irishub-1 state after height 37242247 is not carried over.
+* (IRISHub) IBC/TIBC state (`07-tendermint`, `ibc`, `transfer`, `interchainaccounts`, `nonfungibletokentransfer`, `tibc`) reset to fresh defaults; all cross-chain connections must be re-established.
+* (IRISHub) Minimal genesis sanitizations: bank `denom_metadata` display fields normalized (balances untouched); gov `expedited_min_deposit` raised to 25000 iris; unreachable EVM accounts pruned; `total_liquid_staked_tokens` realigned.
+* (IRISHub) Preserved as-is: EVM contracts/storage, NFTs, MTs, accounts/balances (`uiris` supply `2156713998266827`), 38 bonded validators (keys unchanged), distribution rewards, 3 tokenize-share records.
+
+### Features
+
+* (IRISHub) New `iris genesis replace-validators` helper for local simulation launches from exported genesis.
+* (IRISHub) Memory-bounded export flow (`scripts/chain-recovery/export-genesis.sh`); `export` skips the IAVL fastnode rewrite, so multi-TB data dirs no longer OOM.
+
+### Improvements
+
+* (IRISMod) Bump token module to v2.0.0: `MsgIssueToken` rejected with `ErrIssueTokenDisabled`; hardened symbol/min-unit uniqueness checks; fixed `SwapFeeToken` min-unit resolution and ERC20 auto-deploy validation.
+* (IRISHub) Corrected IBC/ICA/transfer keeper authorities to the gov module address; fixed TIBC MT transfer keeper to use its own store key.
+
+### Genesis
+
+```
+https://irishub-snapshot.oss-ap-southeast-1.aliyuncs.com/genesis.json
+MD5:    199c0f48900cc00a71c68e7c44a80c5d
+SHA256: 6540bd7c1d11d5475e7eaabe8d16278c76dc319636cb1679a1f1351646822ef2
+```
+
+### Action Required
+
+All validators: use binary `v4.1.0`, reuse your irishub-1 `priv_validator_key.json`. 16GB machines must apply the documented memory tuning for the first Commit (~15–18GB peak, one-time).
+
 ## 3.1.0
 
 ### State Machine Breaking
