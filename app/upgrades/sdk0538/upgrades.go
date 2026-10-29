@@ -18,6 +18,9 @@ var Upgrade = upgrades.Upgrade{
 	StoreUpgrades: &storetypes.StoreUpgrades{Deleted: []string{"capability"}},
 	UpgradeHandlerConstructor: func(m *module.Manager, c module.Configurator, box upgrades.Toolbox) upgradetypes.UpgradeHandler {
 		return func(ctx context.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			if err := migrateLSM(sdk.UnwrapSDKContext(ctx), box); err != nil {
+				return nil, err
+			}
 			// SetModuleVersionMap only overwrites present modules; explicitly remove
 			// the retired module from the persisted version map as well.
 			store := sdk.UnwrapSDKContext(ctx).KVStore(box.GetKey(upgradetypes.StoreKey))

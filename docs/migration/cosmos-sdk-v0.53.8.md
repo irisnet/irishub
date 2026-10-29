@@ -32,10 +32,11 @@ IBC-Go 直接使用 `v10.7.0`，不通过 `replace` 降级。按照 Ethermint �
 
 `auth` 的 PreBlocker 排在 `upgrade` 之后。未启用无序交易、epochs 或 protocolpool。
 
-本次不保留 LSM 功能，已移除旧 v3 升级处理器中启用 LSM 的步骤。普通 staking 的
-protobuf 字段编号保持兼容，LSM 附加字段不再由上游类型读取；原 LSM 使用的
-`0x81` 至 `0x87` 存储前缀在 SDK v0.53.8 中明确保留，不会复用。本次没有销毁、
-赎回或重新分配任何存量 LSM 代币，也没有改写已有验证人的最低自委托值。
+本次不保留 LSM 功能。升级处理器在指定高度清除 staking 中的 LSM 记录、索引和
+`0x81` 至 `0x87` 存储前缀，并重写 staking 参数、验证人和委托记录以去除旧 LSM
+protobuf 字段。验证人的最低自委托值归零，延续旧 LSM 版本的实际行为。原
+`tokenizeshare_N` 账户的底层委托、distribution 奖励关联和 bank 中的 LSM 衍生币
+余额及供应量保留，供后续兑付核验；本次升级不提供衍生币赎回交易。
 
 ## Docker 构建
 
@@ -49,12 +50,13 @@ docker build -t irishub:sdk0538 --build-arg EVM_CHAIN_ID=6688 --build-arg BUILDE
 ## 验证范围
 
 新增测试覆盖真实应用创世初始化、首块执行、IBC 路由，以及通过已注册升级处理器
-迁移旧 DenomTrace 编码并保持 IBC 资产 denom 不变。仓库现有测试用于检查本地
-模块和 CLI 的兼容性。
+迁移旧 DenomTrace 编码并保持 IBC 资产 denom 不变。合成 LSM 状态测试检查升级
+处理器清理旧 staking 字段和记录，同时保留 bank 凭证、底层委托及奖励关联。
+仓库现有测试用于检查本地模块和 CLI 的兼容性。
 
 这些检查没有使用生产链数据库快照。生产升级前仍需用目标链快照演练升级高度、
 已有 IBC 通道/客户端和存量 LSM 资产的处置；普通单元测试不能证明这些链上状态
 已完成验证。
 
 参考：[SDK 升级说明](https://github.com/cosmos/cosmos-sdk/blob/v0.53.8/UPGRADING.md)、
-[IBC v8.1 到 v10 升级说明](https://github.com/cosmos/ibc-go/blob/v10.7.0/docs/docs/05-migrations/13-v8_1-to-v10.md)。
+[IBC v8.1 到 v10 升级说明](https://docs.cosmos.network/ibc/next/migrations/v8_1-to-v10)。

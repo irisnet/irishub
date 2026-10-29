@@ -46,7 +46,6 @@ import (
 	srvflags "github.com/evmos/ethermint/server/flags"
 
 	irishubante "github.com/irisnet/irishub/v5/app/ante"
-	lsmgenesis "github.com/irisnet/irishub/v5/app/genesis/lsm"
 	"github.com/irisnet/irishub/v5/app/keepers"
 	"github.com/irisnet/irishub/v5/app/params"
 	"github.com/irisnet/irishub/v5/app/rpc"
@@ -288,45 +287,16 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context) (sdk.EndBlock, error) {
 	return app.mm.EndBlock(ctx)
 }
 
-// ValidateGenesis runs application-wide checks required by legacy genesis patches.
-func ValidateGenesis(cdc codec.Codec, config client.TxEncodingConfig, basics module.BasicManager, state map[string]json.RawMessage) error {
-	return lsmgenesis.ValidateGenesis(cdc, config, basics, state)
-}
-
 // InitChainer application update at chain initialization
 func (app *IrisApp) InitChainer(ctx sdk.Context, req *abci.RequestInitChain) (*abci.ResponseInitChain, error) {
 	var genesisState iristypes.GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		return nil, err
 	}
-	prepared, plan, err := lsmgenesis.Prepare(app.codec, genesisState)
-	if err != nil {
-		return nil, err
-	}
-	write := func() {}
-	if len(plan) > 0 {
-		// Keep live LSM conversion atomic with module initialization. Prepare
-		// rejects gentxs for this path; ordinary gentxs need BaseApp's context
-		// to see the module state initialized before genutil executes them.
-		ctx, write = ctx.CacheContext()
-	}
 	if err := app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap()); err != nil {
 		return nil, err
 	}
-	response, err := app.mm.InitGenesis(ctx, app.codec, prepared)
-	if err != nil {
-		return nil, err
-	}
-	if err := lsmgenesis.Migrate(ctx, lsmgenesis.Keepers{
-		Bank:         app.BankKeeper,
-		Staking:      app.StakingKeeper,
-		Distribution: app.DistrKeeper,
-		Crisis:       app.CrisisKeeper,
-	}, plan); err != nil {
-		return nil, err
-	}
-	write()
-	return response, nil
+	return app.mm.InitGenesis(ctx, app.codec, genesisState)
 }
 
 // LoadHeight loads a particular height

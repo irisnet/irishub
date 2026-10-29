@@ -500,8 +500,8 @@ func TestGenesisReplaceValidatorsRejectsLiveLSMTarget(t *testing.T) {
 	target := buildMainnetLikeTarget(t, cdc, defaults)
 	source := buildGentxSource(t, cdc, txConfig, defaults)
 
-	// tokenize-share records in the target are rejected: removing the target
-	// validators drops the records and strands the derivative coins in bank
+	// Replacing target staking would drop these records while preserving their
+	// derivative balances from the target bank state.
 	live := copyGenesisState(target.state)
 	var err error
 	var stakingState map[string]json.RawMessage
@@ -513,7 +513,6 @@ func TestGenesisReplaceValidatorsRejectsLiveLSMTarget(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "live tokenize-share records")
 
-	// empty records carry no claims and are accepted
 	empty := copyGenesisState(target.state)
 	require.NoError(t, json.Unmarshal(empty[stakingtypes.ModuleName], &stakingState))
 	stakingState["tokenize_share_records"] = json.RawMessage(`[]`)

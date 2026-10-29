@@ -79,7 +79,6 @@ import (
 
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
-	lsmgenesis "github.com/irisnet/irishub/v5/app/genesis/lsm"
 	irisappparams "github.com/irisnet/irishub/v5/app/params"
 	irisevm "github.com/irisnet/irishub/v5/modules/evm"
 	"github.com/irisnet/irishub/v5/modules/guardian"
@@ -196,13 +195,13 @@ func appModules(
 			app.StakingKeeper,
 			app.GetSubspace(distrtypes.ModuleName),
 		),
-		lsmgenesis.StakingModule{AppModule: staking.NewAppModule(
+		staking.NewAppModule(
 			appCodec,
 			app.StakingKeeper,
 			app.AccountKeeper,
 			app.BankKeeper,
 			app.GetSubspace(stakingtypes.ModuleName),
-		)},
+		),
 		upgrade.NewAppModule(app.UpgradeKeeper, addresscodec.NewBech32Codec(iristypes.Bech32PrefixAccAddr)),
 		evidence.NewAppModule(*app.EvidenceKeeper),
 		feegrantmodule.NewAppModule(
@@ -320,13 +319,13 @@ func simulationModules(
 			app.FeeGrantKeeper,
 			app.interfaceRegistry,
 		),
-		lsmgenesis.StakingModule{AppModule: staking.NewAppModule(
+		staking.NewAppModule(
 			appCodec,
 			app.StakingKeeper,
 			app.AccountKeeper,
 			app.BankKeeper,
 			app.GetSubspace(stakingtypes.ModuleName),
-		)},
+		),
 		distr.NewAppModule(
 			appCodec,
 			app.DistrKeeper,

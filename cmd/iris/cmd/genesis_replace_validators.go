@@ -66,9 +66,8 @@ added when missing, and the bank supply is recomputed. Everything else (auth,
 bank, gov, mint, slashing, evidence, ibc, token, ...) is kept from the target.
 
 The target validators are removed entirely, so the target genesis must not
-contain tokenize-share records: dropping the records would strand the
-derivative coins left in bank. Start from a genesis without live
-tokenize-share records.
+contain tokenize-share records: dropping them would strand the derivative coins
+left in bank. Start from a genesis without live tokenize-share records.
 
 When the source provides gentxs, the output takes the source chain-id (gentx
 signatures verify against it) and resets the initial height so genesis-time
@@ -139,11 +138,6 @@ func ReplaceValidators(
 	if err := json.Unmarshal(target.AppState, &targetState); err != nil {
 		return nil, fmt.Errorf("target app state: %w", err)
 	}
-
-	// The target validators are removed entirely, so tokenize-share records
-	// in the target are dropped along with them while the derivative coins
-	// stay in bank. Reject such targets instead of silently stranding the
-	// tokenize-share claims.
 	liveRecords, err := liveTokenizeShareCount(targetState[stakingtypes.ModuleName])
 	if err != nil {
 		return nil, err
@@ -251,10 +245,7 @@ func ReplaceValidators(
 	return result, nil
 }
 
-// liveTokenizeShareCount counts the tokenize-share records left in a staking
-// genesis state, accepting both protobuf JSON spellings. The records'
-// validators are looked up at chain start, so removing the validators strands
-// the records' claims.
+// liveTokenizeShareCount counts the tokenize-share records in a target genesis.
 func liveTokenizeShareCount(stakingRaw json.RawMessage) (int, error) {
 	if len(stakingRaw) == 0 {
 		return 0, nil
@@ -272,7 +263,7 @@ func liveTokenizeShareCount(stakingRaw json.RawMessage) (int, error) {
 	}
 	var records []json.RawMessage
 	if err := json.Unmarshal(raw, &records); err != nil {
-		return 0, fmt.Errorf("target staking genesis has an invalid tokenize_share_records field: %w", err)
+		return 0, fmt.Errorf("target staking genesis has invalid tokenize-share records: %w", err)
 	}
 	return len(records), nil
 }
