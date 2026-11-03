@@ -37,9 +37,9 @@ import (
 	ethermintserver "github.com/evmos/ethermint/server"
 	servercfg "github.com/evmos/ethermint/server/config"
 
-	"github.com/irisnet/irishub/v4/app"
-	"github.com/irisnet/irishub/v4/app/params"
-	iristypes "github.com/irisnet/irishub/v4/types"
+	"github.com/irisnet/irishub/v5/app"
+	"github.com/irisnet/irishub/v5/app/params"
+	iristypes "github.com/irisnet/irishub/v5/types"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
@@ -196,7 +196,6 @@ func genesisCommand(basicManager module.BasicManager, encodingConfig params.Enco
 		basicManager,
 		iristypes.DefaultNodeHome,
 	)
-
 	for _, subCmd := range cmds {
 		cmd.AddCommand(subCmd)
 	}

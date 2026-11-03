@@ -10,7 +10,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	_ "github.com/irisnet/irishub/v4/types"
+	_ "github.com/irisnet/irishub/v5/types"
 )
 
 // nolint: deadcode unused

@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/v4/modules/guardian/types"
+	"github.com/irisnet/irishub/v5/modules/guardian/types"
 )
 
 // Keeper of the guardian store

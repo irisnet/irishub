@@ -10,11 +10,11 @@ import (
 	consensustypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	"github.com/cosmos/ibc-go/v8/modules/core/exported"
+	"github.com/cosmos/ibc-go/v10/modules/core/exported"
 
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
-	"github.com/irisnet/irishub/v4/app/upgrades"
+	"github.com/irisnet/irishub/v5/app/upgrades"
 )
 
 // Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal

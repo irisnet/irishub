@@ -36,16 +36,15 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/cosmos/ibc-go/modules/capability"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-	iristypes "github.com/irisnet/irishub/v4/types"
+	iristypes "github.com/irisnet/irishub/v5/types"
 
-	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/v8/modules/core"
+	icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/v10/modules/core"
 
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
-	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	solomachine "github.com/cosmos/ibc-go/v10/modules/light-clients/06-solomachine"
+	ibctm "github.com/cosmos/ibc-go/v10/modules/light-clients/07-tendermint"
 
 	"mods.irisnet.org/modules/coinswap"
 	coinswaptypes "mods.irisnet.org/modules/coinswap/types"
@@ -80,12 +79,12 @@ import (
 
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
-	irisappparams "github.com/irisnet/irishub/v4/app/params"
-	irisevm "github.com/irisnet/irishub/v4/modules/evm"
-	"github.com/irisnet/irishub/v4/modules/guardian"
-	guardiantypes "github.com/irisnet/irishub/v4/modules/guardian/types"
-	"github.com/irisnet/irishub/v4/modules/mint"
-	minttypes "github.com/irisnet/irishub/v4/modules/mint/types"
+	irisappparams "github.com/irisnet/irishub/v5/app/params"
+	irisevm "github.com/irisnet/irishub/v5/modules/evm"
+	"github.com/irisnet/irishub/v5/modules/guardian"
+	guardiantypes "github.com/irisnet/irishub/v5/modules/guardian/types"
+	"github.com/irisnet/irishub/v5/modules/mint"
+	minttypes "github.com/irisnet/irishub/v5/modules/mint/types"
 )
 
 var (
@@ -162,7 +161,6 @@ func appModules(
 			app.AccountKeeper,
 			app.GetSubspace(banktypes.ModuleName),
 		),
-		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
 		crisis.NewAppModule(
 			app.CrisisKeeper,
 			skipGenesisInvariants,
@@ -221,8 +219,9 @@ func appModules(
 			app.interfaceRegistry,
 		),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
-		ibc.NewAppModule(app.IBCKeeper), 
-		ibctm.NewAppModule(),
+		ibc.NewAppModule(app.IBCKeeper),
+		ibctm.NewAppModule(ibctm.NewLightClientModule(appCodec, app.IBCKeeper.ClientKeeper.GetStoreProvider())),
+		solomachine.NewAppModule(solomachine.NewLightClientModule(appCodec, app.IBCKeeper.ClientKeeper.GetStoreProvider())),
 		tibc.NewAppModule(app.TIBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		app.TransferModule,
@@ -305,7 +304,6 @@ func simulationModules(
 			app.AccountKeeper,
 			app.GetSubspace(banktypes.ModuleName),
 		),
-		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
 		gov.NewAppModule(
 			appCodec,
 			app.GovKeeper,
@@ -418,12 +416,10 @@ During begin block slashing happens after distr.BeginBlocker so that
 there is nothing left over in the validator fee pool, so as to keep the
 CanWithdrawInvariant invariant.
 NOTE: staking module is required if HistoricalEntries param > 0
-NOTE: capability module's beginblocker must come before any modules using capabilities (e.g. IBC)
 */
 
 func orderBeginBlockers() []string {
 	return []string{
-		capabilitytypes.ModuleName,
 		minttypes.ModuleName,
 		feemarkettypes.ModuleName,
 		evmtypes.ModuleName,
@@ -482,7 +478,6 @@ func orderEndBlockers() []string {
 		feemarkettypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibcexported.ModuleName,
-		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		distrtypes.ModuleName,
@@ -522,13 +517,9 @@ func orderEndBlockers() []string {
 NOTE: The genutils module must occur after staking so that pools are
 properly initialized with tokens from genesis accounts.
 NOTE: The genutils module must also occur after auth so that it can access the params from auth.
-NOTE: Capability module must occur first so that it can initialize any capabilities
-so that other modules that want to create or claim capabilities afterwards in InitChain
-can do so safely.
 */
 func orderInitBlockers() []string {
 	return []string{
-		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		distrtypes.ModuleName,

@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 	simcli "github.com/cosmos/cosmos-sdk/x/simulation/client/cli"
 
-	"github.com/irisnet/irishub/v4/app/params"
+	"github.com/irisnet/irishub/v5/app/params"
 )
 
 // Profile with:

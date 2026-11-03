@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"github.com/irisnet/irishub/v4/app/upgrades"
+	"github.com/irisnet/irishub/v5/app/upgrades"
 )
 
 // Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal

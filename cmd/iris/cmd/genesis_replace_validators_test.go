@@ -35,7 +35,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/irisnet/irishub/v4/app"
+	"github.com/irisnet/irishub/v5/app"
 )
 
 const (
@@ -226,6 +226,7 @@ func buildGentxSource(t *testing.T, cdc codec.Codec, txConfig client.TxConfig, d
 		sdk.NewCoin(sdk.DefaultBondDenom, selfDelegation),
 		stakingtypes.NewDescription("my-validator", "", "", "", ""),
 		stakingtypes.NewCommissionRates(math.LegacyOneDec(), math.LegacyOneDec(), math.LegacyOneDec()),
+		math.NewInt(1),
 	)
 	require.NoError(t, err)
 	builder := txConfig.NewTxBuilder()
@@ -499,27 +500,24 @@ func TestGenesisReplaceValidatorsRejectsLiveLSMTarget(t *testing.T) {
 	target := buildMainnetLikeTarget(t, cdc, defaults)
 	source := buildGentxSource(t, cdc, txConfig, defaults)
 
-	// tokenize-share records in the target are rejected: removing the target
-	// validators drops the records and strands the derivative coins in bank
+	// Replacing target staking would drop these records while preserving their
+	// derivative balances from the target bank state.
 	live := copyGenesisState(target.state)
-	var stakingState stakingtypes.GenesisState
-	require.NoError(t, cdc.UnmarshalJSON(live[stakingtypes.ModuleName], &stakingState))
-	stakingState.TokenizeShareRecords = []stakingtypes.TokenizeShareRecord{{
-		Id:            1,
-		Owner:         target.operator.String(),
-		ModuleAccount: "tokenizeshare_1",
-		Validator:     target.valAddr.String(),
-	}}
-	live[stakingtypes.ModuleName] = cdc.MustMarshalJSON(&stakingState)
-	_, err := replaceStates(t, cdc, txConfig, irisApp.BasicManager(), source.state, live)
+	var err error
+	var stakingState map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(live[stakingtypes.ModuleName], &stakingState))
+	stakingState["tokenize_share_records"] = json.RawMessage(`[{"id":"1"}]`)
+	live[stakingtypes.ModuleName], err = json.Marshal(stakingState)
+	require.NoError(t, err)
+	_, err = replaceStates(t, cdc, txConfig, irisApp.BasicManager(), source.state, live)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "live tokenize-share records")
 
-	// empty records carry no claims and are accepted
 	empty := copyGenesisState(target.state)
-	require.NoError(t, cdc.UnmarshalJSON(empty[stakingtypes.ModuleName], &stakingState))
-	stakingState.TokenizeShareRecords = []stakingtypes.TokenizeShareRecord{}
-	empty[stakingtypes.ModuleName] = cdc.MustMarshalJSON(&stakingState)
+	require.NoError(t, json.Unmarshal(empty[stakingtypes.ModuleName], &stakingState))
+	stakingState["tokenize_share_records"] = json.RawMessage(`[]`)
+	empty[stakingtypes.ModuleName], err = json.Marshal(stakingState)
+	require.NoError(t, err)
 	merged, err := replaceStates(t, cdc, txConfig, irisApp.BasicManager(), source.state, empty)
 	require.NoError(t, err)
 	require.Equal(t, sourceChainID, merged.ChainID)

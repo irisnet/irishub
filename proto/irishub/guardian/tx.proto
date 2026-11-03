@@ -2,7 +2,7 @@ syntax = "proto3";
 package irishub.guardian;
 import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
-option go_package = "github.com/irisnet/irishub/v4/modules/guardian/types";
+option go_package = "github.com/irisnet/irishub/v5/modules/guardian/types";
 
 // Msg defines the guardian Msg service
 service Msg {

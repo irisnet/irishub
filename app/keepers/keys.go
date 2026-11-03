@@ -15,11 +15,10 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 
-	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	icahosttypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
@@ -40,8 +39,8 @@ import (
 	tibcnfttypes "github.com/bianjieai/tibc-go/modules/tibc/apps/nft_transfer/types"
 	tibchost "github.com/bianjieai/tibc-go/modules/tibc/core/24-host"
 
-	guardiantypes "github.com/irisnet/irishub/v4/modules/guardian/types"
-	minttypes "github.com/irisnet/irishub/v4/modules/mint/types"
+	guardiantypes "github.com/irisnet/irishub/v5/modules/guardian/types"
+	minttypes "github.com/irisnet/irishub/v5/modules/mint/types"
 )
 
 func (appKeepers *AppKeepers) genStoreKeys() {
@@ -64,7 +63,6 @@ func (appKeepers *AppKeepers) genStoreKeys() {
 		ibctransfertypes.StoreKey,
 		ibcnfttransfertypes.StoreKey,
 		icahosttypes.StoreKey,
-		capabilitytypes.StoreKey,
 		guardiantypes.StoreKey,
 		tokentypes.StoreKey,
 		nfttypes.StoreKey,
@@ -94,7 +92,7 @@ func (appKeepers *AppKeepers) genStoreKeys() {
 	)
 
 	// MemKeys are for information that is stored only in RAM.
-	appKeepers.memKeys = storetypes.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
+	appKeepers.memKeys = storetypes.NewMemoryStoreKeys()
 
 }
 

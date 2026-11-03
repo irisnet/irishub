@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/runtime"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 
-	"github.com/irisnet/irishub/v4/app"
+	"github.com/irisnet/irishub/v5/app"
 )
 
 var (
