@@ -1,62 +1,81 @@
-# Cosmos SDK v0.53.8 升级
+# Cosmos SDK v0.53.8 Upgrade
 
-本分支使用 Go 模块路径 `github.com/irisnet/irishub/v5`，升级到 Cosmos SDK
-`v0.53.8` 和 IBC-Go `v10.7.0`。最低 Go 版本为 `1.23.8`。
+This branch uses the Go module path `github.com/irisnet/irishub/v5` and upgrades
+to Cosmos SDK `v0.53.8` and IBC-Go `v10.7.0`. The minimum Go version is `1.23.8`.
 
-## 固定依赖
+## Pinned Dependencies
 
-依赖通过伪版本固定到以下分支提交，构建时不依赖可变的分支头：
+Dependencies are pinned to commits from the following branches using pseudo-versions,
+so builds do not depend on moving branch heads:
 
-| 依赖 | 分支 | 提交 |
+| Dependency | Branch | Commit |
 | --- | --- | --- |
 | nft-transfer | `feat/cosmos-sdk-v0.53.8` | `87faf8d2b44a` |
 | tibc-go | `feat/cosmos-sdk-v0.53.8` | `0b8e7b4af967` |
 | mods.irisnet.org/modules/* | `feat/cosmos-sdk-v0.53.8` | `f4182d6e7472` |
 | bianjieai/ethermint | `release/v0.24.0` | `4a4e53b81b98` |
 
-IBC-Go 直接使用 `v10.7.0`，不通过 `replace` 降级。按照 Ethermint 分支的替换配置，
-实际 EVM 实现保留在 go-ethereum `v1.10.26`。可用
+IBC-Go uses `v10.7.0` directly, without a `replace` directive to downgrade it.
+Following the replacement configuration in the Ethermint branch, the EVM
+implementation remains on go-ethereum `v1.10.26`. Run
 `go list -m -json github.com/cosmos/ibc-go/v10 github.com/ethereum/go-ethereum`
-检查实际版本、替换信息和源码目录。
+to inspect the resolved versions, replacement details, and source directories.
 
-## 链上升级
+## On-chain Upgrade
 
-本次注册的软件升级计划名称是 **`v5.0.0`**。现有链需要在约定的升级
-高度执行该计划；仅替换二进制并直接打开旧数据库不能代替状态迁移。
+The registered software upgrade plan is named **`v5.0.0`**. Existing chains must
+execute this plan at the agreed upgrade height; replacing the binary and opening
+the old database directly does not perform the required state migrations.
 
-升级加载器删除不再使用的 `capability` KV store；升级处理器移除其模块版本记录，
-再运行已注册的 SDK 和 IBC 模块迁移，包括 IBC transfer 的 DenomTrace 到 Denom
-格式迁移。原有 transfer、NFT transfer 和 ICA host 路由继续注册；Tendermint
-和 solo-machine 客户端按 IBC v10 要求显式注册。IBC 客户端恢复、参数修改等
-治理操作使用 v10 消息，由 `gov` 模块作为 authority 执行。
+The upgrade loader deletes the obsolete `capability` KV store. The upgrade
+handler removes its module-version entry and then runs the registered SDK and
+IBC module migrations, including the IBC transfer migration from the old
+DenomTrace encoding to the new Denom format. The existing transfer, NFT
+transfer, and ICA host routes remain registered. Tendermint and solo-machine
+clients are explicitly registered as required by IBC v10. Governance operations
+such as client recovery and parameter updates use v10 messages, with the `gov`
+module as the authority.
 
-`auth` 的 PreBlocker 排在 `upgrade` 之后。未启用无序交易、epochs 或 protocolpool。
+The `auth` PreBlocker is ordered after `upgrade`. Unordered transactions,
+epochs, and protocolpool are not enabled.
 
-本次不保留 LSM 功能。升级处理器在指定高度清除 staking 中的 LSM 记录、索引和
-`0x81` 至 `0x87` 存储前缀，并重写 staking 参数、验证人和委托记录以去除旧 LSM
-protobuf 字段。验证人的最低自委托值归零，延续旧 LSM 版本的实际行为。原
-`tokenizeshare_N` 账户的底层委托、distribution 奖励关联和 bank 中的 LSM 衍生币
-余额及供应量保留，供后续兑付核验；本次升级不提供衍生币赎回交易。
+LSM functionality is not retained. At the upgrade height, the handler removes
+LSM records, indexes, and storage prefixes `0x81` through `0x87` from staking,
+and rewrites staking parameters, validators, and delegation records to remove
+the legacy LSM protobuf fields. Validators' minimum self-delegation values are
+set to zero, preserving the behavior of the previous LSM version. The
+underlying delegations for `tokenizeshare_N` accounts, their distribution
+reward-owner associations, and LSM derivative coin balances and supplies in
+bank are preserved for future redemption verification. This upgrade does not
+provide a transaction for redeeming derivative coins.
 
-## Docker 构建
+## Docker Build
 
-Dockerfile 默认使用 `golang:1.24.9-alpine` 和 `alpine:3.18`。Docker Hub 不可用时，
-可通过构建参数切换到镜像缓存：
+The Dockerfile uses `golang:1.24.9-alpine` and `alpine:3.18` by default. If
+Docker Hub is unavailable, use the build arguments to switch to cached images:
 
 ```shell
 docker build -t irishub:sdk0538 --build-arg EVM_CHAIN_ID=6688 --build-arg BUILDER_IMAGE=mirror.gcr.io/library/golang:1.24.9-alpine --build-arg RUNTIME_IMAGE=mirror.gcr.io/library/alpine:3.18 .
 ```
 
-## 验证范围
+## Validation Scope
 
-新增测试覆盖真实应用创世初始化、首块执行、IBC 路由，以及通过已注册升级处理器
-迁移旧 DenomTrace 编码并保持 IBC 资产 denom 不变。合成 LSM 状态测试检查升级
-处理器清理旧 staking 字段和记录，同时保留 bank 凭证、底层委托及奖励关联。
-仓库现有测试用于检查本地模块和 CLI 的兼容性。
+The added tests cover real application genesis initialization, first-block
+execution, IBC routing, and migration of the legacy DenomTrace encoding through
+the registered upgrade handler while preserving IBC asset denoms. A synthetic
+LSM state test checks that the handler clears legacy staking fields and records
+while preserving bank balances, underlying delegations, and reward-owner
+associations. The existing repository tests check compatibility of local modules
+and the CLI.
 
-这些检查没有使用生产链数据库快照。生产升级前仍需用目标链快照演练升级高度、
-已有 IBC 通道/客户端和存量 LSM 资产的处置；普通单元测试不能证明这些链上状态
-已完成验证。
+The upgrade rehearsal used the mainnet startup `genesis.json` as its base and
+successfully upgraded the three tokenize-share records it contained. The file
+was modified for the local single-validator rehearsal, including repair of
+slashing signing information; this was not an unmodified production snapshot
+rehearsal. Before a production upgrade, rehearse at the target height with a
+complete target-chain snapshot, including existing IBC channels and clients and
+the handling of remaining LSM assets. Unit tests alone cannot verify those
+chain-specific states.
 
-参考：[SDK 升级说明](https://github.com/cosmos/cosmos-sdk/blob/v0.53.8/UPGRADING.md)、
-[IBC v8.1 到 v10 升级说明](https://docs.cosmos.network/ibc/next/migrations/v8_1-to-v10)。
+References: [SDK upgrade guide](https://github.com/cosmos/cosmos-sdk/blob/v0.53.8/UPGRADING.md),
+[IBC v8.1 to v10 migration guide](https://docs.cosmos.network/ibc/next/migrations/v8_1-to-v10).
