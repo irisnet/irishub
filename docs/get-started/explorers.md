@@ -12,3 +12,4 @@ These block explorers allow you to search, view and analyze IRIS Hub data—like
 - [Mintscan](https://irishub.mintscan.io/)
 - [LOOK](https://iris.ping.pub/#/validator)
 - [ATOMScan](https://atomscan.com/iris-network)
+- [Valopers](https://iris.valopers.com)
