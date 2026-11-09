@@ -382,12 +382,18 @@ def collect_object_id(s):
     return value
 
 
-def collect_asset_ids(s):
+def collect_asset_ids(s, id_field='id'):
     if copy_null(s):
         return []
     ids = []
     for _ in iter_array(s):
-        ids.append(collect_object_id(s))
+        value = None
+        for key in iter_members(s):
+            if key == id_field:
+                value = read_json_value(s)
+            else:
+                scan_value(s)
+        ids.append(value)
     return ids
 
 
@@ -417,12 +423,15 @@ def collect_owner_denom_ids(s):
                 continue
             for denom_index, _ in enumerate(iter_array(s)):
                 denom_id = None
+                balance_ids = []
                 for denom_key in iter_members(s):
                     if denom_key == 'denom_id':
                         denom_id = read_json_value(s)
+                    elif denom_key == 'balances':
+                        balance_ids = collect_asset_ids(s, 'mt_id')
                     else:
                         scan_value(s)
-                result[(owner_index, denom_index)] = denom_id
+                result[(owner_index, denom_index)] = (denom_id, balance_ids)
     return result
 
 
@@ -444,30 +453,20 @@ def collect_module_ids(path, module):
     return collections, owner_denoms
 
 
-def shortened_id(module, field, value):
+NFT_TOKEN_ID = re.compile(r'[a-z][a-zA-Z0-9/]{2,100}').fullmatch
+MT_ID = re.compile(r'[a-zA-Z0-9][a-zA-Z0-9/]{2,100}').fullmatch
+
+
+def valid_asset_id(module, value):
     if not isinstance(value, str):
-        return value
-    # NFT's validator explicitly exempts tibc- collection denoms, including
-    # their length. Token IDs and all MT IDs follow the 101-character policy.
-    if module == 'nft' and field == 'denom.id' and value.startswith('tibc-'):
-        return value
-    return value[:101] if len(value) > 101 else value
+        return False
+    return (NFT_TOKEN_ID(value) if module == 'nft' else MT_ID(value)) is not None
 
 
-def build_id_map(module, field, values, namespace):
-    mapping = {}
-    targets = {}
-    for old in values:
-        if not isinstance(old, str):
-            continue
-        new = shortened_id(module, field, old)
-        previous = targets.get(new)
-        if previous is not None and previous != old:
-            raise ValueError('%s %s collision in %s: %r and %r both map to %r'
-                             % (module, field, namespace, previous, old, new))
-        targets[new] = old
-        mapping[old] = new
-    return mapping
+def valid_denom_id(module, value):
+    if module == 'nft' and isinstance(value, str) and value.startswith('tibc-'):
+        return True
+    return valid_asset_id(module, value)
 
 
 def write_key(out, key, wrote):
@@ -477,82 +476,66 @@ def write_key(out, key, wrote):
     out.write(b':')
 
 
-def rewrite_id_object(s, out, field, mapping):
-    out.write(b'{')
-    wrote = False
-    for key in iter_members(s):
-        write_key(out, key, wrote)
-        wrote = True
-        if key == field:
-            old = read_json_value(s)
-            out.write(json.dumps(mapping.get(old, old)).encode('utf-8'))
-        else:
-            scan_value(s, out)
-    out.write(b'}')
-
-
-def rewrite_asset_array(s, out, mapping, field='id'):
+def rewrite_asset_array(s, out, keep_items=None):
     if copy_null(s, out):
         return
     out.write(b'[')
     first = True
-    for _ in iter_array(s):
+    for index, _ in enumerate(iter_array(s)):
+        if keep_items is not None and not keep_items[index]:
+            scan_value(s)
+            continue
         if not first:
             out.write(b',')
         first = False
-        rewrite_id_object(s, out, field, mapping)
+        scan_value(s, out)
     out.write(b']')
 
 
-def rewrite_collection(s, out, module, denom_id, denom_map, asset_map):
+def rewrite_collection(s, out, module, keep_items):
     asset_field = 'nfts' if module == 'nft' else 'mts'
     out.write(b'{')
     wrote = False
     for key in iter_members(s):
         write_key(out, key, wrote)
         wrote = True
-        if key == 'denom':
-            rewrite_id_object(s, out, 'id', denom_map)
-        elif key == asset_field:
-            rewrite_asset_array(s, out, asset_map)
+        if key == asset_field:
+            rewrite_asset_array(s, out, keep_items)
         else:
             scan_value(s, out)
     out.write(b'}')
 
 
-def rewrite_collections(s, out, module, collections, denom_map, asset_maps):
+def rewrite_collections(s, out, module, keep_collections, keep_items):
     if copy_null(s, out):
         return
     out.write(b'[')
     first = True
     for index, _ in enumerate(iter_array(s)):
+        if not keep_collections[index]:
+            scan_value(s)
+            continue
         if not first:
             out.write(b',')
         first = False
-        denom_id = collections[index][0]
-        rewrite_collection(s, out, module, denom_id, denom_map,
-                           asset_maps[index])
+        rewrite_collection(s, out, module, keep_items[index])
     out.write(b']')
 
 
-def rewrite_mt_denom_balance(s, out, original_denom, denom_map, asset_refs):
-    mt_map = asset_refs.get(original_denom, {})
+def rewrite_mt_denom_balance(s, out, keep_balances):
     out.write(b'{')
     wrote = False
     for key in iter_members(s):
         write_key(out, key, wrote)
         wrote = True
-        if key == 'denom_id':
-            old = read_json_value(s)
-            out.write(json.dumps(denom_map.get(old, old)).encode('utf-8'))
-        elif key == 'balances':
-            rewrite_asset_array(s, out, mt_map, 'mt_id')
+        if key == 'balances':
+            rewrite_asset_array(s, out, keep_balances)
         else:
             scan_value(s, out)
     out.write(b'}')
 
 
-def rewrite_mt_owners(s, out, owner_denoms, denom_map, asset_refs):
+def rewrite_mt_owners(s, out, keep_denoms, keep_balances):
     if copy_null(s, out):
         return
     out.write(b'[')
@@ -574,12 +557,15 @@ def rewrite_mt_owners(s, out, owner_denoms, denom_map, asset_refs):
             out.write(b'[')
             first_denom = True
             for denom_index, _ in enumerate(iter_array(s)):
+                context = (owner_index, denom_index)
+                if not keep_denoms.get(context, False):
+                    scan_value(s)
+                    continue
                 if not first_denom:
                     out.write(b',')
                 first_denom = False
-                original = owner_denoms.get((owner_index, denom_index))
-                rewrite_mt_denom_balance(s, out, original, denom_map,
-                                         asset_refs)
+                rewrite_mt_denom_balance(s, out,
+                                         keep_balances.get(context, []))
             out.write(b']')
         out.write(b'}')
     out.write(b']')
@@ -592,30 +578,77 @@ def cmd_sanitize_ids(src, dst, module):
     # The first pass holds only IDs and positional context. It does not load a
     # collection, owner, or the full (potentially hundreds-of-MB) fragment.
     collections, owner_denoms = collect_module_ids(src, module)
-    denom_values = [denom for denom, _ in collections]
-    denom_map = build_id_map(module, 'denom.id', denom_values, 'module')
-    asset_field = 'nft.id' if module == 'nft' else 'mts.id'
-    asset_maps = []
-    asset_refs = {}
-    for index, (denom_id, ids) in enumerate(collections):
-        mapping = build_id_map(module, asset_field, ids,
-                               'collection %r' % denom_id)
-        asset_maps.append(mapping)
-        if denom_id is not None:
-            asset_refs.setdefault(denom_id, {}).update(mapping)
+    asset_label = 'NFT' if module == 'nft' else 'MT'
+    keep_collections = []
+    keep_items = []
+    dropped_collections = []
+    dropped_assets = []
+    for denom_id, ids in collections:
+        keep_collection = valid_denom_id(module, denom_id)
+        keep_collections.append(keep_collection)
+        if not keep_collection:
+            keep_items.append([False] * len(ids))
+            dropped_collections.append((denom_id, ids))
+            continue
+        keep = []
+        for old in ids:
+            valid = valid_asset_id(module, old)
+            keep.append(valid)
+            if not valid:
+                dropped_assets.append((denom_id, old))
+        keep_items.append(keep)
 
-    # All collision checks finish before the destination exists. The caller
-    # can therefore replace the fragment atomically only after a full rewrite.
-    for old, new in denom_map.items():
-        if old != new:
-            print('%s ids: denom.id %r -> %r' % (module, old, new),
+    keep_owner_denoms = {}
+    keep_owner_balances = {}
+    dropped_owner_denoms = 0
+    dropped_owner_balances = 0
+    if module == 'mt':
+        for context, (denom_id, ids) in owner_denoms.items():
+            keep_denom = valid_denom_id(module, denom_id)
+            keep_owner_denoms[context] = keep_denom
+            if not keep_denom:
+                keep_owner_balances[context] = [False] * len(ids)
+                dropped_owner_denoms += 1
+                dropped_owner_balances += len(ids)
+                print('mt ids: owner denom reference %s dropped (does not match '
+                      '[a-zA-Z0-9][a-zA-Z0-9/]{2,100})'
+                      % json.dumps(denom_id, ensure_ascii=False), file=sys.stderr)
+                for value in ids:
+                    print('mt ids: owner balance %s/%s dropped (owner denom is '
+                          'invalid)'
+                          % (json.dumps(denom_id, ensure_ascii=False),
+                             json.dumps(value, ensure_ascii=False)),
+                          file=sys.stderr)
+                continue
+            mask = [valid_asset_id(module, value) for value in ids]
+            keep_owner_balances[context] = mask
+            for value, keep in zip(ids, mask):
+                if not keep:
+                    dropped_owner_balances += 1
+                    print('mt ids: owner balance %s/%s dropped (MT ID does not '
+                          'match [a-zA-Z0-9][a-zA-Z0-9/]{2,100})'
+                          % (json.dumps(denom_id, ensure_ascii=False),
+                             json.dumps(value, ensure_ascii=False)),
+                          file=sys.stderr)
+
+    for denom_id, ids in dropped_collections:
+        print('%s ids: collection denom %s dropped (does not match %s)'
+              % (module, json.dumps(denom_id, ensure_ascii=False),
+                 '[a-z][a-zA-Z0-9/]{2,100} or tibc- prefix'
+                 if module == 'nft'
+                 else '[a-zA-Z0-9][a-zA-Z0-9/]{2,100}'), file=sys.stderr)
+        for old in ids:
+            print('%s ids: collection %s %s ID %s dropped '
+                  '(collection denom is invalid)'
+                  % (module, json.dumps(denom_id, ensure_ascii=False),
+                     asset_label, json.dumps(old, ensure_ascii=False)),
                   file=sys.stderr)
-    for index, mapping in enumerate(asset_maps):
-        for old, new in mapping.items():
-            if old != new:
-                print('%s ids: %s %r -> %r (collection %r)'
-                      % (module, asset_field, old, new,
-                         collections[index][0]), file=sys.stderr)
+    for denom_id, old in dropped_assets:
+        print('%s ids: collection %s %s ID %s dropped (does not match %s)'
+              % (module, json.dumps(denom_id, ensure_ascii=False), asset_label,
+                 json.dumps(old, ensure_ascii=False),
+                 '[a-z][a-zA-Z0-9/]{2,100}' if module == 'nft'
+                 else '[a-zA-Z0-9][a-zA-Z0-9/]{2,100}'), file=sys.stderr)
 
     s = Stream(src)
     with open(dst, 'wb') as out:
@@ -625,17 +658,25 @@ def cmd_sanitize_ids(src, dst, module):
             write_key(out, key, wrote)
             wrote = True
             if key == 'collections':
-                rewrite_collections(s, out, module, collections, denom_map,
-                                    asset_maps)
+                rewrite_collections(s, out, module, keep_collections,
+                                    keep_items)
             elif module == 'mt' and key == 'owners':
-                rewrite_mt_owners(s, out, owner_denoms, denom_map, asset_refs)
+                rewrite_mt_owners(s, out, keep_owner_denoms,
+                                  keep_owner_balances)
             else:
                 scan_value(s, out)
         out.write(b'}\n')
-    changed = (sum(old != new for old, new in denom_map.items())
-               + sum(old != new for mapping in asset_maps
-                     for old, new in mapping.items()))
-    print('%s ID sanitize: %d change(s)' % (module, changed), file=sys.stderr)
+    dropped_asset_count = (len(dropped_assets)
+                           + sum(len(ids) for _, ids in dropped_collections))
+    summary = ('%s ID sanitize: %d invalid collection(s) dropped, '
+               '%d %s record(s) dropped'
+               % (module, len(dropped_collections), dropped_asset_count,
+                  asset_label))
+    if module == 'mt':
+        summary += (', %d owner denom reference(s) dropped, '
+                    '%d owner balance reference(s) dropped'
+                    % (dropped_owner_denoms, dropped_owner_balances))
+    print(summary, file=sys.stderr)
     return 0
 
 
@@ -1488,10 +1529,10 @@ fi
 
 ### native NFT / MT ID sanitize ##############################################
 
-# Legacy native NFT IDs can exceed the target module's 101-character limit.
-# Apply the same recovery policy to MT IDs, updating MT owner references too.
-# The streaming tool checks every target namespace for collisions before it
-# creates the replacement fragment; raw export partials remain untouched.
+# Drop native NFT / MT collections and asset records whose original IDs do not
+# satisfy the recovery policy, and drop matching MT owner references. Native
+# MT IDs may start with a digit because they are SHA-256 hex strings. Raw
+# export partials remain untouched; only the split fragments are rewritten.
 for ASSET_MODULE in nft mt; do
   if [[ -n ${FRAG_FILE[$ASSET_MODULE]:-} ]]; then
     ASSET_FRAG=${FRAG_FILE[$ASSET_MODULE]}

@@ -170,38 +170,39 @@ class GovSanitizerTest(unittest.TestCase):
 
 
 class AssetIdSanitizerTest(unittest.TestCase):
-    def test_nft_truncates_overlong_ids_and_keeps_boundary_and_tibc_denom(self):
+    def test_nft_drops_overlong_ids_and_keeps_boundary_and_tibc_denom(self):
         keep = "a" * 101
         long_id = "b" * 102
         tibc = "tibc-" + "c" * 120
         state = {"collections": [
-            {"nfts": [{"id": long_id, "owner": "owner", "data": "payload"}],
+            {"nfts": [{"id": "validToken", "owner": "owner"}],
              "denom": {"id": long_id, "name": "long"}, "extra": {"x": 1}},
             {"denom": {"id": keep}, "nfts": [{"id": keep, "owner": "owner"}]},
-            {"denom": {"id": tibc}, "nfts": []},
+            {"denom": {"id": tibc}, "nfts": [{"id": "tibcToken", "owner": "owner"}]},
+            {"denom": {"id": "tokens"}, "nfts": [{"id": long_id, "owner": "owner"}]},
         ]}
         result, fixed = run_id_sanitizer("nft", state)
         self.assertEqual(0, result.returncode)
-        self.assertEqual(long_id[:101], fixed["collections"][0]["denom"]["id"])
-        self.assertEqual(long_id[:101], fixed["collections"][0]["nfts"][0]["id"])
-        self.assertEqual("payload", fixed["collections"][0]["nfts"][0]["data"])
-        self.assertEqual({"x": 1}, fixed["collections"][0]["extra"])
-        self.assertEqual(keep, fixed["collections"][1]["denom"]["id"])
-        self.assertEqual(tibc, fixed["collections"][2]["denom"]["id"])
+        self.assertEqual([keep, tibc, "tokens"],
+                         [c["denom"]["id"] for c in fixed["collections"]])
+        self.assertEqual(keep, fixed["collections"][0]["nfts"][0]["id"])
+        self.assertEqual("tibcToken", fixed["collections"][1]["nfts"][0]["id"])
+        self.assertEqual([], fixed["collections"][2]["nfts"])
 
-    def test_same_truncated_token_id_is_allowed_in_different_collections(self):
+    def test_overlong_tokens_drop_without_cross_collection_collision(self):
         token = "z" * 102
         state = {"collections": [
             {"denom": {"id": "alpha"}, "nfts": [{"id": token, "owner": "one"}]},
             {"nfts": [{"id": token, "owner": "two"}], "denom": {"id": "beta"}},
         ]}
         _, fixed = run_id_sanitizer("nft", state)
-        self.assertEqual(token[:101], fixed["collections"][0]["nfts"][0]["id"])
-        self.assertEqual(token[:101], fixed["collections"][1]["nfts"][0]["id"])
+        self.assertEqual([], fixed["collections"][0]["nfts"])
+        self.assertEqual([], fixed["collections"][1]["nfts"])
 
-    def test_mt_updates_definitions_and_references_without_changing_amounts(self):
-        denom = "d" * 102
-        mt_id = "m" * 102
+    def test_mt_keeps_digit_leading_native_hex_ids_and_field_order(self):
+        denom = "259edd57e552854d42bc4a0d98dc7a48fddeae343ad428c9df1d4b09e0ab525a"
+        mt_id = "9" + "b" * 63
+        boundary = "A" * 101
         state = {
             "owners": [{"address": "owner", "denoms": [{
                 "balances": [{"amount": "7", "mt_id": mt_id, "memo": "keep"}],
@@ -210,49 +211,50 @@ class AssetIdSanitizerTest(unittest.TestCase):
             "collections": [{
                 "mts": [{"id": mt_id, "supply": "7", "data": "AA=="}],
                 "denom": {"id": denom, "name": "D"},
-            }],
+            }, {"denom": {"id": boundary},
+                "mts": [{"id": boundary, "supply": "0"}]}],
         }
         _, fixed = run_id_sanitizer("mt", state)
         owner_denom = fixed["owners"][0]["denoms"][0]
-        self.assertEqual(denom[:101], fixed["collections"][0]["denom"]["id"])
-        self.assertEqual(mt_id[:101], fixed["collections"][0]["mts"][0]["id"])
-        self.assertEqual(denom[:101], owner_denom["denom_id"])
-        self.assertEqual(mt_id[:101], owner_denom["balances"][0]["mt_id"])
+        self.assertEqual(denom, fixed["collections"][0]["denom"]["id"])
+        self.assertEqual(mt_id, fixed["collections"][0]["mts"][0]["id"])
+        self.assertEqual(denom, owner_denom["denom_id"])
+        self.assertEqual(mt_id, owner_denom["balances"][0]["mt_id"])
         self.assertEqual("7", owner_denom["balances"][0]["amount"])
         self.assertEqual("7", fixed["collections"][0]["mts"][0]["supply"])
         self.assertEqual("keep", owner_denom["balances"][0]["memo"])
+        self.assertEqual(boundary, fixed["collections"][1]["denom"]["id"])
+        self.assertEqual(boundary, fixed["collections"][1]["mts"][0]["id"])
 
         _, again = run_id_sanitizer("mt", fixed)
         self.assertEqual(fixed, again)
 
-    def test_rejects_long_long_denom_collision_without_output(self):
+    def test_invalid_overlong_denoms_drop_without_collision(self):
         prefix = "c" * 101
         state = {"collections": [
             {"denom": {"id": prefix + "x"}, "nfts": []},
             {"denom": {"id": prefix + "y"}, "nfts": []},
         ]}
-        result, fixed = run_id_sanitizer("nft", state, check=False)
-        self.assertNotEqual(0, result.returncode)
-        self.assertIsNone(fixed)
-        self.assertIn("collision", result.stderr)
+        result, fixed = run_id_sanitizer("nft", state)
+        self.assertEqual([], fixed["collections"])
+        self.assertIn("2 invalid collection(s) dropped", result.stderr)
 
-    def test_rejects_long_short_token_collision_without_output(self):
+    def test_overlong_token_drops_without_collision_with_valid_token(self):
         prefix = "q" * 101
         state = {"collections": [{"denom": {"id": "denom"}, "nfts": [
             {"id": prefix + "x", "owner": "one"},
             {"id": prefix, "owner": "two"},
         ]}]}
-        result, fixed = run_id_sanitizer("nft", state, check=False)
-        self.assertNotEqual(0, result.returncode)
-        self.assertIsNone(fixed)
-        self.assertIn("collision", result.stderr)
+        _, fixed = run_id_sanitizer("nft", state)
+        self.assertEqual([prefix],
+                         [nft["id"] for nft in fixed["collections"][0]["nfts"]])
 
     def test_empty_state_and_unknown_mt_references_are_not_invented(self):
         _, empty = run_id_sanitizer("mt", {"owners": [], "collections": []})
         self.assertEqual({"owners": [], "collections": []}, empty)
 
-        unknown_denom = "u" * 102
-        unknown_mt = "v" * 102
+        unknown_denom = "unknownDenom"
+        unknown_mt = "unknownToken"
         state = {"owners": [{"denoms": [{
             "denom_id": unknown_denom,
             "balances": [{"mt_id": unknown_mt, "amount": "9"}],
@@ -267,6 +269,127 @@ class AssetIdSanitizerTest(unittest.TestCase):
             "nft", {"collections": [{"denom": {"id": "valid"},
                                        "nfts": None}]})
         self.assertIsNone(null_assets["collections"][0]["nfts"])
+
+    def test_nft_drops_invalid_character_ids_in_any_array_position(self):
+        reported = "9«Dã¦ïOF­%`U-%"
+        state = {"collections": [
+            {"denom": {"id": "mixed"}, "nfts": [
+                {"id": reported, "owner": "drop-first", "data": "bad"},
+                {"id": "validToken", "owner": "keep", "data": "payload"},
+                {"id": "bad%middle", "owner": "drop-middle"},
+                {"id": "validLast", "owner": "keep-last"},
+                {"id": "bad-last!", "owner": "drop-last"},
+            ]},
+            {"denom": {"id": "allbad"}, "nfts": [
+                {"id": "%bad", "owner": "one"},
+                {"id": "also_bad", "owner": "two"},
+            ]},
+        ]}
+        result, fixed = run_id_sanitizer("nft", state)
+        self.assertIn(reported, result.stderr)
+        self.assertEqual(["validToken", "validLast"],
+                         [nft["id"] for nft in fixed["collections"][0]["nfts"]])
+        self.assertEqual("payload", fixed["collections"][0]["nfts"][0]["data"])
+        self.assertEqual([], fixed["collections"][1]["nfts"])
+        self.assertIn("0 invalid collection(s) dropped, 5 NFT record(s) dropped",
+                      result.stderr)
+
+        _, again = run_id_sanitizer("nft", fixed)
+        self.assertEqual(fixed, again)
+
+    def test_nft_filters_original_ids_without_collision_checks(self):
+        invalid_prefix = "bad%" + "x" * 97
+        valid_boundary = "s" * 101
+        state = {"collections": [{"denom": {"id": "denom"}, "nfts": [
+            {"id": invalid_prefix + "a", "owner": "drop-one"},
+            {"id": invalid_prefix + "b", "owner": "drop-two"},
+            {"id": valid_boundary + "tail", "owner": "drop-long"},
+        ]}]}
+        _, fixed = run_id_sanitizer("nft", state)
+        self.assertEqual([], fixed["collections"][0]["nfts"])
+
+        collision = {"collections": [{"denom": {"id": "denom"}, "nfts": [
+            {"id": valid_boundary + "%", "owner": "drop-invalid"},
+            {"id": valid_boundary, "owner": "keep-valid"},
+        ]}]}
+        _, fixed = run_id_sanitizer("nft", collision)
+        self.assertEqual([valid_boundary],
+                         [nft["id"] for nft in fixed["collections"][0]["nfts"]])
+
+    def test_invalid_denom_drops_collection_and_all_nested_records(self):
+        state = {"collections": [
+            {"denom": {"id": "bad_denom", "name": "drop"}, "nfts": [
+                {"id": "validOne", "owner": "one"},
+                {"id": "bad%two", "owner": "two"},
+            ]},
+            {"denom": {"id": "valid"}, "nfts": []},
+        ]}
+        result, fixed = run_id_sanitizer("nft", state)
+        self.assertEqual(["valid"],
+                         [c["denom"]["id"] for c in fixed["collections"]])
+        self.assertIn("collection denom", result.stderr)
+        self.assertIn("1 invalid collection(s) dropped, 2 NFT record(s) dropped",
+                      result.stderr)
+
+    def test_mt_drops_invalid_definitions_and_matching_owner_refs(self):
+        long_denom = "d" * 102
+        long_mt = "m" * 102
+        state = {
+            "owners": [{"address": "owner", "denoms": [
+                {"denom_id": "bad_denom", "balances": [
+                    {"mt_id": "nestedToken", "amount": "1"}]},
+                {"denom_id": long_denom, "balances": [
+                    {"mt_id": "nestedToken", "amount": "2"}]},
+                {"balances": [
+                    {"mt_id": "bad%token", "amount": "3"},
+                    {"mt_id": "validToken", "amount": "7", "memo": "keep"},
+                    {"mt_id": long_mt, "amount": "4"},
+                ], "denom_id": "validDenom"},
+            ]}, {"address": "empty", "denoms": [{
+                "denom_id": "bad_denom",
+                "balances": [{"mt_id": "nestedToken", "amount": "5"}],
+            }]}],
+            "collections": [
+                {"denom": {"id": "bad_denom"},
+                 "mts": [{"id": "nestedToken", "supply": "1"}]},
+                {"denom": {"id": long_denom},
+                 "mts": [{"id": "nestedToken", "supply": "2"}]},
+                {"mts": [
+                    {"id": "bad%token", "supply": "3"},
+                    {"id": "validToken", "supply": "7", "data": "keep"},
+                    {"id": long_mt, "supply": "4"},
+                 ], "denom": {"id": "validDenom"}},
+            ],
+        }
+        result, fixed = run_id_sanitizer("mt", state)
+        self.assertEqual(["validDenom"],
+                         [c["denom"]["id"] for c in fixed["collections"]])
+        self.assertEqual(["validToken"],
+                         [mt["id"] for mt in fixed["collections"][0]["mts"]])
+        self.assertEqual("7", fixed["collections"][0]["mts"][0]["supply"])
+        self.assertEqual("keep", fixed["collections"][0]["mts"][0]["data"])
+        denoms = fixed["owners"][0]["denoms"]
+        self.assertEqual(["validDenom"], [d["denom_id"] for d in denoms])
+        self.assertEqual(["validToken"],
+                         [b["mt_id"] for b in denoms[0]["balances"]])
+        self.assertEqual("7", denoms[0]["balances"][0]["amount"])
+        self.assertEqual("keep", denoms[0]["balances"][0]["memo"])
+        self.assertEqual({"address": "empty", "denoms": []}, fixed["owners"][1])
+        self.assertIn("2 invalid collection(s) dropped, 4 MT record(s) dropped",
+                      result.stderr)
+        self.assertIn("3 owner denom reference(s) dropped", result.stderr)
+        self.assertIn("5 owner balance reference(s) dropped", result.stderr)
+
+    def test_same_valid_asset_id_in_different_collections_is_retained(self):
+        state = {"collections": [
+            {"denom": {"id": "alpha"},
+             "nfts": [{"id": "sameToken", "owner": "one"}]},
+            {"denom": {"id": "beta"},
+             "nfts": [{"id": "sameToken", "owner": "two"}]},
+        ]}
+        _, fixed = run_id_sanitizer("nft", state)
+        self.assertEqual(["sameToken", "sameToken"],
+                         [c["nfts"][0]["id"] for c in fixed["collections"]])
 
 
 if __name__ == "__main__":

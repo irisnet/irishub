@@ -251,13 +251,14 @@ normal overhead (irishub-1 validators ran on small machines for seven years).
 > was not discarded — it remains verifiable on the old-chain archive nodes
 > (see section 5).
 
-### 4.3 Legacy data fixes (minimal changes required by new-version validation, all logged)
+### 4.3 Legacy data fixes (minimal recovery changes, all logged)
 
 | Fix | Contents |
 |---|---|
 | bank denom_metadata | filled blank name/symbol, sorted denom units by exponent, removed duplicate denoms/exponents, rebuilt non-conforming unit lists, and applied display fallback (display fields only; balances untouched) |
 | gov params | invalid `expedited_min_deposit` reset to 5× `min_deposit`; invalid `expedited_voting_period` reset to half `voting_period` |
-| native NFT / MT IDs | IDs longer than 101 characters are shortened by removing trailing excess characters; MT owner references are updated to the same IDs |
+| native NFT IDs | collections with invalid denom IDs and NFT records with invalid token IDs are dropped; denom IDs retain the module's `tibc-` exemption |
+| native MT IDs | collections and MT records outside the recovery policy `[a-zA-Z0-9][a-zA-Z0-9/]{2,100}` are dropped together with their owner references |
 | evm account filter | dropped evm entries with no matching auth account (unreachable dead data) |
 | staking counter | aligned `total_liquid_staked_tokens` with the sum of validator liquid_shares (1-unit-level historical drift) |
 
@@ -265,13 +266,15 @@ The `consensus`, `MT`, `NFT`, and `params` modules expose no genesis export
 interface, so they enter the new chain with default empty values. Note the
 case sensitivity: uppercase `MT` / `NFT` are the TIBC cross-chain transfer apps
 (cleared together with `tibc` under section 4.2), **not** the native `mt` /
-`nft` modules. Native asset records, ownership, supply, and metadata are
-preserved, but overlong IDs are renamed by the rule above. Overlong `tibc-`
-NFT collection denoms retain their existing validator exemption and are not
-renamed. The 101-character MT rule is this recovery's matching-ID policy, not
-an MT runtime validation requirement. If shortening would collide with any
-existing ID in the same namespace, export stops without merging or dropping
-assets.
+`nft` modules. Native records with valid IDs retain their ownership, supply,
+and metadata. Invalid NFT/MT asset IDs cause only those asset records to be
+dropped; an invalid collection denom causes the collection and its nested
+assets to be dropped. MT owner references to dropped IDs are removed as well.
+NFT collection denoms retain the module's existing `tibc-` exemption. The MT
+rule is a recovery policy rather than a runtime validation rule; its first
+character allows digits because native SHA-256 hex IDs can start with one.
+With `RESUME=1`, the script re-splits the unchanged export partials before
+sanitizing, so reruns apply the current policy to the original IDs.
 `consensus` carries no genesis state by design.
 
 ---
