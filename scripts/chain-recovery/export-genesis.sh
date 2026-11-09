@@ -20,14 +20,14 @@
 #      manager because they implement no genesis interfaces) fall back to
 #      their fresh default;
 #   3. sanitizes legacy chain data that the v0.50 genesis validation rejects
-#      (blank bank denom_metadata name/symbol, unusable denom units, gov
-#      expedited_min_deposit <= min_deposit), logging every change;
+#      (blank bank denom_metadata name/symbol, unusable denom units, invalid
+#      gov expedited deposit / voting period), logging every change;
 #   4. validates each exported module by building a "padded" genesis — the
 #      fresh defaults with that one module replaced by the exported fragment
 #      (`iris genesis validate` requires every module section to be present,
 #      so a bare partial cannot be validated directly) — and reports ALL
 #      module failures at once;
-#   5. asserts chain_id / initial_height / uiris supply with streaming tools
+#   5. asserts chain_id / initial_height / configured-denom supply with streaming tools
 #      (no jq slurpfile on the huge final file).
 #
 # Note: `iris export` runs service.PrepForZeroHeightGenesis on every run
@@ -37,7 +37,8 @@
 #
 # Env:
 #   IRIS_BIN, OLD_HOME, OUT_DIR,
-#   NEW_CHAIN_ID, EXPORT_HEIGHT, EXPECTED_INITIAL_HEIGHT, EXPECTED_SUPPLY
+#   NEW_CHAIN_ID, EXPORT_HEIGHT, EXPECTED_INITIAL_HEIGHT, EXPECTED_SUPPLY,
+#   SUPPLY_DENOM (defaults to uiris)
 #       — same meaning as before.
 #   MODULE_GROUPS  optional: newline-separated groups of comma-joined module
 #                 names, one `iris export` run per group. Default: one module
@@ -57,6 +58,7 @@ NEW_CHAIN_ID=${NEW_CHAIN_ID:-irishub-2}
 EXPORT_HEIGHT=${EXPORT_HEIGHT:-37242247}
 EXPECTED_INITIAL_HEIGHT=${EXPECTED_INITIAL_HEIGHT:-37242248}
 EXPECTED_SUPPLY=${EXPECTED_SUPPLY:-2156713998266827}
+SUPPLY_DENOM=${SUPPLY_DENOM:-uiris}
 
 # cross-chain modules whose state is reset to fresh-init defaults instead of
 # being exported: the IBC/TIBC client & connection state of the legacy chain
@@ -348,6 +350,293 @@ def cmd_subkeys(path, container):
         scan_value(s)
     sys.stderr.write('container not found: %s\n' % container)
     return 3
+
+
+def read_json_value(s):
+    bio = io.BytesIO()
+    scan_value(s, bio)
+    return json.loads(bio.getvalue().decode('utf-8', 'surrogateescape'))
+
+
+def copy_null(s, out=None):
+    s.skipws()
+    if s.peek() != b'n':
+        return False
+    bio = io.BytesIO()
+    scan_value(s, bio)
+    raw = bio.getvalue()
+    if raw != b'null':
+        raise ValueError('expected array or null, got %r' % raw)
+    if out is not None:
+        out.write(raw)
+    return True
+
+
+def collect_object_id(s):
+    value = None
+    for key in iter_members(s):
+        if key == 'id':
+            value = read_json_value(s)
+        else:
+            scan_value(s)
+    return value
+
+
+def collect_asset_ids(s):
+    if copy_null(s):
+        return []
+    ids = []
+    for _ in iter_array(s):
+        ids.append(collect_object_id(s))
+    return ids
+
+
+def collect_collection_ids(s, asset_field):
+    denom_id = None
+    asset_ids = []
+    for key in iter_members(s):
+        if key == 'denom':
+            denom_id = collect_object_id(s)
+        elif key == asset_field:
+            asset_ids = collect_asset_ids(s)
+        else:
+            scan_value(s)
+    return denom_id, asset_ids
+
+
+def collect_owner_denom_ids(s):
+    result = {}
+    if copy_null(s):
+        return result
+    for owner_index, _ in enumerate(iter_array(s)):
+        for key in iter_members(s):
+            if key != 'denoms':
+                scan_value(s)
+                continue
+            if copy_null(s):
+                continue
+            for denom_index, _ in enumerate(iter_array(s)):
+                denom_id = None
+                for denom_key in iter_members(s):
+                    if denom_key == 'denom_id':
+                        denom_id = read_json_value(s)
+                    else:
+                        scan_value(s)
+                result[(owner_index, denom_index)] = denom_id
+    return result
+
+
+def collect_module_ids(path, module):
+    asset_field = 'nfts' if module == 'nft' else 'mts'
+    collections = []
+    owner_denoms = {}
+    s = Stream(path)
+    for key in iter_members(s):
+        if key == 'collections':
+            if copy_null(s):
+                continue
+            for _ in iter_array(s):
+                collections.append(collect_collection_ids(s, asset_field))
+        elif module == 'mt' and key == 'owners':
+            owner_denoms = collect_owner_denom_ids(s)
+        else:
+            scan_value(s)
+    return collections, owner_denoms
+
+
+def shortened_id(module, field, value):
+    if not isinstance(value, str):
+        return value
+    # NFT's validator explicitly exempts tibc- collection denoms, including
+    # their length. Token IDs and all MT IDs follow the 101-character policy.
+    if module == 'nft' and field == 'denom.id' and value.startswith('tibc-'):
+        return value
+    return value[:101] if len(value) > 101 else value
+
+
+def build_id_map(module, field, values, namespace):
+    mapping = {}
+    targets = {}
+    for old in values:
+        if not isinstance(old, str):
+            continue
+        new = shortened_id(module, field, old)
+        previous = targets.get(new)
+        if previous is not None and previous != old:
+            raise ValueError('%s %s collision in %s: %r and %r both map to %r'
+                             % (module, field, namespace, previous, old, new))
+        targets[new] = old
+        mapping[old] = new
+    return mapping
+
+
+def write_key(out, key, wrote):
+    if wrote:
+        out.write(b',')
+    out.write(json.dumps(key).encode('utf-8'))
+    out.write(b':')
+
+
+def rewrite_id_object(s, out, field, mapping):
+    out.write(b'{')
+    wrote = False
+    for key in iter_members(s):
+        write_key(out, key, wrote)
+        wrote = True
+        if key == field:
+            old = read_json_value(s)
+            out.write(json.dumps(mapping.get(old, old)).encode('utf-8'))
+        else:
+            scan_value(s, out)
+    out.write(b'}')
+
+
+def rewrite_asset_array(s, out, mapping, field='id'):
+    if copy_null(s, out):
+        return
+    out.write(b'[')
+    first = True
+    for _ in iter_array(s):
+        if not first:
+            out.write(b',')
+        first = False
+        rewrite_id_object(s, out, field, mapping)
+    out.write(b']')
+
+
+def rewrite_collection(s, out, module, denom_id, denom_map, asset_map):
+    asset_field = 'nfts' if module == 'nft' else 'mts'
+    out.write(b'{')
+    wrote = False
+    for key in iter_members(s):
+        write_key(out, key, wrote)
+        wrote = True
+        if key == 'denom':
+            rewrite_id_object(s, out, 'id', denom_map)
+        elif key == asset_field:
+            rewrite_asset_array(s, out, asset_map)
+        else:
+            scan_value(s, out)
+    out.write(b'}')
+
+
+def rewrite_collections(s, out, module, collections, denom_map, asset_maps):
+    if copy_null(s, out):
+        return
+    out.write(b'[')
+    first = True
+    for index, _ in enumerate(iter_array(s)):
+        if not first:
+            out.write(b',')
+        first = False
+        denom_id = collections[index][0]
+        rewrite_collection(s, out, module, denom_id, denom_map,
+                           asset_maps[index])
+    out.write(b']')
+
+
+def rewrite_mt_denom_balance(s, out, original_denom, denom_map, asset_refs):
+    mt_map = asset_refs.get(original_denom, {})
+    out.write(b'{')
+    wrote = False
+    for key in iter_members(s):
+        write_key(out, key, wrote)
+        wrote = True
+        if key == 'denom_id':
+            old = read_json_value(s)
+            out.write(json.dumps(denom_map.get(old, old)).encode('utf-8'))
+        elif key == 'balances':
+            rewrite_asset_array(s, out, mt_map, 'mt_id')
+        else:
+            scan_value(s, out)
+    out.write(b'}')
+
+
+def rewrite_mt_owners(s, out, owner_denoms, denom_map, asset_refs):
+    if copy_null(s, out):
+        return
+    out.write(b'[')
+    first_owner = True
+    for owner_index, _ in enumerate(iter_array(s)):
+        if not first_owner:
+            out.write(b',')
+        first_owner = False
+        out.write(b'{')
+        wrote = False
+        for key in iter_members(s):
+            write_key(out, key, wrote)
+            wrote = True
+            if key != 'denoms':
+                scan_value(s, out)
+                continue
+            if copy_null(s, out):
+                continue
+            out.write(b'[')
+            first_denom = True
+            for denom_index, _ in enumerate(iter_array(s)):
+                if not first_denom:
+                    out.write(b',')
+                first_denom = False
+                original = owner_denoms.get((owner_index, denom_index))
+                rewrite_mt_denom_balance(s, out, original, denom_map,
+                                         asset_refs)
+            out.write(b']')
+        out.write(b'}')
+    out.write(b']')
+
+
+def cmd_sanitize_ids(src, dst, module):
+    if module not in ('nft', 'mt'):
+        raise ValueError('unsupported ID sanitizer module %r' % module)
+
+    # The first pass holds only IDs and positional context. It does not load a
+    # collection, owner, or the full (potentially hundreds-of-MB) fragment.
+    collections, owner_denoms = collect_module_ids(src, module)
+    denom_values = [denom for denom, _ in collections]
+    denom_map = build_id_map(module, 'denom.id', denom_values, 'module')
+    asset_field = 'nft.id' if module == 'nft' else 'mts.id'
+    asset_maps = []
+    asset_refs = {}
+    for index, (denom_id, ids) in enumerate(collections):
+        mapping = build_id_map(module, asset_field, ids,
+                               'collection %r' % denom_id)
+        asset_maps.append(mapping)
+        if denom_id is not None:
+            asset_refs.setdefault(denom_id, {}).update(mapping)
+
+    # All collision checks finish before the destination exists. The caller
+    # can therefore replace the fragment atomically only after a full rewrite.
+    for old, new in denom_map.items():
+        if old != new:
+            print('%s ids: denom.id %r -> %r' % (module, old, new),
+                  file=sys.stderr)
+    for index, mapping in enumerate(asset_maps):
+        for old, new in mapping.items():
+            if old != new:
+                print('%s ids: %s %r -> %r (collection %r)'
+                      % (module, asset_field, old, new,
+                         collections[index][0]), file=sys.stderr)
+
+    s = Stream(src)
+    with open(dst, 'wb') as out:
+        out.write(b'{')
+        wrote = False
+        for key in iter_members(s):
+            write_key(out, key, wrote)
+            wrote = True
+            if key == 'collections':
+                rewrite_collections(s, out, module, collections, denom_map,
+                                    asset_maps)
+            elif module == 'mt' and key == 'owners':
+                rewrite_mt_owners(s, out, owner_denoms, denom_map, asset_refs)
+            else:
+                scan_value(s, out)
+        out.write(b'}\n')
+    changed = (sum(old != new for old, new in denom_map.items())
+               + sum(old != new for mapping in asset_maps
+                     for old, new in mapping.items()))
+    print('%s ID sanitize: %d change(s)' % (module, changed), file=sys.stderr)
+    return 0
 
 
 CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l'
@@ -677,6 +966,8 @@ def main():
             return cmd_split(sys.argv[2], sys.argv[3], sys.argv[4])
         if mode == 'subkeys' and len(sys.argv) == 4:
             return cmd_subkeys(sys.argv[2], sys.argv[3])
+        if mode == 'sanitize-ids' and len(sys.argv) == 5:
+            return cmd_sanitize_ids(sys.argv[2], sys.argv[3], sys.argv[4])
         if mode == 'filter-evm' and len(sys.argv) == 4:
             return cmd_filter_evm(sys.argv[2], sys.argv[3])
         if mode == 'fix-liquid-stake' and len(sys.argv) == 4:
@@ -904,25 +1195,51 @@ for m in arr:
                        or m.get('base'))
         changes += 1
         print('denom_metadata: %s: symbol <- %r' % (m['base'], m['symbol']), file=sys.stderr)
-    # v0.50 requires the first denom unit to be the base denom (exponent 0);
-    # legacy IBC entries only carry a single exponent-0 unit named after the
-    # source denom, which cannot be expressed under the new rules — rebuild
-    if not m.get('denom_units') or m['denom_units'][0].get('denom') != m.get('base'):
-        old = [(u.get('denom'), u.get('exponent')) for u in m.get('denom_units', [])]
-        m['denom_units'] = [{'denom': m['base'], 'exponent': 0, 'aliases': []}]
+    # Metadata validation requires strictly increasing exponents. Sort first
+    # so an out-of-order but otherwise valid base unit is preserved. For an
+    # exponent collision, prefer the base at exponent 0 and the configured
+    # display at other exponents; these fields are display-only metadata.
+    old_units = m.get('denom_units') or []
+    def unit_order(u):
+        exponent = int(u.get('exponent', 0))
+        preferred = (u.get('denom') == m.get('base') if exponent == 0
+                     else u.get('denom') == m.get('display'))
+        return (exponent, 0 if preferred else 1)
+    sorted_units = sorted(old_units, key=unit_order)
+    if sorted_units != old_units:
+        changes += 1
+        print('denom_metadata: %s: sorted denom units by exponent'
+              % m['base'], file=sys.stderr)
+
+    seen_denoms = set()
+    seen_exponents = set()
+    units = []
+    for u in sorted_units:
+        denom = u.get('denom')
+        exponent = int(u.get('exponent', 0))
+        if denom in seen_denoms:
+            changes += 1
+            print('denom_metadata: %s: dropped duplicate denom unit %r (exponent %s)'
+                  % (m['base'], denom, exponent), file=sys.stderr)
+            continue
+        if exponent in seen_exponents:
+            changes += 1
+            print('denom_metadata: %s: dropped denom unit %r (duplicate exponent %s)'
+                  % (m['base'], denom, exponent), file=sys.stderr)
+            continue
+        seen_denoms.add(denom)
+        seen_exponents.add(exponent)
+        units.append(u)
+    # v0.50 also requires the first unit to be the base at exponent 0.
+    # Legacy IBC entries that have no such unit cannot be represented under
+    # the new rules, so retain the existing fallback to base-only metadata.
+    if (not units or units[0].get('denom') != m.get('base')
+            or int(units[0].get('exponent', 0)) != 0):
+        old = [(u.get('denom'), u.get('exponent')) for u in units]
+        units = [{'denom': m['base'], 'exponent': 0, 'aliases': []}]
         changes += 1
         print('denom_metadata: %s: rebuilt denom_units to [base:0] (legacy units: %s)'
               % (m['base'], old), file=sys.stderr)
-    seen = set()
-    units = []
-    for u in m.get('denom_units', []):
-        if u.get('denom') in seen:
-            changes += 1
-            print('denom_metadata: %s: dropped duplicate denom unit %r (exponent %s)'
-                  % (m['base'], u.get('denom'), u.get('exponent')), file=sys.stderr)
-            continue
-        seen.add(u.get('denom'))
-        units.append(u)
     m['denom_units'] = units
     # display must be one of the denom units; trace-path displays cannot be
     # units (they would need a fabricated exponent), so fall back to base
@@ -946,18 +1263,60 @@ fi
 
 ### gov params sanitize ######################################################
 
-# Legacy gov params can carry expedited_min_deposit <= min_deposit, which
-# the v0.50 genesis validation rejects (it must be strictly greater). Reset
-# it to 5x min_deposit — the SDK's own default ratio (fresh init uses
-# 10000000/50000000 uiris) — so expedited proposals cost 5x a regular
-# deposit until governance changes the param.
+# Legacy gov params can carry expedited_min_deposit <= min_deposit or an
+# expedited_voting_period >= voting_period, both rejected by v0.50 genesis
+# validation. Reset them to the SDK's default ratios: 5x the regular deposit
+# and half the regular voting period.
 if [[ -n ${FRAG_FILE[gov]:-} ]]; then
   GOV_FRAG=${FRAG_FILE[gov]}
   json_tool top "$GOV_FRAG" params > "$WORK/gov-params.json" \
     || die "failed to extract params from the gov fragment"
   python3 - "$WORK/gov-params.json" "$WORK/gov-params-fixed.json" \
     > "$WORK/gov-count.txt" <<'PY3'
-import json, sys
+import json, re, sys
+from decimal import Decimal, InvalidOperation
+
+
+UNIT_NANOS = {
+    'h': 3600 * 1000000000,
+    'm': 60 * 1000000000,
+    's': 1000000000,
+    'ms': 1000000,
+    'us': 1000,
+    'µs': 1000,
+    'ns': 1,
+}
+DURATION_PART = re.compile(r'(\d+(?:\.\d*)?|\.\d+)(ns|us|µs|ms|s|m|h)')
+
+
+def parse_duration_nanos(value):
+    if not isinstance(value, str) or not value:
+        raise ValueError('invalid duration %r' % value)
+    sign = 1
+    if value[0] in '+-':
+        sign = -1 if value[0] == '-' else 1
+        value = value[1:]
+    pos = 0
+    total = Decimal(0)
+    while pos < len(value):
+        match = DURATION_PART.match(value, pos)
+        if not match:
+            raise ValueError('invalid duration %r' % value)
+        try:
+            total += Decimal(match.group(1)) * UNIT_NANOS[match.group(2)]
+        except InvalidOperation:
+            raise ValueError('invalid duration %r' % value)
+        pos = match.end()
+    if total != total.to_integral_value():
+        raise ValueError('duration has sub-nanosecond precision %r' % value)
+    return sign * int(total)
+
+
+def format_duration_nanos(nanos):
+    seconds, fraction = divmod(nanos, 1000000000)
+    if not fraction:
+        return '%ds' % seconds
+    return '%d.%09ds' % (seconds, fraction)
 
 p = json.load(open(sys.argv[1]))
 fixed = 0
@@ -974,11 +1333,40 @@ if min_list:
     if violates:
         new = {'denom': min_d['denom'], 'amount': str(int(min_d['amount']) * 5)}
         p['expedited_min_deposit'] = [new]
-        fixed = 1
+        fixed += 1
         print('gov params: expedited_min_deposit %s -> %s (must be strictly '
               'greater than min_deposit %s; using 5x like the SDK default)'
               % (json.dumps(old), json.dumps(new),
                  min_d['amount'] + min_d['denom']), file=sys.stderr)
+
+regular_text = p.get('voting_period')
+try:
+    regular = parse_duration_nanos(regular_text)
+except ValueError as e:
+    print('gov params: invalid voting_period: %s' % e, file=sys.stderr)
+    sys.exit(1)
+if regular <= 0:
+    print('gov params: voting_period must be positive, got %r' % regular_text,
+          file=sys.stderr)
+    sys.exit(1)
+
+expedited_text = p.get('expedited_voting_period')
+try:
+    expedited = parse_duration_nanos(expedited_text)
+except ValueError:
+    expedited = 0
+if expedited <= 0 or expedited >= regular:
+    replacement = regular // 2
+    if replacement <= 0:
+        print('gov params: voting_period %r is too short to derive a positive '
+              'expedited_voting_period' % regular_text, file=sys.stderr)
+        sys.exit(1)
+    new = format_duration_nanos(replacement)
+    p['expedited_voting_period'] = new
+    fixed += 1
+    print('gov params: expedited_voting_period %r -> %r (must be positive '
+          'and strictly less than voting_period %s; using half like the SDK default)'
+          % (expedited_text, new, regular_text), file=sys.stderr)
 json.dump(p, open(sys.argv[2], 'w'))
 print(fixed)
 PY3
@@ -987,7 +1375,7 @@ PY3
     json_tool patch "$GOV_FRAG" "$GOV_FRAG.new" params "$WORK/gov-params-fixed.json" \
       || die "failed to patch gov fragment"
     mv "$GOV_FRAG.new" "$GOV_FRAG"
-    printf 'gov params sanitized: expedited_min_deposit reset to 5x min_deposit\n'
+    printf 'gov params sanitized: %s change(s)\n' "$GOV_FIXED"
   fi
 fi
 
@@ -1098,6 +1486,21 @@ PY4
   fi
 fi
 
+### native NFT / MT ID sanitize ##############################################
+
+# Legacy native NFT IDs can exceed the target module's 101-character limit.
+# Apply the same recovery policy to MT IDs, updating MT owner references too.
+# The streaming tool checks every target namespace for collisions before it
+# creates the replacement fragment; raw export partials remain untouched.
+for ASSET_MODULE in nft mt; do
+  if [[ -n ${FRAG_FILE[$ASSET_MODULE]:-} ]]; then
+    ASSET_FRAG=${FRAG_FILE[$ASSET_MODULE]}
+    json_tool sanitize-ids "$ASSET_FRAG" "$ASSET_FRAG.new" "$ASSET_MODULE" \
+      || die "$ASSET_MODULE ID sanitize failed"
+    mv "$ASSET_FRAG.new" "$ASSET_FRAG"
+  fi
+done
+
 ### padded validation #######################################################
 
 # validate every module and report ALL failures at once (a per-module die
@@ -1185,10 +1588,10 @@ ih=$(json_tool top "$OUT_DIR/genesis.json" initial_height) \
 [[ $ih == "$EXPECTED_INITIAL_HEIGHT" ]] \
   || die "genesis initial_height=$ih, want $EXPECTED_INITIAL_HEIGHT"
 
-EXPORTED_SUPPLY=$(json_tool supply "$OUT_DIR/genesis.json" uiris) \
-  || die "uiris not found in genesis bank supply"
+EXPORTED_SUPPLY=$(json_tool supply "$OUT_DIR/genesis.json" "$SUPPLY_DENOM") \
+  || die "$SUPPLY_DENOM not found in genesis bank supply"
 [[ $EXPORTED_SUPPLY == "$EXPECTED_SUPPLY" ]] \
-  || die "uiris supply=$EXPORTED_SUPPLY, want $EXPECTED_SUPPLY"
+  || die "$SUPPLY_DENOM supply=$EXPORTED_SUPPLY, want $EXPECTED_SUPPLY"
 
-printf 'genesis: %s\nuiris supply: %s\n' \
-  "$OUT_DIR/genesis.json" "$EXPORTED_SUPPLY"
+printf 'genesis: %s\n%s supply: %s\n' \
+  "$OUT_DIR/genesis.json" "$SUPPLY_DENOM" "$EXPORTED_SUPPLY"

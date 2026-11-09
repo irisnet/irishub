@@ -143,7 +143,8 @@ migration):
 | `EXPORT_HEIGHT` | `37242247` | chain height the export is based on |
 | `NEW_CHAIN_ID` | `irishub-2` | new chain ID |
 | `EXPECTED_INITIAL_HEIGHT` | `37242248` | asserted initial height of every partial |
-| `EXPECTED_SUPPLY` | `2156713998266827` | asserted uiris supply of the final genesis |
+| `EXPECTED_SUPPLY` | `2156713998266827` | asserted `SUPPLY_DENOM` supply of the final genesis |
+| `SUPPLY_DENOM` | `uiris` | denom whose final bank supply must equal `EXPECTED_SUPPLY` |
 | `RESUME` | `0` | set to 1 to resume an interrupted run (reuses existing partials matched by content, no re-export) |
 | `MODULE_GROUPS` | one module per group | newline-separated, comma-joined module groups; merging small modules reduces rounds |
 | `SKIP_VALIDATE` | `0` | set to 1 to skip per-module validation under extreme memory pressure (assertions still run) |
@@ -151,7 +152,17 @@ migration):
 Script flow: per-module export (peak memory bounded by the largest single
 module, avoiding whole-chain OOM) → legacy data sanitize (see 4.3) →
 per-module validation → streaming assembly of the final genesis (O(1) memory)
-→ assertions on `initial_height` and `uiris` supply.
+→ assertions on `initial_height` and the configured supply denom.
+
+For a chain whose asserted supply uses another denom, set both values
+explicitly; for example, nyancat uses `SUPPLY_DENOM=unyan` together with its
+`EXPECTED_SUPPLY` value:
+
+```bash
+SUPPLY_DENOM=unyan \
+EXPECTED_SUPPLY=1000390968884229927 \
+bash scripts/chain-recovery/export-genesis.sh
+```
 
 Success criteria (last line of output):
 
@@ -244,8 +255,9 @@ normal overhead (irishub-1 validators ran on small machines for seven years).
 
 | Fix | Contents |
 |---|---|
-| bank denom_metadata | filled blank name/symbol, rebuilt non-conforming denom_units, display fallback (153 places total; display fields only, balances untouched) |
-| gov params | `expedited_min_deposit` adjusted from 50 iris to 25000 iris (= 5× min_deposit of 5000 iris; the new version requires the former to be strictly greater) |
+| bank denom_metadata | filled blank name/symbol, sorted denom units by exponent, removed duplicate denoms/exponents, rebuilt non-conforming unit lists, and applied display fallback (display fields only; balances untouched) |
+| gov params | invalid `expedited_min_deposit` reset to 5× `min_deposit`; invalid `expedited_voting_period` reset to half `voting_period` |
+| native NFT / MT IDs | IDs longer than 101 characters are shortened by removing trailing excess characters; MT owner references are updated to the same IDs |
 | evm account filter | dropped evm entries with no matching auth account (unreachable dead data) |
 | staking counter | aligned `total_liquid_staked_tokens` with the sum of validator liquid_shares (1-unit-level historical drift) |
 
@@ -253,7 +265,13 @@ The `consensus`, `MT`, `NFT`, and `params` modules expose no genesis export
 interface, so they enter the new chain with default empty values. Note the
 case sensitivity: uppercase `MT` / `NFT` are the TIBC cross-chain transfer apps
 (cleared together with `tibc` under section 4.2), **not** the native `mt` /
-`nft` modules — native MT/NFT collections are fully preserved (see 4.1).
+`nft` modules. Native asset records, ownership, supply, and metadata are
+preserved, but overlong IDs are renamed by the rule above. Overlong `tibc-`
+NFT collection denoms retain their existing validator exemption and are not
+renamed. The 101-character MT rule is this recovery's matching-ID policy, not
+an MT runtime validation requirement. If shortening would collide with any
+existing ID in the same namespace, export stops without merging or dropping
+assets.
 `consensus` carries no genesis state by design.
 
 ---
