@@ -72,7 +72,28 @@ WORK="$OUT_DIR/work"
 FRAG="$WORK/frag"
 FRESH="$OUT_DIR/config/genesis.json"
 
-die() { printf '%s\n' "$*" >&2; exit 1; }
+EXPORT_PHASE=init
+
+export_failed() {
+  local rc=$?
+  if ((rc != 0)); then
+    printf 'EXPORT_FAILED phase=%s exit_code=%d\n' "$EXPORT_PHASE" "$rc" >&2
+  fi
+}
+
+die() {
+  local rc=$?
+  ((rc != 0)) || rc=1
+  printf '%s\n' "$*" >&2
+  exit "$rc"
+}
+
+export_success() {
+  printf 'EXPORT_SUCCESS chain_id=%q initial_height=%q denom=%q supply=%q module_validation=%s\n' \
+    "$1" "$2" "$3" "$4" "$5"
+}
+
+trap export_failed EXIT
 
 # Streaming JSON member tool: parses huge JSON without loading it.
 #   top <file> <key>                     print raw value of a top-level member
@@ -612,12 +633,11 @@ def cmd_sanitize_ids(src, dst, module):
                 dropped_owner_balances += len(ids)
                 print('mt ids: owner denom reference %s dropped (does not match '
                       '[a-zA-Z0-9][a-zA-Z0-9/]{2,100})'
-                      % json.dumps(denom_id, ensure_ascii=False), file=sys.stderr)
+                      % json.dumps(denom_id), file=sys.stderr)
                 for value in ids:
                     print('mt ids: owner balance %s/%s dropped (owner denom is '
                           'invalid)'
-                          % (json.dumps(denom_id, ensure_ascii=False),
-                             json.dumps(value, ensure_ascii=False)),
+                          % (json.dumps(denom_id), json.dumps(value)),
                           file=sys.stderr)
                 continue
             mask = [valid_asset_id(module, value) for value in ids]
@@ -627,26 +647,24 @@ def cmd_sanitize_ids(src, dst, module):
                     dropped_owner_balances += 1
                     print('mt ids: owner balance %s/%s dropped (MT ID does not '
                           'match [a-zA-Z0-9][a-zA-Z0-9/]{2,100})'
-                          % (json.dumps(denom_id, ensure_ascii=False),
-                             json.dumps(value, ensure_ascii=False)),
+                          % (json.dumps(denom_id), json.dumps(value)),
                           file=sys.stderr)
 
     for denom_id, ids in dropped_collections:
         print('%s ids: collection denom %s dropped (does not match %s)'
-              % (module, json.dumps(denom_id, ensure_ascii=False),
+              % (module, json.dumps(denom_id),
                  '[a-z][a-zA-Z0-9/]{2,100} or tibc- prefix'
                  if module == 'nft'
                  else '[a-zA-Z0-9][a-zA-Z0-9/]{2,100}'), file=sys.stderr)
         for old in ids:
             print('%s ids: collection %s %s ID %s dropped '
                   '(collection denom is invalid)'
-                  % (module, json.dumps(denom_id, ensure_ascii=False),
-                     asset_label, json.dumps(old, ensure_ascii=False)),
+                  % (module, json.dumps(denom_id), asset_label,
+                     json.dumps(old)),
                   file=sys.stderr)
     for denom_id, old in dropped_assets:
         print('%s ids: collection %s %s ID %s dropped (does not match %s)'
-              % (module, json.dumps(denom_id, ensure_ascii=False), asset_label,
-                 json.dumps(old, ensure_ascii=False),
+              % (module, json.dumps(denom_id), asset_label, json.dumps(old),
                  '[a-z][a-zA-Z0-9/]{2,100}' if module == 'nft'
                  else '[a-zA-Z0-9][a-zA-Z0-9/]{2,100}'), file=sys.stderr)
 
@@ -1059,6 +1077,8 @@ mkdir -p "$WORK" "$FRAG"
 ### module list (export everything except the cross-chain modules, which are
 ### reset to fresh-init defaults in the final genesis) ########################
 
+EXPORT_PHASE=module_list
+
 mapfile -t ALL_KEYS < <(jq -r '.app_state | keys[]' "$FRESH" | sort)
 declare -A IBC_SET=()
 for m in "${RESET_MODULES[@]}"; do IBC_SET[$m]=1; done
@@ -1076,6 +1096,8 @@ for m in "${MODULES[@]}" "${RESET_MODULES[@]}"; do
 done
 
 ### batched export ###########################################################
+
+EXPORT_PHASE=export
 
 mapfile -t EXPORT_GROUPS < <(
   if [[ -n $MODULE_GROUPS ]]; then
@@ -1109,6 +1131,7 @@ i=0
 for g in "${EXPORT_GROUPS[@]}"; do
   [[ -n $g ]] || continue
   i=$((i+1))
+  EXPORT_PHASE=export_group_$i
   key=$(printf '%s\n' ${g//,/ } | sort | tr '\n' ',')
   if [[ -n ${PARTIAL_BY_KEY[$key]:-} ]]; then
     printf 'resume: reusing %s for group %d (%s)\n' \
@@ -1138,6 +1161,8 @@ mv "$STAGE"/partial-*.json "$WORK/" || die "failed to move partials back"
 rm -rf "$WORK"/stage*
 
 ### streaming assembly #######################################################
+
+EXPORT_PHASE=split_fragments
 
 rm -rf "$FRAG"
 mkdir -p "$FRAG"
@@ -1195,6 +1220,8 @@ done
 ALL_MERGED=$(printf '%s\n' "${MODULES[@]}" "${RESET_MODULES[@]}" | sort -u)
 
 ### bank denom_metadata sanitize ############################################
+
+EXPORT_PHASE=sanitize_bank
 
 # The legacy chain's bank denom_metadata violates several v0.50 validation
 # rules: blank name/symbol (the token module never fills them), duplicate
@@ -1303,6 +1330,8 @@ PY2
 fi
 
 ### gov params sanitize ######################################################
+
+EXPORT_PHASE=sanitize_gov
 
 # Legacy gov params can carry expedited_min_deposit <= min_deposit or an
 # expedited_voting_period >= voting_period, both rejected by v0.50 genesis
@@ -1422,6 +1451,8 @@ fi
 
 ### tibc client state sanitize ###############################################
 
+EXPORT_PHASE=sanitize_tibc
+
 # tibc-go v0.6.0 rejects legacy tibc genesis data on three counts: client
 # states with trusting_period >= unbonding_period (both were created equal,
 # e.g. 2400h), consensus states whose light client type differs from the
@@ -1535,6 +1566,7 @@ fi
 # export partials remain untouched; only the split fragments are rewritten.
 for ASSET_MODULE in nft mt; do
   if [[ -n ${FRAG_FILE[$ASSET_MODULE]:-} ]]; then
+    EXPORT_PHASE=sanitize_$ASSET_MODULE
     ASSET_FRAG=${FRAG_FILE[$ASSET_MODULE]}
     json_tool sanitize-ids "$ASSET_FRAG" "$ASSET_FRAG.new" "$ASSET_MODULE" \
       || die "$ASSET_MODULE ID sanitize failed"
@@ -1547,8 +1579,10 @@ done
 # validate every module and report ALL failures at once (a per-module die
 # would hide failures behind the first one)
 if [[ $SKIP_VALIDATE != 1 ]]; then
+  VALIDATION_STATUS=passed
   FAILED_MODULES=()
   for m in "${EXPORTED[@]}"; do
+    EXPORT_PHASE=validate_$m
     {
       printf '{'
       first=1
@@ -1576,12 +1610,17 @@ if [[ $SKIP_VALIDATE != 1 ]]; then
     fi
     rm -f "$WORK/padded-genesis.json" "$WORK/padded-app-state.json"
   done
+  EXPORT_PHASE=module_validation
   if ((${#FAILED_MODULES[@]} > 0)); then
     die "padded validation failed for module(s): ${FAILED_MODULES[*]} (fix the data and re-run with RESUME=1)"
   fi
+else
+  VALIDATION_STATUS=skipped
 fi
 
 ### final assembly ##########################################################
+
+EXPORT_PHASE=final_assembly
 
 {
   printf '{'
@@ -1605,6 +1644,7 @@ json_tool skeleton "$first_partial" "$OUT_DIR/genesis.json" \
 # the legacy chain carries evm code/storage entries for addresses that have
 # no auth account (unreachable orphan state); evm InitGenesis panics on the
 # missing account — drop them from the assembled genesis
+EXPORT_PHASE=sanitize_evm
 json_tool filter-evm "$OUT_DIR/genesis.json" "$OUT_DIR/genesis.json.tmp" \
   || die "evm accounts sanitize failed"
 mv "$OUT_DIR/genesis.json.tmp" "$OUT_DIR/genesis.json"
@@ -1613,11 +1653,14 @@ mv "$OUT_DIR/genesis.json.tmp" "$OUT_DIR/genesis.json"
 # total_liquid_staked_tokens counter and the sum of the validators'
 # liquid_shares; the crisis module's liquid stake invariant panics on it at
 # genesis import — normalize the counter to the sum
+EXPORT_PHASE=sanitize_staking
 json_tool fix-liquid-stake "$OUT_DIR/genesis.json" "$OUT_DIR/genesis.json.tmp" \
   || die "liquid staking counter sanitize failed"
 mv "$OUT_DIR/genesis.json.tmp" "$OUT_DIR/genesis.json"
 
 ### assertions ###############################################################
+
+EXPORT_PHASE=assertions
 
 cid=$(json_tool top "$OUT_DIR/genesis.json" chain_id) \
   || die "failed to read chain_id from $OUT_DIR/genesis.json"
@@ -1636,3 +1679,5 @@ EXPORTED_SUPPLY=$(json_tool supply "$OUT_DIR/genesis.json" "$SUPPLY_DENOM") \
 
 printf 'genesis: %s\n%s supply: %s\n' \
   "$OUT_DIR/genesis.json" "$SUPPLY_DENOM" "$EXPORTED_SUPPLY"
+export_success "$NEW_CHAIN_ID" "$EXPECTED_INITIAL_HEIGHT" "$SUPPLY_DENOM" \
+  "$EXPORTED_SUPPLY" "$VALIDATION_STATUS"

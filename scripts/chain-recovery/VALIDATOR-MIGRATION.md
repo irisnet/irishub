@@ -169,7 +169,18 @@ Success criteria (last line of output):
 ```
 genesis: /path/to/export-output/genesis.json
 uiris supply: 2156713998266827
+EXPORT_SUCCESS chain_id=irishub-2 initial_height=37242248 denom=uiris supply=2156713998266827 module_validation=passed
 ```
+
+With `SKIP_VALIDATE=1`, the marker says `module_validation=skipped`; it never
+reports module validation as passed when those checks were skipped. A non-zero
+exit that the shell can observe ends with
+`EXPORT_FAILED phase=<stage> exit_code=<code>`.
+Exit code 137 is compatible with a child being killed by signal 9, but does not
+by itself prove an OOM; check the kernel and service logs. If the shell itself
+is killed with `SIGKILL`, its exit trap cannot print a failure marker. Do not
+delete an existing `genesis.json` based only on a damaged terminal display;
+verify the file and final assertions read-only first.
 
 ### 2.3 Notes
 
@@ -275,6 +286,8 @@ rule is a recovery policy rather than a runtime validation rule; its first
 character allows digits because native SHA-256 hex IDs can start with one.
 With `RESUME=1`, the script re-splits the unchanged export partials before
 sanitizing, so reruns apply the current policy to the original IDs.
+Logged NFT/MT IDs use ASCII JSON escapes for non-ASCII and control characters,
+so malformed legacy IDs cannot inject terminal control sequences into logs.
 `consensus` carries no genesis state by design.
 
 ---

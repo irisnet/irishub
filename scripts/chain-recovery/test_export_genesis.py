@@ -51,6 +51,24 @@ def run_id_sanitizer(module, value, check=True):
         return result, fixed
 
 
+def shell_function(name):
+    source = SCRIPT.read_text()
+    match = re.search(r"^%s\(\) \{\n.*?^\}\n" % re.escape(name), source,
+                      re.MULTILINE | re.DOTALL)
+    if not match:
+        raise AssertionError("shell function %s not found" % name)
+    return match.group(0)
+
+
+def run_status_shell(body):
+    helpers = "\n".join(shell_function(name) for name in
+                        ("export_failed", "die", "export_success"))
+    script = ("set -euo pipefail\nEXPORT_PHASE=init\n" + helpers
+              + "\ntrap export_failed EXIT\n" + body)
+    return subprocess.run(["bash"], input=script, text=True,
+                          capture_output=True, check=False)
+
+
 class BankSanitizerTest(unittest.TestCase):
     def test_sorts_units_without_rebuilding_valid_metadata(self):
         metadata = [{
@@ -286,7 +304,7 @@ class AssetIdSanitizerTest(unittest.TestCase):
             ]},
         ]}
         result, fixed = run_id_sanitizer("nft", state)
-        self.assertIn(reported, result.stderr)
+        self.assertIn(json.dumps(reported), result.stderr)
         self.assertEqual(["validToken", "validLast"],
                          [nft["id"] for nft in fixed["collections"][0]["nfts"]])
         self.assertEqual("payload", fixed["collections"][0]["nfts"][0]["data"])
@@ -390,6 +408,70 @@ class AssetIdSanitizerTest(unittest.TestCase):
         _, fixed = run_id_sanitizer("nft", state)
         self.assertEqual(["sameToken", "sameToken"],
                          [c["nfts"][0]["id"] for c in fixed["collections"]])
+
+    def test_asset_logs_escape_terminal_control_characters(self):
+        invalid = ("\x00\x1f\x7f\x80\x85\x9b2J\x9d0;hidden\x9c"
+                   "\u2028\u2029")
+        metadata = "owner\x1b]0;hidden\x07\u2028"
+        nft_state = {"collections": [{"denom": {"id": "valid"}, "nfts": [
+            {"id": invalid, "owner": metadata, "data": metadata},
+        ]}]}
+        mt_state = {
+            "collections": [{"denom": {"id": "valid"}, "mts": [
+                {"id": invalid, "supply": "9", "data": metadata},
+            ]}],
+            "owners": [{"address": metadata, "denoms": [{
+                "denom_id": "valid",
+                "balances": [{"mt_id": invalid, "amount": "9"}],
+            }]}],
+        }
+        for module, state in (("nft", nft_state), ("mt", mt_state)):
+            with self.subTest(module=module):
+                result, fixed = run_id_sanitizer(module, state)
+                unsafe = [ch for ch in result.stderr
+                          if ch != "\n" and not 0x20 <= ord(ch) <= 0x7e]
+                self.assertEqual([], unsafe)
+                self.assertIn(json.dumps(invalid), result.stderr)
+                assets = fixed["collections"][0]["nfts" if module == "nft"
+                                                         else "mts"]
+                self.assertEqual([], assets)
+                self.assertIn("1 NFT record(s) dropped" if module == "nft"
+                              else "1 MT record(s) dropped", result.stderr)
+                if module == "mt":
+                    self.assertEqual([], fixed["owners"][0]["denoms"][0]
+                                     ["balances"])
+                    self.assertIn("1 owner balance reference(s) dropped",
+                                  result.stderr)
+
+
+class ExportStatusTest(unittest.TestCase):
+    def test_failed_child_reports_phase_and_original_exit_code(self):
+        result = run_status_shell("""
+json_tool() { return 137; }
+EXPORT_PHASE=sanitize_nft
+json_tool sanitize-ids source output nft || die "nft ID sanitize failed"
+export_success chain 1 denom 2 passed
+""")
+        self.assertEqual(137, result.returncode)
+        self.assertNotIn("EXPORT_SUCCESS", result.stdout + result.stderr)
+        self.assertIn("nft ID sanitize failed", result.stderr)
+        self.assertIn("EXPORT_FAILED phase=sanitize_nft exit_code=137",
+                      result.stderr)
+
+    def test_success_marker_reports_validation_status(self):
+        for validation in ("passed", "skipped"):
+            with self.subTest(validation=validation):
+                result = run_status_shell(
+                    "export_success nyancat-10 30846001 unyan "
+                    "1000390968884229927 %s\n" % validation)
+                self.assertEqual(0, result.returncode)
+                self.assertEqual("", result.stderr)
+                self.assertEqual(
+                    "EXPORT_SUCCESS chain_id=nyancat-10 "
+                    "initial_height=30846001 denom=unyan "
+                    "supply=1000390968884229927 module_validation=%s\n"
+                    % validation,
+                    result.stdout)
 
 
 if __name__ == "__main__":
