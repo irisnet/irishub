@@ -6,6 +6,9 @@ usage() {
   cat <<'EOF'
 Generate and optionally submit the IRIS Hub v5.0.0 software-upgrade proposal.
 
+Run this script with the PRE-UPGRADE IRIS Hub v4.1.0 client. IRIS_BIN must
+point to that v4.1.0 executable; the target upgrade plan remains v5.0.0.
+
 Usage:
   KEY_NAME=<key> UPGRADE_HEIGHT=<height> GAS_PRICES=<price> \
     scripts/submit-v5-upgrade-proposal.sh [--submit]
@@ -20,7 +23,7 @@ Required environment variables:
   GAS_PRICES        Gas price accepted by the target node, for example 0.3uiris
 
 Optional environment variables:
-  IRIS_BIN          iris executable (default: iris)
+  IRIS_BIN          PRE-UPGRADE v4.1.0 iris executable (default: iris)
   CHAIN_ID          Target chain ID (default: irishub-2)
   NODE              CometBFT RPC address (default: tcp://127.0.0.1:26657)
   IRIS_HOME         iris client home (default: $HOME/.iris)
@@ -78,7 +81,7 @@ if (( ${#UPGRADE_HEIGHT} > 19 )) ||
 fi
 
 command -v jq >/dev/null 2>&1 || fail "jq is required"
-command -v "$IRIS_BIN" >/dev/null 2>&1 || fail "iris executable not found: $IRIS_BIN"
+IRIS_BIN_PATH="$(command -v "$IRIS_BIN")" || fail "iris executable not found: $IRIS_BIN"
 mkdir -p "$OUTPUT_DIR"
 
 STATUS_FILE="$OUTPUT_DIR/node-status.json"
@@ -89,6 +92,8 @@ PROPOSAL_FILE="$OUTPUT_DIR/irishub-v5-proposal.json"
 UNSIGNED_FILE="$OUTPUT_DIR/irishub-v5-unsigned-tx.json"
 SUBMIT_OUTPUT_FILE="$OUTPUT_DIR/irishub-v5-submit-output.jsonl"
 SUBMIT_FILE="$OUTPUT_DIR/irishub-v5-submit-response.json"
+
+printf 'Using pre-upgrade IRIS binary: %s (expected v4.1.0)\n' "$IRIS_BIN_PATH"
 
 "$IRIS_BIN" status \
   --node "$NODE" \
@@ -119,7 +124,7 @@ fi
 "$IRIS_BIN" query gov params \
   --node "$NODE" \
   --home "$IRIS_HOME" \
-  --output json > "$PARAMS_FILE"
+  --output json > "$PARAMS_FILE" 2>&1
 
 DEPOSIT="$(
   jq -er '
@@ -139,7 +144,7 @@ DEPOSIT="$(
 "$IRIS_BIN" query auth module-account gov \
   --node "$NODE" \
   --home "$IRIS_HOME" \
-  --output json > "$ACCOUNT_FILE"
+  --output json > "$ACCOUNT_FILE" 2>&1
 
 GOV_AUTHORITY="$(
   jq -er '
