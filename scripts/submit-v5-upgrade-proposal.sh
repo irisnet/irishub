@@ -148,7 +148,7 @@ DEPOSIT="$(
 
 GOV_AUTHORITY="$(
   jq -er '
-    .account.base_account.address
+    .account.value.address
     | select(type == "string" and length > 0)
   ' "$ACCOUNT_FILE"
 )" || fail "could not read the governance module address from $ACCOUNT_FILE"

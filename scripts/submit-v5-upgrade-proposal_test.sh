@@ -29,7 +29,11 @@ case "${1:-}" in
         printf '{"params":{"min_deposit":[{"denom":"unyan","amount":"10000000"}]}}\n' >&2
         ;;
       "auth module-account gov")
-        printf '{"account":{"base_account":{"address":"iaa1govauthority"}}}\n' >&2
+        if [[ "${MOCK_ACCOUNT_MISSING:-false}" == true ]]; then
+          printf '{"account":{"type":"/cosmos.auth.v1beta1.ModuleAccount","value":{"name":"gov"}}}\n' >&2
+          exit 0
+        fi
+        printf '{"account":{"type":"/cosmos.auth.v1beta1.ModuleAccount","value":{"account_number":0,"address":"iaa1govauthority","name":"gov","permissions":[],"public_key":"","sequence":0}}}\n' >&2
         ;;
       *) exit 3 ;;
     esac
@@ -130,5 +134,15 @@ if env PATH="$test_root/bin:$PATH" MOCK_LOG="$failed_log" MOCK_PARAMS_MALFORMED=
 fi
 [[ "$(wc -l < "$failed_log" | tr -d ' ')" == 2 ]]
 ! grep -q '^tx ' "$failed_log"
+
+missing_account_log="$test_root/missing-account.log"
+if env PATH="$test_root/bin:$PATH" MOCK_LOG="$missing_account_log" MOCK_ACCOUNT_MISSING=true \
+  IRIS_BIN=iris KEY_NAME=proposer UPGRADE_HEIGHT=200 GAS_PRICES=0.3uiris \
+  OUTPUT_DIR="$test_root/missing-account" "$script" >/dev/null 2>&1; then
+  printf 'expected missing governance authority to stop the script\n' >&2
+  exit 1
+fi
+[[ "$(wc -l < "$missing_account_log" | tr -d ' ')" == 3 ]]
+! grep -q '^tx ' "$missing_account_log"
 
 printf 'submit-v5-upgrade-proposal tests passed\n'
