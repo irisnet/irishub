@@ -182,6 +182,11 @@ is killed with `SIGKILL`, its exit trap cannot print a failure marker. Do not
 delete an existing `genesis.json` based only on a damaged terminal display;
 verify the file and final assertions read-only first.
 
+The assembled export is `OUT_DIR/genesis.json`. The file at
+`OUT_DIR/config/genesis.json` is the fresh initialization template and must
+not be used as the recovered chain's genesis. Copy the assembled export to
+the new node home's `config/genesis.json` before starting that node.
+
 ### 2.3 Notes
 
 - The full run reads ~2TB of data in about 33 passes and takes several hours;
@@ -271,7 +276,16 @@ normal overhead (irishub-1 validators ran on small machines for seven years).
 | native NFT IDs | collections with invalid denom IDs and NFT records with invalid token IDs are dropped; denom IDs retain the module's `tibc-` exemption |
 | native MT IDs | collections and MT records outside the recovery policy `[a-zA-Z0-9][a-zA-Z0-9/]{2,100}` are dropped together with their owner references |
 | evm account filter | dropped evm entries with no matching auth account (unreachable dead data) |
-| staking counter | aligned `total_liquid_staked_tokens` with the sum of validator liquid_shares (1-unit-level historical drift) |
+| staking counter | recalculated `total_liquid_staked_tokens` as the sum, over all validators, of `TokensFromShares(liquid_shares).TruncateInt()` using the target SDK's 18-place `LegacyDec` arithmetic |
+
+The staking calculation multiplies each validator's `liquid_shares` by its
+integer `tokens`, divides by `delegator_shares` with 18-place half-even
+rounding, truncates that validator's result to an integer, then sums the
+integers. Dividing shares before multiplying can lose one token. For an
+already assembled export, this counter can be repaired on that file with the
+script's `json_tool fix-liquid-stake` helper; no source-chain re-export is
+needed. Preserve a backup and check the result before copying it to the new
+node home.
 
 The `consensus`, `MT`, `NFT`, and `params` modules expose no genesis export
 interface, so they enter the new chain with default empty values. Note the

@@ -51,6 +51,19 @@ def run_id_sanitizer(module, value, check=True):
         return result, fixed
 
 
+def run_liquid_stake_sanitizer(value, check=True):
+    with tempfile.TemporaryDirectory() as temp:
+        temp = pathlib.Path(temp)
+        source = temp / "source.json"
+        output = temp / "output.json"
+        source.write_text(json.dumps(value))
+        result = subprocess.run(
+            ["python3", "-", "fix-liquid-stake", str(source), str(output)],
+            input=sanitizer("PY"), text=True, capture_output=True, check=check)
+        fixed = json.loads(output.read_text()) if output.exists() else None
+        return result, fixed
+
+
 def shell_function(name):
     source = SCRIPT.read_text()
     match = re.search(r"^%s\(\) \{\n.*?^\}\n" % re.escape(name), source,
@@ -442,6 +455,110 @@ class AssetIdSanitizerTest(unittest.TestCase):
                                      ["balances"])
                     self.assertIn("1 owner balance reference(s) dropped",
                                   result.stderr)
+
+
+class LiquidStakeSanitizerTest(unittest.TestCase):
+    def test_reproduces_one_token_panic_without_changing_validator_or_bank(self):
+        validator = {
+            "tokens": "75000300",
+            "delegator_shares": "75000300.000000000000000000",
+            "liquid_shares": "25000100.000000000000000000",
+        }
+        state = {"chain_id": "nyancat-10", "app_state": {
+            "bank": {"supply": [{"denom": "unyan", "amount": "999"}]},
+            "staking": {"validators": [validator],
+                        "total_liquid_staked_tokens": "25000099"},
+        }}
+        result, fixed = run_liquid_stake_sanitizer(state)
+        self.assertEqual("25000100", fixed["app_state"]["staking"]
+                         ["total_liquid_staked_tokens"])
+        self.assertEqual([validator], fixed["app_state"]["staking"]["validators"])
+        self.assertEqual(state["app_state"]["bank"], fixed["app_state"]["bank"])
+        self.assertIn('"25000099" -> 25000100', result.stderr)
+        _, again = run_liquid_stake_sanitizer(fixed)
+        self.assertEqual(fixed, again)
+
+    def test_counter_before_validators_and_individual_truncation(self):
+        state = {"app_state": {"staking": {
+            "total_liquid_staked_tokens": "0",
+            "validators": [
+                {"liquid_shares": "1.000000000000000000",
+                 "tokens": "3", "delegator_shares": "3.000000000000000000"},
+                {"liquid_shares": "2.000000000000000000",
+                 "tokens": "1", "delegator_shares": "3.000000000000000000"},
+                {"liquid_shares": "2.000000000000000000",
+                 "tokens": "1", "delegator_shares": "3.000000000000000000"},
+            ],
+        }}}
+        _, fixed = run_liquid_stake_sanitizer(state)
+        # The invariant truncates each validator contribution before summing.
+        self.assertEqual("1", fixed["app_state"]["staking"]
+                         ["total_liquid_staked_tokens"])
+
+    def test_bankers_rounding_at_integer_boundary(self):
+        for shares, expected in (
+                ("1.999999999999999999", "1"),
+                ("1.999999999999999997", "0")):
+            with self.subTest(shares=shares):
+                state = {"app_state": {"staking": {
+                    "validators": [{"liquid_shares": shares, "tokens": "1",
+                                    "delegator_shares": "2.000000000000000000"}],
+                    "total_liquid_staked_tokens": "0",
+                }}}
+                _, fixed = run_liquid_stake_sanitizer(state)
+                self.assertEqual(expected, fixed["app_state"]["staking"]
+                                 ["total_liquid_staked_tokens"])
+
+    def test_large_values_do_not_depend_on_decimal_context_precision(self):
+        large = "1" + "0" * 20
+        state = {"app_state": {"staking": {
+            "validators": [{"liquid_shares": large + ".000000000000000000",
+                            "tokens": large,
+                            "delegator_shares": large + ".000000000000000000"}],
+            "total_liquid_staked_tokens": "0",
+        }}}
+        _, fixed = run_liquid_stake_sanitizer(state)
+        self.assertEqual(large, fixed["app_state"]["staking"]
+                         ["total_liquid_staked_tokens"])
+
+    def test_empty_validators_zero_counter_and_non_lsm_noop(self):
+        empty = {"app_state": {"staking": {
+            "validators": [], "total_liquid_staked_tokens": "9"}}}
+        _, fixed = run_liquid_stake_sanitizer(empty)
+        self.assertEqual("0", fixed["app_state"]["staking"]
+                         ["total_liquid_staked_tokens"])
+        legacy = {"app_state": {"staking": {"validators": [
+            {"tokens": "1", "delegator_shares": "1.000000000000000000"}]}}}
+        _, fixed = run_liquid_stake_sanitizer(legacy)
+        self.assertEqual(legacy, fixed)
+
+    def test_invalid_liquid_fields_fail_closed(self):
+        for validator, error in (
+                ({"liquid_shares": "1.0000000000000000000",
+                  "tokens": "1", "delegator_shares": "1"}, "liquid_shares"),
+                ({"liquid_shares": "1", "tokens": "bad",
+                  "delegator_shares": "1"}, "tokens"),
+                ({"liquid_shares": "1", "tokens": "1",
+                  "delegator_shares": "0"}, "delegator_shares")):
+            with self.subTest(validator=validator):
+                state = {"app_state": {"staking": {
+                    "validators": [validator],
+                    "total_liquid_staked_tokens": "0"}}}
+                result, fixed = run_liquid_stake_sanitizer(state, check=False)
+                self.assertNotEqual(0, result.returncode)
+                self.assertIsNone(fixed)
+                self.assertIn(error, result.stderr)
+
+        mixed = {"app_state": {"staking": {
+            "validators": [
+                {"liquid_shares": "1", "tokens": "1",
+                 "delegator_shares": "1"},
+                {"tokens": "1", "delegator_shares": "1"}],
+            "total_liquid_staked_tokens": "1"}}}
+        result, fixed = run_liquid_stake_sanitizer(mixed, check=False)
+        self.assertNotEqual(0, result.returncode)
+        self.assertIsNone(fixed)
+        self.assertIn("missing liquid_shares", result.stderr)
 
 
 class ExportStatusTest(unittest.TestCase):

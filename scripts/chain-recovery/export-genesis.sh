@@ -835,7 +835,10 @@ def cmd_fix_liquid_stake(src, dst):
         if k == 'app_state':
             for m in iter_members(s):
                 if m == 'staking':
-                    return fix_staking_member(s, dst)
+                    total, seen_shares, seen_counter = staking_liquid_total(s)
+                    if seen_shares and not seen_counter and total:
+                        raise ValueError('staking: liquid shares present but total_liquid_staked_tokens missing')
+                    return fix_staking_member(src, dst, total if seen_shares or seen_counter else None)
                 scan_value(s)
             break
         scan_value(s)
@@ -843,10 +846,69 @@ def cmd_fix_liquid_stake(src, dst):
     return 3
 
 
-def fix_staking_member(s, dst):
-    # single pass: sum liquid_shares while streaming the validators array,
-    # rewrite total_liquid_staked_tokens when reached
-    total = [None]  # mutable box for the nested writer below
+def staking_liquid_total(s):
+    # LegacyDec is a signed integer scaled by 10^18. Match
+    # TokensFromShares: (liquid_shares.MulInt(tokens)).Quo(delegator_shares),
+    # followed by TruncateInt, as used by the v0.50.11-lsm invariant.
+    precision = 10 ** 18
+    half = precision // 2
+    dec_pattern = re.compile(r'[0-9]+(?:\.[0-9]{1,18})?\Z')
+    int_pattern = re.compile(r'[0-9]+\Z')
+
+    def scaled_decimal(value, name):
+        if not isinstance(value, str) or not dec_pattern.fullmatch(value):
+            raise ValueError('staking: invalid %s: %r' % (name, value))
+        whole, _, fraction = value.partition('.')
+        return int(whole) * precision + int(fraction.ljust(18, '0') or '0')
+
+    def unsigned_int(value, name):
+        if not isinstance(value, str) or not int_pattern.fullmatch(value):
+            raise ValueError('staking: invalid %s: %r' % (name, value))
+        return int(value)
+
+    total = 0
+    seen_shares = False
+    seen_counter = False
+    missing_shares = False
+    for member in iter_members(s):
+        if member == 'validators':
+            for _ in iter_array(s):
+                bio = io.BytesIO()
+                scan_value(s, bio)
+                validator = json.loads(bio.getvalue())
+                if not isinstance(validator, dict):
+                    raise ValueError('staking: validator is not an object')
+                if 'liquid_shares' not in validator:
+                    missing_shares = True
+                    continue
+                seen_shares = True
+                shares = scaled_decimal(validator['liquid_shares'], 'liquid_shares')
+                tokens = unsigned_int(validator.get('tokens'), 'tokens')
+                delegator_shares = scaled_decimal(
+                    validator.get('delegator_shares'), 'delegator_shares')
+                if not delegator_shares:
+                    raise ValueError('staking: delegator_shares must be positive')
+                # LegacyDec.Quo multiplies by 10^36, divides, then rounds
+                # the extra 18 digits half to even. MulInt has no rounding.
+                quotient, remainder = divmod(
+                    shares * tokens * precision * precision // delegator_shares,
+                    precision)
+                if remainder > half or (remainder == half and quotient & 1):
+                    quotient += 1
+                total += quotient // precision
+        elif member == 'total_liquid_staked_tokens':
+            seen_counter = True
+            scan_value(s)
+        else:
+            scan_value(s)
+    if missing_shares and (seen_shares or seen_counter):
+        raise ValueError('staking: validator missing liquid_shares in LSM genesis')
+    return total, seen_shares, seen_counter
+
+
+def fix_staking_member(src, dst, total):
+    # The counter may precede validators in JSON. It was computed in a
+    # streaming first pass so this writer depends on neither field order.
 
     def rewrite_staking(s, out):
         out.write(b'{')
@@ -857,43 +919,14 @@ def fix_staking_member(s, dst):
             wrote = True
             out.write(json.dumps(m).encode('utf-8'))
             out.write(b':')
-            if m == 'validators':
-                out.write(b'[')
-                first = True
-                for _ in iter_array(s):
-                    bio = io.BytesIO()
-                    scan_value(s, bio)
-                    el = bio.getvalue()
-                    # replicate the invariant: sum over all validators of
-                    # int(liquid_shares * tokens / delegator_shares) with
-                    # sdk.Dec semantics (18-decimal truncating arithmetic)
-                    ls = re.search(rb'"liquid_shares":\s*"([0-9.]+)"', el)
-                    if ls:
-                        from decimal import Decimal, ROUND_DOWN
-                        if total[0] is None:
-                            total[0] = 0
-                        tk = re.search(rb'"tokens":\s*"([0-9.]+)"', el)
-                        dsh = re.search(rb'"delegator_shares":\s*"([0-9.]+)"', el)
-                        ls_d = Decimal(ls.group(1).decode())
-                        dsh_d = Decimal(dsh.group(1).decode()) if dsh else Decimal(0)
-                        tk_d = Decimal(tk.group(1).decode()) if tk else Decimal(0)
-                        if dsh_d != 0:
-                            q = (ls_d / dsh_d).quantize(Decimal('1e-18'), rounding=ROUND_DOWN)
-                            contrib = int((q * tk_d).quantize(Decimal('1e-18'), rounding=ROUND_DOWN))
-                            total[0] += contrib
-                    if not first:
-                        out.write(b',')
-                    first = False
-                    out.write(el)
-                out.write(b']')
-            elif m == 'total_liquid_staked_tokens':
+            if m == 'total_liquid_staked_tokens':
                 bio = io.BytesIO()
                 scan_value(s, bio)
                 old = bio.getvalue()
-                if total[0] is None:
+                if total is None:
                     out.write(old)
                 else:
-                    new = ('"%d"' % int(total[0])).encode()
+                    new = ('"%d"' % total).encode()
                     if old != new:
                         print('staking: total_liquid_staked_tokens %s -> %s '
                               '(sum of validators\' liquid_shares)'
@@ -903,7 +936,7 @@ def fix_staking_member(s, dst):
                 scan_value(s, out)
         out.write(b'}')
 
-    s2 = Stream(s.f.name)
+    s2 = Stream(src)
     out = open(dst, 'wb')
     out.write(b'{')
     wrote = False
@@ -931,7 +964,7 @@ def fix_staking_member(s, dst):
             else:
                 scan_value(s2, out)
         out.write(b'}\n')
-    if total[0] is None:
+    if total is None:
         sys.stderr.write('staking: no validators seen, nothing to normalize\n')
     return 0
 
